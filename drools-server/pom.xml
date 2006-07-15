@@ -1,0 +1,43 @@
+<project>
+  <parent>
+    <artifactId>drools</artifactId>
+    <groupId>org.drools</groupId>
+	  <version>3.0.2</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>drools-server</artifactId>
+
+  <name>Drools :: Server</name>
+  <version>3.0.2</version>
+
+  <repositories>
+    <repository>
+      <id>basedir</id>
+      <url>file://${basedir}/../repository</url>
+    </repository>
+  </repositories>  
+
+  <dependencies>   
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-remoting</artifactId>
+      <version>1.4.1</version>
+    </dependency>  
+           
+  </dependencies>
+
+  <!-- This is needed to copy the generated jars into the IDE/Plugs lib directory -->
+  <build>
+    <plugins>     
+    </plugins>
+  </build>
+
+</project>
