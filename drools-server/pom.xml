@@ -29,7 +29,7 @@
     <dependency>
       <groupId>jboss</groupId>
       <artifactId>jboss-remoting</artifactId>
-      <version>1.4.1</version>
+      <version>1.4.1-final</version>
     </dependency>  
            
   </dependencies>
