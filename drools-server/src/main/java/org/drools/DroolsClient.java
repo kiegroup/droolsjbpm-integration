@@ -25,6 +25,8 @@ public class DroolsClient
     MBeanServer       server;
     MulticastDetector detector;
 
+    DroolsServer      droolsServer;
+    
     /**
      * Sets up NetworkRegistry and MulticastDetector so we can listen for any additions or removals of remoting
      * servers on the network.
@@ -84,18 +86,17 @@ public class DroolsClient
     //        }
     //    }   
 
-    public DroolsServer connect() throws Exception {
+    public void connect() throws Exception {
 //        InvokerLocator locator = (InvokerLocator) this.servers.toArray()[0];
 //        DroolsServer server = (DroolsServer) TransporterClient.createTransporterClient( locator.getLocatorURI(),
 //                                                                                        DroolsServer.class );
         
-        DroolsServer server = (DroolsServer) TransporterClient.createTransporterClient( this.locatorURI,
+        this.droolsServer = (DroolsServer) TransporterClient.createTransporterClient( this.locatorURI,
                                                                                         DroolsServer.class );        
-        return server;
     }
 
-    public void disconnect(DroolsServer server) {
-        TransporterClient.destroyTransporterClient( server );
+    public void disconnect() {
+        TransporterClient.destroyTransporterClient( this.droolsServer );
     }
 
     /**

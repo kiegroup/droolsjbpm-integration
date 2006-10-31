@@ -8,5 +8,6 @@ public interface DroolsServer {
     
     public boolean isRegistered(String id);
     
-    public RuleBaseInfo[] listRuleBases();            
+    public RuleBaseInfo[] listRuleBases();    
+    
 }
