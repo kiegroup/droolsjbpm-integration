@@ -1,0 +1,8 @@
+{"knowledgebase-request":{"globals":{"named-fact":{"id":"prs",
+"fact":{"@class":"org.drools.Person",
+"name":"Jo"}}},
+"inOutFacts":{"named-fact":{"id":"result",
+"fact":{"@class":"something.Result"}}},
+"inFacts":{"anon-fact":{"fact":{"@class":"something.Car",
+"name":"saab",
+"type":"wagon"}}}}}

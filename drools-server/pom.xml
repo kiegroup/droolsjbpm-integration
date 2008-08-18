@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+  <!-- README: if you have problems running the build.
+  you may need to go up one directory, and run "mvn install" to
+  make sure all the deps are ready.
+
+  If by chance the slackers who maintain the other projects have left the build slight broken,
+  you can skip the tests by doing:
+
+  "mvn -Dmaven.test.skip=true install" and it should work.
+
+  -->
+
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>drools</artifactId>
     <groupId>org.drools</groupId>
@@ -9,21 +21,48 @@
   </parent>
 
   <artifactId>drools-server</artifactId>
-  <packaging>jar</packaging>
+
+  <packaging>war</packaging>
   <name>Drools :: Server</name>
 
+  <build>
+    <finalName>drools-server</finalName>
+  </build>
+
   <dependencies>
-    <!-- Internal dependencies -->
+
+ 	<!-- we are using the most excellent XStream library for fast XML and JSON streaming -->
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
+     <groupId>com.thoughtworks.xstream</groupId>
+     <artifactId>xstream</artifactId>
     </dependency>
 
-    <!-- External dependencies -->
     <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-remoting</artifactId>
+      <groupId>stax</groupId>
+      <artifactId>stax</artifactId>
+      <version>1.2.0</version>
     </dependency>
+
+    <dependency>
+	    <groupId>org.codehaus.jettison</groupId>
+	    <artifactId>jettison</artifactId>
+	    <version>1.0.1</version>
+	</dependency>
+
+
+	<!-- pulling in compiler as we may have to deal with DRLs at some point -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+    </dependency>
+
+
+    <!-- now the deps for the web app -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+
   </dependencies>
 
 </project>
