@@ -49,7 +49,7 @@ public class RuleService extends HttpServlet {
 		InternalRuleBase irb = (InternalRuleBase) rb;
 		ClassLoader originalCL = Thread.currentThread().getContextClassLoader();
 		try {
-			ClassLoader cl = irb.getCompositePackageClassLoader();
+			ClassLoader cl = irb.getRootClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
 
 			XStream xs = (json) ? jsonInstance : xmlInstance;
