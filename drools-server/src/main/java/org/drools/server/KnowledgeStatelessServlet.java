@@ -4,45 +4,92 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.drools.Person;
 import org.drools.RuleBase;
-import org.drools.StatefulSession;
 import org.drools.StatelessSession;
+import org.drools.agent.RuleAgent;
 import org.drools.common.InternalRuleBase;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
-public class RuleService extends HttpServlet {
+/**
+ * This provides a stateless service for dealing with rules/knowledge bases.
+ *
+ * Supported operations are:
+ *
+ *  POST: this will execute the service and return the results.
+ *
+ *  Content-Type: by default XML will be assumed, if application/json is used, then JSON will be used instead.
+ *
+ *  URIs:
+ *
+ *  http://server/drools-server/knowledgebase/{configName}
+ *
+ *  {configName} is the name of the rule agent configuration to load - this is generally a properties file located in the root of the classpath
+ *  for this app.
+ *
+ * @author Michael Neale
+ */
+public class KnowledgeStatelessServlet extends HttpServlet {
 
 
+	private static final long serialVersionUID = -8239975288596976901L;
 	static XStream xmlInstance = configureXStream(false);
 	static XStream jsonInstance = configureXStream(true);
-
+	static Map<String, RuleAgent> cachedAgents = new HashMap<String, RuleAgent>();
+	static Pattern urlPattern = Pattern.compile(".*knowledgebase/(.*)");
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse resp)
 			throws ServletException, IOException {
-
 		String uri = request.getRequestURI();
-		RuleBase rb =  getRuleBaseFromURI(uri);
-
-		//doService(request.getInputStream(), resp.getOutputStream(), rb);
-
-
-		//sample();
-
-
+		String contentType = request.getContentType();
+		resp.setContentType(contentType);
+		Matcher m = urlPattern.matcher(uri);
+		if (!m.matches()) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "URI needs to be of the form /knowledgebase/{configName}");
+			return;
+		}
+		RuleBase rb =  getRuleBase(m.group(1));
+		if (contentType != null && (contentType.indexOf("json") > -1)) {
+			//do json version
+			doService(request.getInputStream(), resp.getOutputStream(), rb, true);
+		} else {
+			//xml version
+			doService(request.getInputStream(), resp.getOutputStream(), rb, true);
+		}
 	}
+
+
+
+	RuleBase getRuleBase(String configName) {
+		if (cachedAgents.containsKey(configName)) {
+			return cachedAgents.get(configName).getRuleBase();
+		} else {
+			synchronized (cachedAgents) {
+				if (!cachedAgents.containsKey(configName)) {
+					RuleAgent ag = RuleAgent.newRuleAgent(configName + ".properties");
+					cachedAgents.put(configName, ag);
+				}
+				return cachedAgents.get(configName).getRuleBase();
+			}
+		}
+	}
+
+
+
 
 	void doService(InputStream inputStream,
 			OutputStream outputStream, RuleBase rb, boolean json) {
@@ -91,10 +138,32 @@ public class RuleService extends HttpServlet {
 		}
 	}
 
-	private RuleBase getRuleBaseFromURI(String uri) {
 
-		return null;
+	static XStream configureXStream(boolean json) {
+		if (json) {
+			XStream xs = new XStream(new JettisonMappedXmlDriver());
+			alias(xs);
+			return xs;
+
+		} else {
+			XStream xs = new XStream();
+			alias(xs);
+			return xs;
+		}
 	}
+
+	private static void alias(XStream xs) {
+		xs.alias("knowledgebase-request", ServiceRequestMessage.class);
+		xs.alias("knowledgebase-response", ServiceResponseMessage.class);
+		xs.alias("named-fact", NamedFact.class);
+		xs.alias("anon-fact", AnonFact.class);
+	}
+
+
+
+
+
+
 
 
 
@@ -124,28 +193,10 @@ public class RuleService extends HttpServlet {
 		if (!requestMessage_.equals(requestMessage)) throw new RuntimeException("fail !");
 	}
 
-	static XStream configureXStream(boolean json) {
-		if (json) {
-			XStream xs = new XStream(new JettisonMappedXmlDriver());
-			alias(xs);
-			return xs;
 
-		} else {
-			XStream xs = new XStream();
-			alias(xs);
-			return xs;
-		}
-	}
-
-	private static void alias(XStream xs) {
-		xs.alias("knowledgebase-request", ServiceRequestMessage.class);
-		xs.alias("knowledgebase-response", ServiceResponseMessage.class);
-		xs.alias("named-fact", NamedFact.class);
-		xs.alias("anon-fact", AnonFact.class);
-	}
 
 	public static void main(String[] args) throws ServletException, IOException {
-		RuleService rs = new RuleService();
+		KnowledgeStatelessServlet rs = new KnowledgeStatelessServlet();
 		rs.sample();
 
 	}

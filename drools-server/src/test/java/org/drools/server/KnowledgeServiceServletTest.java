@@ -3,15 +3,16 @@ package org.drools.server;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.regex.Matcher;
 
 import org.drools.RuleBase;
 import org.drools.RuleBaseFactory;
 import org.drools.compiler.PackageBuilder;
-import org.drools.server.RuleService;
+import org.drools.server.KnowledgeStatelessServlet;
 
 import junit.framework.TestCase;
 
-public class RuleServiceTest extends TestCase {
+public class KnowledgeServiceServletTest extends TestCase {
 
 
 	public void testSample() throws Exception {
@@ -23,7 +24,7 @@ public class RuleServiceTest extends TestCase {
 		RuleBase rb = RuleBaseFactory.newRuleBase();
 		rb.addPackage(pb.getPackage());
 
-		RuleService serv = new RuleService();
+		KnowledgeStatelessServlet serv = new KnowledgeStatelessServlet();
 
 		final InputStream inXML = getClass().getResourceAsStream("sample_request.xml");
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -59,10 +60,19 @@ public class RuleServiceTest extends TestCase {
 	}
 
 	public void testInitialise() {
-		RuleService rs = new RuleService();
+		KnowledgeStatelessServlet rs = new KnowledgeStatelessServlet();
 		assertNotNull(rs.jsonInstance);
 		assertNotNull(rs.xmlInstance);
 
 	}
+
+	public void testURLPattern() {
+		Matcher m = KnowledgeStatelessServlet.urlPattern.matcher("foo/knowledgebase/whee");
+		assertTrue(m.matches());
+		assertEquals("whee", m.group(1));
+		m = KnowledgeStatelessServlet.urlPattern.matcher("foo/knowledgebase");
+		assertFalse(m.matches());
+	}
+
 
 }
