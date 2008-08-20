@@ -11,6 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,8 +48,6 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 
 
 	private static final long serialVersionUID = -8239975288596976901L;
-	static XStream xmlInstance = configureXStream(false);
-	static XStream jsonInstance = configureXStream(true);
 	static Map<String, RuleAgent> cachedAgents = new HashMap<String, RuleAgent>();
 	static Pattern urlPattern = Pattern.compile(".*knowledgebase/(.*)");
 
@@ -65,11 +65,18 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		RuleBase rb =  getRuleBase(m.group(1));
 		if (contentType != null && (contentType.indexOf("json") > -1)) {
 			//do json version
-			doService(request.getInputStream(), resp.getOutputStream(), rb, true);
+			doService(getInputStream(request), getOutputStream(resp), rb, true);
 		} else {
 			//xml version
-			doService(request.getInputStream(), resp.getOutputStream(), rb, true);
+			doService(getInputStream(request), getOutputStream(resp), rb, false);
 		}
+	}
+
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		resp.sendRedirect("/index.jsp");
 	}
 
 
@@ -80,7 +87,7 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		} else {
 			synchronized (cachedAgents) {
 				if (!cachedAgents.containsKey(configName)) {
-					RuleAgent ag = RuleAgent.newRuleAgent(configName + ".properties");
+					RuleAgent ag = RuleAgent.newRuleAgent("/" + configName + ".properties");
 					cachedAgents.put(configName, ag);
 				}
 				return cachedAgents.get(configName).getRuleBase();
@@ -99,7 +106,7 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 			ClassLoader cl = irb.getRootClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
 
-			XStream xs = (json) ? jsonInstance : xmlInstance;
+			XStream xs = configureXStream(json);
 			ServiceRequestMessage req = (ServiceRequestMessage) xs.fromXML(inputStream);
 			StatelessSession session  = rb.newStatelessSession();
 			if (req.globals != null) {
@@ -132,8 +139,8 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 			xs.toXML(res, outputStream);
 
 
-
 		} finally {
+
 			Thread.currentThread().setContextClassLoader(originalCL);
 		}
 	}
@@ -162,10 +169,13 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 
 
 
+	OutputStream getOutputStream(HttpServletResponse resp) throws IOException {
+		return resp.getOutputStream();
+	}
 
-
-
-
+	InputStream getInputStream(HttpServletRequest request) throws IOException {
+		return request.getInputStream();
+	}
 
 
 
@@ -199,6 +209,28 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		KnowledgeStatelessServlet rs = new KnowledgeStatelessServlet();
 		rs.sample();
 
+	}
+
+	public static String getRequestExample(boolean json) {
+		ServiceRequestMessage req = new ServiceRequestMessage();
+		req.globals = new NamedFact[1];
+		req.globals[0] = new NamedFact("myglobal", new ExampleFact("Saab", 42));
+		req.inFacts = new AnonFact[2];
+		req.inFacts[0] = new AnonFact(new ExampleFact("Audi", 55));
+		req.inFacts[1] = new AnonFact(new ExampleFact("Mercedes", 65));
+		req.inOutFacts = new NamedFact[1];
+		req.inOutFacts[0] = new NamedFact("myfact", new ExampleFact("BMW", 50));
+		return configureXStream(json).toXML(req);
+	}
+
+
+	public static String getResponseExample(boolean json) {
+		ServiceResponseMessage req = new ServiceResponseMessage();
+		req.globals = new NamedFact[1];
+		req.globals[0] = new NamedFact("myglobal", new ExampleFact("Saab", 42));
+		req.inOutFacts = new NamedFact[1];
+		req.inOutFacts[0] = new NamedFact("myfact", new ExampleFact("BMW", 50));
+		return configureXStream(json).toXML(req);
 	}
 
 

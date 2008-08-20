@@ -39,6 +39,7 @@ rule "another"
   when
    Car()
   then
+  	System.out.println("Firing Car rule");
     prs.setStatus("crazy");
 end
 
