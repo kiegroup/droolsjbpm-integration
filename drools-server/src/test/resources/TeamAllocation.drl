@@ -1,0 +1,57 @@
+package teamallocation
+
+dialect "mvel"
+
+declare Team
+  currentCases: int
+  name: String
+  specialty: String
+  address1: String
+  address2: String
+end
+
+declare Claim
+  specialty: String
+  value: int
+  customerName: String
+end
+
+declare Assignment
+  explanation: String
+  teamName: String
+end
+
+global Assignment a
+
+rule "Hi value"
+	when
+		Claim(value > 100)
+	then
+		a.teamName = "GOLD"
+		a.explanation = "Hi value claim"
+end
+
+rule "Low value"
+   when
+   		Claim(value < 10)
+   then
+        a.teamName = "RED"
+        a.explanation = "Low value claim"
+end
+
+rule "Assign waiting team"
+   when
+   		t: Team(currentCases == 0)
+   then
+		a.teamName = t.name
+		a.explanation = "They have nothing on, the slackers !"
+end
+
+
+rule "too busy, panic"
+ 	when
+ 		not Team(currentCases < 10)
+ 	then
+ 		a.teamName = "NONE"
+ 		a.explanation = "They are all to busy, do it yourself !"
+end

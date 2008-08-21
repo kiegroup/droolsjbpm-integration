@@ -15,6 +15,7 @@ import junit.framework.TestCase;
 
 import org.drools.RuleBase;
 import org.drools.RuleBaseFactory;
+import org.drools.common.InternalRuleBase;
 import org.drools.compiler.PackageBuilder;
 
 import com.thoughtworks.xstream.XStream;
@@ -128,6 +129,42 @@ public class KnowledgeServiceServletTest extends TestCase {
 		assertEquals("whee", m.group(1));
 		m = KnowledgeStatelessServlet.urlPattern.matcher("foo/knowledgebase");
 		assertFalse(m.matches());
+	}
+
+	public void testXmlVsJSON() throws Exception {
+		PackageBuilder pb = new PackageBuilder();
+		pb.addPackageFromDrl(new InputStreamReader(getClass().getResourceAsStream("test_rules1.drl")));
+		assertFalse(pb.hasErrors());
+
+		RuleBase rb = RuleBaseFactory.newRuleBase();
+		rb.addPackage(pb.getPackage());
+
+		Thread.currentThread().setContextClassLoader(((InternalRuleBase) rb).getRootClassLoader());
+
+		long time = System.currentTimeMillis();
+		for (int i = 0; i < 99; i++) {
+			InputStream inXML = getClass().getResourceAsStream("sample_request.xml");
+			XStream xs = KnowledgeStatelessServlet.configureXStream(false);
+			xs.fromXML(inXML);
+		}
+		System.out.println("XML time:" + (System.currentTimeMillis() - time));
+
+		time = System.currentTimeMillis();
+		for (int i = 0; i < 99; i++) {
+			InputStream inXML = getClass().getResourceAsStream("sample_request.json");
+			XStream xs = KnowledgeStatelessServlet.configureXStream(true);
+			xs.fromXML(inXML);
+		}
+		System.out.println("JSON time:" + (System.currentTimeMillis() - time));
+
+//		time = System.currentTimeMillis();
+//		for (int i = 0; i < 99; i++) {
+//			InputStream inXML = getClass().getResourceAsStream("sample_request_large.xml");
+//			XStream xs = KnowledgeStatelessServlet.configureXStream(false);
+//			xs.fromXML(inXML);
+//		}
+//		System.out.println("LARGE XML time:" + (System.currentTimeMillis() - time));
+
 	}
 
 
