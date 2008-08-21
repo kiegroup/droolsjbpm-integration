@@ -24,6 +24,7 @@
 		By default XML will be used, if you pass in a Content-Type header of application/json, then it will use JSON instead.
 		JSON is both a more compact and more performant format.
 		HTTP POST is used to access this service.
+		Any libraries the rules use (such as fact pojos) will need to be in the WEB-INF/lib directory.
 		<p/>
 		<h3>Sample JSON request:</h3>
 		<textarea rows=10 cols=80><%=KnowledgeStatelessServlet.getRequestExample(true) %></textarea>
