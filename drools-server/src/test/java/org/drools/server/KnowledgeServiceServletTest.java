@@ -68,6 +68,20 @@ public class KnowledgeServiceServletTest extends TestCase {
 			//assertTrue(resp.redirect.endsWith("index.jsp"));
 
 
+			//check bad
+			serv.doPost(new MockHttpRequest("something/knowledgebase/XXX", "application/json"), resp);
+			assertEquals(HttpServletResponse.SC_NOT_FOUND, resp.errorCode);
+
+
+			//check bad request
+			resp = new MockHTTPResponse();
+			serv.inputStream = getClass().getResourceAsStream("sample_request_bad.json");
+			outStream = new ByteArrayOutputStream();
+			serv.outputStream = outStream;
+			serv.doPost(new MockHttpRequest("something/knowledgebase/testservice", "application/json"), resp);
+			assertEquals(HttpServletResponse.SC_NOT_ACCEPTABLE, resp.errorCode);
+
+
 		} finally {
 			source.delete();
 		}

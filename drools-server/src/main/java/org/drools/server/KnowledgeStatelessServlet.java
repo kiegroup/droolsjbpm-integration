@@ -24,6 +24,7 @@ import org.drools.agent.RuleAgent;
 import org.drools.common.InternalRuleBase;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
@@ -62,13 +63,23 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "URI needs to be of the form /knowledgebase/{configName}");
 			return;
 		}
-		RuleBase rb =  getRuleBase(m.group(1));
-		if (contentType != null && (contentType.indexOf("json") > -1)) {
-			//do json version
-			doService(getInputStream(request), getOutputStream(resp), rb, true);
-		} else {
-			//xml version
-			doService(getInputStream(request), getOutputStream(resp), rb, false);
+		String conf = m.group(1);
+		RuleBase rb =  getRuleBase(conf);
+		if (rb == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The rulebase [" + conf + "] was not found or not valid.");
+			return;
+		}
+		try {
+			if (contentType != null && (contentType.indexOf("json") > -1)) {
+				//do json version
+				doService(getInputStream(request), getOutputStream(resp), rb, true);
+			} else {
+				//xml version
+				doService(getInputStream(request), getOutputStream(resp), rb, false);
+			}
+		} catch (ConversionException e) {
+			e.printStackTrace();
+			resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unable to convert. Error: " + e.getMessage() );
 		}
 	}
 
@@ -87,8 +98,13 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		} else {
 			synchronized (cachedAgents) {
 				if (!cachedAgents.containsKey(configName)) {
-					RuleAgent ag = RuleAgent.newRuleAgent("/" + configName + ".properties");
-					cachedAgents.put(configName, ag);
+					 try {
+						RuleAgent ag = RuleAgent.newRuleAgent("/" + configName + ".properties");
+						cachedAgents.put(configName, ag);
+					 } catch (NullPointerException npe) {
+						 npe.printStackTrace();
+						 return null;
+					 }
 				}
 				return cachedAgents.get(configName).getRuleBase();
 			}
