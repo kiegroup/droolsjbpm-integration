@@ -1,7 +1,10 @@
 <projectDescription>
   <name>drools-server</name>
   <comment>A rule production system</comment>
-  <projects/>
+  <projects>
+    <project>drools-compiler</project>
+    <project>drools-core</project>
+  </projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.wst.common.modulecore.ComponentStructuralBuilder</name>
