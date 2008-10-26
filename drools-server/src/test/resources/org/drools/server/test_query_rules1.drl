@@ -1,0 +1,67 @@
+package something
+
+import org.drools.server.InsertedFact;
+
+global org.drools.Person prs
+
+declare Car
+   name: String
+   type: String
+end
+
+declare Result
+	value: Integer
+	explanation: String
+end
+
+query "Get all inserted facts"
+	insf : InsertedFact ()
+end
+
+query "Get named inserted fact" (String a)
+	ninsf : InsertedFact ( name == a )
+end
+
+rule "wagons"
+ dialect "mvel"
+ when
+   Car(name == "saab", type == "wagon")
+   r: Result()
+ then
+   r.value = 42
+   r.explanation = "just cause it is"
+end
+
+rule "cars"
+ dialect "mvel"
+ when
+   Car(type=="car")
+   r: Result()
+ then
+   r.value = 40
+   r.explanation = "not as useful"
+end
+
+rule "another"
+  when
+   Car()
+  then
+  	System.out.println("Firing Car rule");
+    prs.setStatus("crazy");
+end
+
+rule "insert a single fact"
+	when
+	
+	then
+		insert (new InsertedFact("one"));
+end
+
+rule "insert several new facts"
+	when
+	
+	then
+		insert (new InsertedFact("two"));
+		insert (new InsertedFact("three"));
+end
+

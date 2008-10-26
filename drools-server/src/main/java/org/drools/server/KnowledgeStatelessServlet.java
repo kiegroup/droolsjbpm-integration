@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,8 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.drools.Person;
+import org.drools.QueryResult;
+import org.drools.QueryResults;
 import org.drools.RuleBase;
 import org.drools.StatelessSession;
+import org.drools.StatelessSessionResult;
 import org.drools.agent.RuleAgent;
 import org.drools.common.InternalRuleBase;
 
@@ -80,6 +84,9 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		} catch (ConversionException e) {
 			e.printStackTrace();
 			resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unable to convert. Error: " + e.getMessage() );
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unable to process request. Error: " + e.getMessage() );
 		}
 	}
 
@@ -143,6 +150,7 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 			}
 
 			session.execute(facts);
+			StatelessSessionResult ssr = session.executeWithResults(facts);
 
 			ServiceResponseMessage res = new ServiceResponseMessage();
 			if (req.globals != null) {
@@ -150,6 +158,9 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 			}
 			if (req.inOutFacts != null) {
 				res.inOutFacts = req.inOutFacts;
+			}
+			if (req.queries != null) {
+				res.outFacts = processQueries(req.queries, ssr);
 			}
 
 			xs.toXML(res, outputStream);
@@ -161,6 +172,27 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		}
 	}
 
+	private NamedFact[] processQueries(QueryType[] queries, StatelessSessionResult ssr)
+	throws IllegalArgumentException
+	{
+		List<NamedFact> queryFacts = new ArrayList<NamedFact>();
+		
+		for (QueryType qt : queries) {
+			QueryResults qResults = ssr.getQueryResults(qt.queryName, qt.args);
+			Iterator<QueryResult> qIter = qResults.iterator();
+			while (qIter.hasNext()) {
+				QueryResult qResult = qIter.next();
+				for (String factName : qt.factNames) {
+					queryFacts.add(new NamedFact(factName, qResult.get(factName)));
+				}
+			}
+		}
+		
+		if (queryFacts.size() == 0) 
+			return null;
+		else 
+			return (NamedFact[]) queryFacts.toArray(new NamedFact[queryFacts.size()]);
+	}
 
 	static XStream configureXStream(boolean json) {
 		if (json) {
@@ -180,6 +212,7 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		xs.alias("knowledgebase-response", ServiceResponseMessage.class);
 		xs.alias("named-fact", NamedFact.class);
 		xs.alias("anon-fact", AnonFact.class);
+		xs.alias("query-type", QueryType.class);
 	}
 
 
