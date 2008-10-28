@@ -15,6 +15,12 @@
 		This configuration then declares what packages are used, where the repository is etc (this can work with both Guvnor, but also DRL files, etc).
 		This properties file must be in the classpath for this war - in the WEB-INF/classes directory.
 		<h3>Sample request content:</h3>
+		<p>
+		A request may contain queries, globals, inOutFacts, and inFacts. Globals and inOutFacts may be modified 
+		by the rules and returned in the response. Queries provide a mechanism to declare which queries in the 
+		rule base may be run to return selected facts as outFacts. Queries contain the name of the query, the declarations,
+		and arguments.
+		</p>
 		<textarea rows=20 cols=80><%=KnowledgeStatelessServlet.getRequestExample(false) %></textarea>
 
 		<h3>Sample response content:</h3>

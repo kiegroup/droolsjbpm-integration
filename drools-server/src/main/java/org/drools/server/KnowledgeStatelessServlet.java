@@ -262,6 +262,10 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 
 	public static String getRequestExample(boolean json) {
 		ServiceRequestMessage req = new ServiceRequestMessage();
+		req.queries = new QueryType[1];
+		String nameFacts[] = { "ninsf" };
+		Object args[] = { new String("one"), new String("two") };
+		req.queries[0] = new QueryType("Get named inserted fact", nameFacts, args);
 		req.globals = new NamedFact[1];
 		req.globals[0] = new NamedFact("myglobal", new ExampleFact("Saab", 42));
 		req.inFacts = new AnonFact[2];
@@ -279,6 +283,9 @@ public class KnowledgeStatelessServlet extends HttpServlet {
 		req.globals[0] = new NamedFact("myglobal", new ExampleFact("Saab", 42));
 		req.inOutFacts = new NamedFact[1];
 		req.inOutFacts[0] = new NamedFact("myfact", new ExampleFact("BMW", 50));
+		req.outFacts = new NamedFact[2];
+		req.outFacts[0] = new NamedFact("ninsf", new InsertedFact("one"));
+		req.outFacts[1] = new NamedFact("ninsf", new InsertedFact("two"));
 		return configureXStream(json).toXML(req);
 	}
 
