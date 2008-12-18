@@ -23,6 +23,8 @@ package org.drools.test.mc.io.test;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.drools.io.InternalResource;
 import org.drools.io.Resource;
@@ -47,7 +49,7 @@ public class ResourcesTest extends BaseTest
       return provider;
    }
 
-   protected Resource testResource(String name)
+   protected Resource findResource(String name)
    {
       URL url = getResource(name);
       ResourceProvider provider = getResourceProvider();
@@ -56,16 +58,40 @@ public class ResourcesTest extends BaseTest
       return root;
    }
 
+   public void testEquals() throws Exception
+   {
+      Resource r1 = findResource("/mc/io/equalstc");
+      Resource r2 = findResource("/mc/io/equalstc");
+      assertTrue(r1 != r2);
+      assertEquals(r1, r2);
+      // hash test
+      Set<Resource> r = new HashSet<Resource>();
+      r.add(r1);
+      r.add(r2);
+      assertEquals(1, r.size());
+
+      assertTrue(r1 instanceof InternalResource);
+      assertTrue(r2 instanceof InternalResource);
+      Collection<Resource> c1 = InternalResource.class.cast(r1).listResources();
+      Collection<Resource> c2 = InternalResource.class.cast(r2).listResources();
+      assertEquals(c1, c2);
+      // hash test
+      Set<Resource> c = new HashSet<Resource>();
+      c.addAll(c1);
+      c.addAll(c2);
+      assertEquals(1, c.size());
+   }
+
    public void testResource() throws Exception
    {
-      Resource resource = testResource("/mc/io/root");
+      Resource resource = findResource("/mc/io/root");
       assertNotNull(resource.getInputStream());
       assertNotNull(resource.getReader());
    }
 
    public void testInternalResource() throws Exception
    {
-      Resource root = testResource("/mc/io/root");
+      Resource root = findResource("/mc/io/root");
       assertTrue(root instanceof InternalResource);
       InternalResource resource = InternalResource.class.cast(root);
 

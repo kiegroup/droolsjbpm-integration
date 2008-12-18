@@ -167,4 +167,45 @@ public class VFSResource extends BaseResource
    {
       return new InputStreamReader(getInputStream());
    }
+
+   @Override
+   public int hashCode()
+   {
+      return toURL().hashCode();
+   }
+
+   @Override
+   public boolean equals(Object obj)
+   {
+      if (obj instanceof VFSResource == false)
+         return false;
+
+      VFSResource other = VFSResource.class.cast(obj);
+      return toURL().equals(other.toURL());
+   }
+
+   @Override
+   public String toString()
+   {
+      return "[VFSResource = " + toURL() + "]";
+   }
+
+   /**
+    * To url.
+    *
+    * @return the url
+    * @throws RuntimeException for any error
+    */
+   protected URL toURL()
+   {
+      try
+      {
+         return getURL();
+      }
+      catch (Exception e)
+      {
+         throw new RuntimeException(e);
+      }
+   }
 }
+                                         
