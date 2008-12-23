@@ -8,9 +8,9 @@
     <version>5.0.0.SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-dataloaders</artifactId>
+  <artifactId>drools-transformer</artifactId>
   <packaging>pom</packaging>
-  <name>Drools :: DataLoaders</name>
+  <name>Drools :: Transformer</name>
   
   <modules>
       <module>drools-transformer-smooks</module>
