@@ -8,9 +8,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 
-import org.drools.definition.pipeline.JaxbPipelineProvider;
-import org.drools.definition.pipeline.Transformer;
+import org.drools.runtime.pipeline.JaxbPipelineProvider;
 import org.drools.runtime.pipeline.PipelineContext;
+import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
 import org.drools.runtime.pipeline.impl.BaseStage;
 import org.xml.sax.InputSource;

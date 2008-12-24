@@ -15,6 +15,7 @@
   <modules>
       <module>drools-transformer-smooks</module>
       <module>drools-transformer-jaxb</module>
+      <module>drools-transformer-xstream</module>
   </modules>
   
 </project>

@@ -32,14 +32,14 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
-import org.drools.definition.pipeline.Expression;
-import org.drools.definition.pipeline.PipelineFactory;
-import org.drools.definition.pipeline.Splitter;
-import org.drools.definition.pipeline.Transformer;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.dataloader.StatefulKnowledgeSessionDataLoader;
 import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
+import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.Splitter;
+import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.rule.FactHandle;
 
 import com.sun.tools.xjc.Language;

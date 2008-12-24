@@ -2,9 +2,9 @@ package org.drools.runtime.pipeline.impl;
 
 import javax.xml.transform.Source;
 
-import org.drools.definition.pipeline.SmooksPipelineProvider;
-import org.drools.definition.pipeline.Transformer;
 import org.drools.runtime.pipeline.PipelineContext;
+import org.drools.runtime.pipeline.SmooksPipelineProvider;
+import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
 import org.milyn.Smooks;
 import org.milyn.container.ExecutionContext;
