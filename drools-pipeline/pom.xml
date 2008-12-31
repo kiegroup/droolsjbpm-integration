@@ -16,6 +16,7 @@
       <module>drools-transformer-smooks</module>
       <module>drools-transformer-jaxb</module>
       <module>drools-transformer-xstream</module>
+      <module>drools-transformer-jxls</module>
   </modules>
   
 </project>
