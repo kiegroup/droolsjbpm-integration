@@ -101,7 +101,7 @@ public class DroolsJaxbTest extends TestCase {
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );
-        transformer.addReceiver( PipelineFactory.newStatefulKnowledgeSessionReceiverAdapter() );
+        transformer.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
         StatefulKnowledgeSessionDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
                                                                                                     transformer );
@@ -154,7 +154,7 @@ public class DroolsJaxbTest extends TestCase {
         transformer.addReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
         expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newStatefulKnowledgeSessionReceiverAdapter() );
+        splitter.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
         StatefulKnowledgeSessionDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
                                                                                                     transformer );
         Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ) );

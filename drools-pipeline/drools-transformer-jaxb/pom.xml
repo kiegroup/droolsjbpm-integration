@@ -10,7 +10,7 @@
 
   <artifactId>drools-transformer-jaxb</artifactId>
   <packaging>jar</packaging>
-  <name>Drools :: Transformer :: JAXB</name>
+  <name>Drools :: Pipeline :: Transformer :: JAXB</name>
   
       <dependencies>
          <dependency>

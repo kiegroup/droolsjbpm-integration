@@ -10,7 +10,7 @@
 
   <artifactId>drools-transformer-smooks</artifactId>
   <packaging>jar</packaging>
-  <name>Drools :: Transformer :: Smooks</name>
+  <name>Drools :: Pipeline :: Transformer :: Smooks</name>
   
       <dependencies>
          <dependency>
