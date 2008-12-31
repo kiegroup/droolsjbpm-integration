@@ -10,7 +10,7 @@
 
   <artifactId>drools-transformer-xstream</artifactId>
   <packaging>jar</packaging>
-  <name>Drools :: Transformer :: XStream</name>
+  <name>Drools :: Pipeline :: Transformer :: XStream</name>
   
       <dependencies>
          <dependency>

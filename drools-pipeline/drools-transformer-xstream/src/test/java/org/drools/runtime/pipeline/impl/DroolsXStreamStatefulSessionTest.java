@@ -23,7 +23,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.dataloader.DataLoaderFactory;
 import org.drools.runtime.dataloader.StatefulKnowledgeSessionDataLoader;
 import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
-import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionReceiverAdapter;
+import org.drools.runtime.dataloader.impl.EntryPointReceiverAdapter;
 import org.drools.runtime.pipeline.Expression;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.Splitter;
@@ -55,7 +55,7 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
 
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        transformer.addReceiver( PipelineFactory.newStatefulKnowledgeSessionReceiverAdapter() );
+        transformer.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
         StatefulKnowledgeSessionDataLoader dataLoader = DataLoaderFactory.newStatefulKnowledgeSessionDataLoader( ksession,
                                                                                                                  transformer );
@@ -94,7 +94,7 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
         transformer.addReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
         expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newStatefulKnowledgeSessionReceiverAdapter() );
+        splitter.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
         StatefulKnowledgeSessionDataLoader dataLoader = DataLoaderFactory.newStatefulKnowledgeSessionDataLoader( ksession,
                                                                                                                  transformer );
