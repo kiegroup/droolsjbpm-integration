@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<workbook>
+    <worksheet name="Sheet1">
+    
+        <section startRow="0" endRow="6">
+            <mapping cell="B1">company.name</mapping>
+        </section>
+        <loop startRow="7" endRow="7" items="company.employee" var="employee" varType="sample.Employee">
+            <section startRow="7" endRow="7">
+                <mapping row="7" col="0">employee.name</mapping>
+                <mapping row="7" col="1">employee.age</mapping>
+                <mapping row="7" col="3">employee.payment</mapping>
+                <mapping row="7" col="4">employee.bonus</mapping>
+            </section>
+            <loopbreakcondition>
+                <rowcheck offset="0">
+                    <cellcheck offset="0">Employee Payment Totals:</cellcheck>
+                </rowcheck>
+            </loopbreakcondition>
+        </loop>
+        
+    </worksheet>
+    <worksheet name="Sheet3">
+        <loop startRow="0" endRow="8" items="departments" var="department" varType="sample.Department">
+            <section startRow="0" endRow="6">
+                <mapping row="0" col="1">department.name</mapping>
+            </section>
+            <loop startRow="7" endRow="7" items="department.staff" var="employee" varType="sample.Employee">
+                <section startRow="7" endRow="7">
+                    <mapping row="7" col="0">employee.name</mapping>
+                    <mapping row="7" col="1">employee.age</mapping>
+                    <mapping row="7" col="2">employee.payment</mapping>
+                    <mapping row="7" col="3">employee.bonus</mapping>
+                </section>
+                <loopbreakcondition>
+                    <rowcheck offset="0">
+                        <cellcheck offset="0">Employee Payment Totals:</cellcheck>
+                    </rowcheck>
+                </loopbreakcondition>
+            </loop>
+            <section startRow="8" endRow="8"/>
+            <loopbreakcondition>
+                <rowcheck offset="0"/>
+                <rowcheck offset="1"/>
+            </loopbreakcondition>
+        </loop>
+    </worksheet> 
+</workbook>

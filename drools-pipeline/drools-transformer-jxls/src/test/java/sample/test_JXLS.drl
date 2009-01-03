@@ -1,0 +1,17 @@
+package sample
+
+import java.util.List
+// this doesn't work, as we don't support default values
+ 
+
+declare Department
+    name : String
+    chief : Employee
+    staff : List
+end
+
+declare Company
+    name : String
+    chief : Employee
+    employee : List
+end
