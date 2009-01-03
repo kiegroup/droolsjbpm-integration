@@ -5,10 +5,11 @@ import java.io.Reader;
 
 import javax.xml.transform.Source;
 
+import org.drools.io.Resource;
 import org.drools.runtime.pipeline.PipelineContext;
-import org.drools.runtime.pipeline.SmooksPipelineProvider;
+import org.drools.runtime.pipeline.SmooksTransformerProvider;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.XStreamPipelineProvider;
+import org.drools.runtime.pipeline.XStreamTransformerProvider;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
 import com.thoughtworks.xstream.XStream;;
 
@@ -22,7 +23,7 @@ public class XStreamTransformer extends BaseEmitter
 
     }
 
-    public void signal(Object object,
+    public void receive(Object object,
                        PipelineContext context) {
         this.xstream.setClassLoader( context.getClassLoader() );
         Object result = null;
@@ -31,7 +32,11 @@ public class XStreamTransformer extends BaseEmitter
         		result = this.xstream.fromXML( ( Reader ) object );
         	} else if ( object instanceof InputStream ) {
         		result = this.xstream.fromXML( ( InputStream ) object );
-        	}
+        	} else if ( object instanceof Resource ) {
+                result = this.xstream.fromXML( (( Resource ) object).getReader() );
+            } else {
+                throw new IllegalArgumentException( "signal object must be instance of InputStream or Resource" );
+            }
         } catch ( Exception e ) {
             handleException( this,
                              object,
@@ -41,7 +46,7 @@ public class XStreamTransformer extends BaseEmitter
               context );
     }
     
-    public static class XStreamPipelineProviderImpl implements XStreamPipelineProvider {
+    public static class XStreamTransformerProviderImpl implements XStreamTransformerProvider {
         public Transformer newXStreamTransformer(XStream xstream) {
             return new XStreamTransformer( xstream );
         }

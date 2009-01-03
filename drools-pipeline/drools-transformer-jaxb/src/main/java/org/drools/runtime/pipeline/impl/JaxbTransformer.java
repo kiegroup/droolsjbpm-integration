@@ -8,7 +8,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 
-import org.drools.runtime.pipeline.JaxbPipelineProvider;
+import org.drools.io.Resource;
+import org.drools.runtime.pipeline.JaxbTransformerProvider;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
@@ -24,7 +25,7 @@ public class JaxbTransformer extends BaseEmitter
         this.unmarshaller = unmarshaller;
     }
 
-    public void signal(Object object,
+    public void receive(Object object,
                        PipelineContext context) {
         Object result = null;
         try {
@@ -38,21 +39,26 @@ public class JaxbTransformer extends BaseEmitter
                 result = this.unmarshaller.unmarshal( (Source) object );
             } else if ( object instanceof InputSource ) {
                 result = this.unmarshaller.unmarshal( (InputSource) object );
+            }  else if ( object instanceof Resource ) {
+                result = this.unmarshaller.unmarshal( (( Resource ) object).getReader() );
+            } else {
+                throw new IllegalArgumentException( "signal object must be instance of File, InputStream, Reader, Source, InputSource or Resource" );
             }
         } catch ( Exception e ) {
             handleException( this,
                              object,
                              e );
-            if ( result instanceof JAXBElement ) {
-                result = ((JAXBElement) object).getValue().getClass().getName();
-            }
         }
+        
+        if ( result instanceof JAXBElement ) {
+            result = ((JAXBElement) object).getValue().getClass().getName();
+        }
+        
         emit( result,
               context );
-
     }
 
-    public static class JaxbPipelineProviderImpl implements JaxbPipelineProvider {
+    public static class JaxbTransformerProviderImpl implements JaxbTransformerProvider {
         public Transformer newJaxbTransformer(Unmarshaller unmarshaller) {
             return new JaxbTransformer( unmarshaller );
         }
