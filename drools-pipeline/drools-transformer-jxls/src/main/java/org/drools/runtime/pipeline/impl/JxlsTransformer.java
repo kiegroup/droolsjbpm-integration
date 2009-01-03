@@ -1,26 +1,18 @@
 package org.drools.runtime.pipeline.impl;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.transform.Source;
 
 import net.sf.jxls.reader.XLSReadMessage;
 import net.sf.jxls.reader.XLSReadStatus;
 import net.sf.jxls.reader.XLSReader;
 
-import org.drools.builder.impl.KnowledgeBuilderImpl;
 import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
 import org.drools.runtime.pipeline.JxlsTransformerProvider;
 import org.drools.runtime.pipeline.PipelineContext;
-import org.drools.runtime.pipeline.SmooksTransformerProvider;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.XStreamTransformerProvider;
-import org.drools.runtime.pipeline.impl.BaseEmitter;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExpressionCompiler;
