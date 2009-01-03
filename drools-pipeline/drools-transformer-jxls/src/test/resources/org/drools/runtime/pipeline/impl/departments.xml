@@ -5,7 +5,7 @@
         <section startRow="0" endRow="6">
             <mapping cell="B1">company.name</mapping>
         </section>
-        <loop startRow="7" endRow="7" items="company.employee" var="employee" varType="sample.Employee">
+        <loop startRow="7" endRow="7" items="company.employee" var="employee" varType="org.drools.runtime.pipeline.impl.Employee">
             <section startRow="7" endRow="7">
                 <mapping row="7" col="0">employee.name</mapping>
                 <mapping row="7" col="1">employee.age</mapping>
@@ -21,11 +21,11 @@
         
     </worksheet>
     <worksheet name="Sheet3">
-        <loop startRow="0" endRow="8" items="departments" var="department" varType="sample.Department">
+        <loop startRow="0" endRow="8" items="departments" var="department" varType="org.drools.runtime.pipeline.impl.Department">
             <section startRow="0" endRow="6">
                 <mapping row="0" col="1">department.name</mapping>
             </section>
-            <loop startRow="7" endRow="7" items="department.staff" var="employee" varType="sample.Employee">
+            <loop startRow="7" endRow="7" items="department.staff" var="employee" varType="org.drools.runtime.pipeline.impl.Employee">
                 <section startRow="7" endRow="7">
                     <mapping row="7" col="0">employee.name</mapping>
                     <mapping row="7" col="1">employee.age</mapping>

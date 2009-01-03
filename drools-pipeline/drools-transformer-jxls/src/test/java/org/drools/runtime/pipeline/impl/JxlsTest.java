@@ -1,4 +1,4 @@
-package sample;
+package org.drools.runtime.pipeline.impl;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -45,23 +45,31 @@ public class JxlsTest extends TestCase {
         XLSReader mainReader = ReaderBuilder.buildFromXML( inputXML );
         InputStream inputXLS = new BufferedInputStream(getClass().getResourceAsStream( "departmentData.xls"));
         
-        List list = new ArrayList();
         Callable callable = PipelineFactory.newCallable();
-        Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new sample.Company() ]");
+        Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.drools.runtime.pipeline.impl.Company() ]");
         callable.addReceiver( transformer );
-        transformer.addReceiver( callable );
-//        ListAdapter adapter = PipelineFactory.newListAdapter( list, true );
-//        transformer.addReceiver( adapter );
-        
+        transformer.addReceiver( callable );        
         BasePipelineContext context = new BasePipelineContext( Thread.currentThread().getContextClassLoader() );
         
         Map<String, Object> beans = ( Map<String, Object> ) callable.call( inputXLS, context );
-        
-        //callable.signal( inputXLS, context );        
-        //Map<String, Object> beans = ( Map<String, Object> ) list.get( 0 );
 
-        System.out.println( beans.get( "company" ) );
-        System.out.println( beans.get( "departments" ) );        
+        assertEquals( Company.class.getName(), beans.get( "company" ).getClass().getName());
+        assertEquals( ArrayList.class.getName(), beans.get( "departments" ).getClass().getName());
+        
+        Company company = ( Company )  beans.get( "company" );
+        assertEquals( "A-Team", company.getName() );
+        assertEquals( 4, company.getEmployee().size() );
+        
+        List<Department> departments = ( List<Department> ) beans.get( "departments" );
+        assertEquals( 3, departments.size() );
+        
+        Department department = departments.get( 0 );
+        assertEquals( "IT", department.getName() );        
+        assertEquals( 5, department.getStaff().size() );
+        
+        department = departments.get( 2 );
+        assertEquals( "BA", department.getName() );        
+        assertEquals( 4, department.getStaff().size() );        
     }
     
 }

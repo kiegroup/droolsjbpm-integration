@@ -1,4 +1,4 @@
-package sample;
+package org.drools.runtime.pipeline.impl;
 
 import java.util.Date;
 import java.util.List;

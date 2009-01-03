@@ -1,4 +1,4 @@
-package sample;
+package org.drools.runtime.pipeline.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,26 +7,26 @@ import java.util.List;
  * Sample Department bean to demostrate main excel export features
  * author: Leonid Vysochyn
  */
-public class Company {
+public class Department {
     private String name;
     private Employee chief = new Employee();
-    private List employee = new ArrayList();
-
-    public Company() {
+    private List staff = new ArrayList();
+    
+    public Department() {
     }
 
-    public Company(String name) {
+    public Department(String name) {
         this.name = name;
     }
 
-    public Company(String name, Employee chief, List staff) {
+    public Department(String name, Employee chief, List staff) {
         this.name = name;
         this.chief = chief;
-        this.employee = staff;
+        this.staff = staff;
     }
 
     public void addEmployee(Employee employee) {
-        this.employee.add(employee);
+        this.staff.add(employee);
     }
 
     public String getName() {
@@ -43,17 +43,17 @@ public class Company {
 
     public void setChief(Employee chief) {
         this.chief = chief;
-    }    
-
-    public List getEmployee() {
-        return employee;
     }
 
-    public void setEmployee(List staff) {
-        this.employee = employee;
+    public List getStaff() {
+        return staff;
+    }
+
+    public void setStaff(List staff) {
+        this.staff = staff;
     }
     
     public String toString() {
-        return "[Company name : " + this.name + " chief : " + this.chief + " staff : " + this.employee + "]";
-    }    
+        return "[Department name : " + this.name + " chief : " + this.chief + " staff : " + this.staff + "]";
+    }
 }
