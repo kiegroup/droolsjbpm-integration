@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.XStream;
 
 public class DroolsXStreamStatelessSessionTest extends TestCase {
 
-    public void testSmooksDirectRoot() throws Exception {
+    public void testXstreamDirectRoot() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
         kbuilder.add( ResourceFactory.newClassPathResource( "test_XStreamDirectRoot.drl",
@@ -44,7 +44,7 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
 
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        transformer.addReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        transformer.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
 
         StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
                                                                                                       transformer );
@@ -57,7 +57,7 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
                       list.get( 0 ).getClass().getName() );
     }
 
-    public void testSmooksNestedIterable() throws Exception {
+    public void testXstreamNestedIterable() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
         kbuilder.add( ResourceFactory.newClassPathResource( "test_XStreamNestedIterable.drl",
@@ -77,10 +77,10 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
         Expression expression = PipelineFactory.newMvelExpression( "this" );
-        transformer.addReceiver( expression );
+        transformer.setReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        expression.setReceiver( splitter );
+        splitter.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
 
         StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
                                                                                                       transformer );

@@ -47,8 +47,8 @@ public class JxlsTest extends TestCase {
         
         Callable callable = PipelineFactory.newCallable();
         Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.drools.runtime.pipeline.impl.Company() ]");
-        callable.addReceiver( transformer );
-        transformer.addReceiver( callable );        
+        callable.setReceiver( transformer );
+        transformer.setReceiver( callable );        
         BasePipelineContext context = new BasePipelineContext( Thread.currentThread().getContextClassLoader() );
         
         Map<String, Object> beans = ( Map<String, Object> ) callable.call( inputXLS, context );

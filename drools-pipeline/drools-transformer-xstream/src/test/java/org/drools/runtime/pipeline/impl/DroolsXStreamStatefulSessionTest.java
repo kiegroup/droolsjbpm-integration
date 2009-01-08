@@ -21,7 +21,7 @@ import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.dataloader.DataLoaderFactory;
-import org.drools.runtime.dataloader.StatefulKnowledgeSessionDataLoader;
+import org.drools.runtime.dataloader.WorkingMemoryDataLoader;
 import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
 import org.drools.runtime.dataloader.impl.EntryPointReceiverAdapter;
 import org.drools.runtime.pipeline.Expression;
@@ -55,10 +55,10 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
 
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        transformer.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        transformer.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
-        StatefulKnowledgeSessionDataLoader dataLoader = DataLoaderFactory.newStatefulKnowledgeSessionDataLoader( ksession,
-                                                                                                                 transformer );
+        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
+                                                                                                 transformer );
         Map<FactHandle, Object> handles = dataLoader.insert( getClass().getResourceAsStream( "XStreamDirectRoot.xml" ) );
         ksession.fireAllRules();
 
@@ -91,13 +91,13 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
         Expression expression = PipelineFactory.newMvelExpression( "this" );
-        transformer.addReceiver( expression );
+        transformer.setReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        expression.setReceiver( splitter );
+        splitter.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
-        StatefulKnowledgeSessionDataLoader dataLoader = DataLoaderFactory.newStatefulKnowledgeSessionDataLoader( ksession,
-                                                                                                                 transformer );
+        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
+                                                                                                 transformer );
 
         Map<FactHandle, Object> handles = dataLoader.insert( getClass().getResourceAsStream( "XStreamNestedIterable.xml" ) );
         ksession.fireAllRules();

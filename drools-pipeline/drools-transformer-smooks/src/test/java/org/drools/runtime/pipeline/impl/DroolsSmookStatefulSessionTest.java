@@ -18,7 +18,7 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.dataloader.DataLoaderFactory;
-import org.drools.runtime.dataloader.StatefulKnowledgeSessionDataLoader;
+import org.drools.runtime.dataloader.WorkingMemoryDataLoader;
 import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
 import org.drools.runtime.dataloader.impl.EntryPointReceiverAdapter;
 import org.drools.runtime.pipeline.Expression;
@@ -55,9 +55,9 @@ public class DroolsSmookStatefulSessionTest extends TestCase {
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
         
         Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "orderItem" );       
-        transformer.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        transformer.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
         
-        StatefulKnowledgeSessionDataLoader dataLoader = DataLoaderFactory.newStatefulKnowledgeSessionDataLoader( ksession,
+        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
                                                                                                     transformer );
         Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "SmooksDirectRoot.xml" ) ) );
         ksession.fireAllRules();
@@ -93,12 +93,12 @@ public class DroolsSmookStatefulSessionTest extends TestCase {
 
         Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "root" );               
         Expression expression = PipelineFactory.newMvelExpression( "children" );
-        transformer.addReceiver( expression );
+        transformer.setReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        expression.setReceiver( splitter );
+        splitter.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
-        StatefulKnowledgeSessionDataLoader dataLoader = DataLoaderFactory.newStatefulKnowledgeSessionDataLoader( ksession,
+        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
                                                                                                 transformer );
 
         Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ) );

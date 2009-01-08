@@ -34,7 +34,7 @@ import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.dataloader.StatefulKnowledgeSessionDataLoader;
+import org.drools.runtime.dataloader.WorkingMemoryDataLoader;
 import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
 import org.drools.runtime.pipeline.Expression;
 import org.drools.runtime.pipeline.PipelineFactory;
@@ -101,10 +101,10 @@ public class DroolsJaxbTest extends TestCase {
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );
-        transformer.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        transformer.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
-        StatefulKnowledgeSessionDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                                    transformer );
+        WorkingMemoryDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
+                                                                                         transformer );
         Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ) );
 
         ksession.fireAllRules();
@@ -151,12 +151,12 @@ public class DroolsJaxbTest extends TestCase {
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );
         Expression expression = PipelineFactory.newMvelExpression( "this.orderItem" );
-        transformer.addReceiver( expression );
+        transformer.setReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
-        StatefulKnowledgeSessionDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                                    transformer );
+        expression.setReceiver( splitter );
+        splitter.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        WorkingMemoryDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
+                                                                                         transformer );
         Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ) );
 
         ksession.fireAllRules();

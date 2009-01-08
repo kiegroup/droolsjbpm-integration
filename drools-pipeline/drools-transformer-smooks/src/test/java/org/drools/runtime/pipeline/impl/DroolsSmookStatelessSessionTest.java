@@ -48,7 +48,7 @@ public class DroolsSmookStatelessSessionTest extends TestCase {
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
 
         Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "orderItem" );       
-        transformer.addReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        transformer.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
 
         StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
                                                                                                   transformer );
@@ -83,10 +83,10 @@ public class DroolsSmookStatelessSessionTest extends TestCase {
 
         Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "root" );               
         Expression expression = PipelineFactory.newMvelExpression( "children" );
-        transformer.addReceiver( expression );
+        transformer.setReceiver( expression );
         Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.addReceiver( splitter );
-        splitter.addReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        expression.setReceiver( splitter );
+        splitter.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
 
         StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
                                                                                                   transformer );
