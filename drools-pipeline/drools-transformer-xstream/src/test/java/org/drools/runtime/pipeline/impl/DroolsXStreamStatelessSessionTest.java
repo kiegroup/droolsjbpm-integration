@@ -3,8 +3,6 @@ package org.drools.runtime.pipeline.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.transform.stream.StreamSource;
-
 import junit.framework.TestCase;
 
 import org.drools.KnowledgeBase;
@@ -14,11 +12,11 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.dataloader.StatelessKnowledgeSessionDataLoader;
-import org.drools.runtime.dataloader.impl.StatelessKnowledgeSessionDataLoaderImpl;
-import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.Action;
+import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
+import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
-import org.drools.runtime.pipeline.Splitter;
+import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
 
 import com.thoughtworks.xstream.XStream;
@@ -42,13 +40,18 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        transformer.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        transformer.setReceiver( execute );
 
-        StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                                      transformer );
-        dataLoader.executeObject( getClass().getResourceAsStream( "XStreamDirectRoot.xml" ) );
+        Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
+
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( getClass().getResourceAsStream( "XStreamDirectRoot.xml" ),
+                         resultHandler );
 
         assertEquals( 1,
                       list.size() );
@@ -74,20 +77,21 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+
+        Action mvelAction = PipelineFactory.newMvelAction( "context.setIterable( this  )" );
+        mvelAction.setReceiver( execute );
+
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        Expression expression = PipelineFactory.newMvelExpression( "this" );
-        transformer.setReceiver( expression );
-        Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.setReceiver( splitter );
-        splitter.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        transformer.setReceiver( mvelAction );
 
-        StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                                      transformer );
-        dataLoader.executeIterable( getClass().getResourceAsStream( "XStreamNestedIterable.xml" ) );
+        Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
 
-        assertEquals( 2,
-                      list.size() );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( getClass().getResourceAsStream( "XStreamNestedIterable.xml" ),
+                         resultHandler );
 
         assertEquals( "example.OrderItem",
                       list.get( 0 ).getClass().getName() );
@@ -98,4 +102,17 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
                        list.get( 1 ) );
     }
 
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
+        Object object;
+
+        public void handleResult(Object object) {
+            this.object = object;
+        }
+
+        public Object getObject() {
+            return this.object;
+        }
+    }
 }

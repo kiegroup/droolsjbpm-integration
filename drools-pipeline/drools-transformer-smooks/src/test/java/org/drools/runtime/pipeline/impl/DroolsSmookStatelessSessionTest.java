@@ -16,10 +16,13 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.dataloader.StatelessKnowledgeSessionDataLoader;
-import org.drools.runtime.dataloader.impl.StatelessKnowledgeSessionDataLoaderImpl;
+import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.Join;
+import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
+import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
 import org.milyn.Smooks;
@@ -44,15 +47,21 @@ public class DroolsSmookStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+
         // Instantiate Smooks with the config...
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
 
-        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "orderItem" );       
-        transformer.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks,
+                                                                        "orderItem" );
+        transformer.setReceiver( execute );
 
-        StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                                  transformer );
-        dataLoader.executeObject( new StreamSource( getClass().getResourceAsStream( "SmooksDirectRoot.xml" ) ) );
+        Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
+
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksDirectRoot.xml" ) ),
+                         resultHandler );
 
         assertEquals( 1,
                       list.size() );
@@ -78,19 +87,24 @@ public class DroolsSmookStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+
+        Action mvelAction = PipelineFactory.newMvelAction( "context.setIterable( this.children  )" );
+        mvelAction.setReceiver( execute );
+
         // Instantiate Smooks with the config...
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
 
-        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "root" );               
-        Expression expression = PipelineFactory.newMvelExpression( "children" );
-        transformer.setReceiver( expression );
-        Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.setReceiver( splitter );
-        splitter.setReceiver( PipelineFactory.newStatelessKnowledgeSessionReceiverAdapter() );
+        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks,
+                                                                        "root" );
+        transformer.setReceiver( mvelAction );
 
-        StatelessKnowledgeSessionDataLoader dataLoader = new StatelessKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                                  transformer );
-        dataLoader.executeIterable( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ) );
+        Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
+
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ),
+                         resultHandler );
 
         assertEquals( 2,
                       list.size() );
@@ -102,14 +116,19 @@ public class DroolsSmookStatelessSessionTest extends TestCase {
 
         assertNotSame( list.get( 0 ),
                        list.get( 1 ) );
-    }   
+    }
 
-    private static byte[] readInputMessage(InputStream stream) {
-        try {
-            return StreamUtils.readStream( stream );
-        } catch ( IOException e ) {
-            e.printStackTrace();
-            return "<no-message/>".getBytes();
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
+        Object object;
+
+        public void handleResult(Object object) {
+            this.object = object;
+        }
+
+        public Object getObject() {
+            return this.object;
         }
     }
 }

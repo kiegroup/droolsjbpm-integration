@@ -34,12 +34,15 @@ import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.dataloader.WorkingMemoryDataLoader;
-import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
+import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
+import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
+import org.drools.runtime.pipeline.impl.StatefulKnowledgeSessionPipelineTest.ResultHandlerImpl;
 import org.drools.runtime.rule.FactHandle;
 
 import com.sun.tools.xjc.Language;
@@ -96,16 +99,26 @@ public class DroolsJaxbTest extends TestCase {
         List list1 = new ArrayList();
         ksession.setGlobal( "list1",
                             list1 );
+        
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+        insertStage.setReceiver( executeResultHandler );
+        
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );
-        transformer.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
-
-        WorkingMemoryDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                         transformer );
-        Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ) );
+        transformer.setReceiver(insertStage );
+        
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );        
+        
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ), resultHandler );
+        ksession.fireAllRules();
+        
+        Map<FactHandle, Object> handles = ( Map<FactHandle, Object>  ) resultHandler.getObject();
 
         ksession.fireAllRules();
 
@@ -145,20 +158,32 @@ public class DroolsJaxbTest extends TestCase {
                             list1 );
         ksession.setGlobal( "list2",
                             list2 );
+        
+        
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+        insertStage.setReceiver( executeResultHandler );
+        
+        Splitter splitter = PipelineFactory.newIterateSplitter();
+        splitter.setReceiver( insertStage );
+        
+        Expression expression = PipelineFactory.newMvelExpression( "this.orderItem" );
+        expression.setReceiver( splitter );
+        
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
-        Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );
-        Expression expression = PipelineFactory.newMvelExpression( "this.orderItem" );
+        Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );        
         transformer.setReceiver( expression );
-        Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.setReceiver( splitter );
-        splitter.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
-        WorkingMemoryDataLoader dataLoader = new StatefulKnowledgeSessionDataLoaderImpl( ksession,
-                                                                                         transformer );
-        Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ) );
+        
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
+        
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ), resultHandler );
 
+        Map<FactHandle, Object> handles = ( Map<FactHandle, Object>  ) resultHandler.getObject();
         ksession.fireAllRules();
 
         assertEquals( 2,
@@ -177,4 +202,14 @@ public class DroolsJaxbTest extends TestCase {
         assertNotSame( list1.get( 0 ),
                        list2.get( 0 ) );
     }
+    
+    public static class ResultHandlerImpl implements ResultHandler {
+        Object object;
+        public void handleResult(Object object) {
+           this.object = object;             
+        }
+        public Object getObject() {
+            return this.object;
+        }       
+    } 
 }

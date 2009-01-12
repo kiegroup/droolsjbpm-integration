@@ -17,22 +17,19 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.dataloader.DataLoaderFactory;
-import org.drools.runtime.dataloader.WorkingMemoryDataLoader;
-import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
-import org.drools.runtime.dataloader.impl.EntryPointReceiverAdapter;
+import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
+import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.impl.DroolsSmooksConfiguration;
-import org.drools.runtime.pipeline.impl.IterateSplitter;
-import org.drools.runtime.pipeline.impl.MvelExpression;
 import org.drools.runtime.rule.FactHandle;
 import org.milyn.Smooks;
 import org.milyn.io.StreamUtils;
 
-public class DroolsSmookStatefulSessionTest extends TestCase {  
+public class DroolsSmookStatefulSessionTest extends TestCase {
 
     public void testDirectRoot() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -51,16 +48,27 @@ public class DroolsSmookStatefulSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+        insertStage.setReceiver( executeResultHandler );
+
         // Instantiate Smooks with the config...
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
-        
-        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "orderItem" );       
-        transformer.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
-        
-        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
-                                                                                                    transformer );
-        Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "SmooksDirectRoot.xml" ) ) );
+
+        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks,
+                                                                        "orderItem" );
+        transformer.setReceiver( insertStage );
+
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
+
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksDirectRoot.xml" ) ),
+                         resultHandler );
         ksession.fireAllRules();
+
+        Map<FactHandle, Object> handles = (Map<FactHandle, Object>) resultHandler.getObject();
 
         assertEquals( 1,
                       handles.size() );
@@ -88,20 +96,32 @@ public class DroolsSmookStatefulSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+        insertStage.setReceiver( executeResultHandler );
+
+        Splitter splitter = PipelineFactory.newIterateSplitter();
+        splitter.setReceiver( insertStage );
+
+        Expression expression = PipelineFactory.newMvelExpression( "children" );
+        expression.setReceiver( splitter );
+
         // Instantiate Smooks with the config...
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
 
-        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks, "root" );               
-        Expression expression = PipelineFactory.newMvelExpression( "children" );
+        Transformer transformer = PipelineFactory.newSmooksTransformer( smooks,
+                                                                        "root" );
         transformer.setReceiver( expression );
-        Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.setReceiver( splitter );
-        splitter.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
 
-        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
-                                                                                                transformer );
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
 
-        Map<FactHandle, Object> handles = dataLoader.insert( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ),
+                         resultHandler );
+
+        Map<FactHandle, Object> handles = (Map<FactHandle, Object>) resultHandler.getObject();
         ksession.fireAllRules();
 
         assertEquals( 2,
@@ -116,7 +136,7 @@ public class DroolsSmookStatefulSessionTest extends TestCase {
 
         assertNotSame( list.get( 0 ),
                        list.get( 1 ) );
-    }   
+    }
 
     private static byte[] readInputMessage(InputStream stream) {
         try {
@@ -124,6 +144,20 @@ public class DroolsSmookStatefulSessionTest extends TestCase {
         } catch ( IOException e ) {
             e.printStackTrace();
             return "<no-message/>".getBytes();
+        }
+    }
+
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
+        Object object;
+
+        public void handleResult(Object object) {
+            this.object = object;
+        }
+
+        public Object getObject() {
+            return this.object;
         }
     }
 }

@@ -1,7 +1,5 @@
 package org.drools.runtime.pipeline.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,21 +13,16 @@ import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
-import org.drools.common.InternalRuleBase;
-import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.dataloader.DataLoaderFactory;
-import org.drools.runtime.dataloader.WorkingMemoryDataLoader;
-import org.drools.runtime.dataloader.impl.StatefulKnowledgeSessionDataLoaderImpl;
-import org.drools.runtime.dataloader.impl.EntryPointReceiverAdapter;
+import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
+import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.impl.IterateSplitter;
-import org.drools.runtime.pipeline.impl.MvelExpression;
 import org.drools.runtime.rule.FactHandle;
 
 import com.thoughtworks.xstream.XStream;
@@ -53,14 +46,24 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+        insertStage.setReceiver( executeResultHandler );
+
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        transformer.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        transformer.setReceiver( insertStage );
 
-        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
-                                                                                                 transformer );
-        Map<FactHandle, Object> handles = dataLoader.insert( getClass().getResourceAsStream( "XStreamDirectRoot.xml" ) );
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
+
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( getClass().getResourceAsStream( "XStreamDirectRoot.xml" ),
+                         resultHandler );
         ksession.fireAllRules();
+
+        Map<FactHandle, Object> handles = (Map<FactHandle, Object>) resultHandler.getObject();
 
         assertEquals( 1,
                       handles.size() );
@@ -88,18 +91,26 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+        insertStage.setReceiver( executeResultHandler );
+
+        Splitter splitter = PipelineFactory.newIterateSplitter();
+        splitter.setReceiver( insertStage );
+
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
-        Expression expression = PipelineFactory.newMvelExpression( "this" );
-        transformer.setReceiver( expression );
-        Splitter splitter = PipelineFactory.newIterateSplitter();
-        expression.setReceiver( splitter );
-        splitter.setReceiver( PipelineFactory.newEntryPointReceiverAdapter() );
+        transformer.setReceiver( splitter );
 
-        WorkingMemoryDataLoader dataLoader = DataLoaderFactory.newStatefulRuleSessionDataLoader( ksession,
-                                                                                                 transformer );
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( transformer );
 
-        Map<FactHandle, Object> handles = dataLoader.insert( getClass().getResourceAsStream( "XStreamNestedIterable.xml" ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( getClass().getResourceAsStream( "XStreamNestedIterable.xml" ),
+                         resultHandler );
+
+        Map<FactHandle, Object> handles = (Map<FactHandle, Object>) resultHandler.getObject();
         ksession.fireAllRules();
 
         assertEquals( 2,
@@ -114,6 +125,20 @@ public class DroolsXStreamStatefulSessionTest extends TestCase {
 
         assertNotSame( list.get( 0 ),
                        list.get( 1 ) );
+    }
+
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
+        Object object;
+
+        public void handleResult(Object object) {
+            this.object = object;
+        }
+
+        public Object getObject() {
+            return this.object;
+        }
     }
 
 }
