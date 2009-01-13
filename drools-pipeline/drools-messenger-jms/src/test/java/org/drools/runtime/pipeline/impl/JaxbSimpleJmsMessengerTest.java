@@ -66,6 +66,11 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
             throw new RuntimeException( e );
         }
     }
+    
+    protected void tearDown() throws Exception {
+        this.simpleProducer.stop();
+        this.broker.stop();
+    }
 
     public void testJmsWithJaxb() throws Exception {
         Options xjcOpts = new Options();

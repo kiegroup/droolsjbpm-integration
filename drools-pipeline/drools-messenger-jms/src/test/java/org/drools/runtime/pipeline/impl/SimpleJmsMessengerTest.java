@@ -47,6 +47,11 @@ public class SimpleJmsMessengerTest extends TestCase {
             throw new RuntimeException( e );
         }
     }
+    
+    protected void tearDown() throws Exception {
+        this.simpleProducer.stop();
+        this.broker.stop();
+    }    
 
     public void testJms() throws Exception {
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
