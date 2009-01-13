@@ -23,7 +23,7 @@ public class JmsMessengerProviderImpl
                                  destinationName,
                                  resultHandlerFactory );
     }
-    
+
     public Action newJmsUnwrapMessageObject() {
         return new JmsUnwrapMessageObject();
     }

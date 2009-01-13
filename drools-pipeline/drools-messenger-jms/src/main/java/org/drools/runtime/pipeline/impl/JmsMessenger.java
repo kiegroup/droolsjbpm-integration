@@ -14,7 +14,6 @@ import javax.naming.InitialContext;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
 import org.drools.runtime.pipeline.Service;
-import org.drools.runtime.pipeline.impl.BaseService;
 
 public class JmsMessenger extends BaseService
     implements
@@ -39,7 +38,7 @@ public class JmsMessenger extends BaseService
         super();
         this.pipeline = pipeline;
         this.resultHandlerFactory = resultHandlerFactory;
-        
+
         try {
             InitialContext jndiContext = new InitialContext( properties );
             this.connectionFactory = (ConnectionFactory) jndiContext.lookup( "ConnectionFactory" );

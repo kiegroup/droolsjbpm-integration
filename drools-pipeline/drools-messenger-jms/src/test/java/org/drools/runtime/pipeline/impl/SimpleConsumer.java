@@ -25,10 +25,10 @@ public class SimpleConsumer {
     public static void main(String[] args) throws Exception {
         BrokerService broker = new BrokerService();
         // configure the broker
-        broker.setBrokerName("consumer");
-        broker.addConnector("tcp://localhost:61616");
+        broker.setBrokerName( "consumer" );
+        broker.addConnector( "tcp://localhost:61616" );
         broker.start();
-        
+
         Context jndiContext = null;
         ConnectionFactory connectionFactory = null;
         Connection connection = null;

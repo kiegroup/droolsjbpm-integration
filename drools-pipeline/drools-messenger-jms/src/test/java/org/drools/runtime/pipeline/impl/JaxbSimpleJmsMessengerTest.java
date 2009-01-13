@@ -30,12 +30,6 @@ import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
 import org.drools.runtime.pipeline.Service;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.impl.ExecuteResultHandler;
-import org.drools.runtime.pipeline.impl.JmsMessenger;
-import org.drools.runtime.pipeline.impl.JmsUnwrapMessageObject;
-import org.drools.runtime.pipeline.impl.StatefulKnowledgeSessionInsertStage;
-import org.drools.runtime.pipeline.impl.StatefulKnowledgeSessionPipelineImpl;
-import org.drools.runtime.pipeline.impl.JaxbFactTest.ResultHandlerImpl;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.util.StringUtils;
 
