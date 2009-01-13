@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.stream.StreamSource;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -15,29 +17,21 @@ import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.impl.XStreamStatefulSessionTest.ResultHandlerImpl;
 import org.drools.runtime.rule.FactHandle;
-
-import com.thoughtworks.xstream.XStream;
+import org.milyn.Smooks;
 
 import junit.framework.TestCase;
 
-public class XStreamFactTest extends TestCase {
+public class SmooksFactTest extends TestCase {
     public void testFact() throws Exception {
-        String xml = "";
-        xml += "<list>";
-        xml += "<example.OrderItem>";
-        xml += "    <price>8.9</price>";        
-        xml += "    <productId>111</productId>";
-        xml += "    <quantity>2</quantity>";        
-        xml += "</example.OrderItem>";
-        xml += "</list>";
+        String xml = "<org.drools.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><productId>111</productId><quantity>2</quantity></example.OrderItem><example.OrderItem><price>5.2</price><productId>222</productId><quantity>7</quantity></example.OrderItem></children></org.drools.runtime.pipeline.impl.Root>";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        kbuilder.add( ResourceFactory.newClassPathResource( "test_XStreamDirectRoot.drl",
-                                                            XStreamStatefulSessionTest.class ),
+        kbuilder.add( ResourceFactory.newClassPathResource( "test_SmooksNestedIterable.drl",
+                                                            SmooksFactTest.class ),
                       ResourceType.DRL );
 
         assertFalse( kbuilder.hasErrors() );
@@ -48,34 +42,35 @@ public class XStreamFactTest extends TestCase {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        
-        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+        
         KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
         insertStage.setReceiver( executeResultHandler );
-        
-        XStream xstream = new XStream();
-        Transformer transformer = PipelineFactory.newXStreamFromXmlTransformer( xstream );
+
+        Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
+
+        Transformer transformer = PipelineFactory.newSmooksFromSourceTransformer( smooks,
+                                                                                  "root" );
         transformer.setReceiver( insertStage );
 
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
 
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        pipeline.insert( xml,
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ),
                          resultHandler );
         
         FactHandle factHandle = ( FactHandle ) ((Map)resultHandler.getObject()).keySet().iterator().next();
-        assertNotNull( factHandle );
-
+        assertNotNull( factHandle );         
 
         // now round trip that fact
         Action executeResult = PipelineFactory.newExecuteResultHandler();
         
         Action assignAsResult = PipelineFactory.newAssignObjectAsResult();
         assignAsResult.setReceiver( executeResult );
-        
-        transformer = PipelineFactory.newXStreamToXmlTransformer( xstream );
+
+        transformer = PipelineFactory.newSmooksToSourceTransformer( smooks );
         transformer.setReceiver( assignAsResult );
         
         KnowledgeRuntimeCommand getObject = PipelineFactory.newStatefulKnowledgeSessionGetObject();      
@@ -83,20 +78,35 @@ public class XStreamFactTest extends TestCase {
 
         pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( getObject );
-        
+
         resultHandler = new ResultHandlerImpl();
-        pipeline.insert( factHandle, resultHandler );  
-        
-        assertEqualsIgnoreWhitespace( xml, (String) resultHandler.getObject() );
+        pipeline.insert( factHandle, resultHandler );
+
+        assertEquals( xml,
+                      resultHandler.getObject() );
     }
-    
+
     private static void assertEqualsIgnoreWhitespace(final String expected,
                                                      final String actual) {
-               final String cleanExpected = expected.replaceAll( "\\s+",
-                                                                 "" );
-               final String cleanActual = actual.replaceAll( "\\s+",
-                                                             "" );
-               assertEquals( cleanExpected,
-                             cleanActual );
-           }
+        final String cleanExpected = expected.replaceAll( "\\s+",
+                                                          "" );
+        final String cleanActual = actual.replaceAll( "\\s+",
+                                                      "" );
+        assertEquals( cleanExpected,
+                      cleanActual );
+    }
+
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
+        Object object;
+
+        public void handleResult(Object object) {
+            this.object = object;
+        }
+
+        public Object getObject() {
+            return this.object;
+        }
+    }
 }
