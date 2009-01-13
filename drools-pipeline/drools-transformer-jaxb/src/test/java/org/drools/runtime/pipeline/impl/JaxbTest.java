@@ -48,7 +48,7 @@ import org.drools.runtime.rule.FactHandle;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
-public class DroolsJaxbTest extends TestCase {
+public class JaxbTest extends TestCase {
 
     //    public void testModelLoad() throws Exception {
     //        Options xjcOpts = new Options();
@@ -108,7 +108,7 @@ public class DroolsJaxbTest extends TestCase {
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
-        Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver(insertStage );
         
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
@@ -174,7 +174,7 @@ public class DroolsJaxbTest extends TestCase {
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
-        Transformer transformer = PipelineFactory.newJaxbTransformer( unmarshaller );        
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );        
         transformer.setReceiver( expression );
         
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );

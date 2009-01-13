@@ -68,7 +68,6 @@ public class XStreamFactTest extends TestCase {
         FactHandle factHandle = ( FactHandle ) ((Map)resultHandler.getObject()).keySet().iterator().next();
         assertNotNull( factHandle );
 
-
         // now round trip that fact
         Action executeResult = PipelineFactory.newExecuteResultHandler();
         

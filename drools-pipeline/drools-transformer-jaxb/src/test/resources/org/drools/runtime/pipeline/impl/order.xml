@@ -1,7 +1,5 @@
-<?xml version="1.0"?>
-<order xmlns="http://drools.org/model/order" 
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="http://drools.org/model/order order.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<order xmlns="http://drools.org/model/order" >
     <order-item>
         <product-id>111</product-id>
         <quantity>2</quantity>

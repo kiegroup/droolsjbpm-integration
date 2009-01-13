@@ -6,6 +6,8 @@ import org.drools.model.order.Order.OrderItem
 global java.util.List list1;
 global java.util.List list2;
 
+global org.drools.model.order.Order order
+
 
 rule orderRule
 when
