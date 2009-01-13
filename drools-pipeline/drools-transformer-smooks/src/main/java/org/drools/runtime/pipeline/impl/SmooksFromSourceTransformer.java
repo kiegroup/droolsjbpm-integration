@@ -8,20 +8,20 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.drools.io.Resource;
 import org.drools.runtime.pipeline.PipelineContext;
-import org.drools.runtime.pipeline.SmooksTransformerProvider;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
 import org.milyn.Smooks;
 import org.milyn.container.ExecutionContext;
 import org.milyn.payload.JavaResult;
+import org.milyn.payload.StringSource;
 
-public class SmooksTransformer extends BaseEmitter
+public class SmooksFromSourceTransformer extends BaseEmitter
     implements
     Transformer {
     private Smooks                    smooks;
     private DroolsSmooksConfiguration configuration;
 
-    public SmooksTransformer(Smooks smooks,
+    public SmooksFromSourceTransformer(Smooks smooks,
                              DroolsSmooksConfiguration configuration) {
         this.smooks = smooks;
         this.configuration = configuration;
@@ -45,13 +45,15 @@ public class SmooksTransformer extends BaseEmitter
                 source =  new StreamSource( ( Reader ) object );
             } else if ( object instanceof Resource ) {                
                 source =  new StreamSource( ( ( Resource ) object).getReader() );
-            }    else {
+            } else if ( object instanceof String ) {                 
+                source =  new StringSource( (String) object);
+            } else {
                 throw new IllegalArgumentException( "signal object must be instance of Source, InputStream, Reader or Resource" );
             }
             
             this.smooks.filter( source,
                                 javaResult,
-                                executionContext );
+                                executionContext );            
             
             result = javaResult.getBean( this.configuration.getRootId() );
         } catch ( Exception e ) {
@@ -61,15 +63,6 @@ public class SmooksTransformer extends BaseEmitter
         }
         emit( result,
               context );
-    }
-    
-    public static class SmooksTransformerProviderImpl implements SmooksTransformerProvider {
-        public Transformer newSmooksTransformer(Smooks smooks,
-                                                String rootId) {
-            DroolsSmooksConfiguration conf = new DroolsSmooksConfiguration( rootId );
-            return new SmooksTransformer( smooks,
-                                          conf );
-        }
     }
 
 }

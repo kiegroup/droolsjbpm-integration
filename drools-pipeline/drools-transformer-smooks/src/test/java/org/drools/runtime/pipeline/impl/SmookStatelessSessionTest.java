@@ -1,7 +1,11 @@
 package org.drools.runtime.pipeline.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.transform.stream.StreamSource;
 
 import junit.framework.TestCase;
 
@@ -13,21 +17,24 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
+import org.drools.runtime.pipeline.Expression;
+import org.drools.runtime.pipeline.Join;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
+import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
+import org.milyn.Smooks;
+import org.milyn.io.StreamUtils;
 
-import com.thoughtworks.xstream.XStream;
+public class SmookStatelessSessionTest extends TestCase {
 
-public class DroolsXStreamStatelessSessionTest extends TestCase {
-
-    public void testXstreamDirectRoot() throws Exception {
+    public void testSmooksDirectRoot() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        kbuilder.add( ResourceFactory.newClassPathResource( "test_XStreamDirectRoot.drl",
-                                                            DroolsXStreamStatefulSessionTest.class ),
+        kbuilder.add( ResourceFactory.newClassPathResource( "test_SmooksDirectRoot.drl",
+                                                            SmookStatefulSessionTest.class ),
                       ResourceType.DRL );
 
         assertFalse( kbuilder.hasErrors() );
@@ -42,15 +49,18 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
 
         KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
 
-        XStream xstream = new XStream();
-        Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
+        // Instantiate Smooks with the config...
+        Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
+
+        Transformer transformer = PipelineFactory.newSmooksFromSourceTransformer( smooks,
+                                                                                  "orderItem" );
         transformer.setReceiver( execute );
 
         Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
 
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        pipeline.insert( getClass().getResourceAsStream( "XStreamDirectRoot.xml" ),
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksDirectRoot.xml" ) ),
                          resultHandler );
 
         assertEquals( 1,
@@ -60,11 +70,11 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
                       list.get( 0 ).getClass().getName() );
     }
 
-    public void testXstreamNestedIterable() throws Exception {
+    public void testSmooksNestedIterable() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        kbuilder.add( ResourceFactory.newClassPathResource( "test_XStreamNestedIterable.drl",
-                                                            DroolsXStreamStatefulSessionTest.class ),
+        kbuilder.add( ResourceFactory.newClassPathResource( "test_SmooksNestedIterable.drl",
+                                                            SmookStatefulSessionTest.class ),
                       ResourceType.DRL );
 
         assertFalse( kbuilder.hasErrors() );
@@ -79,19 +89,25 @@ public class DroolsXStreamStatelessSessionTest extends TestCase {
 
         KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
 
-        Action mvelAction = PipelineFactory.newMvelAction( "context.setIterable( this  )" );
+        Action mvelAction = PipelineFactory.newMvelAction( "context.setIterable( this.children  )" );
         mvelAction.setReceiver( execute );
 
-        XStream xstream = new XStream();
-        Transformer transformer = PipelineFactory.newXStreamTransformer( xstream );
+        // Instantiate Smooks with the config...
+        Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
+
+        Transformer transformer = PipelineFactory.newSmooksFromSourceTransformer( smooks,
+                                                                                  "root" );
         transformer.setReceiver( mvelAction );
 
         Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
 
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        pipeline.insert( getClass().getResourceAsStream( "XStreamNestedIterable.xml" ),
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "SmooksNestedIterable.xml" ) ),
                          resultHandler );
+
+        assertEquals( 2,
+                      list.size() );
 
         assertEquals( "example.OrderItem",
                       list.get( 0 ).getClass().getName() );

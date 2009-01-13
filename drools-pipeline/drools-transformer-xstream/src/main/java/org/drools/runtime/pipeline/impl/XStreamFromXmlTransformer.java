@@ -13,12 +13,12 @@ import org.drools.runtime.pipeline.XStreamTransformerProvider;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
 import com.thoughtworks.xstream.XStream;;
 
-public class XStreamTransformer extends BaseEmitter
+public class XStreamFromXmlTransformer extends BaseEmitter
     implements
     Transformer {
     private XStream                    xstream;   
 
-    public XStreamTransformer(XStream xstream) {
+    public XStreamFromXmlTransformer(XStream xstream) {
         this.xstream = xstream;
 
     }
@@ -28,7 +28,9 @@ public class XStreamTransformer extends BaseEmitter
         this.xstream.setClassLoader( context.getClassLoader() );
         Object result = null;
         try {
-        	if ( object instanceof Reader ) {
+        	if ( object instanceof String ) {
+        	    result = this.xstream.fromXML( ( String ) object );
+        	} else  if ( object instanceof Reader ) {
         		result = this.xstream.fromXML( ( Reader ) object );
         	} else if ( object instanceof InputStream ) {
         		result = this.xstream.fromXML( ( InputStream ) object );
@@ -45,11 +47,4 @@ public class XStreamTransformer extends BaseEmitter
         emit( result,
               context );
     }
-    
-    public static class XStreamTransformerProviderImpl implements XStreamTransformerProvider {
-        public Transformer newXStreamTransformer(XStream xstream) {
-            return new XStreamTransformer( xstream );
-        }
-    }
-
 }
