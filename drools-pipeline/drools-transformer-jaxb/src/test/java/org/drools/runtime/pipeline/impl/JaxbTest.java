@@ -42,7 +42,6 @@ import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.impl.StatefulKnowledgeSessionPipelineTest.ResultHandlerImpl;
 import org.drools.runtime.rule.FactHandle;
 
 import com.sun.tools.xjc.Language;
@@ -99,26 +98,27 @@ public class JaxbTest extends TestCase {
         List list1 = new ArrayList();
         ksession.setGlobal( "list1",
                             list1 );
-        
+
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
         KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
         insertStage.setReceiver( executeResultHandler );
-        
+
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
-        transformer.setReceiver(insertStage );
-        
+        transformer.setReceiver( insertStage );
+
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
-        pipeline.setReceiver( transformer );        
-        
+        pipeline.setReceiver( transformer );
+
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ), resultHandler );
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ),
+                         resultHandler );
         ksession.fireAllRules();
-        
-        Map<FactHandle, Object> handles = ( Map<FactHandle, Object>  ) resultHandler.getObject();
+
+        Map<FactHandle, Object> handles = (Map<FactHandle, Object>) resultHandler.getObject();
 
         ksession.fireAllRules();
 
@@ -158,32 +158,32 @@ public class JaxbTest extends TestCase {
                             list1 );
         ksession.setGlobal( "list2",
                             list2 );
-        
-        
+
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
         KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
         insertStage.setReceiver( executeResultHandler );
-        
+
         Splitter splitter = PipelineFactory.newIterateSplitter();
         splitter.setReceiver( insertStage );
-        
+
         Expression expression = PipelineFactory.newMvelExpression( "this.orderItem" );
         expression.setReceiver( splitter );
-        
+
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
-        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );        
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( expression );
-        
+
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
-        
-        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ), resultHandler );
 
-        Map<FactHandle, Object> handles = ( Map<FactHandle, Object>  ) resultHandler.getObject();
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        pipeline.insert( new StreamSource( getClass().getResourceAsStream( "order.xml" ) ),
+                         resultHandler );
+
+        Map<FactHandle, Object> handles = (Map<FactHandle, Object>) resultHandler.getObject();
         ksession.fireAllRules();
 
         assertEquals( 2,
@@ -202,14 +202,18 @@ public class JaxbTest extends TestCase {
         assertNotSame( list1.get( 0 ),
                        list2.get( 0 ) );
     }
-    
-    public static class ResultHandlerImpl implements ResultHandler {
+
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
         Object object;
+
         public void handleResult(Object object) {
-           this.object = object;             
+            this.object = object;
         }
+
         public Object getObject() {
             return this.object;
-        }       
-    } 
+        }
+    }
 }
