@@ -17,6 +17,7 @@
       <module>drools-transformer-jaxb</module>
       <module>drools-transformer-xstream</module>
       <module>drools-transformer-jxls</module>
+      <module>drools-messenger-jms</module>
   </modules>
   
 </project>
