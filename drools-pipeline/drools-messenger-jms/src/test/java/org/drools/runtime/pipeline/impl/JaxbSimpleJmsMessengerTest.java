@@ -157,6 +157,7 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
 
         assertEqualsIgnoreWhitespace( xml,
                                       (String) resultHandler.getObject() );
+        feeder.stop();
 
     }
 

@@ -103,6 +103,7 @@ public class SimpleJmsMessengerTest extends TestCase {
         factHandle = (FactHandle) ((Map) ((ResultHandlerImpl) factory.list.get( 3 )).getObject()).keySet().iterator().next();
         assertEquals( "hello3",
                       ksession.getObject( factHandle ) );
+        feeder.stop();
 
     }
 
