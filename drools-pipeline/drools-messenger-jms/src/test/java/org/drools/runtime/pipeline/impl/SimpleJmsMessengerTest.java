@@ -53,7 +53,7 @@ public class SimpleJmsMessengerTest extends TestCase {
         }
     }
 
-    public void test1() throws Exception {
+    public void testJms() throws Exception {
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 

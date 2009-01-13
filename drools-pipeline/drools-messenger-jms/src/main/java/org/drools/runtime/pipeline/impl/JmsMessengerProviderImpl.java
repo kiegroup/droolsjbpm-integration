@@ -5,6 +5,7 @@ package org.drools.runtime.pipeline.impl;
 
 import java.util.Properties;
 
+import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.JmsMessengerProvider;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
@@ -21,6 +22,10 @@ public class JmsMessengerProviderImpl
                                  properties,
                                  destinationName,
                                  resultHandlerFactory );
+    }
+    
+    public Action newJmsUnwrapMessageObject() {
+        return new JmsUnwrapMessageObject();
     }
 
 }

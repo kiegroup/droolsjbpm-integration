@@ -28,6 +28,7 @@ import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
+import org.drools.runtime.pipeline.Service;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.ExecuteResultHandler;
 import org.drools.runtime.pipeline.impl.JmsMessenger;
@@ -72,7 +73,7 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
         }
     }
 
-    public void test1() throws Exception {
+    public void testJmsWithJaxb() throws Exception {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -88,54 +89,52 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
         kbuilder.add( ResourceFactory.newClassPathResource( "test_Jaxb.drl",
                                                             getClass() ),
                       ResourceType.DRL );
-        
+
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        
-        ExecuteResultHandler resultHandlerStage = new ExecuteResultHandler();
-        
-        StatefulKnowledgeSessionInsertStage insertStage = new StatefulKnowledgeSessionInsertStage();
+        Action resultHandlerStage = PipelineFactory.newExecuteResultHandler();
+
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
         insertStage.setReceiver( resultHandlerStage );
-        
+
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( insertStage );
-        
-        JmsUnwrapMessageObject unwrapObjectStage = new JmsUnwrapMessageObject();        
+
+        Action unwrapObjectStage = PipelineFactory.newJmsUnwrapMessageObject();
         unwrapObjectStage.setReceiver( transformer );
-        
+
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( unwrapObjectStage );
-        
 
         ResultHandleFactoryImpl factory = new ResultHandleFactoryImpl();
-        JmsMessenger feeder = new JmsMessenger( pipeline,
-                                            props,
-                                            this.destinationName,
-                                            factory );
-        feeder.start();                
-        
+        Service feeder = PipelineFactory.newJmsMessenger( pipeline,
+                                                          props,
+                                                          this.destinationName,
+                                                          factory );
+        feeder.start();
+
         String xml = StringUtils.readFileAsString( new InputStreamReader( getClass().getResourceAsStream( "order.xml" ) ) );
-        
+
         this.simpleProducer.sendObject( xml );
 
-        
         for ( int i = 0; i < 5; i++ ) {
             // iterate and sleep 5 times, to give these messages time to complete.
             if ( factory.list.size() == 1 ) {
                 break;
             }
             Thread.sleep( 500 );
-        }        
+        }
 
-        FactHandle factHandle = (FactHandle) ((Map)((ResultHandlerImpl)factory.list.get( 0 )).getObject()).keySet().iterator().next();
+        FactHandle factHandle = (FactHandle) ((Map) ((ResultHandlerImpl) factory.list.get( 0 )).getObject()).keySet().iterator().next();
         assertNotNull( factHandle );
-        
-        assertEquals( 1, factory.list.size() );
+
+        assertEquals( 1,
+                      factory.list.size() );
 
         Action executeResult = PipelineFactory.newExecuteResultHandler();
 
@@ -158,11 +157,13 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
                          resultHandler );
 
         assertEqualsIgnoreWhitespace( xml,
-                                      (String) resultHandler.getObject() );        
-        
+                                      (String) resultHandler.getObject() );
+
     }
-    
-    public static class ResultHandleFactoryImpl implements ResultHandlerFactory {
+
+    public static class ResultHandleFactoryImpl
+        implements
+        ResultHandlerFactory {
         List list = new ArrayList();
 
         public ResultHandler newResultHandler() {
@@ -170,19 +171,23 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
             list.add( handler );
             return handler;
         }
-        
+
     }
-    
-    public static class ResultHandlerImpl implements ResultHandler {
+
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
         Object object;
+
         public void handleResult(Object object) {
-           this.object = object;             
+            this.object = object;
         }
+
         public Object getObject() {
             return this.object;
-        }       
-    }    
-    
+        }
+    }
+
     private static void assertEqualsIgnoreWhitespace(final String expected,
                                                      final String actual) {
         final String cleanExpected = expected.replaceAll( "\\s+",
