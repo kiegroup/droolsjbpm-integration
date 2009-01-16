@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 public class SmooksFactTest extends TestCase {
     public void testFact() throws Exception {
-        String xml = "<org.drools.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><productId>111</productId><quantity>2</quantity></example.OrderItem><example.OrderItem><price>5.2</price><productId>222</productId><quantity>7</quantity></example.OrderItem></children></org.drools.runtime.pipeline.impl.Root>";
+        String xml = "<org.drools.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><quantity>2</quantity><productId>111</productId></example.OrderItem><example.OrderItem><price>5.2</price><quantity>7</quantity><productId>222</productId></example.OrderItem></children></org.drools.runtime.pipeline.impl.Root>";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
