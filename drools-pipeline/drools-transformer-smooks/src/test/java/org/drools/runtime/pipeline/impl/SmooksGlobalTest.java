@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.custommonkey.xmlunit.Diff;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -27,11 +28,8 @@ import com.thoughtworks.xstream.XStream;
 import junit.framework.TestCase;
 
 public class SmooksGlobalTest extends TestCase {
-    public void testDummy() {
-        
-    }
     
-    public void FIXME_testGlobal() throws Exception {
+    public void testGlobal() throws Exception {
         String xml = "<org.drools.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><quantity>2</quantity><productId>111</productId></example.OrderItem><example.OrderItem><price>5.2</price><quantity>7</quantity><productId>222</productId></example.OrderItem></children></org.drools.runtime.pipeline.impl.Root>";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -80,19 +78,8 @@ public class SmooksGlobalTest extends TestCase {
         resultHandler = new ResultHandlerImpl();
         pipeline.insert( ksession.getGlobal( "root" ),
                          resultHandler );
-
-        assertEquals( xml,
-                      resultHandler.getObject() );
-    }
-
-    private static void assertEqualsIgnoreWhitespace(final String expected,
-                                                     final String actual) {
-        final String cleanExpected = expected.replaceAll( "\\s+",
-                                                          "" );
-        final String cleanActual = actual.replaceAll( "\\s+",
-                                                      "" );
-        assertEquals( cleanExpected,
-                      cleanActual );
+        
+        assertTrue( new Diff( xml, (String) resultHandler.getObject() ).similar() );
     }
 
     public static class ResultHandlerImpl
