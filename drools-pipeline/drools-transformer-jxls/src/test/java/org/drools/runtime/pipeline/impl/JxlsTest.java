@@ -32,21 +32,19 @@ import net.sf.jxls.reader.XLSReader;
 
 public class JxlsTest extends TestCase {
     public void test1() throws Exception {
-        InputStream stream = getClass().getResourceAsStream( "departments.xml");
-        assertNotNull( stream );
-        
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         // kbuilder.add( ResourceFactory.newClassPathResource( "test_JXLS.drl", getClass() ), ResourceType.DRL );
         
         ClassLoader cl = ((KnowledgeBuilderImpl)kbuilder).pkgBuilder.getRootClassLoader(); 
         Thread.currentThread().setContextClassLoader( cl );
-        
-        InputStream inputXML = new BufferedInputStream( stream );
-        XLSReader mainReader = ReaderBuilder.buildFromXML( inputXML );
+
         InputStream inputXLS = new BufferedInputStream(getClass().getResourceAsStream( "departmentData.xls"));
         
-        Callable callable = new CallableImpl();
+        XLSReader mainReader = ReaderBuilder.buildFromXML( ResourceFactory.newClassPathResource( "departments.xml", getClass() ).getInputStream() );
         Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.drools.runtime.pipeline.impl.Company() ]");
+        
+        Callable callable = new CallableImpl();
+
         callable.setReceiver( transformer );
         transformer.setReceiver( callable );        
         BasePipelineContext context = new BasePipelineContext( Thread.currentThread().getContextClassLoader() );
