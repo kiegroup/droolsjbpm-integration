@@ -1,9 +1,8 @@
 package org.drools.runtime.pipeline.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import junit.framework.TestCase;
 
+import org.custommonkey.xmlunit.Diff;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -17,21 +16,18 @@ import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.XStreamStatefulSessionTest.ResultHandlerImpl;
-import org.drools.runtime.rule.FactHandle;
 
 import com.thoughtworks.xstream.XStream;
-
-import junit.framework.TestCase;
 
 public class XStreamGlobalTest extends TestCase {
     public void testGlobal() throws Exception {
         String xml = "";
-        xml += "<list>";
-        xml += "<example.OrderItem>";
-        xml += "    <price>8.9</price>";        
-        xml += "    <productId>111</productId>";
-        xml += "    <quantity>2</quantity>";        
-        xml += "</example.OrderItem>";
+        xml += "<list>\n";
+        xml += "  <example.OrderItem>\n";
+        xml += "    <price>8.9</price>\n";        
+        xml += "    <productId>111</productId>\n";
+        xml += "    <quantity>2</quantity>\n";        
+        xml += "  </example.OrderItem>\n";
         xml += "</list>";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -81,7 +77,10 @@ public class XStreamGlobalTest extends TestCase {
         resultHandler = new ResultHandlerImpl();
         pipeline.insert( "list", resultHandler );  
         
-        assertEqualsIgnoreWhitespace( xml, (String) resultHandler.getObject() );
+        System.out.println(xml);
+        System.out.println(resultHandler.getObject());
+        System.out.println(new Diff( xml, (String) resultHandler.getObject() ));
+        assertTrue( new Diff( xml, (String) resultHandler.getObject() ).similar() );
     }
     
     private static void assertEqualsIgnoreWhitespace(final String expected,

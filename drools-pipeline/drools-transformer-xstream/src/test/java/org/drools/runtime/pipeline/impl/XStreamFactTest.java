@@ -1,9 +1,10 @@
 package org.drools.runtime.pipeline.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
+import org.custommonkey.xmlunit.Diff;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -21,18 +22,16 @@ import org.drools.runtime.rule.FactHandle;
 
 import com.thoughtworks.xstream.XStream;
 
-import junit.framework.TestCase;
-
 public class XStreamFactTest extends TestCase {
     public void testFact() throws Exception {
         String xml = "";
-        xml += "<list>";
-        xml += "<example.OrderItem>";
-        xml += "    <price>8.9</price>";        
-        xml += "    <productId>111</productId>";
-        xml += "    <quantity>2</quantity>";        
-        xml += "</example.OrderItem>";
-        xml += "</list>";
+        xml += "<list>\n";
+        xml += "  <example.OrderItem>\n";
+        xml += "    <price>8.9</price>\n";        
+        xml += "    <productId>111</productId>\n";
+        xml += "    <quantity>2</quantity>\n";        
+        xml += "  </example.OrderItem>\n";
+        xml += "</list>\n";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -86,7 +85,7 @@ public class XStreamFactTest extends TestCase {
         resultHandler = new ResultHandlerImpl();
         pipeline.insert( factHandle, resultHandler );  
         
-        assertEqualsIgnoreWhitespace( xml, (String) resultHandler.getObject() );
+        assertTrue( new Diff( xml, (String) resultHandler.getObject() ).similar() );
     }
     
     private static void assertEqualsIgnoreWhitespace(final String expected,

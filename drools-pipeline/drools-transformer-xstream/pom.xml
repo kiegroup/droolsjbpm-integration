@@ -30,6 +30,13 @@
           <groupId>com.thoughtworks.xstream</groupId>
           <artifactId>xstream</artifactId>
         </dependency>         
+
+        <dependency>
+          <groupId>xmlunit</groupId>
+          <artifactId>xmlunit</artifactId>
+          <version>1.2</version>
+          <scope>test</scope>
+        </dependency>     
       </dependencies>     
 
     <repositories>
