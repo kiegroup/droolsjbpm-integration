@@ -8,9 +8,9 @@
     <version>5.0.0.SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-transformer</artifactId>
+  <artifactId>drools-pipeline</artifactId>
   <packaging>pom</packaging>
-  <name>Drools :: Transformer</name>
+  <name>Drools :: Pipeline</name>
   
   <modules>
       <module>drools-transformer-smooks</module>

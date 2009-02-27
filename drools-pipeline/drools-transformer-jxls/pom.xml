@@ -10,7 +10,7 @@
 
   <artifactId>drools-transformer-jxls</artifactId>
   <packaging>jar</packaging>
-  <name>Drools :: Pipeline:: Transformer :: JXLS</name>
+  <name>Drools :: Pipeline :: Transformer :: JXLS</name>
   
       <dependencies>
          <dependency>
