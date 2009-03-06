@@ -13,6 +13,7 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
+import org.drools.runtime.pipeline.Expression;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
@@ -40,11 +41,20 @@ public class XStreamStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
-        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+        
+        Action assignResult = PipelineFactory.newAssignObjectAsResult();
+        assignResult.setReceiver( executeResultHandler );
+
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        batchExecution.setReceiver( assignResult );
+        
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newInsertObjectCommand();
+        insertStage.setReceiver( batchExecution );
 
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamFromXmlTransformer( xstream );
-        transformer.setReceiver( execute );
+        transformer.setReceiver( insertStage );
 
         Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
@@ -77,14 +87,23 @@ public class XStreamStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
-        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+        
+        Action assignResult = PipelineFactory.newAssignObjectAsResult();
+        assignResult.setReceiver( executeResultHandler );
 
-        Action mvelAction = PipelineFactory.newMvelAction( "context.setIterable( this  )" );
-        mvelAction.setReceiver( execute );
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        batchExecution.setReceiver( assignResult );
+        
+        KnowledgeRuntimeCommand insertElementsStage = PipelineFactory.newInsertElementsCommand();
+        insertElementsStage.setReceiver( batchExecution );
+        
+        Expression mvelExpression = PipelineFactory.newMvelExpression( "this.children" );
+        mvelExpression.setReceiver( insertElementsStage );
 
         XStream xstream = new XStream();
         Transformer transformer = PipelineFactory.newXStreamFromXmlTransformer( xstream );
-        transformer.setReceiver( mvelAction );
+        transformer.setReceiver( insertElementsStage );
 
         Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );

@@ -3,7 +3,9 @@ package org.drools.runtime.pipeline.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.stream.StreamSource;
 
@@ -14,17 +16,21 @@ import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.common.InternalFactHandle;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Expression;
 import org.drools.runtime.pipeline.Join;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
+import org.drools.runtime.pipeline.Receiver;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
+import org.drools.runtime.rule.FactHandle;
 import org.milyn.Smooks;
 import org.milyn.io.StreamUtils;
 
@@ -47,14 +53,23 @@ public class SmookStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
-        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+        
+        Action assignResult = PipelineFactory.newAssignObjectAsResult();
+        assignResult.setReceiver( executeResultHandler );
+
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        batchExecution.setReceiver( assignResult );
+        
+        KnowledgeRuntimeCommand insertStage = PipelineFactory.newInsertObjectCommand();
+        insertStage.setReceiver( batchExecution );
 
         // Instantiate Smooks with the config...
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
 
         Transformer transformer = PipelineFactory.newSmooksFromSourceTransformer( smooks,
                                                                                   "orderItem" );
-        transformer.setReceiver( execute );
+        transformer.setReceiver( insertStage );
 
         Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
@@ -87,17 +102,26 @@ public class SmookStatelessSessionTest extends TestCase {
         ksession.setGlobal( "list",
                             list );
 
-        KnowledgeRuntimeCommand execute = PipelineFactory.newStatelessKnowledgeSessionExecute();
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+        
+        Action assignResult = PipelineFactory.newAssignObjectAsResult();
+        assignResult.setReceiver( executeResultHandler );
 
-        Action mvelAction = PipelineFactory.newMvelAction( "context.setIterable( this.children  )" );
-        mvelAction.setReceiver( execute );
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        batchExecution.setReceiver( assignResult );
+        
+        KnowledgeRuntimeCommand insertElementsStage = PipelineFactory.newInsertElementsCommand();
+        insertElementsStage.setReceiver( batchExecution );
+        
+        Expression mvelExpression = PipelineFactory.newMvelExpression( "this.children" );
+        mvelExpression.setReceiver( insertElementsStage );
 
         // Instantiate Smooks with the config...
         Smooks smooks = new Smooks( getClass().getResourceAsStream( "smooks-config.xml" ) );
 
         Transformer transformer = PipelineFactory.newSmooksFromSourceTransformer( smooks,
                                                                                   "root" );
-        transformer.setReceiver( mvelAction );
+        transformer.setReceiver( mvelExpression );
 
         Pipeline pipeline = PipelineFactory.newStatelessKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( transformer );
