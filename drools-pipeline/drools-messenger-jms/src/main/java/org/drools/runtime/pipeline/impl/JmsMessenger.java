@@ -124,15 +124,16 @@ public class JmsMessenger extends BaseService
             while ( this.run ) {
                 Message msg = null;
                 try {
-                    msg = this.consumer.receive();
-                    if ( this.resultHandlerFactory != null ) {
-                        pipeline.insert( msg,
-                                         this.resultHandlerFactory.newResultHandler() );
-                    } else {
-                        pipeline.insert( msg,
-                                         null );
+                    msg = this.consumer.receive();     
+                    if (  msg != null ) {
+                        if ( this.resultHandlerFactory != null ) {
+                            pipeline.insert( msg,
+                                             this.resultHandlerFactory.newResultHandler() );
+                        } else {
+                            pipeline.insert( msg,
+                                             null );
+                        }
                     }
-                    System.out.println( "msg received : " + msg );
                 } catch ( JMSException e ) {
                     this.feeder.handleException( this.feeder,
                                                  msg,

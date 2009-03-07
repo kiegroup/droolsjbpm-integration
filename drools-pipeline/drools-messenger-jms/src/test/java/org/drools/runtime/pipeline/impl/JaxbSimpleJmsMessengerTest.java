@@ -126,7 +126,7 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
             if ( factory.list.size() == 1 ) {
                 break;
             }
-            Thread.sleep( 500 );
+            Thread.sleep( 5000 );
         }
 
         FactHandle factHandle = (FactHandle) ((Map) ((ResultHandlerImpl) factory.list.get( 0 )).getObject()).keySet().iterator().next();
