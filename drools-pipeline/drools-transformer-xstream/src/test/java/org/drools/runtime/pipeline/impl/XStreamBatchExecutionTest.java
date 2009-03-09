@@ -20,7 +20,7 @@ import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.runtime.BatchExecutionResult;
+import org.drools.runtime.BatchExecutionResults;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.Action;
@@ -74,7 +74,7 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         
         assertXMLEqual(expectedXml, outXml );
         
-        BatchExecutionResult result = ( BatchExecutionResult ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Cheese stilton = ( Cheese ) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );        
@@ -138,7 +138,7 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         
         assertXMLEqual( expectedXml, outXml );
         
-        BatchExecutionResult result = ( BatchExecutionResult ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         List list = ( List ) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton", 30);
         Cheese stilton30 = new Cheese( "stilton", 35);
@@ -214,7 +214,7 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         
         assertXMLEqual(expectedXml, outXml ); 
         
-        BatchExecutionResult result = ( BatchExecutionResult ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Cheese stilton = new Cheese( "stilton", 30 );
         
         assertNull( result.getValue( "list1" ) );
@@ -391,7 +391,7 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         
         assertXMLEqual(expectedXml, outXml ); 
         
-        BatchExecutionResult batchResult = ( BatchExecutionResult ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        BatchExecutionResults batchResult = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         
         Cheese stilton1 = new Cheese( "stilton", 1);
         Cheese cheddar1 = new Cheese( "cheddar", 1);
