@@ -1,22 +1,37 @@
 package org.drools.runtime.pipeline.impl;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.drools.Cheese;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.RuleBase;
+import org.drools.RuleBaseFactory;
+import org.drools.WorkingMemory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.compiler.DroolsError;
+import org.drools.compiler.PackageBuilder;
+import org.drools.compiler.PackageBuilderErrors;
 import org.drools.definition.KnowledgePackage;
+import org.drools.integrationtests.ProcessActionTest.TestVariable;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
+import org.drools.process.instance.ProcessInstance;
+import org.drools.rule.Package;
 import org.drools.runtime.BatchExecutionResult;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.Action;
@@ -25,6 +40,7 @@ import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
+import org.xml.sax.SAXException;
 
 public class XStreamBatchExecutionTest extends XMLTestCase {
 
@@ -282,6 +298,10 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         str += "    stilton : Cheese(type == 'stilton') \n";
         str += "    cheddar : Cheese(type == 'cheddar', price == stilton.price) \n";
         str += "end\n";
+        str += "query cheesesWithParams(String a, String b) \n";
+        str += "    stilton : Cheese(type == a) \n";
+        str += "    cheddar : Cheese(type == b, price == stilton.price) \n";
+        str += "end\n";        
         
         String inXml = "";
         inXml += "<batch-execution>";
@@ -314,6 +334,10 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         inXml += "    </org.drools.Cheese>";
         inXml += "  </insert>";
         inXml += "  <query out-identifier='cheeses' name='cheeses'/>";
+        inXml += "  <query out-identifier='cheeses2' name='cheesesWithParams'>";
+        inXml += "    <string>stilton</string>";
+        inXml += "    <string>cheddar</string>";
+        inXml += "  </query>";
         inXml += "</batch-execution>";
 
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -355,7 +379,26 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml +="      </row>\n";
         expectedXml +="    </query-results>\n";
         expectedXml +="  </result>\n";
+        expectedXml +="  <result identifier='cheeses2'>\n";
+        expectedXml +="    <query-results>\n";
+        expectedXml +="      <identifiers>\n";
+        expectedXml +="        <identifier>stilton</identifier>\n";
+        expectedXml +="        <identifier>cheddar</identifier>\n";
+        expectedXml +="      </identifiers>\n";
+        expectedXml +="      <row>\n";
+        expectedXml +="        <org.drools.Cheese reference=\"../../../../result/query-results/row/org.drools.Cheese\"/>\n";
+        expectedXml +="        <org.drools.Cheese reference=\"../../../../result/query-results/row/org.drools.Cheese[2]\"/>\n";
+        expectedXml +="      </row>\n";
+        expectedXml +="      <row>\n";
+        expectedXml +="        <org.drools.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.Cheese\"/>\n";
+        expectedXml +="        <org.drools.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.Cheese[2]\"/>\n";
+        expectedXml +="      </row>\n";
+        expectedXml +="    </query-results>\n";
+        expectedXml +="  </result>\n";        
         expectedXml +="</batch-execution-results>\n";
+        
+        System.out.println( expectedXml );
+        System.out.println( outXml );
         
         assertXMLEqual(expectedXml, outXml ); 
         
@@ -389,6 +432,89 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         }
         assertEquals( set, newSet );  
     }       
+    
+    public void testProcess() throws SAXException, IOException {
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        Reader source = new StringReader(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<process xmlns=\"http://drools.org/drools-5.0/process\"\n" +
+            "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+            "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n" +
+            "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n" +
+            "\n" +
+            "  <header>\n" +
+            "    <imports>\n" +
+            "      <import name=\"org.drools.TestVariable\" />\n" +
+            "    </imports>\n" +
+            "    <globals>\n" +
+            "      <global identifier=\"list\" type=\"java.util.List\" />\n" +
+            "    </globals>\n" +
+            "    <variables>\n" +
+            "      <variable name=\"person\" >\n" +
+            "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n" +
+            "      </variable>\n" +
+            "    </variables>\n" +
+            "  </header>\n" +
+            "\n" +
+            "  <nodes>\n" +
+            "    <start id=\"1\" name=\"Start\" />\n" +
+            "    <actionNode id=\"2\" name=\"MyActionNode\" >\n" +
+            "      <action type=\"expression\" dialect=\"mvel\" >System.out.println(\"Triggered\");\n" +
+            "list.add(person.name);\n" +
+            "</action>\n" +
+            "    </actionNode>\n" + 
+            "    <end id=\"3\" name=\"End\" />\n" +
+            "  </nodes>\n" +
+            "\n" +
+            "  <connections>\n" +
+            "    <connection from=\"1\" to=\"2\" />\n" +
+            "    <connection from=\"2\" to=\"3\" />\n" +
+            "  </connections>\n" +
+            "\n" +
+            "</process>");
+        kbuilder.add( ResourceFactory.newReaderResource( source ), ResourceType.DRF );
+        if ( kbuilder.hasErrors()) {
+            fail ( kbuilder.getErrors().toString() );
+        }
+
+        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        
+        StatelessKnowledgeSession ksession = kbase.newStatelessKnowledgeSession();
+        List<String> list = new ArrayList<String>();
+        ksession.setGlobal("list", list);
+        TestVariable person = new TestVariable("John Doe");
+        
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <startProcess processId='org.drools.actions'>";
+        inXml += "    <parameter identifier='person'>";
+        inXml += "       <org.drools.TestVariable>";
+        inXml += "         <name>John Doe</name>";
+        inXml += "    </org.drools.TestVariable>";
+        inXml += "    </parameter>";         
+        inXml += "  </startProcess>";
+        inXml += "  <get-global identifier='list' out-identifier='out-list'/>";        
+        inXml += "</batch-execution>";
+                
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();        
+        getPipeline(ksession).insert( inXml, resultHandler );        
+        String outXml = ( String ) resultHandler.getObject();        
+
+        assertEquals(1, list.size());
+        assertEquals("John Doe", list.get(0));
+        
+        String expectedXml = "";
+        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "  <result identifier=\"out-list\">\n";
+        expectedXml += "    <list>\n";
+        expectedXml += "      <string>John Doe</string>\n";
+        expectedXml += "    </list>\n";
+        expectedXml += "  </result>\n";        
+        expectedXml += "</batch-execution-results>\n";
+        
+        assertXMLEqual(expectedXml, outXml );          
+    }    
     
     private Pipeline getPipeline(StatelessKnowledgeSession ksession) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
