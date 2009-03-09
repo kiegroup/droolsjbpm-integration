@@ -8,8 +8,7 @@ import java.util.List;
 
 public class Person
     implements
-    Serializable,
-    PersonInterface {
+    Serializable {
     /**
      *
      */
