@@ -22,6 +22,7 @@ import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.BatchExecutionResults;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
@@ -547,7 +548,57 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
 
         assertXMLEqual(expectedXml, outXml );
 
-        
+
+    }
+
+
+    public void testInsertObjectStateful() throws Exception {
+        String str = "";
+        str += "package org.foo \n";
+        str += "declare Whee \n\ttype: String\n\tprice: Integer\n\toldPrice: Integer\nend\n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Whee(price < 30) \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n update($c);\n";
+        str += "end\n";
+        str += "query results\n";
+        str += "    w: Whee(price == 30)";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert>";
+        inXml += "    <org.foo.Whee>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.foo.Whee>";
+        inXml += "  </insert>";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful(ksession).insert( inXml, resultHandler );
+
+        String nextXML = "<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>";
+        getPipelineStateful(ksession).insert( nextXML, resultHandler );
+        String outXml = ( String ) resultHandler.getObject();
+
+
+        //we have not fired the rules yet
+        assertFalse(outXml.indexOf("<price>30</price>") > -1);
+
+        ksession.fireAllRules();
+
+        //ok lets try that again...
+        getPipelineStateful(ksession).insert( nextXML, resultHandler );
+        outXml = ( String ) resultHandler.getObject();
+        assertTrue(outXml.indexOf("<price>30</price>") > -1);
+
+
+
     }
     
     private Pipeline getPipeline(StatelessKnowledgeSession ksession) {
@@ -573,6 +624,29 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
     }
 
 
+    private Pipeline getPipelineStateful(StatefulKnowledgeSession ksession) {
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+
+        Action assignResult = PipelineFactory.newAssignObjectAsResult();
+        assignResult.setReceiver( executeResultHandler );
+
+        Transformer outTransformer = PipelineFactory.newXStreamToXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
+        outTransformer.setReceiver( assignResult );
+
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        batchExecution.setReceiver( outTransformer );
+
+
+        Transformer inTransformer = PipelineFactory.newXStreamFromXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
+        inTransformer.setReceiver( batchExecution );
+
+        Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        pipeline.setReceiver( inTransformer );
+
+        return pipeline;
+    }
+
+
     public static class ResultHandlerImpl
         implements
         ResultHandler {
@@ -587,9 +661,6 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         }
     }
     
-    private StatelessKnowledgeSession getSession2(String fileName) throws Exception {
-        return getSession2( ResourceFactory.newClassPathResource( fileName, getClass() ) );
-    }
         
     private StatelessKnowledgeSession getSession2(Resource resource) throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -609,6 +680,29 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         StatelessKnowledgeSession session = kbase.newStatelessKnowledgeSession();
 
         return session;
-    }       
+    }
+
+
+        private StatefulKnowledgeSession getSessionStateful(Resource resource) throws Exception {
+            KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+            kbuilder.add( resource, ResourceType.DRL );
+
+            if (kbuilder.hasErrors() ) {
+                System.out.println( kbuilder.getErrors() );
+            }
+
+            assertFalse( kbuilder.hasErrors() );
+            Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
+
+            KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+
+           
+            kbase.addKnowledgePackages( pkgs );
+            StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+
+            return session;
+    }
+
+
 
 }
