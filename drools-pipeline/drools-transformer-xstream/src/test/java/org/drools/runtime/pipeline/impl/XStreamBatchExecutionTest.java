@@ -503,7 +503,52 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml += "</batch-execution-results>\n";
         
         assertXMLEqual(expectedXml, outXml );          
-    }    
+    }
+
+
+    public void testInsertObjectWithDeclaredFact() throws Exception {
+        String str = "";
+        str += "package org.foo \n";
+        str += "declare Whee \n\ttype: String\n\tprice: Integer\n\toldPrice: Integer\nend\n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Whee() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='outStilton'>";
+        inXml += "    <org.foo.Whee>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.foo.Whee>";
+        inXml += "  </insert>";
+        inXml += "</batch-execution>";
+
+        StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipeline(ksession).insert( inXml, resultHandler );
+        String outXml = ( String ) resultHandler.getObject();
+
+        String expectedXml = "";
+        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "  <result identifier=\"outStilton\">\n";
+        expectedXml += "    <org.foo.Whee>\n";
+        expectedXml += "      <type>stilton</type>\n";
+        expectedXml += "      <oldPrice>0</oldPrice>\n";
+        expectedXml += "      <price>30</price>\n";
+        expectedXml += "    </org.foo.Whee>\n";
+        expectedXml += "  </result>\n";
+        expectedXml += "</batch-execution-results>\n";
+
+        assertXMLEqual(expectedXml, outXml );
+
+        
+    }
     
     private Pipeline getPipeline(StatelessKnowledgeSession ksession) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
