@@ -11,7 +11,7 @@ import org.drools.runtime.pipeline.SmooksTransformerProvider;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.XStreamTransformerProvider;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
-import com.thoughtworks.xstream.XStream;;
+import com.thoughtworks.xstream.XStream;
 
 public class XStreamFromXmlTransformer extends BaseEmitter
     implements
