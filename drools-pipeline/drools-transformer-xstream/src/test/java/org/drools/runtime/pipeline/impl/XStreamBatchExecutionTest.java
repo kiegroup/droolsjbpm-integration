@@ -111,15 +111,7 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
         inXml += "    </org.drools.Cheese>";
-        inXml += "  </insert-elements>";
-        inXml += "  <fire-all-rules />";
-        inXml += "  <insert out-identifier='outBrie'>";
-        inXml += "    <org.drools.Cheese>";
-        inXml += "      <type>brie</type>";
-        inXml += "      <price>10</price>";
-        inXml += "      <oldPrice>5</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
-        inXml += "  </insert>";        
+        inXml += "  </insert-elements>";      
         inXml += "</batch-execution>";
         
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -142,21 +134,13 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml += "        <oldPrice>0</oldPrice>\n";           
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "    </list>\n";        
-        expectedXml += "  </result>\n";
-        expectedXml += "  <result identifier='outBrie'>";
-        expectedXml += "    <org.drools.Cheese>";
-        expectedXml += "      <type>brie</type>";
-        expectedXml += "      <price>10</price>";
-        expectedXml += "      <oldPrice>5</oldPrice>";
-        expectedXml += "    </org.drools.Cheese>";
-        expectedXml += "  </result>";         
+        expectedXml += "  </result>\n";       
         expectedXml += "</batch-execution-results>\n";
         
         assertXMLEqual( expectedXml, outXml );
         
         BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         
-        // brie should not have been added to the list
         List list = ( List ) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton", 30);
         Cheese stilton30 = new Cheese( "stilton", 35);
@@ -166,11 +150,6 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedList.add( stilton30 );
         
         assertEquals( expectedList, new HashSet( list )); 
-
-        // brie should not have changed
-        Cheese brie10 = new Cheese( "brie", 10);
-        brie10.setOldPrice( 5 );
-        assertEquals( brie10, result.getValue( "outBrie" ) );
     }    
     
     public void testSetGlobal() throws Exception {
@@ -542,6 +521,14 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         inXml += "      <oldPrice>0</oldPrice>";
         inXml += "    </org.drools.Cheese>";
         inXml += "  </insert-elements>";
+        inXml += "  <fire-all-rules />";
+        inXml += "  <insert out-identifier='outBrie'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>brie</type>";
+        inXml += "      <price>10</price>";
+        inXml += "      <oldPrice>5</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";          
         inXml += "</batch-execution>";
         
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -565,11 +552,19 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "    </list>\n";        
         expectedXml += "  </result>\n";
+        expectedXml += "  <result identifier='outBrie'>\n";
+        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "      <type>brie</type>\n";
+        expectedXml += "      <price>10</price>\n";
+        expectedXml += "      <oldPrice>5</oldPrice>\n";
+        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "  </result>\n";          
         expectedXml += "</batch-execution-results>\n";
-        
         assertXMLEqual( expectedXml, outXml );
         
         BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        
+        // brie should not have been added to the list
         List list = ( List ) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton", 30);
         Cheese stilton30 = new Cheese( "stilton", 35);
@@ -578,7 +573,12 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedList.add( stilton25 );
         expectedList.add( stilton30 );
         
-        assertEquals( expectedList, new HashSet( list ));       
+        assertEquals( expectedList, new HashSet( list )); 
+
+        // brie should not have changed
+        Cheese brie10 = new Cheese( "brie", 10);
+        brie10.setOldPrice( 5 );
+        assertEquals( brie10, result.getValue( "outBrie" ) );  
     }        
     
     public void testProcess() throws SAXException, IOException {
