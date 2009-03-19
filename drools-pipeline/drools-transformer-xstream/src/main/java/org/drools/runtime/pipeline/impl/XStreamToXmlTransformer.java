@@ -5,7 +5,7 @@ import org.drools.runtime.pipeline.Transformer;
 
 import com.thoughtworks.xstream.XStream;
 
-;
+
 
 public class XStreamToXmlTransformer extends BaseEmitter
     implements
