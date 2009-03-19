@@ -112,6 +112,14 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         inXml += "      <oldPrice>0</oldPrice>";
         inXml += "    </org.drools.Cheese>";
         inXml += "  </insert-elements>";
+        inXml += "  <fire-all-rules />";
+        inXml += "  <insert out-identifier='outBrie'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>brie</type>";
+        inXml += "      <price>10</price>";
+        inXml += "      <oldPrice>5</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";        
         inXml += "</batch-execution>";
         
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -135,11 +143,20 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "    </list>\n";        
         expectedXml += "  </result>\n";
+        expectedXml += "  <result identifier='outBrie'>";
+        expectedXml += "    <org.drools.Cheese>";
+        expectedXml += "      <type>brie</type>";
+        expectedXml += "      <price>10</price>";
+        expectedXml += "      <oldPrice>5</oldPrice>";
+        expectedXml += "    </org.drools.Cheese>";
+        expectedXml += "  </result>";         
         expectedXml += "</batch-execution-results>\n";
         
         assertXMLEqual( expectedXml, outXml );
         
         BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        
+        // brie should not have been added to the list
         List list = ( List ) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton", 30);
         Cheese stilton30 = new Cheese( "stilton", 35);
@@ -148,7 +165,12 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedList.add( stilton25 );
         expectedList.add( stilton30 );
         
-        assertEquals( expectedList, new HashSet( list ));       
+        assertEquals( expectedList, new HashSet( list )); 
+
+        // brie should not have changed
+        Cheese brie10 = new Cheese( "brie", 10);
+        brie10.setOldPrice( 5 );
+        assertEquals( brie10, result.getValue( "outBrie" ) );
     }    
     
     public void testSetGlobal() throws Exception {
@@ -487,7 +509,77 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
             newSet.add( list );
         }
         assertEquals( set, newSet );  
-    }       
+    }   
+    
+    public void testManualFireAllRules() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "global java.util.List list \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "    list.add( $c );";
+        str += "end\n";        
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <set-global identifier='list' out='true'>";
+        inXml += "    <list/>";
+        inXml += "  </set-global>";        
+        inXml += "  <insert-elements>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>30</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert-elements>";
+        inXml += "</batch-execution>";
+        
+        StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();        
+        getPipeline(ksession).insert( inXml, resultHandler );        
+        String outXml = ( String ) resultHandler.getObject();
+        
+        String expectedXml = "";
+        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "  <result identifier='list'>\n";
+        expectedXml += "    <list>\n";
+        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "        <type>stilton</type>\n";
+        expectedXml += "        <price>35</price>\n";        
+        expectedXml += "        <oldPrice>0</oldPrice>\n";        
+        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "        <type>stilton</type>\n";     
+        expectedXml += "        <price>30</price>\n";
+        expectedXml += "        <oldPrice>0</oldPrice>\n";           
+        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "    </list>\n";        
+        expectedXml += "  </result>\n";
+        expectedXml += "</batch-execution-results>\n";
+        
+        assertXMLEqual( expectedXml, outXml );
+        
+        BatchExecutionResults result = ( BatchExecutionResults ) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        List list = ( List ) result.getValue( "list" );
+        Cheese stilton25 = new Cheese( "stilton", 30);
+        Cheese stilton30 = new Cheese( "stilton", 35);
+        
+        Set expectedList = new HashSet();
+        expectedList.add( stilton25 );
+        expectedList.add( stilton30 );
+        
+        assertEquals( expectedList, new HashSet( list ));       
+    }        
     
     public void testProcess() throws SAXException, IOException {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
