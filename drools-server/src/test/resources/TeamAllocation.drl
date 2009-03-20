@@ -44,7 +44,7 @@ rule "Assign waiting team"
    		t: Team(currentCases == 0)
    then
 		a.teamName = t.name
-		a.explanation = "They have nothing on, the slackers !"
+		a.explanation = "They have nothing on the slackers !"
 end
 
 
@@ -53,5 +53,5 @@ rule "too busy, panic"
  		not Team(currentCases < 10)
  	then
  		a.teamName = "NONE"
- 		a.explanation = "They are all to busy, do it yourself !"
+ 		a.explanation = "They are all to busy do it yourself !"
 end
