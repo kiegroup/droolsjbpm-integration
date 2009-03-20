@@ -321,12 +321,12 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml += "    <list>\n";
         expectedXml += "      <org.drools.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
-        expectedXml += "        <price>35</price>\n";        
+        expectedXml += "        <price>30</price>\n";        
         expectedXml += "        <oldPrice>0</oldPrice>\n";        
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "      <org.drools.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";     
-        expectedXml += "        <price>30</price>\n";
+        expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";           
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "    </list>\n";        
@@ -452,10 +452,7 @@ public class XStreamBatchExecutionTest extends XMLTestCase {
         expectedXml +="      </row>\n";
         expectedXml +="    </query-results>\n";
         expectedXml +="  </result>\n";        
-        expectedXml +="</batch-execution-results>\n";
-        
-        System.out.println( expectedXml );
-        System.out.println( outXml );
+        expectedXml +="</batch-execution-results>\n";;
         
         assertXMLEqual(expectedXml, outXml ); 
         
