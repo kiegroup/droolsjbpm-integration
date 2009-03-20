@@ -3,6 +3,9 @@ package org.drools.runtime.pipeline.impl;
 import junit.framework.TestCase;
 
 import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -20,6 +23,30 @@ import org.drools.runtime.pipeline.impl.XStreamStatefulSessionTest.ResultHandler
 import com.thoughtworks.xstream.XStream;
 
 public class XStreamGlobalTest extends TestCase {
+    
+    protected void setUp() throws Exception {
+        XMLUnit.setIgnoreComments( true );
+        XMLUnit.setIgnoreWhitespace( true );
+        XMLUnit.setIgnoreAttributeOrder( true );
+        XMLUnit.setNormalizeWhitespace( true );
+        XMLUnit.setNormalize( true );
+    }
+
+    private void assertXMLEqual(String expectedXml,
+                                String resultXml) {
+        try {
+            Diff diff = new Diff( expectedXml,
+                                  resultXml );
+            diff.overrideElementQualifier( new RecursiveElementNameAndTextQualifier() );
+            XMLAssert.assertXMLEqual( diff,
+                                      true );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "XML Assertion failure",
+                                        e );
+        }
+    }
+    
+    
     public void testGlobal() throws Exception {
         String xml = "";
         xml += "<list>\n";
@@ -77,10 +104,7 @@ public class XStreamGlobalTest extends TestCase {
         resultHandler = new ResultHandlerImpl();
         pipeline.insert( "list", resultHandler );  
         
-        System.out.println(xml);
-        System.out.println(resultHandler.getObject());
-        System.out.println(new Diff( xml, (String) resultHandler.getObject() ));
-        assertTrue( new Diff( xml, (String) resultHandler.getObject() ).similar() );
+        assertXMLEqual( xml, (String) resultHandler.getObject() );
     }
     
     private static void assertEqualsIgnoreWhitespace(final String expected,
