@@ -777,18 +777,24 @@ public class XStreamBatchExecutionTest extends TestCase {
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
 
-        String nextXML = "<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>";
-        getPipelineStateful( ksession ).insert( nextXML,
+        getPipelineStateful( ksession ).insert("<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>",
                                                 resultHandler );
         String outXml = (String) resultHandler.getObject();
 
         //we have not fired the rules yet
         assertFalse( outXml.indexOf( "<price>30</price>" ) > -1 );
 
-        ksession.fireAllRules();
+        //lets send a command to execute them then
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <fire-all-rules max='100'/>";
+        inXml += "</batch-execution>";
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        //ksession.fireAllRules();
 
         //ok lets try that again...
-        getPipelineStateful( ksession ).insert( nextXML,
+        getPipelineStateful( ksession ).insert("<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>",
                                                 resultHandler );
         outXml = (String) resultHandler.getObject();
         assertTrue( outXml.indexOf( "<price>30</price>" ) > -1 );
