@@ -26,7 +26,7 @@ import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.runtime.BatchExecutionResults;
+import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.help.BatchExecutionHelper;
@@ -92,7 +92,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
         expectedXml += "    <org.drools.Cheese>\n";
         expectedXml += "      <type>stilton</type>\n";
@@ -100,12 +100,12 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <price>30</price>\n";
         expectedXml += "    </org.drools.Cheese>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
 
-        BatchExecutionResults result = (BatchExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -151,7 +151,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
         expectedXml += "      <org.drools.Cheese>\n";
@@ -166,12 +166,12 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
 
-        BatchExecutionResults result = (BatchExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
 
         List list = (List) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton",
@@ -233,7 +233,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list2'>\n";
         expectedXml += "    <list>\n";
         expectedXml += "      <org.drools.Cheese>\n";
@@ -248,12 +248,12 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <org.drools.Cheese reference='../../../result/list/org.drools.Cheese'/>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
 
-        BatchExecutionResults result = (BatchExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Cheese stilton = new Cheese( "stilton",
                                      30 );
 
@@ -307,7 +307,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"out-list\">\n";
         expectedXml += "    <list>\n";
         expectedXml += "      <org.drools.Cheese>\n";
@@ -317,7 +317,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      </org.drools.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
@@ -359,7 +359,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>";
+        expectedXml += "<execution-results>";
         expectedXml += "  <result identifier='list'>";
         expectedXml += "    <list>";
         expectedXml += "      <org.drools.Cheese>";
@@ -374,11 +374,11 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      </org.drools.Cheese>";
         expectedXml += "    </list>";
         expectedXml += "  </result>";
-        expectedXml += "</batch-execution-results>";
+        expectedXml += "</execution-results>";
         
         assertXMLEqual( expectedXml, outXml );
 
-        BatchExecutionResults result = (BatchExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         List list = (List) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton",
                                        30 );
@@ -450,7 +450,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='cheeses'>\n";
         expectedXml += "    <query-results>\n";
         expectedXml += "      <identifiers>\n";
@@ -499,12 +499,12 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      </row>\n";
         expectedXml += "    </query-results>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";;
+        expectedXml += "</execution-results>\n";;
 
         assertXMLEqual( expectedXml,
                         outXml );
 
-        BatchExecutionResults batchResult = (BatchExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ExecutionResults batchResult = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
 
         Cheese stilton1 = new Cheese( "stilton",
                                       1 );
@@ -590,7 +590,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
         expectedXml += "      <org.drools.Cheese>\n";
@@ -612,11 +612,11 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <oldPrice>5</oldPrice>\n";
         expectedXml += "    </org.drools.Cheese>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
         assertXMLEqual( expectedXml,
                         outXml );
 
-        BatchExecutionResults result = (BatchExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
 
         // brie should not have been added to the list
         List list = (List) result.getValue( "list" );
@@ -689,13 +689,13 @@ public class XStreamBatchExecutionTest extends TestCase {
                       list.get( 0 ) );
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"out-list\">\n";
         expectedXml += "    <list>\n";
         expectedXml += "      <string>John Doe</string>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
@@ -731,7 +731,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         String outXml = (String) resultHandler.getObject();
 
         String expectedXml = "";
-        expectedXml += "<batch-execution-results>\n";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
         expectedXml += "    <org.foo.Whee>\n";
         expectedXml += "      <type>stilton</type>\n";
@@ -739,7 +739,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <price>30</price>\n";
         expectedXml += "    </org.foo.Whee>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</batch-execution-results>\n";
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
