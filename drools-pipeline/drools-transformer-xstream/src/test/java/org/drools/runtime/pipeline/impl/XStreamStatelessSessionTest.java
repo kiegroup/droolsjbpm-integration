@@ -46,7 +46,7 @@ public class XStreamStatelessSessionTest extends TestCase {
         Action assignResult = PipelineFactory.newAssignObjectAsResult();
         assignResult.setReceiver( executeResultHandler );
 
-        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newCommandExecutor();
         batchExecution.setReceiver( assignResult );
         
         KnowledgeRuntimeCommand insertStage = PipelineFactory.newInsertObjectCommand();
@@ -92,7 +92,7 @@ public class XStreamStatelessSessionTest extends TestCase {
         Action assignResult = PipelineFactory.newAssignObjectAsResult();
         assignResult.setReceiver( executeResultHandler );
 
-        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newCommandExecutor();
         batchExecution.setReceiver( assignResult );
         
         KnowledgeRuntimeCommand insertElementsStage = PipelineFactory.newInsertElementsCommand();

@@ -809,7 +809,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         Transformer outTransformer = PipelineFactory.newXStreamToXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
         outTransformer.setReceiver( assignResult );
 
-        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newCommandExecutor();
         batchExecution.setReceiver( outTransformer );
 
         Transformer inTransformer = PipelineFactory.newXStreamFromXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
@@ -830,7 +830,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         Transformer outTransformer = PipelineFactory.newXStreamToXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
         outTransformer.setReceiver( assignResult );
 
-        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newBatchExecutor();
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newCommandExecutor();
         batchExecution.setReceiver( outTransformer );
 
         Transformer inTransformer = PipelineFactory.newXStreamFromXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
