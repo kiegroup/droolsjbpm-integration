@@ -33,7 +33,7 @@
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
   <classpathentry kind="var" path="M2_REPO/logkit/logkit/1.0.1/logkit-1.0.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mvel/mvel2/2.0.8-SNAPSHOT/mvel2-2.0.8-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mvel/mvel2/2.0.9pre2/mvel2-2.0.9pre2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/objenesis/objenesis/1.0/objenesis-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar"/>
   <classpathentry kind="var" path="M2_REPO/simple-jndi/simple-jndi/0.11.4/simple-jndi-0.11.4.jar"/>
