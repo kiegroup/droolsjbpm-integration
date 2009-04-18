@@ -53,7 +53,7 @@ public class JaxbFromXmlTransformer extends BaseEmitter
         }
         
         if ( result instanceof JAXBElement ) {
-            result = ((JAXBElement) object).getValue().getClass().getName();
+            result = ((JAXBElement) object).getValue();
         }
         
         emit( result,
