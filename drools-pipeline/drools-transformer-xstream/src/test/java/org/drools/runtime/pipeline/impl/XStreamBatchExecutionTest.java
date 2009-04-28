@@ -23,7 +23,10 @@ import org.drools.TestVariable;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.common.InternalFactHandle;
+import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
+import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.ExecutionResults;
@@ -36,7 +39,10 @@ import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
+import org.drools.runtime.rule.FactHandle;
 import org.xml.sax.SAXException;
+
+import com.thoughtworks.xstream.XStream;
 
 public class XStreamBatchExecutionTest extends TestCase {
 
@@ -62,7 +68,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         }
     }
 
-    public void testInsertObject() throws Exception {
+    public void testInsertObjectWithDefaults() throws Exception {
         String str = "";
         str += "package org.drools \n";
         str += "import org.drools.Cheese \n";
@@ -83,14 +89,25 @@ public class XStreamBatchExecutionTest extends TestCase {
         inXml += "      <oldPrice>0</oldPrice>";
         inXml += "    </org.drools.Cheese>";
         inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-        StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        getPipeline( ksession ).insert( inXml,
-                                        resultHandler );
-        String outXml = (String) resultHandler.getObject();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        String outXml = (String) resultHandler.getObject();      
 
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Cheese stilton = (Cheese) result.getValue( "outStilton" );
+        assertEquals( 30,
+                      stilton.getPrice() );
+        
+        FactHandle factHandle = ( FactHandle ) result.getFactHandle( "outStilton" );
+        stilton = ( Cheese ) ksession.getObject( factHandle );
+        assertEquals( 30,
+                      stilton.getPrice() );          
+        
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
@@ -100,16 +117,239 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <price>30</price>\n";
         expectedXml += "    </org.drools.Cheese>\n";
         expectedXml += "  </result>\n";
+        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
-
+                
         assertXMLEqual( expectedXml,
                         outXml );
+    }
+    
+    public void testInsertObjectWithReturnObjectFalse() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='outStilton' return-object='false'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        String outXml = (String) resultHandler.getObject();      
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        assertNull( result.getValue( "outStilton" ) );
+        
+        FactHandle factHandle = ( FactHandle ) result.getFactHandle( "outStilton" );
+        Cheese stilton = ( Cheese ) ksession.getObject( factHandle );
+        assertEquals( 30,
+                      stilton.getPrice() );       
+        
+        String expectedXml = "";
+        expectedXml += "<execution-results>\n";
+        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
+        expectedXml += "</execution-results>\n";
+                
+        assertXMLEqual( expectedXml,
+                        outXml );
+    }    
+    
+    public void testGetObject() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='outStilton'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        String outXml = (String) resultHandler.getObject();      
 
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
-    }
+        
+        FactHandle factHandle = ( FactHandle ) result.getFactHandle( "outStilton" );
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <get-object out-identifier='outStilton' factHandle='" + factHandle.toExternalForm() + "' />";
+        inXml += "</batch-execution>";        
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        outXml = (String) resultHandler.getObject();   
+        result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        stilton = (Cheese) result.getValue( "outStilton" );
+        assertEquals( 30,
+                      stilton.getPrice() );        
+    }    
+    
+    public void testRetractObject() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='outStilton'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        String outXml = (String) resultHandler.getObject();      
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Cheese stilton = (Cheese) result.getValue( "outStilton" );
+        assertEquals( 30,
+                      stilton.getPrice() );
+        
+        FactHandle factHandle = ( FactHandle ) result.getFactHandle( "outStilton" );
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <retract factHandle='" + factHandle.toExternalForm() + "' />";
+        inXml += "</batch-execution>";        
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <get-object out-identifier='outStilton' factHandle='" + factHandle.toExternalForm() + "' />";
+        inXml += "</batch-execution>";        
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        outXml = (String) resultHandler.getObject();   
+        result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        assertNull( result.getValue( "outStilton" ) );
+    }        
+    
+    public void testModifyObject() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='outStilton'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        String outXml = (String) resultHandler.getObject();      
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Cheese stilton = (Cheese) result.getValue( "outStilton" );
+        assertEquals( 30,
+                      stilton.getPrice() );
+        
+        FactHandle factHandle = ((FactHandle) result.getFactHandle( "outStilton" ));
+        
+        String expectedXml = "";
+        expectedXml += "<execution-results>\n";
+        expectedXml += "  <result identifier=\"outStilton\">\n";
+        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "      <type>stilton</type>\n";
+        expectedXml += "      <oldPrice>0</oldPrice>\n";
+        expectedXml += "      <price>30</price>\n";
+        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "  </result>\n";
+        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + factHandle.toExternalForm() + "\" /> \n";
+        expectedXml += "</execution-results>\n";
+                
+        assertXMLEqual( expectedXml,
+                        outXml );
+        
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <modify factHandle='" + factHandle.toExternalForm() + "'> <set accessor='type' value='\"cheddar\"' /><set accessor='price' value='50' /></modify>";
+        inXml += "  <fire-all-rules />";        
+        inXml += "</batch-execution>";        
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <get-object out-identifier='outCheddar' factHandle='" + factHandle.toExternalForm() + "' />";
+        inXml += "</batch-execution>";        
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        outXml = (String) resultHandler.getObject();   
+        result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Cheese cheddar = (Cheese) result.getValue( "outCheddar" );
+        assertEquals( "cheddar", cheddar.getType() );
+        assertEquals( 55,
+                      cheddar.getPrice() );            
+        
+        
+    }       
 
     public void testInsertElements() throws Exception {
         String str = "";
@@ -499,7 +739,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      </row>\n";
         expectedXml += "    </query-results>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "</execution-results>\n";;
+        expectedXml += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
@@ -588,6 +828,8 @@ public class XStreamBatchExecutionTest extends TestCase {
         getPipeline( ksession ).insert( inXml,
                                         resultHandler );
         String outXml = (String) resultHandler.getObject();
+        
+        FactHandle factHandle = ( FactHandle ) ((ExecutionResults)BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml )).getFactHandle( "outBrie" );
 
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
@@ -612,6 +854,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <oldPrice>5</oldPrice>\n";
         expectedXml += "    </org.drools.Cheese>\n";
         expectedXml += "  </result>\n";
+        expectedXml += "  <fact-handle identifier=\"outBrie\" externalForm=\"" + factHandle.toExternalForm() + "\" /> \n";        
         expectedXml += "</execution-results>\n";
         assertXMLEqual( expectedXml,
                         outXml );
@@ -722,14 +965,20 @@ public class XStreamBatchExecutionTest extends TestCase {
         inXml += "      <oldPrice>0</oldPrice>";
         inXml += "    </org.foo.Whee>";
         inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-        StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        getPipeline( ksession ).insert( inXml,
+        getPipelineStateful( ksession ).insert( inXml,
                                         resultHandler );
         String outXml = (String) resultHandler.getObject();
-
+        
+        ClassLoader cl = ((InternalRuleBase) ((StatefulKnowledgeSessionImpl) ksession).getRuleBase()).getRootClassLoader();
+        XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
+        xstream.setClassLoader( cl );
+        FactHandle factHandle = ( FactHandle ) ((ExecutionResults)xstream.fromXML( outXml )).getFactHandle( "outStilton" );
+        
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
@@ -739,7 +988,11 @@ public class XStreamBatchExecutionTest extends TestCase {
         expectedXml += "      <price>30</price>\n";
         expectedXml += "    </org.foo.Whee>\n";
         expectedXml += "  </result>\n";
+        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + factHandle.toExternalForm() + "\" /> \n";                
         expectedXml += "</execution-results>\n";
+        
+        System.out.println( expectedXml );
+        System.out.println( outXml );
 
         assertXMLEqual( expectedXml,
                         outXml );
