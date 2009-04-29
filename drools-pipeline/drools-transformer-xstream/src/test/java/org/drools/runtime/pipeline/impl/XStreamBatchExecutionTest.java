@@ -1220,10 +1220,14 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertEquals( "John Doe",
                       workItem.getParameter( "Comment" ) );
 
+        assertEquals( WorkItem.PENDING, workItem.getState() );
+        
         String inXml = "";
         inXml = "<complete-work-item id='" + workItem.getId() + "' />";
         getPipelineStateful( ksession ).insert( inXml,
                                                 new ResultHandlerImpl() );
+        
+        assertEquals( WorkItem.COMPLETED, workItem.getState() );
 
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
@@ -1251,6 +1255,8 @@ public class XStreamBatchExecutionTest extends TestCase {
                       workItem.getParameter( "Content" ) );
         assertEquals( "Jane Doe",
                       workItem.getParameter( "Comment" ) );
+        
+        assertEquals( WorkItem.PENDING, workItem.getState() );
 
         inXml = "";
         inXml += "<complete-work-item id='" + workItem.getId() + "' >";
@@ -1260,6 +1266,8 @@ public class XStreamBatchExecutionTest extends TestCase {
         inXml += "</complete-work-item>";
         getPipelineStateful( ksession ).insert( inXml,
                                                 new ResultHandlerImpl() );
+        
+        assertEquals( WorkItem.COMPLETED, workItem.getState() );
 
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
@@ -1268,6 +1276,110 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertEquals( 15,
                       processInstance.getVariable( "Number" ) );
     }
+    
+    public void testAbortWorkItem() {
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        String str = "";
+        str += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
+        str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
+        str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "\n";
+        str += "  <header>\n";
+        str += "    <variables>\n";
+        str += "      <variable name=\"UserName\" >\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <value>John Doe</value>\n";
+        str += "      </variable>\n";
+        str += "      <variable name=\"Person\" >\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
+        str += "      </variable>\n";
+        str += "      <variable name=\"MyObject\" >\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "      </variable>\n";
+        str += "      <variable name=\"Number\" >\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "      </variable>\n";
+        str += "    </variables>\n";
+        str += "  </header>\n";
+        str += "\n";
+        str += "  <nodes>\n";
+        str += "    <start id=\"1\" name=\"Start\" />\n";
+        str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
+        str += "      <work name=\"Human Task\" >\n";
+        str += "        <parameter name=\"ActorId\" >\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <value>#{UserName}</value>\n";
+        str += "        </parameter>\n";
+        str += "        <parameter name=\"Content\" >\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <value>#{Person.name}</value>\n";
+        str += "        </parameter>\n";
+        str += "        <parameter name=\"TaskName\" >\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <value>Do something</value>\n";
+        str += "        </parameter>\n";
+        str += "        <parameter name=\"Priority\" >\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        </parameter>\n";
+        str += "        <parameter name=\"Comment\" >\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        </parameter>\n";
+        str += "        <parameter name=\"Attachment\" >\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        </parameter>\n";
+        str += "      </work>\n";
+        str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
+        str += "      <mapping type=\"in\" from=\"Person.name\" to=\"Comment\" />";
+        str += "      <mapping type=\"out\" from=\"Result\" to=\"MyObject\" />";
+        str += "      <mapping type=\"out\" from=\"Result.length()\" to=\"Number\" />";
+        str += "    </workItem>\n";
+        str += "    <end id=\"3\" name=\"End\" />\n";
+        str += "  </nodes>\n";
+        str += "\n";
+        str += "  <connections>\n";
+        str += "    <connection from=\"1\" to=\"2\" />\n";
+        str += "    <connection from=\"2\" to=\"3\" />\n";
+        str += "  </connections>\n";
+        str += "\n";
+        str += "</process>";
+
+        Reader source = new StringReader( str );
+        kbuilder.add( ResourceFactory.newReaderResource( source ),
+                      ResourceType.DRF );
+
+        Collection<KnowledgePackage> kpkgs = kbuilder.getKnowledgePackages();
+        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addKnowledgePackages( kpkgs );
+        StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+
+        TestWorkItemHandler handler = new TestWorkItemHandler();
+        ksession.getWorkItemManager().registerWorkItemHandler( "Human Task",
+                                                               handler );
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put( "UserName",
+                        "John Doe" );
+        Person person = new Person();
+        person.setName( "John Doe" );
+        parameters.put( "Person",
+                        person );
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+                                                                                                   parameters );
+        assertEquals( ProcessInstance.STATE_ACTIVE,
+                      processInstance.getState() );
+        WorkItem workItem = handler.getWorkItem();
+        assertNotNull( workItem );
+        
+        assertEquals( WorkItem.PENDING, workItem.getState() );
+        
+        String inXml = "<abort-work-item id='" + workItem.getId() + "' />";
+        getPipelineStateful( ksession ).insert( inXml,
+                                                new ResultHandlerImpl() );
+        
+        assertEquals( WorkItem.ABORTED, workItem.getState() );        
+    }    
 
     public static class TestWorkItemHandler
         implements
