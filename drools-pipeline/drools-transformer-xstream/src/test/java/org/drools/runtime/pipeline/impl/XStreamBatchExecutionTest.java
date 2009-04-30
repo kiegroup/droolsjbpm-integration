@@ -77,7 +77,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         }
     }
 
-    public void testInsertObjectWithDefaults() throws Exception {
+    public void testInsertWithDefaults() throws Exception {
         String str = "";
         str += "package org.drools \n";
         str += "import org.drools.Cheese \n";
@@ -133,7 +133,7 @@ public class XStreamBatchExecutionTest extends TestCase {
                         outXml );
     }
 
-    public void testInsertObjectWithReturnObjectFalse() throws Exception {
+    public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
         str += "package org.drools \n";
         str += "import org.drools.Cheese \n";
