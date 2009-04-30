@@ -434,6 +434,109 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertEquals( expectedList,
                       new HashSet( list ) );
     }
+    
+    public void testInsertElementsWithReturnObjects() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "global java.util.List list \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "     list.add( $c );";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <set-global identifier='list' out='true' >";
+        inXml += "    <list/>";
+        inXml += "  </set-global>";
+        inXml += "  <insert-elements out-identifier='myfacts' return-objects='true'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>30</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert-elements>";
+        inXml += "  <fire-all-rules/>";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        String outXml = (String) resultHandler.getObject();  
+        
+        Collection<? extends FactHandle> factHandles = ksession.getFactHandles();
+        
+        String expectedXml = "";
+        expectedXml += "<execution-results>\n";
+        expectedXml += "  <result identifier='list'>\n";
+        expectedXml += "    <list>\n";
+        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "        <type>stilton</type>\n";
+        expectedXml += "        <price>35</price>\n";
+        expectedXml += "        <oldPrice>0</oldPrice>\n";
+        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "        <type>stilton</type>\n";
+        expectedXml += "        <price>30</price>\n";
+        expectedXml += "        <oldPrice>0</oldPrice>\n";
+        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "    </list>\n";
+        expectedXml += "  </result>\n";
+        
+        expectedXml += "  <result identifier=\"myfacts\">\n";
+        expectedXml += "  <list>\n";
+        expectedXml += "    <org.drools.Cheese reference=\"../../../result/list/org.drools.Cheese[2]\"/>\n";
+        expectedXml += "    <org.drools.Cheese reference=\"../../../result/list/org.drools.Cheese\"/>\n";
+        expectedXml += "  </list>\n";
+        expectedXml += "  </result>\n";
+        expectedXml += "  <fact-handles identifier=\"myfacts\">\n";        
+        for ( FactHandle factHandle : factHandles ) {
+            if ( ((Cheese)ksession.getObject( factHandle )).getPrice() == 30 ) {
+                expectedXml += "  <fact-handle externalForm=\""+ factHandle.toExternalForm() +"\"/>\n";
+            }
+        }        
+        
+        for ( FactHandle factHandle : factHandles ) {
+            if ( ((Cheese)ksession.getObject( factHandle )).getPrice() == 35 ) {
+                expectedXml += "  <fact-handle externalForm=\""+ factHandle.toExternalForm() +"\"/>\n";
+            }
+        }        
+        expectedXml += "  </fact-handles>\n";
+      
+        expectedXml += "</execution-results>\n";
+        
+        System.out.println( expectedXml );
+        System.out.println( outXml );
+
+        assertXMLEqual( expectedXml,
+                        outXml );
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+
+        List list = (List) result.getValue( "list" );
+        Cheese stilton25 = new Cheese( "stilton",
+                                       30 );
+        Cheese stilton30 = new Cheese( "stilton",
+                                       35 );
+
+        Set expectedList = new HashSet();
+        expectedList.add( stilton25 );
+        expectedList.add( stilton30 );
+
+        assertEquals( expectedList,
+                      new HashSet( list ) );
+    }    
 
     public void testSetGlobal() throws Exception {
         String str = "";
