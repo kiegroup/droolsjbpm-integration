@@ -1166,8 +1166,7 @@ public class XStreamBatchExecutionTest extends TestCase {
                       ((VariableScopeInstance) ((org.drools.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
-    // FIXME for krisv
-    public void FIXME_testProcessRuntimeSignalEvent() throws Exception {
+    public void testProcessRuntimeSignalEvent() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         String str = "";
         str += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
