@@ -80,6 +80,125 @@ public class XStreamBatchExecutionTest extends TestCase {
         }
     }
 
+
+    public void testListenForChanges() throws Exception {
+
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "import org.drools.ChangeCollector \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese(price==25) \n";
+        str += " \n";
+        str += "  then \n";
+        str += "end\n";
+
+
+        str += "rule rule2 \n";
+        str += "  when \n";
+        str += "    p : Person(name=='mic') \n";
+        str += "    c : Cheese(price != 42) \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    c.setPrice( 42 ); \n";
+        str += "    update(c); \n";
+        str += "end\n";
+
+        str += "rule rule3 \n";
+        str += "  when \n";
+        str += "    p : Person(name=='mark') \n";
+        str += "    c : Cheese(price == 42) \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    retract(c); \n";
+        str += "end\n";
+
+
+
+        str += "rule ruleBootStrap \n";
+        str += "salience 10000\n";
+        str += "  when \n";
+        str += "    $c : ChangeCollector() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    kcontext.getKnowledgeRuntime().addEventListener($c); \n";
+        str += "end\n";
+
+
+        str += "rule ruleCleanup \n";
+        str += "salience -10000\n";
+        str += "  when \n";
+        str += "    $c : ChangeCollector() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    kcontext.getKnowledgeRuntime().removeEventListener($c); \n";
+        str += "    retract($c); \n";        
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='outStilton'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+
+
+
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='person'>";
+        inXml += "    <org.drools.Person>";
+        inXml += "      <name>mic</name>";
+        inXml += "    </org.drools.Person>";
+        inXml += "  </insert>";
+        inXml += "  <insert out-identifier='changes'>";
+        inXml += "    <org.drools.ChangeCollector/>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml, resultHandler );
+        String outXml = (String) resultHandler.getObject();
+
+        assertTrue(outXml.indexOf("<changes>") > -1);
+
+
+
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <insert out-identifier='person'>";
+        inXml += "    <org.drools.Person>";
+        inXml += "      <name>mark</name>";
+        inXml += "    </org.drools.Person>";
+        inXml += "  </insert>";
+        inXml += "  <insert out-identifier='changes'>";
+        inXml += "    <org.drools.ChangeCollector/>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml, resultHandler );
+        outXml = (String) resultHandler.getObject();
+
+        assertTrue(outXml.indexOf("<retracted>") > -1);
+        
+
+
+    }
+
     public void testInsertWithDefaults() throws Exception {
         String str = "";
         str += "package org.drools \n";
