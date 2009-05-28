@@ -183,7 +183,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         inXml += "      <name>mark</name>";
         inXml += "    </org.drools.Person>";
         inXml += "  </insert>";
-        inXml += "  <insert out-identifier='changes'>";
+        inXml += "  <insert out-identifier='changes'>";                               
         inXml += "    <org.drools.ChangeCollector/>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
