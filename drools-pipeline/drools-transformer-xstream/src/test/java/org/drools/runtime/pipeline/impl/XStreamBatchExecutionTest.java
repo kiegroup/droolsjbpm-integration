@@ -34,6 +34,7 @@ import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.process.core.context.variable.VariableScope;
 import org.drools.process.instance.context.variable.VariableScopeInstance;
+import org.drools.process.command.ModifyCommand;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
@@ -459,7 +460,7 @@ public class XStreamBatchExecutionTest extends TestCase {
 
         inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <modify factHandle='" + factHandle.toExternalForm() + "'> <set accessor='type' value='\"cheddar\"' /><set accessor='price' value='50' /></modify>";
+        inXml += "  <modify factHandle='" + factHandle.toExternalForm() + "'> <set accessor='oldPrice' value='\"42\"' /><set accessor='price' value='50' /></modify>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
         getPipelineStateful( ksession ).insert( inXml,
@@ -474,10 +475,23 @@ public class XStreamBatchExecutionTest extends TestCase {
         outXml = (String) resultHandler.getObject();
         result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Cheese cheddar = (Cheese) result.getValue( "outCheddar" );
-        assertEquals( "cheddar",
-                      cheddar.getType() );
-        assertEquals( 55,
-                      cheddar.getPrice() );
+        assertEquals( 42, cheddar.getOldPrice() );
+        assertEquals( 55, cheddar.getPrice() );
+
+
+        //now test for code injection:
+        ModifyCommand.ALLOW_MODIFY_EXPRESSIONS = false;
+        inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <modify factHandle='" + factHandle.toExternalForm() + "'> <set accessor='type' value='44\"; System.exit(1);' /><set accessor='price' value='50' /></modify>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        outXml = (String) resultHandler.getObject();
+        result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        ModifyCommand.ALLOW_MODIFY_EXPRESSIONS = true;
+
 
     }
 
