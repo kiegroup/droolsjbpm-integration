@@ -570,6 +570,55 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertEquals( expectedList,
                       new HashSet( list ) );
     }
+
+    public void testFactHandleReturn() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "global java.util.List list \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    System.err.println(42); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution>";
+        inXml += "  <get-global identifier='list' out-identifier='out-list'/>";
+        inXml += "</batch-execution>";
+
+        StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        FactHandle fh = ksession.insert(new Person("mic", 42));
+        List<FactHandle> list = new ArrayList<FactHandle>();
+        list.add(fh);
+
+        ksession.setGlobal("list", list);
+
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineStateful( ksession ).insert( inXml,
+                                                resultHandler );
+        getPipelineStateful( ksession ).insert( inXml,
+                                        resultHandler );
+        String outXml = (String) resultHandler.getObject();
+
+        System.err.println(outXml);
+        String expectedXml = "";
+        expectedXml += "<execution-results>\n" +
+                "  <result identifier=\"out-list\">\n" +
+                "    <list>\n" +
+                "      <fact-handle externalForm=\"" + fh.toExternalForm() +"\"/>\n" +
+                "    </list>\n" +
+                "  </result>\n" +
+                "</execution-results>";
+
+        assertXMLEqual( expectedXml, outXml );
+
+    }
+
+
+
     
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
