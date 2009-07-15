@@ -27,7 +27,6 @@ import org.drools.simulation.KnowledgeBuilderAddCommand;
 import org.drools.simulation.NewKnowledgeBaseCommand;
 import org.drools.simulation.NewKnowledgeBuilderCommand;
 import org.drools.simulation.Simulation;
-import org.drools.simulation.Statement;
 import org.drools.simulation.Step;
 import org.junit.Test;
 import org.junit.runner.RunWith;
