@@ -100,8 +100,7 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
-        Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
-        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( jaxbCtx );
         transformer.setReceiver( insertStage );
 
         Action unwrapObjectStage = PipelineFactory.newJmsUnwrapMessageObject();
@@ -141,8 +140,7 @@ public class JaxbSimpleJmsMessengerTest extends TestCase {
         assignAsResult.setReceiver( executeResult );
 
         //transformer = PipelineFactory.newXStreamToXmlTransformer( xstream );
-        Marshaller marshaller = jaxbCtx.createMarshaller();
-        transformer = PipelineFactory.newJaxbToXmlTransformer( marshaller );
+        transformer = PipelineFactory.newJaxbToXmlTransformer( jaxbCtx );
         transformer.setReceiver( assignAsResult );
 
         KnowledgeRuntimeCommand getObject = PipelineFactory.newStatefulKnowledgeSessionGetObject();
