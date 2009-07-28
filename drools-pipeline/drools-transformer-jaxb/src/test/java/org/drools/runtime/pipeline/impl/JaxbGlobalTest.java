@@ -63,7 +63,8 @@ public class JaxbGlobalTest extends TestCase {
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
-        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( jaxbCtx );
+        Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver(setGlobalStage );
 
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
@@ -82,7 +83,8 @@ public class JaxbGlobalTest extends TestCase {
         assignAsResult.setReceiver( executeResult );
         
         //transformer = PipelineFactory.newXStreamToXmlTransformer( xstream );
-        transformer = PipelineFactory.newJaxbToXmlTransformer( jaxbCtx );
+        Marshaller marshaller = jaxbCtx.createMarshaller();
+        transformer = PipelineFactory.newJaxbToXmlTransformer( marshaller );
         transformer.setReceiver( assignAsResult );
         
         KnowledgeRuntimeCommand getGlobalStage = PipelineFactory.newStatefulKnowledgeSessionGetGlobal( );        

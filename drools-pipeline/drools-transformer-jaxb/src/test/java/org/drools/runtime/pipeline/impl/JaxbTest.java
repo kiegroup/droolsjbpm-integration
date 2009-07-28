@@ -106,7 +106,8 @@ public class JaxbTest extends TestCase {
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
-        Transformer transformer =  PipelineFactory.newJaxbFromXmlTransformer( jaxbCtx );
+        Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( insertStage );
 
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
@@ -171,7 +172,8 @@ public class JaxbTest extends TestCase {
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
                                                                      kbase );
-        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( jaxbCtx );
+        Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
+        Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( expression );
 
         Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
