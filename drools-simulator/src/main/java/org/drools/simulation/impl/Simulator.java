@@ -44,7 +44,7 @@ public class Simulator
     
     private CommandExecutionHandler executionHandler = new DefaultCommandExecutionHandler();
 
-    Simulator(Simulation simulation,
+    public Simulator(Simulation simulation,
               //SessionPseudoClock clock,
               long startTime) {
         //        this.clock = clock;
