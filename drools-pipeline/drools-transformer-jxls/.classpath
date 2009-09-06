@@ -22,10 +22,10 @@
   <classpathentry kind="var" path="M2_REPO/org/jmock/jmock/2.5.1/jmock-2.5.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jmock/jmock-legacy/2.5.1/jmock-legacy-2.5.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/joda-time/joda-time/1.6/joda-time-1.6.jar"/>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.6/junit-4.6.jar"/>
   <classpathentry kind="var" path="M2_REPO/net/sf/jxls/jxls-reader/0.9.6/jxls-reader-0.9.6.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mvel/mvel2/2.0.10/mvel2-2.0.10.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mvel/mvel2/2.0.12/mvel2-2.0.12.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/objenesis/objenesis/1.0/objenesis-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/poi/poi/3.0.2-FINAL/poi-3.0.2-FINAL.jar"/>
 </classpath>
