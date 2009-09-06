@@ -11,8 +11,10 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.command.Command;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
+import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
+import org.drools.command.SetVariableCommand;
 import org.drools.command.assertion.AssertEquals;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
@@ -24,8 +26,6 @@ import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
-import org.drools.simulation.KnowledgeContextResolveFromContextCommand;
-import org.drools.simulation.SetVariableCommand;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.Step;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class SimulationTest {
                                                                                                  null ),
                                                                  "kbuilder",
                                                                  null,
-                                                                 null ) );
+                                                                 null, null ) );
 
         cmds.add( new SetVariableCommand( "path1",
                                           "kbase",
@@ -81,7 +81,7 @@ public class SimulationTest {
         cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 null ) );
+                                                                 null, null ) );
 
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
@@ -91,7 +91,7 @@ public class SimulationTest {
                                           new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ),
                                                                                          "kbuilder",
                                                                                          "kbase",
-                                                                                         null ) ) );
+                                                                                         null, null ) ) );
 
         List list = new ArrayList();
 
@@ -99,7 +99,7 @@ public class SimulationTest {
                                                                                        list ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         steps.add( new StepImpl( path,
                                  cmds,
@@ -110,11 +110,11 @@ public class SimulationTest {
                                                                                                       97 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  2000 ) );
@@ -124,12 +124,12 @@ public class SimulationTest {
                                                                                                       98 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  4000 ) );
@@ -142,7 +142,7 @@ public class SimulationTest {
                                                                                    "size()" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "darth",
@@ -151,7 +151,7 @@ public class SimulationTest {
                                                                                    "get( 0 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "yoda",
@@ -160,7 +160,7 @@ public class SimulationTest {
                                                                                    "get( 1 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         steps.add( new StepImpl( path,
                                  new TestGroupCommand( "test1",
@@ -212,7 +212,7 @@ public class SimulationTest {
                                                                                                  null ),
                                                                  "kbuilder",
                                                                  null,
-                                                                 null ) );
+                                                                 null, null ) );
 
         cmds.add( new SetVariableCommand( "ROOT",
                                           "kbase",
@@ -221,7 +221,7 @@ public class SimulationTest {
         cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 null ) );
+                                                                 null, null ) );
 
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
@@ -231,7 +231,7 @@ public class SimulationTest {
                                           new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ),
                                                                                          "kbuilder",
                                                                                          "kbase",
-                                                                                         null ) ) );
+                                                                                         null, null ) ) );
 
         List list = new ArrayList();
 
@@ -239,7 +239,7 @@ public class SimulationTest {
                                                                                        list ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         steps.add( new StepImpl( path,
                                  cmds,
@@ -250,11 +250,11 @@ public class SimulationTest {
                                                                                                       97 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  2000 ) );
@@ -264,11 +264,11 @@ public class SimulationTest {
                                                                                                       98 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  4000 ) );
@@ -288,11 +288,11 @@ public class SimulationTest {
                                                                                                       77 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  1500 ) );
@@ -302,11 +302,11 @@ public class SimulationTest {
                                                                                                       30 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  2200 ) );
@@ -316,11 +316,11 @@ public class SimulationTest {
                                                                                                       150 ) ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
         steps.add( new StepImpl( path,
                                  cmds,
                                  4500 ) );
@@ -333,7 +333,7 @@ public class SimulationTest {
                                                                                    "size()" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "bobba",
@@ -342,7 +342,7 @@ public class SimulationTest {
                                                                                    "get( 0 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "darth",
@@ -351,7 +351,7 @@ public class SimulationTest {
                                                                                    "get( 1 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "luke",
@@ -360,7 +360,7 @@ public class SimulationTest {
                                                                                    "get( 2 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "yoda",
@@ -369,7 +369,7 @@ public class SimulationTest {
                                                                                    "get( 3 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
                                                                                    new Person( "ben",
@@ -378,7 +378,7 @@ public class SimulationTest {
                                                                                    "get( 4 )" ),
                                                                  "kbuilder",
                                                                  "kbase",
-                                                                 "ksession" ) );
+                                                                 "ksession", null ) );
 
         steps.add( new StepImpl( path,
                                  new TestGroupCommand( "test2",
