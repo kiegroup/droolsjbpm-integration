@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<plugin name="DroolsRHQPlugin"
+        displayName="Drools RHQ JMX Plugin"
+        description="Provides monitoring of Drools Knowledge Bases and Sessions"
+        version="1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:xmlns:rhq-plugin"
+        xmlns:c="urn:xmlns:rhq-configuration">
+
+   <depends plugin="JMX" useClasses="true"/>
+
+   <service name="Drools Service"
+            description="Drools service"
+            discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+            class="org.rhq.plugins.jmx.MBeanResourceComponent">
+
+      <runs-inside>
+         <parent-resource-type name="JMX Server" plugin="JMX"/>
+      </runs-inside>
+
+      <plugin-configuration>
+         <c:simple-property name="objectName" readOnly="true" default="org.drools:type=DroolsManagementAgent"/>
+      </plugin-configuration>
+   </service>
+
+   <service name="Drools Knowledge Bases"
+            description="The Drools Knowledge Base monitoring service."
+            discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+            class="org.rhq.plugins.jmx.MBeanResourceComponent">
+
+      <runs-inside>
+         <parent-resource-type name="JMX Server" plugin="JMX"/>
+      </runs-inside>
+
+      <plugin-configuration>
+         <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:id=%kbaseId%"/>
+         <c:simple-property name="nameTemplate" default="KBase '{kbaseId}'"/>
+         <c:simple-property name="descriptionTemplate" default="A JMX bean for Knowledge Base '{kbaseId}'"/>
+         <c:simple-property name="kbaseId" type="string" description="The Knowledge Base Id"/>
+      </plugin-configuration>
+
+      <operation name="startInternalMBeans"
+                 displayName="Start Internal MBeans"
+                 description="Starts all the internal dependent MBeans.">
+      </operation>
+
+      <operation name="stopInternalMBeans"
+                 displayName="Stop Internal MBeans"
+                 description="Stops all the internal dependent MBeans.">
+      </operation>
+
+   </service>
+
+</plugin>
