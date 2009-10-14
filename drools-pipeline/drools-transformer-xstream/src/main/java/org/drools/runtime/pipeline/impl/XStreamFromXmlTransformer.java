@@ -14,7 +14,7 @@ import org.drools.runtime.pipeline.impl.BaseEmitter;
 import com.thoughtworks.xstream.XStream;
 
 public class XStreamFromXmlTransformer extends BaseEmitter
-    implements
+    implements  
     Transformer {
     private XStream                    xstream;   
 
@@ -46,5 +46,9 @@ public class XStreamFromXmlTransformer extends BaseEmitter
         }
         emit( result,
               context );
+    }
+    
+    public void sniff(Reader reader) {
+        
     }
 }

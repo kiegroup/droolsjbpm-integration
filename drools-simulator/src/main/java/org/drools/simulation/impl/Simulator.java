@@ -148,6 +148,10 @@ public class Simulator
         return this.contexts.get( identifier );
     }
     
+    public Context getDefaultContext() {
+        return this.root;
+    }
+    
     public Simulation getSimulation() {
         return this.simulation;
     }

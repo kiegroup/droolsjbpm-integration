@@ -53,6 +53,8 @@ import org.drools.runtime.process.WorkflowProcessInstance;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.QueryResultsRow;
+import org.drools.vsm.ServiceManager;
+import org.drools.vsm.local.ServiceManagerLocalClient;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
@@ -1797,6 +1799,73 @@ public class XStreamBatchExecutionTest extends TestCase {
         outXml = (String) resultHandler.getObject();
         assertTrue( outXml.indexOf( "<price>30</price>" ) > -1 );
     }
+    
+    public void testVmsPipeline() throws Exception {
+        String str = "";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "rule rule1 \n";
+        str += "  when \n";
+        str += "    $c : Cheese() \n";
+        str += " \n";
+        str += "  then \n";
+        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+        str += "end\n";
+
+        String inXml = "";
+        inXml += "<batch-execution lookup=\"ksession\" >";
+        inXml += "  <insert out-identifier='outStilton'>";
+        inXml += "    <org.drools.Cheese>";
+        inXml += "      <type>stilton</type>";
+        inXml += "      <price>25</price>";
+        inXml += "      <oldPrice>0</oldPrice>";
+        inXml += "    </org.drools.Cheese>";
+        inXml += "  </insert>";
+        inXml += "  <fire-all-rules />";
+        inXml += "</batch-execution>";
+
+        ServiceManager sm = new ServiceManagerLocalClient();
+        
+        StatefulKnowledgeSession ksession = getVmsSessionStateful( sm, ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        
+        sm.register( "ksession1", ksession );
+        
+        XStreamResolverStrategy xstreamStrategy = new XStreamResolverStrategy() {
+            public XStream lookup(String name) {
+                return BatchExecutionHelper.newXStreamMarshaller();
+            }
+            
+        };
+        
+        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+        getPipelineVms( sm, xstreamStrategy ).insert( inXml, resultHandler );
+        String outXml = (String) resultHandler.getObject();
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Cheese stilton = (Cheese) result.getValue( "outStilton" );
+        assertEquals( 30,
+                      stilton.getPrice() );
+
+        FactHandle factHandle = (FactHandle) result.getFactHandle( "outStilton" );
+        stilton = (Cheese) ksession.getObject( factHandle );
+        assertEquals( 30,
+                      stilton.getPrice() );
+
+        String expectedXml = "";
+        expectedXml += "<execution-results>\n";
+        expectedXml += "  <result identifier=\"outStilton\">\n";
+        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "      <type>stilton</type>\n";
+        expectedXml += "      <oldPrice>0</oldPrice>\n";
+        expectedXml += "      <price>30</price>\n";
+        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "  </result>\n";
+        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
+        expectedXml += "</execution-results>\n";
+
+        assertXMLEqual( expectedXml,
+                        outXml );
+    }    
 
     private Pipeline getPipeline(StatelessKnowledgeSession ksession) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
@@ -1818,6 +1887,34 @@ public class XStreamBatchExecutionTest extends TestCase {
 
         return pipeline;
     }
+    
+    private Pipeline getPipelineVms(ServiceManager vsm, XStreamResolverStrategy xstreamResolverStrategy) {
+        Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
+
+        Action assignResult = PipelineFactory.newAssignObjectAsResult();
+        assignResult.setReceiver( executeResultHandler );
+
+        //Transformer outTransformer = PipelineFactory.newXStreamToXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
+        Transformer outTransformer = new XStreamToXmlVsmTransformer();
+        outTransformer.setReceiver( assignResult );
+
+        KnowledgeRuntimeCommand batchExecution = PipelineFactory.newCommandExecutor();
+        batchExecution.setReceiver( outTransformer );
+
+        //Transformer inTransformer = PipelineFactory.newXStreamFromXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
+        Transformer inTransformer = new XStreamFromXmlVsmTransformer( xstreamResolverStrategy );
+        inTransformer.setReceiver( batchExecution ); 
+        
+        Transformer domTransformer = new ToXmlNodeTransformer();
+        domTransformer.setReceiver( inTransformer );
+        
+        //Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+        Pipeline pipeline = new ServiceManagerPipelineImpl(vsm);
+        
+        pipeline.setReceiver( domTransformer );
+
+        return pipeline;
+    }    
 
     private Pipeline getPipelineStateful(StatefulKnowledgeSession ksession) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
@@ -1893,5 +1990,25 @@ public class XStreamBatchExecutionTest extends TestCase {
 
         return session;
     }
+    
+    private StatefulKnowledgeSession getVmsSessionStateful(ServiceManager sm, Resource resource) throws Exception {
+        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactory().newKnowledgeBuilder();
+        kbuilder.add( resource,
+                      ResourceType.DRL );
+
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( kbuilder.getErrors() );
+        }
+
+        assertFalse( kbuilder.hasErrors() );
+        Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
+
+        KnowledgeBase kbase = sm.getKnowledgeBaseFactory().newKnowledgeBase();
+
+        kbase.addKnowledgePackages( pkgs );
+        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+
+        return session;
+    }    
 
 }
