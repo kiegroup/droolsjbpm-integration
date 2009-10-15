@@ -25,6 +25,13 @@
             <version>${project.version}</version>  
             <scope>test</scope>
          </dependency>   
+         
+         <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-vsm</artifactId>
+            <version>${project.version}</version>  
+            <scope>test</scope>
+         </dependency>          
 
         <dependency>
           <groupId>com.thoughtworks.xstream</groupId>

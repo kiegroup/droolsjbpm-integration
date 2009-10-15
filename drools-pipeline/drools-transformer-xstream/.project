@@ -5,6 +5,7 @@
     <project>drools-api</project>
     <project>drools-compiler</project>
     <project>drools-core</project>
+    <project>drools-vsm</project>
   </projects>
   <buildSpec>
     <buildCommand>
