@@ -1804,7 +1804,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         str += "end\n";
 
         String inXml = "";
-        inXml += "<batch-execution lookup=\"ksession\" >";
+        inXml += "<batch-execution lookup=\"ksession1\" >";
         inXml += "  <insert out-identifier='outStilton'>";
         inXml += "    <org.drools.Cheese>";
         inXml += "      <type>stilton</type>";
