@@ -1,0 +1,12 @@
+package  org.drools.springframework
+
+import org.drools.Person
+
+global java.util.List list;
+
+rule "rule 1"
+when
+    $p : Person();
+then
+   list.add( $p );
+end

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://drools.org/schema/drools-spring"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+	targetNamespace="http://drools.org/schema/drools-spring"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xsd:element name="kbase">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="resource" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="decisiontable-conf" minOccurs="0" maxOccurs="1">
+								<xsd:complexType>
+									<xsd:attribute name="input-type" use="required" />
+									<xsd:attribute name="worksheet-name " use="required" />
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>					
+						<xsd:attribute name="source" use="required" />
+						<xsd:attribute name="type" use="required" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="ksession">
+		<xsd:complexType>
+			<xsd:attribute name="type" use="required" />
+			<xsd:attribute name="kbase" use="required" />
+			<xsd:attribute name="id" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

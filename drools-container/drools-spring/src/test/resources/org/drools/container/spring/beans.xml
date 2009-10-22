@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"       
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring drools-spring.xsd">
+  
+  <drools:kbase id="kbase1" >
+      <drools:resource source='classpath:org/drools/container/spring/testSpring.drl' type='DRL' />
+	  <drools:resource source='classpath:org/drools/container/spring/IntegrationExampleTest.xls' type="DTABLE">
+	      <drools:decisiontable-conf input-type="XLS" worksheet-name="Tables_2" />
+	  </drools:resource>      
+  </drools:kbase>
+  
+  <drools:ksession id="ksession1" type="stateless" kbase="kbase1" />
+
+  <drools:ksession id="ksession2" type="stateful"  kbase="kbase1" />
+</beans>
