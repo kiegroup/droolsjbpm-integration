@@ -31,5 +31,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/drools-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/drools-decisiontables"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/drools-templates"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/drools-vsm"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

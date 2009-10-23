@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import org.drools.Person;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.vsm.ServiceManager;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest extends TestCase {
@@ -27,5 +28,25 @@ public class SpringDroolsTest extends TestCase {
 		kstateful.insert( new Person( "Darth", "Cheddar", 50 ) );
 		kstateful.fireAllRules();	
 		assertEquals( 2, list.size() );
+	}
+	
+	public void test2() {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+        
+        ServiceManager sm = (ServiceManager)context.getBean( "sm1" );
+        
+        List list = new ArrayList();
+        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession)sm.lookup( "stateless1" );
+        kstateless.setGlobal( "list", list );
+        kstateless.execute( new Person( "Darth", "Cheddar", 50 ) );
+        assertEquals( 2, list.size() );
+        
+        
+        list = new ArrayList();
+        StatefulKnowledgeSession kstateful = ( StatefulKnowledgeSession ) sm.lookup( "ksession2" );
+        kstateful.setGlobal( "list", list );
+        kstateful.insert( new Person( "Darth", "Cheddar", 50 ) );
+        kstateful.fireAllRules();   
+        assertEquals( 2, list.size() );	    
 	}
 }

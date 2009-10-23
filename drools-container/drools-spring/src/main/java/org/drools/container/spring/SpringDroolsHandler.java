@@ -8,6 +8,8 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("kbase", new KnowledgeBaseDefinitionParser());
         
         registerBeanDefinitionParser("ksession", new KnowledgeSessionDefinitionParser());
+        
+        registerBeanDefinitionParser("serviceManager", new ServiceManagerDefinitionParser());
 
     }
 

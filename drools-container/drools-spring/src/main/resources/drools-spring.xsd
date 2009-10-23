@@ -34,5 +34,19 @@
 			<xsd:attribute name="id" use="required" />
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:element name="serviceManager">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="register" maxOccurs="unbounded">
+					<xsd:complexType>				
+						<xsd:attribute name="name" use="optional" />
+						<xsd:attribute name="ref" use="required" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" use="required" />
+		</xsd:complexType>
+	</xsd:element>	
 
 </xsd:schema>

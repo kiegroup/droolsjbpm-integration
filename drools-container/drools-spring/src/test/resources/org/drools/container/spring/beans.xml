@@ -15,4 +15,9 @@
   <drools:ksession id="ksession1" type="stateless" kbase="kbase1" />
 
   <drools:ksession id="ksession2" type="stateful"  kbase="kbase1" />
+  
+  <drools:serviceManager id="sm1">
+      <drools:register name="stateless1" ref="ksession1" />
+      <drools:register ref="ksession2" />
+  </drools:serviceManager>   
 </beans>
