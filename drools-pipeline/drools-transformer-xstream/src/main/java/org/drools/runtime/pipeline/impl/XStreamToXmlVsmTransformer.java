@@ -18,22 +18,33 @@ import com.thoughtworks.xstream.io.xml.DomReader;
 public class XStreamToXmlVsmTransformer extends BaseEmitter
     implements
     Transformer {
-    
+    Object result = null;
     public void receive(Object object,
                         PipelineContext context) { 
-        XStream xstream = ( XStream ) context.getProperties().get( "xstream-instance" );
-        xstream.setClassLoader( context.getClassLoader() );
-        
-        Object result = null;
-        try {
-            result = xstream.toXML( object );
-        } catch ( Exception e ) {
-            handleException( this,
-                             object,
-                             e );
-        }
+        this.result = transform(context, object);
         
         emit( result,
               context );
     }
+
+    public Object transform(PipelineContext context, Object object) {
+        XStream xstream = (XStream) context.getProperties().get( "xstream-instance" );
+        xstream.setClassLoader(context.getClassLoader());
+        Object result = null;
+        try {
+            result = xstream.toXML(object);
+        } catch (Exception e) {
+            handleException(this, object, e);
+        }
+        return result;
+    }
+
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
+    
 }
