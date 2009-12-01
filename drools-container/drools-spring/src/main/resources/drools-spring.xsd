@@ -1,41 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xsd:schema xmlns="http://drools.org/schema/drools-spring"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
 	targetNamespace="http://drools.org/schema/drools-spring"
-	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	elementFormDefault="qualified" 
+	attributeFormDefault="unqualified">
+
+	<xsd:simpleType name="knowledgeSessionTypeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="stateful" />
+			<xsd:enumeration value="stateless" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="resourceTypeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DRL" />
+			<xsd:enumeration value="XDRL" />
+			<xsd:enumeration value="DSL" />
+			<xsd:enumeration value="DSLR" />
+			<xsd:enumeration value="DRF" />
+			<xsd:enumeration value="DTABLE" />
+			<xsd:enumeration value="PKG" />
+			<xsd:enumeration value="BRL" />
+			<xsd:enumeration value="CHANGE_SET" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="resourceType">
+		<xsd:sequence>
+			<xsd:element name="decisiontable-conf" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:attribute name="input-type" use="required" />
+					<xsd:attribute name="worksheet-name " use="required" />
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="source" use="required" type="xsd:string"/>
+		<xsd:attribute name="type" use="required" type="resourceTypeEnum"/>
+	</xsd:complexType>
+
+	<xsd:element name="resource">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="resourceType">
+					<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>			
 
 	<xsd:element name="kbase">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="resource" maxOccurs="unbounded">
-					<xsd:complexType>
-						<xsd:sequence>
-							<xsd:element name="decisiontable-conf" minOccurs="0" maxOccurs="1">
-								<xsd:complexType>
-									<xsd:attribute name="input-type" use="required" />
-									<xsd:attribute name="worksheet-name " use="required" />
-								</xsd:complexType>
-							</xsd:element>
-						</xsd:sequence>					
-						<xsd:attribute name="source" use="required" />
-						<xsd:attribute name="type" use="required" />
-					</xsd:complexType>
-				</xsd:element>
+				<xsd:element name="resource" type="resourceType" maxOccurs="unbounded"/>
 			</xsd:sequence>
-			<xsd:attribute name="id" use="required" />
+			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="serviceManager" use="required" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="ksession">
 		<xsd:complexType>
-			<xsd:attribute name="type" use="required" />
-			<xsd:attribute name="kbase" use="required" />
-			<xsd:attribute name="id" use="required" />
+			<xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
+			<xsd:attribute name="kbase" use="required" type="xsd:string"/>
+			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="serviceManager" use="optional" type="xsd:string"/>
+			<xsd:attribute name="name" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 	
+	<!-- 
 	<xsd:element name="serviceManager">
+		
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element name="register" maxOccurs="unbounded">
@@ -46,7 +82,9 @@
 				</xsd:element>
 			</xsd:sequence>
 			<xsd:attribute name="id" use="required" />
+			<xsd:attribute name="class" default="org.drools.vsm.local.ServiceManagerLocalClient" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>	
-
+	 -->
+	 
 </xsd:schema>

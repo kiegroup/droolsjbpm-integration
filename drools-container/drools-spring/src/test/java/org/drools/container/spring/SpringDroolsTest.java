@@ -15,15 +15,15 @@ public class SpringDroolsTest extends TestCase {
 	public void test1() throws Exception {		
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 		
-		List list = new ArrayList();
+		List<String> list = new ArrayList<String>();
 		StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean( "ksession1" );
 		kstateless.setGlobal( "list", list );
 		kstateless.execute( new Person( "Darth", "Cheddar", 50 ) );
 		assertEquals( 2, list.size() );
 		
 		
-		list = new ArrayList();
-		StatefulKnowledgeSession kstateful = ( StatefulKnowledgeSession ) ((StatefulKnowledgeSession)context.getBean( "ksession2" ));
+		list = new ArrayList<String>();
+		StatefulKnowledgeSession kstateful = ((StatefulKnowledgeSession)context.getBean( "ksession2" ));
 		kstateful.setGlobal( "list", list );
 		kstateful.insert( new Person( "Darth", "Cheddar", 50 ) );
 		kstateful.fireAllRules();	
@@ -35,14 +35,15 @@ public class SpringDroolsTest extends TestCase {
         
         ServiceManager sm = (ServiceManager)context.getBean( "sm1" );
         
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession)sm.lookup( "stateless1" );
+        assertNotNull("can't obtain session named: stateless1" , kstateless);
         kstateless.setGlobal( "list", list );
         kstateless.execute( new Person( "Darth", "Cheddar", 50 ) );
         assertEquals( 2, list.size() );
         
         
-        list = new ArrayList();
+        list = new ArrayList<String>();
         StatefulKnowledgeSession kstateful = ( StatefulKnowledgeSession ) sm.lookup( "ksession2" );
         kstateful.setGlobal( "list", list );
         kstateful.insert( new Person( "Darth", "Cheddar", 50 ) );
