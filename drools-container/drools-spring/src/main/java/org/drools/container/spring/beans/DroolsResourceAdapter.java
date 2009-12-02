@@ -78,6 +78,8 @@ public class DroolsResourceAdapter implements InitializingBean {
 		if (resourceType == null) {
 			throw new IllegalArgumentException("resourceType property is mandatory");
 		}
-		
+		if (resourceConfiguration != null && !ResourceType.DTABLE.equals(resourceType)) {
+			throw new IllegalArgumentException("Only Decision Tables can have configuration");
+		}
 	}
 }

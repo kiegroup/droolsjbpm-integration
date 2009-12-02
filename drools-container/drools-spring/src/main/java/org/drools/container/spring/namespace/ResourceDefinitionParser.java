@@ -38,9 +38,6 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
 		
 		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "decisiontable-conf");
 		if (childElements != null && !childElements.isEmpty()) {
-			if (!ResourceType.DTABLE.getName().endsWith(type)) {
-				throw new IllegalArgumentException("Only Desicion Tables can have configuration");
-			}
 			Element conf = childElements.get(0);
 			DecisionTableConfigurationImpl dtableConf = new DecisionTableConfigurationImpl();
 			

@@ -55,7 +55,7 @@
 				<xsd:element name="resource" type="resourceType" maxOccurs="unbounded"/>
 			</xsd:sequence>
 			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
-			<xsd:attribute name="serviceManager" use="required" type="xsd:string"/>
+			<xsd:attribute name="serviceManager" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 

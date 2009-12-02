@@ -7,6 +7,7 @@ import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.vsm.ServiceManager;
+import org.drools.vsm.local.ServiceManagerLocalClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -36,7 +37,7 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 //			setName(getBeanName());
 //		}
 		if (serviceManager == null) {
-			throw new IllegalArgumentException("serviceManager property is mandatory");
+			serviceManager = new ServiceManagerLocalClient();
 		}
 		KnowledgeBuilder kbuilder = getServiceManager().getKnowledgeBuilderFactory().newKnowledgeBuilder();
 		for (DroolsResourceAdapter res: resources) {
