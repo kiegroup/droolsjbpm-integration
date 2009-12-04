@@ -295,16 +295,13 @@ class PipelineRouteBuilder extends RouteBuilder {
 
     public void configure() {
         // START SNIPPET: example
-        from("direct:start").process(new ToXmlNodeTransformer()).to("direct:xstreamTransformer");
-
-        from("direct:xstreamTransformer").process(new CamelXStreamFromXmlVsmTransformer(xstreamStrategy)).to("direct:executor");
-        from("direct:executor").process(new BatchExecutorProcessor()).to("direct:xstreamTransformerResult");
-
-        from("direct:xstreamTransformerResult").process(new CamelXStreamToXmlVsmTransformer()).to("direct:finalResult");
-
-        from("direct:finalResult").process(new AssignResultProcessor()).to("direct:executeResult");
-
-        from("direct:executeResult").process(new ExecuteResultProcessor());
-
+        from("direct:start")
+            .process(new ToXmlNodeTransformer())
+            .process(new CamelXStreamFromXmlVsmTransformer(xstreamStrategy))
+            .process(new BatchExecutorProcessor())
+            .process(new CamelXStreamToXmlVsmTransformer())
+            .process(new AssignResultProcessor())
+            .process(new ExecuteResultProcessor());
+        // END SNIPPET: example
     }
 }
