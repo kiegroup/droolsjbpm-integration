@@ -1791,7 +1791,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertTrue( outXml.indexOf( "<price>30</price>" ) > -1 );
     }
 
-    public void testVmsPipeline() throws Exception {
+    public void testVsmPipeline() throws Exception {
         String str = "";
         str += "package org.drools \n";
         str += "import org.drools.Cheese \n";
@@ -1817,7 +1817,7 @@ public class XStreamBatchExecutionTest extends TestCase {
 
         ServiceManager sm = new ServiceManagerLocalClient();
 
-        StatefulKnowledgeSession ksession = getVmsSessionStateful( sm,
+        StatefulKnowledgeSession ksession = getVsmSessionStateful( sm,
                                                                    ResourceFactory.newByteArrayResource( str.getBytes() ) );
 
         sm.register( "ksession1",
@@ -1831,7 +1831,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         };
 
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        getPipelineVms( sm,
+        getPipelineVsm( sm,
                         xstreamStrategy ).insert( inXml,
                                                   resultHandler );
         String outXml = (String) resultHandler.getObject();
@@ -1883,7 +1883,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         return pipeline;
     }
 
-    private Pipeline getPipelineVms(ServiceManager vsm,
+    private Pipeline getPipelineVsm(ServiceManager vsm,
                                     XStreamResolverStrategy xstreamResolverStrategy) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
@@ -1987,7 +1987,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         return session;
     }
 
-    private StatefulKnowledgeSession getVmsSessionStateful(ServiceManager sm,
+    private StatefulKnowledgeSession getVsmSessionStateful(ServiceManager sm,
                                                            Resource resource) throws Exception {
         KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactory().newKnowledgeBuilder();
         kbuilder.add( resource,
