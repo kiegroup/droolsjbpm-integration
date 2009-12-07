@@ -9,6 +9,11 @@
   
     <artifactId>drools-camel</artifactId>
     <name>Drools :: Pipeline :: Camel </name>
+
+    <properties>
+        <camel-version>2.1.0</camel-version>
+    </properties>
+
     <repositories>
         <repository>
             <id>camel</id>
@@ -54,12 +59,12 @@
          <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${camel-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-spring</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${camel-version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -70,9 +75,15 @@
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <version>1.2</version>
-
         </dependency>
 
+         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>${camel-version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     
