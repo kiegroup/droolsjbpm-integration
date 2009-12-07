@@ -30,14 +30,13 @@ import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.vsm.ServiceManager;
 import org.drools.vsm.local.ServiceManagerLocalClient;
-import org.w3c.dom.Document;
 
 public class CamelEndpointTest extends ContextTestSupport {
     private ServiceManager sm;
 
     public void testBasic() throws Exception {
         String inXml = "";
-        inXml += "<batch-execution>";
+        inXml += "<batch-execution lookup=\"ksession1\">";
         inXml += "  <insert out-identifier='salaboy'>";
         inXml += "    <org.drools.pipeline.camel.Person>";
         inXml += "      <name>salaboy</name>";
@@ -47,7 +46,9 @@ public class CamelEndpointTest extends ContextTestSupport {
         inXml += "</batch-execution>";
 
         Object response = template.requestBody("direct:in", inXml);
-        // assertEquals("Hello World", response);
+        
+        // Urgh, ugly stuff, but it's getting late...
+        System.out.println(response);
     }
 
     @Override
@@ -96,5 +97,4 @@ public class CamelEndpointTest extends ContextTestSupport {
 
         return session;
     }
-
 }

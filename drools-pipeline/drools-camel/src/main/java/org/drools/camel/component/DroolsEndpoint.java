@@ -26,11 +26,15 @@ import org.drools.runtime.CommandExecutor;
 import org.drools.vsm.ServiceManager;
 
 public class DroolsEndpoint extends DefaultEndpoint {
+    // Property name *must* follow the Camel conventions (see org.apache.camel.Exchange)
+    public static final String DROOLS_CONTEXT_PROPERTY = "CamelDroolsContext";
+
     private String id;
     private String method;
     private CommandExecutor executor;
+    private ServiceManager serviceManager;
 
-    protected DroolsEndpoint(String endpointUri, String remaining, DroolsComponent component) throws URISyntaxException {
+    public DroolsEndpoint(String endpointUri, String remaining, DroolsComponent component) throws URISyntaxException {
         super(endpointUri, component);
         configure(component, remaining);
     }
@@ -40,7 +44,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
     }
 
     public Producer createProducer() throws Exception {
-        return new DroolsProducer(this);
+        return new DroolsProducer(this, serviceManager);
     }
 
     public boolean isSingleton() {
@@ -63,6 +67,10 @@ public class DroolsEndpoint extends DefaultEndpoint {
         return executor;
     }
 
+    public ServiceManager getServiceManager() {
+        return serviceManager;
+    }
+
     protected void configure(DroolsComponent component, String uri) {
         int pos = uri.indexOf('/');
         String smId = (pos < 0) ? uri : uri.substring(0, pos);
@@ -70,17 +78,17 @@ public class DroolsEndpoint extends DefaultEndpoint {
         
         if (smId.length() > 0) {
             // initialize the component if needed
-            ServiceManager sm = component.getServiceManager();
-            if (sm == null) {
+            serviceManager = component.getServiceManager();
+            if (serviceManager == null) {
                 // let's look it up
-                sm = component.getCamelContext().getRegistry().lookup(smId, ServiceManager.class);
-                if (sm == null) {
+                serviceManager = component.getCamelContext().getRegistry().lookup(smId, ServiceManager.class);
+                if (serviceManager == null) {
                     throw new RuntimeCamelException("Could not find ServiceManager with id=\""
                         + smId + "\" in CamelContext. Check configuration.");
                 }
                 // use this ServiceManager
                 component.setServiceManagerId(smId);
-                component.setServiceManager(sm);
+                component.setServiceManager(serviceManager);
             } else if (!smId.equals(component.getServiceManagerId())) {
                 // make sure we deal with the same ServiceManager.
                 // having multiple ServiceManagers instances in the same process is not supported
@@ -91,7 +99,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
             // if id is empty this endpoint is not attached to a CommandExecutor and will have to look it up at runtime.
             if (id.length() > 0) {
                 // lookup command executor on 
-                executor = sm.lookup(id);
+                executor = serviceManager.lookup(id);
                 if (executor == null) {
                     throw new RuntimeCamelException("Failed to instantiate DroolsEndpoint. " 
                         + "Lookup of CommandExecutor with id=\"" + uri + "\" failed. Check configuration.");

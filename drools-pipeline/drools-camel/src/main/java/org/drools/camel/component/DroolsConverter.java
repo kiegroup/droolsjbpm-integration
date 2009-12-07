@@ -17,17 +17,45 @@ package org.drools.camel.component;
 
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
+import org.drools.runtime.ExecutionResults;
+import org.drools.runtime.help.BatchExecutionHelper;
+import org.drools.runtime.pipeline.PipelineContext;
+import org.drools.runtime.pipeline.impl.XStreamFromXmlVsmTransformer;
+import org.drools.runtime.pipeline.impl.XStreamResolverStrategy;
+import org.drools.runtime.pipeline.impl.XStreamToXmlVsmTransformer;
 import org.w3c.dom.Document;
+
+import com.thoughtworks.xstream.XStream;
 
 @Converter
 public final class DroolsConverter {
+    private XStreamFromXmlVsmTransformer inTransformer;
+    private XStreamToXmlVsmTransformer outTransformer;
 
-    private DroolsConverter() {
-    	// Utility class
+    public DroolsConverter() {
+        // The XStreamFromXmlVsmTransformer will throw an IllegalArgumentException if lookup is null
+        // this *will* be the case if the ksession is specified in the url, so we need a different 
+        // kind of transformer there.
+        inTransformer = new XStreamFromXmlVsmTransformer(new XStreamResolverStrategy() {
+                public XStream lookup(String name) {
+                    return BatchExecutionHelper.newXStreamMarshaller();
+                }
+            });
+        outTransformer = new XStreamToXmlVsmTransformer();
     }
 
     @Converter
-    public static DroolsPayload toVsmPayload(Document payload, Exchange exchange) {
-    	return null;
+    public DroolsPayload toVsmPayload(Document payload, Exchange exchange) {
+    	PipelineContext context = (PipelineContext)exchange.getProperty(DroolsEndpoint.DROOLS_CONTEXT_PROPERTY);
+    	// check for null context and throw CamelRuntimeException?
+    	inTransformer.processPayload(payload, context);
+    	// this was done in the initial example, is it really necessary? why reset the context?
+        exchange.setProperty(DroolsEndpoint.DROOLS_CONTEXT_PROPERTY, inTransformer.getContext());
+        return new DroolsPayload(inTransformer.getPayload());
+    }
+
+    @Converter
+    public Object toXmlPayload(ExecutionResults payload, Exchange exchange) {
+        return outTransformer.transform((PipelineContext)exchange.getProperty(DroolsEndpoint.DROOLS_CONTEXT_PROPERTY), payload);
     }
 }

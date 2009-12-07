@@ -18,6 +18,13 @@ package org.drools.camel.component;
 public class DroolsPayload {
     private Object value;
 
+    DroolsPayload() {
+    }
+
+    DroolsPayload(Object value) {
+        this.value = value;
+    }
+
     public Object getValue() {
     	return value;
     }
