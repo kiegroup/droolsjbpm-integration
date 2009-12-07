@@ -48,6 +48,10 @@ public class CamelEndpointTest extends ContextTestSupport {
         Object response = template.requestBody("direct:in", inXml);
         
         // Urgh, ugly stuff, but it's getting late...
+        // Ideally we need an abstract test that defines the xml assert,
+        // the bootstrapping, the default input message and the response
+        // so the only thing left is to define the route builder with
+        // various kinds of urls, testing different scenarios
         System.out.println(response);
     }
 
@@ -62,6 +66,9 @@ public class CamelEndpointTest extends ContextTestSupport {
     
     @Override
     protected Context createJndiContext() throws Exception {
+        // Overriding this method is necessary in the absence of a spring application context 
+        // to bootstrap the whole thing.  Create another Spring based unit test with all the beans
+        // defined as below and remove this comment from here.
         Context context = super.createJndiContext();
 
         String rule = "";

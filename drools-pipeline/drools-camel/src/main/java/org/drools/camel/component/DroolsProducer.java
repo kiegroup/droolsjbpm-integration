@@ -42,6 +42,9 @@ public class DroolsProducer extends DefaultProducer {
     }
 
     public void process(Exchange exchange) throws Exception {
+        // The method is available via getEndpoint().getMethod();
+        // how should we use it here?
+        // for now the default method 'execute' is used...
         ResultHandlerImpl handler = new ResultHandlerImpl();
 
         exchange.setProperty(DroolsEndpoint.DROOLS_CONTEXT_PROPERTY, 
