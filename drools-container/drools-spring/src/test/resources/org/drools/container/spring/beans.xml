@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:drools="http://drools.org/schema/drools-spring"       
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring drools-spring.xsd">
+                           http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd">
   
 <bean id="sm1" class="org.drools.vsm.local.ServiceManagerLocalClient" />
 
@@ -20,22 +20,4 @@
 <drools:ksession id="ksession2" type="stateful" 
 	kbase="kbase1" serviceManager="sm1"/>
 	
-  
-  <!-- <drools:kbase id="kbase1" >
-      <drools:resource source='classpath:org/drools/container/spring/testSpring.drl' type='DRL' />
-	  <drools:resource source='classpath:org/drools/container/spring/IntegrationExampleTest.xls' type="DTABLE">
-	      <drools:decisiontable-conf input-type="XLS" worksheet-name="Tables_2" />
-	  </drools:resource>      
-  </drools:kbase>
-  
-  <drools:ksession id="ksession1" type="stateless" kbase="kbase1" />
-
-  <drools:ksession id="ksession2" type="stateful"  kbase="kbase1" />
-  
-  <drools:serviceManager id="sm1">
-      <drools:register name="stateless1" ref="ksession1" />
-      <drools:register ref="ksession2" />
-  </drools:serviceManager>   
-  
-  -->
 </beans>
