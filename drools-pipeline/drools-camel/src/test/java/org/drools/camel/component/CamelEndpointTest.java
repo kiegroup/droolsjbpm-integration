@@ -15,93 +15,74 @@
 
 package org.drools.camel.component;
 
-import java.util.Collection;
-
-import javax.naming.Context;
-
-import org.apache.camel.CamelException;
-import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.ResourceType;
-import org.drools.definition.KnowledgePackage;
-import org.drools.io.ResourceFactory;
+import org.drools.command.CommandFactory;
+import org.drools.command.runtime.rule.GetObjectCommand;
+import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.common.DisconnectedFactHandle;
+import org.drools.pipeline.camel.Person;
+import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.vsm.ServiceManager;
-import org.drools.vsm.local.ServiceManagerLocalClient;
+import org.drools.runtime.rule.FactHandle;
 
-public class CamelEndpointTest extends ContextTestSupport {
-    private ServiceManager sm;
+public class CamelEndpointTest extends DroolsCamelTestSupport {
+    private String handle;
 
-    public void testBasic() throws Exception {
-        String inXml = "";
-        inXml += "<batch-execution lookup=\"ksession1\">";
-        inXml += "  <insert out-identifier='salaboy'>";
-        inXml += "    <org.drools.pipeline.camel.Person>";
-        inXml += "      <name>salaboy</name>";
-        inXml += "    </org.drools.pipeline.camel.Person>";
-        inXml += "  </insert>";
-        inXml += "  <fire-all-rules />";
-        inXml += "</batch-execution>";
+    public void testSessionInsert() throws Exception {
+        Person person = new Person();
+        person.setName("Mauricio");
 
-        Object response = template.requestBody("direct:in", inXml);
-        
-        // Urgh, ugly stuff, but it's getting late...
-        // Ideally we need an abstract test that defines the xml assert,
-        // the bootstrapping, the default input message and the response
-        // so the only thing left is to define the route builder with
-        // various kinds of urls, testing different scenarios
-        System.out.println(response);
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person,"salaboy");
+
+        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-with-session", cmd);
+        assertTrue("Expected valid ExecutionResults object", response != null);
+        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+    }
+
+    public void testNoSessionInsert() throws Exception {
+        Person person = new Person();
+        person.setName("Mauricio");
+
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person,"salaboy");
+
+        ExecutionResults response = (ExecutionResults) template.requestBodyAndHeader("direct:test-no-session", cmd, 
+            DroolsComponent.DROOLS_LOOKUP, "ksession1");
+        assertTrue("Expected valid ExecutionResults object", response != null);
+        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+    }
+
+    public void testSessionGetObject() throws Exception {
+        FactHandle factHandle = new DisconnectedFactHandle(handle);
+        GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject(factHandle);
+        cmd.setOutIdentifier("rider");
+
+        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-with-session", cmd);
+        assertTrue("Expected valid ExecutionResults object", response != null);
+        assertTrue("ExecutionResults missing expected object", response.getValue("rider") != null);
+        assertTrue("FactHandle object not of expected type", response.getValue("rider") instanceof Person);
+        assertEquals("Hadrian", ((Person)response.getValue("rider")).getName());
     }
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:in").to("drools:sm/ksession1?method=execute");
+                from("direct:test-with-session").to("drools://sm/ksession1?pipeline=test-with-session");
+                from("direct:test-no-session").to("drools://sm?pipeline=test-no-session");
             }
         };
     }
-    
+
     @Override
-    protected Context createJndiContext() throws Exception {
-        // Overriding this method is necessary in the absence of a spring application context 
-        // to bootstrap the whole thing.  Create another Spring based unit test with all the beans
-        // defined as below and remove this comment from here.
-        Context context = super.createJndiContext();
+    protected void configureDroolsContext() {
+        Person me = new Person();
+        me.setName("Hadrian");
 
-        String rule = "";
-        rule += "package org.drools.pipeline.camel;\n" +
-                "import org.drools.pipeline.camel.Person;\n" +
-                "rule 'Check for Person'\n" +
-                " when\n" +
-                "   $p: Person()\n" +
-                " then\n" +
-                "   System.out.println(\"Person Name: \" + $p.getName());\n" +
-                "end\n";
-
-        sm = new ServiceManagerLocalClient();
-        StatefulKnowledgeSession ksession = getVmsSessionStateful(sm, rule);
-        sm.register("ksession1", ksession);
-
-        context.bind("sm", sm);
-        return context;
-    }
-    
-    private StatefulKnowledgeSession getVmsSessionStateful(ServiceManager sm, String rule) throws Exception {
-        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactory().newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
-
-        if (kbuilder.hasErrors()) {
-            throw new CamelException(kbuilder.getErrors().toString());
-        }
-
-        Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
-        KnowledgeBase kbase = sm.getKnowledgeBaseFactory().newKnowledgeBase();
-        kbase.addKnowledgePackages(pkgs);
-        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-
-        return session;
+        StatefulKnowledgeSession ksession = registerKnowledgeRuntime("ksession1", null);
+        InsertObjectCommand cmd = new InsertObjectCommand(me);
+        cmd.setOutIdentifier("camel-rider");
+        cmd.setReturnObject(false);
+        ExecutionResults results = ksession.execute(cmd);
+        handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
     }
 }

@@ -26,11 +26,9 @@ import org.drools.runtime.CommandExecutor;
 import org.drools.vsm.ServiceManager;
 
 public class DroolsEndpoint extends DefaultEndpoint {
-    // Property name *must* follow the Camel conventions (see org.apache.camel.Exchange)
-    public static final String DROOLS_CONTEXT_PROPERTY = "CamelDroolsContext";
 
-    private String id;
-    private String method;
+    private String ksession;
+    private String pipeline;
     private CommandExecutor executor;
     private ServiceManager serviceManager;
 
@@ -51,16 +49,20 @@ public class DroolsEndpoint extends DefaultEndpoint {
         return true;
     }
 
-    public String getId() {
-        return id;
+    public String getKsession() {
+        return ksession;
     }
 
-    public String getMethod() {
-        return method;
+    public void setKsession(String ksession) {
+        this.ksession = ksession;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public String getPipeline() {
+        return pipeline;
+    }
+
+    public void setPipeline(String pipeline) {
+        this.pipeline = pipeline;
     }
 
     public CommandExecutor getExecutor() {
@@ -74,8 +76,8 @@ public class DroolsEndpoint extends DefaultEndpoint {
     protected void configure(DroolsComponent component, String uri) {
         int pos = uri.indexOf('/');
         String smId = (pos < 0) ? uri : uri.substring(0, pos);
-        id = (pos < 0) ? "" : uri.substring(pos + 1);
-        
+        ksession = (pos < 0) ? "" : uri.substring(pos + 1);
+
         if (smId.length() > 0) {
             // initialize the component if needed
             serviceManager = component.getServiceManager();
@@ -93,13 +95,13 @@ public class DroolsEndpoint extends DefaultEndpoint {
                 // make sure we deal with the same ServiceManager.
                 // having multiple ServiceManagers instances in the same process is not supported
                 throw new RuntimeCamelException("ServiceManager already initialized from id=\""
-                    + component.getServiceManagerId() + "\" yet current endpoint requries id=\"" + id + "\"");
+                    + component.getServiceManagerId() + "\" yet current endpoint requries id=\"" + smId + "\"");
             }
             
             // if id is empty this endpoint is not attached to a CommandExecutor and will have to look it up at runtime.
-            if (id.length() > 0) {
-                // lookup command executor on 
-                executor = serviceManager.lookup(id);
+            if (ksession.length() > 0) {
+                // lookup command executor
+                executor = serviceManager.lookup(ksession);
                 if (executor == null) {
                     throw new RuntimeCamelException("Failed to instantiate DroolsEndpoint. " 
                         + "Lookup of CommandExecutor with id=\"" + uri + "\" failed. Check configuration.");
@@ -107,7 +109,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
             }
         } else {
             // this is a hanging entity, not attached to an SM
-            executor = component.getCamelContext().getRegistry().lookup(id, CommandExecutor.class);
+            executor = component.getCamelContext().getRegistry().lookup(ksession, CommandExecutor.class);
             
             // TODO: test this scenario...
         }
