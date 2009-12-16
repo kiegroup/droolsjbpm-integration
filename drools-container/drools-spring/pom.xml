@@ -8,6 +8,10 @@
     <version>5.1.0.SNAPSHOT</version>
   </parent>
 
+	<properties>
+		<spring.version>2.5.6</spring.version>
+	</properties>
+
   <artifactId>drools-spring</artifactId>
   <packaging>jar</packaging>
   <name>Drools :: Spring</name> 
@@ -37,25 +41,73 @@
     	<dependency>
     		<groupId>org.drools</groupId>
     		<artifactId>drools-decisiontables</artifactId>
+    	</dependency>
+    	
+    	<dependency>
+    		<groupId>org.drools</groupId>
+    		<artifactId>drools-persistence-jpa</artifactId>
+    		<optional>true</optional>
     	</dependency>    	
         
     	<dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-core</artifactId>
-            <version>2.5.6</version>
+            <version>${spring.version}</version>
     	</dependency>     
 
         <dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-beans</artifactId>
-            <version>2.5.6</version>
+            <version>${spring.version}</version>
     	</dependency> 
         
         <dependency>
     		<groupId>org.springframework</groupId>
+    		<artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+            <optional>true</optional>
+    	</dependency>
+    	
+    	<dependency>
+    		<groupId>org.springframework</groupId>
+    		<artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+            <optional>true</optional>
+    	</dependency>
+        
+        <dependency>
+    		<groupId>org.springframework</groupId>
     		<artifactId>spring-context</artifactId>
-            <version>2.5.6</version>
-    	</dependency>         
+            <version>${spring.version}</version>
+    	</dependency>
+
+        <dependency>
+        	<groupId>javax.persistence</groupId>
+        	<artifactId>persistence-api</artifactId>
+        	<version>1.0</version>
+        	<optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>3.4.0.GA</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-log4j12</artifactId>
+        	<version>1.5.2</version>
+        	<scope>test</scope>
+        </dependency>
+
+        <dependency>
+        	<groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.1.117</version>
+        	<scope>test</scope>
+        </dependency>         
 
       </dependencies>              
                   

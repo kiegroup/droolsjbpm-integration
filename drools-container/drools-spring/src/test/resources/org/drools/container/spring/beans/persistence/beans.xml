@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:drools="http://drools.org/schema/drools-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                        http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd">
+
+	<bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<!-- org.h2.jdbcx.JdbcDataSource -->
+		<property name="driverClassName" value="org.h2.Driver" />
+		<!-- jdbc:h2:mem:mydb 
+		jdbc:h2:tcp://localhost/DroolsFlow-->
+		<property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+	<!--
+		<bean id="sm1" class="org.drools.vsm.local.ServiceManagerLocalClient" /> 
+	<drools:kbase id="kbase1" serviceManager="sm1">
+		<drools:resource type="DRF" source="classpath:rules/VariablePersistenceStrategyProcess.rf" />
+	</drools:kbase>
+	<drools:ksession id="ksession1" type="stateless" name="stateless1" kbase="kbase1" serviceManager="sm1" />
+	<drools:ksession id="ksession2" type="stateful" kbase="kbase1" serviceManager="sm1" />
+	 -->
+	<bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="ds" />
+		<property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
+	</bean>
+
+	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="myEmf" />
+	</bean>
+
+	<!-- 
+	<bean id="jpaProcessKnowledgeProvider" class="org.drools.container.spring.beans.persistence.JPAKnowledgeServiceBean">
+		<property name="kbase" ref="kbase1" />
+		<property name="serviceManager" ref="sm1" />
+		<property name="entityManagerFactory" ref="myEmf" />
+		<property name="transactionManager" ref="txManager" />
+		<property name="variablePersisters">
+			<map>
+				<entry key="javax.persistence.Entity" value="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
+				<entry key="java.lang.String" value="org.plugtree.labs.variablepersistence.StringVariablePersister"/>
+				<entry key="java.io.Serializable" value="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
+			</map>
+		</property>
+	</bean>
+	 -->
+</beans>

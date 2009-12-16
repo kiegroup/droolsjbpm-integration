@@ -14,7 +14,6 @@ import org.w3c.dom.Element;
 
 public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser {
 	
-	private static final String RESOUCES_ATTRIBUTE = "resources";
 	private static final String SERVICE_MANAGER_ATTRIBUTE = "serviceManager";
 
 	@SuppressWarnings("unchecked")
