@@ -32,28 +32,25 @@
 
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>drools-core</artifactId>
-            <version>${project.version}</version>
+            <artifactId>drools-api</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-compiler</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-vsm</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-transformer-xstream</artifactId>
-            <version>5.1.0.SNAPSHOT</version>
         </dependency>
 
          <dependency>

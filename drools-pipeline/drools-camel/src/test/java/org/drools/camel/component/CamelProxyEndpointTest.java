@@ -16,6 +16,7 @@
 package org.drools.camel.component;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.drools.command.CommandFactory;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.pipeline.camel.Person;
 import org.drools.runtime.ExecutionResults;
@@ -26,6 +27,13 @@ public class CamelProxyEndpointTest extends DroolsCamelTestSupport {
     private String handle;
 
     public void testSessionInsert() throws Exception {
+        Person person = new Person();
+        person.setName("Mauricio");
+
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person,"salaboy");
+        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-no-marshal", cmd);
+        assertTrue("Expected valid ExecutionResults object", response != null);
+        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
     }
 
     @Override

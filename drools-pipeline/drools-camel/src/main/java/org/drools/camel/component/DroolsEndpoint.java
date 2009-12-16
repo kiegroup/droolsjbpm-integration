@@ -74,9 +74,8 @@ public class DroolsEndpoint extends DefaultEndpoint {
     }
 
     protected void configure(DroolsComponent component, String uri) {
-        int pos = uri.indexOf('/');
-        String smId = (pos < 0) ? uri : uri.substring(0, pos);
-        ksession = (pos < 0) ? "" : uri.substring(pos + 1);
+        String smId = DroolsComponent.getSessionManagerId(uri);
+        ksession = DroolsComponent.getKsessionId(uri);
 
         if (smId.length() > 0) {
             // initialize the component if needed

@@ -16,10 +16,13 @@
 package org.drools.camel.component;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultComponent;
+import org.apache.camel.util.UuidGenerator;
 import org.drools.vsm.ServiceManager;
 
 public class DroolsComponent extends DefaultComponent {
@@ -27,6 +30,9 @@ public class DroolsComponent extends DefaultComponent {
     public static final String DROOLS_LOOKUP = "DroolsLookup";
     public static final String DROOLS_OUT_IDENTIFIER = "DroolsOutIdentifier";
     public static final String DROOLS_HANDLE = "DroolsHandle";
+    
+    private static final String UUID_PREFIX = "drools-";
+    private static final AtomicInteger counter = new AtomicInteger();
     
     private CamelContext embeddedContext;
     private ServiceManager serviceManager;
@@ -40,6 +46,9 @@ public class DroolsComponent extends DefaultComponent {
     }
 
     public CamelContext getEmbeddedContext() {
+        if (embeddedContext == null) {
+            createEmbeddedContext();
+        }
         return embeddedContext;
     }
 
@@ -59,7 +68,7 @@ public class DroolsComponent extends DefaultComponent {
         return serviceManager;
     }
 
-    public void setServiceManager (ServiceManager sm) {
+    public void setServiceManager(ServiceManager sm) {
         serviceManager = sm;
     }
 
@@ -77,9 +86,48 @@ public class DroolsComponent extends DefaultComponent {
      */
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-        Endpoint endpoint = parameters.containsKey("pipeline") ? 
-            new DroolsEndpoint(uri, remaining, this) : new DroolsProxyEndpoint(uri, remaining, this);
+        Endpoint endpoint;
+        boolean isProxy = !parameters.containsKey("pipeline");
+        if (isProxy) {
+            endpoint = new DroolsProxyEndpoint(uri, remaining, this);
+        } else {
+            endpoint = new DroolsEndpoint(uri, remaining, this);
+        }
         setProperties(endpoint, parameters);
         return endpoint;
+    }
+
+    protected void createEmbeddedContext() {
+        // TODO: fix this temporary solution. Should be able to create a context from spring configuration as well
+        if (embeddedContext == null) {
+            CamelContext context;
+            try {
+                context = new DefaultCamelContext(getCamelContext().getRegistry());
+                context.disableJMX();
+                context.start();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return;
+            }
+            embeddedContext = context;
+        }
+    }
+    
+    public static final String getSessionManagerId(String uri) {
+        int pos = uri.indexOf('/');
+        return (pos < 0) ? uri : uri.substring(0, pos);
+
+    }
+
+    public static final String getKsessionId(String uri) {
+        int pos = uri.indexOf('/');
+        return (pos < 0) ? "" : uri.substring(pos + 1);
+    }
+
+    public static final String generateUuid() {
+        // Using the Camel uuid generator would be an option, but those are pretty long ids
+        // UuidGenerator.get().generateUuid()
+        return UUID_PREFIX + counter.incrementAndGet();
     }
 }
