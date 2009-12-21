@@ -22,6 +22,9 @@ import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.spi.DataFormat;
+import org.drools.pipeline.camel.DroolsCamelContextInit;
+import org.drools.vsm.ServiceManager;
 
 public class DroolsProxyEndpoint extends DefaultEndpoint {
 
@@ -31,7 +34,7 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
     private String marshall;
     private String unmarshall;
     private RouteBuilder builder;
-
+    
     public DroolsProxyEndpoint(String endpointUri, String remaining, DroolsComponent component) throws Exception {
         super(endpointUri, component);
         configure(component, remaining);
@@ -44,10 +47,15 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
     public Producer createProducer() throws Exception {
         // let's setup a route first
         // we'll come up with a better way later
+        final DataFormat xstream = new DroolsXStreamDataFormat();
+
         if (builder == null) {
             builder = new RouteBuilder() {
                 public void configure() throws Exception {
-                    from("direct:" + id).to("drools:" + uri + "?pipeline=" + id);
+                    from("direct:" + id).bean(new DroolsCamelContextInit((ServiceManager)getCamelContext().getRegistry().lookup("sm")))
+                            //.unmarshal(xstream)
+                            .to("drools:" + uri + "?pipeline=" + id);
+                            //.marshal(xstream);
                 }
             };
             
@@ -64,6 +72,11 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
         this.uri = uri;
         // create unique id for embedded route
         id = DroolsComponent.generateUuid();
+    }
+
+    @Override
+    public boolean isLenientProperties(){
+        return true;
     }
 
     public String getId() {

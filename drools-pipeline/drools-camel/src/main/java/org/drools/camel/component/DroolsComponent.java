@@ -130,4 +130,8 @@ public class DroolsComponent extends DefaultComponent {
         // UuidGenerator.get().generateUuid()
         return UUID_PREFIX + counter.incrementAndGet();
     }
+    @Override
+    protected void validateParameters(String uri, Map<String, Object> parameters, String optionPrefix) {
+
+    }
 }
