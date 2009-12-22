@@ -96,16 +96,34 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     }
 
     public void testSessionGetObject() throws Exception {
-        FactHandle factHandle = new DisconnectedFactHandle(handle);
-        GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject(factHandle);
-        cmd.setOutIdentifier("rider");
-/*
-        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-with-session", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected object", response.getValue("rider") != null);
-        assertTrue("FactHandle object not of expected type", response.getValue("rider") instanceof Person);
-        assertEquals("Hadrian", ((Person)response.getValue("rider")).getName());
-*/
+//        FactHandle factHandle = new DisconnectedFactHandle(handle);
+//        GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject(factHandle);
+//        cmd.setOutIdentifier("rider");
+
+        String cmd = "" +
+                "<batch-execution lookup=\"ksession1\">\n" +
+                    "<get-object out-identifier=\"rider\" factHandle=\""+ handle +"\"/>\n" +
+
+                "</batch-execution>\n";
+                 
+                
+       String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
+        Person person = (Person) result.getValue("rider");
+        assertEquals("Hadrian", person.getName());
+
+        String expectedXml = "<execution-results>\n" +
+                             "  <result identifier=\"rider\">\n" +
+                             "    <org.drools.pipeline.camel.Person>\n" +
+                             "      <name>Hadrian</name>\n" +
+                             "    </org.drools.pipeline.camel.Person>\n" +
+                             "  </result>\n" +
+                             "</execution-results>";
+
+        assertEquals(expectedXml, outXml);
+
+
     }
 
     @Override
