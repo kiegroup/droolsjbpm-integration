@@ -15,6 +15,7 @@
 
 package org.drools.camel.component;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,6 +32,7 @@ public class DroolsComponent extends DefaultComponent {
     public static final String DROOLS_OUT_IDENTIFIER = "DroolsOutIdentifier";
     public static final String DROOLS_HANDLE = "DroolsHandle";
     
+    private static final String EMBEDDED_SCHEME = "drools-embedded";
     private static final String UUID_PREFIX = "drools-";
     private static final AtomicInteger counter = new AtomicInteger();
     
@@ -87,11 +89,10 @@ public class DroolsComponent extends DefaultComponent {
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         Endpoint endpoint;
-        boolean isProxy = !parameters.containsKey("pipeline");
-        if (isProxy) {
-            endpoint = new DroolsProxyEndpoint(uri, remaining, this);
-        } else {
+        if (EMBEDDED_SCHEME.equals(new URI(uri).getScheme())) {
             endpoint = new DroolsEndpoint(uri, remaining, this);
+        } else {
+            endpoint = new DroolsProxyEndpoint(uri, remaining, this);
         }
         setProperties(endpoint, parameters);
         return endpoint;

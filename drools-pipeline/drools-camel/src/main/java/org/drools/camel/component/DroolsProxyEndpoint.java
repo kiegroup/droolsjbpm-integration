@@ -54,7 +54,7 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
                 public void configure() throws Exception {
                     from("direct:" + id).bean(new DroolsCamelContextInit((ServiceManager)getCamelContext().getRegistry().lookup("sm")))
                             //.unmarshal(xstream)
-                            .to("drools:" + uri + "?pipeline=" + id);
+                            .to("drools-embedded:" + uri);
                             //.marshal(xstream);
                 }
             };
