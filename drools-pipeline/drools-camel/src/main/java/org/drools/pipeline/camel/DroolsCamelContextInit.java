@@ -13,16 +13,14 @@ import org.drools.vsm.ServiceManager;
  */
 public class DroolsCamelContextInit {
 
-	private ServiceManagerPipelineContextImpl context;
+    private ServiceManagerPipelineContextImpl context;
 
-	public DroolsCamelContextInit(ServiceManager serviceManager) {
+    public DroolsCamelContextInit(ServiceManager serviceManager) {
+        this.context = new ServiceManagerPipelineContextImpl(serviceManager, null);
+    }
 
-		this.context = new ServiceManagerPipelineContextImpl(serviceManager, null);
-	}
-        @Handler
-	public void initialize(Exchange exchange) throws Exception {
-                
-		exchange.setProperty("drools-context", context);
-	}
-
+    @Handler
+    public void initialize(Exchange exchange) throws Exception {
+        exchange.setProperty("drools-context", context);
+    }
 }

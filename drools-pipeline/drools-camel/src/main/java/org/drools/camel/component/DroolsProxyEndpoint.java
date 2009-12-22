@@ -22,6 +22,8 @@ import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.model.ProcessorDefinition;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spi.DataFormat;
 import org.drools.pipeline.camel.DroolsCamelContextInit;
 import org.drools.vsm.ServiceManager;
@@ -30,7 +32,7 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
 
     private String id;
     private String uri;
-    private String dataType;
+    private String dataFormat;
     private String marshall;
     private String unmarshall;
     private RouteBuilder builder;
@@ -47,15 +49,29 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
     public Producer createProducer() throws Exception {
         // let's setup a route first
         // we'll come up with a better way later
-        final DataFormat xstream = new DroolsXStreamDataFormat();
+        // final DataFormat xstream = new DroolsXStreamDataFormat();
 
         if (builder == null) {
+            String smId = DroolsComponent.getSessionManagerId(uri);
+            final ServiceManager sm = (ServiceManager)getCamelContext().getRegistry().lookup(smId);
+            if (sm == null) {
+                throw new RuntimeCamelException("Cannot find ServiceManager instance with id=\"" + 
+                    smId + "\" in the CamelContext registry.");
+            }
+
+            final String inFormat = (dataFormat == null) ? unmarshall : dataFormat;
+            final String outFormat = (dataFormat == null) ? marshall : dataFormat;
             builder = new RouteBuilder() {
                 public void configure() throws Exception {
-                    from("direct:" + id).bean(new DroolsCamelContextInit((ServiceManager)getCamelContext().getRegistry().lookup("sm")))
-                            //.unmarshal(xstream)
-                            .to("drools-embedded:" + uri);
-                            //.marshal(xstream);
+                    // build the route step by step
+                    ProcessorDefinition<?> pipeline = from("direct:" + id).bean(new DroolsCamelContextInit(sm));
+                    if (inFormat != null) {
+                        pipeline = pipeline.unmarshal(inFormat);
+                    }
+                    pipeline = pipeline.to("drools-embedded:" + uri);
+                    if (inFormat != null) {
+                        pipeline = pipeline.marshal(outFormat);
+                    }
                 }
             };
             
@@ -87,12 +103,12 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
         this.id = id;
     }
 
-    public String getDataType() {
-        return dataType;
+    public String getDataFormat() {
+        return dataFormat;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setDataFormat(String dataFormat) {
+        this.dataFormat = dataFormat;
     }
 
     public String getMarshall() {

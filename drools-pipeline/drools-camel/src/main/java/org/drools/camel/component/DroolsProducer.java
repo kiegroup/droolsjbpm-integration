@@ -51,6 +51,9 @@ public class DroolsProducer extends DefaultProducer {
         }
         
         Command cmd = exchange.getIn().getBody(Command.class);
+        if (cmd == null) {
+            throw new RuntimeCamelException("Body of in message not of the expected type 'org.drools.command.Command'");
+        }
         ExecutionResults results = exec.execute(cmd);
         exchange.getOut().setBody(results);
     }
