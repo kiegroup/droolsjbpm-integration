@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <artifactId>drools-osgi</artifactId>
+    <groupId>org.drools</groupId>
+    <version>5.1.0.SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>org.drools.osgi</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Drools :: Container :: OSGi :: Plugin</name>
+  <build>
+    <plugins>    
+    
+     <!--plugin>
+       <artifactId>maven-antrun-plugin</artifactId>
+       <inherited>false</inherited>
+       <executions>
+         <execution>
+           <id>clean lib</id>
+           <phase>clean</phase>
+           <configuration>
+             <tasks>                              
+                <delete>
+                  <fileset dir="lib" includes="**/*.jar" excludes="**/.svn" />                 
+                </delete>  
+             </tasks>
+           </configuration>
+           <goals>
+             <goal>run</goal>
+           </goals>
+         </execution>        
+       </executions>
+     </plugin>    
+    
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>lib</outputDirectory>
+              <overWriteReleases>true</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+              <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin-->  
+
+    </plugins>
+    
+   <resources>
+     <resource>
+         <directory>META-INF</directory>      
+     </resource>
+     <resource>
+         <directory>lib</directory>       
+     </resource>     
+   </resources>
+    
+  </build>
+
+  <dependencies>
+
+    <!-- this should include core and compiler -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-decisiontables</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>core</artifactId>
+        </exclusion>
+
+        <exclusion>
+          <groupId>janino</groupId>
+          <artifactId>janino</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-bpmn2</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>core</artifactId>
+        </exclusion>
+
+        <exclusion>
+          <groupId>janino</groupId>
+          <artifactId>janino</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-bpmn2</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>core</artifactId>
+        </exclusion>
+
+        <exclusion>
+          <groupId>janino</groupId>
+          <artifactId>janino</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>     
+    
+
+    
+</dependencies>
+
+</project>
