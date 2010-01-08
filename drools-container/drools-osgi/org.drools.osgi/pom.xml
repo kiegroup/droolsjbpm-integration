@@ -15,7 +15,7 @@
   <build>
     <plugins>    
     
-     <!--plugin>
+     <plugin>
        <artifactId>maven-antrun-plugin</artifactId>
        <inherited>false</inherited>
        <executions>
@@ -55,18 +55,27 @@
             </configuration>
           </execution>
         </executions>
-      </plugin-->  
+      </plugin>  
 
     </plugins>
     
-   <resources>
-     <resource>
-         <directory>META-INF</directory>      
-     </resource>
-     <resource>
-         <directory>lib</directory>       
-     </resource>     
-   </resources>
+              <resources>          
+                <resource>
+                  <targetPath>META-INF</targetPath>                
+                  <directory>META-INF</directory>
+                </resource>  
+                <resource>
+                  <targetPath>lib</targetPath>                
+                  <directory>lib</directory>
+                    <includes>
+                      <include>*.jar</include>
+                      <include>drools-api.jar</include>
+                    </includes>
+                    <excludes>
+                      <exclude>drools-*.jar</exclude>
+                    </excludes>                 
+                </resource>                    
+              </resources>  
     
   </build>
 
