@@ -52,6 +52,8 @@
               <overWriteSnapshots>true</overWriteSnapshots>
               <overWriteIfNewer>true</overWriteIfNewer>
               <stripVersion>true</stripVersion>
+              <includeScope>runtime</includeScope>  
+              <excludeTransitive>false</excludeTransitive>           
             </configuration>
           </execution>
         </executions>
@@ -119,22 +121,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-bpmn2</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.jdt</groupId>
-          <artifactId>core</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>janino</groupId>
-          <artifactId>janino</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>     
+     
     
 
     

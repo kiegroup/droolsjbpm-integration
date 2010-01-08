@@ -7,46 +7,16 @@ Bundle-Activator: org.drools.Activator
 Bundle-Vendor: JBoss, a division of Red Hat
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.jdt.core,
- org.eclipse.osgi;bundle-version="3.5.1",
- drools-api;bundle-version="5.1.0"
+ org.eclipse.osgi;bundle-version="3.5.1"
 Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: .,
- lib/drools-api.jar,
- lib/activation.jar,
  lib/antlr-runtime.jar,
- lib/commons-beanutils.jar,
- lib/commons-collections.jar,
- lib/commons-digester.jar,
- lib/commons-jexl.jar,
- lib/commons-lang.jar,
- lib/commons-logging.jar,
- lib/drools-bpmn2.jar,
- lib/drools-compiler.jar,
- lib/drools-core.jar,
- lib/drools-decisiontables.jar,
- lib/drools-templates.jar,
- lib/freemarker.jar,
- lib/jaxb-api.jar,
- lib/jaxb-impl.jar,
- lib/jaxb-xjc.jar,
- lib/jms.jar,
+ lib/drools-api.jar,
  lib/joda-time.jar,
  lib/jxl.jar,
- lib/jxls-reader.jar,
- lib/log4j.jar,
- lib/milyn-commons.jar,
- lib/milyn-smooks-core.jar,
- lib/milyn-smooks-javabean.jar,
- lib/mvel.jar,
- lib/mvel2.jar,
- lib/poi.jar,
- lib/quartz.jar,
- lib/stax-api.jar,
- lib/xpp3_min.jar,
- lib/xpp3.jar,
- lib/xstream.jar
+ lib/mvel2.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.osgi.framework
+Eclipse-ExtensibleAPI: true
 Export-Package: org.drools,
  org.drools.agent,
  org.drools.builder,
@@ -79,5 +49,6 @@ Export-Package: org.drools,
  org.drools.time,
  org.drools.util,
  org.drools.vsm
+Import-Package: org.eclipse.core.runtime
 
 

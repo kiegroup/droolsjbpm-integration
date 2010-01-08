@@ -4,40 +4,11 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
-	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-collections.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-digester.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-jexl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools-bpmn2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools-compiler.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools-core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools-decisiontables.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools-templates.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/freemarker.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jaxb-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jaxb-impl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jaxb-xjc.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jms.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jxl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jxls-reader.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/milyn-commons.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/milyn-smooks-core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/milyn-smooks-javabean.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mvel.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mvel2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/quartz.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/stax-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xpp3_min.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xpp3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xstream.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="target/classes"/>
