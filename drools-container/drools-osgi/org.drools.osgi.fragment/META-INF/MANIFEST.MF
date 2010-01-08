@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fragment
+Bundle-SymbolicName: org.drools.osgi.fragment
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.drools.osgi;bundle-version="5.1.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

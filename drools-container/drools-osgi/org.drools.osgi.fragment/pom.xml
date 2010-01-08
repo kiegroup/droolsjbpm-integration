@@ -8,13 +8,13 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>org.drools.osgi</artifactId>
+  <artifactId>org.drools.osgi.fragment</artifactId>
   <packaging>jar</packaging>
 
-  <name>Drools :: Container :: OSGi :: Runtime Plugin</name>
+  <name>Drools :: Container :: OSGi :: Runtime Fragment</name>
   <build>
     <plugins>    
-    
+  
      <plugin>
        <artifactId>maven-antrun-plugin</artifactId>
        <inherited>false</inherited>
@@ -55,10 +55,9 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>  
-
+      </plugin>   
     </plugins>
-    
+     
               <resources>          
                 <resource>
                   <targetPath>META-INF</targetPath>                
@@ -68,25 +67,16 @@
                   <targetPath>lib</targetPath>                
                   <directory>lib</directory>
                     <includes>
-                      <include>*.jar</include>
+                      <include>drools-*.jar</include>
                     </includes>
                     <excludes>
-                      <exclude>drools-*.jar</exclude>
+                      <exclude>drools-api.jar</exclude>
                     </excludes>                 
-                </resource>     
-                <resource>
-                  <targetPath>lib</targetPath>                
-                  <directory>lib</directory>
-                    <includes>
-                      <include>drools-api.jar</include>
-                    </includes>                 
-                </resource>                  
-              </resources>  
-    
+                </resource>                      
+              </resources>       
   </build>
 
   <dependencies>
-
     <!-- this should include core and compiler -->
     <dependency>
       <groupId>org.drools</groupId>
@@ -134,10 +124,7 @@
           <artifactId>janino</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>     
-    
-
-    
-</dependencies>
+    </dependency>      
+  </dependencies>
 
 </project>
