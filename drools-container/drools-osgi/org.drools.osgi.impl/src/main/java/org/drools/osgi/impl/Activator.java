@@ -6,10 +6,11 @@ import org.drools.builder.KnowledgeBuilderProvider;
 import org.drools.builder.impl.KnowledgeBuilderProviderImpl;
 import org.drools.io.ResourceProvider;
 import org.drools.io.impl.ResourceProviderImpl;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-public class Activator {
+public class Activator implements BundleActivator {
     private ServiceRegistration kbuilderReg;
     private ServiceRegistration resourceReg;
 

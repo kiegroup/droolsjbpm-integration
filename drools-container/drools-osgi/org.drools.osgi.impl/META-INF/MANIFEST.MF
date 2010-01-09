@@ -5,10 +5,17 @@ Bundle-SymbolicName: org.drools.osgi.impl
 Bundle-Version: 5.1.0.SNAPSHOT
 Require-Bundle: org.drools.osgi.api
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: lib/drools-compiler.jar,
+Bundle-ClassPath: .,
+ lib/drools-compiler.jar,
  lib/drools-core.jar,
  lib/drools-decisiontables.jar,
- lib/drools-templates.jar
+ lib/drools-templates.jar,
+ lib/antlr-runtime.jar,
+ lib/drools-api.jar,
+ lib/drools-bpmn2.jar,
+ lib/joda-time.jar,
+ lib/jxl.jar,
+ lib/mvel2.jar
 Bundle-Vendor: JBoss, a division of Red Hat
 Import-Package: org.osgi.framework;version="1.5.0"
 Bundle-Activator: org.drools.osgi.impl.Activator

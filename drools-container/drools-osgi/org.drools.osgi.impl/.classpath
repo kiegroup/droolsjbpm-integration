@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools-bpmn2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/joda-time.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jxl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mvel2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/drools-compiler.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/drools-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/drools-decisiontables.jar"/>
