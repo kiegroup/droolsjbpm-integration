@@ -1,24 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Drools Runtime Plug-in
-Bundle-SymbolicName: org.drools.osgi;singleton:=true
+Bundle-Name: Drools Api plugin
+Bundle-SymbolicName: org.drools.osgi.api;singleton:=true
 Bundle-Version: 5.1.0.SNAPSHOT
-Bundle-Activator: org.drools.Activator
+Bundle-Activator: org.drools.osgi.api.Activator
 Bundle-Vendor: JBoss, a division of Red Hat
-Bundle-Localization: plugin
-Require-Bundle: org.eclipse.jdt.core,
- org.eclipse.osgi;bundle-version="3.5.1"
-Eclipse-BuddyPolicy: registered
+Require-Bundle: org.eclipse.jdt.core
 Bundle-ClassPath: .,
- lib/antlr-runtime.jar,
- lib/drools-api.jar,
- lib/joda-time.jar,
- lib/jxl.jar,
- lib/mvel2.jar
+ lib/drools-api.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Eclipse-ExtensibleAPI: true
-Export-Package: org.drools,
- org.drools.agent,
+Export-Package: org.drools.agent,
  org.drools.builder,
  org.drools.builder.conf,
  org.drools.builder.help,
@@ -49,6 +40,6 @@ Export-Package: org.drools,
  org.drools.time,
  org.drools.util,
  org.drools.vsm
-Import-Package: org.eclipse.core.runtime
+Import-Package: org.osgi.framework
 
 

@@ -1,13 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Drools Runtime Fragment
-Bundle-SymbolicName: org.drools.osgi.fragment
+Bundle-Name: Drools Impl Plugin
+Bundle-SymbolicName: org.drools.osgi.impl
 Bundle-Version: 5.1.0.SNAPSHOT
-Fragment-Host: org.drools.osgi;bundle-version="5.1.0.SNAPSHOT"
+Require-Bundle: org.drools.osgi.api
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: lib/drools-bpmn2.jar,
- lib/drools-compiler.jar,
+Bundle-ClassPath: lib/drools-compiler.jar,
  lib/drools-core.jar,
  lib/drools-decisiontables.jar,
  lib/drools-templates.jar
 Bundle-Vendor: JBoss, a division of Red Hat
+Import-Package: org.osgi.framework;version="1.5.0"
+Bundle-Activator: org.drools.osgi.impl.Activator

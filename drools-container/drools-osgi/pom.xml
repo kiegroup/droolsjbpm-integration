@@ -13,8 +13,8 @@
   <name>Drools :: Container :: OSGi</name>
   
   <modules>
-      <module>org.drools.osgi</module>
-      <module>org.drools.osgi.fragment</module>
+      <module>org.drools.osgi.api</module>
+      <module>org.drools.osgi.impl</module>
   </modules>
   
 </project>

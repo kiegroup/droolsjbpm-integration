@@ -8,10 +8,10 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>org.drools.osgi.fragment</artifactId>
+  <artifactId>org.drools.osgi.impl</artifactId>
   <packaging>jar</packaging>
 
-  <name>Drools :: Container :: OSGi :: Runtime Fragment</name>
+  <name>Drools :: Container :: OSGi :: Impl</name>
   <build>
     <plugins>    
   
@@ -95,7 +95,7 @@
       </exclusions>
     </dependency>
     
-    <dependency>
+    <!--dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-bpmn2</artifactId>
       <exclusions>
@@ -109,23 +109,7 @@
           <artifactId>janino</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-bpmn2</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.jdt</groupId>
-          <artifactId>core</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>janino</groupId>
-          <artifactId>janino</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>      
+    </dependency-->     
   </dependencies>
 
 </project>

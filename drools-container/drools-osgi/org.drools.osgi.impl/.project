@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.drools.osgi.fragment</name>
+	<name>org.drools.osgi.impl</name>
 	<comment></comment>
 	<projects>
 	</projects>

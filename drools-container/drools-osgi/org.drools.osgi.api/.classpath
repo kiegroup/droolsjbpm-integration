@@ -4,11 +4,7 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
-	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/drools-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/joda-time.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jxl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mvel2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="target/classes"/>

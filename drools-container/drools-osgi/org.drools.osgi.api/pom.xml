@@ -8,10 +8,10 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>org.drools.osgi</artifactId>
+  <artifactId>org.drools.osgi.api</artifactId>
   <packaging>jar</packaging>
 
-  <name>Drools :: Container :: OSGi :: Runtime Plugin</name>
+  <name>Drools :: Container :: OSGi :: Api</name>
   <build>
     <plugins>    
     
@@ -106,7 +106,7 @@
       </exclusions>
     </dependency>
     
-    <dependency>
+    <!-- dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-bpmn2</artifactId>
       <exclusions>
@@ -120,7 +120,7 @@
           <artifactId>janino</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency-->
      
     
 
