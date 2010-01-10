@@ -14,6 +14,7 @@
   
   <modules>
       <module>drools-spring</module>
+      <module>drools-osgi</module>
   </modules>
   
 </project>

@@ -5,11 +5,11 @@ Bundle-SymbolicName: org.drools.osgi.api;singleton:=true
 Bundle-Version: 5.1.0.SNAPSHOT
 Bundle-Activator: org.drools.osgi.api.Activator
 Bundle-Vendor: JBoss, a division of Red Hat
-Require-Bundle: org.eclipse.jdt.core
 Bundle-ClassPath: .,
  lib/drools-api.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.drools.agent,
+Export-Package: org.drools,
+ org.drools.agent,
  org.drools.builder,
  org.drools.builder.conf,
  org.drools.builder.help,

@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Drools Impl Plugin
 Bundle-SymbolicName: org.drools.osgi.impl
 Bundle-Version: 5.1.0.SNAPSHOT
-Require-Bundle: org.drools.osgi.api
+Require-Bundle: org.drools.osgi.api,
+ org.eclipse.jdt.core;bundle-version="3.5.1"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .,
  lib/drools-compiler.jar,
