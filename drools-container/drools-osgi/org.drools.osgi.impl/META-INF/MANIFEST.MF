@@ -1,22 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Drools Impl Plugin
-Bundle-SymbolicName: org.drools.osgi.impl
+Bundle-SymbolicName: org.drools.osgi
 Bundle-Version: 5.1.0.SNAPSHOT
-Require-Bundle: org.drools.osgi.api,
- org.eclipse.jdt.core;bundle-version="3.5.1"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: .,
- lib/drools-compiler.jar,
- lib/drools-core.jar,
- lib/drools-decisiontables.jar,
- lib/drools-templates.jar,
- lib/antlr-runtime.jar,
- lib/drools-api.jar,
- lib/drools-bpmn2.jar,
- lib/joda-time.jar,
- lib/jxl.jar,
- lib/mvel2.jar
+Bundle-ClassPath: .
 Bundle-Vendor: JBoss, a division of Red Hat
-Import-Package: org.osgi.framework;version="1.5.0"
 Bundle-Activator: org.drools.osgi.impl.Activator
+DynamicImport-Package: *
+Require-Bundle: org.drools.compiler;bundle-version="5.1.0",
+ org.drools.core;bundle-version="5.1.0",
+ org.eclipse.osgi;bundle-version="3.5.1"
+Import-Package: org.osgi.framework

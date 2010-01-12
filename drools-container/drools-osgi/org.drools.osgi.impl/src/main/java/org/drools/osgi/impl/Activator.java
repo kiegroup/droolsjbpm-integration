@@ -2,6 +2,7 @@ package org.drools.osgi.impl;
 
 import java.util.Hashtable;
 
+
 import org.drools.KnowledgeBaseProvider;
 import org.drools.builder.KnowledgeBuilderProvider;
 import org.drools.builder.impl.KnowledgeBuilderProviderImpl;
