@@ -33,10 +33,10 @@
             <scope>test</scope>
          </dependency>          
 
-        <dependency>
-          <groupId>com.thoughtworks.xstream</groupId>
-          <artifactId>xstream</artifactId>
-        </dependency>         
+          <dependency>  
+              <groupId>com.thoughtworks.xstream</groupId>  
+              <artifactId>com.springsource.com.thoughtworks.xstream</artifactId>  
+          </dependency>    
 
         <dependency>
           <groupId>xmlunit</groupId>
