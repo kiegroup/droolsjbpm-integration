@@ -26,9 +26,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.drools.io.InternalResource;
+import org.drools.io.internal.InternalResource;
 import org.drools.io.Resource;
-import org.drools.io.ResourceProvider;
+import org.drools.io.ResourceFactoryService;
 import org.drools.mc.io.VFSResourceProvider;
 import org.drools.test.mc.BaseTest;
 
@@ -39,20 +39,20 @@ import org.drools.test.mc.BaseTest;
  */
 public class ResourcesTest extends BaseTest
 {
-   private ResourceProvider provider;
+   private ResourceFactoryService factoryService;
 
-   protected ResourceProvider getResourceProvider()
+   protected ResourceFactoryService getResourceProvider()
    {
-      if (provider == null)
-         provider = new VFSResourceProvider();
+      if (factoryService == null)
+          factoryService = new VFSResourceProvider();
 
-      return provider;
+      return factoryService;
    }
 
    protected Resource findResource(String name)
    {
       URL url = getResource(name);
-      ResourceProvider provider = getResourceProvider();
+      ResourceFactoryService provider = getResourceProvider();
       Resource root = provider.newUrlResource(url);
       assertNotNull(root);
       return root;

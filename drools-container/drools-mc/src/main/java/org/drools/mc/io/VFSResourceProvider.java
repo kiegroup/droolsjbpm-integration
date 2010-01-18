@@ -24,7 +24,7 @@ package org.drools.mc.io;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.drools.io.impl.ResourceProviderImpl;
+import org.drools.io.impl.ResourceFactoryServiceImpl;
 import org.drools.io.Resource;
 import org.drools.util.StringUtils;
 
@@ -33,7 +33,7 @@ import org.drools.util.StringUtils;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public class VFSResourceProvider extends ResourceProviderImpl
+public class VFSResourceProvider extends ResourceFactoryServiceImpl
 {
    /**
     * Determine a cleaned URL for the given original URL.
