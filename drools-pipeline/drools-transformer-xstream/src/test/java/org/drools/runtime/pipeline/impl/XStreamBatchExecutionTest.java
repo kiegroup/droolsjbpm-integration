@@ -1989,7 +1989,7 @@ public class XStreamBatchExecutionTest extends TestCase {
 
     private StatefulKnowledgeSession getVsmSessionStateful(ServiceManager sm,
                                                            Resource resource) throws Exception {
-        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactory().newKnowledgeBuilder();
+        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
         kbuilder.add( resource,
                       ResourceType.DRL );
 
@@ -2000,7 +2000,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertFalse( kbuilder.hasErrors() );
         Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
 
-        KnowledgeBase kbase = sm.getKnowledgeBaseFactory().newKnowledgeBase();
+        KnowledgeBase kbase = sm.getKnowledgeBaseFactoryService().newKnowledgeBase();
 
         kbase.addKnowledgePackages( pkgs );
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
