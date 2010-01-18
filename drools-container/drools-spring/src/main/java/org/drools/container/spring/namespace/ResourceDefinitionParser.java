@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.drools.builder.DecisionTableInputType;
 import org.drools.builder.ResourceType;
-import org.drools.builder.impl.DecisionTableConfigurationImpl;
+import org.drools.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

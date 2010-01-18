@@ -209,7 +209,7 @@ public class CamelPipelineTest extends TestCase {
 
     private StatefulKnowledgeSession getVmsSessionStateful(ServiceManager sm,
             String rule) throws Exception {
-        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactory().newKnowledgeBuilder();
+        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
         kbuilder.add(ResourceFactory.newByteArrayResource(rule.getBytes()),
                 ResourceType.DRL);
 
@@ -220,7 +220,7 @@ public class CamelPipelineTest extends TestCase {
         assertFalse(kbuilder.hasErrors());
         Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
 
-        KnowledgeBase kbase = sm.getKnowledgeBaseFactory().newKnowledgeBase();
+        KnowledgeBase kbase = sm.getKnowledgeBaseFactoryService().newKnowledgeBase();
 
         kbase.addKnowledgePackages(pkgs);
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();

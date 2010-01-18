@@ -68,7 +68,7 @@ public class JPAKnowledgeServiceBean extends JpaDaoSupport  {
 			serviceManager = new ServiceManagerLocalClient();
 		}
 		if (environment == null) {
-			environment = serviceManager.getKnowledgeBaseFactory().newEnvironment();
+			environment = serviceManager.getKnowledgeBaseFactoryService().newEnvironment();
 		}
 
 		if (environment.get(EnvironmentName.ENTITY_MANAGER_FACTORY) != null) {

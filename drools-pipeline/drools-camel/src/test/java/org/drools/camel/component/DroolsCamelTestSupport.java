@@ -77,7 +77,7 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
     protected abstract void configureDroolsContext();
 
     protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier, String rule) {
-        KnowledgeBuilder kbuilder = serviceManager.getKnowledgeBuilderFactory().newKnowledgeBuilder();
+        KnowledgeBuilder kbuilder = serviceManager.getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
         
         if (rule != null && rule.length() > 0) {
             kbuilder.add(ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
@@ -88,7 +88,7 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         }
         assertFalse(kbuilder.hasErrors());
         Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
-        KnowledgeBase kbase = serviceManager.getKnowledgeBaseFactory().newKnowledgeBase();
+        KnowledgeBase kbase = serviceManager.getKnowledgeBaseFactoryService().newKnowledgeBase();
 
         kbase.addKnowledgePackages(pkgs);
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();

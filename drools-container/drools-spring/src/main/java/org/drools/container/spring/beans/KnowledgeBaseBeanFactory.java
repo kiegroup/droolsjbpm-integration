@@ -39,7 +39,7 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 		if (serviceManager == null) {
 			serviceManager = new ServiceManagerLocalClient();
 		}
-		KnowledgeBuilder kbuilder = getServiceManager().getKnowledgeBuilderFactory().newKnowledgeBuilder();
+		KnowledgeBuilder kbuilder = getServiceManager().getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
 		for (DroolsResourceAdapter res: resources) {
 			if (res.getResourceConfiguration() == null) {
 				kbuilder.add(res.getDroolsResource(), res.getResourceType());
@@ -54,7 +54,7 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 		}
 		
 //		kbase = getServiceManager().getKnowledgeBaseFactory().newKnowledgeBase(getName());
-		kbase = getServiceManager().getKnowledgeBaseFactory().newKnowledgeBase();
+		kbase = getServiceManager().getKnowledgeBaseFactoryService().newKnowledgeBase();
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 		
 		///
