@@ -1,48 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>drools</artifactId>
-    <groupId>org.drools</groupId>
-    <version>5.1.0.SNAPSHOT</version>
-  </parent>
-
-  <artifactId>drools-transformer-jxls</artifactId>
-  <packaging>jar</packaging>
-  <name>Drools :: Pipeline :: Transformer :: JXLS</name>
-  
-      <dependencies>
-         <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-core</artifactId>
-            <version>${project.version}</version>  
-         </dependency>                     
-
-         <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-compiler</artifactId>
-            <version>${project.version}</version>  
-            <scope>test</scope>
-         </dependency>   
-
-        <dependency>
-          <groupId>net.sf.jxls</groupId>
-          <artifactId>jxls-reader</artifactId>    
-          <version>0.9.6</version>           
-        </dependency>        
-      </dependencies>     
-
-    <repositories>
-        <repository>
-            <id>dist.codehaus.org</id>
-            <url>http://dist.codehaus.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-               <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>    
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <artifactId>drools</artifactId>
+      <groupId>org.drools</groupId>
+      <version>5.1.0.SNAPSHOT</version>
+   </parent>
+   <artifactId>drools-transformer-jxls</artifactId>
+   <packaging>jar</packaging>
+   <name>Drools :: Pipeline :: Transformer :: JXLS</name>
+   <dependencies>
+      <dependency>
+         <groupId>org.drools</groupId>
+         <artifactId>drools-core</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.drools</groupId>
+         <artifactId>drools-compiler</artifactId>
+         <version>${project.version}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>net.sf.jxls</groupId>
+         <artifactId>jxls-reader</artifactId>
+         <version>0.9.6</version>
+      </dependency>
+   </dependencies>
+   <repositories>
+      <repository>
+         <id>dist.codehaus.org</id>
+         <url>http://dist.codehaus.org</url>
+         <snapshots>
+            <enabled>false</enabled>
+         </snapshots>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+      </repository>
+   </repositories>
 </project>
