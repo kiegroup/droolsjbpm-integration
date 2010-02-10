@@ -507,7 +507,7 @@ public class SpringSingleSessionCommandServiceTest {
     }
 
     @Test
-    public void testPersistenceTimer() throws Exception {
+    public void TODOtestPersistenceTimer() throws Exception {
     	KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         Collection<KnowledgePackage> kpkgs = getProcessTimer();
         kbase.addKnowledgePackages( kpkgs );
