@@ -171,6 +171,8 @@ public class SpringSingleSessionCommandService implements CommandService {
 						// sessionInfo = em.find(SessionInfo.class, sessionInfo.getId());
 						// sessionInfo.setJPASessionMashallingHelper(marshallingHelper);
 						// marshallingHelper.loadSnapshot(sessionInfo.getData(), ksession);
+						//sessionInfo.setDirty(); // TODO FIXME baunux: this should not be needed now that we use idle time, I think, double check.
+						
 						T result = command.execute(kContext);
 						em.flush();
 						env.set(EnvironmentName.ENTITY_MANAGER, null);

@@ -27,7 +27,7 @@
   <classpathentry kind="var" path="M2_REPO/org/milyn/milyn-smooks-core/1.1/milyn-smooks-core-1.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/milyn/milyn-smooks-javabean/1.1/milyn-smooks-javabean-1.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mvel/mvel/1.3.12-java1.5/mvel-1.3.12-java1.5.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mvel/mvel2/2.0.12/mvel2-2.0.12.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mvel/mvel2/2.0.16/mvel2-2.0.16.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/objenesis/objenesis/1.0/objenesis-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/antlr/stringtemplate/3.2/stringtemplate-3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar"/>
