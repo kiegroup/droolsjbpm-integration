@@ -159,7 +159,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		String classNames[] = null;
 
 		try {
-			classNames = KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource("personComplex.xsd", getClass()),
+			classNames = KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource("person.xsd", getClass()),
 					kbuilder,
 					xjcOpts,
 			"xsd" );
