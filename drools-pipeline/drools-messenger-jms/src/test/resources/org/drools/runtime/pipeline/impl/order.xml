@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<order xmlns="http://drools.org/model/order" >
-    <order-item>
-        <product-id>111</product-id>
-        <quantity>2</quantity>
-        <price>8.90</price>
-    </order-item>
-    <order-item>
-        <product-id>222</product-id>
-        <quantity>7</quantity>
-        <price>5.20</price>
-    </order-item>
-</order>
+<ns2:order xmlns:ns2="http://drools.org/model/order" >
+    <ns2:order-item>
+        <ns2:product-id>111</ns2:product-id>
+        <ns2:quantity>2</ns2:quantity>
+        <ns2:price>8.90</ns2:price>
+    </ns2:order-item>
+    <ns2:order-item>
+        <ns2:product-id>222</ns2:product-id>
+        <ns2:quantity>7</ns2:quantity>
+        <ns2:price>5.20</ns2:price>
+    </ns2:order-item>
+</ns2:order>

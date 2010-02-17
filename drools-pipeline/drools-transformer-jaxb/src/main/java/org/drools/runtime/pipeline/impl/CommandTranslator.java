@@ -144,10 +144,16 @@ class InsertObjectTransformer extends CommandTransformer {
 class ModifyObjectTransformer extends CommandTransformer {
 	public GenericCommand<?> transform(CommandTranslator ct, Object o, Unmarshaller unmarshaller) {
 		ModifyCommand mo = (ModifyCommand)o;
-		List<Setter> setters = mo.getSetters();
+		List<?> setters = mo.getSetters();
 		List<Setter> convertedSetters = new ArrayList<Setter>();
 		for (Object node : setters) {
-			Setter setter = (Setter) ct.makeObject((Node)node, unmarshaller);
+			Setter setter;
+			if (node instanceof Element) {
+				setter = (Setter) ct.makeObject((Element)node, unmarshaller);
+			}
+			else {
+				setter = (Setter) node;
+			}
 			convertedSetters.add(setter);
 		}
 		mo.setSetters(convertedSetters);
