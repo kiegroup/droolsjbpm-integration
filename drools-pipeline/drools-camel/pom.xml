@@ -52,7 +52,11 @@
             <groupId>org.drools</groupId>
             <artifactId>drools-transformer-xstream</artifactId>
         </dependency>
-
+         <dependency>
+         	<groupId>org.drools</groupId>
+         	<artifactId>drools-transformer-jaxb</artifactId>
+         </dependency>
+         
          <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>

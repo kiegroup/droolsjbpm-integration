@@ -24,21 +24,33 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.drools.KnowledgeBase;
-import org.drools.RuleBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.help.DroolsJaxbHelperProvider;
 import org.drools.builder.impl.KnowledgeBuilderImpl;
+import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.GetGlobalCommand;
+import org.drools.command.runtime.SetGlobalCommand;
+import org.drools.command.runtime.process.AbortWorkItemCommand;
+import org.drools.command.runtime.process.SignalEventCommand;
+import org.drools.command.runtime.process.StartProcessCommand;
+import org.drools.command.runtime.rule.FireAllRulesCommand;
+import org.drools.command.runtime.rule.InsertElementsCommand;
+import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.command.runtime.rule.ModifyCommand;
+import org.drools.command.runtime.rule.QueryCommand;
+import org.drools.command.runtime.rule.RetractCommand;
+import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
+import org.drools.common.DefaultFactHandle;
+import org.drools.common.DisconnectedFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.PackageRegistry;
@@ -46,6 +58,10 @@ import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.Resource;
 import org.drools.lang.descr.PackageDescr;
 import org.drools.rule.builder.dialect.java.JavaDialect;
+import org.drools.runtime.impl.BatchExecutionImpl;
+import org.drools.runtime.impl.ExecutionResultImpl;
+import org.drools.runtime.rule.impl.FlatQueryResults;
+import org.drools.xml.jaxb.util.JaxbListWrapper;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
@@ -57,11 +73,32 @@ import com.sun.tools.xjc.ErrorReceiver;
 import com.sun.tools.xjc.ModelLoader;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.model.Model;
-import com.sun.tools.xjc.outline.Outline;
 
 public class DroolsJaxbHelperProviderImpl
     implements
     DroolsJaxbHelperProvider {
+	
+	private static final String[] JAXB_ANNOTATED_CMD = {BatchExecutionCommand.class.getName(),
+														SetGlobalCommand.class.getName(),
+														GetGlobalCommand.class.getName(),
+														FireAllRulesCommand.class.getName(),
+														InsertElementsCommand.class.getName(),
+														InsertObjectCommand.class.getName(),
+														ModifyCommand.class.getName(),
+														SetterImpl.class.getName(),
+														QueryCommand.class.getName(),
+														RetractCommand.class.getName(),
+														AbortWorkItemCommand.class.getName(),
+														SignalEventCommand.class.getName(),
+														StartProcessCommand.class.getName(),
+														BatchExecutionImpl.class.getName(),
+														ExecutionResultImpl.class.getName() ,
+														DefaultFactHandle.class.getName(),
+														JaxbListWrapper.class.getName(),
+														DisconnectedFactHandle.class.getName(),
+														FlatQueryResults.class.getName()
+														};
+	
     public String[] addXsdModel(Resource resource,
                              KnowledgeBuilder kbuilder,
                              Options xjcOpts,
@@ -86,17 +123,18 @@ public class DroolsJaxbHelperProviderImpl
                                         new JCodeModel(),
                                         errorReceiver );
 
-        final Outline outline = model.generateCode( xjcOpts,
-                                                    errorReceiver );
+        model.generateCode( xjcOpts, errorReceiver );
 
         MapVfsCodeWriter codeWriter = new MapVfsCodeWriter();
         model.codeModel.build( xjcOpts.createCodeWriter( codeWriter ) );
 
-        Set<JavaDialect> dialects = new HashSet<JavaDialect>();
         List<String> classNames = new ArrayList<String>();
         for ( Entry<String, byte[]> entry : codeWriter.getMap().entrySet() ) {
             String name = entry.getKey();
-
+            //if (name.endsWith("ObjectFactory.java")) {
+            //	continue;
+            //}
+            
             String pkgName = null;
             int dotPos = name.lastIndexOf( '.' );
             pkgName = name.substring( 0,
@@ -119,7 +157,6 @@ public class DroolsJaxbHelperProviderImpl
             }
 
             JavaDialect dialect = (JavaDialect) pkgReg.getDialectCompiletimeRegistry().getDialect( "java" );
-            dialects.add( dialect );
             dialect.addSrc( convertToResource( entry.getKey() ),
                             entry.getValue() );
         }
@@ -127,7 +164,7 @@ public class DroolsJaxbHelperProviderImpl
         pkgBuilder.compileAll();
         pkgBuilder.updateResults();
 
-        return (String[]) classNames.toArray( new String[classNames.size()] );
+        return classNames.toArray( new String[classNames.size()] );
     }
 
     public JAXBContext newJAXBContext(String[] classNames,
@@ -140,21 +177,24 @@ public class DroolsJaxbHelperProviderImpl
     public JAXBContext newJAXBContext(String[] classNames,
                                       Map<String, ? > properties,
                                       KnowledgeBase kbase) throws JAXBException {
-        ClassLoader classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
-
-        Class[] classes = new Class[classNames.length];
-        int i = 0;
-        try {
-            for ( i = 0; i < classNames.length; i++ ) {
-                classes[i] = classLoader.loadClass( classNames[i] );
-            }
-        } catch ( ClassNotFoundException e ) {
-            throw new JAXBException( "Unable to resolve class '" + classNames[i] + "'",
-                                     e );
-        }
-
-        return JAXBContext.newInstance( classes,
-                                        properties );
+		ClassLoader classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase)
+				.getRuleBase()).getRootClassLoader();
+		int i = 0;
+		try {
+			Class<?>[] classes = new Class[classNames.length
+					+ JAXB_ANNOTATED_CMD.length];
+			
+			for (i = 0; i < classNames.length; i++) {
+				classes[i] = classLoader.loadClass(classNames[i]);
+			}
+			int j = 0;
+			for (i = classNames.length; i < classes.length; i++, j++) {
+				classes[i] = classLoader.loadClass(JAXB_ANNOTATED_CMD[j]);
+			}
+			return JAXBContext.newInstance(classes, properties);
+		} catch (ClassNotFoundException e) {
+			throw new JAXBException("Unable to resolve class '" + classNames[i] + "'", e);
+		}        
     }
 
     private static String convertToResource(String string) {

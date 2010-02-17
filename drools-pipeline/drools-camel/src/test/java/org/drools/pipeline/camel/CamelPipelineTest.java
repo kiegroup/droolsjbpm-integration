@@ -140,10 +140,6 @@ public class CamelPipelineTest extends TestCase {
 
         assertXMLEqual(expectedXml,
                 outXml);
-
-
-
-
     }
 
     public void testCamelPipelineWithVSMAndSpring() throws Exception {

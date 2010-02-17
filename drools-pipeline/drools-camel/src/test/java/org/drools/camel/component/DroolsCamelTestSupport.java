@@ -38,8 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class DroolsCamelTestSupport extends ContextTestSupport {
-    private static final Logger LOG = LoggerFactory.getLogger(DroolsCamelTestSupport.class);
-    private ServiceManager serviceManager;
+	protected static final Logger LOG = LoggerFactory.getLogger(DroolsCamelTestSupport.class);
+    protected ServiceManager serviceManager;
 
     public void setServiceManager(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;

@@ -1,0 +1,24 @@
+<xsd:schema 
+	xmlns:person="http://drools.org/model" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://drools.org/model" 
+	elementFormDefault="qualified"
+>
+
+	<xsd:complexType name="person">
+		<xsd:sequence>
+			<xsd:element name="name" type="xsd:string" />
+			<xsd:element name="age" type="xsd:integer" />
+			<xsd:element name="address" type="person:addressType" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="addressType">	
+		<xsd:sequence>
+			<xsd:element name="street" type="xsd:string" />
+			<xsd:element name="postalCode" type="xsd:integer" />
+		</xsd:sequence>
+	</xsd:complexType>	
+
+</xsd:schema>

@@ -16,10 +16,7 @@
 package org.drools.camel.component;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.drools.command.CommandFactory;
-import org.drools.command.runtime.rule.GetObjectCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.common.DisconnectedFactHandle;
 import org.drools.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
 import org.drools.runtime.ExecutionResults;

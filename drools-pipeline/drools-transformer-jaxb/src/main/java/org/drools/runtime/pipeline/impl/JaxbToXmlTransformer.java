@@ -1,22 +1,11 @@
 package org.drools.runtime.pipeline.impl;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
 
-import org.drools.io.Resource;
-import org.drools.runtime.pipeline.JaxbTransformerProvider;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.pipeline.impl.BaseEmitter;
-import org.drools.runtime.pipeline.impl.BaseStage;
-import org.xml.sax.InputSource;
 
 public class JaxbToXmlTransformer extends BaseEmitter
     implements
