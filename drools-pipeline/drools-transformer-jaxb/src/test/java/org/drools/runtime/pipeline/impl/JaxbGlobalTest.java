@@ -25,7 +25,7 @@ import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.rule.FactHandle;
-import org.drools.util.StringUtils;
+import org.drools.core.util.StringUtils;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
