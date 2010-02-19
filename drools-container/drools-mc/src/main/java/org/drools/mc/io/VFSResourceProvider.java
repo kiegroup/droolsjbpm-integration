@@ -26,7 +26,7 @@ import java.net.URL;
 
 import org.drools.io.impl.ResourceFactoryServiceImpl;
 import org.drools.io.Resource;
-import org.drools.util.StringUtils;
+import org.drools.core.util.StringUtils;
 
 /**
  * JBoss VFS based ResourceProvider impl.
