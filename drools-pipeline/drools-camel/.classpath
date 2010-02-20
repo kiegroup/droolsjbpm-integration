@@ -37,6 +37,7 @@
   <classpathentry kind="src" path="/drools-core"/>
   <classpathentry kind="src" path="/drools-persistence-jpa"/>
   <classpathentry kind="src" path="/drools-process-task"/>
+  <classpathentry kind="src" path="/drools-transformer-jaxb"/>
   <classpathentry kind="src" path="/drools-transformer-xstream"/>
   <classpathentry kind="src" path="/drools-vsm"/>
   <classpathentry kind="src" path="/drools-workitems"/>
@@ -52,6 +53,7 @@
   <classpathentry kind="var" path="M2_REPO/janino/janino/2.5.15/janino-2.5.15.jar"/>
   <classpathentry kind="var" path="M2_REPO/javassist/javassist/3.4.GA/javassist-3.4.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.1.7/jaxb-impl-2.1.7.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-xjc/2.1.7/jaxb-xjc-2.1.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/el/jboss-el/1.0_02.CR2/jboss-el-1.0_02.CR2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam/2.1.1.GA/jboss-seam-2.1.1.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/jdom/jdom/1.0/jdom-1.0.jar"/>
@@ -73,6 +75,7 @@
   <classpathentry kind="var" path="M2_REPO/org/rioproject/rio-cli/4.0-M3/rio-cli-4.0-M3.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/rioproject/rio-test/4.0-M3/rio-test-4.0-M3.jar"/>
   <classpathentry kind="var" path="M2_REPO/rome/rome/0.9/rome-0.9.jar"/>
+  <classpathentry kind="var" path="M2_REPO/xalan/serializer/2.7.1/serializer-2.7.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.2/slf4j-api-1.5.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-jdk14/1.5.2/slf4j-jdk14-1.5.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/jivesoftware/smack/3.0.4/smack-3.0.4.jar"/>
@@ -85,6 +88,7 @@
   <classpathentry kind="var" path="M2_REPO/net/jini/start/2.1/start-2.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/antlr/stringtemplate/3.2/stringtemplate-3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/rioproject/webster/4.0-M3/webster-4.0-M3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/xalan/xalan/2.7.1/xalan-2.7.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/xmlunit/xmlunit/1.2/xmlunit-1.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar"/>
