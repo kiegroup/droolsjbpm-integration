@@ -26,6 +26,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.DataFormat;
+import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.io.Resource;
@@ -117,6 +119,8 @@ public class DroolsXStreamDataFormat implements DataFormat {
             xstream.setClassLoader(cl);
         } else if (executor instanceof StatelessKnowledgeSessionImpl) {
             cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
+		} else if (executor instanceof CommandBasedStatefulKnowledgeSession) {
+			cl = ((ReteooRuleBase) ((KnowledgeBaseImpl)((CommandBasedStatefulKnowledgeSession) executor).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
         } else {
             throw new IllegalArgumentException("Unable to set ClassLoader on " + executor);
         }
