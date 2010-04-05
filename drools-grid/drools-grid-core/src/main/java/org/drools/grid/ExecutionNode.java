@@ -14,10 +14,10 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package org.drools.grid;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,31 +26,46 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ExecutionNode {
 
- private final Map<Class<?>, Object> services
-    = new ConcurrentHashMap<Class<?>, Object>();
+    private String id;
+    private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
 
-
-  public <T> T get(Class<T> interfaceClass) {
-    synchronized (interfaceClass) {
-      Object service = services.get(interfaceClass);
-      if (service == null) {
-        try {
-          Class<?> implementingClass = Class.forName(interfaceClass.getCanonicalName()+"Impl");
-
-          service = implementingClass.newInstance();
-          services.put(interfaceClass, service);
-        }
-        catch (Exception e) {
-          throw new RuntimeException(e);
-        }
-      }
-      return interfaceClass.cast(service);
+    public ExecutionNode() {
+        this.id = UUID.randomUUID().toString();
     }
-  }
-  public <T> void set(Class<T> interfaceClass, T provider) {
-    synchronized (interfaceClass) {
-      services.put(interfaceClass, provider);
-    }
-  }
 
+    public ExecutionNode(String id) {
+        this.id = id;
+    }
+
+    public <T> T get(Class<T> interfaceClass) {
+        synchronized (interfaceClass) {
+            Object service = services.get(interfaceClass);
+            if (service == null) {
+                try {
+                    Class<?> implementingClass = Class.forName(interfaceClass.getCanonicalName() + "Impl");
+
+                    service = implementingClass.newInstance();
+                    services.put(interfaceClass, service);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            return interfaceClass.cast(service);
+        }
+    }
+
+    public <T> void set(Class<T> interfaceClass, T provider) {
+        synchronized (interfaceClass) {
+            services.put(interfaceClass, provider);
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
 }
