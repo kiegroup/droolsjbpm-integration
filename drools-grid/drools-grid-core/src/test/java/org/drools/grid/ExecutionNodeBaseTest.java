@@ -19,7 +19,6 @@ package org.drools.grid;
 
 
 import org.drools.KnowledgeBase;
-import org.drools.grid.ExecutionNode;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
