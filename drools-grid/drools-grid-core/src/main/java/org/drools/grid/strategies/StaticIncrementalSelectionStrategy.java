@@ -35,7 +35,7 @@ public class StaticIncrementalSelectionStrategy implements NodeSelectionStrategy
     }
 
 
-    @Override
+    //@Override
     public GenericNodeConnector getBestNode() {
         System.out.println("!!!!!GET BEST NODE = "+counter);
         GenericNodeConnector service = connection.getNodeConnectors().get(counter);
