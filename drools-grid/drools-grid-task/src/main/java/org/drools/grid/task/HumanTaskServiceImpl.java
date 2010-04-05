@@ -51,7 +51,7 @@ public class HumanTaskServiceImpl implements HumanTaskService {
 
     }
 
-    @Override
+    //@Override
     public boolean connect() {
         try {
             return this.client.connect();
