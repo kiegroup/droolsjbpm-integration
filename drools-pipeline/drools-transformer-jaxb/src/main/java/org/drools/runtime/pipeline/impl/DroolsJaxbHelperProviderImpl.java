@@ -58,7 +58,6 @@ import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.Resource;
 import org.drools.lang.descr.PackageDescr;
 import org.drools.rule.builder.dialect.java.JavaDialect;
-import org.drools.runtime.impl.BatchExecutionImpl;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
 import org.drools.xml.jaxb.util.JaxbListWrapper;
@@ -91,7 +90,7 @@ public class DroolsJaxbHelperProviderImpl
 														AbortWorkItemCommand.class.getName(),
 														SignalEventCommand.class.getName(),
 														StartProcessCommand.class.getName(),
-														BatchExecutionImpl.class.getName(),
+														BatchExecutionCommand.class.getName(),
 														ExecutionResultImpl.class.getName() ,
 														DefaultFactHandle.class.getName(),
 														JaxbListWrapper.class.getName(),

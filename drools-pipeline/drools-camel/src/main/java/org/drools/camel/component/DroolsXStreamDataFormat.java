@@ -19,28 +19,19 @@ package org.drools.camel.component;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.DataFormat;
-import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.io.Resource;
 import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.impl.ServiceManagerPipelineContextImpl;
-import org.drools.runtime.pipeline.impl.XStreamFromXmlVsmTransformer;
 import org.drools.runtime.pipeline.impl.XStreamResolverStrategy;
 import org.drools.vsm.ServiceManager;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomReader;
@@ -51,7 +42,7 @@ import com.thoughtworks.xstream.io.xml.DomReader;
  */
 public class DroolsXStreamDataFormat implements DataFormat {
     private XStreamResolverStrategy xstreamStrategy = null;
-    private final XStreamFromXmlVsmTransformer transformer;
+//    private final XStreamFromXmlVsmTransformer transformer;
     private String charset;
 
     public DroolsXStreamDataFormat() {
@@ -60,7 +51,7 @@ public class DroolsXStreamDataFormat implements DataFormat {
                 return BatchExecutionHelper.newXStreamMarshaller();
             }
         };
-        this.transformer = new XStreamFromXmlVsmTransformer(xstreamStrategy);
+        //this.transformer = new XStreamFromXmlVsmTransformer(xstreamStrategy);
     }
 
     public void marshal(Exchange exchange, Object graph, OutputStream stream)
@@ -71,12 +62,12 @@ public class DroolsXStreamDataFormat implements DataFormat {
         xstream.setClassLoader(context.getClassLoader());
         String result = null;
 
-        try {
+//        try {
             result = xstream.toXML(exchange.getIn().getBody());
-        } catch (Exception e) {
-            // handleException(this, object, e);
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            handleException(this, object, e);
+//            e.printStackTrace();
+//        }
 
         byte[] bytes;
         if (charset != null) {
@@ -97,66 +88,69 @@ public class DroolsXStreamDataFormat implements DataFormat {
         // exchange.setProperty("drools-context",this.transformer.getContext()
         // );
 
-        PipelineContext context = (PipelineContext) exchange.getProperty("drools-context");
-        Document d = exchange.getIn().getBody(Document.class);
-        String name = d.getDocumentElement().getAttribute("lookup");
-        XStream xstream = this.xstreamStrategy.lookup(name);
-        if (xstream == null) {
-            throw new IllegalArgumentException(
-                    "Unable to lookup XStream parser using name '" + name + "'");
-        }
-        ServiceManagerPipelineContextImpl vsmContext = 
-            (ServiceManagerPipelineContextImpl) exchange.getProperty("drools-context");
-        ServiceManager sm = vsmContext.getServiceManager();
-        CommandExecutor executor = sm.lookup(name);
-        if (executor == null) {
-            throw new IllegalArgumentException("Unable to lookup CommandExecutor using name '" + name + "'");
-        }
-        vsmContext.setCommandExecutor(executor);
-        ClassLoader cl = null;
-        if (executor instanceof StatefulKnowledgeSessionImpl) {
-            cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
-            xstream.setClassLoader(cl);
-        } else if (executor instanceof StatelessKnowledgeSessionImpl) {
-            cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
-		} else if (executor instanceof CommandBasedStatefulKnowledgeSession) {
-			cl = ((ReteooRuleBase) ((KnowledgeBaseImpl)((CommandBasedStatefulKnowledgeSession) executor).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
-        } else {
-            throw new IllegalArgumentException("Unable to set ClassLoader on " + executor);
-        }
-        xstream.setClassLoader(cl);
-        vsmContext.setClassLoader(cl);
-        Object payload = xstream.unmarshal(new DomReader(d));
+        try {
+			PipelineContext context = (PipelineContext) exchange.getProperty("drools-context");
+			Document d = exchange.getIn().getBody(Document.class);
+			String name = d.getDocumentElement().getAttribute("lookup");
+			XStream xstream = this.xstreamStrategy.lookup(name);
+			if (xstream == null) {
+			    throw new IllegalArgumentException(
+			            "Unable to lookup XStream parser using name '" + name + "'");
+			}
+			ServiceManagerPipelineContextImpl vsmContext = 
+			    (ServiceManagerPipelineContextImpl) exchange.getProperty("drools-context");
+			ServiceManager sm = vsmContext.getServiceManager();
+			CommandExecutor executor = sm.lookup(name);
+			if (executor == null) {
+			    throw new IllegalArgumentException("Unable to lookup CommandExecutor using name '" + name + "'");
+			}
+			vsmContext.setCommandExecutor(executor);
+			ClassLoader cl = null;
+			if (executor instanceof StatefulKnowledgeSessionImpl) {
+			    cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
+			    xstream.setClassLoader(cl);
+			} else if (executor instanceof StatelessKnowledgeSessionImpl) {
+			    cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
+			} else {
+			    throw new IllegalArgumentException("Unable to set ClassLoader on " + executor);
+			}
+			xstream.setClassLoader(cl);
+			vsmContext.setClassLoader(cl);
+			Object payload = xstream.unmarshal(new DomReader(d));
 
-        context.getProperties().put("xstream-instance", xstream);
-        exchange.setProperty("drools-context", context);
-        return payload;
+			context.getProperties().put("xstream-instance", xstream);
+			exchange.setProperty("drools-context", context);
+			return payload;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
     }
 
-    private Document processTranslate(Object object) {
-        // Create a DOM builder and parse the fragment
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document d = null;
-        try {
-            d = factory.newDocumentBuilder().parse((InputSource) null);
-        } catch (Exception e) {
-        }
-        try {
-            if (object instanceof String) {
-                d = factory.newDocumentBuilder().parse(new InputSource(new StringReader((String) object)));
-            } else if (object instanceof Reader) {
-                d = factory.newDocumentBuilder().parse(new InputSource((Reader) object));
-            } else if (object instanceof InputStream) {
-                d = factory.newDocumentBuilder().parse((InputStream) object);
-            } else if (object instanceof Resource) {
-                d = factory.newDocumentBuilder().parse(new InputSource(((Resource) object).getReader()));
-            } else {
-                throw new IllegalArgumentException("signal object must be instance of InputStream or Resource");
-            }
-        } catch (Exception e) {
-            // handleException(this, object, e);
-            e.printStackTrace();
-        }
-        return d;
-    }
+//    private Document processTranslate(Object object) {
+//        // Create a DOM builder and parse the fragment
+//        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        Document d = null;
+//        try {
+//            d = factory.newDocumentBuilder().parse((InputSource) null);
+//        } catch (Exception e) {
+//        }
+//        try {
+//            if (object instanceof String) {
+//                d = factory.newDocumentBuilder().parse(new InputSource(new StringReader((String) object)));
+//            } else if (object instanceof Reader) {
+//                d = factory.newDocumentBuilder().parse(new InputSource((Reader) object));
+//            } else if (object instanceof InputStream) {
+//                d = factory.newDocumentBuilder().parse((InputStream) object);
+//            } else if (object instanceof Resource) {
+//                d = factory.newDocumentBuilder().parse(new InputSource(((Resource) object).getReader()));
+//            } else {
+//                throw new IllegalArgumentException("signal object must be instance of InputStream or Resource");
+//            }
+//        } catch (Exception e) {
+//            // handleException(this, object, e);
+//            e.printStackTrace();
+//        }
+//        return d;
+//    }
 }

@@ -1,0 +1,14 @@
+package org.drools.test.model
+
+import org.drools.model.Person;
+
+query persons
+	$p : Person(name != null)
+end
+
+rule "Test Rule 1"
+	when
+		$p : Person()
+	then 
+		System.out.println("fired " + $p.getName());
+end

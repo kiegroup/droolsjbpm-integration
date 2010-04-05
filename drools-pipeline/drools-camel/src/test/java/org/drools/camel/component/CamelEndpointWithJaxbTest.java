@@ -89,6 +89,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 		marshaller.setProperty("jaxb.formatted.output", true);
 		marshaller.marshal(cmd, xmlReq);
 		
+		System.out.println(xmlReq.toString());
+		
 		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
 		
 		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));

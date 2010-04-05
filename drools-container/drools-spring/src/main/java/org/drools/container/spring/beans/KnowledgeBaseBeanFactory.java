@@ -1,15 +1,20 @@
 package org.drools.container.spring.beans;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
+import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.vsm.ServiceManager;
 import org.drools.vsm.local.ServiceManagerLocalClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+
+import com.sun.tools.xjc.Language;
+import com.sun.tools.xjc.Options;
 
 public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 
@@ -19,6 +24,7 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 //	private String name;
 //	private String beanName;
 	private List<DroolsResourceAdapter> resources = Collections.emptyList();
+	private List<DroolsResourceAdapter> models = Collections.emptyList();
 
 	public Object getObject() throws Exception {
 		return kbase;
@@ -37,9 +43,29 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 //			setName(getBeanName());
 //		}
 		if (serviceManager == null) {
+			System.out.println("creating NEW SERVICE MANAGER LOCAL CLIENT");
 			serviceManager = new ServiceManagerLocalClient();
 		}
+
 		KnowledgeBuilder kbuilder = getServiceManager().getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
+		kbase = getServiceManager().getKnowledgeBaseFactoryService().newKnowledgeBase();
+
+		if (models != null && models.size() > 0) {
+			for (DroolsResourceAdapter res: models) {
+				Options xjcOptions = new Options();
+				xjcOptions.setSchemaLanguage(Language.XMLSCHEMA);
+				try {
+					KnowledgeBuilderHelper.addXsdModel(res.getDroolsResource(),
+														kbuilder,
+														xjcOptions, 
+														"xsd" );
+					kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+				} catch (IOException e) {
+					throw new RuntimeException("Error creating XSD model", e);
+				}
+			}
+		}
+		
 		for (DroolsResourceAdapter res: resources) {
 			if (res.getResourceConfiguration() == null) {
 				kbuilder.add(res.getDroolsResource(), res.getResourceType());
@@ -53,12 +79,8 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 			throw new RuntimeException(errors.toString());
 		}
 		
-//		kbase = getServiceManager().getKnowledgeBaseFactory().newKnowledgeBase(getName());
-		kbase = getServiceManager().getKnowledgeBaseFactoryService().newKnowledgeBase();
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-		
-		///
-		
+
 	}
 
 	public KnowledgeBase getKbase() {
@@ -99,5 +121,13 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 
 	public void setServiceManager(ServiceManager serviceManager) {
 		this.serviceManager = serviceManager;
+	}
+
+	public void setModels(List<DroolsResourceAdapter> models) {
+		this.models = models;
+	}
+
+	public List<DroolsResourceAdapter> getModels() {
+		return models;
 	}
 }

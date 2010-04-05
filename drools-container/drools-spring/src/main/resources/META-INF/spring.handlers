@@ -1,1 +1,2 @@
 http\://drools.org/schema/drools-spring=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-service-spring=org.drools.container.spring.namespace.SpringDroolsServiceHandler

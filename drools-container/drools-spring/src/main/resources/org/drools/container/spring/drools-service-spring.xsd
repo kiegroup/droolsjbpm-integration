@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://drools.org/schema/drools-service-spring"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://drools.org/schema/drools-service-spring"
+	elementFormDefault="qualified" 
+	attributeFormDefault="unqualified">
+
+	<xsd:simpleType name="marshallerTypeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="JAXB" />
+			<xsd:enumeration value="XSTREAM" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:complexType name="serviceConfType">
+		<xsd:sequence>
+			<xsd:element name="class" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="startup-command" type="xsd:string" minOccurs="0" maxOccurs="unbounded" /> 
+		</xsd:sequence>
+		<xsd:attribute name="session" use="required" type="xsd:string" />
+		<xsd:attribute name="marshaller" use="required" type="marshallerTypeEnum"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="serviceConfRefType">
+		<xsd:attribute name="id" use="required" type="xsd:string"/>
+	</xsd:complexType>
+	
+	<xsd:element name="configuration">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="serviceConfType">
+					<xsd:attribute name="id" use="required" type="xsd:ID"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="definition">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="configuration" type="serviceConfType" minOccurs="0" maxOccurs="unbounded" /> 
+				<xsd:element name="configuration-ref" type="serviceConfRefType" minOccurs="0" maxOccurs="unbounded" />
+			</xsd:sequence>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
+			<xsd:attribute name="smId" use="required" type="xsd:string"/>
+			<xsd:attribute name="camelContext" use="required" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

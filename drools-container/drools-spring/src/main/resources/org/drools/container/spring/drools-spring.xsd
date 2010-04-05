@@ -25,7 +25,7 @@
 			<xsd:enumeration value="CHANGE_SET" />
 		</xsd:restriction>
 	</xsd:simpleType>
-
+	
 	<xsd:complexType name="resourceType">
 		<xsd:sequence>
 			<xsd:element name="decisiontable-conf" minOccurs="0" maxOccurs="1">
@@ -38,6 +38,10 @@
 		<xsd:attribute name="source" use="required" type="xsd:string"/>
 		<xsd:attribute name="type" use="required" type="resourceTypeEnum"/>
 	</xsd:complexType>
+	
+	<xsd:complexType name="resourceRefType">
+		<xsd:attribute name="id" use="required" type="xsd:string"/>
+	</xsd:complexType>
 
 	<xsd:element name="resource">
 		<xsd:complexType>
@@ -47,12 +51,24 @@
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
-	</xsd:element>			
+	</xsd:element>
+	
+	<xsd:complexType name="modelType">
+		<xsd:attribute name="source" use="required" type="xsd:string"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="classesType">
+		<xsd:sequence>
+			<xsd:element name="class" type="xsd:string"  />
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<xsd:element name="kbase">
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element name="resource" type="resourceType" maxOccurs="unbounded"/>
+				<xsd:element name="resource-ref" type="resourceRefType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="model" type="modelType" minOccurs="0" maxOccurs="unbounded"/>
 			</xsd:sequence>
 			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
 			<xsd:attribute name="serviceManager" use="optional" type="xsd:string"/>
@@ -68,7 +84,7 @@
 			<xsd:attribute name="name" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
-	
+
 	<!-- 
 	<xsd:element name="serviceManager">
 		

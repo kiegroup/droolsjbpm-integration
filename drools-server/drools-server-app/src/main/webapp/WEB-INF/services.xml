@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:drools-service="http://drools.org/schema/drools-service-spring"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://drools.org/schema/drools-service-spring http://drools.org/schema/drools-service-spring.xsd
+		http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd"
+    default-autowire="byName">
+
+	<!-- Only needed when deployed on JBoss AS 5.X -->    
+<!--    <bean id="jbossResolver" class="org.apache.camel.jboss.JBossPackageScanClassResolver"/>-->
+    
+    <!-- This camel context bean is required -->
+	<camelContext id="executionContext" xmlns="http://camel.apache.org/schema/spring" />
+
+	<!-- Example service configuration  
+	<drools-service:configuration id="service-conf-2" marshaller="XSTREAM" session="ksession2" />
+	-->
+
+	<!-- If you change the service definition id you MUST change this in the core.xml file -->
+	<drools-service:definition id="service" smId="sm1" camelContext="executionContext">
+		<!-- Here you can add your service configuration	
+		<drools-service:configuration marshaller="JAXB" session="ksession1">
+			<drools-service:class>org.drools.model.Person</drools-service:class>
+		</drools-service:configuration> -->
+		<!--  or add a reference to an external configuration definition
+		<drools-service:configuration-ref id="service-conf-2" />
+		 -->
+	</drools-service:definition>
+	
+</beans>

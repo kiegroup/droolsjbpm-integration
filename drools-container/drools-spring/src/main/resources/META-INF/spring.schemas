@@ -1,1 +1,2 @@
 http\://drools.org/schema/drools-spring.xsd=org/drools/container/spring/drools-spring.xsd
+http\://drools.org/schema/drools-service-spring.xsd=org/drools/container/spring/drools-service-spring.xsd

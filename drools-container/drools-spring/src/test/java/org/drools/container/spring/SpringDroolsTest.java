@@ -8,6 +8,8 @@ import junit.framework.TestCase;
 import org.drools.Person;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.server.KnowledgeService;
+import org.drools.server.profile.KnowledgeServiceConfiguration;
 import org.drools.vsm.ServiceManager;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -49,5 +51,14 @@ public class SpringDroolsTest extends TestCase {
         kstateful.insert( new Person( "Darth", "Cheddar", 50 ) );
         kstateful.fireAllRules();   
         assertEquals( 2, list.size() );	    
+	}
+	
+	public void test3() {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+		KnowledgeServiceConfiguration kserviceConf1 = (KnowledgeServiceConfiguration)context.getBean( "service-conf-1" );
+		assertNotNull(kserviceConf1);
+		assertEquals("XSTREAM", kserviceConf1.getMarshaller());
+		KnowledgeService kservice = (KnowledgeService)context.getBean( "service" );
+		assertNotNull(kservice);
 	}
 }

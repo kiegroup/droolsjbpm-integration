@@ -25,15 +25,42 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
 		factory.addPropertyReference(SERVICE_MANAGER_ATTRIBUTE, smRef);
 		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "resource");
 		
+		ManagedList resources = null;
 		if (childElements != null && !childElements.isEmpty()) {
-			ManagedList resources = new ManagedList(childElements.size());
+			resources = new ManagedList();
 			for (Element childResource : childElements) {
 				BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement(childResource, factory.getBeanDefinition());
 				resources.add(resourceDefinition);
 			}
-			factory.addPropertyValue("resources", resources);
 		}
 		
+		childElements = DomUtils.getChildElementsByTagName(element, "resource-ref");
+		
+		if (childElements != null && !childElements.isEmpty()) {
+			if (resources==null) {
+				resources = new ManagedList(childElements.size());
+			}
+			for (Element childResource : childElements) {
+				BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement(childResource, factory.getBeanDefinition());
+				resources.add(resourceDefinition);
+			}
+		}
+
+		if (resources!=null) {
+			factory.addPropertyValue("resources", resources);
+		}
+
+		childElements = DomUtils.getChildElementsByTagName(element, "model");
+
+		if (childElements != null && !childElements.isEmpty()) {
+			ManagedList models = new ManagedList(childElements.size());
+			for (Element childResource : childElements) {
+				BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement(childResource, factory.getBeanDefinition());
+				models.add(resourceDefinition);
+			}
+			factory.addPropertyValue("models", models);
+		}
+
 		return factory.getBeanDefinition();
 	}
 	
