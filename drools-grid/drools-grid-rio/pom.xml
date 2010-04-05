@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>drools</artifactId>
+    <groupId>org.drools</groupId>
+    <version>5.1.0.SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>drools-grid-rio</artifactId>
+  <name>Drools :: Grid :: RIO</name>
+  
+  <packaging>oar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.6</version>
+      <scope>test</scope>
+    </dependency>
+
+     <!-- Drools Runtime -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-api</artifactId>
+            <version>5.1.0.SNAPSHOT</version>
+            
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>5.1.0.SNAPSHOT</version>
+            
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>5.1.0.SNAPSHOT</version>
+
+        </dependency>
+
+       <!-- Drools Grid Core -->
+       <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-core</artifactId>
+            <version>5.1.0.SNAPSHOT</version>
+        </dependency>
+
+        <!-- RIO Runtime -->
+         <dependency>
+            <groupId>org.rioproject</groupId>
+            <artifactId>rio</artifactId>
+            <version>4.0</version>
+        </dependency>
+
+        <!-- RIO Test framework -->
+        <dependency>
+            <groupId>org.rioproject</groupId>
+            <artifactId>rio-test</artifactId>
+            <version>4.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- RIO Gnostic -->
+        <dependency>
+            <groupId>org.rioproject</groupId>
+            <artifactId>gnostic</artifactId>
+            <version>4.0</version>
+            
+        </dependency>
+
+  </dependencies>
+  <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-rio-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <opstring>src/test/resources/org/drools/executionNodeService.groovy</opstring>
+                    <createJar>
+                        <classifier>dl</classifier>
+                        <ins>
+                            <in>org.drools.grid</in>
+                            <in>org.rioproject.gnostic</in>
+                        </ins>
+                        <topclasses>
+                            <topclass>org.drools.grid.ExecutionNodeService</topclass>
+                            <topclass>org.drools.grid.DirectoryNodeService</topclass>
+                            <topclass>org.drools.grid.distributed.util.IDEntry</topclass>
+                            <topclass>org.drools.impl.SystemEventListenerServiceImpl</topclass>
+                            <topclass>org.rioproject.gnostic.Gnostic</topclass>
+                        </topclasses>
+                    </createJar>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*IT*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>failsafe-maven-plugin</artifactId>
+                <version>2.4.3-alpha-1</version>
+                <configuration>
+                    <forkMode>always</forkMode>
+                    <argLine>-DRIO_TEST_ATTACH</argLine>
+                    <systemProperties>
+
+                        <property>
+                            <name>opstring</name>
+                            <value>src/test/resources/org/drools/executionNodeService.groovy</value>
+                        </property>
+                        <property>
+                            <name>org.rioproject.test.config</name>
+                            <value>src/test/conf/test-config.groovy</value>
+                        </property>
+                      
+                        <property>
+                            <name>org.rioproject.test.manager.config</name>
+                            <value>src/test/conf/manager-config.groovy</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <repositories>
+        <repository>
+            <id>rio</id>
+            <url>http://www.rio-project.org/maven2</url>
+        </repository>
+       
+      
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>rio</id>
+            <url>http://www.rio-project.org/maven2</url>
+        </pluginRepository>
+
+        <pluginRepository>
+
+            <id>elastic-grid</id>
+            <url>http://maven.elastic-grid.com</url>
+
+        </pluginRepository>
+    </pluginRepositories>
+</project>

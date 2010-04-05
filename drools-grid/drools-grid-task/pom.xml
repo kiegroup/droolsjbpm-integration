@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>drools</artifactId>
+        <groupId>org.drools</groupId>
+        <version>5.1.0.SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>drools-grid-task</artifactId>
+    <version>5.1.0.SNAPSHOT</version>
+    
+    <name>Drools :: Grid :: Task</name>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Drools Runtime -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+        </dependency>
+
+        <!-- Apache Mina for default Service Remote Implementation -->
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+            <version>2.0.0-M6</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-process-task</artifactId>
+            <version>5.1.0.SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-core</artifactId>
+            <version>5.1.0.SNAPSHOT</version>
+            
+        </dependency>
+
+
+         <!-- DB H2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.2.128</version>
+        </dependency>
+    </dependencies>
+    
+</project>
