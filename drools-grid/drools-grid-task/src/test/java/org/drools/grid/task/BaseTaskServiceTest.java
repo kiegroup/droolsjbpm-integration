@@ -765,7 +765,7 @@ public abstract class BaseTaskServiceTest {
         public void registerWorkItemHandler(String workItemName, WorkItemHandler handler) {
         }
 
-        @Override
+        //@Override
         public void registerWorkItemHandler(String workItemName, org.drools.runtime.process.WorkItemHandler handler) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
