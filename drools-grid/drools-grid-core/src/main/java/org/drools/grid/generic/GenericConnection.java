@@ -33,6 +33,7 @@ public interface GenericConnection {
     public List<GenericNodeConnector> getNodeConnectors();
     public List<DirectoryNodeService> getDirectories();
     public ExecutionNode getExecutionNode(NodeSelectionStrategy strategy);
+    public ExecutionNode getExecutionNode();
     public DirectoryNodeService getDirectoryNode(DirectoryServiceSelectionStrategy directorySelectionStrategy);
 
     

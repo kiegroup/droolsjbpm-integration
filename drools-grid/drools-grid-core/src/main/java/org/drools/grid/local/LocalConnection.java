@@ -79,4 +79,8 @@ public class LocalConnection implements GenericConnection {
         return node;
     }
 
+    public ExecutionNode getExecutionNode() {
+        return getExecutionNode(null);
+    }
+
 }

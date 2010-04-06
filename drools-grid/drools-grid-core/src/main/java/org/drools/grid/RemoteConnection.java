@@ -118,6 +118,10 @@ public class RemoteConnection implements GenericConnection {
         return directories.get(0);
     }
 
+    public ExecutionNode getExecutionNode() {
+        return getExecutionNode(null);
+    }
+
    
 
 
