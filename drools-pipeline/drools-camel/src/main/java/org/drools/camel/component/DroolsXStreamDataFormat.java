@@ -22,15 +22,16 @@ import java.io.OutputStream;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.DataFormat;
+import org.drools.builder.DirectoryLookupFactoryService;
+import org.drools.grid.ExecutionNode;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.PipelineContext;
-import org.drools.runtime.pipeline.impl.ServiceManagerPipelineContextImpl;
+import org.drools.runtime.pipeline.impl.ExecutionNodePipelineContextImpl;
 import org.drools.runtime.pipeline.impl.XStreamResolverStrategy;
-import org.drools.vsm.ServiceManager;
 import org.w3c.dom.Document;
 
 import com.thoughtworks.xstream.XStream;
@@ -97,14 +98,13 @@ public class DroolsXStreamDataFormat implements DataFormat {
 			    throw new IllegalArgumentException(
 			            "Unable to lookup XStream parser using name '" + name + "'");
 			}
-			ServiceManagerPipelineContextImpl vsmContext = 
-			    (ServiceManagerPipelineContextImpl) exchange.getProperty("drools-context");
-			ServiceManager sm = vsmContext.getServiceManager();
-			CommandExecutor executor = sm.lookup(name);
+			ExecutionNodePipelineContextImpl executionNodeContext = (ExecutionNodePipelineContextImpl) exchange.getProperty("drools-context");
+			ExecutionNode node = executionNodeContext.getExecutionNode();
+			CommandExecutor executor = node.get(DirectoryLookupFactoryService.class).lookup(name);
 			if (executor == null) {
 			    throw new IllegalArgumentException("Unable to lookup CommandExecutor using name '" + name + "'");
 			}
-			vsmContext.setCommandExecutor(executor);
+			executionNodeContext.setCommandExecutor(executor);
 			ClassLoader cl = null;
 			if (executor instanceof StatefulKnowledgeSessionImpl) {
 			    cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
@@ -115,11 +115,11 @@ public class DroolsXStreamDataFormat implements DataFormat {
 			    throw new IllegalArgumentException("Unable to set ClassLoader on " + executor);
 			}
 			xstream.setClassLoader(cl);
-			vsmContext.setClassLoader(cl);
+			executionNodeContext.setClassLoader(cl);
 			Object payload = xstream.unmarshal(new DomReader(d));
 
-			context.getProperties().put("xstream-instance", xstream);
-			exchange.setProperty("drools-context", context);
+			executionNodeContext.getProperties().put("xstream-instance", xstream);
+			exchange.setProperty("drools-context", executionNodeContext);
 			return payload;
 		} catch (Exception e) {
 			e.printStackTrace();

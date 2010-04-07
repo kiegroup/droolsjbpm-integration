@@ -5,7 +5,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 public class SpringDroolsHandler extends NamespaceHandlerSupport {
 
     public void init() {
-    	//registerBeanDefinitionParser("serviceManager", new ServiceManagerDefinitionParser());
     	
     	registerBeanDefinitionParser("resource", new ResourceDefinitionParser());
     	
@@ -17,12 +16,10 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
         
         registerBeanDefinitionParser("ksession", new KnowledgeSessionDefinitionParser());
         
-        registerBeanDefinitionParser("service", new KnowledgeServiceDefinitionParser());
+        registerBeanDefinitionParser("connection", new ConnectionDefinitionParser());
         
-        registerBeanDefinitionParser("service-conf", new KnowledgeServiceConfigurationDefinitionParser());
+        registerBeanDefinitionParser("execution-node", new ExecutionNodeDefinitionParser());
         
-        registerBeanDefinitionParser("service-conf-ref", new KnowledgeServiceConfigurationRefDefinitionParser());
-
     }
 
 }

@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
+import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.help.KnowledgeBuilderHelper;
-import org.drools.vsm.ServiceManager;
-import org.drools.vsm.local.ServiceManagerLocalClient;
+import org.drools.grid.ExecutionNode;
+import org.drools.grid.local.LocalConnection;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -19,10 +21,7 @@ import com.sun.tools.xjc.Options;
 public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 
 	private KnowledgeBase kbase;
-	private ServiceManager serviceManager;
-	//XXX currently the SessionManager only has one kbase.
-//	private String name;
-//	private String beanName;
+	private ExecutionNode node;
 	private List<DroolsResourceAdapter> resources = Collections.emptyList();
 	private List<DroolsResourceAdapter> models = Collections.emptyList();
 
@@ -39,16 +38,12 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 	}
 
 	public void afterPropertiesSet() throws Exception {
-//		if (name == null) {
-//			setName(getBeanName());
-//		}
-		if (serviceManager == null) {
-			System.out.println("creating NEW SERVICE MANAGER LOCAL CLIENT");
-			serviceManager = new ServiceManagerLocalClient();
+		if (node == null) {
+			LocalConnection connection = new LocalConnection();
+			node = connection.getExecutionNode(null);
 		}
-
-		KnowledgeBuilder kbuilder = getServiceManager().getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
-		kbase = getServiceManager().getKnowledgeBaseFactoryService().newKnowledgeBase();
+		KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
+		kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
 
 		if (models != null && models.size() > 0) {
 			for (DroolsResourceAdapter res: models) {
@@ -65,7 +60,7 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 				}
 			}
 		}
-		
+
 		for (DroolsResourceAdapter res: resources) {
 			if (res.getResourceConfiguration() == null) {
 				kbuilder.add(res.getDroolsResource(), res.getResourceType());
@@ -73,12 +68,12 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 				kbuilder.add(res.getDroolsResource(), res.getResourceType(), res.getResourceConfiguration());
 			}
 		}
-		
+
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (!errors.isEmpty() ) {
 			throw new RuntimeException(errors.toString());
 		}
-		
+
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 
 	}
@@ -91,25 +86,9 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 		this.kbase = kbase;
 	}
 
-//	public String getName() {
-//		return name;
-//	}
-//
-//	public void setName(String name) {
-//		this.name = name;
-//	}
-	
-	public ServiceManager getServiceManager() {
-		return serviceManager;
+	public ExecutionNode getNode() {
+		return node;
 	}
-
-//	public String getBeanName() {
-//		return beanName;
-//	}
-//
-//	public void setBeanName(String name) {
-//		beanName = name;
-//	}
 
 	public List<DroolsResourceAdapter> getResources() {
 		return resources;
@@ -119,8 +98,8 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 		this.resources = resources;
 	}
 
-	public void setServiceManager(ServiceManager serviceManager) {
-		this.serviceManager = serviceManager;
+	public void setNode(ExecutionNode executionNode) {
+		this.node = executionNode;
 	}
 
 	public void setModels(List<DroolsResourceAdapter> models) {

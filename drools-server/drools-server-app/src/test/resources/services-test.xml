@@ -19,7 +19,7 @@
 
 	<drools-service:configuration id="service-conf-2" marshaller="XSTREAM" session="ksession2" />
 	
-	<drools-service:definition id="service" smId="sm1" camelContext="executionContext">
+	<drools-service:definition id="service" node="node1" camelContext="executionContext">
 		<drools-service:configuration marshaller="JAXB" session="ksession1">
 			<drools-service:class>org.drools.model.Person</drools-service:class>
 			<drools-service:startup-command>

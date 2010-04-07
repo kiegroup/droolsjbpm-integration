@@ -23,12 +23,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
          <scope>test</scope>
       </dependency>
       <dependency>
-         <groupId>org.drools</groupId>
-         <artifactId>drools-vsm</artifactId>
-         <version>${project.version}</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
          <groupId>com.thoughtworks.xstream</groupId>
          <artifactId>xstream</artifactId>
       </dependency>
@@ -37,6 +31,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
          <artifactId>xmlunit</artifactId>
          <version>1.2</version>
          <scope>test</scope>
+      </dependency>
+      <dependency>
+      	<groupId>org.drools</groupId>
+      	<artifactId>drools-grid-core</artifactId>
+      	<version>${project.version}</version>
       </dependency>
    </dependencies>
    <repositories>

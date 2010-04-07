@@ -5,6 +5,13 @@
 	elementFormDefault="qualified" 
 	attributeFormDefault="unqualified">
 
+	<xsd:simpleType name="connectionTypeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="local" />
+			<xsd:enumeration value="remote" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
 	<xsd:simpleType name="knowledgeSessionTypeEnum">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="stateful" />
@@ -71,7 +78,7 @@
 				<xsd:element name="model" type="modelType" minOccurs="0" maxOccurs="unbounded"/>
 			</xsd:sequence>
 			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
-			<xsd:attribute name="serviceManager" use="optional" type="xsd:string"/>
+			<xsd:attribute name="node" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 
@@ -80,27 +87,23 @@
 			<xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
 			<xsd:attribute name="kbase" use="required" type="xsd:string"/>
 			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
-			<xsd:attribute name="serviceManager" use="optional" type="xsd:string"/>
+			<xsd:attribute name="node" use="optional" type="xsd:string"/>
 			<xsd:attribute name="name" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
-
-	<!-- 
-	<xsd:element name="serviceManager">
-		
+	
+	<xsd:element name="connection">
 		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="register" maxOccurs="unbounded">
-					<xsd:complexType>				
-						<xsd:attribute name="name" use="optional" />
-						<xsd:attribute name="ref" use="required" />
-					</xsd:complexType>
-				</xsd:element>
-			</xsd:sequence>
-			<xsd:attribute name="id" use="required" />
-			<xsd:attribute name="class" default="org.drools.vsm.local.ServiceManagerLocalClient" use="optional" type="xsd:string"/>
+			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="type" use="required" type="connectionTypeEnum"/>
 		</xsd:complexType>
-	</xsd:element>	
-	 -->
-	 
+	</xsd:element>
+
+	<xsd:element name="execution-node">
+		<xsd:complexType>
+			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="connection" use="required" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+
 </xsd:schema>

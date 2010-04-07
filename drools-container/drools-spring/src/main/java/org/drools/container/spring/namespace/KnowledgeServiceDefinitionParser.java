@@ -19,9 +19,8 @@ import org.w3c.dom.Element;
  */
 public class KnowledgeServiceDefinitionParser extends AbstractBeanDefinitionParser {
 
-	private static final String ID_ATTRIBUTE = "id";
 	private static final String CAMEL_CONTEXT_ATTRIBUTE = "camelContext";
-	private static final String SM_ID_ATTRIBUTE = "smId";
+	private static final String EXECUTION_NODE_ID_ATTRIBUTE = "node";
 	private static final String CONFIGURATION_ELEMENT = "configuration";
 	private static final String CONFIGURATION_REF_ELEMENT = "configuration-ref";
 
@@ -29,17 +28,12 @@ public class KnowledgeServiceDefinitionParser extends AbstractBeanDefinitionPars
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
-		String id = element.getAttribute(ID_ATTRIBUTE);
-		emptyAttributeCheck(element.getLocalName(), ID_ATTRIBUTE, id);
-		
 		BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KnowledgeServiceBeanFactory.class);
 
-		factory.addPropertyValue("id", id);
-		
-		String smId = element.getAttribute(SM_ID_ATTRIBUTE);
-		emptyAttributeCheck(element.getLocalName(), SM_ID_ATTRIBUTE, smId);
+		String nodeId = element.getAttribute(EXECUTION_NODE_ID_ATTRIBUTE);
+		emptyAttributeCheck(element.getLocalName(), EXECUTION_NODE_ID_ATTRIBUTE, nodeId);
 
-		factory.addPropertyValue("smId", smId);
+		factory.addPropertyValue("nodeId", nodeId);
 		
 		String camelContextId = element.getAttribute(CAMEL_CONTEXT_ATTRIBUTE);
 		emptyAttributeCheck(element.getLocalName(), CAMEL_CONTEXT_ATTRIBUTE, camelContextId);

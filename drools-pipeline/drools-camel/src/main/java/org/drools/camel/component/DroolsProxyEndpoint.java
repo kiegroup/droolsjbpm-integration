@@ -23,10 +23,8 @@ import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.spi.DataFormat;
+import org.drools.grid.ExecutionNode;
 import org.drools.pipeline.camel.DroolsCamelContextInit;
-import org.drools.vsm.ServiceManager;
 
 public class DroolsProxyEndpoint extends DefaultEndpoint {
 
@@ -53,8 +51,8 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
 
         if (builder == null) {
             String smId = DroolsComponent.getSessionManagerId(uri);
-            final ServiceManager sm = (ServiceManager)getCamelContext().getRegistry().lookup(smId);
-            if (sm == null) {
+            final ExecutionNode node = (ExecutionNode)getCamelContext().getRegistry().lookup(smId);
+            if (node == null) {
                 throw new RuntimeCamelException("Cannot find ServiceManager instance with id=\"" + 
                     smId + "\" in the CamelContext registry.");
             }
@@ -64,7 +62,7 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
             builder = new RouteBuilder() {
                 public void configure() throws Exception {
                     // build the route step by step
-                    ProcessorDefinition<?> pipeline = from("direct:" + id).bean(new DroolsCamelContextInit(sm));
+                    ProcessorDefinition<?> pipeline = from("direct:" + id).bean(new DroolsCamelContextInit(node));
                     if (inFormat != null) {
                         pipeline = pipeline.unmarshal(inFormat);
                     }

@@ -21,15 +21,20 @@ import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.Cheese;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.KnowledgeBaseFactoryService;
 import org.drools.Person;
 import org.drools.TestVariable;
+import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
+import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
+import org.drools.grid.ExecutionNode;
+import org.drools.grid.local.LocalConnection;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -52,8 +57,6 @@ import org.drools.runtime.process.WorkItemManager;
 import org.drools.runtime.process.WorkflowProcessInstance;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.runtime.rule.QueryResultsRow;
-import org.drools.vsm.ServiceManager;
-import org.drools.vsm.local.ServiceManagerLocalClient;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
@@ -1815,25 +1818,21 @@ public class XStreamBatchExecutionTest extends TestCase {
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-        ServiceManager sm = new ServiceManagerLocalClient();
+        LocalConnection connection = new LocalConnection();
+        ExecutionNode node = connection.getExecutionNode(null);
 
-        StatefulKnowledgeSession ksession = getVsmSessionStateful( sm,
-                                                                   ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        StatefulKnowledgeSession ksession = getExecutionNodeSessionStateful(node, ResourceFactory.newByteArrayResource( str.getBytes() ) );
 
-        sm.register( "ksession1",
-                     ksession );
+        node.get(DirectoryLookupFactoryService.class).register("ksession1", ksession);
 
         XStreamResolverStrategy xstreamStrategy = new XStreamResolverStrategy() {
             public XStream lookup(String name) {
                 return BatchExecutionHelper.newXStreamMarshaller();
             }
-
         };
 
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        getPipelineVsm( sm,
-                        xstreamStrategy ).insert( inXml,
-                                                  resultHandler );
+        getPipelineSessionStateful(node, xstreamStrategy).insert(inXml, resultHandler);
         String outXml = (String) resultHandler.getObject();
 
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
@@ -1883,29 +1882,28 @@ public class XStreamBatchExecutionTest extends TestCase {
         return pipeline;
     }
 
-    private Pipeline getPipelineVsm(ServiceManager vsm,
-                                    XStreamResolverStrategy xstreamResolverStrategy) {
+    private Pipeline getPipelineSessionStateful(ExecutionNode node, XStreamResolverStrategy xstreamResolverStrategy) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
         Action assignResult = PipelineFactory.newAssignObjectAsResult();
         assignResult.setReceiver( executeResultHandler );
 
         //Transformer outTransformer = PipelineFactory.newXStreamToXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
-        Transformer outTransformer = new XStreamToXmlVsmTransformer();
+        Transformer outTransformer = new XStreamToXmlGridTransformer();
         outTransformer.setReceiver( assignResult );
 
         KnowledgeRuntimeCommand batchExecution = PipelineFactory.newCommandExecutor();
         batchExecution.setReceiver( outTransformer );
 
         //Transformer inTransformer = PipelineFactory.newXStreamFromXmlTransformer( BatchExecutionHelper.newXStreamMarshaller() );
-        Transformer inTransformer = new XStreamFromXmlVsmTransformer( xstreamResolverStrategy );
+        Transformer inTransformer = new XStreamFromXmlGridTransformer( xstreamResolverStrategy );
         inTransformer.setReceiver( batchExecution );
 
         Transformer domTransformer = new ToXmlNodeTransformer();
         domTransformer.setReceiver( inTransformer );
 
         //Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
-        Pipeline pipeline = new ServiceManagerPipelineImpl( vsm );
+        Pipeline pipeline = new ExecutionNodePipelineImpl( node );
 
         pipeline.setReceiver( domTransformer );
 
@@ -1987,9 +1985,8 @@ public class XStreamBatchExecutionTest extends TestCase {
         return session;
     }
 
-    private StatefulKnowledgeSession getVsmSessionStateful(ServiceManager sm,
-                                                           Resource resource) throws Exception {
-        KnowledgeBuilder kbuilder = sm.getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
+    private StatefulKnowledgeSession getExecutionNodeSessionStateful(ExecutionNode node, Resource resource) throws Exception {
+        KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
         kbuilder.add( resource,
                       ResourceType.DRL );
 
@@ -2000,7 +1997,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertFalse( kbuilder.hasErrors() );
         Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
 
-        KnowledgeBase kbase = sm.getKnowledgeBaseFactoryService().newKnowledgeBase();
+        KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
 
         kbase.addKnowledgePackages( pkgs );
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();

@@ -14,15 +14,15 @@ import org.w3c.dom.Element;
 
 public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser {
 	
-	private static final String SERVICE_MANAGER_ATTRIBUTE = "serviceManager";
+	private static final String EXECUTION_NODE_ATTRIBUTE = "node";
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KnowledgeBaseBeanFactory.class);
 
-		String smRef = element.getAttribute(SERVICE_MANAGER_ATTRIBUTE);
-		factory.addPropertyReference(SERVICE_MANAGER_ATTRIBUTE, smRef);
+		String nodeRef = element.getAttribute(EXECUTION_NODE_ATTRIBUTE);
+		factory.addPropertyReference(EXECUTION_NODE_ATTRIBUTE, nodeRef);
 		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "resource");
 		
 		ManagedList resources = null;

@@ -1,8 +1,9 @@
 package org.drools.container.spring.beans;
 
 import org.drools.KnowledgeBase;
+import org.drools.builder.DirectoryLookupFactoryService;
+import org.drools.grid.ExecutionNode;
 import org.drools.runtime.CommandExecutor;
-import org.drools.vsm.ServiceManager;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.NamedBean;
 public abstract class AbstractKnowledgeSessionBeanFactory implements FactoryBean,
 		InitializingBean, BeanNameAware, NamedBean {
 
-	private ServiceManager serviceManager;
+	private ExecutionNode node;
 	private KnowledgeBase kbase;
 	private String beanName;
 	private String name;
@@ -52,8 +53,8 @@ public abstract class AbstractKnowledgeSessionBeanFactory implements FactoryBean
 			name = beanName;
 		}
 		internalAfterPropertiesSet();
-		if (serviceManager != null) {
-			serviceManager.register(name, getCommandExecutor());
+		if (node != null) {
+			node.get(DirectoryLookupFactoryService.class).register(name, getCommandExecutor());
 		}
 	}
 
@@ -61,12 +62,12 @@ public abstract class AbstractKnowledgeSessionBeanFactory implements FactoryBean
 
 	protected abstract void internalAfterPropertiesSet();
 
-	public ServiceManager getServiceManager() {
-		return serviceManager;
+	public ExecutionNode getNode() {
+		return node;
 	}
 
-	public void setServiceManager(ServiceManager serviceManager) {
-		this.serviceManager = serviceManager;
+	public void setNode(ExecutionNode node) {
+		this.node = node;
 	}
 
 	public void setBeanName(String name) {

@@ -14,7 +14,10 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactoryService;
+import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.command.runtime.BatchExecutionCommand;
@@ -151,7 +154,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
 	@Override
 	protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier, String rule) {
-		KnowledgeBuilder kbuilder = serviceManager.getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
+		KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
 
 		Options xjcOpts = new Options();
 		xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
@@ -265,7 +268,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
 		assertFalse(kbuilder.hasErrors());
 
-		KnowledgeBase kbase = serviceManager.getKnowledgeBaseFactoryService().newKnowledgeBase();
+		KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
 		
 		classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
@@ -282,7 +285,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		}
 
 		StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-		serviceManager.register(identifier, session);
+		node.get(DirectoryLookupFactoryService.class).register(identifier, session);
 		return session;
 	}
 

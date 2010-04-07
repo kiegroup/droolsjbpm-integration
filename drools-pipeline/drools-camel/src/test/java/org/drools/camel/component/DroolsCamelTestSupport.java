@@ -19,37 +19,38 @@ import java.util.Collection;
 
 import javax.naming.Context;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.ContextTestSupport;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactoryService;
+import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
+import org.drools.grid.ExecutionNode;
+import org.drools.grid.local.LocalConnection;
 import org.drools.io.ResourceFactory;
-import org.drools.runtime.KnowledgeRuntime;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.vsm.ServiceManager;
-import org.drools.vsm.local.ServiceManagerLocalClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class DroolsCamelTestSupport extends ContextTestSupport {
 	protected static final Logger LOG = LoggerFactory.getLogger(DroolsCamelTestSupport.class);
-    protected ServiceManager serviceManager;
+	protected ExecutionNode node;
 
-    public void setServiceManager(ServiceManager serviceManager) {
-        this.serviceManager = serviceManager;
-    }
+    public void setNode(ExecutionNode node) {
+		this.node = node;
+	}
 
-    public ServiceManager getServiceManager() {
-        return serviceManager;
-    }    
+	public ExecutionNode getNode() {
+		return node;
+	}
 
-    @Override
+	@Override
     public void setUp() throws Exception {
         super.setUp();
         
@@ -67,8 +68,10 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         // defined as below and remove this comment from here.
         Context context = super.createJndiContext();
 
-        serviceManager = new ServiceManagerLocalClient();
-        context.bind("sm", serviceManager);
+        LocalConnection connection = new LocalConnection();
+        node = connection.getExecutionNode(null);
+        node.setId("sm");
+        context.bind("sm", node);
 
         configureDroolsContext();
         return context;
@@ -77,7 +80,7 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
     protected abstract void configureDroolsContext();
 
     protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier, String rule) {
-        KnowledgeBuilder kbuilder = serviceManager.getKnowledgeBuilderFactoryService().newKnowledgeBuilder();
+    	KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
         
         if (rule != null && rule.length() > 0) {
             kbuilder.add(ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
@@ -88,11 +91,13 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         }
         assertFalse(kbuilder.hasErrors());
         Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
-        KnowledgeBase kbase = serviceManager.getKnowledgeBaseFactoryService().newKnowledgeBase();
+        KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
 
         kbase.addKnowledgePackages(pkgs);
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-        serviceManager.register(identifier, session);
+        
+        node.get(DirectoryLookupFactoryService.class).register(identifier, session);
+        
         return session;
     }
 

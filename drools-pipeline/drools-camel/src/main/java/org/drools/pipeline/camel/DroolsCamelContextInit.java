@@ -2,8 +2,8 @@ package org.drools.pipeline.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
-import org.drools.runtime.pipeline.impl.ServiceManagerPipelineContextImpl;
-import org.drools.vsm.ServiceManager;
+import org.drools.grid.ExecutionNode;
+import org.drools.runtime.pipeline.impl.ExecutionNodePipelineContextImpl;
 
 /**
  * Camel Processor to initialize the drools-camel context 
@@ -13,10 +13,10 @@ import org.drools.vsm.ServiceManager;
  */
 public class DroolsCamelContextInit {
 
-    private ServiceManagerPipelineContextImpl context;
+    private ExecutionNodePipelineContextImpl context;
 
-    public DroolsCamelContextInit(ServiceManager serviceManager) {
-        this.context = new ServiceManagerPipelineContextImpl(serviceManager, null);
+    public DroolsCamelContextInit(ExecutionNode node) {
+        this.context = new ExecutionNodePipelineContextImpl(node, null);
     }
 
     @Handler

@@ -42,7 +42,7 @@
 				<xsd:element name="configuration-ref" type="serviceConfRefType" minOccurs="0" maxOccurs="unbounded" />
 			</xsd:sequence>
 			<xsd:attribute name="id" use="required" type="xsd:ID"/>
-			<xsd:attribute name="smId" use="required" type="xsd:string"/>
+			<xsd:attribute name="node" use="required" type="xsd:string"/>
 			<xsd:attribute name="camelContext" use="required" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>

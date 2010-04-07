@@ -25,7 +25,7 @@ public class KnowledgeServiceBeanFactory  implements FactoryBean, InitializingBe
 	private PackageScanClassResolver packageClassLoaderResolver;
 	private KnowledgeService service;
 	private List<KnowledgeServiceConfiguration> configurations = Collections.emptyList();
-	private String smId;
+	private String nodeId;
 
 	public Object getObject() throws Exception {
 		return service;
@@ -44,7 +44,7 @@ public class KnowledgeServiceBeanFactory  implements FactoryBean, InitializingBe
 		for (KnowledgeServiceConfiguration cfg : configurations) {
 			configs.put(cfg.getSessionId(), cfg);
 		}
-		service = new KnowledgeServiceImpl(camelContext, configs, smId);
+		service = new KnowledgeServiceImpl(camelContext, configs, nodeId);
 	}
 
 	public void setId(String id) {
@@ -87,12 +87,12 @@ public class KnowledgeServiceBeanFactory  implements FactoryBean, InitializingBe
 		return packageClassLoaderResolver;
 	}
 
-	public void setSmId(String smId) {
-		this.smId = smId;
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
 	}
 
-	public String getSmId() {
-		return smId;
+	public String getNodeId() {
+		return nodeId;
 	}
 
 }

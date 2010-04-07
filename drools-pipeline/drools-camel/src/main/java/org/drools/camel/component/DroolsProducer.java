@@ -19,22 +19,22 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.impl.DefaultProducer;
+import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
+import org.drools.grid.ExecutionNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.pipeline.ResultHandler;
-import org.drools.vsm.ServiceManager;
 
 public class DroolsProducer extends DefaultProducer {
-    private ServiceManager serviceManager;
+    private ExecutionNode node;
     private CommandExecutor executor;
 
-    public DroolsProducer(Endpoint endpoint, ServiceManager serviceManager) {
+    public DroolsProducer(Endpoint endpoint, ExecutionNode node) {
         super(endpoint);
-        this.serviceManager = serviceManager;
-        
+        this.node = node;
         DroolsEndpoint de = (DroolsEndpoint) endpoint;
-        executor = serviceManager.lookup(de.getKsession());
+        executor = node.get(DirectoryLookupFactoryService.class).lookup(de.getKsession());
     }
 
     public void process(Exchange exchange) throws Exception {
@@ -42,8 +42,7 @@ public class DroolsProducer extends DefaultProducer {
         if (exec == null) {
             // need to look it up
             String ksession = exchange.getIn().getHeader(DroolsComponent.DROOLS_LOOKUP, String.class);
-            exec = serviceManager.lookup(ksession == null ? "" : ksession);
-            
+            exec = node.get(DirectoryLookupFactoryService.class).lookup(ksession == null ? "" : ksession);
             // cannot continue if executor is not available
             if (exec == null) {
                 throw new RuntimeCamelException("Null executor");

@@ -29,20 +29,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 	</dependency>
 	<dependency>
 		<groupId>org.drools</groupId>
-		<artifactId>drools-vsm</artifactId>
-		<exclusions>
-			<exclusion>
-				<groupId>org.drools</groupId>
-				<artifactId>drools-process-task</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>xml-apis</groupId>
-				<artifactId>xml-apis</artifactId>
-			</exclusion>
-		</exclusions>
-	</dependency>
-	<dependency>
-		<groupId>org.drools</groupId>
 		<artifactId>drools-compiler</artifactId>
 	</dependency>
 	<dependency>
@@ -53,6 +39,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 	<dependency>
 		<groupId>org.drools</groupId>
 		<artifactId>drools-spring</artifactId>
+		<exclusions>
+			<exclusion>
+				<groupId>org.drools</groupId>
+				<artifactId>drools-vsm</artifactId>
+			</exclusion>
+		</exclusions>
 	</dependency>
     <!-- CXF deps -->
 	<dependency>

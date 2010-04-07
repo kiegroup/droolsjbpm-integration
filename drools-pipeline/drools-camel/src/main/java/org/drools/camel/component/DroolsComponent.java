@@ -23,8 +23,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultComponent;
-import org.apache.camel.util.UuidGenerator;
-import org.drools.vsm.ServiceManager;
+import org.drools.grid.ExecutionNode;
 
 public class DroolsComponent extends DefaultComponent {
     // Property name *must* follow the Camel conventions (see org.apache.camel.Exchange)
@@ -37,8 +36,8 @@ public class DroolsComponent extends DefaultComponent {
     private static final AtomicInteger counter = new AtomicInteger();
     
     private CamelContext embeddedContext;
-    private ServiceManager serviceManager;
-    private String smId = "";
+    private ExecutionNode node;
+    private String nodeId = "";
 
     public DroolsComponent() {
     }
@@ -58,20 +57,20 @@ public class DroolsComponent extends DefaultComponent {
         embeddedContext = context;
     }
 
-    public String getServiceManagerId() {
-        return smId;
+    public String getExecutionNodeId() {
+        return nodeId;
     }
 
-    public void setServiceManagerId (String smId) {
-        this.smId = smId == null ? "" : smId;
+    public void setExecutionNodeId (String nodeId) {
+        this.nodeId = nodeId == null ? "" : nodeId;
     }
 
-    public ServiceManager getServiceManager() {
-        return serviceManager;
+    public ExecutionNode getExecutionNode() {
+        return node;
     }
 
-    public void setServiceManager(ServiceManager sm) {
-        serviceManager = sm;
+    public void setExecutionNode(ExecutionNode node) {
+        this.node = node;
     }
 
     /**

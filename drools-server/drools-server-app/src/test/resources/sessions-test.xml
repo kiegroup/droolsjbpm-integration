@@ -9,19 +9,22 @@
 		http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd"
     default-autowire="byName">
 
-    <bean id="sm1" class="org.drools.vsm.local.ServiceManagerLocalClient" />
 
-	<drools:kbase id="kbase1" serviceManager="sm1">
+	<drools:connection id="connection1" type="local" />
+	
+	<drools:execution-node id="node1" connection="connection1" />
+    
+	<drools:kbase id="kbase1" node="node1">
 		<drools:resource source="classpath:changesets/change-set-1.xml" type="CHANGE_SET" />
 		<drools:model source="classpath:model/person.xsd" />
 	</drools:kbase>
 
-	<drools:kbase id="kbase2" serviceManager="sm1">
+	<drools:kbase id="kbase2" node="node1">
 		<drools:resource source="classpath:changesets/change-set-2.xml" type="CHANGE_SET" />
 	</drools:kbase>
 
-	<drools:ksession id="ksession1" type="stateful"  kbase="kbase1" serviceManager="sm1"/>
+	<drools:ksession id="ksession1" type="stateful"  kbase="kbase1" node="node1"/>
 
-	<drools:ksession id="ksession2" type="stateless" kbase="kbase2" serviceManager="sm1"/>
+	<drools:ksession id="ksession2" type="stateless" kbase="kbase2" node="node1"/>
 
 </beans>

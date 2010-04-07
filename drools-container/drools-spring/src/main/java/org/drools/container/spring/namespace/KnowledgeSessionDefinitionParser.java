@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionParser {
 
 	private static final String NAME_ATTRIBUTE = "name";
-	private static final String SERVICE_MANAGER_ATTRIBUTE = "serviceManager";
+	private static final String EXECUTION_NODE_ATTRIBUTE = "node";
 	private static final String KBASE_ATTRIBUTE = "kbase";
 	private static final String TYPE_ATTRIBUTE = "type";
 
@@ -32,9 +32,9 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
 
 		factory.addPropertyReference("kbase", kbase);
 
-		String smRef = element.getAttribute(SERVICE_MANAGER_ATTRIBUTE);
-		if (smRef != null && smRef.length() > 0) {
-			factory.addPropertyReference("serviceManager", smRef);
+		String node = element.getAttribute(EXECUTION_NODE_ATTRIBUTE);
+		if (node != null && node.length() > 0) {
+			factory.addPropertyReference("node", node);
 		}
 
 		String name = element.getAttribute(NAME_ATTRIBUTE);
