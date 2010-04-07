@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
+import org.drools.builder.JPAKnowledgeFactoryService;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNode;
@@ -76,6 +77,7 @@ public class LocalConnection implements GenericConnection {
         node.set(KnowledgeBuilderFactoryService.class, new KnowledgeBuilderProviderLocalClient() );
         node.set(KnowledgeBaseFactoryService.class, new KnowledgeBaseProviderLocalClient() );
         node.set(DirectoryLookupFactoryService.class, new DirectoryLookupProviderLocalClient());
+        
         return node;
     }
 
