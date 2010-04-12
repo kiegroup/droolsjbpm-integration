@@ -313,29 +313,29 @@ public abstract class ExecutionNodeBaseTest {
 
     }
 
-   @Test
-   public void scalingUp(){
-       for(int i=1; i<20; i++) {
-       List<GenericNodeConnector> services = connection.getNodeConnectors();
-         for(GenericNodeConnector serviceConnector : services) {
-             if(serviceConnector instanceof ExecutionNodeService){
-                    Throwable thrown = null;
-                    try {
-                        double d = ((ExecutionNodeService)serviceConnector).getLoad();
-                        if(d<80)
-                            ((ExecutionNodeService)serviceConnector).setLoad(d+10);
-                        else
-                            ((ExecutionNodeService)serviceConnector).setLoad(d);
-                        Thread.sleep(5000);
-                    } catch (Exception e) {
-                        thrown = e;
-                    }
-                    Assert.assertNull(thrown);
-                }
-         }
-       }
-
-   }
+//   @Test
+//   public void scalingUp(){
+//       for(int i=1; i<20; i++) {
+//       List<GenericNodeConnector> services = connection.getNodeConnectors();
+//         for(GenericNodeConnector serviceConnector : services) {
+//             if(serviceConnector instanceof ExecutionNodeService){
+//                    Throwable thrown = null;
+//                    try {
+//                        double d = ((ExecutionNodeService)serviceConnector).getLoad();
+//                        if(d<80)
+//                            ((ExecutionNodeService)serviceConnector).setLoad(d+10);
+//                        else
+//                            ((ExecutionNodeService)serviceConnector).setLoad(d);
+//                        Thread.sleep(5000);
+//                    } catch (Exception e) {
+//                        thrown = e;
+//                    }
+//                    Assert.assertNull(thrown);
+//                }
+//         }
+//       }
+//
+//   }
 
 
 

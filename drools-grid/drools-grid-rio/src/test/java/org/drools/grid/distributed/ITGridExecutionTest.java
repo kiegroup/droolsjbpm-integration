@@ -49,7 +49,7 @@ public class ITGridExecutionTest extends ExecutionNodeBaseTest {
         }
 
         //Get an execution node using the default/round robin strategy
-        node = connection.getExecutionNode(null);
+        node = connection.getExecutionNode();
         System.out.println("Node = "+ node);
 
 

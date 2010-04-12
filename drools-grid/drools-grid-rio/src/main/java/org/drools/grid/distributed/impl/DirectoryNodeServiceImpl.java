@@ -43,6 +43,11 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService{
     public void register(String sessionId, String sessionServiceId) throws RemoteException {
         System.out.println("Registering: "+  sessionId + " -- "+sessionServiceId);
         directoryMap.put(sessionId, sessionServiceId);
+        for(ExecutionNodeService node : nodeServices){
+            if(node.getId().equals(sessionServiceId)){
+                node.incrementKsessionCounter();
+            }
+        }
     }
 
     @Override

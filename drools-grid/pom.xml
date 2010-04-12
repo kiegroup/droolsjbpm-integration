@@ -7,7 +7,7 @@
     <groupId>org.drools</groupId>
     <version>5.1.0.SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>drools-grid</artifactId>
   <packaging>pom</packaging>
   <name>Drools :: Grid</name>
@@ -17,10 +17,10 @@
       <module>drools-grid-task</module>
       <!-- You need JDK 1.6 and a special branch of the RIO project to work with this -->
       <!-- This will be updated soon to be used with RIO trunk -->
-      <!-- For building this module with Hudson, we need to have installed a RIO runtime/RIO trunk inside 
-           the Hudson Machine and compile everything with JDK 1.6. Also you need to export the RIO_HOME 
+      <!-- For building this module with Hudson, we need to have installed a RIO runtime/RIO trunk inside
+           the Hudson Machine and compile everything with JDK 1.6. Also you need to export the RIO_HOME
            env variable -->
       <!--module>drools-grid-rio</module-->
   </modules>
-  
+
 </project>

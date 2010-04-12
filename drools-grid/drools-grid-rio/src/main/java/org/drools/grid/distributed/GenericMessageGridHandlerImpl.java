@@ -28,57 +28,57 @@ public class GenericMessageGridHandlerImpl implements GenericMessageHandler {
     private SystemEventListener systemEventListener;
 
     private NodeData  data;
-    private DirectoryNodeService registry;
+    private DirectoryNodeService directory;
 
     public GenericMessageGridHandlerImpl(NodeData data,
                                  SystemEventListener systemEventListener) {
         this.systemEventListener = systemEventListener;
         this.data = data;
         
-        Class[] classes = new Class[]{org.drools.grid.DirectoryNodeService.class};
-        ServiceTemplate tmpl = new ServiceTemplate(null, classes,null);
-
-        LookupDiscoveryManager lookupDiscovery = null;
-        try {
-            lookupDiscovery = new LookupDiscoveryManager(LookupDiscoveryManager.ALL_GROUPS, null, null);
-        } catch (IOException ex) {
-            Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        System.out.println("Discovering Manager service ...");
-
-        ServiceDiscoveryManager serviceDiscovery =  null;
-        try {
-            serviceDiscovery = new ServiceDiscoveryManager(lookupDiscovery, new LeaseRenewalManager());
-        } catch (IOException ex) {
-            Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        /* Wait no more then 10 seconds to discover the service */
-        ServiceItem item = null;
-        try {
-            try {
-                item = serviceDiscovery.lookup(tmpl, null, 1000);
-            } catch (RemoteException ex) {
-                Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        serviceDiscovery.terminate();
-
-        if(item != null) {
-            System.out.println("Discovered Registry service");
-            if(item.service instanceof DirectoryNodeService){
-                registry = (DirectoryNodeService)item.service;
-
-            }
-
-
-        } else {
-            System.out.println("Registry service not discovered, make sure the"+
-                               "service is deployed");
-        }
+//        Class[] classes = new Class[]{org.drools.grid.DirectoryNodeService.class};
+//        ServiceTemplate tmpl = new ServiceTemplate(null, classes,null);
+//
+//        LookupDiscoveryManager lookupDiscovery = null;
+//        try {
+//            lookupDiscovery = new LookupDiscoveryManager(LookupDiscoveryManager.ALL_GROUPS, null, null);
+//        } catch (IOException ex) {
+//            Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        System.out.println("Discovering Manager service ...");
+//
+//        ServiceDiscoveryManager serviceDiscovery =  null;
+//        try {
+//            serviceDiscovery = new ServiceDiscoveryManager(lookupDiscovery, new LeaseRenewalManager());
+//        } catch (IOException ex) {
+//            Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        /* Wait no more then 10 seconds to discover the service */
+//        ServiceItem item = null;
+//        try {
+//            try {
+//                item = serviceDiscovery.lookup(tmpl, null, 1000);
+//            } catch (RemoteException ex) {
+//                Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(GenericMessageGridHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        serviceDiscovery.terminate();
+//
+//        if(item != null) {
+//            System.out.println("Discovered Registry service");
+//            if(item.service instanceof DirectoryNodeService){
+//                registry = (DirectoryNodeService)item.service;
+//
+//            }
+//
+//
+//        } else {
+//            System.out.println("Registry service not discovered, make sure the"+
+//                               "service is deployed");
+//        }
 
     }
 
@@ -112,7 +112,7 @@ public class GenericMessageGridHandlerImpl implements GenericMessageHandler {
         localSessionContext.set( "kresults_" + msg.getSessionId(),
                                  localKresults );
         //@TODO: replace with Environment ?? this needs to change..
-        localSessionContext.set("registry", registry);
+        localSessionContext.set("registry", directory);
         
         for ( GenericCommand cmd : commands ) {
             // evaluate the commands

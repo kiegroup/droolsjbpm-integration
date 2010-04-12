@@ -31,6 +31,7 @@ import org.drools.grid.ExecutionNodeService;
 import org.drools.grid.distributed.util.IDEntry;
 
 import org.rioproject.core.jsb.ServiceBeanContext;
+import org.rioproject.watch.CounterWatch;
 import org.rioproject.watch.GaugeWatch;
 
 /**
@@ -42,6 +43,7 @@ public class ExecutionNodeServiceImpl implements ExecutionNodeService {
     private GenericMessageHandler handler;
     private String id;
     private GaugeWatch loadWatch;
+    private CounterWatch ksessionCounter;
     private Long instanceID;
 
     public ExecutionNodeServiceImpl() {
@@ -78,7 +80,9 @@ public class ExecutionNodeServiceImpl implements ExecutionNodeService {
     public void setServiceBeanContext(ServiceBeanContext context) {
         context.addAttribute(new IDEntry(this.id));
         loadWatch = new GaugeWatch("load");
+        ksessionCounter = new CounterWatch("ksessionCounter");
         context.getWatchRegistry().register(loadWatch);
+        context.getWatchRegistry().register(ksessionCounter);
         instanceID = context.getServiceBeanConfig().getInstanceID();
     }
 
@@ -123,6 +127,26 @@ public class ExecutionNodeServiceImpl implements ExecutionNodeService {
                 "breached=" +
                 loadWatch.getThresholdManager().getThresholdCrossed());
     }
+
+
+    public double getKsessionCounter() throws RemoteException {
+        return ksessionCounter.getLastCalculableValue();
+    }
+
+
+    public void incrementKsessionCounter() throws RemoteException {
+        double last = ksessionCounter.getLastCalculableValue();
+        ksessionCounter.increment();
+
+            System.err.println(System.currentTimeMillis() + " "+
+                "---> ["+instanceID+"] was [" + ksessionCounter.getLastCalculableValue() +
+                "], " +
+                "breached=" +
+                ksessionCounter.getThresholdManager().getThresholdCrossed());
+
+    }
+
+
 
   
 }

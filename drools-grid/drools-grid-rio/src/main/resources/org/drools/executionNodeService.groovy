@@ -7,6 +7,7 @@ deployment(name:'executionNodeService',  debug: 'true') {
 
     logging {
         logger 'org.rioproject.resolver', Level.FINE
+        logger 'org.rioproject.associsations' , Level.FINE
     }
     /* Configuration for the discovery group that the service should join.
      * This first checks if the org.rioproject.groups property is set, if not
@@ -31,10 +32,13 @@ deployment(name:'executionNodeService',  debug: 'true') {
         implementation(class:'org.drools.grid.distributed.impl.ExecutionNodeServiceImpl') {
             artifact ref:'service'
         }
-        sla(id:'load', low:10, high: 30) {
+        /*sla(id:'load', low:10, high: 30) {
             rule resource: 'ScalingRuleHandler', max:5
+        }*/
+        sla(id:'ksessionCounter', low:1, high: 4) {
+            rule resource: 'ScalingRuleHandlerCounter', max:5
         }
-        maintain 2
+        maintain 1
     }
     service(name: 'DirectoryNodeService') {
         interfaces {

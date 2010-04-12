@@ -80,7 +80,7 @@
                 <artifactId>maven-rio-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <opstring>src/test/resources/org/drools/executionNodeService.groovy</opstring>
+                    <opstring>src/main/resources/org/drools/executionNodeService.groovy</opstring>
                     <createJar>
                         <classifier>dl</classifier>
                         <ins>
@@ -91,6 +91,7 @@
                             <topclass>org.drools.grid.ExecutionNodeService</topclass>
                             <topclass>org.drools.grid.DirectoryNodeService</topclass>
                             <topclass>org.drools.grid.distributed.util.IDEntry</topclass>
+                            <topclass>org.drools.grid.distributed.command.NewStatefulKnowledgeSessionGridCommand</topclass>
                             <topclass>org.drools.impl.SystemEventListenerServiceImpl</topclass>
                             <topclass>org.rioproject.gnostic.Gnostic</topclass>
                         </topclasses>
@@ -124,7 +125,7 @@
 
                         <property>
                             <name>opstring</name>
-                            <value>src/test/resources/org/drools/executionNodeService.groovy</value>
+                            <value>src/main/resources/org/drools/executionNodeService.groovy</value>
                         </property>
                         <property>
                             <name>org.rioproject.test.config</name>
