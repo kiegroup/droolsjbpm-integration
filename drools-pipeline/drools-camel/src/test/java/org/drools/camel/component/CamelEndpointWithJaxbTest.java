@@ -104,7 +104,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 		assertNotNull(resp.getValue("hadrian"));
 	}
 	
-	public void FIXMEtestSessionModify() throws Exception {
+	public void testSessionModify() throws Exception {
 		String cmd = "";
 		cmd += "<batch-execution lookup='ksession1'>\n";
 		cmd += "   <modify factHandle='" + handle + "'>\n";
