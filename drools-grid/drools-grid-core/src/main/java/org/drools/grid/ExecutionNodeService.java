@@ -18,5 +18,7 @@ public interface ExecutionNodeService extends GenericNodeConnector{
     public Message write(Message msg) throws RemoteException;
     double getLoad() throws RemoteException;
     void setLoad(double load) throws RemoteException;
+    double getKsessionCounter() throws RemoteException;
+    void incrementKsessionCounter() throws RemoteException;
     
 }
