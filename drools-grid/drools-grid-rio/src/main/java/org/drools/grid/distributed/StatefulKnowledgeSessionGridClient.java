@@ -1,7 +1,6 @@
 package org.drools.grid.distributed;
 
 
-import org.drools.grid.ExecutionNodeService;
 import java.util.Collection;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import org.drools.runtime.rule.WorkingMemoryEntryPoint;
 import org.drools.grid.command.GetWorkItemManagerCommand;
 import org.drools.grid.command.RegisterRemoteWorkItemHandlerCommand;
 import org.drools.grid.command.StartProcessRemoteCommand;
+import org.drools.grid.distributed.command.GetWorkingMemoryEntryPointGridCommand;
 import org.drools.grid.generic.GenericNodeConnector;
 import org.drools.grid.generic.Message;
 import org.drools.grid.generic.MessageSession;
@@ -133,7 +133,8 @@ public class StatefulKnowledgeSessionGridClient
                                                                                   kresultsId ) );
 
         try {
-            Object object = nodeConnection.write( msg ).getPayload();if ( object == null ) {
+            Object object = nodeConnection.write( msg ).getPayload();
+            if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
 
@@ -203,8 +204,32 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public WorkingMemoryEntryPoint getWorkingMemoryEntryPoint(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        String commandId = "ksession.execute" + messageSession.getNextId();
+        String kresultsId = "kresults_" + messageSession.getSessionId();
+
+        Message msg = new Message( messageSession.getSessionId(),
+                                   messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointGridCommand( name ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  instanceId,
+                                                                                  name,
+                                                                                  kresultsId ) );
+
+        try {
+            Object object = nodeConnection.write( msg ).getPayload();
+            
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
+            }
+
+            return new WorkingMemoryEntryPointGridClient(name, nodeConnection, messageSession);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
+        }
+        
     }
 
     public Collection< ? extends WorkingMemoryEntryPoint> getWorkingMemoryEntryPoints() {

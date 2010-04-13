@@ -33,9 +33,9 @@ public class NewStatefulKnowledgeSessionGridCommand
 
         KnowledgeBase kbase = ((KnowledgeCommandContext) context).getKnowledgeBase();
         DirectoryNodeService registry = (DirectoryNodeService)context.get("registry");
-        System.out.println("Inside Grid Command!!!!!!!!");
-        System.out.println("Registry = "+registry);
-        System.out.println("KbaseId = "+kbaseId);
+//        System.out.println("Inside Grid Command!!!!!!!!");
+//        System.out.println("Registry = "+registry);
+//        System.out.println("KbaseId = "+kbaseId);
         StatefulKnowledgeSession ksession;
 
         if( kbase == null){
