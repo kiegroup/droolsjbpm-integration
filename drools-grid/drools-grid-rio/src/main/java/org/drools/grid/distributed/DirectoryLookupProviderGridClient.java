@@ -14,12 +14,13 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package org.drools.grid.distributed;
 
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNodeService;
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.drools.builder.DirectoryLookupFactoryService;
@@ -44,8 +45,6 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
     private GenericNodeConnector currentService;
     private MessageSession messageSession;
 
-  
-
     public DirectoryLookupProviderGridClient(GenericNodeConnector currentService, GridConnection gridClient) {
         this.currentService = currentService;
         this.gridClient = gridClient;
@@ -53,96 +52,106 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
     }
 
     public void register(String identifier,
-                         CommandExecutor executor) {
+            CommandExecutor executor) {
+
+        String commandId = "client.lookup" + messageSession.getNextId();
+        String kresultsId = "kresults_" + messageSession.getSessionId();
+        int type;
+
+
+        if (executor instanceof StatefulKnowledgeSession) {
+            type = 0;
+        } else {
+            throw new IllegalArgumentException("Type is not supported for registration");
+        }
+        Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new RegisterCommand(identifier, ((StatefulKnowledgeSessionGridClient) executor).getInstanceId(), type), null, null, null, null));
+        //System.out.println("Registering " + identifier + " - - " + currentService.getId());
         try {
-            String commandId = "client.lookup" + messageSession.getNextId();
-            String kresultsId = "kresults_" + messageSession.getSessionId();
-            int type;
 
+            for (DirectoryNodeService directory : gridClient.getDirectories()) {
 
-            if ( executor instanceof StatefulKnowledgeSession ) {
-                type = 0;
-            } else {
-                throw new IllegalArgumentException("Type is not supported for registration");
-            }
-            Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new RegisterCommand(identifier, ((StatefulKnowledgeSessionGridClient) executor).getInstanceId(), type), null, null, null, null));
-            System.out.println("Registering " + identifier + " - - " + currentService.getId());
-            try {
-               // DirectoryNodeService directory = (DirectoryNodeService) gridClient.getDirectories().iterator().next();
-                for(DirectoryNodeService directory : gridClient.getDirectories() ){
+                directory.register(identifier, currentService.getId());
 
-                        directory.register(identifier, currentService.getId());
-                    
-                }
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
             }
-            try {
-                Object object = currentService.write(msg).getPayload();
-                if (!(object instanceof FinishedCommand)) {
-                    throw new RuntimeException("Response was not correctly ended");
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to execute message", e);
-            }
-        } catch ( RemoteException ex ) {
+        } catch (RemoteException ex) {
             Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+        try {
+            Object object = currentService.write(msg).getPayload();
+            if (!(object instanceof FinishedCommand)) {
+                throw new RuntimeException("Response was not correctly ended");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to execute message", e);
+        }
+
     }
 
     public CommandExecutor lookup(String identifier) {
         String commandId = "client.lookup" + messageSession.getNextId();
         String kresultsId = "kresults_" + messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.getCounter().incrementAndGet(),
-                                   false,
-                                   new KnowledgeContextResolveFromContextCommand( new LookupCommand( identifier,
-                                                                                                     commandId ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  null,
-                                                                                  kresultsId ) );
-        System.out.println("Looking up the session with identifier = "+identifier);
-            try {
+        Message msg = new Message(messageSession.getSessionId(),
+                messageSession.getCounter().incrementAndGet(),
+                false,
+                new KnowledgeContextResolveFromContextCommand(new LookupCommand(identifier,
+                commandId),
+                null,
+                null,
+                null,
+                kresultsId));
+        //System.out.println("Looking up the session with identifier = "+identifier);
+        try {
             //First I need to get the correct client ExecutionNodeService with the identifier
             //Look in all the DirectoryNodes
             //DirectoryNodeService directory = (DirectoryNodeService) gridClient.getDirectories().iterator().next();
-            
-             for(DirectoryNodeService directory : gridClient.getDirectories() )  {
+
+            for (DirectoryNodeService directory : gridClient.getDirectories()) {
                 currentService = directory.lookup(identifier);
-             }
-            
+            }
+
         } catch (RemoteException ex) {
             Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            Object object = currentService.write( msg ).getPayload();
+            Object object = currentService.write(msg).getPayload();
 
-            if ( object == null ) {
-                throw new RuntimeException( "Response was not correctly received" );
+            if (object == null) {
+                throw new RuntimeException("Response was not correctly received");
             }
-            String value = (String) ((ExecutionResults) object).getValue( commandId );
-            String type = String.valueOf( value.charAt( 0 ) );
-            String instanceId = value.substring( 2 );
+            String value = (String) ((ExecutionResults) object).getValue(commandId);
+            String type = String.valueOf(value.charAt(0));
+            String instanceId = value.substring(2);
 
             CommandExecutor executor = null;
-            switch ( Integer.parseInt( type ) ) {
-                case 0 : {
-                    executor = new StatefulKnowledgeSessionGridClient( instanceId, currentService, messageSession );
+            switch (Integer.parseInt(type)) {
+                case 0: {
+                    executor = new StatefulKnowledgeSessionGridClient(instanceId, currentService, messageSession);
                     break;
                 }
-                default : {
-
+                default: {
                 }
 
             }
 
             return executor;
-        } catch ( Exception e ) {
-            throw new RuntimeException( "Unable to execute message",
-                                        e );
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to execute message",
+                    e);
         }
     }
+    public Map<String, Map<String, String>> getDirectoryMap(){
+        Map<String, Map<String, String>> directoryMap = new HashMap<String,Map<String, String>>();
+        for (DirectoryNodeService directory : gridClient.getDirectories()) {
+            try {
+                directoryMap.put(directory.getId(), directory.getDirectoryMap());
+            } catch (RemoteException ex) {
+                Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
+
+        }
+        return directoryMap;
+
+    }
 }

@@ -17,15 +17,10 @@
 
 package org.drools.grid.local;
 
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.runtime.CommandExecutor;
-import org.drools.grid.DirectoryNodeService;
 
 /**
  *
@@ -47,6 +42,10 @@ public class DirectoryLookupProviderLocalClient implements DirectoryLookupFactor
 
     public CommandExecutor lookup(String key) {
             return  services.get(key);
+    }
+
+    public Map<String, Map<String, String>> getDirectoryMap() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

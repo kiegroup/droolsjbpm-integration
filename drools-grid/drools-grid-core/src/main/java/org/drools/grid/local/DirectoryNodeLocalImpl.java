@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.generic.GenericNodeConnector;
@@ -31,8 +32,18 @@ import org.drools.grid.generic.GenericNodeConnector;
  * @author salaboy
  */
 public class DirectoryNodeLocalImpl implements DirectoryNodeService {
+    private String id;
     private Map<String, String> directoryMap = new HashMap<String, String>();
     private List<GenericNodeConnector> services = new ArrayList<GenericNodeConnector>();
+
+    public DirectoryNodeLocalImpl() {
+        this.id = UUID.randomUUID().toString();
+    }
+
+
+     public String getId() throws RemoteException {
+        return this.id;
+    }
 
     public void register(String executorId, String sessionServiceId) throws RemoteException {
         System.out.println("Registering: "+  executorId + " -- "+sessionServiceId);
@@ -64,5 +75,11 @@ public class DirectoryNodeLocalImpl implements DirectoryNodeService {
     public void addService(GenericNodeConnector service){
         services.add(service);
     }
+
+    public Map<String, String> getDirectoryMap() {
+        return directoryMap;
+    }
+
+
 
 }

@@ -1,9 +1,5 @@
 package org.drools.grid.task;
 
-import org.drools.grid.task.CommandBasedServicesWSHumanTaskHandler;
-import org.drools.grid.task.HumanTaskServiceProviderRemoteClient;
-import org.drools.grid.task.HumanTaskFactoryService;
-import org.drools.grid.task.TaskServerMessageHandlerImpl;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;

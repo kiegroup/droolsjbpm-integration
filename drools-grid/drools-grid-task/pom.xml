@@ -41,12 +41,14 @@
             <artifactId>mina-core</artifactId>
             <version>2.0.0-M6</version>
         </dependency>
-        
+         
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-process-task</artifactId>
             <version>5.1.0.SNAPSHOT</version>
         </dependency>
+
+
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-core</artifactId>
@@ -54,6 +56,27 @@
             
         </dependency>
 
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+
+         <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+         <groupId>org.subethamail</groupId>
+         <artifactId>subethasmtp-wiser</artifactId>
+         <version>1.2</version>
+         <scope>test</scope>
+      </dependency>
 
          <!-- DB H2 -->
         <dependency>

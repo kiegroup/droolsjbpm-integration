@@ -17,7 +17,6 @@
 package org.drools.grid.remote;
 
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +69,7 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
             Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new RegisterCommand(identifier, ((StatefulKnowledgeSessionRemoteClient) executor).getInstanceId(), type), null, null, null, null));
 
 
-            System.out.println("Registering " + identifier + " - - " + client.getId());
+            //System.out.println("Registering " + identifier + " - - " + client.getId());
             connection.getDirectoryNode(null).register(identifier, client.getId());
             try {
                 Object object = client.write(msg).getPayload();
@@ -92,7 +91,7 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
             String commandId = "client.lookup" + messageSession.getNextId();
             String kresultsId = "kresults_" + messageSession.getSessionId();
             Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new LookupCommand(identifier, commandId), null, null, null, kresultsId));
-            System.out.println("Looking up the session with identifier = " + identifier);
+            //System.out.println("Looking up the session with identifier = " + identifier);
             client = connection.getDirectoryNode(null).lookup(identifier);
             try {
                 Object object = client.write(msg).getPayload();
@@ -121,6 +120,10 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
             Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public Map<String, Map<String, String>> getDirectoryMap() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
    
 
