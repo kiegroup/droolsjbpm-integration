@@ -53,7 +53,6 @@ public class WorkingMemoryEntryPointGridClient implements WorkingMemoryEntryPoin
     public FactHandle insert(Object object) throws FactException {
          String commandId = "ksession.insert" + messageSession.getNextId();
         String kresultsId = "kresults_" + messageSession.getSessionId();
-        System.out.println("INSTANCE ID, ENTRY POINT!!!!! ="+instanceId);
         Message msg = new Message( messageSession.getSessionId(),
                                    messageSession.counter.incrementAndGet(),
                                    false,

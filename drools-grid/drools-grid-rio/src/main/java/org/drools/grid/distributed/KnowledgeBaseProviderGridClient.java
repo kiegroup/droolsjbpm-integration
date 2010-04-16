@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
+import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
 
@@ -59,7 +60,7 @@ public class KnowledgeBaseProviderGridClient
                                    false,
                                    new SetVariableCommand( "__TEMP__",
                                                            localId,
-                                                           new NewKnowledgeBaseCommand( null ) ) );
+                                                           new NewKnowledgeBaseCommand( conf ) ) );
         try {
             Object object = client.write( msg ).getPayload();
 
@@ -78,8 +79,8 @@ public class KnowledgeBaseProviderGridClient
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration() {
-        // TODO Auto-generated method stub
-        return null;
+    	// TODO: change this to use a remote implementation instead the local factory?
+        return KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
