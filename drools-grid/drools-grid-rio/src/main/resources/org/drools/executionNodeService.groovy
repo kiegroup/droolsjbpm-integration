@@ -5,10 +5,10 @@ import org.rioproject.resources.servicecore.Service
 
 deployment(name:'executionNodeService',  debug: 'true') {
 
-    logging {
-        logger 'org.rioproject.resolver', Level.FINE
-        logger 'org.rioproject.associsations' , Level.FINE
-    }
+//    logging {
+//        logger 'org.rioproject.resolver', Level.FINE
+//        logger 'org.rioproject.associsations' , Level.FINE
+//    }
     /* Configuration for the discovery group that the service should join.
      * This first checks if the org.rioproject.groups property is set, if not
      * the user name is used */

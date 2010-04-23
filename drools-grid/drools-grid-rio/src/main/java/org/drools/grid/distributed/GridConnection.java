@@ -95,6 +95,17 @@ public class GridConnection implements GenericConnection {
         aMgr.setBackend(this);
         aMgr.addAssociationDescriptors(descriptorExecutionNode, descriptorDirectoryNode);
 
+        
+
+        Iterable<org.drools.grid.ExecutionNodeService> executionNodes = aMgr.getAssociations("ExecutionNodeService", null)[0];
+        for (ExecutionNodeService executionNodeService : executionNodes) {
+            addNodeConnector(executionNodeService);
+        }
+
+        Iterable<org.drools.grid.DirectoryNodeService> directoryNodes = aMgr.getAssociations("DirectoryNodeService", null)[0];
+        for (DirectoryNodeService directoryNodeService : directoryNodes) {
+            addDirectoryNode(directoryNodeService);
+        }
 
         long waited = 0;
         while (nodeConnectors.size() == 0 && waited < 30000) {

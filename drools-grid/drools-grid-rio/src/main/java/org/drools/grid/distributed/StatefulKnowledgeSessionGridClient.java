@@ -7,7 +7,10 @@ import java.util.Map;
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.command.ExecuteCommand;
+import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.command.runtime.GetGlobalCommand;
+import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
@@ -151,8 +154,31 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public Object getGlobal(String identifier) {
-        // TODO Auto-generated method stub
-        return null;
+         String commandId = "ksession.execute" + messageSession.getNextId();
+        String kresultsId = "kresults_" + messageSession.getSessionId();
+
+        Message msg = new Message( messageSession.getSessionId(),
+                                   messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new GetGlobalCommand( identifier ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  instanceId,
+                                                                                  kresultsId ) );
+
+        try {
+            Object result = nodeConnection.write( msg ).getPayload();
+            if ( result == null ) {
+                throw new RuntimeException( "Response was not correctly received = null" );
+            }
+
+           return result;
+
+
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
+        }
     }
 
     public Globals getGlobals() {
@@ -178,7 +204,34 @@ public class StatefulKnowledgeSessionGridClient
 
     public void setGlobal(String identifier,
                           Object object) {
-        // TODO Auto-generated method stub
+        String commandId = "ksession.execute" + messageSession.getNextId();
+        String kresultsId = "kresults_" + messageSession.getSessionId();
+
+        Message msg = new Message( messageSession.getSessionId(),
+                                   messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new SetGlobalCommand( identifier,
+                                                                                                      object ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  instanceId,
+                                                                                  kresultsId ) );
+
+        try {
+            Object result = nodeConnection.write( msg ).getPayload();
+            if ( result == null ) {
+                throw new RuntimeException( "Response was not correctly received = null" );
+            }
+
+            if ( !(result instanceof FinishedCommand)) {
+                throw new RuntimeException( "Response was not correctly received" );
+            }
+
+            
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
+        }
 
     }
 
