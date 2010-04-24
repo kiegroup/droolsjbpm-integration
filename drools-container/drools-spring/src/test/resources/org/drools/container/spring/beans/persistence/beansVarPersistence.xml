@@ -5,23 +5,17 @@
                         http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd">
 
 	<bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<!-- org.h2.jdbcx.JdbcDataSource -->
 		<property name="driverClassName" value="org.h2.Driver" />
-		<!-- jdbc:h2:mem:mydb 
-		jdbc:h2:tcp://localhost/DroolsFlow-->
 		<property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow" />
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
 
-	<drools:connection id="connection1" type="local" />
-	<drools:execution-node id="node1" connection="connection1" />
+	<!-- <drools:connection id="connection1" type="local" />
+	<drools:execution-node id="node1" connection="connection1" /> -->
 
-	<drools:kbase id="kbProcessWorkItems" node="node1">
-		<drools:resource type="PKG" source="file://${temp.dir}/processWorkItems.pkg" />
-		<drools:resource type="PKG" source="file://${temp.dir}/processSubProcess.pkg" />
-		<drools:resource type="PKG" source="file://${temp.dir}/processTimer.pkg" />
-		<drools:resource type="PKG" source="file://${temp.dir}/processTimer2.pkg" />
+	<drools:kbase id="kbase1">
+		<drools:resource type="DRF" source="classpath:org/drools/container/spring/beans/persistence/VariablePersistenceStrategyProcess.rf" />
 	</drools:kbase>
 	
 	<bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -34,18 +28,15 @@
 	</bean>
 	
 	<bean id="jpaSingleSessionCommandService" class="org.drools.container.spring.beans.JPASingleSessionCommandServiceFactory">
-		<property name="knowledgeBase" ref="kbProcessWorkItems"/>
+		<property name="knowledgeBase" ref="kbase1"/>
 		<property name="entityManagerFactory" ref="myEmf"/>
 		<property name="transactionManager" ref="txManager"/>
-		<!-- 
 		<property name="variablePersisters">
 			<map>
 				<entry key="javax.persistence.Entity" value="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
-				<entry key="java.lang.String" value="org.plugtree.labs.variablepersistence.StringVariablePersister"/>
+				<entry key="java.lang.String" value="org.drools.container.spring.beans.persistence.StringVariablePersister"/>
 				<entry key="java.io.Serializable" value="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
 			</map>
 		</property>
-		 -->
 	</bean>
-
 </beans>

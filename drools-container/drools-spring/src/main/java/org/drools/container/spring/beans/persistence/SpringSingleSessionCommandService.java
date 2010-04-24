@@ -7,8 +7,8 @@ import javax.persistence.PersistenceException;
 import org.drools.KnowledgeBase;
 import org.drools.RuleBase;
 import org.drools.SessionConfiguration;
-import org.drools.command.CommandService;
 import org.drools.command.Context;
+import org.drools.command.SingleSessionCommandService;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
@@ -19,6 +19,7 @@ import org.drools.persistence.processinstance.JPASignalManager;
 import org.drools.persistence.processinstance.JPAWorkItemManager;
 import org.drools.persistence.session.JPASessionMarshallingHelper;
 import org.drools.persistence.session.SessionInfo;
+import org.drools.persistence.session.SingleSessionCommandService.EndOperationListenerImpl;
 import org.drools.reteoo.ReteooStatefulSession;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
@@ -31,7 +32,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class SpringSingleSessionCommandService implements CommandService {
+public class SpringSingleSessionCommandService implements SingleSessionCommandService {
 	private JpaTemplate jpaTemplate;
 	private SessionInfo sessionInfo;
 	private JPASessionMarshallingHelper marshallingHelper;
@@ -40,7 +41,7 @@ public class SpringSingleSessionCommandService implements CommandService {
 	private KnowledgeCommandContext kContext;
 	private PlatformTransactionManager transactionManager;
 
-	public void checkEnvironment(Environment env) {
+	private void checkEnvironment(Environment env) {
 		if (env.get(EnvironmentName.ENTITY_MANAGER_FACTORY) == null) {
 			throw new IllegalArgumentException("Environment must have an EntityManagerFactory");
 		}
@@ -92,13 +93,17 @@ public class SpringSingleSessionCommandService implements CommandService {
 			public Object doInTransaction(TransactionStatus status) {
 				Object result = jpaTemplate.execute(new JpaCallback() {
 					public Object doInJpa(EntityManager em) throws PersistenceException {
-						SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, em);
-						em.persist(sessionInfo);
-						// update the session id to be the same as the session info id
-						((StatefulKnowledgeSessionImpl) ksession).session.setId(sessionInfo.getId());
-						em.flush();
-						SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, null);
-						return null;
+						try {
+							SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, em);
+							em.persist(sessionInfo);
+							// update the session id to be the same as the session info id
+							((StatefulKnowledgeSessionImpl) ksession).session.setId(sessionInfo.getId());
+							((StatefulKnowledgeSessionImpl) ksession).session.setEndOperationListener( new EndOperationListenerImpl( sessionInfo ) );
+							em.flush();
+							return null;
+						} finally {
+							SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, null);
+						}
 					}
 				});
 				return result;
@@ -120,31 +125,34 @@ public class SpringSingleSessionCommandService implements CommandService {
 				return jpaTemplate.execute(new JpaCallback() {
 
 					public Object doInJpa(EntityManager em) throws PersistenceException {
-						SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, em);
-						sessionInfo = em.find(SessionInfo.class, sessionId);
+						try {
+							SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, em);
+							sessionInfo = em.find(SessionInfo.class, sessionId);
 
-						if (sessionInfo == null) {
+							if (sessionInfo == null) {
+								SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, null);
+								throw new RuntimeException("Could not find session data for id " + sessionId);
+							}
+
+							marshallingHelper = new JPASessionMarshallingHelper(sessionInfo, kbase, localConf,
+									SpringSingleSessionCommandService.this.env);
+
+							sessionInfo.setJPASessionMashallingHelper(marshallingHelper);
+							ksession = marshallingHelper.getObject();
+							kContext = new KnowledgeCommandContext(new ContextImpl("ksession", null), null, null,
+									ksession, null);
+							((JPASignalManager) ((StatefulKnowledgeSessionImpl) ksession).session.getSignalManager())
+									.setCommandService(SpringSingleSessionCommandService.this);
+
+							// update the session id to be the same as the
+							// session info id
+							((StatefulKnowledgeSessionImpl) ksession).session.setId(sessionInfo.getId());
+							((StatefulKnowledgeSessionImpl) ksession).session.setEndOperationListener( new EndOperationListenerImpl( sessionInfo ) );
+							em.flush();
+							return sessionInfo;
+						} finally {
 							SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, null);
-							throw new RuntimeException("Could not find session data for id " + sessionId);
 						}
-
-						marshallingHelper = new JPASessionMarshallingHelper(sessionInfo,
-								kbase,
-								localConf,
-								SpringSingleSessionCommandService.this.env);
-
-						sessionInfo.setJPASessionMashallingHelper(marshallingHelper);
-						ksession = marshallingHelper.getObject();
-						kContext = new KnowledgeCommandContext(new ContextImpl("ksession", null), null, null, ksession,
-								null);
-						((JPASignalManager) ((StatefulKnowledgeSessionImpl) ksession).session.getSignalManager())
-								.setCommandService(SpringSingleSessionCommandService.this);
-
-						// update the session id to be the same as the session info id
-						((StatefulKnowledgeSessionImpl) ksession).session.setId(sessionInfo.getId());
-						em.flush();
-						SpringSingleSessionCommandService.this.env.set(EnvironmentName.ENTITY_MANAGER, null);
-						return sessionInfo;
 					}
 				});
 			}
@@ -165,18 +173,18 @@ public class SpringSingleSessionCommandService implements CommandService {
 				T result = (T) jpaTemplate.execute(new JpaCallback() {
 					public Object doInJpa(EntityManager em) {
 						env.set(EnvironmentName.ENTITY_MANAGER, em);
-						SessionInfo sessionInfoMerged = em.merge(sessionInfo);
-						sessionInfoMerged.setJPASessionMashallingHelper(sessionInfo.getJPASessionMashallingHelper());
-						sessionInfo = sessionInfoMerged;
-						// sessionInfo = em.find(SessionInfo.class, sessionInfo.getId());
-						// sessionInfo.setJPASessionMashallingHelper(marshallingHelper);
-						// marshallingHelper.loadSnapshot(sessionInfo.getData(), ksession);
-						//sessionInfo.setDirty(); // TODO FIXME baunux: this should not be needed now that we use idle time, I think, double check.
-						
-						T result = command.execute(kContext);
-						em.flush();
-						env.set(EnvironmentName.ENTITY_MANAGER, null);
-						return result;
+						try {
+							SessionInfo sessionInfoMerged = em.merge(sessionInfo);
+							sessionInfoMerged.setJPASessionMashallingHelper(sessionInfo.getJPASessionMashallingHelper());
+							sessionInfo = sessionInfoMerged;
+							((StatefulKnowledgeSessionImpl) ksession).session.setEndOperationListener( new EndOperationListenerImpl( sessionInfo ) );
+							
+							T result = command.execute(kContext);
+							em.flush();
+							return result;
+						} finally {
+							env.set(EnvironmentName.ENTITY_MANAGER, null);
+						}
 					}
 
 				});

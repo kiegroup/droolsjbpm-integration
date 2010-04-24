@@ -13,15 +13,17 @@
 		-->
 		<class>org.drools.persistence.session.SessionInfo</class>
 		<class>org.drools.persistence.processinstance.ProcessInstanceInfo</class>
-		<class>org.drools.persistence.processinstance.WorkItemInfo</class>
-		<class>org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo</class>
+		<class>org.drools.persistence.processinstance.EventType</class>
 		<class>org.drools.persistence.processinstance.variabletypes.JPAPersistedVariable</class>
+		<class>org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo</class>
 		<class>org.drools.persistence.processinstance.variabletypes.SerializablePersistedVariable</class>
-		<!-- 	
-		<class>org.plugtree.labs.variablepersistence.StringPersistedVariable</class>
-		<class>org.plugtree.labs.variablepersistence.MyEntity</class>
-		<class>org.plugtree.labs.variablepersistence.MyVariableSerializable</class>
-		 -->
+		<class>org.drools.persistence.processinstance.WorkItemInfo</class>
+		
+		<!-- my persistent variables -->
+		<class>org.drools.container.spring.beans.persistence.MyEntity</class>
+		<class>org.drools.container.spring.beans.persistence.MyEntityMethods</class>
+		<class>org.drools.container.spring.beans.persistence.MyEntityOnlyFields</class>
+		<class>org.drools.container.spring.beans.persistence.StringPersistedVariable</class>
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<!--property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/-->

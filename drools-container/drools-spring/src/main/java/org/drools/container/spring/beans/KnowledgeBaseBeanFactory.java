@@ -39,8 +39,7 @@ public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
 
 	public void afterPropertiesSet() throws Exception {
 		if (node == null) {
-			LocalConnection connection = new LocalConnection();
-			node = connection.getExecutionNode(null);
+			node = new LocalConnection().getExecutionNode();
 		}
 		KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
 		kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();

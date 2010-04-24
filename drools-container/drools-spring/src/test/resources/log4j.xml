@@ -4,18 +4,29 @@
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out"/>
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%-4r %d{dd/MM HH:mm:ss,SSS}[%t] %-5p %c{3}.%M %x - %m%n"/>
+			<param name="ConversionPattern" value="%-4r %d{dd/MM HH:mm:ss,SSS}[%t] %-5p %c{3}.%M %x- %m%n"/>
 		</layout>
 	</appender>
-	<!--
+
+	<!-- A time/date based rolling appender 
+	<appender name="FILE" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${java.io.tmpdir}/drools.log"/>
+		<param name="Append" value="true"/>
+		<param name="MaxBackupIndex" value="5"/>
+		<param name="MaxFileSize" value="50MB"/>
+
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-4r %d{dd/MM HH:mm:ss,SSS}[%t] %-5p %c{3}.%M %x- %m%n"/>
+		</layout>
+	</appender>
+	-->
 	<logger name="org.drools">
 		<level value="DEBUG"/>
 	</logger>
-	-->
 	
-	<logger name="org.hibernate">
+	<!-- logger name="org.hibernate">
 		<level value="DEBUG"/>
-	</logger>
+	</logger -->
 	<root>
 		<priority value="INFO"/>
 		<appender-ref ref="CONSOLE"/>

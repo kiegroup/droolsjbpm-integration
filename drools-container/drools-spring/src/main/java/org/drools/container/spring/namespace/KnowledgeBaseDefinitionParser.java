@@ -22,9 +22,11 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
 		BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KnowledgeBaseBeanFactory.class);
 
 		String nodeRef = element.getAttribute(EXECUTION_NODE_ATTRIBUTE);
-		factory.addPropertyReference(EXECUTION_NODE_ATTRIBUTE, nodeRef);
-		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "resource");
+		if (nodeRef != null && nodeRef.length() > 0) {
+			factory.addPropertyReference(EXECUTION_NODE_ATTRIBUTE, nodeRef);
+		}
 		
+		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "resource");
 		ManagedList resources = null;
 		if (childElements != null && !childElements.isEmpty()) {
 			resources = new ManagedList();

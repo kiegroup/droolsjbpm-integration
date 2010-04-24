@@ -29,7 +29,7 @@ public class ExecutionNodeBeanFactory  implements FactoryBean, InitializingBean 
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		node = connection.getExecutionNode(null);
+		node = connection.getExecutionNode();
 	}
 
 	public void setId(String id) {
