@@ -12,6 +12,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
+import static org.drools.container.spring.namespace.DefinitionParserHelper.*;
+
 /**
  * 
  * @author Lucas Amador
@@ -69,11 +71,4 @@ public class KnowledgeServiceDefinitionParser extends AbstractBeanDefinitionPars
 
 		return factory.getBeanDefinition();
 	}
-
-	public void emptyAttributeCheck(final String element, final String attributeName, final String attribute) {
-		if (attribute == null || attribute.trim().length() == 0) {
-			throw new IllegalArgumentException("<" + element + "> requires a '" + attributeName + "' attribute");
-		}
-	}
-
 }

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+import static org.drools.container.spring.namespace.DefinitionParserHelper.*;
+
 public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionParser {
 
 	private static final String NAME_ATTRIBUTE = "name";
@@ -43,14 +45,6 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
 		}
 		
 		return factory.getBeanDefinition();
-	}
-
-	public void emptyAttributeCheck(final String element,
-			final String attributeName,
-			final String attribute) {
-		if (attribute == null || attribute.trim().length() == 0) {
-			throw new IllegalArgumentException("<" + element + "> requires a '" + attributeName + "' attribute");
-		}
 	}
 
 }

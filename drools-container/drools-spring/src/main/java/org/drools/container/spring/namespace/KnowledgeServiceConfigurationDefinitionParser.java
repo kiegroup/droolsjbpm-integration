@@ -12,6 +12,7 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import static org.drools.container.spring.namespace.DefinitionParserHelper.*;
 
 /**
  * 
@@ -78,11 +79,4 @@ public class KnowledgeServiceConfigurationDefinitionParser extends AbstractBeanD
 		
 		return factory.getBeanDefinition();
 	}
-
-	public void emptyAttributeCheck(final String element, final String attributeName, final String attribute) {
-		if (attribute == null || attribute.trim().length() == 0) {
-			throw new IllegalArgumentException("<" + element + "> requires a '" + attributeName + "' attribute");
-		}
-	}
-
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
+import static org.drools.container.spring.namespace.DefinitionParserHelper.*;
 
 public class ResourceRefDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -14,11 +15,5 @@ public class ResourceRefDefinitionParser extends AbstractBeanDefinitionParser {
 		String id = element.getAttribute(ID_ATTRIBUTE);
 		emptyAttributeCheck(element.getLocalName(), ID_ATTRIBUTE, id);
 		return (AbstractBeanDefinition) parserContext.getRegistry().getBeanDefinition(id);
-	}
-
-	public void emptyAttributeCheck(final String element, final String attributeName, final String attribute) {
-		if (attribute == null || attribute.trim().equals("")) {
-			throw new IllegalArgumentException("<" + element + "> requires a '" + attributeName + "' attribute");
-		}
 	}
 }

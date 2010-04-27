@@ -20,6 +20,8 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
         
         registerBeanDefinitionParser("execution-node", new ExecutionNodeDefinitionParser());
         
+        registerBeanDefinitionParser("jpaSessionServiceFactory", new JpaSessionServiceFactoryDefinitionParser());
+        
     }
 
 }
