@@ -4,6 +4,6 @@ import org.drools.command.SingleSessionCommandService;
 
 
 public interface JPASingleSessionCommandService  {
-	public SingleSessionCommandService createNew();
-	public SingleSessionCommandService load(int sessionId);
+	public SingleSessionCommandService newStatefulKnowledgeSession();
+	public SingleSessionCommandService loadStatefulKnowledgeSession(int sessionId);
 }

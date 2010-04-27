@@ -81,7 +81,7 @@ public class VariablePersistenceStrategyTest {
         JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
         
         log.info("---> create new SingleSessionCommandService");
-        SingleSessionCommandService service = jpaService.createNew();
+        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
         
         int sessionId = service.getSessionId();
         log.info("---> created SingleSessionCommandService id: " + sessionId);
@@ -109,7 +109,7 @@ public class VariablePersistenceStrategyTest {
         assertEquals(5, result.size());
         log.info("### Retrieving process instance ###");
         
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = (WorkflowProcessInstance) service.execute( getProcessInstanceCommand );

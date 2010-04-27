@@ -127,11 +127,11 @@ public class JPASingleSessionCommandServiceFactory implements FactoryBean, Initi
 		private EntityManagerFactory entityManagerFactory;
 		private PlatformTransactionManager transactionManager;
 
-		public SingleSessionCommandService createNew() {
+		public SingleSessionCommandService newStatefulKnowledgeSession() {
 			return new SpringSingleSessionCommandService(knowledgeBase, getSessionConfiguration(), getEnvironment());
 		}
 
-		public SingleSessionCommandService load(int sessionId) {
+		public SingleSessionCommandService loadStatefulKnowledgeSession(int sessionId) {
 			return new SpringSingleSessionCommandService(sessionId, knowledgeBase, getSessionConfiguration(),
 					getEnvironment());
 		}

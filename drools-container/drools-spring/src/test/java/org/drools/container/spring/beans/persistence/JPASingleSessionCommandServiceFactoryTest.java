@@ -131,7 +131,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
         
         log.info("---> create new SingleSessionCommandService");
-        SingleSessionCommandService service = jpaService.createNew();
+        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
         
         int sessionId = service.getSessionId();
         log.info("---> created SingleSessionCommandService id: " + sessionId);
@@ -146,14 +146,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -162,14 +162,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -178,14 +178,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -194,7 +194,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
@@ -206,7 +206,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     public void testPersistenceWorkItemsUserTransaction() throws Exception {
         
         JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
-        SingleSessionCommandService service = jpaService.createNew();
+        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
         int sessionId = service.getSessionId();
 
@@ -220,14 +220,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -236,14 +236,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-		service = jpaService.load(sessionId);
+		service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -252,14 +252,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -268,7 +268,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
@@ -369,7 +369,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     public void testPersistenceSubProcess() {
 
         JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
-        SingleSessionCommandService service = jpaService.createNew();
+        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
         int sessionId = service.getSessionId();
 
@@ -384,7 +384,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstanceId );
         processInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
@@ -401,13 +401,13 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( subProcessInstance );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( subProcessInstanceId );
         subProcessInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
@@ -515,7 +515,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
         
         log.info("---> create new SingleSessionCommandService");
-        SingleSessionCommandService service = jpaService.createNew();
+        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
         
         int sessionId = service.getSessionId();
         log.info("---> created SingleSessionCommandService id: " + sessionId);
@@ -528,7 +528,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         service.dispose();
         log.info( "---> session disposed" );
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         log.info( "---> load session: " + sessionId);
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( procId );
@@ -538,7 +538,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         log.info( "---> session disposed" );
         service.dispose();
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         log.info( "---> load session: " + sessionId);
         Thread.sleep( 3000 );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
@@ -600,7 +600,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceTimer2() throws Exception {
     	JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
-        SingleSessionCommandService service = jpaService.createNew();
+        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
         int sessionId = service.getSessionId();
         
@@ -611,7 +611,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
         Thread.sleep( 2000 );
 
-        service = jpaService.load(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession(sessionId);
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
