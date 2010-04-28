@@ -22,6 +22,7 @@
 	<xsd:simpleType name="resourceTypeEnum">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="DRL" />
+			<xsd:enumeration value="BPMN2" />
 			<xsd:enumeration value="XDRL" />
 			<xsd:enumeration value="DSL" />
 			<xsd:enumeration value="DSLR" />
