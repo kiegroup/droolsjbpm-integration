@@ -33,7 +33,6 @@ import org.drools.grid.remote.KnowledgeBuilderProviderRemoteClient;
 import org.drools.grid.strategies.DirectoryServiceSelectionStrategy;
 
 import org.drools.grid.strategies.StaticIncrementalSelectionStrategy;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -65,7 +64,7 @@ public class RemoteConnection implements GenericConnection {
     // In real scenarios this method will be in charge of populating
     // all the ExecutionNodeService and DirectoryServices
     public void connect() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("This method is not supported");
     }
 
 

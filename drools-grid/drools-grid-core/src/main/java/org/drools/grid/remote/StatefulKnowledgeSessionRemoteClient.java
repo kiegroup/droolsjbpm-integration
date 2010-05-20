@@ -26,7 +26,9 @@ import org.drools.runtime.process.WorkItemManager;
 import org.drools.runtime.rule.Agenda;
 import org.drools.runtime.rule.AgendaFilter;
 import org.drools.runtime.rule.FactHandle;
+import org.drools.runtime.rule.LiveQuery;
 import org.drools.runtime.rule.QueryResults;
+import org.drools.runtime.rule.ViewChangedEventListener;
 import org.drools.runtime.rule.WorkingMemoryEntryPoint;
 import org.drools.grid.generic.GenericNodeConnector;
 import org.drools.time.SessionClock;
@@ -418,6 +420,13 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public Calendars getCalendars() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public LiveQuery openLiveQuery(String query,
+                                   Object[] arguments,
+                                   ViewChangedEventListener listener) {
         // TODO Auto-generated method stub
         return null;
     }
