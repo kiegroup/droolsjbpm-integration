@@ -15,6 +15,7 @@ import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.runtime.Calendars;
+import org.drools.runtime.Channel;
 import org.drools.runtime.Environment;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.ExitPoint;
@@ -430,5 +431,20 @@ public class StatefulKnowledgeSessionRemoteClient
         // TODO Auto-generated method stub
         return null;
     }
+
+	public Map<String, Channel> getChannels() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void registerChannel(String name, Channel channel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void unregisterChannel(String name) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
