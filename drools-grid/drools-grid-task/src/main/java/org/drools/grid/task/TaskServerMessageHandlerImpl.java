@@ -65,14 +65,18 @@ public class TaskServerMessageHandlerImpl implements GenericMessageHandler {
                     long taskId = (Long) cmd.getArguments().get(1);
                     String userId = (String) cmd.getArguments().get(2);
                     String targetEntityId = null;
+                    ContentData data = null;
+                    List<String> groupIds = null;
                     if (cmd.getArguments().size() > 3) {
                         targetEntityId = (String) cmd.getArguments().get(3);
+                        if (cmd.getArguments().size() > 4) {
+                            data = (ContentData) cmd.getArguments().get(4);
+                            if (cmd.getArguments().size() > 5) {
+                                groupIds = (List<String>) cmd.getArguments().get(5);
+                            }
+                        }
                     }
-                    ContentData data = null;
-                    if (cmd.getArguments().size() > 4) {
-                        data = (ContentData) cmd.getArguments().get(4);
-                    }
-                    taskSession.taskOperation(operation, taskId, userId, targetEntityId, data);
+                    taskSession.taskOperation(operation, taskId, userId, targetEntityId, data, groupIds);
 
                     List args = Collections.emptyList();
 
