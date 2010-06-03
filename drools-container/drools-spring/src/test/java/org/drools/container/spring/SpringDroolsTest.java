@@ -16,7 +16,7 @@ import org.drools.server.profile.KnowledgeServiceConfiguration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest extends TestCase {
-	public void test1() throws Exception {		
+	public void testSimpleKSessions() throws Exception {		
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
 		List<String> list = new ArrayList<String>();
@@ -33,7 +33,7 @@ public class SpringDroolsTest extends TestCase {
 		assertEquals( 2, list.size() );
 	}
 
-	public void test2() {
+	public void testNode() {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
 		ExecutionNode node = (ExecutionNode) context.getBean("node1");
@@ -52,7 +52,7 @@ public class SpringDroolsTest extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	public void test3() {
+	public void testBeansConstructions() {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 		assertNotNull(context.getBean("connection1"));
 		assertNotNull(context.getBean("node1"));
