@@ -16,6 +16,23 @@ import org.drools.server.profile.KnowledgeServiceConfiguration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest extends TestCase {
+    public void testNoNodeKSessions() throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/no-node-beans.xml" );
+
+        List<String> list = new ArrayList<String>();
+        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean( "ksession1" );
+        kstateless.setGlobal( "list", list );
+        kstateless.execute( new Person( "Darth", "Cheddar", 50 ) );
+        assertEquals( 1, list.size() );
+
+        list = new ArrayList<String>();
+        StatefulKnowledgeSession kstateful = ((StatefulKnowledgeSession)context.getBean( "ksession2" ));
+        kstateful.setGlobal( "list", list );
+        kstateful.insert( new Person( "Darth", "Cheddar", 50 ) );
+        kstateful.fireAllRules();   
+        assertEquals( 1, list.size() );
+    }
+    
 	public void testSimpleKSessions() throws Exception {		
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
