@@ -298,7 +298,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 		me.setName("Hadrian");
 
 		String rule = "";
-		rule += "package org.drools \n";
+		rule += "package org.drools.pipeline.camel \n";
 		rule += "import org.drools.pipeline.camel.Person \n";
 		rule += "global java.util.List list \n";
 		rule += "query persons \n";

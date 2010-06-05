@@ -29,22 +29,27 @@ import org.drools.runtime.CommandExecutor;
 
 public class DroolsEndpoint extends DefaultEndpoint {
 
-    private String ksession;
-    private String pipeline;
+    private String          ksession;
+    private String          pipeline;
     private CommandExecutor executor;
-    private ExecutionNode node;
+    private ExecutionNode   node;
 
-    public DroolsEndpoint(String endpointUri, String remaining, DroolsComponent component) throws URISyntaxException {
-        super(endpointUri, component);
-        configure(component, remaining);
+    public DroolsEndpoint(String endpointUri,
+                          String remaining,
+                          DroolsComponent component) throws URISyntaxException {
+        super( endpointUri,
+               component );
+        configure( component,
+                   remaining );
     }
 
     public Consumer createConsumer(Processor processor) throws Exception {
-        throw new RuntimeCamelException("Drools consumers not supported.");
+        throw new RuntimeCamelException( "Drools consumers not supported." );
     }
 
     public Producer createProducer() throws Exception {
-        return new DroolsProducer(this, node);
+        return new DroolsProducer( this,
+                                   node );
     }
 
     public boolean isSingleton() {
@@ -75,43 +80,43 @@ public class DroolsEndpoint extends DefaultEndpoint {
         return node;
     }
 
-    protected void configure(DroolsComponent component, String uri) {
-        String smId = DroolsComponent.getSessionManagerId(uri);
-        ksession = DroolsComponent.getKsessionId(uri);
+    protected void configure(DroolsComponent component,
+                             String uri) {
+        String smId = DroolsComponent.getSessionManagerId( uri );
+        ksession = DroolsComponent.getKsessionId( uri );
 
-        if (smId.length() > 0) {
+        if ( smId.length() > 0 ) {
             // initialize the component if needed
             node = component.getExecutionNode();
-            if (node == null) {
+            if ( node == null ) {
                 // let's look it up
-                node = component.getCamelContext().getRegistry().lookup(smId, ExecutionNode.class);
-                if (node == null) {
-                    throw new RuntimeCamelException("Could not find ServiceManager with id=\""
-                        + smId + "\" in CamelContext. Check configuration.");
+                node = component.getCamelContext().getRegistry().lookup( smId,
+                                                                         ExecutionNode.class );
+                if ( node == null ) {
+                    throw new RuntimeCamelException( "Could not find ServiceManager with id=\"" + smId + "\" in CamelContext. Check configuration." );
                 }
                 // use this ServiceManager
-                component.setExecutionNodeId(smId);
-                component.setExecutionNode(node);
-            } else if (!smId.equals(component.getExecutionNodeId())) {
+                component.setExecutionNodeId( smId );
+                component.setExecutionNode( node );
+            } else if ( !smId.equals( component.getExecutionNodeId() ) ) {
                 // make sure we deal with the same ServiceManager.
                 // having multiple ServiceManagers instances in the same process is not supported
-                throw new RuntimeCamelException("ServiceManager already initialized from id=\""
-                    + component.getExecutionNodeId() + "\" yet current endpoint requries id=\"" + smId + "\"");
+                throw new RuntimeCamelException( "ServiceManager already initialized from id=\"" + component.getExecutionNodeId() + "\" yet current endpoint requries id=\"" + smId + "\"" );
             }
-            
+
             // if id is empty this endpoint is not attached to a CommandExecutor and will have to look it up at runtime.
-            if (ksession.length() > 0) {
+            if ( ksession.length() > 0 ) {
                 // lookup command executor
-                executor = node.get(DirectoryLookupFactoryService.class).lookup(ksession);
-                if (executor == null) {
-                    throw new RuntimeCamelException("Failed to instantiate DroolsEndpoint. " 
-                        + "Lookup of CommandExecutor with id=\"" + uri + "\" failed. Check configuration.");
+                executor = node.get( DirectoryLookupFactoryService.class ).lookup( ksession );
+                if ( executor == null ) {
+                    throw new RuntimeCamelException( "Failed to instantiate DroolsEndpoint. " + "Lookup of CommandExecutor with id=\"" + uri + "\" failed. Check configuration." );
                 }
             }
         } else {
             // this is a hanging entity, not attached to an SM
-            executor = component.getCamelContext().getRegistry().lookup(ksession, CommandExecutor.class);
-            
+            executor = component.getCamelContext().getRegistry().lookup( ksession,
+                                                                         CommandExecutor.class );
+
             // TODO: test this scenario...
         }
     }

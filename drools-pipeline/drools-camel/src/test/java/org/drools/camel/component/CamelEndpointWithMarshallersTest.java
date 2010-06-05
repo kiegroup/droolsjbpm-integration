@@ -27,58 +27,83 @@ import org.drools.runtime.rule.FactHandle;
 public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     private String handle;
 
-    public void testSimple(){
+    public void testSimple() {
     }
 
     public void testSessionInsert() throws Exception {
 
-        String cmd = "" +
-            "<batch-execution lookup=\"ksession1\">\n" +
-                "<insert out-identifier=\"salaboy\">\n" +
-                    "<org.drools.pipeline.camel.Person>\n" +
-                        "<name>salaboy</name>\n" +
-                    "</org.drools.pipeline.camel.Person>\n" +
-                "</insert>\n" +
-                "<fire-all-rules/>\n" +
-            "</batch-execution>\n";
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "  <insert out-identifier=\"salaboy\">\n";
+        cmd += "      <org.drools.pipeline.camel.Person>\n";
+        cmd += "         <name>salaboy</name>\n";
+        cmd += "      </org.drools.pipeline.camel.Person>\n";
+        cmd += "   </insert>\n";
+        cmd += "   <fire-all-rules/>\n";
+        cmd += "</batch-execution>\n";
 
-        String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session",
+                                                                   cmd ) );
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
-        Person person = (Person) result.getValue("salaboy");
-        assertEquals("salaboy", person.getName());
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Person person = (Person) result.getValue( "salaboy" );
+        assertEquals( "salaboy",
+                      person.getName() );
 
-        String expectedXml = "<execution-results>\n";
+        String expectedXml ="";
+        expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"salaboy\">\n";
         expectedXml += "    <org.drools.pipeline.camel.Person>\n";
         expectedXml += "      <name>salaboy</name>\n";
         expectedXml += "    </org.drools.pipeline.camel.Person>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "  <fact-handle identifier=\"salaboy\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle("salaboy")).toExternalForm() + "\"/>\n";
+        expectedXml += "  <fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>\n";
         expectedXml += "</execution-results>";
 
-        assertEquals(expectedXml, outXml);
+        assertEquals( expectedXml,
+                      outXml );
 
     }
+    
+    public void testJSonSessionInsert() throws Exception {
+
+        String inXml = "";
+        inXml += "{\"batch-execution\":{\"commands\":[";
+        inXml += "{\"insert\":{\"lookup\":\"ksession1\", ";
+        inXml += "             \"object\":{\"org.drools.pipeline.camel.Person\":{\"name\":\"salaboy\"}}, \"out-identifier\":\"salaboy\" } }";
+        inXml += ", {\"fire-all-rules\":\"\"}";
+        inXml += "]}}";          
+
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session-json",
+                                                                   inXml ) );
+
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
+        Person person = (Person) result.getValue( "salaboy" );
+        assertEquals( "salaboy",
+                      person.getName() );
+    }    
 
     public void testNoSessionInsert() throws Exception {
 
-        String cmd = "" +
-                "<batch-execution lookup=\"ksession1\">\n" +
-                    "<insert out-identifier=\"salaboy\">\n" +
-                        "<org.drools.pipeline.camel.Person>\n" +
-                            "<name>salaboy</name>\n" +
-                        "</org.drools.pipeline.camel.Person>\n" +
-                    "</insert>\n" +
-                    "<fire-all-rules/>\n" +
-                "</batch-execution>\n";
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "<insert out-identifier=\"salaboy\">\n";
+        cmd += "<org.drools.pipeline.camel.Person>\n";
+        cmd += "<name>salaboy</name>\n";
+        cmd += "</org.drools.pipeline.camel.Person>\n";
+        cmd += "</insert>\n";
+        cmd += "<fire-all-rules/>\n";
+        cmd += "</batch-execution>\n";
 
-        String outXml = new String((byte[])template.requestBodyAndHeader("direct:test-no-session", cmd,
-            DroolsComponent.DROOLS_LOOKUP, "ksession1"));
+        String outXml = new String( (byte[]) template.requestBodyAndHeader( "direct:test-no-session",
+                                                                            cmd,
+                                                                            DroolsComponent.DROOLS_LOOKUP,
+                                                                            "ksession1" ) );
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
-        Person person = (Person) result.getValue("salaboy");
-        assertEquals("salaboy", person.getName());
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Person person = (Person) result.getValue( "salaboy" );
+        assertEquals( "salaboy",
+                      person.getName() );
 
         String expectedXml = "<execution-results>\n";
         expectedXml += "  <result identifier=\"salaboy\">\n";
@@ -86,40 +111,38 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         expectedXml += "      <name>salaboy</name>\n";
         expectedXml += "    </org.drools.pipeline.camel.Person>\n";
         expectedXml += "  </result>\n";
-        expectedXml += "  <fact-handle identifier=\"salaboy\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle("salaboy")).toExternalForm() + "\"/>\n";
+        expectedXml += "  <fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>\n";
         expectedXml += "</execution-results>";
 
-        assertEquals(expectedXml, outXml);
+        assertEquals( expectedXml,
+                      outXml );
     }
 
     public void testSessionGetObject() throws Exception {
-//        FactHandle factHandle = new DisconnectedFactHandle(handle);
-//        GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject(factHandle);
-//        cmd.setOutIdentifier("rider");
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "<get-object out-identifier=\"rider\" fact-handle=\"" + this.handle + "\"/>\n";
+        cmd += "</batch-execution>\n";
 
-        String cmd = "" +
-                "<batch-execution lookup=\"ksession1\">\n" +
-                    "<get-object out-identifier=\"rider\" factHandle=\""+ handle +"\"/>\n" +
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session",
+                                                                   cmd ) );
 
-                "</batch-execution>\n";
-                 
-                
-       String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
+        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
+        Person person = (Person) result.getValue( "rider" );
+        assertEquals( "Hadrian",
+                      person.getName() );
 
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML(outXml);
-        Person person = (Person) result.getValue("rider");
-        assertEquals("Hadrian", person.getName());
+        String expectedXml = "";
+        expectedXml += "<execution-results>\n";
+        expectedXml += "  <result identifier=\"rider\">\n";
+        expectedXml += "    <org.drools.pipeline.camel.Person>\n";
+        expectedXml += "      <name>Hadrian</name>\n";
+        expectedXml += "    </org.drools.pipeline.camel.Person>\n";
+        expectedXml += "  </result>\n";
+        expectedXml += "</execution-results>";
 
-        String expectedXml = "<execution-results>\n" +
-                             "  <result identifier=\"rider\">\n" +
-                             "    <org.drools.pipeline.camel.Person>\n" +
-                             "      <name>Hadrian</name>\n" +
-                             "    </org.drools.pipeline.camel.Person>\n" +
-                             "  </result>\n" +
-                             "</execution-results>";
-
-        assertEquals(expectedXml, outXml);
-
+        assertEquals( expectedXml,
+                      outXml );
 
     }
 
@@ -127,8 +150,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-with-session").to("drools:sm/ksession1?dataFormat=drools-xstream");
-                from("direct:test-no-session").to("drools:sm?dataFormat=drools-xstream");
+                from( "direct:test-with-session" ).to( "drools:sm/ksession1?dataFormat=drools-xstream" );
+                from( "direct:test-with-session-json" ).to( "drools:sm/ksession1?dataFormat=drools-json" );
+                from( "direct:test-no-session" ).to( "drools:sm?dataFormat=drools-xstream" );
             }
         };
     }
@@ -136,13 +160,14 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     @Override
     protected void configureDroolsContext() {
         Person me = new Person();
-        me.setName("Hadrian");
+        me.setName( "Hadrian" );
 
-        StatefulKnowledgeSession ksession = registerKnowledgeRuntime("ksession1", null);
-        InsertObjectCommand cmd = new InsertObjectCommand(me);
-        cmd.setOutIdentifier("camel-rider");
-        cmd.setReturnObject(false);
-        ExecutionResults results = ksession.execute(cmd);
-        handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
+        StatefulKnowledgeSession ksession = registerKnowledgeRuntime( "ksession1",
+                                                                      null );
+        InsertObjectCommand cmd = new InsertObjectCommand( me );
+        cmd.setOutIdentifier( "camel-rider" );
+        cmd.setReturnObject( false );
+        ExecutionResults results = ksession.execute( cmd );
+        handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
     }
 }

@@ -200,7 +200,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 		me.setName("Hadrian");
 
 		String rule = "";
-		rule += "package org.drools \n";
+		rule += "package org.drools.pipeline.camel \n";
 		rule += "import org.drools.pipeline.camel.Person\n";
 		rule += "import org.drools.camel.component.CamelEndpointWithJaxWrapperCollectionTest.WrappedList\n";
 		rule += "global org.drools.camel.component.CamelEndpointWithJaxWrapperCollectionTest.WrappedList list\n";

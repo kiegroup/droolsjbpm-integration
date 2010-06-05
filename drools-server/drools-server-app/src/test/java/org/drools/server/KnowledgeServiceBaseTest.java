@@ -30,14 +30,14 @@ public abstract class KnowledgeServiceBaseTest extends TestCase {
 		String cmd = "";
 		cmd += "<batch-execution lookup='ksession2'>\n";
 		cmd += "   <insert out-identifier='baunax'>\n";
-		cmd += "      <org.drools.pipeline.camel.Person>\n";
+		cmd += "      <org.drools.pipeline.camel.server.Person>\n";
 		cmd += "         <name>baunax</name>\n";
-		cmd += "      </org.drools.pipeline.camel.Person>\n";
+		cmd += "      </org.drools.pipeline.camel.server.Person>\n";
 		cmd += "   </insert>\n";
 		cmd += "   <insert out-identifier='lucaz'>\n";
-		cmd += "      <org.drools.pipeline.camel.Person>\n";
+		cmd += "      <org.drools.pipeline.camel.server.Person>\n";
 		cmd += "         <name>lucaz</name>\n";
-		cmd += "      </org.drools.pipeline.camel.Person>\n";
+		cmd += "      </org.drools.pipeline.camel.server.Person>\n";
 		cmd += "   </insert>\n";
 		cmd += "   <query name='persons' out-identifier='persons'/>\n";
 		cmd += "   <fire-all-rules/>\n";

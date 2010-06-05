@@ -1,4 +1,4 @@
-package org.drools.pipeline.camel;
+package org.drools.pipeline.camel.server;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

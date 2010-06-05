@@ -1,6 +1,6 @@
 package org.drools.test.model
 
-import org.drools.pipeline.camel.Person;
+import org.drools.pipeline.camel.server.Person;
 
 query persons
 	$p : Person(name != null)

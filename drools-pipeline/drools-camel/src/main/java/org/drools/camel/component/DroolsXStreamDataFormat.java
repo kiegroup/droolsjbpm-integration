@@ -19,6 +19,8 @@ package org.drools.camel.component;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.DataFormat;
@@ -34,19 +36,21 @@ import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.impl.ExecutionNodePipelineContextImpl;
 import org.drools.runtime.pipeline.impl.XStreamResolverStrategy;
-import org.w3c.dom.Document;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomReader;
 
 /**
  * 
  * @author salaboy
  */
-public class DroolsXStreamDataFormat implements DataFormat {
-    private XStreamResolverStrategy xstreamStrategy = null;
-//    private final XStreamFromXmlVsmTransformer transformer;
-    private String charset;
+public class DroolsXStreamDataFormat
+    implements
+    DataFormat {
+    protected XStreamResolverStrategy xstreamStrategy = null;
+
+    protected String                  charset;
+
+    protected static Pattern          p               = Pattern.compile( "[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']" );
 
     public DroolsXStreamDataFormat() {
         xstreamStrategy = new XStreamResolverStrategy() {
@@ -54,81 +58,73 @@ public class DroolsXStreamDataFormat implements DataFormat {
                 return BatchExecutionHelper.newXStreamMarshaller();
             }
         };
-        //this.transformer = new XStreamFromXmlVsmTransformer(xstreamStrategy);
     }
 
-    public void marshal(Exchange exchange, Object graph, OutputStream stream)
-            throws Exception {
+    public void marshal(Exchange exchange,
+                        Object graph,
+                        OutputStream stream) throws Exception {
 
-        PipelineContext context = (PipelineContext) exchange.getProperty("drools-context");
-        XStream xstream = (XStream) context.getProperties().get("xstream-instance");
-        xstream.setClassLoader(context.getClassLoader());
+        PipelineContext context = (PipelineContext) exchange.getProperty( "drools-context" );
+        XStream xstream = (XStream) context.getProperties().get( "xstream-instance" );
+        xstream.setClassLoader( context.getClassLoader() );
         String result = null;
 
-//        try {
-            result = xstream.toXML(exchange.getIn().getBody());
-//        } catch (Exception e) {
-//            handleException(this, object, e);
-//            e.printStackTrace();
-//        }
+        result = xstream.toXML( exchange.getIn().getBody() );
 
         byte[] bytes;
-        if (charset != null) {
-            bytes = result.getBytes(charset);
+        if ( charset != null ) {
+            bytes = result.getBytes( charset );
         } else {
             bytes = result.getBytes();
         }
 
-        stream.write(bytes);
+        stream.write( bytes );
 
     }
 
-    public Object unmarshal(Exchange exchange, InputStream stream) throws Exception {
+    public Object unmarshal(Exchange exchange,
+                            InputStream stream) throws Exception {
+        PipelineContext context = (PipelineContext) exchange.getProperty( "drools-context" );
+        String str = exchange.getIn().getBody( String.class );
 
-        // this.transformer.processPayload(exchange.getIn().getBody(),
-        // (PipelineContext)exchange.getProperty("drools-context"));
-        // exchange.getOut().setBody(this.transformer.getPayload());
-        // exchange.setProperty("drools-context",this.transformer.getContext()
-        // );
+        Matcher m = p.matcher( str );
+        String name = null;
+        if ( m.find() ) {
+            name = m.group( 1 );
+        }
 
-        try {
-			PipelineContext context = (PipelineContext) exchange.getProperty("drools-context");
-			Document d = exchange.getIn().getBody(Document.class);
-			String name = d.getDocumentElement().getAttribute("lookup");
-			XStream xstream = this.xstreamStrategy.lookup(name);
-			if (xstream == null) {
-			    throw new IllegalArgumentException(
-			            "Unable to lookup XStream parser using name '" + name + "'");
-			}
-			ExecutionNodePipelineContextImpl executionNodeContext = (ExecutionNodePipelineContextImpl) exchange.getProperty("drools-context");
-			ExecutionNode node = executionNodeContext.getExecutionNode();
-			CommandExecutor executor = node.get(DirectoryLookupFactoryService.class).lookup(name);
-			if (executor == null) {
-			    throw new IllegalArgumentException("Unable to lookup CommandExecutor using name '" + name + "'");
-			}
-			executionNodeContext.setCommandExecutor(executor);
-			ClassLoader cl = null;
-			if (executor instanceof StatefulKnowledgeSessionImpl) {
-			    cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
-			    xstream.setClassLoader(cl);
-			} else if (executor instanceof StatelessKnowledgeSessionImpl) {
-			    cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
-			} else if (executor instanceof CommandBasedStatefulKnowledgeSession) {
-				cl = ((ReteooRuleBase) ((KnowledgeBaseImpl)((CommandBasedStatefulKnowledgeSession) executor).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
-			} else {
-			    throw new IllegalArgumentException("Unable to set ClassLoader on " + executor);
-			}
-			xstream.setClassLoader(cl);
-			executionNodeContext.setClassLoader(cl);
-			Object payload = xstream.unmarshal(new DomReader(d));
+        XStream xstream = this.xstreamStrategy.lookup( name );
+        if ( xstream == null ) {
+            throw new IllegalArgumentException( "Unable to lookup XStream parser using name '" + name + "'" );
+        }
 
-			executionNodeContext.getProperties().put("xstream-instance", xstream);
-			exchange.setProperty("drools-context", executionNodeContext);
-			return payload;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+        ExecutionNodePipelineContextImpl executionNodeContext = (ExecutionNodePipelineContextImpl) exchange.getProperty( "drools-context" );
+        ExecutionNode node = executionNodeContext.getExecutionNode();
+        CommandExecutor executor = node.get( DirectoryLookupFactoryService.class ).lookup( name );
+        if ( executor == null ) {
+            throw new IllegalArgumentException( "Unable to lookup CommandExecutor using name '" + name + "'" );
+        }
+        executionNodeContext.setCommandExecutor( executor );
+        ClassLoader cl = null;
+        if ( executor instanceof StatefulKnowledgeSessionImpl ) {
+            cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
+            xstream.setClassLoader( cl );
+        } else if ( executor instanceof StatelessKnowledgeSessionImpl ) {
+            cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) executor).getRuleBase()).getRootClassLoader();
+        } else if ( executor instanceof CommandBasedStatefulKnowledgeSession ) {
+            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) executor).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
+        } else {
+            throw new IllegalArgumentException( "Unable to set ClassLoader on " + executor );
+        }
+        xstream.setClassLoader( cl );
+        executionNodeContext.setClassLoader( cl );
+        Object payload = xstream.fromXML( str );
+
+        executionNodeContext.getProperties().put( "xstream-instance",
+                                                  xstream );
+        exchange.setProperty( "drools-context",
+                              executionNodeContext );
+        return payload;
     }
 
 }

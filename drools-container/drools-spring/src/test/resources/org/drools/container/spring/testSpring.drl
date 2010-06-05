@@ -8,5 +8,5 @@ rule "rule 1"
 when
     $p : Person();
 then
-   list.add( $p );
+    list.add( $p );
 end

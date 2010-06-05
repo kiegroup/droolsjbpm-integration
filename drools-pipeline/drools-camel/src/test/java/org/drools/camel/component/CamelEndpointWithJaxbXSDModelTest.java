@@ -132,7 +132,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 	@Override
 	protected void configureDroolsContext() {
 		String rule = "";
-		rule += "package org.drools \n";
+		rule += "package org.drools.pipeline.camel.test \n";
 		rule += "import org.drools.model.Person \n";
 		rule += "global java.util.List list \n";
 		rule += "query persons \n";
@@ -185,7 +185,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
         process1 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         process1 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         process1 += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        process1 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        process1 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools.camel.pipeline.test\" version=\"1\" >\n";
         process1 += "\n";
         process1 += "  <header>\n";
         process1 += "    <imports>\n";
