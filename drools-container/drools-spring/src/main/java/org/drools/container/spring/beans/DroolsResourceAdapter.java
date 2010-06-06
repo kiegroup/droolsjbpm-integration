@@ -91,8 +91,8 @@ public class DroolsResourceAdapter
         if ( resourceType == null ) {
             throw new IllegalArgumentException( "resourceType property is mandatory" );
         }
-        if ( resourceConfiguration != null && !ResourceType.DTABLE.equals( resourceType ) ) {
-            throw new IllegalArgumentException( "Only Decision Tables can have configuration" );
+        if ( resourceConfiguration != null && !(ResourceType.DTABLE.equals( resourceType ) || ResourceType.XSD.equals( resourceType ))  ) {
+            throw new IllegalArgumentException( "Only Decision Tables or XSD resources can have configuration" );
         }
     }
 }

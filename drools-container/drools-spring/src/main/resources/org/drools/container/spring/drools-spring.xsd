@@ -31,18 +31,35 @@
 			<xsd:enumeration value="PKG" />
 			<xsd:enumeration value="BRL" />
 			<xsd:enumeration value="CHANGE_SET" />
+			<xsd:enumeration value="XSD" />
 		</xsd:restriction>
 	</xsd:simpleType>
 	
+	<xsd:simpleType name="languageTypeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DTD" />
+			<xsd:enumeration value="RELAXNG" />
+			<xsd:enumeration value="RELAXNG_COMPACT" />
+			<xsd:enumeration value="WSDL" />
+			<xsd:enumeration value="XMLSCHEMA" />
+		</xsd:restriction>
+	</xsd:simpleType>	
+	
 	<xsd:complexType name="resourceType">
-		<xsd:sequence>
-			<xsd:element name="decisiontable-conf" minOccurs="0" maxOccurs="1">
+		<xsd:choice minOccurs="0" maxOccurs="1">
+			<xsd:element name="decisiontable-conf">
 				<xsd:complexType>
-					<xsd:attribute name="input-type" use="required" />
-					<xsd:attribute name="worksheet-name " use="required" />
+					<xsd:attribute name="input-type" use="required" type="xsd:string"/>
+					<xsd:attribute name="worksheet-name" use="required" type="xsd:string"/>
 				</xsd:complexType>
+		    </xsd:element>
+			<xsd:element name="jaxb-conf">
+		        <xsd:complexType>
+					<xsd:attribute name="system-id" use="optional" type="xsd:string" />
+					<xsd:attribute name="schema-language" type="languageTypeEnum" use="optional" />
+				</xsd:complexType>				
 			</xsd:element>
-		</xsd:sequence>
+		</xsd:choice>
 		<xsd:attribute name="source" use="required" type="xsd:string"/>
 		<xsd:attribute name="type" use="required" type="resourceTypeEnum"/>
 	</xsd:complexType>
@@ -61,10 +78,6 @@
 		</xsd:complexType>
 	</xsd:element>
 	
-	<xsd:complexType name="modelType">
-		<xsd:attribute name="source" use="required" type="xsd:string"/>
-	</xsd:complexType>
-	
 	<xsd:complexType name="classesType">
 		<xsd:sequence>
 			<xsd:element name="class" type="xsd:string"  />
@@ -73,11 +86,10 @@
 
 	<xsd:element name="kbase">
 		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="resource" type="resourceType" maxOccurs="unbounded"/>
-				<xsd:element name="resource-ref" type="resourceRefType" minOccurs="0" maxOccurs="unbounded"/>
-				<xsd:element name="model" type="modelType" minOccurs="0" maxOccurs="unbounded"/>
-			</xsd:sequence>
+			<xsd:choice  maxOccurs="unbounded">
+				<xsd:element name="resource" type="resourceType"/>
+				<xsd:element name="resource-ref" type="resourceRefType"/>
+			</xsd:choice>
 			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
 			<xsd:attribute name="node" use="optional" type="xsd:string"/>
 		</xsd:complexType>

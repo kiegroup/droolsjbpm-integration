@@ -1,14 +1,17 @@
 package org.drools.container.spring.beans;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
+import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
+import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.local.LocalConnection;
@@ -26,7 +29,6 @@ public class KnowledgeBaseBeanFactory
     private KnowledgeBase               kbase;
     private ExecutionNode               node;
     private List<DroolsResourceAdapter> resources = Collections.emptyList();
-    private List<DroolsResourceAdapter> models    = Collections.emptyList();
 
     public Object getObject() throws Exception {
         return kbase;
@@ -46,25 +48,11 @@ public class KnowledgeBaseBeanFactory
         }
         KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
         kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
-
-        if ( models != null && models.size() > 0 ) {
-            for ( DroolsResourceAdapter res : models ) {
-                Options xjcOptions = new Options();
-                xjcOptions.setSchemaLanguage( Language.XMLSCHEMA );
-                try {
-                    KnowledgeBuilderHelper.addXsdModel( res.getDroolsResource(),
-                                                        kbuilder,
-                                                        xjcOptions,
-                                                        "xsd" );
-                    kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-                } catch ( IOException e ) {
-                    throw new RuntimeException( "Error creating XSD model",
-                                                e );
-                }
-            }
-        }
-
-        for ( DroolsResourceAdapter res : resources ) {
+ 
+        List<DroolsResourceAdapter> xsds = new ArrayList<DroolsResourceAdapter>();
+        
+        for ( DroolsResourceAdapter res : resources ) {            
+            
             if ( res.getResourceConfiguration() == null ) {
                 kbuilder.add( res.getDroolsResource(),
                               res.getResourceType() );
@@ -106,13 +94,5 @@ public class KnowledgeBaseBeanFactory
 
     public void setNode(ExecutionNode executionNode) {
         this.node = executionNode;
-    }
-
-    public void setModels(List<DroolsResourceAdapter> models) {
-        this.models = models;
-    }
-
-    public List<DroolsResourceAdapter> getModels() {
-        return models;
     }
 }

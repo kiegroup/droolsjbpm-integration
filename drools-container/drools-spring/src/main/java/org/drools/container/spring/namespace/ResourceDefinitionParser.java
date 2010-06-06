@@ -3,6 +3,8 @@ package org.drools.container.spring.namespace;
 import java.util.List;
 
 import org.drools.builder.DecisionTableInputType;
+import org.drools.builder.JaxbConfiguration;
+import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
@@ -12,6 +14,10 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import com.sun.tools.xjc.Language;
+import com.sun.tools.xjc.Options;
 
 public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -19,6 +25,8 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String INPUT_TYPE_ATTRIBUTE     = "input-type";
     private static final String TYPE_ATTRIBUTE           = "type";
     private static final String SOURCE_ATTRIBUTE         = "source";
+    private static final String SYSTEM_ID                = "system-id";
+    private static final String SCHEMA_LANGUAGE          = "schema-language";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -34,31 +42,64 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
                                   source );
 
         String type = element.getAttribute( TYPE_ATTRIBUTE );
-        //emptyAttributeCheck(element.getLocalName(), type, type);
+
+        String resourceType = type == null || type.length() == 0 ? ResourceType.DRL.getName() : type;
+
         factory.addPropertyValue( "resourceType",
-                                  type == null || type.length() == 0 ? ResourceType.DRL.getName() : type );
+                                  resourceType );
 
-        List<Element> childElements = DomUtils.getChildElementsByTagName( element,
-                                                                          "decisiontable-conf" );
-        if ( childElements != null && !childElements.isEmpty() ) {
-            Element conf = childElements.get( 0 );
-            DecisionTableConfigurationImpl dtableConf = new DecisionTableConfigurationImpl();
+        if ( "xsd".equals( resourceType.toLowerCase() ) ) {
+            List<Element> childElements = DomUtils.getChildElementsByTagName( element,
+                                                                              "jaxb-conf" );
+            if ( !childElements.isEmpty() ) {
+                Element conf = childElements.get( 0 );
+                
+                String systemId = conf.getAttribute( SYSTEM_ID );
+                systemId = ( systemId != null && !systemId.trim().isEmpty()) ? systemId : "xsd";
+                
+                String schemaLanguage = conf.getAttribute( SCHEMA_LANGUAGE );
+                schemaLanguage = ( schemaLanguage != null && !schemaLanguage.trim().isEmpty()) ? schemaLanguage : "XMLSCHEMA";
+                
+                Options options = new Options();
+                options.setSchemaLanguage( Language.valueOf( schemaLanguage ) );
+                
 
-            String inputType = conf.getAttribute( INPUT_TYPE_ATTRIBUTE );
-            emptyAttributeCheck( conf.getLocalName(),
-                                 INPUT_TYPE_ATTRIBUTE,
-                                 inputType );
-            dtableConf.setInputType( DecisionTableInputType.valueOf( inputType ) );
+                JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( new Options(),
+                                                                                           systemId );
 
-            String worksheetName = conf.getAttribute( WORKSHEET_NAME_ATTRIBUTE );
-            emptyAttributeCheck( conf.getLocalName(),
-                                 WORKSHEET_NAME_ATTRIBUTE,
-                                 worksheetName );
-            dtableConf.setWorksheetName( worksheetName );
+                factory.addPropertyValue( "resourceConfiguration",
+                                          jaxbConf );
+            } else {
+                JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( new Options(),
+                                                                                           "xsd" );
 
-            factory.addPropertyValue( "resourceConfiguration",
-                                      dtableConf );
+                factory.addPropertyValue( "resourceConfiguration",
+                                          jaxbConf );                
+            }
+        } else if ( "dtable".equals( resourceType.toLowerCase() ) ) {
+            List<Element> childElements = DomUtils.getChildElementsByTagName( element,
+                                                                              "decisiontable-conf" );
+            if ( !childElements.isEmpty() ) {
+                Element conf = childElements.get( 0 );
+                DecisionTableConfigurationImpl dtableConf = new DecisionTableConfigurationImpl();
+
+                String inputType = conf.getAttribute( INPUT_TYPE_ATTRIBUTE );
+                emptyAttributeCheck( conf.getLocalName(),
+                                     INPUT_TYPE_ATTRIBUTE,
+                                     inputType );
+                dtableConf.setInputType( DecisionTableInputType.valueOf( inputType ) );
+
+                String worksheetName = conf.getAttribute( WORKSHEET_NAME_ATTRIBUTE );
+                emptyAttributeCheck( conf.getLocalName(),
+                                     WORKSHEET_NAME_ATTRIBUTE,
+                                     worksheetName );
+                dtableConf.setWorksheetName( worksheetName );
+
+                factory.addPropertyValue( "resourceConfiguration",
+                                          dtableConf );
+            }
         }
+
         return factory.getBeanDefinition();
     }
 

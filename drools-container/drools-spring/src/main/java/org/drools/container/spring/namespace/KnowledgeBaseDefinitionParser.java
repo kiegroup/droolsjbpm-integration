@@ -59,20 +59,6 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
                                       resources );
         }
 
-        childElements = DomUtils.getChildElementsByTagName( element,
-                                                            "model" );
-
-        if ( childElements != null && !childElements.isEmpty() ) {
-            ManagedList models = new ManagedList( childElements.size() );
-            for ( Element childResource : childElements ) {
-                BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement( childResource,
-                                                                                                    factory.getBeanDefinition() );
-                models.add( resourceDefinition );
-            }
-            factory.addPropertyValue( "models",
-                                      models );
-        }
-
         return factory.getBeanDefinition();
     }
 
