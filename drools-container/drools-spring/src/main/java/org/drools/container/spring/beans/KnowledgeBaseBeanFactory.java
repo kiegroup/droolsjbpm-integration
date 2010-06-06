@@ -18,94 +18,101 @@ import org.springframework.beans.factory.InitializingBean;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
-public class KnowledgeBaseBeanFactory implements FactoryBean, InitializingBean {
+public class KnowledgeBaseBeanFactory
+    implements
+    FactoryBean,
+    InitializingBean {
 
-	private KnowledgeBase kbase;
-	private ExecutionNode node;
-	private List<DroolsResourceAdapter> resources = Collections.emptyList();
-	private List<DroolsResourceAdapter> models = Collections.emptyList();
+    private KnowledgeBase               kbase;
+    private ExecutionNode               node;
+    private List<DroolsResourceAdapter> resources = Collections.emptyList();
+    private List<DroolsResourceAdapter> models    = Collections.emptyList();
 
-	public Object getObject() throws Exception {
-		return kbase;
-	}
+    public Object getObject() throws Exception {
+        return kbase;
+    }
 
-	public Class<? extends KnowledgeBase> getObjectType() {
-		return KnowledgeBase.class;
-	}
+    public Class< ? extends KnowledgeBase> getObjectType() {
+        return KnowledgeBase.class;
+    }
 
-	public boolean isSingleton() {
-		return true;
-	}
+    public boolean isSingleton() {
+        return true;
+    }
 
-	public void afterPropertiesSet() throws Exception {
-		if (node == null) {
-			node = new LocalConnection().getExecutionNode();
-		}
-		KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-		kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
+    public void afterPropertiesSet() throws Exception {
+        if ( node == null ) {
+            node = new LocalConnection().getExecutionNode();
+        }
+        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
-		if (models != null && models.size() > 0) {
-			for (DroolsResourceAdapter res: models) {
-				Options xjcOptions = new Options();
-				xjcOptions.setSchemaLanguage(Language.XMLSCHEMA);
-				try {
-					KnowledgeBuilderHelper.addXsdModel(res.getDroolsResource(),
-														kbuilder,
-														xjcOptions, 
-														"xsd" );
-					kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-				} catch (IOException e) {
-					throw new RuntimeException("Error creating XSD model", e);
-				}
-			}
-		}
+        if ( models != null && models.size() > 0 ) {
+            for ( DroolsResourceAdapter res : models ) {
+                Options xjcOptions = new Options();
+                xjcOptions.setSchemaLanguage( Language.XMLSCHEMA );
+                try {
+                    KnowledgeBuilderHelper.addXsdModel( res.getDroolsResource(),
+                                                        kbuilder,
+                                                        xjcOptions,
+                                                        "xsd" );
+                    kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+                } catch ( IOException e ) {
+                    throw new RuntimeException( "Error creating XSD model",
+                                                e );
+                }
+            }
+        }
 
-		for (DroolsResourceAdapter res: resources) {
-			if (res.getResourceConfiguration() == null) {
-				kbuilder.add(res.getDroolsResource(), res.getResourceType());
-			} else {
-				kbuilder.add(res.getDroolsResource(), res.getResourceType(), res.getResourceConfiguration());
-			}
-		}
+        for ( DroolsResourceAdapter res : resources ) {
+            if ( res.getResourceConfiguration() == null ) {
+                kbuilder.add( res.getDroolsResource(),
+                              res.getResourceType() );
+            } else {
+                kbuilder.add( res.getDroolsResource(),
+                              res.getResourceType(),
+                              res.getResourceConfiguration() );
+            }
+        }
 
-		KnowledgeBuilderErrors errors = kbuilder.getErrors();
-		if (!errors.isEmpty() ) {
-			throw new RuntimeException(errors.toString());
-		}
+        KnowledgeBuilderErrors errors = kbuilder.getErrors();
+        if ( !errors.isEmpty() ) {
+            throw new RuntimeException( errors.toString() );
+        }
 
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
-	}
+    }
 
-	public KnowledgeBase getKbase() {
-		return kbase;
-	}
+    public KnowledgeBase getKbase() {
+        return kbase;
+    }
 
-	public void setKbase(KnowledgeBase kbase) {
-		this.kbase = kbase;
-	}
+    public void setKbase(KnowledgeBase kbase) {
+        this.kbase = kbase;
+    }
 
-	public ExecutionNode getNode() {
-		return node;
-	}
+    public ExecutionNode getNode() {
+        return node;
+    }
 
-	public List<DroolsResourceAdapter> getResources() {
-		return resources;
-	}
+    public List<DroolsResourceAdapter> getResources() {
+        return resources;
+    }
 
-	public void setResources(List<DroolsResourceAdapter> resources) {
-		this.resources = resources;
-	}
+    public void setResources(List<DroolsResourceAdapter> resources) {
+        this.resources = resources;
+    }
 
-	public void setNode(ExecutionNode executionNode) {
-		this.node = executionNode;
-	}
+    public void setNode(ExecutionNode executionNode) {
+        this.node = executionNode;
+    }
 
-	public void setModels(List<DroolsResourceAdapter> models) {
-		this.models = models;
-	}
+    public void setModels(List<DroolsResourceAdapter> models) {
+        this.models = models;
+    }
 
-	public List<DroolsResourceAdapter> getModels() {
-		return models;
-	}
+    public List<DroolsResourceAdapter> getModels() {
+        return models;
+    }
 }

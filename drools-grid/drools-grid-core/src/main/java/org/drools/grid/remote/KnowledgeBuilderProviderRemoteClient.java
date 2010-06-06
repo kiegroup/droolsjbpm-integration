@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.drools.KnowledgeBase;
 import org.drools.builder.DecisionTableConfiguration;
+import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
@@ -17,6 +18,8 @@ import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.grid.generic.GenericNodeConnector;
 import org.drools.grid.generic.Message;
 import org.drools.grid.generic.MessageSession;
+
+import com.sun.tools.xjc.Options;
 
 public class KnowledgeBuilderProviderRemoteClient
     implements
@@ -85,6 +88,12 @@ public class KnowledgeBuilderProviderRemoteClient
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties,
                                                                           ClassLoader classLoader) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,
+                                                  String systemId) {
         // TODO Auto-generated method stub
         return null;
     }

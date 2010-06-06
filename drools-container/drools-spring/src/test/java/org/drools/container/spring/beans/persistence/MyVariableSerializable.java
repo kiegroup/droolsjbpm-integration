@@ -6,11 +6,13 @@ import java.io.Serializable;
  *
  * @author salaboy
  */
-public class MyVariableSerializable implements Serializable {
+public class MyVariableSerializable
+    implements
+    Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	private String text = "";
+    private static final long serialVersionUID = 1L;
+
+    private String            text             = "";
 
     public MyVariableSerializable(String string) {
         this.text = string;
@@ -32,14 +34,14 @@ public class MyVariableSerializable implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if ( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( getClass() != obj.getClass() ) {
             return false;
         }
         final MyVariableSerializable other = (MyVariableSerializable) obj;
-        if ((this.text == null) ? (other.text != null) : !this.text.equals(other.text)) {
+        if ( (this.text == null) ? (other.text != null) : !this.text.equals( other.text ) ) {
             return false;
         }
         return true;
@@ -52,8 +54,8 @@ public class MyVariableSerializable implements Serializable {
         return hash;
     }
 
-    public String toString(){
-        return "Serializable Variable: "+this.getText();
+    public String toString() {
+        return "Serializable Variable: " + this.getText();
     }
 
 }

@@ -14,24 +14,30 @@ import org.w3c.dom.Element;
  */
 public class ConnectionDefinitionParser extends AbstractBeanDefinitionParser {
 
-	private static final String TYPE_ATTRIBUTE = "type";
+    private static final String TYPE_ATTRIBUTE = "type";
 
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+    protected AbstractBeanDefinition parseInternal(Element element,
+                                                   ParserContext parserContext) {
 
-		BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(ConnectionBeanFactory.class);
+        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( ConnectionBeanFactory.class );
 
-		String type = element.getAttribute(TYPE_ATTRIBUTE);
-		emptyAttributeCheck(element.getLocalName(), TYPE_ATTRIBUTE, type);
+        String type = element.getAttribute( TYPE_ATTRIBUTE );
+        emptyAttributeCheck( element.getLocalName(),
+                             TYPE_ATTRIBUTE,
+                             type );
 
-		factory.addPropertyValue("type", type);
+        factory.addPropertyValue( "type",
+                                  type );
 
-		return factory.getBeanDefinition();
-	}
+        return factory.getBeanDefinition();
+    }
 
-	public void emptyAttributeCheck(final String element, final String attributeName, final String attribute) {
-		if (attribute == null || attribute.trim().length() == 0) {
-			throw new IllegalArgumentException("<" + element + "> requires a '" + attributeName + "' attribute");
-		}
-	}
+    public void emptyAttributeCheck(final String element,
+                                    final String attributeName,
+                                    final String attribute) {
+        if ( attribute == null || attribute.trim().length() == 0 ) {
+            throw new IllegalArgumentException( "<" + element + "> requires a '" + attributeName + "' attribute" );
+        }
+    }
 
 }

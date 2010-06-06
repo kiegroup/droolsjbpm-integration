@@ -8,42 +8,43 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class Person {
-	private String name;
-	private Integer age;
+    private String  name;
+    private Integer age;
 
-	public Person() {
-	}
+    public Person() {
+    }
 
-	public Person(String name) {
-		super();
-		this.name = name;
-	}
+    public Person(String name) {
+        super();
+        this.name = name;
+    }
 
-	public Person(String name, int age) {
-		super();
-		this.name = name;
-		this.age = age;
-	}
+    public Person(String name,
+                  int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setAge(Integer age) {
-		this.age = age;
-	}
+    public void setAge(Integer age) {
+        this.age = age;
+    }
 
-	public Integer getAge() {
-		return age;
-	}
+    public Integer getAge() {
+        return age;
+    }
 
-	@Override
-	public String toString() {
-		return "Person [age=" + age + ", name=" + name + "]";
-	}
-	
+    @Override
+    public String toString() {
+        return "Person [age=" + age + ", name=" + name + "]";
+    }
+
 }

@@ -6,6 +6,7 @@
 package org.drools.container.spring.beans.persistence;
 
 import javax.persistence.Entity;
+
 import org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo;
 
 /**
@@ -28,7 +29,5 @@ public class StringPersistedVariable extends VariableInstanceInfo {
     public void setString(String string) {
         this.string = string;
     }
-
-
 
 }

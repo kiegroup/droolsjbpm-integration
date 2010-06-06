@@ -1,5 +1,6 @@
 package org.drools.container.spring.beans.persistence;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -50,110 +51,124 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import static org.junit.Assert.*;
-
 public class JPASingleSessionCommandServiceFactoryTest {
-	private static final String TMPDIR = System.getProperty("java.io.tmpdir");
-	private static final Logger log = LoggerFactory.getLogger(JPASingleSessionCommandServiceFactoryTest.class);
-	private static Server h2Server;
-    
+    private static final String            TMPDIR = System.getProperty( "java.io.tmpdir" );
+    private static final Logger            log    = LoggerFactory.getLogger( JPASingleSessionCommandServiceFactoryTest.class );
+    private static Server                  h2Server;
+
     private ClassPathXmlApplicationContext ctx;
-    
+
     @BeforeClass
     public static void startH2Database() throws Exception {
-    	DeleteDbFiles.execute("", "DroolsFlow", true);
-    	h2Server = Server.createTcpServer(new String[0]);
-    	h2Server.start();
+        DeleteDbFiles.execute( "",
+                               "DroolsFlow",
+                               true );
+        h2Server = Server.createTcpServer( new String[0] );
+        h2Server.start();
     }
-    
+
     @AfterClass
     public static void stopH2Database() throws Exception {
-    	log.info("stoping database");
-    	h2Server.stop();
-    	DeleteDbFiles.execute("", "DroolsFlow", true);
+        log.info( "stoping database" );
+        h2Server.stop();
+        DeleteDbFiles.execute( "",
+                               "DroolsFlow",
+                               true );
     }
 
     @BeforeClass
     public static void generatePackages() {
-    	try {
-			log.info("creating: {}", TMPDIR + "/processWorkItems.pkg");
-			writePackage(getProcessWorkItems(), new File(TMPDIR + "/processWorkItems.pkg"));
-			
-			log.info("creating: {}", TMPDIR + "/processSubProcess.pkg");
-			writePackage(getProcessSubProcess(), new File(TMPDIR + "/processSubProcess.pkg"));
-			
-			log.info("creating: {}", TMPDIR + "/processTimer.pkg");
-			writePackage(getProcessTimer(), new File(TMPDIR + "/processTimer.pkg"));
-			
-			log.info("creating: {}", TMPDIR + "/processTimer2.pkg");
-			writePackage(getProcessTimer2(), new File(TMPDIR + "/processTimer2.pkg"));
-		} catch (Exception e) {
-			log.error("can't create packages!", e);
-			throw new RuntimeException(e);
-		}
-	}
-    
+        try {
+            log.info( "creating: {}",
+                      TMPDIR + "/processWorkItems.pkg" );
+            writePackage( getProcessWorkItems(),
+                          new File( TMPDIR + "/processWorkItems.pkg" ) );
+
+            log.info( "creating: {}",
+                      TMPDIR + "/processSubProcess.pkg" );
+            writePackage( getProcessSubProcess(),
+                          new File( TMPDIR + "/processSubProcess.pkg" ) );
+
+            log.info( "creating: {}",
+                      TMPDIR + "/processTimer.pkg" );
+            writePackage( getProcessTimer(),
+                          new File( TMPDIR + "/processTimer.pkg" ) );
+
+            log.info( "creating: {}",
+                      TMPDIR + "/processTimer2.pkg" );
+            writePackage( getProcessTimer2(),
+                          new File( TMPDIR + "/processTimer2.pkg" ) );
+        } catch ( Exception e ) {
+            log.error( "can't create packages!",
+                       e );
+            throw new RuntimeException( e );
+        }
+    }
+
     @AfterClass
     public static void deletePackages() {
-    	new File(TMPDIR + "/processWorkItems.pkg").delete();
-		new File(TMPDIR + "/processSubProcess.pkg").delete();
-		new File(TMPDIR + "/processTimer.pkg").delete();
-		new File(TMPDIR + "/processTimer2.pkg").delete();
-	}
-    
+        new File( TMPDIR + "/processWorkItems.pkg" ).delete();
+        new File( TMPDIR + "/processSubProcess.pkg" ).delete();
+        new File( TMPDIR + "/processTimer.pkg" ).delete();
+        new File( TMPDIR + "/processTimer2.pkg" ).delete();
+    }
+
     @Before
     public void createSpringContext() {
-    	try {
-			log.info("creating spring context");
-			PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-			Properties properties = new Properties();
-			properties.setProperty("temp.dir", TMPDIR);
-			configurer.setProperties(properties);
-			ctx = new ClassPathXmlApplicationContext();
-			ctx.addBeanFactoryPostProcessor(configurer);
-			ctx.setConfigLocation("org/drools/container/spring/beans/persistence/beans.xml");
-			ctx.refresh();
-		} catch (Exception e) {
-			log.error("can't create spring context", e);
-			throw new RuntimeException(e);
-		}
+        try {
+            log.info( "creating spring context" );
+            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
+            Properties properties = new Properties();
+            properties.setProperty( "temp.dir",
+                                    TMPDIR );
+            configurer.setProperties( properties );
+            ctx = new ClassPathXmlApplicationContext();
+            ctx.addBeanFactoryPostProcessor( configurer );
+            ctx.setConfigLocation( "org/drools/container/spring/beans/persistence/beans.xml" );
+            ctx.refresh();
+        } catch ( Exception e ) {
+            log.error( "can't create spring context",
+                       e );
+            throw new RuntimeException( e );
+        }
     }
-    
+
     @After
     public void destrySpringContext() {
-    	log.info("destroy spring context");
-    	ctx.destroy();
+        log.info( "destroy spring context" );
+        ctx.destroy();
     }
-    	
+
     @Test
     public void testPersistenceWorkItems() throws Exception {
-    	log.info("---> get bean jpaSingleSessionCommandService");
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
-        
-        log.info("---> create new SingleSessionCommandService");
+        log.info( "---> get bean jpaSingleSessionCommandService" );
+        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
+
+        log.info( "---> create new SingleSessionCommandService" );
         SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
-        
+
         int sessionId = service.getSessionId();
-        log.info("---> created SingleSessionCommandService id: " + sessionId);
+        log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
         ProcessInstance processInstance = service.execute( startProcessCommand );
-        log.info( "Started process instance {}", processInstance.getId() );
+        log.info( "Started process instance {}",
+                  processInstance.getId() );
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
         WorkItem workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -162,14 +177,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -178,14 +193,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -194,7 +209,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
@@ -204,8 +219,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
     @Test
     public void testPersistenceWorkItemsUserTransaction() throws Exception {
-        
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
+
+        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
         SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
         int sessionId = service.getSessionId();
@@ -213,21 +228,22 @@ public class JPASingleSessionCommandServiceFactoryTest {
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
         ProcessInstance processInstance = service.execute( startProcessCommand );
-        log.info( "Started process instance {}", processInstance.getId() );
+        log.info( "Started process instance {}",
+                  processInstance.getId() );
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
         WorkItem workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -236,14 +252,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-		service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -252,14 +268,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
@@ -268,7 +284,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );
@@ -343,32 +359,33 @@ public class JPASingleSessionCommandServiceFactoryTest {
         ProcessBuilder processBuilder = new ProcessBuilder( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
-        
-        
-        return packageBuilder.getPackage() ;
+
+        return packageBuilder.getPackage();
     }
-    
-	public static void writePackage(Package pkg, File dest) {
-		OutputStream out = null;
-		try {
-			out = new BufferedOutputStream(new FileOutputStream(dest));
-			DroolsStreamUtils.streamOut(out, pkg);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-				}
-			}
-		}
-	}
-    
+
+    public static void writePackage(Package pkg,
+                                    File dest) {
+        OutputStream out = null;
+        try {
+            out = new BufferedOutputStream( new FileOutputStream( dest ) );
+            DroolsStreamUtils.streamOut( out,
+                                         pkg );
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
+        } finally {
+            if ( out != null ) {
+                try {
+                    out.close();
+                } catch ( IOException e ) {
+                }
+            }
+        }
+    }
+
     @Test
     public void testPersistenceSubProcess() {
 
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
+        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
         SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
         int sessionId = service.getSessionId();
@@ -376,7 +393,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.ProcessSubProcess" );
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.execute( startProcessCommand );
-        log.info( "Started process instance {}", processInstance.getId() );
+        log.info( "Started process instance {}",
+                  processInstance.getId() );
         long processInstanceId = processInstance.getId();
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
@@ -384,7 +402,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstanceId );
         processInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
@@ -401,13 +419,13 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( subProcessInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
         completeWorkItemCommand.setWorkItemId( workItem.getId() );
         service.execute( completeWorkItemCommand );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( subProcessInstanceId );
         subProcessInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
@@ -508,42 +526,43 @@ public class JPASingleSessionCommandServiceFactoryTest {
                                      null );
         return packageBuilder.getPackage();
     }
-    
+
     @Test
     public void testPersistenceTimer() throws Exception {
-    	log.info("---> get bean jpaSingleSessionCommandService");
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
-        
-        log.info("---> create new SingleSessionCommandService");
+        log.info( "---> get bean jpaSingleSessionCommandService" );
+        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
+
+        log.info( "---> create new SingleSessionCommandService" );
         SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
-        
+
         int sessionId = service.getSessionId();
-        log.info("---> created SingleSessionCommandService id: " + sessionId);
-    	    	
+        log.info( "---> created SingleSessionCommandService id: " + sessionId );
+
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.ProcessTimer" );
         ProcessInstance processInstance = service.execute( startProcessCommand );
         long procId = processInstance.getId();
-		log.info( "---> Started ProcessTimer id: {}", procId );
+        log.info( "---> Started ProcessTimer id: {}",
+                  procId );
         service.dispose();
         log.info( "---> session disposed" );
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
-        log.info( "---> load session: " + sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
+        log.info( "---> load session: " + sessionId );
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( procId );
         processInstance = service.execute( getProcessInstanceCommand );
-        log.info("---> GetProcessInstanceCommand id: " + procId);
+        log.info( "---> GetProcessInstanceCommand id: " + procId );
         assertNotNull( processInstance );
         log.info( "---> session disposed" );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
-        log.info( "---> load session: " + sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
+        log.info( "---> load session: " + sessionId );
         Thread.sleep( 3000 );
         getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( procId );
-        log.info("---> GetProcessInstanceCommand id: " + procId);
+        log.info( "---> GetProcessInstanceCommand id: " + procId );
         processInstance = service.execute( getProcessInstanceCommand );
         log.info( "---> session disposed" );
         assertNull( processInstance );
@@ -599,19 +618,20 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
     @Test
     public void testPersistenceTimer2() throws Exception {
-    	JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean("jpaSingleSessionCommandService");
+        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
         SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
         int sessionId = service.getSessionId();
-        
+
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.ProcessTimer2" );
         ProcessInstance processInstance = service.execute( startProcessCommand );
-        log.info( "Started process instance {}", processInstance.getId() );
+        log.info( "Started process instance {}",
+                  processInstance.getId() );
 
         Thread.sleep( 2000 );
 
-        service = jpaService.loadStatefulKnowledgeSession(sessionId);
+        service = jpaService.loadStatefulKnowledgeSession( sessionId );
         GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
         getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
         processInstance = service.execute( getProcessInstanceCommand );

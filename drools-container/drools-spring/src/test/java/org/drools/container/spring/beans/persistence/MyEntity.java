@@ -12,19 +12,22 @@ import javax.persistence.Id;
  * @author salaboy
  */
 @Entity
-public class MyEntity implements Serializable {
+public class MyEntity
+    implements
+    Serializable {
 
+    private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = 1L;
-	
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-    private String test;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long              id;
+    private String            test;
 
-    public MyEntity(){}
+    public MyEntity() {
+    }
 
     public MyEntity(String string) {
-        this.test= string;
+        this.test = string;
     }
 
     /**
@@ -54,23 +57,24 @@ public class MyEntity implements Serializable {
     public void setTest(String test) {
         this.test = test;
     }
-    public String toString(){
-        return "VARIABLE: " +this.getId() + " - " + this.getTest();
+
+    public String toString() {
+        return "VARIABLE: " + this.getId() + " - " + this.getTest();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if ( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( getClass() != obj.getClass() ) {
             return false;
         }
         final MyEntity other = (MyEntity) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if ( this.id != other.id && (this.id == null || !this.id.equals( other.id )) ) {
             return false;
         }
-        if ((this.test == null) ? (other.test != null) : !this.test.equals(other.test)) {
+        if ( (this.test == null) ? (other.test != null) : !this.test.equals( other.test ) ) {
             return false;
         }
         return true;
@@ -83,5 +87,5 @@ public class MyEntity implements Serializable {
         hash = 41 * hash + (this.test != null ? this.test.hashCode() : 0);
         return hash;
     }
-    
+
 }

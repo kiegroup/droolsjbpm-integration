@@ -9,74 +9,79 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NamedBean;
 
-public abstract class AbstractKnowledgeSessionBeanFactory implements FactoryBean,
-		InitializingBean, BeanNameAware, NamedBean {
+public abstract class AbstractKnowledgeSessionBeanFactory
+    implements
+    FactoryBean,
+    InitializingBean,
+    BeanNameAware,
+    NamedBean {
 
-	private ExecutionNode node;
-	private KnowledgeBase kbase;
-	private String beanName;
-	private String name;
+    private ExecutionNode node;
+    private KnowledgeBase kbase;
+    private String        beanName;
+    private String        name;
 
-	public AbstractKnowledgeSessionBeanFactory() {
-		super();
-	}
+    public AbstractKnowledgeSessionBeanFactory() {
+        super();
+    }
 
-	public Object getObject() throws Exception {
-		return getCommandExecutor();
-	}
-	
-	public String getName() {
-		return name;
-	}
+    public Object getObject() throws Exception {
+        return getCommandExecutor();
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public KnowledgeBase getKbase() {
-		return kbase;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setKbase(KnowledgeBase kbase) {
-		this.kbase = kbase;
-	}
+    public KnowledgeBase getKbase() {
+        return kbase;
+    }
 
-	public boolean isSingleton() {
-		return true;
-	}
+    public void setKbase(KnowledgeBase kbase) {
+        this.kbase = kbase;
+    }
 
-	public final void afterPropertiesSet() throws Exception {
-		if (kbase == null) {
-			throw new IllegalArgumentException("kbase property is mandatory");
-		}
-		if (name == null) {
-			name = beanName;
-		}
-		internalAfterPropertiesSet();
-		if (node != null) {
-			node.get(DirectoryLookupFactoryService.class).register(name, getCommandExecutor());
-		}
-	}
+    public boolean isSingleton() {
+        return true;
+    }
 
-	protected abstract CommandExecutor getCommandExecutor();
+    public final void afterPropertiesSet() throws Exception {
+        if ( kbase == null ) {
+            throw new IllegalArgumentException( "kbase property is mandatory" );
+        }
+        if ( name == null ) {
+            name = beanName;
+        }
+        internalAfterPropertiesSet();
+        if ( node != null ) {
+            node.get( DirectoryLookupFactoryService.class ).register( name,
+                                                                      getCommandExecutor() );
+        }
+    }
 
-	protected abstract void internalAfterPropertiesSet();
+    protected abstract CommandExecutor getCommandExecutor();
 
-	public ExecutionNode getNode() {
-		return node;
-	}
+    protected abstract void internalAfterPropertiesSet();
 
-	public void setNode(ExecutionNode node) {
-		this.node = node;
-	}
+    public ExecutionNode getNode() {
+        return node;
+    }
 
-	public void setBeanName(String name) {
-		this.beanName = name;
+    public void setNode(ExecutionNode node) {
+        this.node = node;
+    }
 
-	}
+    public void setBeanName(String name) {
+        this.beanName = name;
 
-	public String getBeanName() {
-		return beanName;
-	}
+    }
+
+    public String getBeanName() {
+        return beanName;
+    }
 
 }

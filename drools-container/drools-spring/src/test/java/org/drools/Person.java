@@ -69,7 +69,6 @@ public class Person
               0 );
     }
 
-
     public Person(final String name,
                   final String likes) {
         this( name,

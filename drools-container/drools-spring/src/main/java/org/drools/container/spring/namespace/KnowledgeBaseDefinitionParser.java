@@ -13,57 +13,67 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser {
-	
-	private static final String EXECUTION_NODE_ATTRIBUTE = "node";
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KnowledgeBaseBeanFactory.class);
+    private static final String EXECUTION_NODE_ATTRIBUTE = "node";
 
-		String nodeRef = element.getAttribute(EXECUTION_NODE_ATTRIBUTE);
-		if (nodeRef != null && nodeRef.length() > 0) {
-			factory.addPropertyReference(EXECUTION_NODE_ATTRIBUTE, nodeRef);
-		}
-		
-		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "resource");
-		ManagedList resources = null;
-		if (childElements != null && !childElements.isEmpty()) {
-			resources = new ManagedList();
-			for (Element childResource : childElements) {
-				BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement(childResource, factory.getBeanDefinition());
-				resources.add(resourceDefinition);
-			}
-		}
-		
-		childElements = DomUtils.getChildElementsByTagName(element, "resource-ref");
-		
-		if (childElements != null && !childElements.isEmpty()) {
-			if (resources==null) {
-				resources = new ManagedList(childElements.size());
-			}
-			for (Element childResource : childElements) {
-				BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement(childResource, factory.getBeanDefinition());
-				resources.add(resourceDefinition);
-			}
-		}
+    @SuppressWarnings("unchecked")
+    @Override
+    protected AbstractBeanDefinition parseInternal(Element element,
+                                                   ParserContext parserContext) {
+        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( KnowledgeBaseBeanFactory.class );
 
-		if (resources!=null) {
-			factory.addPropertyValue("resources", resources);
-		}
+        String nodeRef = element.getAttribute( EXECUTION_NODE_ATTRIBUTE );
+        if ( nodeRef != null && nodeRef.length() > 0 ) {
+            factory.addPropertyReference( EXECUTION_NODE_ATTRIBUTE,
+                                          nodeRef );
+        }
 
-		childElements = DomUtils.getChildElementsByTagName(element, "model");
+        List<Element> childElements = DomUtils.getChildElementsByTagName( element,
+                                                                          "resource" );
+        ManagedList resources = null;
+        if ( childElements != null && !childElements.isEmpty() ) {
+            resources = new ManagedList();
+            for ( Element childResource : childElements ) {
+                BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement( childResource,
+                                                                                                    factory.getBeanDefinition() );
+                resources.add( resourceDefinition );
+            }
+        }
 
-		if (childElements != null && !childElements.isEmpty()) {
-			ManagedList models = new ManagedList(childElements.size());
-			for (Element childResource : childElements) {
-				BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement(childResource, factory.getBeanDefinition());
-				models.add(resourceDefinition);
-			}
-			factory.addPropertyValue("models", models);
-		}
+        childElements = DomUtils.getChildElementsByTagName( element,
+                                                            "resource-ref" );
 
-		return factory.getBeanDefinition();
-	}
-	
+        if ( childElements != null && !childElements.isEmpty() ) {
+            if ( resources == null ) {
+                resources = new ManagedList( childElements.size() );
+            }
+            for ( Element childResource : childElements ) {
+                BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement( childResource,
+                                                                                                    factory.getBeanDefinition() );
+                resources.add( resourceDefinition );
+            }
+        }
+
+        if ( resources != null ) {
+            factory.addPropertyValue( "resources",
+                                      resources );
+        }
+
+        childElements = DomUtils.getChildElementsByTagName( element,
+                                                            "model" );
+
+        if ( childElements != null && !childElements.isEmpty() ) {
+            ManagedList models = new ManagedList( childElements.size() );
+            for ( Element childResource : childElements ) {
+                BeanDefinition resourceDefinition = parserContext.getDelegate().parseCustomElement( childResource,
+                                                                                                    factory.getBeanDefinition() );
+                models.add( resourceDefinition );
+            }
+            factory.addPropertyValue( "models",
+                                      models );
+        }
+
+        return factory.getBeanDefinition();
+    }
+
 }

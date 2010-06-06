@@ -12,38 +12,41 @@ import javax.persistence.Id;
  * @author salaboy
  */
 @Entity
-public class MyEntityOnlyFields implements Serializable {
+public class MyEntityOnlyFields
+    implements
+    Serializable {
 
+    private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = 1L;
-	
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-    public Long id;
-    public String test;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long               id;
+    public String             test;
 
-    public MyEntityOnlyFields(){}
+    public MyEntityOnlyFields() {
+    }
 
     public MyEntityOnlyFields(String string) {
-        this.test= string;
+        this.test = string;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return "VARIABLE: " + id + " - " + test;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if ( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( getClass() != obj.getClass() ) {
             return false;
         }
         final MyEntityOnlyFields other = (MyEntityOnlyFields) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if ( this.id != other.id && (this.id == null || !this.id.equals( other.id )) ) {
             return false;
         }
-        if ((this.test == null) ? (other.test != null) : !this.test.equals(other.test)) {
+        if ( (this.test == null) ? (other.test != null) : !this.test.equals( other.test ) ) {
             return false;
         }
         return true;
@@ -56,5 +59,5 @@ public class MyEntityOnlyFields implements Serializable {
         hash = 41 * hash + (this.test != null ? this.test.hashCode() : 0);
         return hash;
     }
-    
+
 }

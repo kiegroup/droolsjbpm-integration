@@ -8,6 +8,6 @@ import org.drools.CheckedDroolsException;
 @WebService
 public interface KnowledgeServiceSoap {
 
-	String execute(@WebParam(name="command") String command) throws CheckedDroolsException;
+    String execute(@WebParam(name = "command") String command) throws CheckedDroolsException;
 
 }

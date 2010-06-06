@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
@@ -78,12 +79,12 @@ public class JaxbTest extends TestCase {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-
-        String[] classNames = KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource( "order.xsd",
-                                                                                                        getClass() ),
-                                                                  kbuilder,
-                                                                  xjcOpts,
-                                                                  "xsd" );
+        
+        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );               
+        
+        kbuilder.add( ResourceFactory.newClassPathResource( "order.xsd",
+                                                          getClass() ), ResourceType.XSD,
+                                                          jaxbConf );
 
         assertFalse( kbuilder.hasErrors() );
 
@@ -104,8 +105,8 @@ public class JaxbTest extends TestCase {
         KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
         insertStage.setReceiver( executeResultHandler );
 
-        JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
-                                                                     kbase );
+        JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
+                                                                     kbase ); 
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( insertStage );
@@ -136,11 +137,11 @@ public class JaxbTest extends TestCase {
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        String[] classNames = KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource( "order.xsd",
-                                                                                                        getClass() ),
-                                                                  kbuilder,
-                                                                  xjcOpts,
-                                                                  "xsd" );
+        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );               
+        
+        kbuilder.add( ResourceFactory.newClassPathResource( "order.xsd",
+                                                          getClass() ), ResourceType.XSD,
+                                                          jaxbConf );
 
         assertFalse( kbuilder.hasErrors() );
 
@@ -170,8 +171,9 @@ public class JaxbTest extends TestCase {
         Expression expression = PipelineFactory.newMvelExpression( "this.orderItem" );
         expression.setReceiver( splitter );
 
-        JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
-                                                                     kbase );
+        JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
+                                                                     kbase ); 
+        
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( expression );
