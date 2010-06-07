@@ -150,9 +150,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from( "direct:test-with-session" ).to( "drools:sm/ksession1?dataFormat=drools-xstream" );
-                from( "direct:test-with-session-json" ).to( "drools:sm/ksession1?dataFormat=drools-json" );
-                from( "direct:test-no-session" ).to( "drools:sm?dataFormat=drools-xstream" );
+                from( "direct:test-with-session" ).to( "drools:node/ksession1?dataFormat=drools-xstream" );
+                from( "direct:test-with-session-json" ).to( "drools:node/ksession1?dataFormat=drools-json" );
+                from( "direct:test-no-session" ).to( "drools:node?dataFormat=drools-xstream" );
             }
         };
     }

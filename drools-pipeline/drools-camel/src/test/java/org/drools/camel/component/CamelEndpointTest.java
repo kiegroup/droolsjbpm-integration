@@ -67,8 +67,8 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-with-session").to("drools-embedded://sm/ksession1");
-                from("direct:test-no-session").to("drools-embedded://sm");
+                from("direct:test-with-session").to("drools-embedded://node/ksession1");
+                from("direct:test-no-session").to("drools-embedded://node");
             }
         };
     }

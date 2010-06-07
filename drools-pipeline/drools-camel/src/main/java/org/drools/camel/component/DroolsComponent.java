@@ -83,7 +83,7 @@ public class DroolsComponent extends DefaultComponent {
      * referred to in such an embedded route and must have a 'pipeline' parameter set.
      * 
      * The choice of using a pipeline parameter may be revisited. Another option would be to have the url
-     * contain a keyword something like drools:proxy://sm/ksession1.
+     * contain a keyword something like drools:proxy://node/ksession1.
      */
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {

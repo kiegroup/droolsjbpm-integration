@@ -23,7 +23,6 @@ import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.drools.builder.DirectoryLookupFactoryService;
-import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNode;
 import org.drools.runtime.CommandExecutor;
 
@@ -82,26 +81,26 @@ public class DroolsEndpoint extends DefaultEndpoint {
 
     protected void configure(DroolsComponent component,
                              String uri) {
-        String smId = DroolsComponent.getSessionManagerId( uri );
+        String nodeId = DroolsComponent.getSessionManagerId( uri );
         ksession = DroolsComponent.getKsessionId( uri );
 
-        if ( smId.length() > 0 ) {
+        if ( nodeId.length() > 0 ) {
             // initialize the component if needed
             node = component.getExecutionNode();
             if ( node == null ) {
                 // let's look it up
-                node = component.getCamelContext().getRegistry().lookup( smId,
+                node = component.getCamelContext().getRegistry().lookup( nodeId,
                                                                          ExecutionNode.class );
                 if ( node == null ) {
-                    throw new RuntimeCamelException( "Could not find ServiceManager with id=\"" + smId + "\" in CamelContext. Check configuration." );
+                    throw new RuntimeCamelException( "Could not find ExecutionNode with id=\"" + nodeId + "\" in CamelContext. Check configuration." );
                 }
                 // use this ServiceManager
-                component.setExecutionNodeId( smId );
+                component.setExecutionNodeId( nodeId );
                 component.setExecutionNode( node );
-            } else if ( !smId.equals( component.getExecutionNodeId() ) ) {
+            } else if ( !nodeId.equals( component.getExecutionNodeId() ) ) {
                 // make sure we deal with the same ServiceManager.
                 // having multiple ServiceManagers instances in the same process is not supported
-                throw new RuntimeCamelException( "ServiceManager already initialized from id=\"" + component.getExecutionNodeId() + "\" yet current endpoint requries id=\"" + smId + "\"" );
+                throw new RuntimeCamelException( "ExecutionNode already initialized from id=\"" + component.getExecutionNodeId() + "\" yet current endpoint requries id=\"" + nodeId + "\"" );
             }
 
             // if id is empty this endpoint is not attached to a CommandExecutor and will have to look it up at runtime.

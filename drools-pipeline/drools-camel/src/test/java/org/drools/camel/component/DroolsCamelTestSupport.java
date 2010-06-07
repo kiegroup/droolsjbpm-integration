@@ -70,8 +70,8 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
 
         LocalConnection connection = new LocalConnection();
         node = connection.getExecutionNode(null);
-        node.setId("sm");
-        context.bind("sm", node);
+        node.setId("node");
+        context.bind("node", node);
 
         configureDroolsContext();
         return context;

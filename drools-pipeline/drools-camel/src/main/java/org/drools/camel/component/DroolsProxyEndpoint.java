@@ -31,6 +31,7 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
     private String id;
     private String uri;
     private String dataFormat;
+    private String xstream;
     private String marshall;
     private String unmarshall;
     private RouteBuilder builder;
@@ -50,11 +51,11 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
         // final DataFormat xstream = new DroolsXStreamDataFormat();
 
         if (builder == null) {
-            String smId = DroolsComponent.getSessionManagerId(uri);
-            final ExecutionNode node = (ExecutionNode)getCamelContext().getRegistry().lookup(smId);
+            String nodeId = DroolsComponent.getSessionManagerId(uri);
+            final ExecutionNode node = (ExecutionNode)getCamelContext().getRegistry().lookup(nodeId);
             if (node == null) {
-                throw new RuntimeCamelException("Cannot find ServiceManager instance with id=\"" + 
-                    smId + "\" in the CamelContext registry.");
+                throw new RuntimeCamelException("Cannot find ExecutionNode instance with id=\"" + 
+                    nodeId + "\" in the CamelContext registry.");
             }
 
             final String inFormat = (dataFormat == null) ? unmarshall : dataFormat;
@@ -109,7 +110,15 @@ public class DroolsProxyEndpoint extends DefaultEndpoint {
         this.dataFormat = dataFormat;
     }
 
-    public String getMarshall() {
+    public void setXstream(String xstream) {
+		this.xstream = xstream;
+	}
+
+	public String getXstream() {
+		return xstream;
+	}
+
+	public String getMarshall() {
         return marshall;
     }
 
