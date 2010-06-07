@@ -21,16 +21,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
          <artifactId>drools-compiler</artifactId>
          <version>${project.version}</version>
       </dependency>
-      <dependency>
-         <groupId>com.sun.xml.bind</groupId>
-         <artifactId>jaxb-impl</artifactId>
-         <version>2.0.3</version>
-      </dependency>
-      <dependency>
-         <groupId>com.sun.xml.bind</groupId>
-         <artifactId>jaxb-xjc</artifactId>
-         <version>2.0.3</version>
-      </dependency>
+	<dependency>
+		<groupId>com.sun.xml.bind</groupId>
+		<artifactId>jaxb-xjc</artifactId>
+	</dependency>
       <dependency>
       	<groupId>org.drools</groupId>
       	<artifactId>drools-api</artifactId>
