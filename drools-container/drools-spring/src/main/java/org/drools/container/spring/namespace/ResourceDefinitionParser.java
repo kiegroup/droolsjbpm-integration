@@ -55,10 +55,10 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
                 Element conf = childElements.get( 0 );
                 
                 String systemId = conf.getAttribute( SYSTEM_ID );
-                systemId = ( systemId != null && !systemId.trim().isEmpty()) ? systemId : "xsd";
+                systemId = ( systemId != null && systemId.trim().length() > 0) ? systemId : "xsd";
                 
                 String schemaLanguage = conf.getAttribute( SCHEMA_LANGUAGE );
-                schemaLanguage = ( schemaLanguage != null && !schemaLanguage.trim().isEmpty()) ? schemaLanguage : "XMLSCHEMA";
+                schemaLanguage = ( schemaLanguage != null && schemaLanguage.trim().length() > 0) ? schemaLanguage : "XMLSCHEMA";
                 
                 Options options = new Options();
                 options.setSchemaLanguage( Language.valueOf( schemaLanguage ) );
