@@ -16,7 +16,9 @@
     
 	<drools:kbase id="kbase1" node="node1">
 		<drools:resource source="classpath:changesets/change-set-1.xml" type="CHANGE_SET" />
-		<drools:model source="classpath:model/person.xsd" />
+		<drools:resource source="classpath:model/person.xsd" type="XSD">
+		   <drools:jaxb-conf system-id="xsd" />
+		</drools:resource>	
 	</drools:kbase>
 
 	<drools:kbase id="kbase2" node="node1">
