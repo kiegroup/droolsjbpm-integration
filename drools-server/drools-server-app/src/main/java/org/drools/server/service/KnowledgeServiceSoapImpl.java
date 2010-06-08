@@ -18,7 +18,7 @@ public class KnowledgeServiceSoapImpl
         try {
             return getService().executeCommand( command );
         } catch ( Exception e ) {
-            throw new RuntimeException( e.getMessage() );
+            throw new RuntimeException( e );
         }
     }
 
