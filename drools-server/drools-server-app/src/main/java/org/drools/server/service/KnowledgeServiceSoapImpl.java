@@ -15,13 +15,11 @@ public class KnowledgeServiceSoapImpl
         if ( command == null || command.length() == 0 ) {
             throw new RuntimeException( "Invalid or null command" );
         }
-        String response = null;
         try {
-            response = getService().executeCommand( command );
+            return getService().executeCommand( command );
         } catch ( Exception e ) {
             throw new RuntimeException( e.getMessage() );
         }
-        return response;
     }
 
     public void setService(KnowledgeService service) {
