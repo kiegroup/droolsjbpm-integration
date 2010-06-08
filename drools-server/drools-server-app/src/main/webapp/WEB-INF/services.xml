@@ -22,7 +22,7 @@
 	-->
 
 	<!-- If you change the service definition id you MUST change this in the core.xml file -->
-	<drools-service:definition id="service" smId="sm1" camelContext="executionContext">
+	<drools-service:definition id="service" node="node1" camelContext="executionContext">
 		<!-- Here you can add your service configuration	
 		<drools-service:configuration marshaller="JAXB" session="ksession1">
 			<drools-service:class>org.drools.model.Person</drools-service:class>
