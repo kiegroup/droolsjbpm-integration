@@ -7,7 +7,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import org.drools.CheckedDroolsException;
 import org.drools.server.KnowledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class KnowledgeServiceRest {
         String response;
         try {
             response = getService().executeCommand( command );
-        } catch ( CheckedDroolsException e ) {
+        } catch ( RuntimeException e ) {
             logger.error( e.getMessage() );
             return Response.status( Status.BAD_REQUEST ).build();
         } catch ( Exception e ) {

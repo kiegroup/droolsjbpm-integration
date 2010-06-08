@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
-import org.drools.CheckedDroolsException;
 import org.drools.server.profile.KnowledgeServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,22 +48,22 @@ public class KnowledgeServiceImpl
         }
     }
 
-    private void executeCommands(List<String> commands) throws CheckedDroolsException {
+    private void executeCommands(List<String> commands) throws RuntimeException {
         for ( String command : commands ) {
             executeCommand( command );
         }
     }
 
-    public String executeCommand(String cmd) throws CheckedDroolsException {
+    public String executeCommand(String cmd) throws RuntimeException {
         String lookup = getLookup( cmd );
         if ( lookup == null || lookup.length() == 0 ) {
             LOG.error( "Unable to get command lookup attribute: " + lookup );
-            throw new CheckedDroolsException( "Unable to get command lookup attribute: " + lookup );
+            throw new RuntimeException( "Unable to get command lookup attribute: " + lookup );
         }
         KnowledgeServiceConfiguration serviceConfiguration = configurations.get( lookup );
         if ( serviceConfiguration == null ) {
             LOG.error( "Unable to lookup session: " + lookup );
-            throw new CheckedDroolsException( "Unable to lookup session: " + lookup );
+            throw new RuntimeException( "Unable to lookup session: " + lookup );
         }
         if ( "JAXB".equals( serviceConfiguration.getMarshaller() ) ) {
             JAXBContext jaxbContext = serviceConfiguration.getContext();
@@ -94,14 +93,14 @@ public class KnowledgeServiceImpl
         camelContext.addRoutes( rb );
     }
 
-    private String getLookup(String xml) throws CheckedDroolsException {
+    private String getLookup(String xml) throws RuntimeException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         InputSource source = new InputSource( new StringReader( xml ) );
         Document d = null;
         try {
             d = factory.newDocumentBuilder().parse( source );
         } catch ( Exception e ) {
-            throw new CheckedDroolsException( "Error getting lookup: " + e.getMessage(),
+            throw new RuntimeException( "Error getting lookup: " + e.getMessage(),
                                               e );
         }
         return d.getDocumentElement().getAttribute( "lookup" );
