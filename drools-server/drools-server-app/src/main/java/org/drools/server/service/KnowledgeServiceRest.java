@@ -26,22 +26,20 @@ public class KnowledgeServiceRest {
     @Path("/execute")
     public Response execute(@FormParam("command") String command) {
         if ( command == null || command.length() == 0 ) {
-            logger.error( "Invalid or null command " + command );
+            logger.error( "Invalid or null command: {}", command );
             return Response.status( Status.BAD_REQUEST ).build();
         }
-        String response;
         try {
-            response = getService().executeCommand( command );
+            ResponseBuilder builder = 
+            	Response.ok( getService().executeCommand( command ), "application/xml" );
+            return builder.build();
         } catch ( RuntimeException e ) {
-            logger.error( e.getMessage() );
+            logger.error( e.getMessage(), e );
             return Response.status( Status.BAD_REQUEST ).build();
         } catch ( Exception e ) {
-            logger.error( e.getMessage() );
+            logger.error( e.getMessage(), e );
             return Response.status( Status.CONFLICT ).build();
         }
-        ResponseBuilder builder = Response.ok( response,
-                                               "application/xml" );
-        return builder.build();
     }
 
     public void setService(KnowledgeService service) {
@@ -51,5 +49,4 @@ public class KnowledgeServiceRest {
     public KnowledgeService getService() {
         return service;
     }
-
 }
