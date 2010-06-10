@@ -67,12 +67,14 @@ public class KnowledgeServiceImpl
         }
         if ( "JAXB".equals( serviceConfiguration.getMarshaller() ) ) {
             JAXBContext jaxbContext = serviceConfiguration.getContext();
-            return new String( (byte[]) template.requestBodyAndHeader( "direct:with-session-jaxb",
+            String endpointUri = "direct:with-session-jaxb-" + lookup;
+			return new String( (byte[]) template.requestBodyAndHeader( endpointUri,
                                                                        cmd,
                                                                        "jaxb-context",
                                                                        jaxbContext ) );
         } else if ( "XSTREAM".equals( serviceConfiguration.getMarshaller() ) ) {
-            return new String( (byte[]) template.requestBody( "direct:with-session-xstream",
+            String endpointUri = "direct:with-session-xstream-" + lookup;
+			return new String( (byte[]) template.requestBody( endpointUri,
                                                               cmd ) );
         }
         return null;
@@ -84,9 +86,11 @@ public class KnowledgeServiceImpl
             }
         };
         if ( "JAXB".equals( configuration.getMarshaller() ) ) {
-            rb.from( "direct:with-session-jaxb" ).to( "drools:" + smId + "/" + configuration.getSessionId() + "?dataFormat=drools-jaxb" );
+            String uri = "direct:with-session-jaxb-" + configuration.getSessionId();
+			rb.from( uri ).to( "drools:" + smId + "/" + configuration.getSessionId() + "?dataFormat=drools-jaxb" );
         } else if ( "XSTREAM".equals( configuration.getMarshaller() ) ) {
-            rb.from( "direct:with-session-xstream" ).to( "drools:" + smId + "/" + configuration.getSessionId() + "?dataFormat=drools-xstream" );
+        	String uri = "direct:with-session-xstream-" + configuration.getSessionId();
+            rb.from( uri ).to( "drools:" + smId + "/" + configuration.getSessionId() + "?dataFormat=drools-xstream" );
         } else {
             throw new IllegalArgumentException( "Invalid marshaller value on camel routes creation: " + configuration.getMarshaller() );
         }
