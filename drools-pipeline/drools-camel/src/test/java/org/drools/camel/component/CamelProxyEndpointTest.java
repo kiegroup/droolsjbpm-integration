@@ -40,7 +40,7 @@ public class CamelProxyEndpointTest extends DroolsCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-no-marshal").to("drools://node/ksession1");
+                from("direct:test-no-marshal").to("drools-embedded://node/ksession1");
             }
         };
     }
