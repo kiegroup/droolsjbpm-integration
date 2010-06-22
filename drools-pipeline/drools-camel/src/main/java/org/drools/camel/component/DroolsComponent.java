@@ -34,7 +34,6 @@ public class DroolsComponent extends DefaultComponent {
     private static final String UUID_PREFIX = "drools-";
     private static final AtomicInteger counter = new AtomicInteger();
     
-    private CamelContext embeddedContext;
     private ExecutionNode node;
     private String nodeId = "";
 
@@ -43,17 +42,6 @@ public class DroolsComponent extends DefaultComponent {
 
     public DroolsComponent(CamelContext context) {
         super(context);
-    }
-
-    public CamelContext getEmbeddedContext() {
-        if (embeddedContext == null) {
-            createEmbeddedContext();
-        }
-        return embeddedContext;
-    }
-
-    public void setEmbeddedContext(CamelContext context) {
-        embeddedContext = context;
     }
 
     public String getExecutionNodeId() {
@@ -72,41 +60,12 @@ public class DroolsComponent extends DefaultComponent {
         this.node = node;
     }
 
-    /**
-     * There are two kinds of drools endpoints. One is the regular endpoint, one would refer two in 
-     * a camel route and is the only one a user should be aware of. However such drools endpoint
-     * are actually proxies for an entire hidden route (see documentation) because of many things that
-     * have to happen within a drools context that is normally not available on a regular camel route.
-     * This kind of endpoints would set up a new drools context aware route in a separate, hidden
-     * CamelContext embedded in the DroolsComponent. The second kind of endpoint is the one
-     * referred to in such an embedded route and must have a 'pipeline' parameter set.
-     * 
-     * The choice of using a pipeline parameter may be revisited. Another option would be to have the url
-     * contain a keyword something like drools:proxy://node/ksession1.
-     */
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         Endpoint endpoint;
         endpoint = new DroolsEndpoint(uri, remaining, this);
         setProperties(endpoint, parameters);
         return endpoint;
-    }
-
-    protected void createEmbeddedContext() {
-        // TODO: fix this temporary solution. Should be able to create a context from spring configuration as well
-        if (embeddedContext == null) {
-            CamelContext context;
-            try {
-                context = new DefaultCamelContext(getCamelContext().getRegistry());
-                context.disableJMX();
-                context.start();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return;
-            }
-            embeddedContext = context;
-        }
     }
     
     public static final String getSessionManagerId(String uri) {
