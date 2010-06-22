@@ -363,9 +363,9 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 		return new RouteBuilder() {
 			public void configure() throws Exception {
 				from("direct:test-with-session").
-				    unmarshal("drools-jaxb").to("drools-embedded:node/ksession1").marshal("drools-jaxb");
+				    unmarshal("drools-jaxb").to("drools:node/ksession1").marshal("drools-jaxb");
 				from("direct:test-no-session").
-				    unmarshal("drools-jaxb").to("drools-embedded:node").marshal("drools-jaxb");
+				    unmarshal("drools-jaxb").to("drools:node").marshal("drools-jaxb");
 			}
 		};
 	}
