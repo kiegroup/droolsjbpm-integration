@@ -123,8 +123,10 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 	protected RouteBuilder createRouteBuilder() throws Exception {
 		return new RouteBuilder() {
 			public void configure() throws Exception {
-				from("direct:test-with-session").to("drools:node/ksession1?dataFormat=drools-jaxb");
-				from("direct:test-no-session").to("drools:node?dataFormat=drools-jaxb");
+				from("direct:test-with-session").
+				    unmarshal("drools-jaxb").to("drools-embedded:node/ksession1").marshal("drools-jaxb");
+				from("direct:test-no-session").
+                                    unmarshal("drools-jaxb").to("drools-embedded:node").marshal("drools-jaxb");
 			}
 		};
 	}
