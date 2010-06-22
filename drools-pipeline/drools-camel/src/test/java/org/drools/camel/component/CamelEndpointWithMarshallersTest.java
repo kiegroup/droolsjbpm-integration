@@ -148,11 +148,11 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
+        return new DroolsRouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-with-session").routePolicy(new DroolsClassloaderPolicy()).unmarshal("drools-xstream").to("drools:node/ksession1").marshal("drools-xstream");
-                from("direct:test-with-session-json").routePolicy(new DroolsClassloaderPolicy()).unmarshal("drools-json").to("drools:node/ksession1").marshal("drools-json" );
-                from("direct:test-no-session").routePolicy(new DroolsClassloaderPolicy()).unmarshal("drools-xstream").to( "drools:node").marshal("drools-xstream");
+                from("direct:test-with-session").unmarshal("drools-xstream").to("drools:node/ksession1").marshal("drools-xstream");
+                from("direct:test-with-session-json").unmarshal("drools-json").to("drools:node/ksession1").marshal("drools-json" );
+                from("direct:test-no-session").unmarshal("drools-xstream").to( "drools:node").marshal("drools-xstream");
             }
         };
     }
