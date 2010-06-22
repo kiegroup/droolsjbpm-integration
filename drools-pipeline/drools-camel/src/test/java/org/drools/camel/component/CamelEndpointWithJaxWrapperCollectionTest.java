@@ -360,7 +360,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
+		return new DroolsRouteBuilder() {
 			public void configure() throws Exception {
 				from("direct:test-with-session").
 				    unmarshal("drools-jaxb").to("drools:node/ksession1").marshal("drools-jaxb");
