@@ -11,7 +11,7 @@
     <name>Drools :: Pipeline :: Camel </name>
 
     <properties>
-        <camel-version>2.1.0</camel-version>
+        <camel-version>2.3.0</camel-version>
     </properties>
 
     <repositories>
