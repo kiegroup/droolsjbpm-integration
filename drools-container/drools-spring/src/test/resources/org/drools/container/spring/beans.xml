@@ -33,13 +33,13 @@
 	
 	<drools:ksession id="ksession2" type="stateful" kbase="kbase1" node="node1"/>
 	
-	<drools-service:configuration id="service-conf-1" marshaller="XSTREAM" session="ksession1">
+	<!--drools-service:configuration id="service-conf-1" marshaller="XSTREAM" session="ksession1">
 		<drools-service:class>org.drools.model.Person</drools-service:class>
-	</drools-service:configuration>
+	</drools-service:configuration-->
 	
-	<drools-service:definition id="service" node="node1" camelContext="executionContext">
+	<!--drools-service:definition id="service" node="node1" camelContext="executionContext">
 		<drools-service:configuration marshaller="JAXB" session="ksession2" />
 		<drools-service:configuration-ref id="service-conf-1" />
-	</drools-service:definition>
+	</drools-service:definition-->
 
 </beans>
