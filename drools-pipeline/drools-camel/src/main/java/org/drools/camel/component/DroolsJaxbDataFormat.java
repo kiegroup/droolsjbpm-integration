@@ -52,6 +52,8 @@ public class DroolsJaxbDataFormat implements DataFormat {
 		
 		if (body instanceof ExecutionResults) {
 			result = resTranslator.transform((ExecutionResultImpl) body, marshaller);
+		} else {
+			throw new IllegalArgumentException("body must be instance of " + ExecutionResults.class.getName());
 		}
 
 		byte[] bytes;
