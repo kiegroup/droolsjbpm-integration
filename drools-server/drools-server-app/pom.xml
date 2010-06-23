@@ -127,7 +127,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 	<dependency>
 	  	<groupId>org.slf4j</groupId>
 	  	<artifactId>slf4j-log4j12</artifactId>
-	  	<version>1.5.2</version>
 	</dependency>
 
 	<!-- web app deps -->
