@@ -12,6 +12,13 @@
   <packaging>pom</packaging>
   <name>Drools :: Grid</name>
 
+  <dependencies>
+  	<dependency>
+  		<groupId>org.slf4j</groupId>
+  		<artifactId>slf4j-simple</artifactId>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
   <modules>
       <module>drools-grid-core</module>
       <module>drools-grid-task</module>
