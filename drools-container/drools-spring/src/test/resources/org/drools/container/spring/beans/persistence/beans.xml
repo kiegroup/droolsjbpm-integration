@@ -32,20 +32,14 @@
 	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="myEmf" />
 	</bean>
-	
-	<bean id="jpaSingleSessionCommandService" class="org.drools.container.spring.beans.JPASingleSessionCommandServiceFactory">
-		<property name="knowledgeBase" ref="kbProcessWorkItems"/>
-		<property name="entityManagerFactory" ref="myEmf"/>
-		<property name="transactionManager" ref="txManager"/>
-		<!-- 
-		<property name="variablePersisters">
-			<map>
-				<entry key="javax.persistence.Entity" value="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
-				<entry key="java.lang.String" value="org.plugtree.labs.variablepersistence.StringVariablePersister"/>
-				<entry key="java.io.Serializable" value="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
-			</map>
-		</property>
-		 -->
-	</bean>
 
+	<drools:kstore id="kstore1" />	
+	    
+	<drools:ksession id="jpaSingleSessionCommandService" type="stateful"  kbase="kbProcessWorkItems">
+		<drools:jpa-persistence>
+            <drools:transaction-manager ref="txManager" />
+            <drools:entity-manager-factory ref="myEmf" />   	    
+	    </drools:jpa-persistence>		    
+	</drools:ksession>
+	
 </beans>

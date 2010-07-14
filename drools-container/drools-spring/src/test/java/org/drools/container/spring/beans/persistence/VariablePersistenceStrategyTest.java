@@ -11,10 +11,12 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.drools.command.SingleSessionCommandService;
-import org.drools.command.runtime.process.GetProcessInstanceCommand;
-import org.drools.command.runtime.process.StartProcessCommand;
-import org.drools.container.spring.beans.JPASingleSessionCommandService;
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.persistence.jpa.KnowledgeStoreService;
+import org.drools.runtime.Environment;
+import org.drools.runtime.EnvironmentName;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkflowProcessInstance;
 import org.h2.tools.DeleteDbFiles;
@@ -84,15 +86,11 @@ public class VariablePersistenceStrategyTest {
     @Test
     public void testPersistenceVariables() {
         log.info( "---> get bean jpaSingleSessionCommandService" );
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
+        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        log.info( "---> create new SingleSessionCommandService" );
-        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
-
-        int sessionId = service.getSessionId();
+        int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
-        StartProcessCommand startProcessCommand = new StartProcessCommand( "com.sample.ruleflow" );
         log.info( "### Starting process ###" );
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put( "x",
@@ -105,8 +103,7 @@ public class VariablePersistenceStrategyTest {
                         new MyEntityOnlyFields( "This is a test Entity with annotations in fields and without accesors methods" ) );
         parameters.put( "z",
                         new MyVariableSerializable( "This is a test SerializableObject" ) );
-        startProcessCommand.setParameters( parameters );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.execute( startProcessCommand );
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.startProcess( "com.sample.ruleflow", parameters );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -122,10 +119,15 @@ public class VariablePersistenceStrategyTest {
                       result.size() );
         log.info( "### Retrieving process instance ###" );
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = (WorkflowProcessInstance) service.execute( getProcessInstanceCommand );
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
+
+        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbase1" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        
+        processInstance = (WorkflowProcessInstance) service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
 
         assertNotNull( processInstance );

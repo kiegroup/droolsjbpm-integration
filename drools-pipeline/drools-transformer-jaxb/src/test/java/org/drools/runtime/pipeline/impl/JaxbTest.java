@@ -33,6 +33,8 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
+import org.drools.common.InternalRuleBase;
+import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
@@ -104,10 +106,19 @@ public class JaxbTest extends TestCase {
 
         KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
         insertStage.setReceiver( executeResultHandler );
-
+        
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
                                                                      kbase ); 
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
+        
+//        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+//        
+//        ClassLoader classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
+//        
+//        Thread.currentThread().setContextClassLoader( classLoader );
+//        Unmarshaller unmarshaller = JAXBContext.newInstance( "org.drools.model.order" ).createUnmarshaller();
+//        Thread.currentThread().setContextClassLoader( originalClassLoader );
+        
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
         transformer.setReceiver( insertStage );
 

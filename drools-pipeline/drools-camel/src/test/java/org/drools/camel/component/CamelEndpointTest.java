@@ -15,8 +15,14 @@
 
 package org.drools.camel.component;
 
+import java.util.Arrays;
+
+import javax.naming.Context;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.drools.command.CommandFactory;
+import org.drools.command.impl.GenericCommand;
+import org.drools.command.runtime.BatchExecutionCommand;
 import org.drools.command.runtime.rule.GetObjectCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.DisconnectedFactHandle;
@@ -74,7 +80,7 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext() {
+    protected void configureDroolsContext(Context jndiContext) {
         Person me = new Person();
         me.setName("Hadrian");
 
@@ -82,7 +88,9 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
         InsertObjectCommand cmd = new InsertObjectCommand(me);
         cmd.setOutIdentifier("camel-rider");
         cmd.setReturnObject(false);
-        ExecutionResults results = ksession.execute(cmd);
+        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[]{cmd} ));
+        
+        ExecutionResults results = ksession.execute( script );
         handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
     }
 }

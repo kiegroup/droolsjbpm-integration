@@ -17,6 +17,12 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
 
         registerBeanDefinitionParser( "kbase",
                                       new KnowledgeBaseDefinitionParser() );
+        
+        registerBeanDefinitionParser( "kagent",
+                                      new KnowledgeAgentDefinitionParser() );        
+        
+        registerBeanDefinitionParser( "kstore",
+                                      new KnowledgeStoreDefinitionParser() );        
 
         registerBeanDefinitionParser( "ksession",
                                       new KnowledgeSessionDefinitionParser() );
@@ -26,10 +32,6 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
 
         registerBeanDefinitionParser( "execution-node",
                                       new ExecutionNodeDefinitionParser() );
-
-        registerBeanDefinitionParser( "jpaSessionServiceFactory",
-                                      new JpaSessionServiceFactoryDefinitionParser() );
-
     }
 
 }

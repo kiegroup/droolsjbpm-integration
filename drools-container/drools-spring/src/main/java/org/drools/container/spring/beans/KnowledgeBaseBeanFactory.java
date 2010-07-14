@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.util.JAXBResult;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.JaxbConfiguration;
@@ -12,11 +14,16 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
+import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.local.LocalConnection;
+import org.drools.impl.KnowledgeBaseImpl;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
@@ -49,9 +56,12 @@ public class KnowledgeBaseBeanFactory
         KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
         kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
  
-        List<DroolsResourceAdapter> xsds = new ArrayList<DroolsResourceAdapter>();
+        List<JaxbConfigurationImpl> xsds = new ArrayList<JaxbConfigurationImpl>();
         
         for ( DroolsResourceAdapter res : resources ) {            
+            if ( res.getResourceType().equals( ResourceType.XSD ) ) {
+                xsds.add( ( JaxbConfigurationImpl ) res.getResourceConfiguration() );
+            }
             
             if ( res.getResourceConfiguration() == null ) {
                 kbuilder.add( res.getDroolsResource(),
@@ -69,6 +79,12 @@ public class KnowledgeBaseBeanFactory
         }
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        
+        KnowledgeBaseImpl kbaseImpl = ( KnowledgeBaseImpl ) kbase;
+        kbaseImpl.jaxbClasses = new ArrayList();
+        for ( JaxbConfigurationImpl conf : xsds ) {
+            kbaseImpl.jaxbClasses.add( conf.getClasses() );            
+        }
 
     }
 
@@ -95,4 +111,5 @@ public class KnowledgeBaseBeanFactory
     public void setNode(ExecutionNode executionNode) {
         this.node = executionNode;
     }
+
 }

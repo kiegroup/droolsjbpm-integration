@@ -15,7 +15,21 @@
 
 package org.drools.camel.component;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.naming.NamingException;
+
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.dataformat.xstream.JsonDataFormat;
+import org.apache.camel.dataformat.xstream.XStreamDataFormat;
+import org.apache.camel.model.DataFormatDefinition;
+import org.apache.camel.spi.DataFormat;
+import org.apache.camel.spring.CamelRouteContextFactoryBean;
+import org.drools.command.impl.GenericCommand;
+import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.rule.GetObjectsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
@@ -23,6 +37,15 @@ import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.rule.FactHandle;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.converters.collections.AbstractCollectionConverter;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.mapper.Mapper;
 
 public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     private String handle;
@@ -50,21 +73,21 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         assertEquals( "salaboy",
                       person.getName() );
 
-        String expectedXml ="";
-        expectedXml += "<execution-results>\n";
-        expectedXml += "  <result identifier=\"salaboy\">\n";
-        expectedXml += "    <org.drools.pipeline.camel.Person>\n";
-        expectedXml += "      <name>salaboy</name>\n";
-        expectedXml += "    </org.drools.pipeline.camel.Person>\n";
-        expectedXml += "  </result>\n";
-        expectedXml += "  <fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>\n";
+        String expectedXml = "";
+        expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
+        expectedXml += "<result identifier=\"salaboy\">";
+        expectedXml += "<org.drools.pipeline.camel.Person>";
+        expectedXml += "<name>salaboy</name>";
+        expectedXml += "</org.drools.pipeline.camel.Person>";
+        expectedXml += "</result>";
+        expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
 
         assertEquals( expectedXml,
                       outXml );
 
     }
-    
+
     public void testJSonSessionInsert() throws Exception {
 
         String inXml = "";
@@ -72,7 +95,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         inXml += "{\"insert\":{\"lookup\":\"ksession1\", ";
         inXml += "             \"object\":{\"org.drools.pipeline.camel.Person\":{\"name\":\"salaboy\"}}, \"out-identifier\":\"salaboy\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";          
+        inXml += "]}}";
 
         String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session-json",
                                                                    inXml ) );
@@ -81,7 +104,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         Person person = (Person) result.getValue( "salaboy" );
         assertEquals( "salaboy",
                       person.getName() );
-    }    
+    }
 
     public void testNoSessionInsert() throws Exception {
 
@@ -95,23 +118,57 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
 
-        String outXml = new String( (byte[]) template.requestBodyAndHeader( "direct:test-no-session",
-                                                                            cmd,
-                                                                            DroolsComponent.DROOLS_LOOKUP,
-                                                                            "ksession1" ) );
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-no-session",
+                                                                   cmd ) );
 
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         Person person = (Person) result.getValue( "salaboy" );
         assertEquals( "salaboy",
                       person.getName() );
 
-        String expectedXml = "<execution-results>\n";
-        expectedXml += "  <result identifier=\"salaboy\">\n";
-        expectedXml += "    <org.drools.pipeline.camel.Person>\n";
-        expectedXml += "      <name>salaboy</name>\n";
-        expectedXml += "    </org.drools.pipeline.camel.Person>\n";
-        expectedXml += "  </result>\n";
-        expectedXml += "  <fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>\n";
+        String expectedXml = "";
+        expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
+        expectedXml += "<result identifier=\"salaboy\">";
+        expectedXml += "<org.drools.pipeline.camel.Person>";
+        expectedXml += "<name>salaboy</name>";
+        expectedXml += "</org.drools.pipeline.camel.Person>";
+        expectedXml += "</result>";
+        expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
+        expectedXml += "</execution-results>";
+
+        assertEquals( expectedXml,
+                      outXml );
+    }
+
+    public void testNoSessionInsertCustomXstream() throws Exception {
+
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "<insert out-identifier=\"salaboy\">\n";
+        cmd += "<org.drools.pipeline.camel.Person name=\"salaboy\">\n";
+        cmd += "</org.drools.pipeline.camel.Person>\n";
+        cmd += "</insert>\n";
+        cmd += "<fire-all-rules/>\n";
+        cmd += "</batch-execution>\n";
+
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-no-session-custom",
+                                                                   cmd ) );
+
+        XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
+        PersonConverter converter = new PersonConverter();
+        xstream.registerConverter( converter );
+
+        ExecutionResults result = (ExecutionResults) xstream.fromXML( outXml );
+        Person person = (Person) result.getValue( "salaboy" );
+        assertEquals( "salaboy",
+                      person.getName() );
+
+        String expectedXml = "";
+        expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
+        expectedXml += "<result identifier=\"salaboy\">";
+        expectedXml += "<org.drools.pipeline.camel.Person name=\"salaboy\"/>";
+        expectedXml += "</result>";
+        expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
 
         assertEquals( expectedXml,
@@ -133,12 +190,12 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
                       person.getName() );
 
         String expectedXml = "";
-        expectedXml += "<execution-results>\n";
-        expectedXml += "  <result identifier=\"rider\">\n";
-        expectedXml += "    <org.drools.pipeline.camel.Person>\n";
-        expectedXml += "      <name>Hadrian</name>\n";
-        expectedXml += "    </org.drools.pipeline.camel.Person>\n";
-        expectedXml += "  </result>\n";
+        expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
+        expectedXml += "<result identifier=\"rider\">";
+        expectedXml += "<org.drools.pipeline.camel.Person>";
+        expectedXml += "<name>Hadrian</name>";
+        expectedXml += "</org.drools.pipeline.camel.Person>";
+        expectedXml += "</result>";
         expectedXml += "</execution-results>";
 
         assertEquals( expectedXml,
@@ -148,17 +205,27 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        return new DroolsRouteBuilder() {
-            public void configure() throws Exception {
-                from("direct:test-with-session").unmarshal("drools-xstream").to("drools:node/ksession1").marshal("drools-xstream");
-                from("direct:test-with-session-json").unmarshal("drools-json").to("drools:node/ksession1").marshal("drools-json" );
-                from("direct:test-no-session").unmarshal("drools-xstream").to( "drools:node").marshal("drools-xstream");
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {          
+                org.apache.camel.model.dataformat.XStreamDataFormat xstreamDataFormat = new org.apache.camel.model.dataformat.XStreamDataFormat();
+                xstreamDataFormat.setConverters( Arrays.asList( new String[]{PersonConverter.class.getName()} ) );
+
+                Map<String, DataFormatDefinition> dataFormats = new HashMap<String, DataFormatDefinition>();
+                dataFormats.put( "custom-xstream",
+                                 xstreamDataFormat );
+                getContext().setDataFormats( dataFormats );
+
+                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).unmarshal( "xstream" ).to( "drools:node/ksession1" ).marshal( "xstream" );
+                from( "direct:test-with-session-json" ).policy( new DroolsPolicy() ).unmarshal( "json" ).to( "drools:node/ksession1" ).marshal( "json" );
+                from( "direct:test-no-session" ).policy( new DroolsPolicy() ).unmarshal( "xstream" ).to( "drools:node" ).marshal( "xstream" );
+                from( "direct:test-no-session-custom" ).policy( new DroolsPolicy() ).unmarshal( "custom-xstream" ).to( "drools:node" ).marshal( "custom-xstream" );
             }
         };
     }
 
     @Override
-    protected void configureDroolsContext() {
+    protected void configureDroolsContext(javax.naming.Context jndiContext) {
         Person me = new Person();
         me.setName( "Hadrian" );
 
@@ -167,7 +234,37 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         InsertObjectCommand cmd = new InsertObjectCommand( me );
         cmd.setOutIdentifier( "camel-rider" );
         cmd.setReturnObject( false );
-        ExecutionResults results = ksession.execute( cmd );
+
+        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
+
+        ExecutionResults results = ksession.execute( script );
         handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
+
+    }
+
+    public static class PersonConverter
+        implements
+        Converter {
+
+        public PersonConverter() {
+        }
+
+        public void marshal(Object object,
+                            HierarchicalStreamWriter writer,
+                            MarshallingContext context) {
+            Person p = (Person) object;
+            writer.addAttribute( "name",
+                                 p.getName() );
+        }
+
+        public Object unmarshal(HierarchicalStreamReader reader,
+                                UnmarshallingContext context) {
+            Person p = new Person( reader.getAttribute( "name" ) );
+            return p;
+        }
+
+        public boolean canConvert(Class clazz) {
+            return clazz.equals( Person.class );
+        }
     }
 }

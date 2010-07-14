@@ -33,6 +33,7 @@ public class ExecutionNodeBeanFactory
 
     public void afterPropertiesSet() throws Exception {
         node = connection.getExecutionNode();
+        node.setId( id );
     }
 
     public void setId(String id) {

@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.naming.Context;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
@@ -26,6 +29,7 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalRuleBase;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
+import org.drools.reteoo.ReteooRuleBase;
 import org.drools.rule.DroolsCompositeClassLoader;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -77,7 +81,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		cmd.getCommands().add(new FireAllRulesCommand());
 		
 		StringWriter xmlReq = new StringWriter();
-		Marshaller marshaller = jaxbContext.createMarshaller();
+		Marshaller marshaller = getJaxbContext().createMarshaller();
 		marshaller.setProperty("jaxb.formatted.output", true);
 		marshaller.marshal(cmd, xmlReq);
 		
@@ -104,11 +108,11 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		xmlCmd += "   <fire-all-rules />";
 		xmlCmd += "</batch-execution>\n";
 
-		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
+		byte[] xmlResp = (byte[]) template.requestBody("direct:test-with-session", xmlReq.toString() );
 		assertNotNull(xmlResp);
 		System.out.println(new String(xmlResp));
 
-		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
+		ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
 		assertNotNull(resp);
 		
 		assertEquals(2, resp.getIdentifiers().size());
@@ -119,20 +123,50 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		assertNotNull(resp.getFactHandle("baunax"));
 	}
 	
+    public JAXBContext getJaxbContext() {
+        if ( this.jaxbContext == null ) {
+            JaxbDataFormat def = new JaxbDataFormat();
+            def.setPrettyPrint( true );
+            def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+    
+            // create a jaxbContext for the test to use outside of Camel.
+            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "ksession1" );
+            KnowledgeBase kbase = ksession1.getKnowledgeBase();
+            ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
+                def = DroolsPolicy.augmentJaxbDataFormatDefinition( def );
+                
+                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = ( org.apache.camel.converter.jaxb.JaxbDataFormat ) def.getDataFormat(  this.context.getRoutes().get( 0 ).getRouteContext() );
+                
+                
+                jaxbContext = jaxbDataformat.getContext();
+            } catch ( JAXBException e ) {
+                throw new RuntimeException( e );
+            } finally {
+                Thread.currentThread().setContextClassLoader( originalCl );
+            }   
+        }
+        
+        return jaxbContext;
+    }	
+	
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new DroolsRouteBuilder() {
+		return new RouteBuilder() {
 			public void configure() throws Exception {
-				from("direct:test-with-session").
-				    unmarshal("drools-jaxb").to("drools:node/ksession1").marshal("drools-jaxb");
-				from("direct:test-no-session").
-                                    unmarshal("drools-jaxb").to("drools:node").marshal("drools-jaxb");
+                JaxbDataFormat def = new JaxbDataFormat();
+                def.setPrettyPrint( true );
+                def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+                
+				from("direct:test-with-session").policy( new DroolsPolicy() ).
+				    unmarshal(def).to("drools:node/ksession1").marshal(def);
 			}
 		};
 	}
 
 	@Override
-	protected void configureDroolsContext() {
+	protected void configureDroolsContext(Context jndiContext) {
 		String rule = "";
 		rule += "package org.drools.pipeline.camel.test \n";
 		rule += "import org.drools.model.Person \n";
@@ -161,10 +195,9 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		Options xjcOpts = new Options();
 		xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
 
-		String classNames[] = null;
 
 		try {
-			classNames = KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource("person.xsd", getClass()),
+			KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource("person.xsd", getClass()),
 					kbuilder,
 					xjcOpts,
 			"xsd" );
@@ -181,110 +214,12 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 				LOG.info("Errors while adding rule. ", kbuilder.getErrors());
 			}
 		}
-		
-		String process1 = "";
-        process1 += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        process1 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
-        process1 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-        process1 += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        process1 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools.camel.pipeline.test\" version=\"1\" >\n";
-        process1 += "\n";
-        process1 += "  <header>\n";
-        process1 += "    <imports>\n";
-        process1 += "      <import name=\"org.drools.model.Person\" />\n";
-        process1 += "    </imports>\n";
-        process1 += "    <globals>\n";
-        process1 += "      <global identifier=\"list\" type=\"java.util.List\" />\n";
-        process1 += "    </globals>\n";
-        process1 += "    <variables>\n";
-        process1 += "      <variable name=\"person\" >\n";
-        process1 += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"Person\" />\n";
-        process1 += "      </variable>\n";
-        process1 += "    </variables>\n";
-        process1 += "  </header>\n";
-        process1 += "\n";
-        process1 += "  <nodes>\n";
-        process1 += "    <start id=\"1\" name=\"Start\" />\n";
-        process1 += "    <actionNode id=\"2\" name=\"MyActionNode\" >\n";
-        process1 += "      <action type=\"expression\" dialect=\"mvel\" >System.out.println(\"Triggered\");\n";
-        process1 += "list.add(person.name);\n";
-        process1 += "</action>\n";
-        process1 += "    </actionNode>\n";
-        process1 += "    <end id=\"3\" name=\"End\" />\n";
-        process1 += "  </nodes>\n";
-        process1 += "\n";
-        process1 += "  <connections>\n";
-        process1 += "    <connection from=\"1\" to=\"2\" />\n";
-        process1 += "    <connection from=\"2\" to=\"3\" />\n";
-        process1 += "  </connections>\n" + "\n";
-        process1 += "</process>";
-        
-        kbuilder.add(ResourceFactory.newByteArrayResource(process1.getBytes()), ResourceType.DRF);
-
-        if (kbuilder.hasErrors()) {
-        	System.out.println("Errors while adding process rule 1. " + kbuilder.getErrors());
-        }
-
-		assertFalse(kbuilder.hasErrors());
-        
-        String process2 = "";
-        process2 += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        process2 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
-        process2 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-        process2 += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        process2 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
-        process2 += "\n";
-        process2 += "  <header>\n";
-        process2 += "    <variables>\n";
-        process2 += "      <variable name=\"MyVar\" >\n";
-        process2 += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
-        process2 += "        <value>SomeText</value>\n";
-        process2 += "      </variable>\n";
-        process2 += "    </variables>\n";
-        process2 += "  </header>\n";
-        process2 += "\n";
-        process2 += "  <nodes>\n";
-        process2 += "    <start id=\"1\" name=\"Start\" />\n";
-        process2 += "    <eventNode id=\"2\" name=\"Event\" variableName=\"MyVar\" >\n";
-        process2 += "      <eventFilters>\n";
-        process2 += "        <eventFilter type=\"eventType\" eventType=\"MyEvent\" />\n";
-        process2 += "      </eventFilters>\n";
-        process2 += "    </eventNode>\n";
-        process2 += "    <join id=\"3\" name=\"Join\" type=\"1\" />\n";
-        process2 += "    <end id=\"4\" name=\"End\" />\n";
-        process2 += "  </nodes>\n";
-        process2 += "\n";
-        process2 += "  <connections>\n";
-        process2 += "    <connection from=\"1\" to=\"3\" />\n";
-        process2 += "    <connection from=\"2\" to=\"3\" />\n";
-        process2 += "    <connection from=\"3\" to=\"4\" />\n";
-        process2 += "  </connections>\n";
-        process2 += "\n";
-        process2 += "</process>";
-        
-        kbuilder.add(ResourceFactory.newByteArrayResource(process2.getBytes()), ResourceType.DRF);
-
-        if (kbuilder.hasErrors()) {
-        	LOG.info("Errors while adding process rule 2. ", kbuilder.getErrors());
-        }
-
+	
 		assertFalse(kbuilder.hasErrors());
 
-		KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-		
-		classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
+		KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();		
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-
-		// Add object model to classes array
-		List<String> allClasses = new ArrayList<String>(Arrays.asList(classNames));		
-
-		try {
-			jaxbContext = KnowledgeBuilderHelper.newJAXBContext( allClasses.toArray(new String[allClasses.size()]), kbase );
-		} catch (Exception e) {
-			LOG.info("Errors while creating JAXB Context. ", e);
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+        classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();		
 
 		StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
 		node.get(DirectoryLookupFactoryService.class).register(identifier, session);

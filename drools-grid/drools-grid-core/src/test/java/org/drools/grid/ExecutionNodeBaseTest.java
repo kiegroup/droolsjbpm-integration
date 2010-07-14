@@ -18,12 +18,17 @@
 package org.drools.grid;
 
 
+import java.util.Arrays;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
+import org.drools.command.Command;
+import org.drools.command.impl.GenericCommand;
+import org.drools.command.runtime.BatchExecutionCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.ExecutionResults;
@@ -126,8 +131,10 @@ public abstract class ExecutionNodeBaseTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+        
+        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
 
-        ExecutionResults results = ksession.execute( new FireAllRulesCommand( "fired" ) );
+        ExecutionResults results = ksession.execute( script );
 
         Assert.assertEquals( 2,
                       (int) (Integer) results.getValue( "fired" ) );
@@ -170,7 +177,9 @@ public abstract class ExecutionNodeBaseTest {
         node.get(DirectoryLookupFactoryService.class).register( "ksession1",
                               ksession );
 
-        ExecutionResults results = node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" ).execute( new FireAllRulesCommand( "fired" ) );
+        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
+        
+        ExecutionResults results = node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" ).execute( script );
 
         Assert.assertEquals( 2,
                       (int) (Integer) results.getValue( "fired" ) );
@@ -212,7 +221,9 @@ public abstract class ExecutionNodeBaseTest {
         node.get(DirectoryLookupFactoryService.class).register( "ksession1",
                               ksession );
 
-        ExecutionResults results = node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" ).execute( new FireAllRulesCommand( "fired" ) );
+        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
+        
+        ExecutionResults results = node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" ).execute( script );
 
         Assert.assertEquals( 2, (int ) ( Integer) results.getValue( "fired" ) );
     }

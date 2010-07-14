@@ -27,7 +27,18 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
             factory.addPropertyReference( EXECUTION_NODE_ATTRIBUTE,
                                           nodeRef );
         }
+        
+        ManagedList resources = getResources(element, parserContext, factory);
 
+        if ( resources != null ) {
+            factory.addPropertyValue( "resources",
+                                      resources );
+        }
+
+        return factory.getBeanDefinition();
+    }
+
+    public static ManagedList getResources(Element element, ParserContext parserContext, BeanDefinitionBuilder factory) {
         List<Element> childElements = DomUtils.getChildElementsByTagName( element,
                                                                           "resource" );
         ManagedList resources = null;
@@ -53,13 +64,8 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
                 resources.add( resourceDefinition );
             }
         }
-
-        if ( resources != null ) {
-            factory.addPropertyValue( "resources",
-                                      resources );
-        }
-
-        return factory.getBeanDefinition();
+        
+        return resources;
     }
 
 }

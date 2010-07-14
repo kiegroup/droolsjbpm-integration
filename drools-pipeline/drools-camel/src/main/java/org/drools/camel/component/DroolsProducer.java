@@ -15,56 +15,151 @@
 
 package org.drools.camel.component;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.management.RuntimeErrorException;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.RuntimeCamelException;
+import org.apache.camel.dataformat.xstream.JsonDataFormat;
+import org.apache.camel.dataformat.xstream.XStreamDataFormat;
 import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.model.dataformat.JaxbDataFormat;
+import org.apache.camel.spi.DataFormat;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
+import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.command.impl.GenericCommand;
+import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.core.util.StringUtils;
 import org.drools.grid.ExecutionNode;
+import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.drools.impl.StatelessKnowledgeSessionImpl;
+import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
+import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.ResultHandler;
+import org.drools.runtime.pipeline.impl.ExecutionNodePipelineContextImpl;
 
 public class DroolsProducer extends DefaultProducer {
-    private ExecutionNode node;
-    private CommandExecutor executor;
 
-    public DroolsProducer(Endpoint endpoint, ExecutionNode node) {
-        super(endpoint);
-        this.node = node;
-        DroolsEndpoint de = (DroolsEndpoint) endpoint;
-        executor = node.get(DirectoryLookupFactoryService.class).lookup(de.getKsession());
+    DroolsEndpoint de;
+
+    public DroolsProducer(Endpoint endpoint,
+                          ExecutionNode node) {
+        super( endpoint );
+        de = (DroolsEndpoint) endpoint;
     }
 
     public void process(Exchange exchange) throws Exception {
-        CommandExecutor exec = executor;
-        if (exec == null) {
-            // need to look it up
-            String ksession = exchange.getIn().getHeader(DroolsComponent.DROOLS_LOOKUP, String.class);
-            exec = node.get(DirectoryLookupFactoryService.class).lookup(ksession == null ? "" : ksession);
-            // cannot continue if executor is not available
-            if (exec == null) {
-                throw new RuntimeCamelException("Null executor");
+
+        // Lookup the original ClassLoaders, so we can restore after execution
+        //        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+
+            //            String lookup = null;
+            //            if ( executor == null ) {
+            //                lookup = getLookup(str);
+            //                exchange.setProperty( DroolsComponent.DROOLS_LOOKUP, 
+            //                                      lookup );
+            //            }
+            //            
+            //            
+            //            CommandExecutor exec = getCommandExecutor( lookup );
+            //            if ( exec == null ) {
+            //                throw new RuntimeException( "CommandExecutor cannot be found for uri " + this.getEndpoint().getEndpointUri() );
+            //            }
+            //            
+            //            ClassLoader localClassLoader = getClassLoader( exec );
+            //            if ( exec == null ) {
+            //                throw new RuntimeException( "CommandExecutor Classloader cannot be null for uri " + this.getEndpoint().getEndpointUri() );
+            //            }            
+            //            
+            //            // Set the classloader to the one used by the CommandExecutor
+            //            Thread.currentThread().setContextClassLoader( localClassLoader );
+
+            Command cmd = null;
+            if ( de.dataFormat != null ) {
+                String str = exchange.getIn().getBody( String.class );
+                ByteArrayInputStream bais = new ByteArrayInputStream( str.getBytes() );
+                cmd = (Command) de.dataFormat.unmarshal( exchange,
+                                                         bais );
+            } else {
+                // no data format set, so we assume it's already concrete
+                cmd = exchange.getIn().getBody( Command.class );
             }
+
+            if ( cmd == null ) {
+                throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri()  );
+            }
+
+            if ( !(cmd instanceof BatchExecutionCommand) ) {
+                cmd = new BatchExecutionCommand( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand) cmd} ) );
+            }
+
+            CommandExecutor exec;
+            ExecutionNodePipelineContextImpl droolsContext = exchange.getProperty( "drools-context",
+                                                                                   ExecutionNodePipelineContextImpl.class );
+            if ( droolsContext != null ) {
+                exec = droolsContext.getCommandExecutor();
+            } else {
+                exec = de.getExecutor();
+                if ( exec == null ) {
+                    String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP,
+                                                                String.class );
+                    if ( StringUtils.isEmpty( lookup ) && (cmd instanceof BatchExecutionCommand) ) {
+                        lookup = ((BatchExecutionCommand) cmd).getLookup();
+                    }
+
+                    if ( de.getExecutionNode() != null && !StringUtils.isEmpty( lookup ) ) {
+                        exec = de.getExecutionNode().get( DirectoryLookupFactoryService.class ).lookup( lookup );
+                        if ( exec == null ) {
+                            throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup  +" for uri" + de.getEndpointUri() );
+                        }
+                    } else {
+                        throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup +" for uri" + de.getEndpointUri());
+                    }
+                }
+            }
+            
+            if ( exec == null ) {
+                throw new RuntimeException( "No defined ksession for uri" + de.getEndpointUri() );
+            }            
+
+            ExecutionResults results = exec.execute( (BatchExecutionCommand) cmd );;
+
+            if ( de.dataFormat != null ) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                de.dataFormat.marshal( exchange,
+                                       results,
+                                       baos );
+                exchange.getOut().setBody( baos.toByteArray() );
+            } else {
+                exchange.getOut().setBody( results );
+            }
+        } finally {
+            // we must restore the ClassLoader
+            //            Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
-        
-        Command cmd = exchange.getIn().getBody(Command.class);
-        if (cmd == null) {
-            throw new RuntimeCamelException("Body of in message not of the expected type 'org.drools.command.Command'");
-        }
-        ExecutionResults results = exec.execute(cmd);
-        exchange.getOut().setBody(results);
     }
 
     // There are nicer ways of doing this
-    public static class ResultHandlerImpl implements ResultHandler {
+    public static class ResultHandlerImpl
+        implements
+        ResultHandler {
         Object object;
 
         public void handleResult(Object object) {
             this.object = object;
         }
-        
+
         public Object getObject() {
             return this.object;
         }

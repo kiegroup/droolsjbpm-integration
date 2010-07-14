@@ -91,13 +91,13 @@ public class JPAKnowledgeServiceBean extends JpaDaoSupport {
         environment.set( EnvironmentName.GLOBALS,
                          new MapGlobalResolver() );
 
-        jpaKnowledgeServiceProvider = node.get( JPAKnowledgeFactoryService.class );
-        if ( jpaKnowledgeServiceProvider instanceof JPAKnowledgeProviderLocalClient ) {
-            JPAKnowledgeProviderLocalClient local = (JPAKnowledgeProviderLocalClient) jpaKnowledgeServiceProvider;
-            local.setCommandServiceClass( SpringSingleSessionCommandService.class );
-        } else {
-            throw new RuntimeDroolsException( "JPAKnowledgeService is not instance of: " + JPAKnowledgeProviderLocalClient.class.getName() );
-        }
+//        jpaKnowledgeServiceProvider = node.get( JPAKnowledgeFactoryService.class );
+//        if ( jpaKnowledgeServiceProvider instanceof JPAKnowledgeProviderLocalClient ) {
+//            JPAKnowledgeProviderLocalClient local = (JPAKnowledgeProviderLocalClient) jpaKnowledgeServiceProvider;
+//            local.setCommandServiceClass( SpringSingleSessionCommandService.class );
+//        } else {
+//            throw new RuntimeDroolsException( "JPAKnowledgeService is not instance of: " + JPAKnowledgeProviderLocalClient.class.getName() );
+//        }
 
         if ( variablePersisters != null && !variablePersisters.isEmpty() ) {
             for ( Map.Entry<Class< ? >, Class< ? extends VariablePersister>> entry : variablePersisters.entrySet() ) {

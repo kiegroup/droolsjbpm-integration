@@ -12,20 +12,25 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
 import org.drools.command.SingleSessionCommandService;
 import org.drools.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.command.runtime.process.GetProcessInstanceCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.ProcessBuilder;
-import org.drools.container.spring.beans.JPASingleSessionCommandService;
 import org.drools.core.util.DroolsStreamUtils;
+import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
 import org.drools.process.core.timer.Timer;
 import org.drools.rule.Package;
 import org.drools.ruleflow.core.RuleFlowProcess;
 import org.drools.ruleflow.instance.RuleFlowProcessInstance;
+import org.drools.runtime.Environment;
+import org.drools.runtime.EnvironmentName;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.NodeInstance;
 import org.drools.runtime.process.ProcessInstance;
 import org.drools.runtime.process.WorkItem;
@@ -142,17 +147,14 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceWorkItems() throws Exception {
         log.info( "---> get bean jpaSingleSessionCommandService" );
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
+        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         log.info( "---> create new SingleSessionCommandService" );
-        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
 
-        int sessionId = service.getSessionId();
+        int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
-
-        StartProcessCommand startProcessCommand = new StartProcessCommand();
-        startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
-        ProcessInstance processInstance = service.execute( startProcessCommand );
+       
+        ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -160,74 +162,60 @@ public class JPASingleSessionCommandServiceFactoryTest {
         WorkItem workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
+        
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        processInstance = service.getProcessInstance( processInstance.getId()  );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        service.getWorkItemManager().completeWorkItem( workItem.getId(), null );
 
         workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        processInstance = service.getProcessInstance( processInstance.getId()  );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        service.getWorkItemManager().completeWorkItem( workItem.getId(), null );
 
         workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
-        assertNotNull( processInstance );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        processInstance = service.getProcessInstance( processInstance.getId()  );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+         service.getWorkItemManager().completeWorkItem( workItem.getId(), null );
 
         workItem = handler.getWorkItem();
         assertNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
-        assertNull( processInstance );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        processInstance = service.getProcessInstance( processInstance.getId()  );
         service.dispose();
     }
 
     @Test
     public void testPersistenceWorkItemsUserTransaction() throws Exception {
 
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
-        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
+        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        int sessionId = service.getSessionId();
-
-        StartProcessCommand startProcessCommand = new StartProcessCommand();
-        startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
-        ProcessInstance processInstance = service.execute( startProcessCommand );
+        int sessionId = service.getId();
+        ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -235,59 +223,51 @@ public class JPASingleSessionCommandServiceFactoryTest {
         WorkItem workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
+        
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );        
+
+        processInstance = service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );   
+        service.getWorkItemManager().completeWorkItem(  workItem.getId(), null );
 
         workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        processInstance = service.getProcessInstance( processInstance.getId()  );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        service.getWorkItemManager().abortWorkItem(  workItem.getId() );
 
         workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );        
+        processInstance = service.getProcessInstance( processInstance.getId()  );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
-
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        service.getWorkItemManager().completeWorkItem( workItem.getId(), null );
         workItem = handler.getWorkItem();
         assertNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        processInstance = service.getProcessInstance(  processInstance.getId() );
         assertNull( processInstance );
         service.dispose();
     }
@@ -385,14 +365,13 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceSubProcess() {
 
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
-        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
+        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        int sessionId = service.getSessionId();
+        int sessionId = service.getId();
 
         StartProcessCommand startProcessCommand = new StartProcessCommand();
-        startProcessCommand.setProcessId( "org.drools.test.ProcessSubProcess" );
-        RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.execute( startProcessCommand );
+        
+        RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess( "org.drools.test.ProcessSubProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
         long processInstanceId = processInstance.getId();
@@ -402,10 +381,15 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstanceId );
-        processInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
+
+        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        
+        processInstance = (RuleFlowProcessInstance) service.getProcessInstance( processInstanceId );
         assertNotNull( processInstance );
 
         Collection<NodeInstance> nodeInstances = processInstance.getNodeInstances();
@@ -413,27 +397,19 @@ public class JPASingleSessionCommandServiceFactoryTest {
                       nodeInstances.size() );
         SubProcessNodeInstance subProcessNodeInstance = (SubProcessNodeInstance) nodeInstances.iterator().next();
         long subProcessInstanceId = subProcessNodeInstance.getProcessInstanceId();
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( subProcessInstanceId );
-        RuleFlowProcessInstance subProcessInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
+        RuleFlowProcessInstance subProcessInstance = (RuleFlowProcessInstance) service.getProcessInstance( subProcessInstanceId );
         assertNotNull( subProcessInstance );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        CompleteWorkItemCommand completeWorkItemCommand = new CompleteWorkItemCommand();
-        completeWorkItemCommand.setWorkItemId( workItem.getId() );
-        service.execute( completeWorkItemCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        service.getWorkItemManager().completeWorkItem( workItem.getId() , null );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( subProcessInstanceId );
-        subProcessInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        subProcessInstance = (RuleFlowProcessInstance) service.getProcessInstance( subProcessInstanceId );
         assertNull( subProcessInstance );
-
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstanceId );
-        processInstance = (RuleFlowProcessInstance) service.execute( getProcessInstanceCommand );
+        
+        processInstance = (RuleFlowProcessInstance)  service.getProcessInstance( processInstanceId );
         assertNull( processInstance );
         service.dispose();
     }
@@ -530,40 +506,39 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceTimer() throws Exception {
         log.info( "---> get bean jpaSingleSessionCommandService" );
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
+        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        log.info( "---> create new SingleSessionCommandService" );
-        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
-
-        int sessionId = service.getSessionId();
+        int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
-        StartProcessCommand startProcessCommand = new StartProcessCommand();
-        startProcessCommand.setProcessId( "org.drools.test.ProcessTimer" );
-        ProcessInstance processInstance = service.execute( startProcessCommand );
+        ProcessInstance processInstance = service.startProcess( "org.drools.test.ProcessTimer"  );
         long procId = processInstance.getId();
         log.info( "---> Started ProcessTimer id: {}",
                   procId );
         service.dispose();
         log.info( "---> session disposed" );
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
+
+        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        
         log.info( "---> load session: " + sessionId );
-        GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( procId );
-        processInstance = service.execute( getProcessInstanceCommand );
+        processInstance = service.getProcessInstance( procId );
         log.info( "---> GetProcessInstanceCommand id: " + procId );
         assertNotNull( processInstance );
         log.info( "---> session disposed" );
         service.dispose();
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
         log.info( "---> load session: " + sessionId );
         Thread.sleep( 3000 );
-        getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( procId );
+        
         log.info( "---> GetProcessInstanceCommand id: " + procId );
-        processInstance = service.execute( getProcessInstanceCommand );
+        processInstance = service.getProcessInstance( procId );
         log.info( "---> session disposed" );
         assertNull( processInstance );
     }
@@ -618,23 +593,25 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
     @Test
     public void testPersistenceTimer2() throws Exception {
-        JPASingleSessionCommandService jpaService = (JPASingleSessionCommandService) ctx.getBean( "jpaSingleSessionCommandService" );
-        SingleSessionCommandService service = jpaService.newStatefulKnowledgeSession();
+        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        int sessionId = service.getSessionId();
+        int sessionId = service.getId();
 
-        StartProcessCommand startProcessCommand = new StartProcessCommand();
-        startProcessCommand.setProcessId( "org.drools.test.ProcessTimer2" );
-        ProcessInstance processInstance = service.execute( startProcessCommand );
+        ProcessInstance processInstance = service.startProcess( "org.drools.test.ProcessTimer2" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
         Thread.sleep( 2000 );
 
-        service = jpaService.loadStatefulKnowledgeSession( sessionId );
-        GetProcessInstanceCommand getProcessInstanceCommand = new GetProcessInstanceCommand();
-        getProcessInstanceCommand.setProcessInstanceId( processInstance.getId() );
-        processInstance = service.execute( getProcessInstanceCommand );
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
+
+        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
+        
+        processInstance = service.getProcessInstance(  processInstance.getId()  );
         assertNull( processInstance );
     }
 

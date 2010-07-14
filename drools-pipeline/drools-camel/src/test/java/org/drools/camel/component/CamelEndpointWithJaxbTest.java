@@ -3,13 +3,21 @@ package org.drools.camel.component;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import javax.naming.NamingException;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.OnCompletionDefinition;
+import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
@@ -20,21 +28,37 @@ import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.builder.help.KnowledgeBuilderHelper;
+import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.GetGlobalCommand;
+import org.drools.command.runtime.SetGlobalCommand;
+import org.drools.command.runtime.process.AbortWorkItemCommand;
+import org.drools.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.GetObjectCommand;
+import org.drools.command.runtime.rule.GetObjectsCommand;
 import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.command.runtime.rule.QueryCommand;
+import org.drools.command.runtime.rule.RetractCommand;
+import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
+import org.drools.common.DefaultFactHandle;
 import org.drools.common.DisconnectedFactHandle;
+import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.pipeline.camel.Person;
+import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.impl.ExecutionResultImpl;
+import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.runtime.rule.QueryResultsRow;
 import org.drools.runtime.rule.impl.FlatQueryResults;
+import org.drools.xml.jaxb.util.JaxbListWrapper;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
@@ -46,306 +70,400 @@ import com.sun.tools.xjc.Options;
  */
 public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
-	private String handle;
-	private JAXBContext jaxbContext;
+    private String      handle;
+    private JAXBContext jaxbContext;
 
-	public void testSessionInsert() throws Exception {
+    public void testSessionInsert() throws Exception {        
 
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
-		cmd.setLookup("ksession1");
-		cmd.getCommands().add(new InsertObjectCommand(new Person("lucaz", 25), "person1"));
-		cmd.getCommands().add(new InsertObjectCommand(new Person("hadrian", 25), "person2"));
-		cmd.getCommands().add(new InsertObjectCommand(new Person("baunax", 21), "person3"));
-		cmd.getCommands().add(new FireAllRulesCommand());
-		
-		StringWriter xmlReq = new StringWriter();
-		Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty("jaxb.formatted.output", true);
-		marshaller.marshal(cmd, xmlReq);
-		
-		System.out.println(xmlReq.toString());
-		
-		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
-		assertNotNull(xmlResp);
-		System.out.println(new String(xmlResp));
+        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        cmd.setLookup( "ksession1" );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "lucaz",
+                                                                    25 ),
+                                                        "person1" ) );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "hadrian",
+                                                                    25 ),
+                                                        "person2" ) );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "baunax",
+                                                                    21 ),
+                                                        "person3" ) );
+        cmd.getCommands().add( new FireAllRulesCommand() );
 
-		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
-		assertNotNull(resp);
-		
-		assertEquals(3, resp.getIdentifiers().size());
-		assertNotNull(resp.getValue("person1"));
-		assertNotNull(resp.getValue("person2"));
-		assertNotNull(resp.getValue("person3"));
-		
-		assertNotNull(resp.getFactHandle("person1"));
-		assertNotNull(resp.getFactHandle("person2"));
-		assertNotNull(resp.getFactHandle("person3"));
-	}
-	
-	public void testSessionGetObject() throws Exception {
-		
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
-		cmd.setLookup("ksession1");
-		cmd.getCommands().add(new GetObjectCommand(new DisconnectedFactHandle(handle), "hadrian"));
-		
-		StringWriter xmlReq = new StringWriter();
-		Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty("jaxb.formatted.output", true);
-		marshaller.marshal(cmd, xmlReq);
-		
-		System.out.println(xmlReq.toString());
-		
-		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
-		
-		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
-		assertNotNull(resp);
-		
-		assertEquals(1, resp.getIdentifiers().size());
-		
-		assertNotNull(resp.getValue("hadrian"));
-	}
-	
-	public void testSessionModify() throws Exception {
-		String cmd = "";
-		cmd += "<batch-execution lookup='ksession1'>\n";
-		cmd += "   <modify fact-handle='" + handle + "'>\n";
-		cmd += "      <set accessor='name' value='\"salaboy\"' />\n";
-		cmd += "   </modify>\n";
-		cmd += "</batch-execution>\n";
-		
-		String outXml = new String((byte[])template.requestBodyAndHeader("direct:test-with-session", cmd, "jaxb-context", jaxbContext));
-		
-		String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
-		expectedXml += "<execution-results xmlns:ns2=\"http://drools.org/model\">\n";
-		expectedXml += "    <results/>\n";
-		expectedXml += "    <facts/>\n";
-		expectedXml += "</execution-results>\n";
-		
-		assertEquals(expectedXml, outXml);
-		
-		cmd = "<batch-execution lookup='ksession1'>\n";
-		cmd += "   <get-object out-identifier='rider' fact-handle='" + handle + "'/>\n";
-		cmd += "</batch-execution>\n";
+        StringWriter xmlReq = new StringWriter();
+        Marshaller marshaller = getJaxbContext().createMarshaller();
+        marshaller.setProperty( "jaxb.formatted.output",
+                                true );
+        marshaller.marshal( cmd,
+                            xmlReq );
 
-		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", cmd.toString(), "jaxb-context", jaxbContext);
-		assertNotNull(xmlResp);
-		System.out.println(new String(xmlResp));
+        System.out.println( xmlReq.toString() );
 
-		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
-		assertNotNull(resp);
-		
-		Person person = (Person) resp.getValue("rider");
-		System.out.println(person.getName());
-		
-		assertEquals("salaboy", person.getName());
-		
-	}
+        byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
+                                                        xmlReq.toString() );
+        assertNotNull( xmlResp );
+        System.out.println( new String( xmlResp ) );
 
-	public void testSessionRetractObject() throws Exception {
+        ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        assertNotNull( resp );
 
-		String cmd =  "";
-		cmd += "<batch-execution lookup='ksession1'>\n"; 
-		cmd += "   <retract fact-handle='" + handle + "' />\n"; 
-		cmd += "</batch-execution>";
+        assertEquals( 3,
+                      resp.getIdentifiers().size() );
+        assertNotNull( resp.getValue( "person1" ) );
+        assertNotNull( resp.getValue( "person2" ) );
+        assertNotNull( resp.getValue( "person3" ) );
 
-		String outXml = new String((byte[])template.requestBodyAndHeader("direct:test-with-session", cmd, "jaxb-context", jaxbContext));
+        assertNotNull( resp.getFactHandle( "person1" ) );
+        assertNotNull( resp.getFactHandle( "person2" ) );
+        assertNotNull( resp.getFactHandle( "person3" ) );
+    }
 
-		System.out.println(outXml);
+    public void testSessionGetObject() throws Exception {
 
-		assertNotNull(outXml);
+        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        cmd.setLookup( "ksession1" );
+        cmd.getCommands().add( new GetObjectCommand( new DisconnectedFactHandle( handle ),
+                                                     "hadrian" ) );
 
-	}
+        StringWriter xmlReq = new StringWriter();
+        Marshaller marshaller = getJaxbContext().createMarshaller();
+        marshaller.setProperty( "jaxb.formatted.output",
+                                true );
+        marshaller.marshal( cmd,
+                            xmlReq );
 
-	public void testInsertElements() throws Exception {
-		
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
-		cmd.setLookup("ksession1");
-		InsertElementsCommand elems = new InsertElementsCommand("elems");
-		elems.getObjects().add(new Person("lucaz", 25));
-		elems.getObjects().add(new Person("hadrian", 25));
-		elems.getObjects().add(new Person("baunax", 21));
-		
-		cmd.getCommands().add(elems);
-		cmd.getCommands().add(new FireAllRulesCommand());
-		
-		StringWriter xmlReq = new StringWriter();
-		Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty("jaxb.formatted.output", true);
-		marshaller.marshal(cmd, xmlReq);
-		
-		System.out.println(xmlReq.toString());
-		
-		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
-		assertNotNull(xmlResp);
-		System.out.println(new String(xmlResp));
+        System.out.println( xmlReq.toString() );
 
-		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
-		assertNotNull(resp);
-		
-		assertEquals(1, resp.getIdentifiers().size());
-		List<Person> list = (List<Person>) resp.getValue("elems");
-		assertEquals("lucaz", list.get(0).getName());
-		assertEquals("hadrian", list.get(1).getName());
-		assertEquals("baunax", list.get(2).getName());
-		
-	}
-	
-	public void testQuery() throws Exception {
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
-		cmd.setLookup("ksession1");
-		cmd.getCommands().add(new InsertObjectCommand(new Person("lucaz")));
-		cmd.getCommands().add(new InsertObjectCommand(new Person("hadrian")));
-		cmd.getCommands().add(new InsertObjectCommand(new Person("baunax", 43)));
-		cmd.getCommands().add(new InsertObjectCommand(new Person("baunax", 21)));
-		cmd.getCommands().add(new QueryCommand("persons", "persons", null));
-		cmd.getCommands().add(new QueryCommand("person", "personWithName", new String[] {"baunax"} ));
-		
-		StringWriter xmlReq = new StringWriter();
-		Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty("jaxb.formatted.output", true);
-		marshaller.marshal(cmd, xmlReq);
-		
-		System.out.println(xmlReq.toString());
-		
-		byte[] xmlResp = (byte[]) template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
-		assertNotNull(xmlResp);
-		System.out.println(new String(xmlResp));
-		
-		ExecutionResults resp = (ExecutionResults) jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
-		assertNotNull(resp);
-		
-		FlatQueryResults personQuery = (FlatQueryResults) resp.getValue("person");
-		assertEquals(2, personQuery.size());
-		FlatQueryResults personsQuery = (FlatQueryResults) resp.getValue("persons");
-		assertEquals(5, personsQuery.size());
-		
-		Iterator<QueryResultsRow> iterator = personQuery.iterator();
-		QueryResultsRow row = iterator.next();
-		Person person = (Person) row.get("$p");
-		
-		assertEquals("baunax", person.getName());
-	}
+        byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
+                                                        xmlReq.toString() );
 
-	public void testProcess() throws Exception {
+        ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        assertNotNull( resp );
 
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
-		cmd.setLookup("ksession1");
-		
-		StartProcessCommand start = new StartProcessCommand("org.drools.actions");
-		start.putParameter("person", new Person("lucaz", 25));
-		start.putParameter("person2", new Person("hadrian", 25));
-		start.putParameter("person3", new Person("baunax", 21));
-		
-		cmd.getCommands().add(start);
-		
-		StringWriter xmlReq = new StringWriter();
-		Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty("jaxb.formatted.output", true);
-		marshaller.marshal(cmd, xmlReq);
-		
-		System.out.println(xmlReq.toString());
+        assertEquals( 1,
+                      resp.getIdentifiers().size() );
 
-		byte[] xmlResp = (byte[])template.requestBodyAndHeader("direct:test-with-session", xmlReq.toString(), "jaxb-context", jaxbContext);
-		assertNotNull(xmlResp);
-		System.out.println(new String(xmlResp));
-		Object resp = jaxbContext.createUnmarshaller().unmarshal(new ByteArrayInputStream(xmlResp));
-		assertNotNull(resp);
-	}
-	
-	
-	public void testProcessInstanceSignalEvent() throws Exception {
-		
-		String processId = "org.drools.event";
-		
-		String cmd = "";
-		cmd += "<batch-execution lookup='ksession1'>\n";
-		cmd += "  <start-process processId='" + processId + "'>\n";
-		cmd += "  </start-process>\n";
-		cmd += "</batch-execution>\n";
-		
-		System.out.println(cmd);
+        assertNotNull( resp.getValue( "hadrian" ) );
+    }
 
-		String outXml = new String((byte[])template.requestBodyAndHeader("direct:test-with-session", cmd, "jaxb-context", jaxbContext));
-		
-		assertNotNull(outXml);
-		
-		int processInstanceId = 1;
-		
-		cmd = "";
-		cmd += "<batch-execution lookup='ksession1'>\n";
-		cmd += "   <signal-event process-instance-id= '" + processInstanceId + "' event-type='MyEvent'>";
+    public void testSessionModify() throws Exception {
+        String cmd = "";
+        cmd += "<batch-execution lookup='ksession1'>\n";
+        cmd += "   <modify fact-handle='" + handle + "'>\n";
+        cmd += "      <setters>";
+        cmd += "          <item accessor='name' value='\"salaboy\"' />\n";
+        cmd += "      </setters>\n";
+        cmd += "   </modify>\n";
+        cmd += "</batch-execution>\n";
+
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session",
+                                                                   cmd ) );
+
+        String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+        expectedXml += "<execution-results xmlns:ns2=\"http://drools.org/model\">\n";
+        expectedXml += "    <results/>\n";
+        expectedXml += "    <facts/>\n";
+        expectedXml += "</execution-results>\n";
+
+        //assertEquals(expectedXml, outXml);
+
+        cmd = "<batch-execution lookup='ksession1'>\n";
+        cmd += "   <get-object out-identifier='rider' fact-handle='" + handle + "'/>\n";
+        cmd += "</batch-execution>\n";
+
+        byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
+                                                        cmd.toString() );
+        assertNotNull( xmlResp );
+
+        ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        assertNotNull( resp );
+
+        Person person = (Person) resp.getValue( "rider" );
+
+        assertEquals( "salaboy",
+                      person.getName() );
+
+    }
+
+    public void testSessionRetractObject() throws Exception {
+
+        String cmd = "";
+        cmd += "<batch-execution lookup='ksession1'>\n";
+        cmd += "   <retract fact-handle='" + handle + "' />\n";
+        cmd += "</batch-execution>";
+
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session",
+                                                                   cmd ) );
+
+        System.out.println( outXml );
+
+        assertNotNull( outXml );
+
+    }
+
+    public void testInsertElements() throws Exception {
+
+        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        cmd.setLookup( "ksession1" );
+        InsertElementsCommand elems = new InsertElementsCommand( "elems" );
+        elems.getObjects().add( new Person( "lucaz",
+                                            25 ) );
+        elems.getObjects().add( new Person( "hadrian",
+                                            25 ) );
+        elems.getObjects().add( new Person( "baunax",
+                                            21 ) );
+        elems.getObjects().add( "xxx" );
+
+        cmd.getCommands().add( elems );
+        cmd.getCommands().add( new FireAllRulesCommand() );
+
+        StringWriter xmlReq = new StringWriter();
+        Marshaller marshaller = getJaxbContext().createMarshaller();
+        marshaller.setProperty( "jaxb.formatted.output",
+                                true );
+        marshaller.marshal( cmd,
+                            xmlReq );
+
+        System.out.println( xmlReq.toString() );
+
+        BatchExecutionCommand cmd2 = (BatchExecutionCommand) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlReq.toString().getBytes() ) );
+
+        byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
+                                                        xmlReq.toString() );
+        assertNotNull( xmlResp );
+        System.out.println( new String( xmlResp ) );
+
+        ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        assertNotNull( resp );
+
+        assertEquals( 1,
+                      resp.getIdentifiers().size() );
+        List<Person> list = (List<Person>) resp.getValue( "elems" );
+        assertEquals( "lucaz",
+                      list.get( 0 ).getName() );
+        assertEquals( "hadrian",
+                      list.get( 1 ).getName() );
+        assertEquals( "baunax",
+                      list.get( 2 ).getName() );
+
+    }
+
+    public void testQuery() throws Exception {
+        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        cmd.setLookup( "ksession1" );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "lucaz" ) ) );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "hadrian" ) ) );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "baunax",
+                                                                    43 ) ) );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "baunax",
+                                                                    21 ) ) );
+        cmd.getCommands().add( new QueryCommand( "persons",
+                                                 "persons",
+                                                 null ) );
+        cmd.getCommands().add( new QueryCommand( "person",
+                                                 "personWithName",
+                                                 new String[]{"baunax"} ) );
+
+        StringWriter xmlReq = new StringWriter();
+        Marshaller marshaller = getJaxbContext().createMarshaller();
+        marshaller.setProperty( "jaxb.formatted.output",
+                                true );
+        marshaller.marshal( cmd,
+                            xmlReq );
+
+        System.out.println( xmlReq.toString() );
+
+        byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
+                                                        xmlReq.toString() );
+        assertNotNull( xmlResp );
+        System.out.println( new String( xmlResp ) );
+
+        ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        assertNotNull( resp );
+
+        FlatQueryResults personQuery = (FlatQueryResults) resp.getValue( "person" );
+        assertEquals( 2,
+                      personQuery.size() );
+        FlatQueryResults personsQuery = (FlatQueryResults) resp.getValue( "persons" );
+        assertEquals( 5,
+                      personsQuery.size() );
+
+        Iterator<QueryResultsRow> iterator = personQuery.iterator();
+        QueryResultsRow row = iterator.next();
+        Person person = (Person) row.get( "$p" );
+
+        assertEquals( "baunax",
+                      person.getName() );
+    }
+
+    public void testProcess() throws Exception {
+
+        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        cmd.setLookup( "ksession1" );
+
+        StartProcessCommand start = new StartProcessCommand( "org.drools.actions" );
+        start.putParameter( "person",
+                            new Person( "lucaz",
+                                        25 ) );
+        start.putParameter( "person2",
+                            new Person( "hadrian",
+                                        25 ) );
+        start.putParameter( "person3",
+                            new Person( "baunax",
+                                        21 ) );
+
+        cmd.getCommands().add( start );
+
+        StringWriter xmlReq = new StringWriter();
+        Marshaller marshaller = getJaxbContext().createMarshaller();
+        marshaller.setProperty( "jaxb.formatted.output",
+                                true );
+        marshaller.marshal( cmd,
+                            xmlReq );
+
+        System.out.println( xmlReq.toString() );
+
+        byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
+                                                        xmlReq.toString() );
+        assertNotNull( xmlResp );
+        System.out.println( new String( xmlResp ) );
+        Object resp = getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        assertNotNull( resp );
+    }
+
+    public void testProcessInstanceSignalEvent() throws Exception {
+
+        String processId = "org.drools.event";
+
+        String cmd = "";
+        cmd += "<batch-execution lookup='ksession1'>\n";
+        cmd += "  <start-process processId='" + processId + "'>\n";
+        cmd += "  </start-process>\n";
+        cmd += "</batch-execution>\n";
+
+        System.out.println( cmd );
+
+        String outXml = new String( (byte[]) template.requestBody( "direct:test-with-session",
+                                                                   cmd ) );
+
+        assertNotNull( outXml );
+
+        int processInstanceId = 1;
+
+        cmd = "";
+        cmd += "<batch-execution lookup='ksession1'>\n";
+        cmd += "   <signal-event process-instance-id= '" + processInstanceId + "' event-type='MyEvent'>";
         cmd += "      <string>MyValue</string>";
         cmd += "   </signal-event>";
         cmd += "</batch-execution>\n";
-		
-		outXml = new String((byte[])template.requestBodyAndHeader("direct:test-with-session", cmd, "jaxb-context", jaxbContext));
-		
-		System.out.println(outXml);
-	}
 
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new DroolsRouteBuilder() {
-			public void configure() throws Exception {
-				from("direct:test-with-session").
-				    unmarshal("drools-jaxb").to("drools:node/ksession1").marshal("drools-jaxb");
-				from("direct:test-no-session").
-				    unmarshal("drools-jaxb").to("drools:node").marshal("drools-jaxb");
-			}
-		};
-	}
+        outXml = new String( (byte[]) template.requestBody( "direct:test-with-session",
+                                                            cmd ) );
 
-	@Override
-	protected void configureDroolsContext() {
-		Person me = new Person();
-		me.setName("Hadrian");
+        System.out.println( outXml );
+    }
 
-		String rule = "";
-		rule += "package org.drools.pipeline.camel \n";
-		rule += "import org.drools.pipeline.camel.Person \n";
-		rule += "global java.util.List list \n";
-		rule += "query persons \n";
-		rule += "   $p : Person(name != null) \n";
-		rule += "end \n";
-		rule += "query personWithName(String param)\n";
-		rule += "   $p : Person(name == param) \n";
-		rule += "end \n";
-		rule += "rule rule1 \n";
-		rule += "  when \n";
-		rule += "    $p : Person() \n";
-		rule += " \n";
-		rule += "  then \n";
-		rule += "    System.out.println(\"executed\"); \n";
-		rule += "end\n";
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            public void configure() throws Exception {
+                JaxbDataFormat def = new JaxbDataFormat();
+                def.setPrettyPrint( true );
+                def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
 
-		StatefulKnowledgeSession ksession = registerKnowledgeRuntime("ksession1", rule);
-		InsertObjectCommand cmd = new InsertObjectCommand(me);
-		cmd.setOutIdentifier("camel-rider");
-		cmd.setReturnObject(false);
-		ExecutionResults results = ksession.execute(cmd);
-		handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
-	}
+                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
+                from( "direct:test-no-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node" ).marshal( def );
+            }            
+        };
+    }
 
-	@Override
-	protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier, String rule) {
-		KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
+    public JAXBContext getJaxbContext() {
+        if ( this.jaxbContext == null ) {
+            JaxbDataFormat def = new JaxbDataFormat();
+            def.setPrettyPrint( true );
+            def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+    
+            // create a jaxbContext for the test to use outside of Camel.
+            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "ksession1" );
+            KnowledgeBase kbase = ksession1.getKnowledgeBase();
+            ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
+                def = DroolsPolicy.augmentJaxbDataFormatDefinition( def );
+                
+                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = ( org.apache.camel.converter.jaxb.JaxbDataFormat ) def.getDataFormat(  this.context.getRoutes().get( 0 ).getRouteContext() );
+                
+                
+                jaxbContext = jaxbDataformat.getContext();
+            } catch ( JAXBException e ) {
+                throw new RuntimeException( e );
+            } finally {
+                Thread.currentThread().setContextClassLoader( originalCl );
+            }   
+        }
+        
+        return jaxbContext;
+    }
+    
+    @Override
+    protected void configureDroolsContext(javax.naming.Context jndiContext) {
+        Person me = new Person();
+        me.setName( "Hadrian" );
 
-		Options xjcOpts = new Options();
-		xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
-		
-		JaxbConfiguration jaxbConfiguration = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );
-		
-		kbuilder.add( ResourceFactory.newClassPathResource("person.xsd", getClass()), ResourceType.XSD, jaxbConfiguration);
+        String rule = "";
+        rule += "package org.drools.pipeline.camel \n";
+        rule += "import org.drools.pipeline.camel.Person \n";
+        rule += "global java.util.List list \n";
+        rule += "query persons \n";
+        rule += "   $p : Person(name != null) \n";
+        rule += "end \n";
+        rule += "query personWithName(String param)\n";
+        rule += "   $p : Person(name == param) \n";
+        rule += "end \n";
+        rule += "rule rule1 \n";
+        rule += "  when \n";
+        rule += "    $p : Person() \n";
+        rule += " \n";
+        rule += "  then \n";
+        rule += "    System.out.println(\"executed\"); \n";
+        rule += "end\n";
 
-		if (rule != null && rule.length() > 0) {
-			kbuilder.add(ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
+        StatefulKnowledgeSession ksession = registerKnowledgeRuntime( "ksession1",
+                                                                      rule );
+        InsertObjectCommand cmd = new InsertObjectCommand( me );
+        cmd.setOutIdentifier( "camel-rider" );
+        cmd.setReturnObject( false );
+        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
 
-			if (kbuilder.hasErrors()) {
-				LOG.info("Errors while adding rule. ", kbuilder.getErrors());
-			}
-		}
-		
-		String process1 = "";
+        ExecutionResults results = ksession.execute( script );
+        handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
+    }
+
+    @Override
+    protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier,
+                                                                String rule) {
+        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+
+        Options xjcOpts = new Options();
+        xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
+
+        JaxbConfiguration jaxbConfiguration = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts,
+                                                                                            "xsd" );
+
+        kbuilder.add( ResourceFactory.newClassPathResource( "person.xsd",
+                                                            getClass() ),
+                      ResourceType.XSD,
+                      jaxbConfiguration );
+
+        if ( rule != null && rule.length() > 0 ) {
+            kbuilder.add( ResourceFactory.newByteArrayResource( rule.getBytes() ),
+                          ResourceType.DRL );
+
+            if ( kbuilder.hasErrors() ) {
+                LOG.info( "Errors while adding rule. ",
+                          kbuilder.getErrors() );
+            }
+        }
+
+        String process1 = "";
         process1 += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         process1 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         process1 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
@@ -370,7 +488,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process1 += "    <start id=\"1\" name=\"Start\" />\n";
         process1 += "    <actionNode id=\"2\" name=\"MyActionNode\" >\n";
         process1 += "      <action type=\"expression\" dialect=\"mvel\" >System.out.println(\"Triggered\");\n";
-//        process1 += "list.add(person.name);\n";
+        //        process1 += "list.add(person.name);\n";
         process1 += "</action>\n";
         process1 += "    </actionNode>\n";
         process1 += "    <end id=\"3\" name=\"End\" />\n";
@@ -381,15 +499,16 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process1 += "    <connection from=\"2\" to=\"3\" />\n";
         process1 += "  </connections>\n" + "\n";
         process1 += "</process>";
-        
-        kbuilder.add(ResourceFactory.newByteArrayResource(process1.getBytes()), ResourceType.DRF);
 
-        if (kbuilder.hasErrors()) {
-        	System.out.println("Errors while adding process rule 1. " + kbuilder.getErrors());
+        kbuilder.add( ResourceFactory.newByteArrayResource( process1.getBytes() ),
+                      ResourceType.DRF );
+
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( "Errors while adding process rule 1. " + kbuilder.getErrors() );
         }
 
-		assertFalse(kbuilder.hasErrors());
-        
+        assertFalse( kbuilder.hasErrors() );
+
         String process2 = "";
         process2 += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         process2 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
@@ -424,36 +543,23 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process2 += "  </connections>\n";
         process2 += "\n";
         process2 += "</process>";
-        
-        kbuilder.add(ResourceFactory.newByteArrayResource(process2.getBytes()), ResourceType.DRF);
 
-        if (kbuilder.hasErrors()) {
-        	LOG.info("Errors while adding process rule 2. ", kbuilder.getErrors());
+        kbuilder.add( ResourceFactory.newByteArrayResource( process2.getBytes() ),
+                      ResourceType.DRF );
+
+        if ( kbuilder.hasErrors() ) {
+            LOG.info( "Errors while adding process rule 2. ",
+                      kbuilder.getErrors() );
         }
 
-		assertFalse(kbuilder.hasErrors());
+        assertFalse( kbuilder.hasErrors() );
 
-		KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        KnowledgeBase kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
-		// Add object model to classes array
-		List<String> classesName = new ArrayList<String>();		
-		classesName.add("org.drools.model.AddressType");
-		classesName.add("org.drools.model.ObjectFactory");
-		classesName.add("org.drools.model.Person");
-		classesName.add("org.drools.pipeline.camel.Person");
-		
-		try {
-			jaxbContext = KnowledgeBuilderHelper.newJAXBContext( classesName.toArray(new String[classesName.size()]), kbase );
-		} catch (Exception e) {
-			LOG.info("Errors while creating JAXB Context. ", e);
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-
-		StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-		node.get(DirectoryLookupFactoryService.class).register(identifier, session);
-		return session;
-	}
-	
+        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+        node.get( DirectoryLookupFactoryService.class ).register( identifier,
+                                                                  session );
+        return session;
+    }
 }

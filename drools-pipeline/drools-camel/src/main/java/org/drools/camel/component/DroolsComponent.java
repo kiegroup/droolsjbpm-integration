@@ -27,15 +27,7 @@ import org.drools.grid.ExecutionNode;
 
 public class DroolsComponent extends DefaultComponent {
     // Property name *must* follow the Camel conventions (see org.apache.camel.Exchange)
-    public static final String DROOLS_LOOKUP = "DroolsLookup";
-    public static final String DROOLS_OUT_IDENTIFIER = "DroolsOutIdentifier";
-    public static final String DROOLS_HANDLE = "DroolsHandle";
-
-    private static final String UUID_PREFIX = "drools-";
-    private static final AtomicInteger counter = new AtomicInteger();
-    
-    private ExecutionNode node;
-    private String nodeId = "";
+    public static final String DROOLS_LOOKUP = "DroolsLookup"; 
 
     public DroolsComponent() {
     }
@@ -44,46 +36,14 @@ public class DroolsComponent extends DefaultComponent {
         super(context);
     }
 
-    public String getExecutionNodeId() {
-        return nodeId;
-    }
-
-    public void setExecutionNodeId (String nodeId) {
-        this.nodeId = nodeId == null ? "" : nodeId;
-    }
-
-    public ExecutionNode getExecutionNode() {
-        return node;
-    }
-
-    public void setExecutionNode(ExecutionNode node) {
-        this.node = node;
-    }
-
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         Endpoint endpoint;
         endpoint = new DroolsEndpoint(uri, remaining, this);
         setProperties(endpoint, parameters);
         return endpoint;
-    }
-    
-    public static final String getSessionManagerId(String uri) {
-        int pos = uri.indexOf('/');
-        return (pos < 0) ? uri : uri.substring(0, pos);
+    }    
 
-    }
-
-    public static final String getKsessionId(String uri) {
-        int pos = uri.indexOf('/');
-        return (pos < 0) ? "" : uri.substring(pos + 1);
-    }
-
-    public static final String generateUuid() {
-        // Using the Camel uuid generator would be an option, but those are pretty long ids
-        // UuidGenerator.get().generateUuid()
-        return UUID_PREFIX + counter.incrementAndGet();
-    }
     @Override
     protected void validateParameters(String uri, Map<String, Object> parameters, String optionPrefix) {
 

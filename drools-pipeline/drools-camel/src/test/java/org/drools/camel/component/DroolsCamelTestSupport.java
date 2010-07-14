@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public abstract class DroolsCamelTestSupport extends ContextTestSupport {
 	protected static final Logger LOG = LoggerFactory.getLogger(DroolsCamelTestSupport.class);
 	protected ExecutionNode node;
+	
 
     public void setNode(ExecutionNode node) {
 		this.node = node;
@@ -66,6 +67,7 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         // Overriding this method is necessary in the absence of a spring application context 
         // to bootstrap the whole thing.  Create another Spring based unit test with all the beans
         // defined as below and remove this comment from here.
+        //create
         Context context = super.createJndiContext();
 
         LocalConnection connection = new LocalConnection();
@@ -73,11 +75,11 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         node.setId("node");
         context.bind("node", node);
 
-        configureDroolsContext();
+        configureDroolsContext(context);
         return context;
     }
         
-    protected abstract void configureDroolsContext();
+    protected abstract void configureDroolsContext(Context jndiContext);
 
     protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier, String rule) {
     	KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
@@ -105,5 +107,10 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         Diff diff = new Diff(expected, result);
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         XMLAssert.assertXMLEqual(diff, true);
+    }
+
+    protected void configureDroolsContext() {
+        // TODO Auto-generated method stub
+        
     }
 }

@@ -16,4 +16,23 @@
 	<drools:ksession id="ksession1" type="stateless" kbase="kbase1"/>
 	
 	<drools:ksession id="ksession2" type="stateful"  kbase="kbase1"/>
+	
+	<bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<!-- org.h2.jdbcx.JdbcDataSource -->
+		<property name="driverClassName" value="org.h2.Driver" />
+		<!-- jdbc:h2:mem:mydb 
+		jdbc:h2:tcp://localhost/DroolsFlow-->
+		<property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>	
+
+	<drools:ksession id="ksession3" type="stateful"  kbase="kbase1">	    
+
+	</drools:ksession>
+	
+		
+    <bean id="person1" class="org.drools.Person" >
+        <property name="name" value="mark" />
+    </bean>
 </beans>

@@ -1,7 +1,10 @@
 package org.drools.container.spring.beans;
 
+import java.util.List;
+
 import org.drools.KnowledgeBase;
 import org.drools.builder.DirectoryLookupFactoryService;
+import org.drools.command.Command;
 import org.drools.grid.ExecutionNode;
 import org.drools.runtime.CommandExecutor;
 import org.springframework.beans.factory.BeanNameAware;
@@ -20,6 +23,8 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     private KnowledgeBase kbase;
     private String        beanName;
     private String        name;
+    
+    private List<Command> script;
 
     public AbstractKnowledgeSessionBeanFactory() {
         super();
@@ -47,6 +52,14 @@ public abstract class AbstractKnowledgeSessionBeanFactory
 
     public boolean isSingleton() {
         return true;
+    }        
+
+    public List<Command> getScript() {
+        return script;
+    }
+
+    public void setScript(List<Command> commands) {
+        this.script = commands;
     }
 
     public final void afterPropertiesSet() throws Exception {

@@ -7,10 +7,7 @@
     <groupId>org.drools</groupId>
     <version>5.1.0.SNAPSHOT</version>
   </parent>
-
-	<properties>
-		<spring.version>2.5.6</spring.version>
-	</properties>
+  
 
   <artifactId>drools-spring</artifactId>
   <packaging>jar</packaging>
@@ -33,11 +30,11 @@
     		<artifactId>drools-compiler</artifactId>
     	</dependency>
     	
-    	<dependency>
+    	<!--dependency>
     		<groupId>org.drools</groupId>
     		<artifactId>drools-server-spring</artifactId>
     		<version>${project.version}</version>
-    	</dependency>
+    	</dependency-->
     	
     	<dependency>
     		<groupId>org.drools</groupId>
@@ -49,10 +46,28 @@
     		<artifactId>drools-persistence-jpa</artifactId>
     		<optional>true</optional>
     	</dependency>
+    	
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>    	
+    	
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-xjc</artifactId>    
+			<scope>provided</scope>	
+    	</dependency>
+    	
     	 <dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
             <exclusions>
 		      <exclusion>
 		        <groupId>commons-logging</groupId>
@@ -63,24 +78,20 @@
     	 <dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
     	</dependency>
     	 <dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-orm</artifactId>
-            <version>${spring.version}</version>
             <optional>true</optional>
     	</dependency>
     	 <dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
             <optional>true</optional>
     	</dependency>
     	 <dependency>
     		<groupId>org.springframework</groupId>
-    		<artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
+    		<artifactId>spring-context</artifactId>k
     	</dependency>
     	 <dependency>
         	<groupId>javax.persistence</groupId>
