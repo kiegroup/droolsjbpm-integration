@@ -72,12 +72,12 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-xstream</artifactId>
-            <scope>optional</scope>
+            <optional>true</optional>
         </dependency>     
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jaxb</artifactId>
-            <scope>optional</scope>
+            <optional>true</optional>
         </dependency>  
         <dependency>
             <groupId>org.springframework</groupId>
