@@ -83,8 +83,8 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
 
-        assertEquals( expectedXml,
-                      outXml );
+        assertXMLEqual( expectedXml,
+                        outXml );
 
     }
 
@@ -136,8 +136,8 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
 
-        assertEquals( expectedXml,
-                      outXml );
+        assertXMLEqual( expectedXml,
+                        outXml );
     }
 
     public void testNoSessionInsertCustomXstream() throws Exception {
@@ -171,8 +171,8 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
 
-        assertEquals( expectedXml,
-                      outXml );
+        assertXMLEqual( expectedXml,
+                        outXml );
     }
 
     public void testSessionGetObject() throws Exception {
@@ -198,8 +198,8 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         expectedXml += "</result>";
         expectedXml += "</execution-results>";
 
-        assertEquals( expectedXml,
-                      outXml );
+        assertXMLEqual( expectedXml,
+                        outXml );
 
     }
 

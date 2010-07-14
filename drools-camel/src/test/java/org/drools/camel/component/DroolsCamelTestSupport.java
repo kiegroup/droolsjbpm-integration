@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class DroolsCamelTestSupport extends ContextTestSupport {
 	protected static final Logger LOG = LoggerFactory.getLogger(DroolsCamelTestSupport.class);
-	protected ExecutionNode node;
-	
+	protected ExecutionNode node;	
 
     public void setNode(ExecutionNode node) {
 		this.node = node;
@@ -108,6 +107,8 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         XMLAssert.assertXMLEqual(diff, true);
     }
+    
+    
 
     protected void configureDroolsContext() {
         // TODO Auto-generated method stub
