@@ -18,7 +18,6 @@
       <module>drools-transformer-xstream</module>
       <module>drools-transformer-jxls</module>
       <module>drools-messenger-jms</module>
-      <module>drools-camel</module>
   </modules>
   
 </project>
