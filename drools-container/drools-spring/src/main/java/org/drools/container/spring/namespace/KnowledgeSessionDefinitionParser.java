@@ -4,6 +4,9 @@ import static org.drools.container.spring.namespace.DefinitionParserHelper.empty
 
 import java.util.List;
 
+import org.drools.ClockType;
+import org.drools.RuleBaseConfiguration;
+import org.drools.SessionConfiguration;
 import org.drools.command.CommandFactory;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
@@ -11,11 +14,13 @@ import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.conf.EventProcessingOption;
 import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
 import org.drools.container.spring.beans.KnowledgeBaseBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
+import org.drools.runtime.conf.ClockTypeOption;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -43,6 +48,13 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     private static final String EXECUTION_NODE_ATTRIBUTE = "node";
     private static final String TYPE_ATTRIBUTE           = "type";
 
+    private static final String KEEP_RERENCE             = "keep-reference";
+    private static final String CLOCK_TYPE               = "clock-type";
+    
+    private static final String WORK_ITEMS               = "work-item-handlers";
+    
+    private static final String WORK_ITEM                = "work-item-handler";    
+    
     protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
     	
@@ -86,45 +98,71 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
             						  id );        	
         }
         
-        Element persistenceElm = DomUtils.getChildElementByTagName(element, "jpa-persistence");
-        if ( persistenceElm != null) {
-            BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( JpaConfiguration.class );
-            
-            String loadId = persistenceElm.getAttribute( "load" );
-            if ( StringUtils.hasText( loadId ) ) {
-                beanBuilder.addPropertyValue( "id", Long.parseLong( loadId ) );
-            }
-            
-            Element tnxMng = DomUtils.getChildElementByTagName(persistenceElm, TX_MANAGER_ATTRIBUTE);
-            String ref = tnxMng.getAttribute( "ref" );
-            
-            beanBuilder.addPropertyReference( "platformTransactionManager", ref );
-            
-            Element emf = DomUtils.getChildElementByTagName(persistenceElm, EMF_ATTRIBUTE);
-            ref = emf.getAttribute( "ref" );
-            beanBuilder.addPropertyReference( "entityManagerFactory", ref ); 
-            
-            Element variablePersisters = DomUtils.getChildElementByTagName(persistenceElm, "variable-persisters");
-            if ( variablePersisters != null && variablePersisters.hasChildNodes() ) {
-                List<Element> childPersisterElems = DomUtils.getChildElementsByTagName(variablePersisters, "persister");
-                ManagedMap persistors = new ManagedMap( childPersisterElems.size() );
-                for ( Element persisterElem : childPersisterElems) {
-                    String forClass = persisterElem.getAttribute( FORCLASS_ATTRIBUTE );
-                    String implementation = persisterElem.getAttribute( IMPLEMENTATION_ATTRIBUTE );
-                    if ( !StringUtils.hasText( forClass ) ) {                        
-                        throw new RuntimeException( "persister element must have valid for-class attribute" );
-                    }
-                    if ( !StringUtils.hasText( implementation ) ) {                        
-                        throw new RuntimeException( "persister element must have valid implementation attribute" );
-                    }                    
-                    persistors.put( forClass,
-                                    implementation );                    
+        Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
+        if ( ksessionConf != null ) {
+            Element persistenceElm = DomUtils.getChildElementByTagName(ksessionConf, "jpa-persistence");
+            if ( persistenceElm != null) {
+                BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( JpaConfiguration.class );
+                
+                String loadId = persistenceElm.getAttribute( "load" );
+                if ( StringUtils.hasText( loadId ) ) {
+                    beanBuilder.addPropertyValue( "id", Long.parseLong( loadId ) );
                 }
-                beanBuilder.addPropertyValue( "variablePersisters", persistors );
+                
+                Element tnxMng = DomUtils.getChildElementByTagName(persistenceElm, TX_MANAGER_ATTRIBUTE);
+                String ref = tnxMng.getAttribute( "ref" );
+                
+                beanBuilder.addPropertyReference( "platformTransactionManager", ref );
+                
+                Element emf = DomUtils.getChildElementByTagName(persistenceElm, EMF_ATTRIBUTE);
+                ref = emf.getAttribute( "ref" );
+                beanBuilder.addPropertyReference( "entityManagerFactory", ref ); 
+                
+                Element variablePersisters = DomUtils.getChildElementByTagName(persistenceElm, "variable-persisters");
+                if ( variablePersisters != null && variablePersisters.hasChildNodes() ) {
+                    List<Element> childPersisterElems = DomUtils.getChildElementsByTagName(variablePersisters, "persister");
+                    ManagedMap persistors = new ManagedMap( childPersisterElems.size() );
+                    for ( Element persisterElem : childPersisterElems) {
+                        String forClass = persisterElem.getAttribute( FORCLASS_ATTRIBUTE );
+                        String implementation = persisterElem.getAttribute( IMPLEMENTATION_ATTRIBUTE );
+                        if ( !StringUtils.hasText( forClass ) ) {                        
+                            throw new RuntimeException( "persister element must have valid for-class attribute" );
+                        }
+                        if ( !StringUtils.hasText( implementation ) ) {                        
+                            throw new RuntimeException( "persister element must have valid implementation attribute" );
+                        }                    
+                        persistors.put( forClass,
+                                        implementation );                    
+                    }
+                    beanBuilder.addPropertyValue( "variablePersisters", persistors );
+                }
+                
+                factory.addPropertyValue( "jpaConfiguration", beanBuilder.getBeanDefinition() );                                           
             }
+            BeanDefinitionBuilder rbaseConfBuilder = BeanDefinitionBuilder.rootBeanDefinition( SessionConfiguration.class );
+            Element e = DomUtils.getChildElementByTagName(ksessionConf, KEEP_RERENCE);
+            if ( e != null && StringUtils.hasText( e.getAttribute( "enabled" ) )) {
+                rbaseConfBuilder.addPropertyValue( "keepReference", Boolean.parseBoolean( e.getAttribute( "enabled" ) ) );
+            }   
             
-            factory.addPropertyValue( "jpaConfiguration", beanBuilder.getBeanDefinition() );
+            e = DomUtils.getChildElementByTagName(ksessionConf, CLOCK_TYPE);
+            if ( e != null && StringUtils.hasText( e.getAttribute( "type" ) )) {
+                rbaseConfBuilder.addPropertyValue( "clockType", ClockType.resolveClockType( e.getAttribute( "type" ) ) );
+            }                
+            factory.addPropertyValue( "conf", rbaseConfBuilder.getBeanDefinition() );   
             
+            e = DomUtils.getChildElementByTagName(ksessionConf, WORK_ITEMS);
+            if ( e != null ) {
+                List<Element> children = DomUtils.getChildElementsByTagName( e, WORK_ITEM );
+                if ( children != null && !children.isEmpty() ) {
+                    ManagedMap workDefs = new ManagedMap();
+                    for ( Element child : children ) {
+                        workDefs.put(  child.getAttribute( "name" ),
+                                       new RuntimeBeanReference( child.getAttribute( "ref" ) ) );
+                    }
+                    factory.addPropertyValue( "workItems", workDefs );                    
+                }
+            }            
         }
         
         Element script = DomUtils.getChildElementByTagName(element, "script");

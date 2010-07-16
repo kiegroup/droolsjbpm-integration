@@ -18,10 +18,12 @@
 	<drools:execution-node id="node1" connection="connection1" />
 
 	<drools:kbase id="kbProcessWorkItems" node="node1">
-		<drools:resource type="PKG" source="file:///${temp.dir}/processWorkItems.pkg" />
-		<drools:resource type="PKG" source="file:///${temp.dir}/processSubProcess.pkg" />
-		<drools:resource type="PKG" source="file:///${temp.dir}/processTimer.pkg" />
-		<drools:resource type="PKG" source="file:///${temp.dir}/processTimer2.pkg" />
+	    <drools:resources>
+			<drools:resource type="PKG" source="file:///${temp.dir}/processWorkItems.pkg" />
+			<drools:resource type="PKG" source="file:///${temp.dir}/processSubProcess.pkg" />
+			<drools:resource type="PKG" source="file:///${temp.dir}/processTimer.pkg" />
+			<drools:resource type="PKG" source="file:///${temp.dir}/processTimer2.pkg" />
+		</drools:resources>
 	</drools:kbase>
 	
 	<bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -36,10 +38,12 @@
 	<drools:kstore id="kstore1" />	
 	    
 	<drools:ksession id="jpaSingleSessionCommandService" type="stateful"  kbase="kbProcessWorkItems">
-		<drools:jpa-persistence>
-            <drools:transaction-manager ref="txManager" />
-            <drools:entity-manager-factory ref="myEmf" />   	    
-	    </drools:jpa-persistence>		    
+	    <drools:configuration>
+			<drools:jpa-persistence>
+	            <drools:transaction-manager ref="txManager" />
+	            <drools:entity-manager-factory ref="myEmf" />   	    
+		    </drools:jpa-persistence>
+	    </drools:configuration>		    
 	</drools:ksession>
 	
 </beans>

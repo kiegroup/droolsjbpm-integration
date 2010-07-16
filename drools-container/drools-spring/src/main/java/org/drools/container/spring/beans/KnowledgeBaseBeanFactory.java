@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.util.JAXBResult;
 
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
+import org.drools.RuleBaseConfiguration;
 import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
@@ -19,6 +22,7 @@ import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.local.LocalConnection;
 import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.process.core.WorkDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,6 +37,9 @@ public class KnowledgeBaseBeanFactory
     FactoryBean,
     InitializingBean {
 
+    private KnowledgeBaseConfiguration  conf;
+    private Map<String, WorkDefinition> workDefinitions;
+    
     private KnowledgeBase               kbase;
     private ExecutionNode               node;
     private List<DroolsResourceAdapter> resources = Collections.emptyList();
@@ -53,8 +60,18 @@ public class KnowledgeBaseBeanFactory
         if ( node == null ) {
             node = new LocalConnection().getExecutionNode();
         }
+        
+        if ( this.conf != null && this.workDefinitions != null && !this.workDefinitions.isEmpty() ) {
+            Map<String, WorkDefinition> map = ((RuleBaseConfiguration) this.conf).getProcessWorkDefinitions();
+            map.putAll( this.workDefinitions );
+        }
+         
         KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
-        kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        if ( this.conf != null ) {
+            kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(conf);
+        } else {
+            kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase( );
+        }
  
         List<JaxbConfigurationImpl> xsds = new ArrayList<JaxbConfigurationImpl>();
         
@@ -86,6 +103,23 @@ public class KnowledgeBaseBeanFactory
             kbaseImpl.jaxbClasses.add( conf.getClasses() );            
         }
 
+    }
+    
+
+    public Map<String, WorkDefinition> getWorkDefinitions() {
+        return workDefinitions;
+    }
+
+    public void setWorkDefinitions(Map<String, WorkDefinition> workDefinitions) {
+        this.workDefinitions = workDefinitions;
+    }
+
+    public KnowledgeBaseConfiguration getConf() {
+        return conf;
+    }
+
+    public void setConf(KnowledgeBaseConfiguration conf) {
+        this.conf = conf;
     }
 
     public KnowledgeBase getKbase() {

@@ -6,14 +6,18 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.KnowledgeBaseFactory;
+import org.drools.RuleBaseConfiguration;
+import org.drools.SessionConfiguration;
 import org.drools.command.Command;
 import org.drools.persistence.jpa.JPAKnowledgeService;
 import org.drools.persistence.processinstance.VariablePersistenceStrategyFactory;
 import org.drools.persistence.processinstance.persisters.VariablePersister;
+import org.drools.process.core.WorkDefinition;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.process.WorkItemHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {
@@ -40,6 +44,11 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
 
     @Override
     protected void internalAfterPropertiesSet() {
+        if ( getConf() != null && getWorkItems() != null && !getWorkItems().isEmpty() ) {
+            Map<String, WorkItemHandler> map = ((SessionConfiguration) getConf()).getWorkItemHandlers();
+            map.putAll( getWorkItems() );
+        }
+        
         if ( jpaConfiguration != null ) {
             if ( !jpaConfiguration.getVariablePersisters().isEmpty() ) {
                 for ( Map.Entry<String, Class< ? extends VariablePersister>> entry : jpaConfiguration.getVariablePersisters().entrySet() ) {
@@ -53,18 +62,20 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
                      jpaConfiguration.getEntityManagerFactory() );
             env.set( EnvironmentName.TRANSACTION_MANAGER,
                      jpaConfiguration.getPlatformTransactionManager() );
+            
+            
             if ( jpaConfiguration.getId() >= 0 ) {
                 ksession = JPAKnowledgeService.loadStatefulKnowledgeSession( jpaConfiguration.getId(),
                                                                              getKbase(),
-                                                                             null,
+                                                                             getConf(),
                                                                              env );
             } else {
                 ksession = JPAKnowledgeService.newStatefulKnowledgeSession( getKbase(),
-                                                                            null,
+                                                                            getConf(),
                                                                             env );
             }
         } else {
-            ksession = getKbase().newStatefulKnowledgeSession();
+            ksession = getKbase().newStatefulKnowledgeSession( getConf(), null);
         }
         
         if ( getScript() != null && !getScript().isEmpty()) {

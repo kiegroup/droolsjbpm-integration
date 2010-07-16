@@ -1,12 +1,16 @@
 package org.drools.container.spring.beans;
 
 import java.util.List;
+import java.util.Map;
 
 import org.drools.KnowledgeBase;
+import org.drools.SessionConfiguration;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
 import org.drools.grid.ExecutionNode;
 import org.drools.runtime.CommandExecutor;
+import org.drools.runtime.KnowledgeSessionConfiguration;
+import org.drools.runtime.process.WorkItemHandler;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,6 +24,8 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     NamedBean {
 
     private ExecutionNode node;
+    private Map<String, WorkItemHandler> workItems;
+    private KnowledgeSessionConfiguration conf;
     private KnowledgeBase kbase;
     private String        beanName;
     private String        name;
@@ -32,6 +38,22 @@ public abstract class AbstractKnowledgeSessionBeanFactory
 
     public Object getObject() throws Exception {
         return getCommandExecutor();
+    }
+
+    public Map<String, WorkItemHandler> getWorkItems() {
+        return workItems;
+    }
+
+    public void setWorkItems(Map<String, WorkItemHandler> workItems) {
+        this.workItems = workItems;
+    }
+
+    public KnowledgeSessionConfiguration getConf() {
+        return conf;
+    }
+
+    public void setConf(KnowledgeSessionConfiguration conf) {
+        this.conf = conf;
     }
 
     public String getName() {

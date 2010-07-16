@@ -15,7 +15,9 @@
 	<drools:execution-node id="node1" connection="connection1" /> -->
 
 	<drools:kbase id="kbase1">
-		<drools:resource type="DRF" source="classpath:org/drools/container/spring/beans/persistence/VariablePersistenceStrategyProcess.rf" />
+		<drools:resources>
+			<drools:resource type="DRF" source="classpath:org/drools/container/spring/beans/persistence/VariablePersistenceStrategyProcess.rf" />
+		</drools:resources>
 	</drools:kbase>
 	
 	<bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -27,26 +29,19 @@
 		<property name="entityManagerFactory" ref="myEmf" />
 	</bean>
 	
-	<drools:kstore id="kstore1" />
-	
-	<!--drools:jpaSessionServiceFactory id="jpaSingleSessionCommandService" kbase="kbase1" 
-			entityManagerFactory="myEmf" transactionManager="txManager">
-		<drools:variablePersisters>
-			<drools:persister forClass="javax.persistence.Entity" implementation="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
-			<drools:persister forClass="java.lang.String" implementation="org.drools.container.spring.beans.persistence.StringVariablePersister"/>
-			<drools:persister forClass="java.io.Serializable" implementation="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
-		</drools:variablePersisters>
-	</drools:jpaSessionServiceFactory--> 
+	<drools:kstore id="kstore1" />	
 	
 	<drools:ksession id="jpaSingleSessionCommandService" type="stateful"  kbase="kbase1">
-		<drools:jpa-persistence>
-            <drools:transaction-manager ref="txManager" />
-            <drools:entity-manager-factory ref="myEmf" />
-			<drools:variable-persisters>
-				<drools:persister for-class="javax.persistence.Entity" implementation="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
-				<drools:persister for-class="java.lang.String" implementation="org.drools.container.spring.beans.persistence.StringVariablePersister"/>
-				<drools:persister for-class="java.io.Serializable" implementation="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
-			</drools:variable-persisters>               	    
-	    </drools:jpa-persistence>    
+	    <drools:configuration>
+			<drools:jpa-persistence>
+	            <drools:transaction-manager ref="txManager" />
+	            <drools:entity-manager-factory ref="myEmf" />
+				<drools:variable-persisters>
+					<drools:persister for-class="javax.persistence.Entity" implementation="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
+					<drools:persister for-class="java.lang.String" implementation="org.drools.container.spring.beans.persistence.StringVariablePersister"/>
+					<drools:persister for-class="java.io.Serializable" implementation="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
+				</drools:variable-persisters>               	    
+		    </drools:jpa-persistence>
+	    </drools:configuration>    
 	</drools:ksession>	
 </beans>

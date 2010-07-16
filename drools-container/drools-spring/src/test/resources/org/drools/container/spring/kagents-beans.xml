@@ -18,8 +18,10 @@
 	
 	<drools:ksession id="ksession2" type="stateful"  kbase="kbase1"/>	
 	
-	<drools:kbase id="kbase1" node="node1">						
-		<drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>	
+	<drools:kbase id="kbase1" node="node1">			
+	    <drools:resources>			
+			<drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+		</drools:resources>	
 	</drools:kbase>
 	
 	<drools:kbase id="kbase2" node="node1">							
@@ -31,7 +33,9 @@
 	<drools:kagent id="kagent1" kbase="kbase1" new-instance="false" />
 	
 	<drools:kagent id="kagent2" kbase="kbase2" new-instance="false">
-	    <drools:resource type="DRL" source="classpath:org/drools/container/spring/drl" />
+	    <drools:resources>
+	    	<drools:resource type="DRL" source="classpath:org/drools/container/spring/drl" />
+	    </drools:resources>
 	</drools:kagent>
 	
 	<drools:kagent id="kagent3" kbase="kbase3" new-instance="true" />

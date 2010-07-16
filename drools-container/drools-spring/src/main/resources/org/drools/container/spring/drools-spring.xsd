@@ -26,6 +26,15 @@
 		</xsd:complexType>
 	</xsd:element>	
 	
+	<xsd:element name="resources">
+		<xsd:complexType>
+			<xsd:choice  minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="resource" />
+				<xsd:element ref="resource-ref" />
+			</xsd:choice>
+		</xsd:complexType>	
+	</xsd:element>
+	
 	<xsd:element name="resource">
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -35,13 +44,58 @@
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>	
+	
+	<xsd:element name="resource-ref" type="resourceRefType" />
 
 	<xsd:element name="kbase">
 		<xsd:complexType>
-			<xsd:choice  minOccurs="0" maxOccurs="unbounded">
-				<xsd:element name="resource" type="resourceType"/>
-				<xsd:element name="resource-ref" type="resourceRefType"/>
-			</xsd:choice>
+		    <xsd:all minOccurs="0">
+			    <xsd:element ref="resources"  minOccurs="0" maxOccurs="1" />
+			    
+				<xsd:element name="configuration" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:all minOccurs="0">
+	                        <xsd:element name="advanced-process-rule-integration" minOccurs="0">
+							    <xsd:complexType>
+							        <xsd:attribute name="enabled" type="xsd:boolean"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>
+	                        
+	                        <xsd:element name="multithread" minOccurs="0">
+							    <xsd:complexType>
+							        <xsd:attribute name="enabled" type="xsd:boolean"/>
+							        <xsd:attribute name="max-threads" type="xsd:positiveInteger"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>
+	                        	                        
+	                        <xsd:element name="mbeans" minOccurs="0">
+				                <xsd:complexType>
+							        <xsd:attribute name="enabled" type="xsd:boolean"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>	                        
+	                        
+	                        <xsd:element name="event-processing-mode" minOccurs="0">
+				                <xsd:complexType>
+							        <xsd:attribute name="mode" type="cloudModeEnum"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>	
+
+	                        <xsd:element name="work-item-definitions" minOccurs="0">
+				                <xsd:complexType>
+				                    <xsd:choice>
+				                	    <xsd:element name="work-item-definition" minOccurs="0" maxOccurs="unbounded">
+					                	    <xsd:complexType>
+					                	        <xsd:attribute name="name" use="required" type="xsd:string"/>
+					                	        <xsd:attribute name="ref" use="required" type="xsd:string"/>
+					                	    </xsd:complexType>
+				                	    </xsd:element>				                	    
+				                	</xsd:choice>
+							    </xsd:complexType>	                        
+	                        </xsd:element>	                        	                        
+						</xsd:all>
+					</xsd:complexType>				
+				</xsd:element>	
+			</xsd:all>
 			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
 			<xsd:attribute name="node" use="optional" type="xsd:string"/>
 		</xsd:complexType>
@@ -49,11 +103,9 @@
 	
 	<xsd:element name="kagent">
 		<xsd:complexType>
-			<xsd:choice   minOccurs="0" maxOccurs="unbounded">
-				<xsd:element name="resource" type="resourceType"/>
-				<xsd:element name="resource-ref" type="resourceRefType"/>
-			</xsd:choice>
-					
+		    <xsd:all>
+			    <xsd:element ref="resources"  minOccurs="0" maxOccurs="1" />
+			</xsd:all>		
 			<xsd:attribute name="id" use="required" type="xsd:ID"/>
 			<xsd:attribute name="kbase" use="required" type="xsd:string"/>
 			<xsd:attribute name="new-instance" use="optional" type="xsd:boolean"/>
@@ -64,7 +116,7 @@
 
 	<xsd:element name="ksession">
 		<xsd:complexType>
-			<xsd:all>
+			<xsd:all minOccurs="0">
 				<xsd:element name="script" minOccurs="0" maxOccurs="1">
 					<xsd:complexType>
 						<xsd:sequence>
@@ -73,7 +125,39 @@
 					</xsd:complexType>				
 				</xsd:element>
 				
-				<xsd:element ref="persistence" minOccurs="0" maxOccurs="1" />				
+				<xsd:element name="configuration" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:all minOccurs="0">
+	                        <xsd:element ref="persistence" minOccurs="0"/>
+	                        
+	                        <xsd:element name="keep-reference" minOccurs="0">
+				                <xsd:complexType>
+							        <xsd:attribute name="enabled" type="xsd:boolean"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>	                        
+	                        
+	                        <xsd:element name="clock-type" minOccurs="0">
+				                <xsd:complexType>
+							        <xsd:attribute name="type" type="clockTypeEnum"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>		
+	                        
+	                        <xsd:element name="work-item-handlers" minOccurs="0">
+				                <xsd:complexType>
+				                    <xsd:choice>
+				                	    <xsd:element name="work-item-handler" minOccurs="0" maxOccurs="unbounded">
+					                	    <xsd:complexType>
+					                	        <xsd:attribute name="name" use="required" type="xsd:string"/>
+					                	        <xsd:attribute name="ref" use="required" type="xsd:string"/>
+					                	    </xsd:complexType>
+				                	    </xsd:element>				                	    
+				                	</xsd:choice>
+							    </xsd:complexType>	                        
+	                        </xsd:element>		                                                
+						</xsd:all>
+					</xsd:complexType>				
+				</xsd:element>				
+								
 			</xsd:all>	
 				
 			<xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
@@ -123,6 +207,21 @@
 			<xsd:enumeration value="XMLSCHEMA" />
 		</xsd:restriction>
 	</xsd:simpleType>	
+	
+	<xsd:simpleType name="cloudModeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="STREAM" />
+			<xsd:enumeration value="CLOUD" />
+		</xsd:restriction>
+	</xsd:simpleType>	
+	
+	<xsd:simpleType name="clockTypeEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="REALTIME" />
+			<xsd:enumeration value="PSEUDO" />
+		</xsd:restriction>
+	</xsd:simpleType>		
+	
 	
 	<xsd:complexType name="resourceType">
 		<xsd:choice minOccurs="0" maxOccurs="1">

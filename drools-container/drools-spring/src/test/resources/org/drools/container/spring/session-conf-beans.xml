@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"
+       xmlns:drools-service="http://drools.org/schema/drools-service-spring"       
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
+                           http://drools.org/schema/drools-service-spring http://drools.org/schema/drools-service-spring.xsd
+                           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+   <bean id="rwid1" class="org.drools.process.core.impl.WorkDefinitionImpl">
+       <property name="name" value="wid1" />
+   </bean>
+   
+   <bean id="rwid2" class="org.drools.process.core.impl.WorkDefinitionImpl">
+       <property name="name" value="wid2" />
+   </bean> 
+   
+   <bean id="rwih1" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />
+   
+   <bean id="rwih2" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />  
+
+	<drools:kbase id="kbase1">
+	   <drools:resources>
+	      <drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+	   </drools:resources>
+	   
+	   <drools:configuration>
+	      <drools:advanced-process-rule-integration enabled="true" />
+	      
+	      <drools:multithread enabled="true" max-threads="5" />
+	      
+	      <drools:mbeans enabled="true" />
+	      
+	      <drools:event-processing-mode mode="STREAM" />
+	      
+	      <drools:work-item-definitions>
+	          <drools:work-item-definition name="wid1" ref="rwid1" />
+	          <drools:work-item-definition name="wid2" ref="rwid2" />
+	      </drools:work-item-definitions>
+	      
+	   </drools:configuration>
+	</drools:kbase>
+	
+	<drools:kbase id="kbase2">
+	   <drools:resources>
+	      <drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+	   </drools:resources>
+	   
+	   <drools:configuration>
+	      <drools:advanced-process-rule-integration enabled="false" />
+	      
+	      <drools:multithread enabled="false" />
+	      
+	      <drools:mbeans enabled="false" />
+	      
+	      <drools:event-processing-mode mode="CLOUD" />	      
+	   </drools:configuration>
+	</drools:kbase>	
+	
+	
+	<drools:ksession id="ksession1" type="stateful"  kbase="kbase1" >
+	   <drools:configuration>
+		    <drools:work-item-handlers>
+		        <drools:work-item-handler name="wih1" ref="rwih1" />
+		        <drools:work-item-handler name="wih2" ref="rwih2" />
+		    </drools:work-item-handlers>
+		    <drools:keep-reference enabled="true" />	
+		    <drools:clock-type type="REALTIME"  /> 
+	   </drools:configuration>		    
+	</drools:ksession>
+	
+	<drools:ksession id="ksession2" type="stateful"  kbase="kbase1" >
+	   <drools:configuration>
+		    <drools:keep-reference enabled="false" />	
+		    <drools:clock-type type="PSEUDO"  /> 
+	   </drools:configuration>		    
+	</drools:ksession>	
+	
+</beans>
