@@ -77,19 +77,7 @@
 							        <xsd:attribute name="mode" type="cloudModeEnum"/>
 							    </xsd:complexType>	                        
 	                        </xsd:element>	
-
-	                        <xsd:element name="work-item-definitions" minOccurs="0">
-				                <xsd:complexType>
-				                    <xsd:choice>
-				                	    <xsd:element name="work-item-definition" minOccurs="0" maxOccurs="unbounded">
-					                	    <xsd:complexType>
-					                	        <xsd:attribute name="name" use="required" type="xsd:string"/>
-					                	        <xsd:attribute name="ref" use="required" type="xsd:string"/>
-					                	    </xsd:complexType>
-				                	    </xsd:element>				                	    
-				                	</xsd:choice>
-							    </xsd:complexType>	                        
-	                        </xsd:element>	                        	                        
+                        	                        
 						</xsd:all>
 					</xsd:complexType>				
 				</xsd:element>	

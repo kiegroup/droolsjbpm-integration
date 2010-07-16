@@ -176,15 +176,6 @@ public class SpringDroolsTest extends TestCase {
         assertTrue( rconf.isMultithreadEvaluation() );
         assertEquals( 5, rconf.getMaxThreads() );
         assertEquals( EventProcessingOption.STREAM, rconf.getEventProcessingMode() );
-        Map<String, WorkDefinition> wds = rconf.getProcessWorkDefinitions();
-        assertEquals( 4, wds.size() );
-        assertTrue( wds.containsKey( "Email" ));
-        assertTrue( wds.containsKey( "Log" ));
-        assertTrue( wds.containsKey( "wid1" ));
-        assertTrue( wds.containsKey( "wid2" ));
-        assertNotSame(  wds.get( "wid1" ), wds.get( "wid2" ));
-        assertEquals( org.drools.process.core.impl.WorkDefinitionImpl.class, wds.get( "wid1" ).getClass() );
-        assertEquals( org.drools.process.core.impl.WorkDefinitionImpl.class, wds.get( "wid2" ).getClass() );
         
         KnowledgeBaseImpl kbase2 = ( KnowledgeBaseImpl ) context.getBean( "kbase2" );
         rconf = ((InternalRuleBase)kbase2.getRuleBase()).getConfiguration();

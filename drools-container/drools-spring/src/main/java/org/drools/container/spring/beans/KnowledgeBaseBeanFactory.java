@@ -38,7 +38,6 @@ public class KnowledgeBaseBeanFactory
     InitializingBean {
 
     private KnowledgeBaseConfiguration  conf;
-    private Map<String, WorkDefinition> workDefinitions;
     
     private KnowledgeBase               kbase;
     private ExecutionNode               node;
@@ -59,11 +58,6 @@ public class KnowledgeBaseBeanFactory
     public void afterPropertiesSet() throws Exception {
         if ( node == null ) {
             node = new LocalConnection().getExecutionNode();
-        }
-        
-        if ( this.conf != null && this.workDefinitions != null && !this.workDefinitions.isEmpty() ) {
-            Map<String, WorkDefinition> map = ((RuleBaseConfiguration) this.conf).getProcessWorkDefinitions();
-            map.putAll( this.workDefinitions );
         }
          
         KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
@@ -103,16 +97,7 @@ public class KnowledgeBaseBeanFactory
             kbaseImpl.jaxbClasses.add( conf.getClasses() );            
         }
 
-    }
-    
-
-    public Map<String, WorkDefinition> getWorkDefinitions() {
-        return workDefinitions;
-    }
-
-    public void setWorkDefinitions(Map<String, WorkDefinition> workDefinitions) {
-        this.workDefinitions = workDefinitions;
-    }
+    }   
 
     public KnowledgeBaseConfiguration getConf() {
         return conf;

@@ -66,19 +66,6 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
                 rbaseConfBuilder.addPropertyValue( "eventProcessingMode", EventProcessingOption.valueOf( e.getAttribute( "mode" ) ) );
             }                
             
-            e = DomUtils.getChildElementByTagName(kbaseConf, WORK_ITEM_DEFINITIONS);
-            if ( e != null ) {
-                List<Element> children = DomUtils.getChildElementsByTagName( e, WORK_ITEM_DEFINITION );
-                if ( children != null && !children.isEmpty() ) {
-                    ManagedMap workDefs = new ManagedMap();
-                    for ( Element child : children ) {
-                        workDefs.put(  child.getAttribute( "name" ),
-                                       new RuntimeBeanReference( child.getAttribute( "ref" ) ) );
-                    }
-                    factory.addPropertyValue( "workDefinitions", workDefs );                    
-                }
-            }
-            
             factory.addPropertyValue( "conf", rbaseConfBuilder.getBeanDefinition() );
         }
 
