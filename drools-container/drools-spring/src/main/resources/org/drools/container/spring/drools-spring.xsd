@@ -7,15 +7,22 @@
 	
 	<xsd:element name="connection">
 		<xsd:complexType>
-			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
 			<xsd:attribute name="type" use="required" type="connectionTypeEnum"/>
 		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="execution-node">
 		<xsd:complexType>
-			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
 			<xsd:attribute name="connection" use="required" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>	
+	
+	<xsd:element name="resource-change-scanner">
+		<xsd:complexType>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
+			<xsd:attribute name="interval" use="optional" type="xsd:integer"/>
 		</xsd:complexType>
 	</xsd:element>	
 	
@@ -47,8 +54,8 @@
 				<xsd:element name="resource-ref" type="resourceRefType"/>
 			</xsd:choice>
 					
-			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
-			<xsd:attribute name="kbase" use="optional" type="xsd:string"/>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
+			<xsd:attribute name="kbase" use="required" type="xsd:string"/>
 			<xsd:attribute name="new-instance" use="optional" type="xsd:boolean"/>
 		</xsd:complexType>
 	</xsd:element>		
@@ -71,7 +78,7 @@
 				
 			<xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
 			<xsd:attribute name="kbase" use="required" type="xsd:string"/>
-			<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
 			<xsd:attribute name="node" use="optional" type="xsd:string"/>
 			<xsd:attribute name="name" use="optional" type="xsd:string"/>
 		</xsd:complexType>

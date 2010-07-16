@@ -3,36 +3,39 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:drools="http://drools.org/schema/drools-spring"
        xmlns:drools-service="http://drools.org/schema/drools-service-spring"       
-       xmlns:camel="http://camel.apache.org/schema/spring"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                            http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
                            http://drools.org/schema/drools-service-spring http://drools.org/schema/drools-service-spring.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<camelContext id="executionContext" xmlns="http://camel.apache.org/schema/spring" />
+	<drools:resource-change-scanner id="s1" interval="5" />
 	
 	<drools:connection id="connection1" type="local" />
 	
 	<drools:execution-node id="node1" connection="connection1" />
 	
+	<drools:ksession id="ksession1" type="stateless" kbase="kbase1"/>
+	
+	<drools:ksession id="ksession2" type="stateful"  kbase="kbase1"/>	
+	
 	<drools:kbase id="kbase1" node="node1">						
-		<drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/temp/drl/testSpring.drl"/>	
+		<drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>	
 	</drools:kbase>
 	
-	<drools:kagent id="kagent1" kbase="kbase1" new-instance="true" />
+	<drools:kbase id="kbase2" node="node1">							
+	</drools:kbase>	
+
+	<drools:kbase id="kbase3" node="node1">							
+	</drools:kbase>
 	
-	<drools:kagent id="kagent2" new-instance="true" >
-	    <drools:resource type="DRL" source="classpath:org/drools/container/spring/temp/drl"/>
+	<drools:kagent id="kagent1" kbase="kbase1" new-instance="false" />
+	
+	<drools:kagent id="kagent2" kbase="kbase2" new-instance="false">
+	    <drools:resource type="DRL" source="classpath:org/drools/container/spring/drl" />
 	</drools:kagent>
 	
+	<drools:kagent id="kagent3" kbase="kbase3" new-instance="true" />
 	
-	<drools-service:configuration id="service-conf-1" marshaller="XSTREAM" session="ksession1">
-		<drools-service:class>org.drools.model.Person</drools-service:class>
-	</drools-service:configuration>
-	
-	<drools-service:definition id="service" node="node1" camelContext="executionContext">
-		<drools-service:configuration marshaller="JAXB" session="ksession2" />
-		<drools-service:configuration-ref id="service-conf-1" />
-	</drools-service:definition>
+	<drools:ksession id="ksession3" type="stateless" kbase="kbase2"/>	
 
 </beans>

@@ -44,44 +44,41 @@ public class KnowledgeAgentBeanFactory
         return this.kagent;
     }
 
-    public Class< ? extends KnowledgeAgent> getObjectType() {
+    public Class<KnowledgeAgent> getObjectType() {
         return KnowledgeAgent.class;
     }
 
     public void afterPropertiesSet() throws Exception {
         KnowledgeAgentConfiguration kagentConf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-        if ( kbase == null && (resources == null || resources == Collections.<DroolsResourceAdapter> emptyList()) ) {
-            throw new RuntimeException( "kagent must reference either an existing kbase or have child element resources" );
+        if ( kbase == null ) {
+            throw new RuntimeException( "kagent must reference an existing kbase" );
         }
-        
-        kagentConf.setProperty( "newInstance",
+
+        kagentConf.setProperty( "drools.agent.newInstance",
                                 newInstance );
 
-        if ( kbase != null ) {
-            this.kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.id,
-                                                                   this.kbase,
-                                                                   kagentConf );
-        } else {
-            this.kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.id,
-                                                                   kagentConf );
+        this.kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.id,
+                                                               this.kbase,
+                                                               kagentConf );
+        
+        if ( resources != null && !resources.isEmpty() ) {
             Collection<Resource> rs = new ArrayList<Resource>();
             for ( DroolsResourceAdapter res : resources ) {
                 InternalResource resource = (InternalResource) res.getDroolsResource();
-
+    
                 resource.setResourceType( res.getResourceType() );
-
+    
                 if ( res.getResourceConfiguration() != null ) {
                     resource.setConfiguration( res.getResourceConfiguration() );
                 }
-
+    
                 rs.add( resource );
             }
             ChangeSetImpl changeSet = new ChangeSetImpl();
             changeSet.setResourcesAdded( rs );
-            
+    
             kagent.applyChangeSet( changeSet );
         }
-        System.out.println( kagent );
     }
 
     public KnowledgeBase getKbase() {

@@ -11,9 +11,12 @@ import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
+import org.drools.container.spring.beans.KnowledgeBaseBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -42,6 +45,13 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
 
     protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
+    	
+        String id = element.getAttribute( "id" );
+        emptyAttributeCheck( element.getLocalName(),
+                             "id", 
+                             id);
+        
+        
         String kbase = element.getAttribute( KBASE_ATTRIBUTE );
         emptyAttributeCheck( element.getLocalName(),
                              KBASE_ATTRIBUTE,
@@ -68,9 +78,12 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         }
 
         String name = element.getAttribute( NAME_ATTRIBUTE );
-        if ( name != null && name.length() > 0 ) {
+        if ( StringUtils.hasText(name) ) {
             factory.addPropertyValue( "name",
                                       name );
+        } else {
+            factory.addPropertyValue( "name",
+            						  id );        	
         }
         
         Element persistenceElm = DomUtils.getChildElementByTagName(element, "jpa-persistence");
@@ -209,6 +222,18 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                 }
             }
             factory.addPropertyValue( "script", children );
+        }        
+        
+        // find any kagent's for the current kbase and assign
+        for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
+        	BeanDefinition def = parserContext.getRegistry().getBeanDefinition(beanName);
+        	if ( def.getBeanClassName().equals( KnowledgeAgentBeanFactory.class.getName() ) ) {        		        		
+        		 PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
+        		 RuntimeBeanReference tbf = ( RuntimeBeanReference ) pvalue.getValue();        		 
+        		if ( kbase.equals( tbf.getBeanName() ) ) {
+        			factory.addPropertyValue( "knowledgeAgent", new RuntimeBeanReference( beanName ) );
+        		}
+        	}       	
         }        
 
         return factory.getBeanDefinition();

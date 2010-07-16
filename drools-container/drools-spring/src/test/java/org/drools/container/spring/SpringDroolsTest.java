@@ -12,9 +12,17 @@ import junit.framework.TestCase;
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.drools.KnowledgeBase;
 import org.drools.Person;
+import org.drools.agent.KnowledgeAgent;
+import org.drools.agent.impl.KnowledgeAgentImpl;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.core.util.FileManager;
 import org.drools.grid.ExecutionNode;
+import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.drools.impl.StatelessKnowledgeSessionImpl;
+import org.drools.io.ResourceChangeScanner;
+import org.drools.io.ResourceFactory;
+import org.drools.io.impl.ResourceChangeScannerImpl;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.server.KnowledgeService;
@@ -80,45 +88,39 @@ public class SpringDroolsTest extends TestCase {
                       list.size() );
     }
     
-    public void testAgents() throws Exception {
-        URL url = getClass().getResource( "testSpring.drl" );
-        File file = new File( url.getFile() );
-//        File dir = new File( file, "temp" );
-//        dir.mkdirs()
-        File dir = new File( file.getParentFile(), "temp/drl" );
-        dir.mkdirs();
+    public void testAgents() throws Exception {        
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/kagents-beans.xml" );
         
-        File drlFile = new File( dir, "testSpring.drl");
-        System.out.println( drlFile );
-        drlFile.createNewFile();
+        ResourceChangeScannerImpl scanner = ( ResourceChangeScannerImpl ) ResourceFactory.getResourceChangeScannerService();
+        assertEquals( 5, scanner.getInterval() );
         
+        KnowledgeBaseImpl kbase1 = ( KnowledgeBaseImpl ) context.getBean( "kbase1" );
+        KnowledgeBaseImpl kbase2 = ( KnowledgeBaseImpl ) context.getBean( "kbase2" );
         
-        StreamUtils.copy( url.openStream(), new FileOutputStream( drlFile ) );
-        System.out.println( url );
-         assertTrue( drlFile.exists() );
-//        
-//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
-//
-//        List<String> list = new ArrayList<String>();
-//        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean( "ksession1" );
-//        kstateless.setGlobal( "list",
-//                              list );
-//        kstateless.execute( new Person( "Darth",
-//                                        "Cheddar",
-//                                        50 ) );
-//        assertEquals( 2,
-//                      list.size() );
-//
-//        list = new ArrayList<String>();
-//        StatefulKnowledgeSession kstateful = ((StatefulKnowledgeSession) context.getBean( "ksession2" ));
-//        kstateful.setGlobal( "list",
-//                             list );
-//        kstateful.insert( new Person( "Darth",
-//                                      "Cheddar",
-//                                      50 ) );
-//        kstateful.fireAllRules();
-//        assertEquals( 2,
-//                      list.size() );
+        KnowledgeAgentImpl kagent1 = ( KnowledgeAgentImpl ) context.getBean( "kagent1" );
+        assertSame( kagent1.getKnowledgeBase(), kbase1 );
+        assertEquals( 0, kagent1.getResourceDirectories().size() );
+        assertFalse( kagent1.isNewInstance() );
+        
+        KnowledgeAgentImpl kagent2 = ( KnowledgeAgentImpl ) context.getBean( "kagent2" );
+        assertSame( kagent2.getKnowledgeBase(), kbase2 );
+        assertEquals( 1, kagent2.getResourceDirectories().size() );
+        assertFalse( kagent2.isNewInstance() );
+        
+        KnowledgeAgentImpl kagent3 = ( KnowledgeAgentImpl ) context.getBean( "kagent3" );
+        assertTrue( kagent3.isNewInstance() );
+        
+        StatelessKnowledgeSessionImpl ksession1 = (StatelessKnowledgeSessionImpl)  context.getBean( "ksession1" );
+        assertSame( kbase1.getRuleBase(), ksession1.getRuleBase() );
+        assertSame( kagent1, ksession1.getKnowledgeAgent() );
+        
+        StatefulKnowledgeSessionImpl ksession2 = (StatefulKnowledgeSessionImpl)  context.getBean( "ksession2" );
+        assertSame( kbase1.getRuleBase(), ksession2.getRuleBase() );
+        
+        StatelessKnowledgeSessionImpl ksession3 = (StatelessKnowledgeSessionImpl)  context.getBean( "ksession3" );
+        assertSame( kagent2, ksession3.getKnowledgeAgent() );
+        assertSame( kbase2.getRuleBase(), ksession3.getRuleBase() );
+
     }    
 
     public void testNode() {

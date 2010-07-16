@@ -4,6 +4,10 @@ import static org.drools.container.spring.namespace.DefinitionParserHelper.empty
 
 import org.drools.container.spring.beans.ExecutionNodeBeanFactory;
 import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
+import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -50,6 +54,18 @@ public class KnowledgeAgentDefinitionParser extends AbstractBeanDefinitionParser
             factory.addPropertyValue( "resources",
                                       resources );
         }        
+        
+        // inject the kagent into any stateless sessions
+        for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
+        	BeanDefinition def = parserContext.getRegistry().getBeanDefinition(beanName);
+        	if ( def.getBeanClassName().equals( StatelessKnowledgeSessionBeanFactory.class.getName() ) ) {
+        		 PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
+        		 RuntimeBeanReference tbf = ( RuntimeBeanReference ) pvalue.getValue();        		 
+        		if ( kbase.equals( tbf.getBeanName() ) ) {
+        			def.getPropertyValues().addPropertyValue( "knowledgeAgent", new RuntimeBeanReference( id ) );
+        		}
+        	}       	
+        }
 
 
         return factory.getBeanDefinition();
