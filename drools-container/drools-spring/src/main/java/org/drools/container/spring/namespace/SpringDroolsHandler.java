@@ -9,9 +9,6 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser( "resource",
                                       new ResourceDefinitionParser() );
 
-        registerBeanDefinitionParser( "resource-ref",
-                                      new ResourceRefDefinitionParser() );
-
         registerBeanDefinitionParser( "resource-change-scanner",
                 					  new ResourceChangeScannerDefinitionParser() );        
 

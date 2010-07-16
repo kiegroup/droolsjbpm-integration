@@ -30,7 +30,6 @@
 		<xsd:complexType>
 			<xsd:choice  minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="resource" />
-				<xsd:element ref="resource-ref" />
 			</xsd:choice>
 		</xsd:complexType>	
 	</xsd:element>
@@ -45,7 +44,6 @@
 		</xsd:complexType>
 	</xsd:element>	
 	
-	<xsd:element name="resource-ref" type="resourceRefType" />
 
 	<xsd:element name="kbase">
 		<xsd:complexType>
@@ -238,8 +236,9 @@
 				</xsd:complexType>				
 			</xsd:element>
 		</xsd:choice>
-		<xsd:attribute name="source" use="required" type="xsd:string"/>
-		<xsd:attribute name="type" use="required" type="resourceTypeEnum"/>
+		<xsd:attribute name="source" use="optional" type="xsd:string"/>
+		<xsd:attribute name="type" use="optional" type="resourceTypeEnum"/>
+	    <xsd:attribute name="ref"  use="optional" type="xsd:string"/>		
 	</xsd:complexType>
 	
 	<xsd:complexType name="resourceRefType">

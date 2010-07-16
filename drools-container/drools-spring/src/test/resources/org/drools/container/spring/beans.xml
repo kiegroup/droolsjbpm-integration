@@ -20,7 +20,7 @@
 				<drools:decisiontable-conf input-type="XLS" worksheet-name="Tables_2" />
 			</drools:resource>
 			
-			<drools:resource-ref id="resource1"/>
+			<drools:resource ref="resource1"/>
 			
 			<drools:resource source="classpath:org/drools/container/spring/model.xsd" type="XSD">
 			   <drools:jaxb-conf system-id="xsd" />
