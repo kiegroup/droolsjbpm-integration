@@ -15,7 +15,7 @@
 	<xsd:element name="execution-node">
 		<xsd:complexType>
 			<xsd:attribute name="id" use="required" type="xsd:ID"/>
-			<xsd:attribute name="connection" use="required" type="xsd:string"/>
+			<xsd:attribute name="connection" use="optional" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>	
 	

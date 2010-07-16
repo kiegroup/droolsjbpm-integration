@@ -48,6 +48,13 @@ public class SpringDroolsTest extends TestCase {
     protected void tearDown() throws Exception {
     }
     
+    public void testNoConnection() throws Exception {
+            ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+
+            ExecutionNode node2 = (ExecutionNode) context.getBean( "node2" );
+            assertNotNull( node2 );
+    }
+    
     public void testNoNodeKSessions() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/no-node-beans.xml" );
 

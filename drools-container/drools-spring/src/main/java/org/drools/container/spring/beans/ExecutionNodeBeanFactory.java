@@ -2,6 +2,7 @@ package org.drools.container.spring.beans;
 
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.generic.GenericConnection;
+import org.drools.grid.local.LocalConnection;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -16,7 +17,7 @@ public class ExecutionNodeBeanFactory
     InitializingBean {
 
     private String            id;
-    private GenericConnection connection;
+    private GenericConnection connection = new LocalConnection();
     private ExecutionNode     node;
 
     public Object getObject() throws Exception {

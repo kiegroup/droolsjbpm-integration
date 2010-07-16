@@ -10,6 +10,8 @@
 	
 	<drools:execution-node id="node1" connection="connection1" />
 	
+	<drools:execution-node id="node2" />
+	
 	<drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
 	
 	<drools:kbase id="kbase1" node="node1">

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -25,11 +26,10 @@ public class ExecutionNodeDefinitionParser extends AbstractBeanDefinitionParser 
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( ExecutionNodeBeanFactory.class );
 
         String connectionRef = element.getAttribute( CONNECTION_ATTRIBUTE );
-        emptyAttributeCheck( element.getLocalName(),
-                             CONNECTION_ATTRIBUTE,
-                             connectionRef );
-        factory.addPropertyReference( "connection",
-                                      connectionRef );
+        if ( StringUtils.hasText( connectionRef ) ) {
+            factory.addPropertyReference( "connection",
+                                          connectionRef );
+        }
 
         return factory.getBeanDefinition();
     }
