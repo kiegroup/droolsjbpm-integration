@@ -129,6 +129,12 @@ public class KnowledgeBaseRemoteClient
         return new StatefulKnowledgeSessionRemoteClient( localId,
                                                          client, messageSession );
     }
+    
+    public Collection<StatefulKnowledgeSession> getStatefulKnowledgeSessions()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     public StatelessKnowledgeSession newStatelessKnowledgeSession(KnowledgeSessionConfiguration conf) {
         // TODO Auto-generated method stub
