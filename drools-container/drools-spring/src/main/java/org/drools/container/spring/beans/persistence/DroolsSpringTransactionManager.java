@@ -52,6 +52,10 @@ public class DroolsSpringTransactionManager
         this.ptm.rollback( currentTransaction );
     }
 
+    /**
+     * Borrowed from Seam
+     * @author Michael Youngstrom
+     */
     public int getStatus() {
         if ( ptm == null ) {
             return TransactionManager.STATUS_NO_TRANSACTION;

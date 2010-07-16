@@ -163,7 +163,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         expectedXml += "    <facts/>\n";
         expectedXml += "</execution-results>\n";
 
-        //assertEquals(expectedXml, outXml);
+        assertXMLEqual(expectedXml, outXml);
 
         cmd = "<batch-execution lookup='ksession1'>\n";
         cmd += "   <get-object out-identifier='rider' fact-handle='" + handle + "'/>\n";
