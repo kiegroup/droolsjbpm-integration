@@ -1,0 +1,5 @@
+<example.OrderItem>
+    <productId>222</productId>
+    <quantity>7</quantity>
+    <price>5.20</price>
+</example.OrderItem>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://drools.org/drools-5.0/batch-execution" xmlns:batch-execution="http://drools.org/drools-5.0/batch-execution">
+  
+  <xs:annotation id="fact-instance-structure">
+    <xs:documentation>
+      
+      Data for fact instances are demonstrated below. The "shape" of these are driven by the module defined in the knowledge base.
+      These are simple structures representing the state of the object (type co-ercision is done by the server).
+      
+    </xs:documentation>
+    <xs:appinfo>
+      <ExamplePackage.ExampleFact>
+        <ExampleField1>sample value 1</ExampleField1>
+        <ExampleField2>sample value 2</ExampleField2>
+      </ExamplePackage.ExampleFact>
+      <ExamplePackage.ExampleFact2>
+        <ExampleField1>sample value 1</ExampleField1>
+        <ExampleField2>sample value 2</ExampleField2>
+      </ExamplePackage.ExampleFact2>
+    </xs:appinfo>
+    <xs:documentation>It is possible for fields to contain nested objects as their value. Also, a field can have a "reference" 
+      attribute which has an xpath expression to the referred value if necessary.</xs:documentation>
+  </xs:annotation>
+  
+  
+  <xs:element name="batch-execution">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:set-global"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:startProcess"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:insert-elements"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:get-objects"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:fire-all-rules"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:insert"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:get-global"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="batch-execution:query"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="set-global">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:annotation><xs:appinfo>fact-instance-structure</xs:appinfo></xs:annotation>
+        <xs:any/>
+      </xs:sequence>
+      <xs:attribute name="identifier" use="required" type="xs:string"/>
+      <xs:attribute name="out" type="xs:boolean"/>
+      <xs:attribute name="out-identifier" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="startProcess">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="batch-execution:parameter"/>
+      </xs:sequence>
+      <xs:attribute name="processId" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:annotation><xs:appinfo>fact-instance-structure</xs:appinfo></xs:annotation>
+        <xs:any/>
+      </xs:sequence>
+      <xs:attribute name="identifier" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="insert-elements">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:annotation><xs:appinfo>fact-instance-structure</xs:appinfo></xs:annotation>
+        <xs:any />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="get-objects">
+    <xs:complexType>
+      <xs:attribute name="out-identifier" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fire-all-rules">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="insert">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:annotation><xs:appinfo>fact-instance-structure</xs:appinfo></xs:annotation>
+        <xs:any/>
+      </xs:sequence>
+      <xs:attribute name="out-identifier" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="get-global">
+    <xs:complexType>
+      <xs:attribute name="identifier" use="required" type="xs:string"/>
+      <xs:attribute name="out-identifier" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="query">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:annotation><xs:appinfo>Fact instance structure</xs:appinfo></xs:annotation>
+        <xs:any minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="out-identifier" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+</xs:schema>
