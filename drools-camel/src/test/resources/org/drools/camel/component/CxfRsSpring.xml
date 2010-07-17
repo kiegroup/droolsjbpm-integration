@@ -33,7 +33,9 @@
 	<drools:execution-node id="node1" connection="connection1" />
   
 	<drools:kbase id="kbase1" node="node1">		
-		<drools:resource type="DRL" source="classpath:org/drools/camel/component/testSpring.drl"/>					
+	    <drools:resources>
+		    <drools:resource type="DRL" source="classpath:org/drools/camel/component/testSpring.drl"/>
+		</drools:resources>					
 	</drools:kbase>
 	
 	
@@ -70,9 +72,7 @@
     <route id="x1">
        <from uri="direct://http"/>
        <policy ref="droolsPolicy">
-           <marshal ref="xstream" /> 
-	       <to uri="cxfrs://http://localhost:9002/rest"/>
-	       <unmarshal ref="xstream" /> 
+	       <to uri="cxfrs://http://localhost:9002/rest"/> 
        </policy>
     </route> 
         
