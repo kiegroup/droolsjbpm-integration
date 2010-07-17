@@ -77,7 +77,33 @@
 							        <xsd:attribute name="mode" type="cloudModeEnum"/>
 							    </xsd:complexType>	                        
 	                        </xsd:element>	
-                        	                        
+
+	                        <xsd:element name="accumulate-functions" minOccurs="0">
+				                <xsd:complexType>
+				                    <xsd:choice>
+				                	    <xsd:element name="accumulate-function" minOccurs="0" maxOccurs="unbounded">
+					                	    <xsd:complexType>
+					                	        <xsd:attribute name="name" use="required" type="xsd:string"/>
+					                	        <xsd:attribute name="ref" use="required" type="xsd:string"/>
+					                	    </xsd:complexType>
+				                	    </xsd:element>				                	    
+				                	</xsd:choice>
+							    </xsd:complexType>	                        
+	                        </xsd:element>	
+	                        
+	                        <xsd:element name="evaluators" minOccurs="0">
+				                <xsd:complexType>
+				                    <xsd:choice>
+				                	    <xsd:element name="evaluator" minOccurs="0" maxOccurs="unbounded">
+					                	    <xsd:complexType>
+					                	        <xsd:attribute name="name" use="required" type="xsd:string"/>
+					                	        <xsd:attribute name="ref" use="required" type="xsd:string"/>
+					                	    </xsd:complexType>
+				                	    </xsd:element>				                	    
+				                	</xsd:choice>
+							    </xsd:complexType>	                        
+	                        </xsd:element>		                        
+	                                                	                        
 						</xsd:all>
 					</xsd:complexType>				
 				</xsd:element>	

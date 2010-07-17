@@ -11,7 +11,13 @@
    
    <bean id="rwih1" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />
    
-   <bean id="rwih2" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />  
+   <bean id="rwih2" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />
+   
+   <bean id="raf1" class="org.drools.container.spring.MockAccumulateFunction" />
+   <bean id="raf2" class="org.drools.container.spring.MockAccumulateFunction" />    
+
+   <bean id="red1" class="org.drools.container.spring.MockEvaluatorDefinition" />
+   <bean id="red2" class="org.drools.container.spring.MockEvaluatorDefinition" />
 
 	<drools:kbase id="kbase1">
 	   <drools:resources>
@@ -26,6 +32,16 @@
 	      <drools:mbeans enabled="true" />
 	      
 	      <drools:event-processing-mode mode="STREAM" />
+	      
+	      <drools:accumulate-functions>
+	         <drools:accumulate-function name="af1" ref="raf1" />
+	         <drools:accumulate-function name="af2" ref="raf2" />
+	      </drools:accumulate-functions>
+	      
+	      <drools:evaluators>
+	         <drools:evaluator name="ed1" ref="red1" />
+	         <drools:evaluator name="ed2" ref="red2" />
+	      </drools:evaluators>	      
 	      
 	   </drools:configuration>
 	</drools:kbase>

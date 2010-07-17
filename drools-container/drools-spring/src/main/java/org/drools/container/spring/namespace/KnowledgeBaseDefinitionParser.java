@@ -30,9 +30,13 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
 
     private static final String EVENT_PROCESSING_MODE            = "event-processing-mode";
     
-    private static final String WORK_ITEM_DEFINITIONS            = "work-item-definitions";
+    private static final String ACCUMULATE_FUNCTIONS             = "accumulate-functions";
     
-    private static final String WORK_ITEM_DEFINITION            = "work-item-definition";
+    private static final String ACCUMULATE_FUNCTION              = "accumulate-function";
+    
+    private static final String EVALUATORS                       = "evaluators";
+    
+    private static final String EVALUATOR                        = "evaluator";    
 
     @SuppressWarnings("unchecked")
     @Override
@@ -65,6 +69,32 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
             if ( e != null && !StringUtils.isEmpty( e.getAttribute( "mode" ) )) {
                 rbaseConfBuilder.addPropertyValue( "eventProcessingMode", EventProcessingOption.valueOf( e.getAttribute( "mode" ) ) );
             }                
+            
+            e = DomUtils.getChildElementByTagName(kbaseConf, ACCUMULATE_FUNCTIONS);
+            if ( e != null ) {
+                List<Element> children = DomUtils.getChildElementsByTagName( e, ACCUMULATE_FUNCTION );
+                if ( children != null && !children.isEmpty() ) {
+                    ManagedMap functions = new ManagedMap();
+                    for ( Element child : children ) {
+                        functions.put(  child.getAttribute( "name" ),
+                                        new RuntimeBeanReference( child.getAttribute( "ref" ) ) );
+                    }
+                    factory.addPropertyValue( "accumulateFunctions", functions );                    
+                }
+            }
+            
+            e = DomUtils.getChildElementByTagName(kbaseConf, EVALUATORS);
+            if ( e != null ) {
+                List<Element> children = DomUtils.getChildElementsByTagName( e, EVALUATOR );
+                if ( children != null && !children.isEmpty() ) {
+                    ManagedMap evaluators = new ManagedMap();
+                    for ( Element child : children ) {
+                        evaluators.put(  child.getAttribute( "name" ),
+                                        new RuntimeBeanReference( child.getAttribute( "ref" ) ) );
+                    }
+                    factory.addPropertyValue( "evaluators", evaluators );                    
+                }
+            }            
             
             factory.addPropertyValue( "conf", rbaseConfBuilder.getBeanDefinition() );
         }

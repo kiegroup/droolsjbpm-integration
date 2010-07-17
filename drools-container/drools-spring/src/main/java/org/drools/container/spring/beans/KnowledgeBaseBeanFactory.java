@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.util.JAXBResult;
 
@@ -14,15 +15,23 @@ import org.drools.KnowledgeBaseFactoryService;
 import org.drools.RuleBaseConfiguration;
 import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderErrors;
+import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
+import org.drools.builder.conf.AccumulateFunctionOption;
+import org.drools.builder.conf.EvaluatorOption;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.builder.help.KnowledgeBuilderHelper;
+import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.local.LocalConnection;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.process.core.WorkDefinition;
+import org.drools.runtime.rule.AccumulateFunction;
+import org.drools.runtime.rule.Evaluator;
+import org.drools.runtime.rule.EvaluatorDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -38,6 +47,8 @@ public class KnowledgeBaseBeanFactory
     InitializingBean {
 
     private KnowledgeBaseConfiguration  conf;
+    private Map<String, AccumulateFunction>         accumulateFunctions;
+    private Map<String, EvaluatorDefinition>         evaluators;
     
     private KnowledgeBase               kbase;
     private ExecutionNode               node;
@@ -56,11 +67,24 @@ public class KnowledgeBaseBeanFactory
     }
 
     public void afterPropertiesSet() throws Exception {
-        if ( node == null ) {
-            node = new LocalConnection().getExecutionNode();
+        if ( this.node == null ) {
+            this.node = new LocalConnection().getExecutionNode();
+        }       
+        
+        PackageBuilderConfiguration kconf = (PackageBuilderConfiguration)  KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+        if (this.accumulateFunctions != null && !this.accumulateFunctions.isEmpty()) {            
+            for ( Entry<String, AccumulateFunction> entry : this.accumulateFunctions.entrySet() ) {
+                kconf.setOption( AccumulateFunctionOption.get( entry.getKey(), entry.getValue()) );
+            }
         }
+        
+        if (this.evaluators != null && !this.evaluators.isEmpty()) {            
+            for ( Entry<String, EvaluatorDefinition> entry : this.evaluators.entrySet() ) {
+                kconf.setOption( EvaluatorOption.get( entry.getKey(), entry.getValue()) );
+            }
+        }        
          
-        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder(kconf);
         if ( this.conf != null ) {
             kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(conf);
         } else {
@@ -97,7 +121,24 @@ public class KnowledgeBaseBeanFactory
             kbaseImpl.jaxbClasses.add( conf.getClasses() );            
         }
 
-    }   
+    }
+    
+
+    public Map<String, AccumulateFunction> getAccumulateFunctions() {
+        return accumulateFunctions;
+    }
+
+    public void setAccumulateFunctions(Map<String, AccumulateFunction> accumulateFunctions) {
+        this.accumulateFunctions = accumulateFunctions;
+    }
+
+    public Map<String, EvaluatorDefinition> getEvaluators() {
+        return evaluators;
+    }
+
+    public void setEvaluators(Map<String, EvaluatorDefinition> evaluators) {
+        this.evaluators = evaluators;
+    }
 
     public KnowledgeBaseConfiguration getConf() {
         return conf;
