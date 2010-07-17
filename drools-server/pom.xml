@@ -13,7 +13,6 @@
   <name>Drools :: Server</name>
   
   <modules>
-      <module>drools-server-spring</module>
       <module>drools-server-app</module>
   </modules>
   

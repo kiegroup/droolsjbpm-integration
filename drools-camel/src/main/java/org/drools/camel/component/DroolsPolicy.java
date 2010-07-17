@@ -68,7 +68,6 @@ import org.drools.common.DisconnectedFactHandle;
 import org.drools.core.util.StringUtils;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
-import org.drools.runtime.pipeline.impl.ExecutionNodePipelineContextImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
 import org.drools.xml.jaxb.util.JaxbListWrapper;
 import org.mvel2.optimizers.impl.refl.nodes.ArrayLength;

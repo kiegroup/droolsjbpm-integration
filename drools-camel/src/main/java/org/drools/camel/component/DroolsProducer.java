@@ -61,8 +61,6 @@ import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.help.BatchExecutionHelper;
-import org.drools.runtime.pipeline.ResultHandler;
-import org.drools.runtime.pipeline.impl.ExecutionNodePipelineContextImpl;
 
 public class DroolsProducer extends DefaultProducer {
 
@@ -163,21 +161,6 @@ public class DroolsProducer extends DefaultProducer {
         } finally {
             // we must restore the ClassLoader
             //            Thread.currentThread().setContextClassLoader( originalClassLoader );
-        }
-    }
-
-    // There are nicer ways of doing this
-    public static class ResultHandlerImpl
-        implements
-        ResultHandler {
-        Object object;
-
-        public void handleResult(Object object) {
-            this.object = object;
-        }
-
-        public Object getObject() {
-            return this.object;
         }
     }
 }

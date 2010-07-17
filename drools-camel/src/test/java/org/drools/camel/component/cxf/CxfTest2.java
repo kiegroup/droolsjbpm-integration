@@ -33,19 +33,19 @@ public class CxfTest2 extends CamelSpringTestSupport {
     }    
     
     public void test1() throws Exception {
-//        String cmd = "";
-//        cmd += "<batch-execution lookup=\"ksession1\">\n";
-//        cmd += "  <insert out-identifier=\"salaboy\">\n";
-//        cmd += "      <org.drools.pipeline.camel.Person>\n";
-//        cmd += "         <name>salaboy</name>\n";
-//        cmd += "      </org.drools.pipeline.camel.Person>\n";
-//        cmd += "   </insert>\n";
-//        cmd += "   <fire-all-rules/>\n";
-//        cmd += "</batch-execution>\n";
-//        
-//        
-//        Object object = this.context.createProducerTemplate().requestBody("direct://http", cmd);
-//        System.out.println( object ); 
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "  <insert out-identifier=\"salaboy\">\n";
+        cmd += "      <org.drools.pipeline.camel.Person>\n";
+        cmd += "         <name>salaboy</name>\n";
+        cmd += "      </org.drools.pipeline.camel.Person>\n";
+        cmd += "   </insert>\n";
+        cmd += "   <fire-all-rules/>\n";
+        cmd += "</batch-execution>\n";
+        
+        
+        Object object = this.context.createProducerTemplate().requestBody("direct://http", cmd);
+        System.out.println( object ); 
     }
     
 }
