@@ -77,6 +77,12 @@
 							        <xsd:attribute name="mode" type="cloudModeEnum"/>
 							    </xsd:complexType>	                        
 	                        </xsd:element>	
+	                        
+	                        <xsd:element name="assert-behavior" minOccurs="0">
+				                <xsd:complexType>
+							        <xsd:attribute name="mode" type="assertBehaviorEnum"/>
+							    </xsd:complexType>	                        
+	                        </xsd:element>		                        
 
 	                        <xsd:element name="accumulate-functions" minOccurs="0">
 				                <xsd:complexType>
@@ -227,6 +233,14 @@
 		</xsd:restriction>
 	</xsd:simpleType>	
 	
+	
+	<xsd:simpleType name="assertBehaviorEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="IDENTITY" />
+			<xsd:enumeration value="EQUALITY" />
+		</xsd:restriction>
+	</xsd:simpleType>	
+		
 	<xsd:simpleType name="clockTypeEnum">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="REALTIME" />

@@ -16,6 +16,7 @@ import org.drools.KnowledgeBase;
 import org.drools.Person;
 import org.drools.RuleBaseConfiguration;
 import org.drools.SessionConfiguration;
+import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.agent.impl.KnowledgeAgentImpl;
 import org.drools.builder.DirectoryLookupFactoryService;
@@ -37,6 +38,8 @@ import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.server.KnowledgeService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.sun.org.apache.bcel.internal.verifier.exc.AssertionViolatedException;
 
 public class SpringDroolsTest extends TestCase {
    
@@ -176,6 +179,7 @@ public class SpringDroolsTest extends TestCase {
         assertTrue( rconf.isMultithreadEvaluation() );
         assertEquals( 5, rconf.getMaxThreads() );
         assertEquals( EventProcessingOption.STREAM, rconf.getEventProcessingMode() );
+        assertEquals( AssertBehaviour.IDENTITY, rconf.getAssertBehaviour() );
         
         KnowledgeBaseImpl kbase2 = ( KnowledgeBaseImpl ) context.getBean( "kbase2" );
         rconf = ((InternalRuleBase)kbase2.getRuleBase()).getConfiguration();
@@ -183,13 +187,14 @@ public class SpringDroolsTest extends TestCase {
         assertFalse( rconf.isMultithreadEvaluation() );
         assertEquals( 3, rconf.getMaxThreads() );
         assertEquals( EventProcessingOption.CLOUD, rconf.getEventProcessingMode() );
+        assertEquals( AssertBehaviour.EQUALITY, rconf.getAssertBehaviour() );
+        
         
         StatefulKnowledgeSessionImpl ksession1 = ( StatefulKnowledgeSessionImpl ) context.getBean( "ksession1" );
         SessionConfiguration sconf = ksession1.session.getSessionConfiguration();
         assertTrue( sconf.isKeepReference() );
         assertEquals( ClockType.REALTIME_CLOCK , sconf.getClockType() );
         Map<String, WorkItemHandler> wih = sconf.getWorkItemHandlers();
-        System.out.println( wih );
         assertEquals( 4, wih.size() );
         assertTrue( wih.containsKey( "wih1" ));
         assertTrue( wih.containsKey( "wih2" ));

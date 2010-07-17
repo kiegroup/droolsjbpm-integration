@@ -41,7 +41,9 @@
 	      <drools:evaluators>
 	         <drools:evaluator name="ed1" ref="red1" />
 	         <drools:evaluator name="ed2" ref="red2" />
-	      </drools:evaluators>	      
+	      </drools:evaluators>
+	      
+	      <drools:assert-behavior mode="IDENTITY" />	      
 	      
 	   </drools:configuration>
 	</drools:kbase>
@@ -58,7 +60,9 @@
 	      
 	      <drools:mbeans enabled="false" />
 	      
-	      <drools:event-processing-mode mode="CLOUD" />	      
+	      <drools:event-processing-mode mode="CLOUD" />
+	      
+	      <drools:assert-behavior mode="EQUALITY" />	      
 	   </drools:configuration>
 	</drools:kbase>	
 	

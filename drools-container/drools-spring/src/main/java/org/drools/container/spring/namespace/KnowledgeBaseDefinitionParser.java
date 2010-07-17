@@ -3,6 +3,7 @@ package org.drools.container.spring.namespace;
 import java.util.List;
 
 import org.drools.RuleBaseConfiguration;
+import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.conf.EventProcessingOption;
 import org.drools.container.spring.beans.KnowledgeBaseBeanFactory;
 import org.drools.core.util.StringUtils;
@@ -29,6 +30,8 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
     private static final String MBEABS                           = "mbeans";
 
     private static final String EVENT_PROCESSING_MODE            = "event-processing-mode";
+        
+    private static final String ASSERT_BEHAVIOR                  = "assert-behavior";
     
     private static final String ACCUMULATE_FUNCTIONS             = "accumulate-functions";
     
@@ -68,7 +71,12 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
             e = DomUtils.getChildElementByTagName(kbaseConf, EVENT_PROCESSING_MODE);
             if ( e != null && !StringUtils.isEmpty( e.getAttribute( "mode" ) )) {
                 rbaseConfBuilder.addPropertyValue( "eventProcessingMode", EventProcessingOption.valueOf( e.getAttribute( "mode" ) ) );
-            }                
+            }     
+            
+            e = DomUtils.getChildElementByTagName(kbaseConf, ASSERT_BEHAVIOR);
+            if ( e != null && !StringUtils.isEmpty( e.getAttribute( "mode" ) )) {
+                rbaseConfBuilder.addPropertyValue( "assertBehaviour", AssertBehaviour.determineAssertBehaviour( e.getAttribute( "mode" ) ) );
+            }             
             
             e = DomUtils.getChildElementByTagName(kbaseConf, ACCUMULATE_FUNCTIONS);
             if ( e != null ) {
