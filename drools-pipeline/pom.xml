@@ -15,16 +15,23 @@
   
    <dependencies>
       <dependency>
+      	<groupId>org.drools</groupId>
+      	<artifactId>drools-api</artifactId>
+      </dependency>
+	  
+      <dependency>
          <groupId>org.drools</groupId>
          <artifactId>drools-core</artifactId>
-         <version>${project.version}</version>
       </dependency>
       <dependency>
          <groupId>org.drools</groupId>
          <artifactId>drools-compiler</artifactId>
-         <version>${project.version}</version>
-         <scope>test</scope>
       </dependency>
+      <dependency>
+      	<groupId>org.drools</groupId>
+      	<artifactId>drools-grid-core</artifactId>
+      </dependency>
+	  
       <dependency>
          <groupId>com.thoughtworks.xstream</groupId>
          <artifactId>xstream</artifactId>
@@ -34,15 +41,8 @@
          <artifactId>xmlunit</artifactId>
          <scope>test</scope>
       </dependency>
-      <dependency>
-      	<groupId>org.drools</groupId>
-      	<artifactId>drools-grid-core</artifactId>
-      	<version>${project.version}</version>
-      </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
+
+
       <dependency>
          <groupId>org.codehaus.jettison</groupId>
          <artifactId>jettison</artifactId>
@@ -51,9 +51,8 @@
       <dependency>
          <groupId>net.sf.jxls</groupId>
          <artifactId>jxls-reader</artifactId>
-         <version>0.9.6</version>
       </dependency>  
-
+	  
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
@@ -62,32 +61,24 @@
 		<groupId>com.sun.xml.bind</groupId>
 		<artifactId>jaxb-xjc</artifactId>
 	</dependency>
-      <dependency>
-      	<groupId>org.drools</groupId>
-      	<artifactId>drools-api</artifactId>
-      	<version>${project.version}</version>
-      </dependency>
+
       <dependency>
       	<groupId>xalan</groupId>
 		<artifactId>xalan</artifactId>
-		<version>2.7.1</version>
 	</dependency>
 	
       <dependency>
          <groupId>org.apache.activemq</groupId>
          <artifactId>activemq-core</artifactId>
-         <version>5.3.1</version>
       </dependency>
       <dependency>
          <groupId>simple-jndi</groupId>
          <artifactId>simple-jndi</artifactId>
-         <version>0.11.4</version>
         </dependency>	
 	  
         <dependency>
           <groupId>org.milyn</groupId>
           <artifactId>milyn-smooks-javabean</artifactId>
-          <version>1.1</version>
         </dependency>     
 	</dependencies>
    
