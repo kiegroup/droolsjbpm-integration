@@ -74,42 +74,20 @@ public class DroolsProducer extends DefaultProducer {
 
     public void process(Exchange exchange) throws Exception {
 
-        // Lookup the original ClassLoaders, so we can restore after execution
-        //        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-
-            //            String lookup = null;
-            //            if ( executor == null ) {
-            //                lookup = getLookup(str);
-            //                exchange.setProperty( DroolsComponent.DROOLS_LOOKUP, 
-            //                                      lookup );
-            //            }
-            //            
-            //            
-            //            CommandExecutor exec = getCommandExecutor( lookup );
-            //            if ( exec == null ) {
-            //                throw new RuntimeException( "CommandExecutor cannot be found for uri " + this.getEndpoint().getEndpointUri() );
-            //            }
-            //            
-            //            ClassLoader localClassLoader = getClassLoader( exec );
-            //            if ( exec == null ) {
-            //                throw new RuntimeException( "CommandExecutor Classloader cannot be null for uri " + this.getEndpoint().getEndpointUri() );
-            //            }            
-            //            
-            //            // Set the classloader to the one used by the CommandExecutor
-            //            Thread.currentThread().setContextClassLoader( localClassLoader );
-
             Command cmd = null;
-            if ( de.dataFormat != null ) {
-                String str = exchange.getIn().getBody( String.class );
-                ByteArrayInputStream bais = new ByteArrayInputStream( str.getBytes() );
-                cmd = (Command) de.dataFormat.unmarshal( exchange,
-                                                         bais );
-            } else {
-                // no data format set, so we assume it's already concrete
-                cmd = exchange.getIn().getBody( Command.class );
-            }
+//            if ( de.dataFormat != null ) {
+//                String str = exchange.getIn().getBody( String.class );
+//                ByteArrayInputStream bais = new ByteArrayInputStream( str.getBytes() );
+//                cmd = (Command) de.dataFormat.unmarshal( exchange,
+//                                                         bais );
+//            } else {
+//                // no data format set, so we assume it's already concrete
+//                cmd = exchange.getIn().getBody( Command.class );
+//            }
 
+            cmd = exchange.getIn().getBody( Command.class );
+            
             if ( cmd == null ) {
                 throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri()  );
             }
@@ -149,15 +127,16 @@ public class DroolsProducer extends DefaultProducer {
 
             ExecutionResults results = exec.execute( (BatchExecutionCommand) cmd );;
 
-            if ( de.dataFormat != null ) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                de.dataFormat.marshal( exchange,
-                                       results,
-                                       baos );
-                exchange.getOut().setBody( baos.toByteArray() );
-            } else {
-                exchange.getOut().setBody( results );
-            }
+//            if ( de.dataFormat != null ) {
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                de.dataFormat.marshal( exchange,
+//                                       results,
+//                                       baos );
+//                exchange.getOut().setBody( baos.toByteArray() );
+//            } else {
+//                exchange.getOut().setBody( results );
+//            }
+            exchange.getOut().setBody( results );
         } finally {
             // we must restore the ClassLoader
             //            Thread.currentThread().setContextClassLoader( originalClassLoader );

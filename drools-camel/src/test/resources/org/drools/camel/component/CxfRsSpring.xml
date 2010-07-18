@@ -73,7 +73,7 @@
        <from uri="direct://http"/>
        <policy ref="droolsPolicy">
 	       <to uri="cxfrs://http://localhost:9002/rest"/> 
-       </policy>
+       </policy> 
     </route> 
         
   </camelContext>

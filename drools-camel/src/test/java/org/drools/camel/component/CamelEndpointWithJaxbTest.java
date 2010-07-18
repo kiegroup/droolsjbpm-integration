@@ -17,6 +17,7 @@
 package org.drools.camel.component;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import javax.naming.NamingException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.OnCompletionDefinition;
@@ -238,14 +240,9 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         marshaller.marshal( cmd,
                             xmlReq );
 
-        System.out.println( xmlReq.toString() );
-
-        BatchExecutionCommand cmd2 = (BatchExecutionCommand) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlReq.toString().getBytes() ) );
-
         byte[] xmlResp = (byte[]) template.requestBody( "direct:test-with-session",
                                                         xmlReq.toString() );
         assertNotNull( xmlResp );
-        System.out.println( new String( xmlResp ) );
 
         ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
         assertNotNull( resp );
