@@ -24,10 +24,9 @@
 
 
 	<!-- loads the kbases and ksessions into the ApplicationContext -->
-	<import resource="classpath:services-test.xml" />
-	
-	<!-- Builds the routes that makes the ksessesions available as services -->
 	<import resource="classpath:knowledge-services.xml" />
 
+	<!-- Builds the routes that makes the ksessesions available as services -->
+	<import resource="classpath:camel-server.xml" />
 
 </beans>

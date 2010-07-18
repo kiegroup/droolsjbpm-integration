@@ -26,13 +26,8 @@
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
     ">
 
-  <!--
-   !   Define the server end point.
-   !   Copy and paste this element, changing id and the path for the address to expose services on different urls.
-   !   Different Camel routes can handle different end point paths.
-    --> 
   <cxf:rsServer id="rsServer"  
-                address="/"
+                address="http://localhost:9002/rest"
                 serviceClass="org.drools.jax.rs.CommandExecutorImpl">
        <cxf:providers>
            <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
@@ -42,14 +37,7 @@
   <!-- Leave this, as it's needed to make Camel "drools" aware -->
   <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />  
     
-  <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
-    
-    <!-- 
-     ! Routes incoming messages from end point id="rsServer"
-     ! Example route unmarshals the messages with xstream and executes against ksession1
-     ! Copy and paste this element, changing marsalls and the to uri, to target different sessions, as needed
-     !-->
-     
+  <camelContext id="camel-server-ctx" xmlns="http://camel.apache.org/schema/spring">    
     <route>
        <from uri="cxfrs://bean://rsServer"/>
        <policy ref="droolsPolicy">
@@ -58,7 +46,7 @@
 	       <marshal ref="xstream" />
        </policy>
     </route>    
-        
+            
   </camelContext>
   
 </beans>
