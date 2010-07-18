@@ -9,7 +9,7 @@
   </parent>
 
    <artifactId>drools-server</artifactId>
-   <packaging>jar</packaging>
+   <packaging>war</packaging>
    <name>Drools :: Server</name>
    <build>
       <finalName>drools-server</finalName>
