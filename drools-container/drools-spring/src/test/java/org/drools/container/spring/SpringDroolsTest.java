@@ -39,8 +39,6 @@ import org.drools.runtime.process.WorkItemHandler;
 import org.drools.server.KnowledgeService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.sun.org.apache.bcel.internal.verifier.exc.AssertionViolatedException;
-
 public class SpringDroolsTest extends TestCase {
    
     
