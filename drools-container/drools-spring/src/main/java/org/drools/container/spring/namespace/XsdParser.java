@@ -16,7 +16,8 @@ public class XsdParser {
     private static final String SYSTEM_ID                = "system-id";
     private static final String SCHEMA_LANGUAGE          = "schema-language"; 
     
-    public static void parse(Element element,
+    @SuppressWarnings("unchecked")
+	public static void parse(Element element,
                              ParserContext parserContext,
                              BeanDefinitionBuilder factory) {
         

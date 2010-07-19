@@ -5,22 +5,17 @@ import static org.drools.container.spring.namespace.DefinitionParserHelper.empty
 import java.util.List;
 
 import org.drools.ClockType;
-import org.drools.RuleBaseConfiguration;
 import org.drools.SessionConfiguration;
-import org.drools.command.CommandFactory;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.conf.EventProcessingOption;
 import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
-import org.drools.container.spring.beans.KnowledgeBaseBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory;
-import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
-import org.drools.runtime.conf.ClockTypeOption;
+import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -55,7 +50,8 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     
     private static final String WORK_ITEM                = "work-item-handler";    
     
-    protected AbstractBeanDefinition parseInternal(Element element,
+    @SuppressWarnings("unchecked")
+	protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
     	
         String id = element.getAttribute( "id" );
@@ -183,7 +179,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         if ( StringUtils.hasText( ref ) ) {
                             beanBuilder.addConstructorArgReference( ref );
                         } else if ( nestedElm != null  ) {
-                            beanBuilder.addConstructorArg( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
+                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
                         } else {
                             throw new IllegalArgumentException( "insert-object must either specify a 'ref' attribute or have a nested bean" );
                         }
@@ -191,11 +187,11 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         String ref = e.getAttribute( "ref" );
                         Element nestedElm = getFirstElement( e.getChildNodes() );                   
                         beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( SetGlobalCommand.class );
-                        beanBuilder.addConstructorArg( e.getAttribute( "identifier" ) );
+                        beanBuilder.addConstructorArgValue( e.getAttribute( "identifier" ) );
                         if ( StringUtils.hasText( ref ) ) {
                             beanBuilder.addConstructorArgReference( ref );
                         } else if ( nestedElm != null  ) {
-                            beanBuilder.addConstructorArg( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
+                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
                         } else {
                             throw new IllegalArgumentException( "set-global must either specify a 'ref' attribute or have a nested bean" );
                         }
@@ -214,7 +210,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         if ( !StringUtils.hasText( processId ) ) {
                             throw new IllegalArgumentException( "start-process must specify a process-id" );
                         }
-                        beanBuilder.addConstructorArg( processId );
+                        beanBuilder.addConstructorArgValue( processId );
                         
                         List<Element> params = DomUtils.getChildElementsByTagName( e, "parameter" );
                         if ( !params.isEmpty() ) {
@@ -241,20 +237,23 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( SignalEventCommand.class );
                         String processInstanceId = e.getAttribute( "process-instance-id" );
                         if ( StringUtils.hasText( processInstanceId ) ) {
-                            beanBuilder.addConstructorArg( processInstanceId );    
+                            beanBuilder.addConstructorArgValue( processInstanceId );    
                         }
                         
-                        beanBuilder.addConstructorArg( e.getAttribute( "event-type" ) );
+                        beanBuilder.addConstructorArgValue( e.getAttribute( "event-type" ) );
                         
                         String ref = e.getAttribute( "ref" );
                         Element nestedElm = getFirstElement( e.getChildNodes() );                   
                         if ( StringUtils.hasText( ref ) ) {
                             beanBuilder.addConstructorArgReference( ref );
                         } else if ( nestedElm != null  ) {
-                            beanBuilder.addConstructorArg( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
+                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
                         } else {
                             throw new IllegalArgumentException( "signal-event must either specify a 'ref' attribute or have a nested bean" );
                         }             
+                    }
+                    if (beanBuilder == null) {
+                    	throw new IllegalStateException("Unknow element: " + e.getLocalName());
                     }
                     children.add( beanBuilder.getBeanDefinition() );
                 }

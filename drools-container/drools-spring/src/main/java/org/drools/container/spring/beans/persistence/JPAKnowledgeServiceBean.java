@@ -8,12 +8,10 @@ import javax.persistence.PersistenceException;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.RuntimeDroolsException;
 import org.drools.base.MapGlobalResolver;
 import org.drools.builder.JPAKnowledgeFactoryService;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.local.LocalConnection;
-import org.drools.persistence.jpa.grid.JPAKnowledgeProviderLocalClient;
 import org.drools.persistence.processinstance.VariablePersistenceStrategyFactory;
 import org.drools.persistence.processinstance.persisters.VariablePersister;
 import org.drools.runtime.Environment;

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.KnowledgeBase;
-import org.drools.SessionConfiguration;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
 import org.drools.grid.ExecutionNode;
@@ -30,7 +29,7 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     private String        beanName;
     private String        name;
     
-    private List<Command> script;
+    private List<Command<?>> script;
 
     public AbstractKnowledgeSessionBeanFactory() {
         super();
@@ -76,11 +75,11 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         return true;
     }        
 
-    public List<Command> getScript() {
+    public List<Command<?>> getScript() {
         return script;
     }
 
-    public void setScript(List<Command> commands) {
+    public void setScript(List<Command<?>> commands) {
         this.script = commands;
     }
 

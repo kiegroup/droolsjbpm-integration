@@ -125,7 +125,8 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
         return factory.getBeanDefinition();
     }
 
-    public static ManagedList getResources(Element element,
+    @SuppressWarnings("unchecked")
+	public static ManagedList getResources(Element element,
                                            ParserContext parserContext,
                                            BeanDefinitionBuilder factory) {
         Element resourcesElm = DomUtils.getChildElementByTagName( element,

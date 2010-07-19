@@ -2,7 +2,6 @@ package org.drools.container.spring.namespace;
 
 import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
-import org.drools.container.spring.beans.ExecutionNodeBeanFactory;
 import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
 import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
 import org.springframework.beans.PropertyValue;

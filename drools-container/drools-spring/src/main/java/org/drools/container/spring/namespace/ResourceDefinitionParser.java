@@ -1,12 +1,8 @@
 package org.drools.container.spring.namespace;
 
-import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
-
 import java.util.List;
 
 import org.drools.builder.DecisionTableInputType;
-import org.drools.builder.JaxbConfiguration;
-import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
@@ -17,7 +13,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
 

@@ -79,7 +79,7 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
         }
         
         if ( getScript() != null && !getScript().isEmpty()) {
-            for ( Command cmd : getScript() ) {
+            for ( Command<?> cmd : getScript() ) {
                 ksession.execute( cmd );
             }
         }

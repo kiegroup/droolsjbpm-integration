@@ -116,7 +116,7 @@ public class KnowledgeBaseBeanFactory
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
         
         KnowledgeBaseImpl kbaseImpl = ( KnowledgeBaseImpl ) kbase;
-        kbaseImpl.jaxbClasses = new ArrayList();
+        kbaseImpl.jaxbClasses = new ArrayList<List<String>>();
         for ( JaxbConfigurationImpl conf : xsds ) {
             kbaseImpl.jaxbClasses.add( conf.getClasses() );            
         }

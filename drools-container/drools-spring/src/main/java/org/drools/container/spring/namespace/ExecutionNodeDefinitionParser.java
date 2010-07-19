@@ -1,7 +1,5 @@
 package org.drools.container.spring.namespace;
 
-import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
-
 import org.drools.container.spring.beans.ExecutionNodeBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

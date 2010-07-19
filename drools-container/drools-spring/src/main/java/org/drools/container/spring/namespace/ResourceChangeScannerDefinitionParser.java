@@ -1,6 +1,5 @@
 package org.drools.container.spring.namespace;
 
-import org.drools.container.spring.beans.ConnectionBeanFactory;
 import org.drools.container.spring.beans.ResourceChangeScannerBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
