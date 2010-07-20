@@ -43,7 +43,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     private static final String EXECUTION_NODE_ATTRIBUTE = "node";
     private static final String TYPE_ATTRIBUTE           = "type";
 
-    private static final String KEEP_RERENCE             = "keep-reference";
+    private static final String KEEP_REFERENCE           = "keep-reference";
     private static final String CLOCK_TYPE               = "clock-type";
     
     private static final String WORK_ITEMS               = "work-item-handlers";
@@ -136,7 +136,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                 factory.addPropertyValue( "jpaConfiguration", beanBuilder.getBeanDefinition() );                                           
             }
             BeanDefinitionBuilder rbaseConfBuilder = BeanDefinitionBuilder.rootBeanDefinition( SessionConfiguration.class );
-            Element e = DomUtils.getChildElementByTagName(ksessionConf, KEEP_RERENCE);
+            Element e = DomUtils.getChildElementByTagName(ksessionConf, KEEP_REFERENCE);
             if ( e != null && StringUtils.hasText( e.getAttribute( "enabled" ) )) {
                 rbaseConfBuilder.addPropertyValue( "keepReference", Boolean.parseBoolean( e.getAttribute( "enabled" ) ) );
             }   
