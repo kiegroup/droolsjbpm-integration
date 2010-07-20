@@ -63,15 +63,11 @@ public class StringVariablePersister
 
     }
 
-    public Object getExternalPersistedVariable(VariableInstanceInfo variableInstanceInfo,
-                                               Environment env) {
-        EntityManager em = (EntityManager) env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER );
-        if ( ((StringPersistedVariable) variableInstanceInfo) == null ) {
-            return null;
-        } else {
-
-            return ((StringPersistedVariable) variableInstanceInfo).getString();
-        }
-
-    }
+	public Object getExternalPersistedVariable(VariableInstanceInfo variableInstanceInfo, Environment env) {
+		env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
+		if (variableInstanceInfo == null) {
+			return null;
+		}
+		return ((StringPersistedVariable) variableInstanceInfo).getString();
+	}
 }

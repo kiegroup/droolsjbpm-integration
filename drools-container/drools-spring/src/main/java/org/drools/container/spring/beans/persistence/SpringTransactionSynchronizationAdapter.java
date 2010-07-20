@@ -22,7 +22,7 @@ public class SpringTransactionSynchronizationAdapter
                 break;
             }
             case TransactionSynchronization.STATUS_ROLLED_BACK : {
-                this.ts.afterCompletion( TransactionManager.STATUS_COMMITTED );
+                this.ts.afterCompletion( TransactionManager.STATUS_ROLLEDBACK );
                 break;
             }
             default : {

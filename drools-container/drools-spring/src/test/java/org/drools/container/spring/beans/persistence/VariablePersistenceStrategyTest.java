@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.base.MapGlobalResolver;
+import org.drools.persistence.jpa.JPAKnowledgeService;
 import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
@@ -30,6 +33,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class VariablePersistenceStrategyTest {
 
@@ -83,6 +90,115 @@ public class VariablePersistenceStrategyTest {
         ctx.destroy();
     }
 
+    @Test
+    public void testTransactionsRollback() throws Exception {
+    	final List<?> list = new ArrayList<Object>();
+    	PlatformTransactionManager txManager = (PlatformTransactionManager) ctx.getBean( "txManager" );
+    	
+    	final Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
+		env.set( EnvironmentName.TRANSACTION_MANAGER, txManager);
+		env.set( EnvironmentName.GLOBALS, new MapGlobalResolver() );
+		
+    	final KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
+        final KnowledgeBase kbRollback = ( KnowledgeBase ) ctx.getBean( "kbRollback" );
+    	
+    	TransactionTemplate txTemplate = new TransactionTemplate(txManager);
+    	final StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+				StatefulKnowledgeSession kNewSession = kstore.newStatefulKnowledgeSession(kbRollback, null, env);
+				kNewSession.setGlobal( "list", list );
+				kNewSession.insert( 1 );
+		        kNewSession.insert( 2 );
+				return kNewSession;
+			}
+		});
+    	
+    	final int sessionId = ksession.getId();
+
+        txTemplate = new TransactionTemplate(txManager);
+    	txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+		        ksession.insert( 3 );
+		        status.setRollbackOnly();
+				return null;
+			}
+		});
+        
+        txTemplate = new TransactionTemplate(txManager);
+    	txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+				ksession.fireAllRules();
+				return null;
+			}
+		});
+
+    	assertEquals( 2,
+                      list.size() );
+
+    	txTemplate = new TransactionTemplate(txManager);
+    	txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+				ksession.insert( 3 );
+		        ksession.insert( 4 );
+				return null;
+			}
+		});
+    	
+    	txTemplate = new TransactionTemplate(txManager);
+    	txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+				ksession.insert( 5 );
+		        ksession.insert( 6 );
+		        status.setRollbackOnly();
+				return null;
+			}
+		});
+
+    	txTemplate = new TransactionTemplate(txManager);
+    	txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+				ksession.fireAllRules();
+				return null;
+			}
+		});
+
+        assertEquals( 4,
+                      list.size() );
+        
+        ksession.dispose();
+        
+        // now load the ksession
+        final StatefulKnowledgeSession ksession2 = JPAKnowledgeService.loadStatefulKnowledgeSession( sessionId, kbRollback, null, env );
+        
+        txTemplate = new TransactionTemplate(txManager);
+    	txTemplate.execute(new TransactionCallback() {
+			
+			public Object doInTransaction(TransactionStatus status) {
+				ksession2.setGlobal( "list", list );
+				ksession2.insert( 7 );
+		        ksession2.insert( 8 );
+				return null;
+			}
+		});
+
+    	txTemplate.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				ksession2.fireAllRules();
+				return null;
+			}
+		});
+
+        assertEquals( 6,
+                      list.size() );
+    }
+    
     @Test
     public void testPersistenceVariables() {
         log.info( "---> get bean jpaSingleSessionCommandService" );

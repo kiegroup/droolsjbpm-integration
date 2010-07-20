@@ -14,10 +14,6 @@ import java.util.Properties;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.command.SingleSessionCommandService;
-import org.drools.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.command.runtime.process.GetProcessInstanceCommand;
-import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.ProcessBuilder;
 import org.drools.core.util.DroolsStreamUtils;
@@ -104,18 +100,10 @@ public class JPASingleSessionCommandServiceFactoryTest {
             writePackage( getProcessTimer2(),
                           new File( TMPDIR + "/processTimer2.pkg" ) );
         } catch ( Exception e ) {
-            log.error( "can't create packages!",
-                       e );
+            log.error( "can't create packages!", 
+            		e );
             throw new RuntimeException( e );
         }
-    }
-
-    @AfterClass
-    public static void deletePackages() {
-        new File( TMPDIR + "/processWorkItems.pkg" ).delete();
-        new File( TMPDIR + "/processSubProcess.pkg" ).delete();
-        new File( TMPDIR + "/processTimer.pkg" ).delete();
-        new File( TMPDIR + "/processTimer2.pkg" ).delete();
     }
 
     @Before
@@ -272,7 +260,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         service.dispose();
     }
 
-    private static Package getProcessWorkItems() {
+    @SuppressWarnings("unused")
+	private static Package getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId( "org.drools.test.TestProcess" );
         process.setName( "TestProcess" );
@@ -345,6 +334,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
     public static void writePackage(Package pkg,
                                     File dest) {
+    	dest.deleteOnExit();
         OutputStream out = null;
         try {
             out = new BufferedOutputStream( new FileOutputStream( dest ) );
@@ -369,8 +359,6 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
         int sessionId = service.getId();
 
-        StartProcessCommand startProcessCommand = new StartProcessCommand();
-        
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess( "org.drools.test.ProcessSubProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
@@ -414,7 +402,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         service.dispose();
     }
 
-    private static Package getProcessSubProcess() {
+    @SuppressWarnings("unused")
+	private static Package getProcessSubProcess() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId( "org.drools.test.ProcessSubProcess" );
         process.setName( "ProcessSubProcess" );
@@ -543,7 +532,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( processInstance );
     }
 
-    private static Package getProcessTimer() {
+    @SuppressWarnings("unused")
+	private static Package getProcessTimer() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId( "org.drools.test.ProcessTimer" );
         process.setName( "ProcessTimer" );
@@ -615,7 +605,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( processInstance );
     }
 
-    private static Package getProcessTimer2() {
+    @SuppressWarnings("unused")
+	private static Package getProcessTimer2() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId( "org.drools.test.ProcessTimer2" );
         process.setName( "ProcessTimer2" );
