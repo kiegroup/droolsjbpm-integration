@@ -1,42 +1,30 @@
 package org.drools.container.spring;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.lf5.util.StreamUtils;
 import org.drools.ClockType;
-import org.drools.KnowledgeBase;
 import org.drools.Person;
 import org.drools.RuleBaseConfiguration;
-import org.drools.SessionConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
-import org.drools.agent.KnowledgeAgent;
+import org.drools.SessionConfiguration;
 import org.drools.agent.impl.KnowledgeAgentImpl;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.common.InternalRuleBase;
 import org.drools.conf.EventProcessingOption;
-import org.drools.core.util.FileManager;
 import org.drools.grid.ExecutionNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.io.ResourceChangeScanner;
 import org.drools.io.ResourceFactory;
 import org.drools.io.impl.ResourceChangeScannerImpl;
-import org.drools.process.core.WorkDefinition;
 import org.drools.process.instance.impl.humantask.HumanTaskHandler;
-import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.process.WorkItemHandler;
-import org.drools.server.KnowledgeService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest extends TestCase {

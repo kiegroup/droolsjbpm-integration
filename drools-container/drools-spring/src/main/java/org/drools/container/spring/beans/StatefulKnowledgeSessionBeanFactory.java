@@ -6,13 +6,11 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.KnowledgeBaseFactory;
-import org.drools.RuleBaseConfiguration;
 import org.drools.SessionConfiguration;
 import org.drools.command.Command;
 import org.drools.persistence.jpa.JPAKnowledgeService;
 import org.drools.persistence.processinstance.VariablePersistenceStrategyFactory;
 import org.drools.persistence.processinstance.persisters.VariablePersister;
-import org.drools.process.core.WorkDefinition;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;

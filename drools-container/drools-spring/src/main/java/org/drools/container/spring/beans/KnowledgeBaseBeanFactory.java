@@ -1,21 +1,15 @@
 package org.drools.container.spring.beans;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.bind.util.JAXBResult;
-
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.RuleBaseConfiguration;
-import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
@@ -23,23 +17,14 @@ import org.drools.builder.ResourceType;
 import org.drools.builder.conf.AccumulateFunctionOption;
 import org.drools.builder.conf.EvaluatorOption;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
-import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.local.LocalConnection;
 import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.process.core.WorkDefinition;
 import org.drools.runtime.rule.AccumulateFunction;
-import org.drools.runtime.rule.Evaluator;
 import org.drools.runtime.rule.EvaluatorDefinition;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
-import com.sun.tools.xjc.Language;
-import com.sun.tools.xjc.Options;
 
 public class KnowledgeBaseBeanFactory
     implements

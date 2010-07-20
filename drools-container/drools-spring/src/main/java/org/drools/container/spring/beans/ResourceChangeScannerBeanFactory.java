@@ -1,7 +1,5 @@
 package org.drools.container.spring.beans;
 
-import org.drools.grid.generic.GenericConnection;
-import org.drools.grid.local.LocalConnection;
 import org.drools.io.ResourceChangeScanner;
 import org.drools.io.ResourceFactory;
 import org.springframework.beans.factory.FactoryBean;
