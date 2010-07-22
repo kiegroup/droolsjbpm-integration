@@ -11,6 +11,7 @@ import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.definition.KnowledgePackage;
 import org.drools.definition.process.Process;
+import org.drools.definition.rule.Query;
 import org.drools.definition.rule.Rule;
 import org.drools.definition.type.FactType;
 import org.drools.event.knowledgebase.KnowledgeBaseEventListener;
@@ -91,6 +92,12 @@ public class KnowledgeBaseRemoteClient
         // TODO Auto-generated method stub
         return null;
     }
+    
+    public Query getQuery(String packageName,
+                        String   queryName) {
+        // TODO Auto-generated method stub
+        return null;
+    }    
 
     public StatefulKnowledgeSession newStatefulKnowledgeSession() {
         return newStatefulKnowledgeSession( null,
@@ -161,6 +168,12 @@ public class KnowledgeBaseRemoteClient
         // TODO Auto-generated method stub
 
     }
+    
+    public void removeQuery(String packageName,
+                           String queryName) {
+        // TODO Auto-generated method stub
+
+    }    
 
     public void addEventListener(KnowledgeBaseEventListener listener) {
         // TODO Auto-generated method stub
