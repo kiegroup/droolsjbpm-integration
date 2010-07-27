@@ -161,13 +161,17 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
             }            
         }
         
-        Element script = DomUtils.getChildElementByTagName(element, "script");
-        if ( script != null) {
+        Element batch = DomUtils.getChildElementByTagName(element, "batch");
+        if ( batch == null ) {
+            // just temporary legacy suppport
+            batch = DomUtils.getChildElementByTagName(element, "script");
+        }
+        if ( batch != null) {
             // we know there can only ever be one
             ManagedList children = new ManagedList();
 
-            for (int i = 0, length = script.getChildNodes().getLength(); i < length; i++) {
-                Node n = script.getChildNodes().item( i );
+            for (int i = 0, length = batch.getChildNodes().getLength(); i < length; i++) {
+                Node n = batch.getChildNodes().item( i );
                 if ( n instanceof Element ) {
                     Element e = ( Element ) n;
                     
@@ -258,7 +262,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                     children.add( beanBuilder.getBeanDefinition() );
                 }
             }
-            factory.addPropertyValue( "script", children );
+            factory.addPropertyValue( "batch", children );
         }        
         
         // find any kagent's for the current kbase and assign

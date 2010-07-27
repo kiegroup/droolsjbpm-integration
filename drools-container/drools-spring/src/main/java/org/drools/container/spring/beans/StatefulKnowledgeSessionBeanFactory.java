@@ -76,8 +76,8 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
             ksession = getKbase().newStatefulKnowledgeSession( getConf(), null);
         }
         
-        if ( getScript() != null && !getScript().isEmpty()) {
-            for ( Command<?> cmd : getScript() ) {
+        if ( getBatch() != null && !getBatch().isEmpty()) {
+            for ( Command<?> cmd : getBatch() ) {
                 ksession.execute( cmd );
             }
         }

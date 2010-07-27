@@ -135,13 +135,21 @@
 	<xsd:element name="ksession">
 		<xsd:complexType>
 			<xsd:all minOccurs="0">
-				<xsd:element name="script" minOccurs="0" maxOccurs="1">
+				<xsd:element name="batch" minOccurs="0" maxOccurs="1">
 					<xsd:complexType>
 						<xsd:sequence>
 	                        <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded" />
 						</xsd:sequence>
 					</xsd:complexType>				
 				</xsd:element>
+				
+				<xsd:element name="script" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+	                        <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded" />
+						</xsd:sequence>
+					</xsd:complexType>				
+				</xsd:element>				
 				
 				<xsd:element name="configuration" minOccurs="0" maxOccurs="1">
 					<xsd:complexType>

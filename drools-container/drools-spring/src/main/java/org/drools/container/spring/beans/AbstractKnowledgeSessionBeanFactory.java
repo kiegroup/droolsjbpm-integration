@@ -29,7 +29,7 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     private String        beanName;
     private String        name;
     
-    private List<Command<?>> script;
+    private List<Command<?>> batch;
 
     public AbstractKnowledgeSessionBeanFactory() {
         super();
@@ -75,12 +75,12 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         return true;
     }        
 
-    public List<Command<?>> getScript() {
-        return script;
+    public List<Command<?>> getBatch() {
+        return batch;
     }
 
-    public void setScript(List<Command<?>> commands) {
-        this.script = commands;
+    public void setBatch(List<Command<?>> commands) {
+        this.batch = commands;
     }
 
     public final void afterPropertiesSet() throws Exception {
