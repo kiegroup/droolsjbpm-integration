@@ -43,7 +43,7 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.command.runtime.rule.QueryCommand;
 import org.drools.command.runtime.rule.RetractCommand;
-import org.drools.common.DisconnectedFactHandle;
+import org.drools.common.DefaultFactHandle;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.help.impl.CommandsObjectContainer;
 import org.drools.runtime.help.impl.ObjectsObjectContainer;
@@ -194,7 +194,7 @@ public class XStreamJson {
                 }
                 reader.moveUp();
             }
-            return new RowItemContainer( new DisconnectedFactHandle( externalForm ),
+            return new RowItemContainer( new DefaultFactHandle( externalForm ),
                                          object );
         }
 
@@ -368,7 +368,7 @@ public class XStreamJson {
         public Object unmarshal(HierarchicalStreamReader reader,
                                 UnmarshallingContext unmarshallingContext) {
             reader.moveDown();
-            DisconnectedFactHandle factHandle = new DisconnectedFactHandle( reader.getValue() );
+            DefaultFactHandle factHandle = new DefaultFactHandle( reader.getValue() );
             reader.moveUp();
             return factHandle;
         }
@@ -465,7 +465,7 @@ public class XStreamJson {
                 reader.moveDown();
                 String name = reader.getNodeName();
                 if ( "fact-handle".equals( name ) ) {
-                    factHandle = new DisconnectedFactHandle( reader.getValue() );
+                    factHandle = new DefaultFactHandle( reader.getValue() );
                 } else if ( "out-identifier".equals( "out-identifier" ) ) {
                     outIdentifier = reader.getValue();
                 }
@@ -504,7 +504,7 @@ public class XStreamJson {
         public Object unmarshal(HierarchicalStreamReader reader,
                                 UnmarshallingContext context) {
             reader.moveDown();
-            FactHandle factHandle = new DisconnectedFactHandle( reader.getValue() );
+            FactHandle factHandle = new DefaultFactHandle( reader.getValue() );
             reader.moveUp();
 
             Command cmd = CommandFactory.newRetract( factHandle );
@@ -546,7 +546,7 @@ public class XStreamJson {
         public Object unmarshal(HierarchicalStreamReader reader,
                                 UnmarshallingContext context) {
             reader.moveDown();
-            FactHandle factHandle = new DisconnectedFactHandle( reader.getValue() );
+            FactHandle factHandle = new DefaultFactHandle( reader.getValue() );
             reader.moveUp();
 
             List<Setter> setters = new ArrayList();
@@ -754,7 +754,7 @@ public class XStreamJson {
                         reader.moveUp();
 
                         facts.put( identifier,
-                                   new DisconnectedFactHandle( externalForm ) );
+                                   new DefaultFactHandle( externalForm ) );
                     } else if ( reader.getNodeName().equals( "fact-handles" ) ) {
                         List list = new ArrayList();
                         String identifier = null;
@@ -764,7 +764,7 @@ public class XStreamJson {
                             reader.moveUp();
                             while ( reader.hasMoreChildren() ) {
                                 reader.moveDown();
-                                FactHandle factHandle = new DisconnectedFactHandle( (String) readItem( reader,
+                                FactHandle factHandle = new DefaultFactHandle( (String) readItem( reader,
                                                                                                        context,
                                                                                                        null ) );
                                 list.add( factHandle );

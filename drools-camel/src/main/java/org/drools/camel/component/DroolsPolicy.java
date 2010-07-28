@@ -64,7 +64,6 @@ import org.drools.command.runtime.rule.QueryCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
 import org.drools.common.DefaultFactHandle;
-import org.drools.common.DisconnectedFactHandle;
 import org.drools.core.util.StringUtils;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
@@ -367,7 +366,7 @@ public class DroolsPolicy
 
     public static final String[] JAXB_ANNOTATED_CMD = {BatchExecutionCommand.class.getName(), SetGlobalCommand.class.getName(), GetGlobalCommand.class.getName(), FireAllRulesCommand.class.getName(), InsertElementsCommand.class.getName(),
             InsertObjectCommand.class.getName(), ModifyCommand.class.getName(), SetterImpl.class.getName(), QueryCommand.class.getName(), RetractCommand.class.getName(), AbortWorkItemCommand.class.getName(), SignalEventCommand.class.getName(),
-            StartProcessCommand.class.getName(), BatchExecutionCommand.class.getName(), ExecutionResultImpl.class.getName(), DefaultFactHandle.class.getName(), JaxbListWrapper.class.getName(), DisconnectedFactHandle.class.getName(),
+            StartProcessCommand.class.getName(), BatchExecutionCommand.class.getName(), ExecutionResultImpl.class.getName(), DefaultFactHandle.class.getName(), JaxbListWrapper.class.getName(),
             FlatQueryResults.class.getName(), CompleteWorkItemCommand.class.getName(), GetObjectsCommand.class.getName()};
 
 }

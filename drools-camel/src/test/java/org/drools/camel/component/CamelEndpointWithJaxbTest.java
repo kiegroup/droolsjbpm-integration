@@ -64,7 +64,6 @@ import org.drools.command.runtime.rule.QueryCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
 import org.drools.common.DefaultFactHandle;
-import org.drools.common.DisconnectedFactHandle;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.pipeline.camel.Person;
@@ -138,7 +137,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
         BatchExecutionCommand cmd = new BatchExecutionCommand();
         cmd.setLookup( "ksession1" );
-        cmd.getCommands().add( new GetObjectCommand( new DisconnectedFactHandle( handle ),
+        cmd.getCommands().add( new GetObjectCommand( new DefaultFactHandle( handle ),
                                                      "hadrian" ) );
 
         StringWriter xmlReq = new StringWriter();

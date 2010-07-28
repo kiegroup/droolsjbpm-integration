@@ -45,7 +45,7 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.command.runtime.rule.QueryCommand;
 import org.drools.command.runtime.rule.RetractCommand;
-import org.drools.common.DisconnectedFactHandle;
+import org.drools.common.DefaultFactHandle;
 import org.drools.rule.Declaration;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.impl.ExecutionResultImpl;
@@ -215,7 +215,7 @@ public class XStreamXml {
 
         public Object unmarshal(HierarchicalStreamReader reader,
                                 UnmarshallingContext context) {
-            FactHandle factHandle = new DisconnectedFactHandle( reader.getAttribute( "fact-handle" ) );
+            FactHandle factHandle = new DefaultFactHandle( reader.getAttribute( "fact-handle" ) );
 
             List<Setter> setters = new ArrayList();
             while ( reader.hasMoreChildren() ) {
@@ -256,7 +256,7 @@ public class XStreamXml {
 
         public Object unmarshal(HierarchicalStreamReader reader,
                                 UnmarshallingContext context) {
-            FactHandle factHandle = new DisconnectedFactHandle( reader.getAttribute( "fact-handle" ) );
+            FactHandle factHandle = new DefaultFactHandle( reader.getAttribute( "fact-handle" ) );
 
             Command cmd = CommandFactory.newRetract( factHandle );
 
@@ -407,7 +407,7 @@ public class XStreamXml {
 
         public Object unmarshal(HierarchicalStreamReader reader,
                                 UnmarshallingContext context) {
-            FactHandle factHandle = new DisconnectedFactHandle( reader.getAttribute( "fact-handle" ) );
+            FactHandle factHandle = new DefaultFactHandle( reader.getAttribute( "fact-handle" ) );
             String identifierOut = reader.getAttribute( "out-identifier" );
 
             GetObjectCommand cmd = new GetObjectCommand( factHandle );
@@ -867,13 +867,13 @@ public class XStreamXml {
                 } else if ( reader.getNodeName().equals( "fact-handle" ) ) {
                     String identifier = reader.getAttribute( "identifier" );
                     facts.put( identifier,
-                               new DisconnectedFactHandle( reader.getAttribute( "external-form" ) ) );
+                               new DefaultFactHandle( reader.getAttribute( "external-form" ) ) );
                 } else if ( reader.getNodeName().equals( "fact-handles" ) ) {
                     String identifier = reader.getAttribute( "identifier" );
                     List<FactHandle> list = new ArrayList();
                     while ( reader.hasMoreChildren() ) {
                         reader.moveDown();
-                        list.add( new DisconnectedFactHandle( reader.getAttribute( "external-form" ) ) );
+                        list.add( new DefaultFactHandle( reader.getAttribute( "external-form" ) ) );
                         reader.moveUp();
                     }
                     facts.put( identifier,
@@ -979,7 +979,7 @@ public class XStreamXml {
                     reader.moveUp();
 
                     reader.moveDown();
-                    FactHandle handle = new DisconnectedFactHandle( reader.getAttribute( "external-form" ) );
+                    FactHandle handle = new DefaultFactHandle( reader.getAttribute( "external-form" ) );
                     reader.moveUp();
 
                     objects.add( object );

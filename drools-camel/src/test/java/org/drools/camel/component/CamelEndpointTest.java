@@ -41,7 +41,7 @@ import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommand;
 import org.drools.command.runtime.rule.GetObjectCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.common.DisconnectedFactHandle;
+import org.drools.common.DefaultFactHandle;
 import org.drools.pipeline.camel.Person;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -74,7 +74,7 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
     }
 
     public void testSessionGetObject() throws Exception {
-        FactHandle factHandle = new DisconnectedFactHandle(handle);
+        FactHandle factHandle = new DefaultFactHandle(handle);
         GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject(factHandle);
         cmd.setOutIdentifier("rider");
 
