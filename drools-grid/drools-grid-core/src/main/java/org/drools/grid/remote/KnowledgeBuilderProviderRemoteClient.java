@@ -87,7 +87,7 @@ public class KnowledgeBuilderProviderRemoteClient
     }
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties,
-                                                                          ClassLoader classLoader) {
+                                                                          ClassLoader... classLoaders) {
         // TODO Auto-generated method stub
         return null;
     }

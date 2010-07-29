@@ -30,7 +30,7 @@ public class KnowledgeBaseProviderLocalClient
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
-                                                                    ClassLoader classLoader) {
+                                                                    ClassLoader... classLoader) {
         // TODO Auto-generated method stub
         return null;
     }

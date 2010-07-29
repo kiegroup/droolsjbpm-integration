@@ -47,9 +47,9 @@ public class KnowledgeBuilderProviderLocalClient
     }
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties,
-                                                                          ClassLoader classLoader) {
+                                                                          ClassLoader... classLoaders) {
         return KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration( properties,
-                                                                         classLoader );
+                                                                         classLoaders );
     }
     
     public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,
