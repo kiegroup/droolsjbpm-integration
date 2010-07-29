@@ -36,7 +36,7 @@ import org.drools.grid.generic.MessageSession;
  */
 public class WorkItemManagerGridClient implements WorkItemManager, Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 510l;
 	
 	//private GridExecutionNodeConnection nodeConnection;
         private GenericNodeConnector client;

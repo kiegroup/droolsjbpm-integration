@@ -30,7 +30,7 @@ import org.drools.grid.remote.WorkItemManagerRemoteClient;
  */
 public class GetWorkItemManagerCommand implements GenericCommand<WorkItemManager> {
 	
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 510l;
 
 	public WorkItemManager execute(Context context) {
         WorkItemManager workItemManager = ((KnowledgeCommandContext) context).getWorkItemManager();

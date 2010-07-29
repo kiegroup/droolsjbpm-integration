@@ -34,7 +34,7 @@ import org.drools.grid.generic.MessageSession;
  */
 public class WorkItemManagerRemoteClient implements WorkItemManager, Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 510l;
 	
 	private GenericNodeConnector     client;
         private MessageSession              messageSession;
