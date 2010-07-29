@@ -16,31 +16,23 @@
 
 package org.drools;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlRegistry;
 
-/**
- * 
- */
-
-@XmlRootElement
-public class TestVariable {
-    
-    private String name;
-    
-    public TestVariable() {
-        
+@XmlRegistry
+public class ObjectFactory {
+    public ChangeCollector createChangeCollector() {
+        return new ChangeCollector();
     }
     
-    public TestVariable(String name) {
-        this.name = name;
+    public Cheese createCheese() {
+        return new Cheese();
     }
     
-    public String getName() {
-        return name;
-    }
+    public Person createPerson() {
+        return new Person();
+    }  
     
-    public void setName(String name) {
-        this.name = name;
-    }
-
-}
+    public TestVariable createTestVariable() {
+        return new TestVariable();
+    }       
+}  

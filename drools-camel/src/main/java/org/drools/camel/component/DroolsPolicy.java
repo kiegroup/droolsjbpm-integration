@@ -115,12 +115,10 @@ public class DroolsPolicy
 
             List<ProcessorDefinition> outputs = nav.getOutputs();
             for ( int i = 0; i <  outputs.size(); i++  ) {
-            //for ( Iterator<ProcessorDefinition> it = nav.getOutputs().iterator(); it.hasNext(); ) {
                 ProcessorDefinition child = outputs.get( i );//it.next();
                 if ( child instanceof ToDefinition) {
                     ToDefinition to = ( ToDefinition ) child;
                     if (to.getUri().startsWith( "cxfrs" ) && !visited.contains( to ) ) {                        
-//                        it.remove();
                         BeanDefinition beanDef = new BeanDefinition();
                         beanDef.setBeanType( PreCxfrs.class );
                         outputs.add( i, beanDef ); // insert before cxfrs
@@ -128,19 +126,6 @@ public class DroolsPolicy
                         beanDef.setBeanType( PostCxfrs.class );
                         outputs.add( i+2, beanDef ); // insert after cxfrs
                         i = i + 2;// adjust for the two inserts
-                        
-//                        System.out.println( to.getUri( ) );
-//                        ToDefinition newTo = new ToDefinition( to.getUri() );
-//                        beanDef.addOutput( newTo );
-//                        newOutputs.add( beanDef );
-//                        
-//                        BeanDefinition beanDef2 = new BeanDefinition();
-//                        beanDef2.setBeanType( DummyProcess.class );
-//                        //beanDef.addOutput( beanDef2 );
-//                        to.addOutput( beanDef2 );
-//                        to.bean(  DummyProcess.class );
-//                        
-//                        visited.add( to );
                     }
                     
                 } else if ( child instanceof MarshalDefinition ) {

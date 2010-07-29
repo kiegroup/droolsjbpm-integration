@@ -1,0 +1,358 @@
+@declare{"testListenForChanges.in.1"}
+{
+   "batch-execution":{
+      "commands":[
+         {
+            "insert":{
+               "out-identifier":"outStilton",
+               "return-object":true,
+               "object":{
+                  "org.drools.Cheese":{
+                     "type":"stilton",
+                     "price":25,
+                     "oldPrice":0
+                  }
+               }
+            }
+         },
+         {
+            "fire-all-rules":""
+         }
+      ]
+   }
+}
+@end{}
+
+@declare{"testListenForChanges.in.2"}
+{
+   "batch-execution":{
+      "commands":[
+         {
+            "insert":{
+               "out-identifier":"person",
+               "return-object":true,
+               "object":{
+                  "org.drools.Person":{
+                     "name":"mic",
+                     "age":0,
+                     "sex":"",
+                     "alive":false
+                  }
+               }
+            }
+         },
+         {
+            "insert":{
+               "out-identifier":"changes",
+               "return-object":true,
+               "object":{
+                  "org.drools.ChangeCollector":""
+               }
+            }
+         },
+         {
+            "fire-all-rules":""
+         }
+      ]
+   }
+}
+@end{}
+
+@declare{"testListenForChanges.expected.1"}
+{
+   "execution-results":{
+      "results":{
+         "result":[
+            {
+               "identifier":"changes",
+               "value":{
+                  "org.drools.ChangeCollector":{
+                     "changes":{
+                        "org.drools.Cheese":{
+                           "type":"stilton",
+                           "price":42,
+                           "oldPrice":0
+                        }
+                     }
+                  }
+               }
+            },
+            {
+               "identifier":"person",
+               "value":{
+                  "org.drools.Person":{
+                     "name":"mic",
+                     "age":0,
+                     "sex":"",
+                     "alive":false
+                  }
+               }
+            }
+         ],
+         "fact-handle":[
+            {
+               "identifier":"changes",
+               "external-form":"@{var1}"
+            },
+            {
+               "identifier":"person",
+               "external-form":"@{var2}"
+            }
+         ]
+      }
+   }
+}
+@end{}
+
+@declare{"testListenForChanges.in.3"}
+{
+   "batch-execution":{
+      "commands":[
+         {
+            "insert":{
+               "object":{
+                  "org.drools.Person":{
+                     "name":"mark"
+                  }
+               },
+               "out-identifier":"person"
+            }
+         },
+         {
+            "insert":{
+               "object":{
+                  "org.drools.ChangeCollector":{
+
+                  }
+               },
+               "out-identifier":"changes"
+            }
+         },
+         {
+            "fire-all-rules":""
+         }
+      ]
+   }
+}
+@end{}
+
+@declare{"testInsertWithDefaults.in.1"}
+{
+   "batch-execution":{
+      "commands":[
+         {
+            "insert":{
+               "object":{
+                  "org.drools.Cheese":{
+                     "type":"stilton",
+                     "price":25,
+                     "oldPrice":0
+                  }
+               },
+               "out-identifier":"outStilton"
+            }
+         },
+         {
+            "fire-all-rules":""
+         }
+      ]
+   }
+}
+@end{}
+
+@declare{"testInsertWithDefaults.expected.1"}
+{
+   "execution-results":{
+      "results":{
+         "result":{
+            "identifier":"outStilton",
+            "value":{
+               "org.drools.Cheese":{
+                  "type":"stilton",
+                  "price":30,
+                  "oldPrice":0
+               }
+            }
+         },
+         "fact-handle":{
+            "identifier":"outStilton",
+            "external-form":"@{var1}"
+         }
+      }
+   }
+}
+@end{}
+
+@declare{"testInsertWithReturnObjectFalse.in.1"}
+{"batch-execution":{"commands":[{"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}, "return-object":false, "out-identifier":"outStilton" } }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testInsertWithReturnObjectFalse.expected.1"}
+{"execution-results":{"results":{"fact-handle":{"identifier":"outStilton","external-form":"@{var1}"}}}}
+@end{}
+
+@declare{"testFactHandleReturn.in.1"}
+{"batch-execution":{"commands":[  {"get-global":{"identifier":"list1","out-identifier":"out-list"}}]}}
+@end{}
+
+@declare{"testFactHandleReturn.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"out-list","value":{"list":{"fact-handle":{"external-form":"@{var1}"}}}}}}}
+@end{}
+
+@declare{"testGetObject.in.1"}
+{"batch-execution":{"commands":[{"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}, "out-identifier":"outStilton" } }, {"fire-all-rules":{"max":10}}]}}
+@end{}
+
+@declare{"testGetObject.in.2"}
+{"batch-execution":{"commands":[  {"get-object":{       "out-identifier":'outStilton',      "fact-handle":"@{var1}"}}]}}
+@end{}
+
+@declare{"testRetractObject.in.1"}
+{"batch-execution":{"commands":[{"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}, "out-identifier":"outStilton" } }, {"fire-all-rules":{"max":10}}]}}
+@end{}
+
+
+@declare{"testRetractObject.in.2"}
+{"batch-execution":{"commands":[  { "retract":{"fact-handle":"@{var1}"}}]}}
+@end{}
+
+@declare{"testRetractObject.in.3"}
+{"batch-execution":{"commands":[  {"get-object":{       "out-identifier":'outStilton',      "fact-handle":"@{var1}"}}]}}
+@end{}
+
+@declare{"testModifyObject.in.1"}
+{"batch-execution":{"commands":[{"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}, "out-identifier":"outStilton" } }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testModifyObject.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"outStilton","value":{"org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}},"fact-handle":{"identifier":"outStilton","external-form":"@{var1}"}}}}
+@end{}
+
+@declare{"testModifyObject.in.2"}
+{"batch-execution":{"commands":[  {"modify":{"fact-handle":"@{var1}", "setters":[{"accessor":"oldPrice","set":42}, {"accessor":"price","set":50}]} }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testModifyObject.in.3"}
+{"batch-execution":{"commands":[  {"get-object":{ "out-identifier":'outStilton', "fact-handle":"@{var1}"}}]}}
+@end{}
+
+@declare{"testModifyObject.in.4"}
+{"batch-execution":{"commands":[  {"modify":{"fact-handle":"@{var1}",  "setters":[{"accessor":"type","set":throwException()}, {"accessor":"price","set":100}]} }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testModifyObject.in.5"}
+{"batch-execution":{"commands":[  {"get-object":{ "out-identifier":'outStilton', "fact-handle":"@{var1}"}}]}}
+@end{}
+
+@declare{"testInsertElements.in.1"}
+{"batch-execution":{"commands":[   {"set-global":{"identifier":"list1","out"=true                   ,"object":{"list":{"object":[]}}   } } ,  {"insert-elements":{"objects":[   {   "org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}},    {   "org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}    ]}}, {"fire-all-rules":""}]}}    
+@end{}
+
+@declare{"testInsertElements.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"list1","value":{"list":{"org.drools.Cheese":[{"type":"stilton","price":35,"oldPrice":0},{"type":"stilton","price":30,"oldPrice":0}]}}}}}}
+@end{}
+
+
+@declare{"testInsertElementsWithReturnObjects.in.1"}
+{"batch-execution":{"commands":[   {"set-global":{"identifier":"list1","out":"true","object":{"list":{"object":[]}}   } } ,  {"insert-elements":{"out-identifier":"myfacts","return-objects":true,"objects":[   {   "org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}},    {   "org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}    ]}}, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testInsertElementsWithReturnObjects.expected.1"}
+{"execution-results":{"results":{"result":[{"identifier":"myfacts","value":{"list":{"org.drools.Cheese":[{"type":"stilton","price":30,"oldPrice":0},{"type":"stilton","price":35,"oldPrice":0}]}}},{"identifier":"list1","value":{"list":{"org.drools.Cheese":[{"type":"stilton","price":35,"oldPrice":0},{"type":"stilton","price":30,"oldPrice":0}]}}}],"fact-handles":{"identifier":"myfacts","string":["@{var1}", "@{var2}"]}}}}
+@end{}
+
+@declare{"testSetGlobal.in.1"}
+    {"batch-execution":{"commands":[ {"set-global":{"identifier":"list1","object":{"list":{"object":[]}}} } , {"set-global":{"identifier":"list2","out":true,"object":{"list":{"object":[]}}} } , {"set-global":{"identifier":"list3","out-identifier":"outList3","object":{"list":{"object":[]}}} } , {"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":5}}, "out-identifier":"outStilton" } }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testSetGlobal.expected.1"}
+{"execution-results":{"results":{"result":[{"identifier":"list2","value":{"list":{"org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}}},{"identifier":"outStilton","value":{"org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}},{"identifier":"outList3","value":{"list":{"org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}}}],"fact-handle":{"identifier":"outStilton","external-form":"@{var1}"}}}}
+@end{}
+
+@declare{"testGetGlobal.in.1"}
+{"batch-execution":{"commands":[   {"set-global":{"identifier":"list1","out"=true                   ,"object":{"list":{"object":[]}}   } } ,  {"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}, "out-identifier":"outStilton" } },  {"get-global":{"identifier":"list1","out-identifier"="out-list"}}, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testGetGlobal.expected.1"}
+{"execution-results":{"results":{"result":[{"identifier":"out-list","value":{"list":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}}},{"identifier":"outStilton","value":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}},{"identifier":"list1","value":{"list":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}}}],"fact-handle":{"identifier":"outStilton","external-form":"@{var1}"}}}}
+@end{}
+
+@declare{"testGetObjects.in.1"}
+{"batch-execution":{"commands":[  {"insert-elements":{"objects":[   {   "org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}},    {   "org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}    ]}},  {"get-objects":{"out-identifier":"list1"}}]}}
+@end{}
+
+@declare{"testGetObjects.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"list1","value":{"list":{"org.drools.Cheese":[{"type":"stilton","price":35,"oldPrice":0},{"type":"stilton","price":30,"oldPrice":0}]}}}}}}
+@end{}
+
+@declare{"testQuery.in.1"}
+{"batch-execution":{"commands":[  {"insert-elements":{"objects":[   {   "org.drools.Cheese":{"type":"stilton","price":2}},    {   "org.drools.Cheese":{"type":"cheddar","price":1}},    {   "org.drools.Cheese":{"type":"cheddar","price":2}},    {   "org.drools.Cheese":{"type":"stilton","price":1}}     ]}},  {"query":{"out-identifier":"cheeses","name":"cheeses"}}]}}
+@end{}
+
+@declare{"testQuery.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"cheeses","value":{"query-results":{"identifiers":{"string":["cheddar","stilton"]},"row":[{"item":[{"external-form":"0:3:29292935:742337872:3:DEFAULT","object":{"org.drools.Cheese":{"type":"cheddar","price":2,"oldPrice":0}}},{"external-form":"0:1:18538167:-1889974386:1:DEFAULT","object":{"org.drools.Cheese":{"type":"stilton","price":2,"oldPrice":0}}}]},{"item":[{"external-form":"0:2:2419450:742337841:2:DEFAULT","object":{"org.drools.Cheese":{"type":"cheddar","price":1,"oldPrice":0}}},{"external-form":"0:4:15736146:-1889974417:4:DEFAULT","object":{"org.drools.Cheese":{"type":"stilton","price":1,"oldPrice":0}}}]}]}}}}}}
+@end{}
+
+@declare{"testManualFireAllRules.in.1"}
+{"batch-execution":{"commands":[   {"set-global":{"identifier":"list1","out":true                   ,"object":{"list":{"object":[]}}   } } ,  {"insert-elements":{"objects":[   {   "org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}},    {   "org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}    ]}}, {"fire-all-rules":""}, {"insert":{"object":{"org.drools.Cheese":{"type":"brie","price":10,"oldPrice":0}}, "out-identifier":"outBrie" } }]}}
+@end{}
+
+@declare{"testManualFireAllRules.expected.1"}
+{"execution-results":{"results":{"result":[{"identifier":"outBrie","value":{"org.drools.Cheese":{"type":"brie","price":10,"oldPrice":0}}},{"identifier":"list1","value":{"list":{"org.drools.Cheese":[{"type":"stilton","price":35,"oldPrice":0},{"type":"stilton","price":30,"oldPrice":0}]}}}],"fact-handle":{"identifier":"outBrie","external-form":"@{var1}"}}}}
+@end{}
+
+@declare{"testProcess.in.1"}
+{"batch-execution":{"commands":[   {"start-process":      {"process-id":"org.drools.actions",     "parameters":[        {"identifier":"person",         "object":{"@class":"org.drools.TestVariable",                     "name":"John Doe"}}]}},    {"get-global":{"identifier":"list1","out-identifier":"out-list"}}]}}
+@end{}
+
+@declare{"testProcess.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"out-list","value":{"list":{"string":"John Doe"}}}}}}
+@end{}
+
+@declare{"testProcessInstanceSignalEvent.in.1"}
+{"batch-execution":{"commands":[{"signal-event":{"process-instance-id":1,"event-type":"MyEvent"                   ,"object":{"string":["MyValue"]} } }]}}
+@end{}
+
+@declare{"testProcessRuntimeSignalEvent.in.1"}
+{"batch-execution":{"commands":[   {"signal-event":{"event-type":"MyEvent"                    ,"object":{"string":["MyValue"]} } }]}}
+@end{}
+
+@declare{"testCompleteWorkItem.in.1"}
+{"complete-work-item":{"id":@{var1}}}
+@end{}
+
+@declare{"testCompleteWorkItem.in.2"}
+{"complete-work-item":{"id":@{var1},"results":{"identifier":"Result","object":{"@class":"string","$":"SomeOtherString"}}}}
+@end{}
+
+@declare{"testAbortWorkItem.in.1"}
+{"abort-work-item":{"id":@{var1}}}
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFact.in.1"}
+{"batch-execution":{"commands":[{"insert":{"object":{"org.foo.Whee":{"type":"stilton","price":25,"oldPrice":0}}, "out-identifier":"outStilton" } }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFact.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"outStilton","value":{"org.foo.Whee":{"type":"stilton","price":30,"oldPrice":0}}},"fact-handle":{"identifier":"outStilton","external-form":"@{var1}"}}}}
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFactAndQuery.in.1"}
+{"batch-execution":{"commands":[{"insert":{"out-identifier":"outStilton", "object":{"org.foo.Whee":{"type":"stilton","price":25,"oldPrice":0}} } }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFactAndQuery.in.2"}
+{"batch-execution":{"commands":[   {"query":{"out-identifier":"matchingthings","name":"results"}}]}}
+@end{}
+
+@declare{"testInsertObjectWithDeclaredFactAndQuery.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"matchingthings","value":{"query-results":{"identifiers":{"string":"w"},"row":{"item":{"external-form":"@{var1}","object":{"org.foo.Whee":{"type":"stilton","price":30,"oldPrice":0}}}}}}}}}}
+@end{}
+
+@declare{"testExecutionNodeLookup.in.1"}
+{"batch-execution":{"commands":[{"insert":{"object":{"org.drools.Cheese":{"type":"stilton","price":25,"oldPrice":0}}, "return-object":true, "out-identifier":"outStilton" } }, {"fire-all-rules":""}]}}
+@end{}
+
+@declare{"testExecutionNodeLookup.expected.1"}
+{"execution-results":{"results":{"result":{"identifier":"outStilton","value":{"org.drools.Cheese":{"type":"stilton","price":30,"oldPrice":0}}},"fact-handle":{"identifier":"outStilton","external-form":"@{var1}"}}}}
+@end{}

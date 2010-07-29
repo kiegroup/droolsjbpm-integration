@@ -21,19 +21,30 @@ import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.event.rule.ObjectInsertedEvent;
 import org.drools.event.rule.ObjectUpdatedEvent;
 import org.drools.event.rule.ObjectRetractedEvent;
+import org.drools.xml.jaxb.util.JaxbListAdapter;
+import org.drools.xml.jaxb.util.JaxbUnknownAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Michael Neale
- */
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class ChangeCollector implements WorkingMemoryEventListener {
 
+    @XmlElement
+    @XmlJavaTypeAdapter(JaxbListAdapter.class)
     private List<String> retracted;
+    
+    @XmlElement
+    @XmlJavaTypeAdapter(JaxbListAdapter.class)
     private List changes;
-
-
 
 
     public List<String> getRetracted() {

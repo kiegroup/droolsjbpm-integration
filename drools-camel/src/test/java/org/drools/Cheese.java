@@ -21,6 +21,8 @@ package org.drools;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /*
  * Copyright 2005 JBoss Inc
  *
@@ -37,6 +39,7 @@ import java.util.Date;
  * limitations under the License.
  */
 
+@XmlRootElement
 public class Cheese
     implements
     Serializable {
@@ -95,7 +98,7 @@ public class Cheese
     }
 
     public String toString() {
-        return "Cheese( type='" + this.type + "', price=" + this.price + " )";
+        return "Cheese( type='" + this.type + "', price=" + this.price + ", old price:" + this.oldPrice + ")";
     }
 
     public int hashCode() {
@@ -135,5 +138,7 @@ public class Cheese
     }
 
 
-
+    public int throwException() {
+        throw new RuntimeException("eeeeee");
+    }
 }

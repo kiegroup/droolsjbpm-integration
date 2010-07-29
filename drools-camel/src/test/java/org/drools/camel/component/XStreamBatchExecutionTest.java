@@ -1914,25 +1914,5 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         return session;
     }
-//
-//    private StatefulKnowledgeSession getExecutionNodeSessionStateful(ExecutionNode node, Resource resource) throws Exception {
-//        KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-//        kbuilder.add( resource,
-//                      ResourceType.DRL );
-//
-//        if ( kbuilder.hasErrors() ) {
-//            System.out.println( kbuilder.getErrors() );
-//        }
-//
-//        assertFalse( kbuilder.hasErrors() );
-//        Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
-//
-//        KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-//
-//        kbase.addKnowledgePackages( pkgs );
-//        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-//
-//        return session;
-//    }
 
 }

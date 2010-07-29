@@ -87,8 +87,6 @@ public class XStreamHelper {
                  QueryCommand.class.getName() );
         map.put( "query-results",
                  FlatQueryResults.class.getName() );
-        map.put( "query-results",
-                 NativeQueryResults.class.getName() );
         map.put( "fact-handle",
                  DefaultFactHandle.class.getName() );
 
