@@ -27,7 +27,7 @@ import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.command.Command;
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.ExecutionResults;
@@ -131,7 +131,7 @@ public abstract class ExecutionNodeBaseTest {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
         
-        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
 
         ExecutionResults results = ksession.execute( script );
 
@@ -176,7 +176,7 @@ public abstract class ExecutionNodeBaseTest {
         node.get(DirectoryLookupFactoryService.class).register( "ksession1",
                               ksession );
 
-        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
         
         ExecutionResults results = node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" ).execute( script );
 
@@ -220,7 +220,7 @@ public abstract class ExecutionNodeBaseTest {
         node.get(DirectoryLookupFactoryService.class).register( "ksession1",
                               ksession );
 
-        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[] { new FireAllRulesCommand( "fired" ) } )  );
         
         ExecutionResults results = node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" ).execute( script );
 
