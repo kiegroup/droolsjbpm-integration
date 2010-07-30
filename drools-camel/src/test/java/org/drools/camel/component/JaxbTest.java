@@ -30,7 +30,7 @@ import javax.xml.bind.Unmarshaller;
 import junit.framework.TestCase;
 
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
@@ -71,7 +71,7 @@ public class JaxbTest extends TestCase {
         cmds.add( new InsertObjectCommand( new Person("darth", 21), "p" ) );
         cmds.add( new GetGlobalCommand( "xxx" ) );
         cmds.add( new SetGlobalCommand( "yyy", new Person("yoda", 21) ));
-        BatchExecutionCommand batch = new BatchExecutionCommand(cmds);
+        BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl(cmds);
         
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
@@ -81,7 +81,7 @@ public class JaxbTest extends TestCase {
         System.out.println( baos );
         
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        BatchExecutionCommand batch2 = ( BatchExecutionCommand ) unmarshaller.unmarshal( new ByteArrayInputStream( baos.toByteArray() ) );
+        BatchExecutionCommandImpl batch2 = ( BatchExecutionCommandImpl ) unmarshaller.unmarshal( new ByteArrayInputStream( baos.toByteArray() ) );
         baos = new ByteArrayOutputStream();
         marshaller.marshal( batch2, baos );
         System.out.println( baos );

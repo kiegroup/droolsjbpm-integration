@@ -37,7 +37,7 @@ import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
@@ -66,7 +66,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 
 	public void testWorkingSetGlobalTestSessionSetAndGetGlobal() throws Exception {
 
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
+		BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
 		cmd.setLookup("ksession1");
 		
 		SetGlobalCommand setGlobal = new SetGlobalCommand("list", new WrappedList());
@@ -121,7 +121,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 		InsertObjectCommand cmd = new InsertObjectCommand(me);
 		cmd.setOutIdentifier("camel-rider");
 		cmd.setReturnObject(false);
-        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand<?>[]{cmd} ));
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[]{cmd} ));
         
         ExecutionResults results = ksession.execute( script );
 		handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();

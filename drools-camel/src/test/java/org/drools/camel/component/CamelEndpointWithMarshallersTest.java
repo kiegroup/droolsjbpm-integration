@@ -44,7 +44,7 @@ import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spring.CamelRouteContextFactoryBean;
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.rule.GetObjectsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalFactHandle;
@@ -251,7 +251,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         cmd.setOutIdentifier( "camel-rider" );
         cmd.setReturnObject( false );
 
-        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
 
         ExecutionResults results = ksession.execute( script );
         handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();

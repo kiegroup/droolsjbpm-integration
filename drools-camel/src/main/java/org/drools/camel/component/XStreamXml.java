@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.model.dataformat.XStreamDataFormat;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.runtime.help.impl.XStreamXML.AbortWorkItemConverter;
 import org.drools.runtime.help.impl.XStreamXML.BatchExecutionResultConverter;
 import org.drools.runtime.help.impl.XStreamXML.CompleteWorkItemConverter;
@@ -52,7 +52,7 @@ public class XStreamXml {
         if ( map == null ) {
             map = new HashMap<String, String[]>();
         }
-        map.put( BatchExecutionCommand.class.getName(), 
+        map.put( BatchExecutionCommandImpl.class.getName(), 
                  new String[] { "commands"  } );
         xstreamDataFormat.setImplicitCollections( map );
         

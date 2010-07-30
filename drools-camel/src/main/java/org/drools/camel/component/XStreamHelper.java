@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.dataformat.XStreamDataFormat;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.process.AbortWorkItemCommand;
@@ -52,7 +52,7 @@ public class XStreamHelper {
         }
 
         map.put( "batch-execution",
-                 BatchExecutionCommand.class.getName() );
+                 BatchExecutionCommandImpl.class.getName() );
         map.put( "insert",
                  InsertObjectCommand.class.getName() );
         map.put( "modify",

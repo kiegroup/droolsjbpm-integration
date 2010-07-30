@@ -39,7 +39,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.builder.help.KnowledgeBuilderHelper;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalRuleBase;
@@ -90,7 +90,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 		setAddress.invoke(lucaz, lucazAddress);
 		setAddress.invoke(baunax, baunaxAddress);
 		
-		BatchExecutionCommand cmd = new BatchExecutionCommand();
+		BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
 		cmd.setLookup("ksession1");
 		cmd.getCommands().add(new InsertObjectCommand(lucaz, "lucaz"));
 		cmd.getCommands().add(new InsertObjectCommand(baunax, "baunax"));

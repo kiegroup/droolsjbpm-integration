@@ -51,7 +51,7 @@ import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
 import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.ExecutionNode;
 import org.drools.impl.KnowledgeBaseImpl;
@@ -92,8 +92,8 @@ public class DroolsProducer extends DefaultProducer {
                 throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri()  );
             }
 
-            if ( !(cmd instanceof BatchExecutionCommand) ) {
-                cmd = new BatchExecutionCommand( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand) cmd} ) );
+            if ( !(cmd instanceof BatchExecutionCommandImpl) ) {
+                cmd = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand) cmd} ) );
             }
 
             CommandExecutor exec;
@@ -106,8 +106,8 @@ public class DroolsProducer extends DefaultProducer {
                 if ( exec == null ) {
                     String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP,
                                                                 String.class );
-                    if ( StringUtils.isEmpty( lookup ) && (cmd instanceof BatchExecutionCommand) ) {
-                        lookup = ((BatchExecutionCommand) cmd).getLookup();
+                    if ( StringUtils.isEmpty( lookup ) && (cmd instanceof BatchExecutionCommandImpl) ) {
+                        lookup = ((BatchExecutionCommandImpl) cmd).getLookup();
                     }
 
                     if ( de.getExecutionNode() != null && !StringUtils.isEmpty( lookup ) ) {
@@ -125,7 +125,7 @@ public class DroolsProducer extends DefaultProducer {
                 throw new RuntimeException( "No defined ksession for uri" + de.getEndpointUri() );
             }            
 
-            ExecutionResults results = exec.execute( (BatchExecutionCommand) cmd );;
+            ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
 
 //            if ( de.dataFormat != null ) {
 //                ByteArrayOutputStream baos = new ByteArrayOutputStream();

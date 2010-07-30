@@ -47,7 +47,7 @@ import org.drools.builder.ResourceType;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.process.AbortWorkItemCommand;
@@ -92,7 +92,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     public void testSessionInsert() throws Exception {        
 
-        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
         cmd.getCommands().add( new InsertObjectCommand( new Person( "lucaz",
                                                                     25 ),
@@ -135,7 +135,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     public void testSessionGetObject() throws Exception {
 
-        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
         cmd.getCommands().add( new GetObjectCommand( new DefaultFactHandle( handle ),
                                                      "hadrian" ) );
@@ -218,7 +218,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     public void testInsertElements() throws Exception {
 
-        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
         InsertElementsCommand elems = new InsertElementsCommand( "elems" );
         elems.getObjects().add( new Person( "lucaz",
@@ -259,7 +259,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
     }
 
     public void testQuery() throws Exception {
-        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
         cmd.getCommands().add( new InsertObjectCommand( new Person( "lucaz" ) ) );
         cmd.getCommands().add( new InsertObjectCommand( new Person( "hadrian" ) ) );
@@ -308,7 +308,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     public void testProcess() throws Exception {
 
-        BatchExecutionCommand cmd = new BatchExecutionCommand();
+        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
 
         StartProcessCommand start = new StartProcessCommand( "org.drools.actions" );
@@ -443,7 +443,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         InsertObjectCommand cmd = new InsertObjectCommand( me );
         cmd.setOutIdentifier( "camel-rider" );
         cmd.setReturnObject( false );
-        BatchExecutionCommand script = new BatchExecutionCommand( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
 
         ExecutionResults results = ksession.execute( script );
         handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
