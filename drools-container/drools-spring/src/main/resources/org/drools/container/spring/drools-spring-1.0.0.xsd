@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring-1.0.0.xsd"
+<xsd:schema xmlns="http://drools.org/schema/drools-spring"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring-1.0.0.xsd"
+	targetNamespace="http://drools.org/schema/drools-spring"
 	elementFormDefault="qualified" 
 	attributeFormDefault="unqualified">
 	
