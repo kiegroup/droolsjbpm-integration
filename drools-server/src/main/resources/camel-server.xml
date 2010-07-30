@@ -29,7 +29,12 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/> 
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-    
+
+  <!--
+      !   If you are running on JBoss you will need to copy a camel-jboss.jar into the lib and set this classloader configuration 
+      |  http://camel.apache.org/camel-jboss.html
+      <bean id="jbossResolver" class="org.apache.camel.jboss.JBossPackageScanClassResolver"/>
+      -->
 
   <!--
    !   Define the server end point.
