@@ -5,10 +5,10 @@
     <parent>
         <artifactId>drools</artifactId>
         <groupId>org.drools</groupId>
-        <version>5.1.0.SNAPSHOT</version>
+        <version>5.1.0</version>
     </parent>
     <artifactId>drools-grid-core</artifactId>
-    <version>5.1.0.SNAPSHOT</version>
+    <version>5.1.0</version>
     <name>Drools :: Grid :: Core</name>
     
     <dependencies>
@@ -35,19 +35,19 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-api</artifactId>
-            <version>5.1.0.SNAPSHOT</version>
+            <version>5.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-core</artifactId>
-            <version>5.1.0.SNAPSHOT</version>
+            <version>5.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-compiler</artifactId>
-            <version>5.1.0.SNAPSHOT</version>
+            <version>5.1.0</version>
         </dependency>
 
         <!-- Apache Mina for default Service Remote Implementation -->
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-persistence-jpa</artifactId>
-            <version>5.1.0.SNAPSHOT</version>
+            <version>5.1.0</version>
             <scope>test</scope>
         </dependency>
 
