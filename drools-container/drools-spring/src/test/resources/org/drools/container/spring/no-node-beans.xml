@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:drools="http://drools.org/schema/drools-spring"
-       xmlns:drools-service="http://drools.org/schema/drools-service-spring"       
+       xmlns:drools="http://drools.org/schema/drools-spring" 
        xmlns:camel="http://camel.apache.org/schema/spring"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
-                           http://drools.org/schema/drools-service-spring http://drools.org/schema/drools-service-spring.xsd
+                           http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring-1.0.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
 	<drools:kbase id="kbase1">
