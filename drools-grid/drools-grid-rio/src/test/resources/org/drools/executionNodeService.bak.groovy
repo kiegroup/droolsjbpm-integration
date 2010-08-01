@@ -16,8 +16,8 @@ deployment(name:'executionNodeService',  debug: 'true') {
 
     /* Declares the artifacts required for deployment. Note the 'dl'
      * classifier used for the 'download' jar */
-    artifact id:'service', 'org.drools:drools-grid-rio:5.1.0'
-    artifact id:'service-dl', 'org.drools:drools-grid-rio:dl:5.1.0'
+    artifact id:'service', 'org.drools:drools-grid-rio:5.2.0.SNAPSHOT'
+    artifact id:'service-dl', 'org.drools:drools-grid-rio:dl:5.2.0.SNAPSHOT'
 
     /*
      * Declare the service to be deployed. The number of instances deployed

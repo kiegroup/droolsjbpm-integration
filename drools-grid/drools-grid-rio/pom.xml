@@ -5,7 +5,7 @@
   <parent>
     <artifactId>drools</artifactId>
     <groupId>org.drools</groupId>
-    <version>5.1.0</version>
+    <version>5.2.0.SNAPSHOT</version>
   </parent>
   
   <artifactId>drools-grid-rio</artifactId>
@@ -24,21 +24,21 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-api</artifactId>
-            <version>5.1.0</version>
+            <version>5.2.0.SNAPSHOT</version>
             
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-core</artifactId>
-            <version>5.1.0</version>
+            <version>5.2.0.SNAPSHOT</version>
             
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-compiler</artifactId>
-            <version>5.1.0</version>
+            <version>5.2.0.SNAPSHOT</version>
 
         </dependency>
 
@@ -46,7 +46,7 @@
        <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-core</artifactId>
-            <version>5.1.0</version>
+            <version>5.2.0.SNAPSHOT</version>
         </dependency>
 
         <!-- RIO Runtime -->
