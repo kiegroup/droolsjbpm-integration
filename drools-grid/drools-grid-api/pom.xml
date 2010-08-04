@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <name>Drools :: Grid :: API</name>
     <artifactId>drools-grid-api</artifactId>
-    
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -34,8 +34,8 @@
             <artifactId>drools-compiler</artifactId>
             <type>jar</type>
         </dependency>
-        
+
     </dependencies>
-      
+
 
 </project>

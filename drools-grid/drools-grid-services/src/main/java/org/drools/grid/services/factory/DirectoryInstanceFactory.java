@@ -46,12 +46,10 @@ public class DirectoryInstanceFactory {
             this.name = directoryInstanceName;
         }
 
-        @Override
         public DirectoryInstance onLocalProvider() {
             return new DirectoryInstance(name, new LocalDirectoryConnector());
         }
 
-        @Override
         public DirectoryInstance onMinaProvider(MinaProvider provider) {
             return new DirectoryInstance(name,
                     new RemoteMinaDirectoryConnector(name,
@@ -60,7 +58,6 @@ public class DirectoryInstanceFactory {
                     SystemEventListenerFactory.getSystemEventListener()));
         }
 
-        @Override
         public DirectoryInstance onRioProvider(RioProvider rioProvider) {
             throw new UnsupportedOperationException("Uncomment RIO DEPS and this method!");
 //            try {
@@ -74,10 +71,9 @@ public class DirectoryInstanceFactory {
 //                    new DistributedRioDirectoryConnector(name,
 //                            SystemEventListenerFactory.getSystemEventListener(),
 //                            rioProvider.getDirectoryNode()));
-            
+
         }
 
-        @Override
         public DirectoryInstance onHornetQProvider() {
             return null;
         }

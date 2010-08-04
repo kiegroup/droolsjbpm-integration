@@ -25,7 +25,7 @@ import org.drools.grid.internal.MessageSession;
 public class KnowledgeBuilderGridClient
     implements
     KnowledgeBuilder {
-    //private GridExecutionNodeConnection nodeConnection;
+    
     private String                      instanceId;
     private GenericNodeConnector     client;
     private MessageSession              messageSession;
@@ -33,7 +33,6 @@ public class KnowledgeBuilderGridClient
     public KnowledgeBuilderGridClient(String instanceId,
                                         GenericNodeConnector client, MessageSession messageSession) {
         this.instanceId = instanceId;
-        //this.nodeConnection = nodeConnection;
         this.client = client;
         this.messageSession = messageSession;
 
@@ -139,7 +138,7 @@ public class KnowledgeBuilderGridClient
         
     }
 
-    @Override
+    
     public KnowledgeBase newKnowledgeBase() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

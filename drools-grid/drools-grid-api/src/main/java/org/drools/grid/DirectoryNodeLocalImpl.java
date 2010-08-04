@@ -39,13 +39,11 @@ public class DirectoryNodeLocalImpl implements DirectoryNodeService {
         return "Local:Directory:";
     }
 
-    @Override
     public void register(String executorId, String resourceId) throws ConnectorException, RemoteException {
         executorsMap.put(executorId, resourceId);
 
     }
 
-    @Override
     public void register(String executorId, GenericNodeConnector resourceConnector) throws ConnectorException, RemoteException {
 
         executorsMap.put(executorId, resourceConnector.getId());
@@ -53,25 +51,21 @@ public class DirectoryNodeLocalImpl implements DirectoryNodeService {
 
     }
 
-    @Override
     public GenericNodeConnector lookup(String executorId) throws ConnectorException, RemoteException {
         String nodeConnectorId = (String) executorsMap.get(executorId);
 
         return GenericConnectorFactory.newNodeConnector(nodeConnectorId);
     }
 
-    @Override
     public void registerKBase(String kbaseId, KnowledgeBase kbase) throws ConnectorException, RemoteException {
         this.kbasesMap.put(kbaseId, "local");
         this.kbasesInstancesMap.put(kbaseId, kbase);
     }
 
-    @Override
     public void registerKBase(String kbaseId, String resourceId) throws ConnectorException, RemoteException {
         this.kbasesMap.put(kbaseId, resourceId);
     }
 
-    @Override
     public KnowledgeBase lookupKBase(String kbaseId) throws ConnectorException, RemoteException {
         String resourceId = this.kbasesMap.get(kbaseId); //based on the id I should create a kbase client
         if (resourceId.equals("local")) {
@@ -82,12 +76,10 @@ public class DirectoryNodeLocalImpl implements DirectoryNodeService {
 
     }
 
-    @Override
     public Map<String, String> getExecutorsMap() throws ConnectorException, RemoteException {
         return this.executorsMap;
     }
 
-    @Override
     public String lookupId(String resourceId) {
         return this.executorsMap.get(resourceId);
     }
@@ -98,31 +90,23 @@ public class DirectoryNodeLocalImpl implements DirectoryNodeService {
         return this;
     }
 
-   
 
-   
-
-    @Override
     public void unregister(String executorId) throws ConnectorException, RemoteException {
         executorsMap.remove(executorId);
     }
 
-    @Override
     public Map<String, String> getKBasesMap() throws ConnectorException, RemoteException {
         return kbasesMap;
     }
 
-    @Override
     public void unregisterKBase(String kbaseId) throws ConnectorException, RemoteException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public void dispose() throws ConnectorException, RemoteException {
         //Do nothing ??
     }
 
-    @Override
     public ServiceType getServiceType() {
         return ServiceType.LOCAL;
     }

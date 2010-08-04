@@ -59,7 +59,6 @@ public class KnowledgeBuilderProviderLocalClient
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public JaxbConfiguration newJaxbConfiguration(Options xjcOpts, String systemId) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

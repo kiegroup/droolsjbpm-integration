@@ -45,21 +45,18 @@ public class ExecutionEnvironmentFactory {
             this.name = executionEnvironmentName;
         }
 
-        @Override
         public ExecutionEnvironment onLocalProvider() {
             return new ExecutionEnvironment(name, new LocalNodeConnector());
         }
 
-        @Override
         public ExecutionEnvironment onMinaProvider(MinaProvider provider) {
             return new ExecutionEnvironment(name,
                     new RemoteMinaNodeConnector(name,
-                     provider.getProviderAddress(),
-                     provider.getProviderPort(),
+                    provider.getProviderAddress(),
+                    provider.getProviderPort(),
                     SystemEventListenerFactory.getSystemEventListener()));
         }
 
-        @Override
         public ExecutionEnvironment onRioProvider(RioProvider rioProvider) {
             try {
                 rioProvider.lookupExecutionNodeServices();
@@ -68,13 +65,12 @@ public class ExecutionEnvironmentFactory {
             } catch (InterruptedException ex) {
                 Logger.getLogger(ExecutionEnvironmentFactory.class.getName()).log(Level.SEVERE, null, ex);
             }
-            return new ExecutionEnvironment(name, 
+            return new ExecutionEnvironment(name,
                     new DistributedRioNodeConnector(name,
-                        SystemEventListenerFactory.getSystemEventListener(),
-                        rioProvider.getExecutionNode()));
+                    SystemEventListenerFactory.getSystemEventListener(),
+                    rioProvider.getExecutionNode()));
         }
 
-        @Override
         public ExecutionEnvironment onHornetQProvider() {
             return null;
         }

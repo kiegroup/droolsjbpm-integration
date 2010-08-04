@@ -14,7 +14,6 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package org.drools.grid.services.factory;
 
 import org.drools.SystemEventListenerFactory;
@@ -25,41 +24,37 @@ import org.drools.grid.services.configuration.RioProvider;
 import org.drools.grid.task.RemoteMinaHumanTaskConnector;
 
 public class TaskServerInstanceFactory {
-    public static TaskServerInstance newTaskServerInstance(String name, GenericProvider provider){
+
+    public static TaskServerInstance newTaskServerInstance(String name, GenericProvider provider) {
         return GenericProviderContainerFactoryHelper.doOnGenericProvider(provider, new TaskServerInstanceBuilder(name));
     }
-    
-    private static class TaskServerInstanceBuilder implements GenericProviderContainerBuilder<TaskServerInstance>{
 
-    	private String name;
+    private static class TaskServerInstanceBuilder implements GenericProviderContainerBuilder<TaskServerInstance> {
 
-		public TaskServerInstanceBuilder(String taskServerInstanceName) {
-    		this.name = taskServerInstanceName;
-		}
-    	
-		@Override
-		public TaskServerInstance onHornetQProvider() {
+        private String name;
+
+        public TaskServerInstanceBuilder(String taskServerInstanceName) {
+            this.name = taskServerInstanceName;
+        }
+
+        public TaskServerInstance onHornetQProvider() {
             throw new UnsupportedOperationException("We don't have a HortnetQ implementation for the Task Service. Yet!");
-		}
+        }
 
-		@Override
-		public TaskServerInstance onLocalProvider() {
+        public TaskServerInstance onLocalProvider() {
             throw new UnsupportedOperationException("We don't have a local implementation for the Task Service. Yet!");
-		}
+        }
 
-		@Override
-		public TaskServerInstance onMinaProvider(MinaProvider provider) {
-			return new TaskServerInstance(name,
+        public TaskServerInstance onMinaProvider(MinaProvider provider) {
+            return new TaskServerInstance(name,
                     new RemoteMinaHumanTaskConnector(name,
-                            ((MinaProvider)provider).getProviderAddress(),
-                            ((MinaProvider)provider).getProviderPort(),
-                            SystemEventListenerFactory.getSystemEventListener()));
-		}
+                    ((MinaProvider) provider).getProviderAddress(),
+                    ((MinaProvider) provider).getProviderPort(),
+                    SystemEventListenerFactory.getSystemEventListener()));
+        }
 
-		@Override
-		public TaskServerInstance onRioProvider(RioProvider rioProvider) {
+        public TaskServerInstance onRioProvider(RioProvider rioProvider) {
             throw new UnsupportedOperationException("We don't have a Distributed Rio implementation for the Task Service. Yet!");
-		}
-    	
+        }
     }
 }

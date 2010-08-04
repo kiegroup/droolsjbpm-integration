@@ -424,12 +424,10 @@ public class HumanTaskServiceImpl implements HumanTaskService {
         client.write(msg, responseHandler);
     }
 
-    @Override
     public String getId() throws ConnectorException, RemoteException {
         return "Remote:Task:";
     }
 
-    @Override
     public ServiceType getServiceType() throws ConnectorException, RemoteException {
         return ServiceType.REMOTE;
     }
