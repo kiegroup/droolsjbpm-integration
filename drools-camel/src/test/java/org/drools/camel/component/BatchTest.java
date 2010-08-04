@@ -43,9 +43,10 @@ import org.drools.common.InternalRuleBase;
 import org.drools.core.util.StringUtils;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.local.LocalConnection;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.process.core.context.variable.VariableScope;
@@ -62,7 +63,6 @@ import org.drools.runtime.process.WorkflowProcessInstance;
 import org.drools.runtime.rule.FactHandle;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -126,7 +126,9 @@ public abstract class BatchTest extends ContextTestSupport {
     protected Context createJndiContext() throws Exception {
         Context context = super.createJndiContext();
 
-        LocalConnection connection = new LocalConnection();
+        GridConnection connection = new GridConnection();
+        connection.addExecutionNode(new LocalNodeConnector());
+        connection.addDirectoryNode(new LocalDirectoryConnector());
         node = connection.getExecutionNode( null );
         node.setId( "node" );
         context.bind( "node",

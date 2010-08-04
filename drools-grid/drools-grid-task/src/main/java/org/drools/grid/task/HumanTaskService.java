@@ -19,6 +19,8 @@ package org.drools.grid.task;
 import java.util.List;
 
 import org.drools.eventmessaging.EventKey;
+import org.drools.grid.ConnectorException;
+import org.drools.grid.HumanTaskNodeService;
 
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddAttachmentMessageResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddCommentMessageResponseHandler;
@@ -39,7 +41,7 @@ import org.drools.task.service.ContentData;
 import org.drools.task.service.FaultData;
  
 
-public interface HumanTaskService {
+public interface HumanTaskService extends HumanTaskNodeService {
     public void addTask(Task task, ContentData content, AddTaskMessageResponseHandler responseHandler);
     public Task getTask(long taskId, GetTaskMessageResponseHandler responseHandler);
     public void addComment(long taskId, Comment comment, AddCommentMessageResponseHandler responseHandler);
@@ -70,6 +72,5 @@ public interface HumanTaskService {
     public void getTasksAssignedAsTaskInitiator(String userId, String language, TaskSummaryMessageResponseHandler responseHandler);
     public void getTasksAssignedAsTaskStakeholder(String userId, String language, TaskSummaryMessageResponseHandler responseHandler);
     public void registerForEvent(EventKey key, boolean remove, EventMessageResponseHandler responseHandler);
-    public boolean connect();
-    public void disconnect();
+    public void disconnect() throws ConnectorException;
 }

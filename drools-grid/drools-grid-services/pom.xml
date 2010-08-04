@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>drools-grid</artifactId>
+        <groupId>org.drools</groupId>
+        <version>5.2.0.SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <name>Drools :: Grid :: Services</name>
+    <artifactId>drools-grid-services</artifactId>
+
+    <dependencies>
+        
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-api</artifactId>
+            <type>jar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-api</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-local</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-remote-api</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-remote-dir-mina</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-task</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-distributed-api</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <!-- Rio Dependencies -->
+        <!--dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-distributed-rio</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-distributed-dir-rio</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+        </dependency-->
+        
+        <!-- Test deps -->
+         <!-- HSQLDB -->
+    	<dependency>
+    		<groupId>com.h2database</groupId>
+    		<artifactId>h2</artifactId>
+		<scope>test</scope>
+    	</dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+         <!-- RIO Test framework -->
+        <!--dependency>
+            <groupId>org.rioproject</groupId>
+            <artifactId>rio-test</artifactId>
+            <version>4.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency-->
+       
+    </dependencies>
+
+</project>

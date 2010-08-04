@@ -34,13 +34,16 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
+import org.drools.grid.ExecutionNode;
+import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.GenericNodeConnector;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.grid.generic.NodeData;
-import org.drools.grid.generic.GenericNodeConnector;
-import org.drools.grid.generic.GenericMessageHandlerImpl;
+import org.drools.grid.internal.NodeData;
+
+import org.drools.grid.internal.GenericMessageHandlerImpl;
 import org.drools.grid.remote.mina.MinaAcceptor;
-import org.drools.grid.remote.mina.MinaNodeConnector;
+import org.drools.grid.remote.mina.RemoteMinaNodeConnector;
 import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
 import org.drools.task.Group;
@@ -67,7 +70,7 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
     
     protected static TaskService taskService;
     protected TaskServiceSession taskSession;
-    protected GenericNodeConnector htMinaClient;
+    protected GenericHumanTaskConnector htMinaClient;
     protected GenericNodeConnector minaClient;
     @Before
     public void setUpTaskService() throws Exception {
@@ -143,29 +146,27 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
         // setup the ht client
         NioSocketConnector htclientConnector = new NioSocketConnector();
         htclientConnector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
-        htMinaClient = new MinaNodeConnector("client ht",
-                htclientConnector,
-                htAddress,
+        htMinaClient = new RemoteMinaHumanTaskConnector("client ht",
+                "127.0.0.1",
+                9124,
                 SystemEventListenerFactory.getSystemEventListener());
 
-         boolean connected = htMinaClient.connect();
-            if (!connected) {
-                throw new IllegalArgumentException("Could not connect task client");
-            }
+         htMinaClient.connect();
+         
 
         // setup RemoteService client
         NioSocketConnector clientConnector = new NioSocketConnector();
         clientConnector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
-        minaClient = new MinaNodeConnector("client SM",
-                clientConnector,
-                address,
+        minaClient = new RemoteMinaNodeConnector("client SM",
+                "127.0.0.1",
+                9123,
                 SystemEventListenerFactory.getSystemEventListener());
 
 
 
-        connection.addNodeConnector(minaClient);
+        connection.addExecutionNode(minaClient);
 
-        node = connection.getExecutionNode(new ReturnAlwaysTheFirstSelectionStrategy(connection));
+        node = connection.getExecutionNode(new ReturnAlwaysTheFirstSelectionStrategy());
         //nodeConnection.connect();
         
         
@@ -178,7 +179,7 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
 
         node.set(HumanTaskFactoryService.class, new HumanTaskServiceProviderRemoteClient(htMinaClient, sessionId));
 
-        this.humanTaskClient = this.node.get(HumanTaskFactoryService.class).newHumanTaskService();
+        this.humanTaskClient = (HumanTaskService) this.node.get(HumanTaskFactoryService.class).newHumanTaskService();
         
 
         this.handler = new CommandBasedServicesWSHumanTaskHandler(ksession);
@@ -189,9 +190,7 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
     public void tearDown() throws Exception {
         this.humanTaskClient.disconnect();
         
-        for(GenericNodeConnector connector : connection.getNodeConnectors()){
-            connector.disconnect();
-        }
+        connection.dispose();
         
         this.handler.dispose();
         this.server.stop();

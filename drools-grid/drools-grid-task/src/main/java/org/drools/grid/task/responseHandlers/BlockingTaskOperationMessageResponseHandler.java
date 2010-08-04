@@ -16,7 +16,7 @@
 
 package org.drools.grid.task.responseHandlers;
 
-import org.drools.grid.generic.Message;
+import org.drools.grid.internal.Message;
 import org.drools.task.service.responsehandlers.BlockingTaskOperationResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.TaskOperationMessageResponseHandler;
 

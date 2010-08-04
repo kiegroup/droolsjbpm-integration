@@ -39,7 +39,7 @@ import org.drools.builder.ResourceType;
 import org.drools.common.InternalFactHandle;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.local.LocalConnection;
+
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.rule.builder.dialect.java.AbstractJavaRuleBuilder;

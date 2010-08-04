@@ -23,10 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.SystemEventListener;
 import org.drools.eventmessaging.Payload;
-import org.drools.grid.generic.GenericIoWriter;
-import org.drools.grid.generic.GenericMessageHandler;
-import org.drools.grid.generic.Message;
-import org.drools.grid.generic.MessageResponseHandler;
+import org.drools.grid.internal.GenericIoWriter;
+import org.drools.grid.internal.GenericMessageHandler;
+import org.drools.grid.internal.Message;
+import org.drools.grid.internal.MessageResponseHandler;
 import org.drools.task.Content;
 import org.drools.task.Task;
 import org.drools.task.query.TaskSummary;

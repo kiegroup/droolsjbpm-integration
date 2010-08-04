@@ -29,7 +29,11 @@
       </dependency>
       <dependency>
       	<groupId>org.drools</groupId>
-      	<artifactId>drools-grid-core</artifactId>
+      	<artifactId>drools-grid-api</artifactId>
+      </dependency>
+      <dependency>
+      	<groupId>org.drools</groupId>
+      	<artifactId>drools-grid-local</artifactId>
       </dependency>
 	  
       <dependency>

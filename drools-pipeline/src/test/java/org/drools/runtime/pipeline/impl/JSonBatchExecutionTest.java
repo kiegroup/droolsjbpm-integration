@@ -50,7 +50,6 @@ import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.local.LocalConnection;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -75,8 +74,11 @@ import org.drools.runtime.rule.FactHandle;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 
-public class JSonBatchExecutionTest extends TestCase {
+public class JSonBatchExecutionTest extends TestCase { 
 
     protected void setUp() throws Exception {
         XMLUnit.setIgnoreComments( true );
@@ -1801,7 +1803,9 @@ public class JSonBatchExecutionTest extends TestCase {
         inXml += "]}}";        
         inXml = roundTripFromXml( inXml );        
         
-        LocalConnection connection = new LocalConnection();
+        GridConnection connection = new GridConnection();
+        connection.addExecutionNode(new LocalNodeConnector());
+        connection.addDirectoryNode(new LocalDirectoryConnector());
         ExecutionNode node = connection.getExecutionNode(null);
 
         StatefulKnowledgeSession ksession = getExecutionNodeSessionStateful(node, ResourceFactory.newByteArrayResource( str.getBytes() ) );

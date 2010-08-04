@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>drools-grid</artifactId>
+    <groupId>org.drools</groupId>
+    <version>5.2.0.SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>drools-grid-distributed-api</artifactId>
+  
+  <name>Drools :: Grid :: Distributed API</name>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-api</artifactId>
+      <version>5.2.0.SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-api</artifactId>
+      <version>5.2.0.SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-remote-api</artifactId>
+      <version>5.2.0.SNAPSHOT</version>
+      <type>jar</type>
+    </dependency>
+     <!-- REMOVE -->
+        <dependency>
+         <groupId>com.sun.xml.bind</groupId>
+         <artifactId>jaxb-xjc</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.sun.xml.bind</groupId>
+         <artifactId>jaxb-impl</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>javax.xml.bind</groupId>
+         <artifactId>jaxb-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+  </dependencies>
+</project>

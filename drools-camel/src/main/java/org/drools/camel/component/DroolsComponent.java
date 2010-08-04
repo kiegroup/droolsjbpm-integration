@@ -39,7 +39,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultComponent;
-import org.drools.grid.ExecutionNode;
+
 
 public class DroolsComponent extends DefaultComponent {
     // Property name *must* follow the Camel conventions (see org.apache.camel.Exchange)

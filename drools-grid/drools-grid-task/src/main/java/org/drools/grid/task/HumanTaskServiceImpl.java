@@ -20,21 +20,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.drools.eventmessaging.EventKey;
-import org.drools.grid.generic.GenericNodeConnector;
-import org.drools.grid.generic.Message;
-import org.drools.task.Attachment;
-import org.drools.task.Comment;
-import org.drools.task.Content;
-import org.drools.task.Task;
-import org.drools.task.service.Command;
-import org.drools.task.service.CommandName;
-import org.drools.task.service.ContentData;
-import org.drools.task.service.FaultData;
-import org.drools.task.service.Operation;
+import org.drools.grid.ConnectorException;
+import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.internal.Message;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddAttachmentMessageResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddCommentMessageResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddTaskMessageResponseHandler;
@@ -46,6 +36,15 @@ import org.drools.grid.task.TaskClientMessageHandlerImpl.SetDocumentMessageRespo
 import org.drools.grid.task.TaskClientMessageHandlerImpl.TaskOperationMessageResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.TaskSummaryMessageResponseHandler;
 import org.drools.grid.task.eventmessaging.EventMessageResponseHandler;
+import org.drools.task.Attachment;
+import org.drools.task.Comment;
+import org.drools.task.Content;
+import org.drools.task.Task;
+import org.drools.task.service.Command;
+import org.drools.task.service.CommandName;
+import org.drools.task.service.ContentData;
+import org.drools.task.service.FaultData;
+import org.drools.task.service.Operation;
 
 /**
  * @author salaboy
@@ -54,12 +53,12 @@ import org.drools.grid.task.eventmessaging.EventMessageResponseHandler;
  */
 public class HumanTaskServiceImpl implements HumanTaskService {
 
-    private final GenericNodeConnector client;
+    private final GenericHumanTaskConnector client;
     private final AtomicInteger counter;
     private int sessionId;
     private String clientName;
 
-    public HumanTaskServiceImpl(GenericNodeConnector client, int sessionId) {
+    public HumanTaskServiceImpl(GenericHumanTaskConnector client, int sessionId) {
         this.client = client;
         this.counter = new AtomicInteger();
         this.clientName = String.valueOf(sessionId);
@@ -67,24 +66,11 @@ public class HumanTaskServiceImpl implements HumanTaskService {
 
     }
 
-    //@Override
-    public boolean connect() {
-        try {
-            return this.client.connect();
-        } catch (RemoteException ex) {
-            Logger.getLogger(HumanTaskServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
 
-    }
 
-    public void disconnect() {
-        try {
+    public void disconnect() throws ConnectorException {
             this.client.disconnect();
-        } catch (RemoteException ex) {
-            Logger.getLogger(HumanTaskServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
 
     public void addTask(Task task, ContentData content, AddTaskMessageResponseHandler responseHandler) {
         List<Object> args = new ArrayList<Object>(2);
@@ -436,5 +422,15 @@ public class HumanTaskServiceImpl implements HumanTaskService {
         Message msg = new Message(sessionId, responseId, false, cmd);
 
         client.write(msg, responseHandler);
+    }
+
+    @Override
+    public String getId() throws ConnectorException, RemoteException {
+        return "Remote:Task:";
+    }
+
+    @Override
+    public ServiceType getServiceType() throws ConnectorException, RemoteException {
+        return ServiceType.REMOTE;
     }
 }

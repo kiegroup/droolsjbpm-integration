@@ -17,7 +17,7 @@
 package org.drools.grid.task.responseHandlers;
 
 import java.util.List;
-import org.drools.grid.generic.Message;
+import org.drools.grid.internal.Message;
 
 import org.drools.task.query.TaskSummary;
 import org.drools.task.service.Command;

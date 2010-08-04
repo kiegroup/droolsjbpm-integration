@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
+import org.drools.base.accumulators.AccumulateFunction;
+import org.drools.base.evaluators.EvaluatorDefinition;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
@@ -35,10 +37,11 @@ import org.drools.builder.conf.EvaluatorOption;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.local.LocalConnection;
+import org.drools.grid.GenericConnection;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.runtime.rule.AccumulateFunction;
-import org.drools.runtime.rule.EvaluatorDefinition;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -69,7 +72,11 @@ public class KnowledgeBaseBeanFactory
 
     public void afterPropertiesSet() throws Exception {
         if ( this.node == null ) {
-            this.node = new LocalConnection().getExecutionNode();
+            GenericConnection connection = new GridConnection();
+            connection.addExecutionNode(new LocalNodeConnector());
+            connection.addDirectoryNode(new LocalDirectoryConnector());
+            this.node = connection.getExecutionNode();
+
         }       
         
         PackageBuilderConfiguration kconf = (PackageBuilderConfiguration)  KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();

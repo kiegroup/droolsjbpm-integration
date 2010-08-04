@@ -48,7 +48,9 @@ import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.local.LocalConnection;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
@@ -85,7 +87,9 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         //create
         Context context = super.createJndiContext();
 
-        LocalConnection connection = new LocalConnection();
+        GridConnection connection = new GridConnection();
+        connection.addExecutionNode(new LocalNodeConnector());
+        connection.addDirectoryNode(new LocalDirectoryConnector());
         node = connection.getExecutionNode(null);
         node.setId("node");
         context.bind("node", node);

@@ -1,0 +1,25 @@
+<assembly>
+  <id>distro</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <baseDirectory>${project.artifactId}-distro</baseDirectory>
+  <files>
+    <file>
+      <source>target/${project.artifactId}-${project.version}.jar</source>
+      <destName>libs/${project.artifactId}-${project.version}.jar</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>src/main/start.sh</source>
+      <destName>start.sh</destName>
+      <fileMode>0555</fileMode>
+    </file>
+  </files>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>libs/</outputDirectory>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+</assembly>

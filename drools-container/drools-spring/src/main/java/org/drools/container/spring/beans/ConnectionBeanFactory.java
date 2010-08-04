@@ -16,8 +16,11 @@
 
 package org.drools.container.spring.beans;
 
-import org.drools.grid.generic.GenericConnection;
-import org.drools.grid.local.LocalConnection;
+
+import org.drools.grid.GenericConnection;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -33,7 +36,7 @@ public class ConnectionBeanFactory
 
     private String id;
     private String type;
-    private Object connection;
+    private GenericConnection connection;
 
     public Object getObject() throws Exception {
         return connection;
@@ -48,13 +51,9 @@ public class ConnectionBeanFactory
     }
 
     public void afterPropertiesSet() throws Exception {
-        if ( "local".equals( type ) ) {
-            connection = new LocalConnection();
-        } else if ( "remote".equals( type ) ) {
-            throw new UnsupportedOperationException( "not implemented yet" );
-        } else {
-            throw new IllegalArgumentException( "invalid connection type: local/remote" );
-        }
+        connection = new GridConnection();
+        connection.addExecutionNode(new LocalNodeConnector());
+        connection.addDirectoryNode(new LocalDirectoryConnector());
     }
 
     public void setId(String id) {

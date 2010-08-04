@@ -16,8 +16,6 @@
 
 package org.drools.grid.task;
 
-import org.drools.grid.task.CommandBasedServicesWSHumanTaskHandler;
-import org.drools.grid.task.HumanTaskService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -33,7 +31,8 @@ import org.drools.process.instance.WorkItemHandler;
 import org.drools.process.instance.WorkItemManager;
 import org.drools.process.instance.impl.WorkItemImpl;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.RemoteConnection;
+import org.drools.grid.GridConnection;
+import org.drools.grid.HumanTaskNodeService;
 import org.drools.grid.task.responseHandlers.BlockingGetContentMessageResponseHandler;
 import org.drools.grid.task.responseHandlers.BlockingGetTaskMessageResponseHandler;
 import org.drools.grid.task.responseHandlers.BlockingTaskOperationMessageResponseHandler;
@@ -61,7 +60,7 @@ public abstract class BaseTaskServiceTest {
     protected Map<String, User> users;
     protected Map<String, Group> groups;
     protected ExecutionNode node;
-    protected RemoteConnection connection = new RemoteConnection();
+    protected GridConnection connection = new GridConnection();
 
     @Test
     public void testTask() throws Exception {

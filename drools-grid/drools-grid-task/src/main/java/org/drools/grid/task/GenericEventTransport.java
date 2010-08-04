@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.drools.eventmessaging.EventTriggerTransport;
 import org.drools.eventmessaging.Payload;
-import org.drools.grid.generic.GenericIoWriter;
-import org.drools.grid.generic.Message;
+import org.drools.grid.internal.GenericIoWriter;
+import org.drools.grid.internal.Message;
 import org.drools.task.service.Command;
 import org.drools.task.service.CommandName;
 

@@ -17,8 +17,10 @@
 package org.drools.container.spring.beans;
 
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.generic.GenericConnection;
-import org.drools.grid.local.LocalConnection;
+import org.drools.grid.GenericConnection;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -33,7 +35,7 @@ public class ExecutionNodeBeanFactory
     InitializingBean {
 
     private String            id;
-    private GenericConnection connection = new LocalConnection();
+    private GenericConnection connection = new GridConnection();
     private ExecutionNode     node;
 
     public Object getObject() throws Exception {
@@ -49,6 +51,8 @@ public class ExecutionNodeBeanFactory
     }
 
     public void afterPropertiesSet() throws Exception {
+        connection.addExecutionNode(new LocalNodeConnector());
+        connection.addDirectoryNode(new LocalDirectoryConnector());
         node = connection.getExecutionNode();
         node.setId( id );
     }

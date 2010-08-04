@@ -1,0 +1,28 @@
+package org.rioproject.gnostic;
+
+
+import org.rioproject.watch.Calculable;
+
+
+global org.rioproject.gnostic.DeployedServiceContext context;
+
+
+declare Calculable
+    @role(event)
+    @timestamp(when)
+end
+
+
+
+rule "1 ksession == scale"
+when
+    Calculable(id == "ksessionCounter", value >= 1 ) from entry-point "calculables-stream"
+then
+    int serviceCount = context.getServiceCount("ExecutionNodeService", "executionNodeService");
+    if(serviceCount < 5) {
+        
+        context.increment("ExecutionNodeService", "executionNodeService");
+    } else {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Have "+serviceCount+" ExecutionNodeServices");
+    }
+end

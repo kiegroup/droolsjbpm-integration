@@ -16,7 +16,11 @@
 
 package org.drools.grid.task;
 
-import org.drools.grid.generic.GenericNodeConnector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.drools.grid.ConnectorException;
+import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.HumanTaskNodeService;
 
 /**
  *
@@ -24,22 +28,22 @@ import org.drools.grid.generic.GenericNodeConnector;
  */
 public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactoryService {
 
-    private GenericNodeConnector connector;
+    private GenericHumanTaskConnector connector;
     private int id;
 
     public HumanTaskServiceProviderRemoteClient() {
     }
 
-    public HumanTaskServiceProviderRemoteClient(GenericNodeConnector connector, int id) {
+    public HumanTaskServiceProviderRemoteClient(GenericHumanTaskConnector connector, int id) {
         this.connector = connector;
         this.id = id;
     }
 
-    public GenericNodeConnector getConnector() {
+    public GenericHumanTaskConnector getConnector() {
         return connector;
     }
 
-    public void setConnector(GenericNodeConnector connector) {
+    public void setConnector(GenericHumanTaskConnector connector) {
         this.connector = connector;
     }
 
@@ -51,14 +55,18 @@ public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactorySer
         this.id = id;
     }
 
-
-    //@Override
-    public HumanTaskService newHumanTaskService() {
-
-        
-            return new HumanTaskServiceImpl(this.connector, this.id);
-      
+    public HumanTaskNodeService newHumanTaskService() {
+        HumanTaskServiceImpl humanTaskServiceImpl = null;
+        try {
+            this.connector.connect();
+            humanTaskServiceImpl = new HumanTaskServiceImpl(this.connector, this.id);
+        } catch (ConnectorException ex) {
+            Logger.getLogger(HumanTaskServiceProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
     }
+        return humanTaskServiceImpl;
+    }
+
+    
 
 
 

@@ -21,9 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,19 +28,21 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.drools.SystemEventListenerFactory;
 import org.drools.eventmessaging.EventKey;
 import org.drools.eventmessaging.Payload;
+import org.drools.grid.ConnectorException;
+import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.internal.Message;
+import org.drools.grid.task.TaskClientMessageHandlerImpl.AddTaskMessageResponseHandler;
+import org.drools.grid.task.TaskClientMessageHandlerImpl.GetContentMessageResponseHandler;
+import org.drools.grid.task.TaskClientMessageHandlerImpl.GetTaskMessageResponseHandler;
+import org.drools.grid.task.eventmessaging.EventMessageResponseHandler;
 import org.drools.runtime.KnowledgeRuntime;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
-import org.drools.grid.generic.GenericNodeConnector;
-import org.drools.grid.generic.Message;
-import org.drools.grid.remote.mina.MinaNodeConnector;
-import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.task.AccessType;
 import org.drools.task.Content;
 import org.drools.task.Group;
@@ -64,11 +63,6 @@ import org.drools.task.service.Command;
 import org.drools.task.service.ContentData;
 import org.drools.task.service.responsehandlers.AbstractBaseResponseHandler;
 
-import org.drools.grid.task.TaskClientMessageHandlerImpl.AddTaskMessageResponseHandler;
-import org.drools.grid.task.TaskClientMessageHandlerImpl.GetContentMessageResponseHandler;
-import org.drools.grid.task.TaskClientMessageHandlerImpl.GetTaskMessageResponseHandler;
-import org.drools.grid.task.eventmessaging.EventMessageResponseHandler;
-
 /**
  * @author salaboy
  * @author Lucas Amador
@@ -79,8 +73,8 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
 
     private String ipAddress = "127.0.0.1";
     private int port = 9124;
-    private SocketAddress address;
-    private GenericNodeConnector connector;
+
+    private GenericHumanTaskConnector connector;
     private HumanTaskServiceImpl client;
     private KnowledgeRuntime session;
     private Map<Long, Long> idMapping = new HashMap<Long, Long>();
@@ -88,21 +82,19 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
 
     public CommandBasedServicesWSHumanTaskHandler(KnowledgeRuntime session) {
         this.session = session;
-        this.address = new InetSocketAddress(ipAddress, port);
+
+    }
+    public void setAddress(String ipAddress, int port){
+        this.ipAddress = ipAddress;
+        this.port = port;
     }
 
-    public void connect() throws RemoteException {
+    public void connect() throws ConnectorException {
         if (connector == null) {
-            NioSocketConnector htclientConnector = new NioSocketConnector();
-            htclientConnector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
-            connector = new MinaNodeConnector("client ht",
-                    htclientConnector,
-                    this.address,
+            connector = new RemoteMinaHumanTaskConnector("client ht",
+                    ipAddress, port,
                     SystemEventListenerFactory.getSystemEventListener());
-            boolean connected = connector.connect();
-            if (!connected) {
-                throw new IllegalArgumentException("Could not connect task client");
-            }
+            connector.connect();
             int id = ((StatefulKnowledgeSession) session).getId();
             client = new HumanTaskServiceImpl(connector, id);
         }
@@ -111,8 +103,9 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
         try {
             connect();
-        } catch (RemoteException ex) {
+		} catch (ConnectorException ex) {
             Logger.getLogger(CommandBasedServicesWSHumanTaskHandler.class.getName()).log(Level.SEVERE, null, ex);
+		    return;
         }
         Task task = new Task();
         String taskName = (String) workItem.getParameter("TaskName");
@@ -218,7 +211,7 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
         client.addTask(task, content, taskResponseHandler);
     }
 
-    public void dispose() throws RemoteException {
+    public void dispose() throws ConnectorException  {
         if (connector != null) {
             connector.disconnect();
         }

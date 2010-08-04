@@ -17,7 +17,7 @@
 package org.drools.grid.task.eventmessaging;
 
 import org.drools.eventmessaging.Payload;
-import org.drools.grid.generic.MessageResponseHandler;
+import org.drools.grid.internal.MessageResponseHandler;
 
 
 

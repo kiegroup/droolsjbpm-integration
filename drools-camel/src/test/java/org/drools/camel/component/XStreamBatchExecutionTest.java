@@ -30,7 +30,6 @@ import java.util.Set;
 
 import javax.naming.Context;
 
-import junit.framework.TestCase;
 
 import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
@@ -41,21 +40,17 @@ import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.Cheese;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.KnowledgeBaseFactoryService;
 import org.drools.Person;
 import org.drools.TestVariable;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
-import org.drools.command.Command;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.local.LocalConnection;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -76,6 +71,9 @@ import org.drools.runtime.rule.QueryResultsRow;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
+import org.drools.grid.GridConnection;
+import org.drools.grid.local.LocalDirectoryConnector;
+import org.drools.grid.local.LocalNodeConnector;
 
 public class XStreamBatchExecutionTest extends ContextTestSupport {
     protected ExecutionNode node;
@@ -85,7 +83,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     protected Context createJndiContext() throws Exception {
         Context context = super.createJndiContext();
 
-        LocalConnection connection = new LocalConnection();
+        GridConnection connection = new GridConnection();
+        connection.addExecutionNode(new LocalNodeConnector());
+        connection.addDirectoryNode(new LocalDirectoryConnector());
         node = connection.getExecutionNode(null);
         node.setId("node");
         context.bind("node", node);
