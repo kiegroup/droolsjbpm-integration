@@ -22,35 +22,25 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
             <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-local</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
             <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-remote-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
             <type>jar</type>
         </dependency>
 
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-remote-dir-mina</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-
+       
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-task</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
             <type>jar</type>
         </dependency>
 
@@ -58,22 +48,8 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-distributed-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-        <!-- Rio Dependencies -->
-        <!--dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-distributed-rio</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-distributed-dir-rio</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
-            <type>jar</type>
-        </dependency-->
         
         <!-- Test deps -->
          <!-- HSQLDB -->
@@ -86,7 +62,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+
+         <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-remote-dir-mina</artifactId>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
          <!-- RIO Test framework -->

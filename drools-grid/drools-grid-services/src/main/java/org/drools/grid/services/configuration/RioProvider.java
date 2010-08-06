@@ -17,6 +17,8 @@
 package org.drools.grid.services.configuration;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 //import net.jini.core.lookup.ServiceItem;
@@ -24,43 +26,48 @@ import java.util.List;
 //import net.jini.discovery.LookupDiscoveryManager;
 //import net.jini.lease.LeaseRenewalManager;
 //import net.jini.lookup.ServiceDiscoveryManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.drools.SystemEventListener;
+import org.drools.SystemEventListenerFactory;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNodeService;
+import org.drools.grid.GenericConnectorFactory;
+import org.drools.grid.GenericNodeConnector;
 
 /**
  *
  * @author salaboy
  */
-public class RioProvider extends GenericProvider {
+public class RioProvider implements GenericProvider {
 
     private List<ExecutionNodeService> executionNodes;
     private List<DirectoryNodeService> directoryNodes;
 
-    public RioProvider(List<ExecutionNodeService> executionNodes, List<DirectoryNodeService> directoryNodes) {
-        this.executionNodes = executionNodes;
-        this.directoryNodes = directoryNodes;
-    }
+    
 
     public RioProvider() {
         this.executionNodes = new ArrayList<ExecutionNodeService>();
         this.directoryNodes = new ArrayList<DirectoryNodeService>();
     }
 
-    @Override
+    
     public String getId() {
         return "RioProvider:";
     }
 
-    @Override
+
     public ProviderType getProviderType() {
         return ProviderType.DistributedRio;
     }
 
     public ExecutionNodeService getExecutionNode() {
+        //Need a strategy
         return executionNodes.get(0);
     }
 
     public DirectoryNodeService getDirectoryNode() {
+        //Need a strategy
         return directoryNodes.get(0);
     }
 
@@ -72,49 +79,15 @@ public class RioProvider extends GenericProvider {
         return directoryNodes;
     }
 
-    public void lookupExecutionNodeServices() throws IOException, InterruptedException {
 
-        throw new UnsupportedOperationException("Uncomment RIO DEPS and this method!");
-//        Class[] classes = new Class[]{ExecutionNodeService.class};
-//        ServiceTemplate tmpl = new ServiceTemplate(null, classes, null);
-//        LookupDiscoveryManager ldm =
-//                new LookupDiscoveryManager(LookupDiscoveryManager.ALL_GROUPS,
-//                null,
-//                null);
-//        System.out.println("Discovering ExecutionNodeService  services ...");
-//        ServiceDiscoveryManager sdm =
-//                new ServiceDiscoveryManager(ldm, new LeaseRenewalManager());
-//        /* Wait no more then 10 seconds to discover the service */
-//        ServiceItem[] items = sdm.lookup(tmpl, 1,100, null, 30000);
-//        System.out.println("Service  items.lenght"+items.length);
-//
-//        for (int i = 0; i < items.length; i++) {
-//            if (items[i].service instanceof ExecutionNodeService) {
-//                executionNodes.add((ExecutionNodeService) items[i].service);
-//            }
-//        }
-    }
 
-    public void lookupDirectoryNodeServices() throws IOException, InterruptedException {
-        throw new UnsupportedOperationException("Uncomment RIO DEPS and this method!");
-//        Class[] classes = new Class[]{DirectoryNodeService.class};
-//        ServiceTemplate tmpl = new ServiceTemplate(null, classes, null);
-//        LookupDiscoveryManager ldm =
-//                new LookupDiscoveryManager(LookupDiscoveryManager.ALL_GROUPS,
-//                null,
-//                null);
-//        System.out.println("Discovering DirectoryNodeService services ...");
-//        ServiceDiscoveryManager sdm =
-//                new ServiceDiscoveryManager(ldm, new LeaseRenewalManager());
-//        /* Wait no more then 10 seconds to discover the service */
-//        ServiceItem[] items = sdm.lookup(tmpl, 1,100, null, 30000);
-//        System.out.println("Service  items.lenght"+items.length);
-//
-//        for (int i = 0; i < items.length; i++) {
-//
-//            if (items[i].service instanceof DirectoryNodeService) {
-//                directoryNodes.add((DirectoryNodeService) items[i].service);
-//            }
-//        }
+    
+
+    public GenericNodeConnector getConnector(String connectorString) {
+
+        return GenericConnectorFactory
+                .newConnector(connectorString);
+      
+
     }
 }

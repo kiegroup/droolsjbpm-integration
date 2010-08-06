@@ -3,14 +3,14 @@ package org.drools.grid.services.configuration;
 import java.io.Serializable;
 
 
-public abstract class GridResourceView implements Serializable{
+public abstract class GridResourceConfiguration implements Serializable{
 
 	private String name;
 	private GenericProvider provider;
 	
-	public GridResourceView() {	}
+	public GridResourceConfiguration() {	}
 	
-	public GridResourceView(String name, GenericProvider provider) {
+	public GridResourceConfiguration(String name, GenericProvider provider) {
 		this.name = name;
 		this.provider = provider;
 	}

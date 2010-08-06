@@ -36,7 +36,6 @@ import org.drools.grid.internal.MessageSession;
 import org.drools.grid.internal.commands.LookupCommand;
 import org.drools.grid.internal.commands.RegisterCommand;
 import org.drools.grid.GenericConnectorFactory;
-import org.drools.grid.NodeService.ServiceType;
 
 /**
  *
@@ -67,10 +66,11 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
                 throw new IllegalArgumentException("Type is not supported for registration");
             }
             Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new RegisterCommand(identifier, ((StatefulKnowledgeSessionGridClient) executor).getInstanceId(), type), null, null, null, null));
-            
+
             for (DirectoryNode directory : connection.getDirectoryNodes()) {
                 try {
                     try {
+
                         directory.get(DirectoryNodeService.class).register(identifier, currentConnector.getId());
                     } catch (RemoteException ex) {
                         Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -99,33 +99,27 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
         try {
             String commandId = "client.lookup" + messageSession.getNextId();
             String kresultsId = "kresults_" + messageSession.getSessionId();
-            Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), 
+            Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(),
                     false, new KnowledgeContextResolveFromContextCommand(
-                            new LookupCommand(identifier, commandId), null, null, null, kresultsId));
-           
+                    new LookupCommand(identifier, commandId), null, null, null, kresultsId));
+
             //First I need to get the correct client ExecutionNodeService with the identifier
             //Look in all the DirectoryNodes
-            
+
             for (DirectoryNode directory : connection.getDirectoryNodes()) {
 
                 try {
-                    
-                    if(directory.get(DirectoryNodeService.class).getServiceType() == ServiceType.DISTRIBUTED){
-                        
-                        String connectorString = directory.get(DirectoryNodeService.class).lookupId(identifier);
-                        
-                        currentConnector = GenericConnectorFactory.newNodeConnector(connectorString);
-                       
-                        
 
-                    }else{
-                        String connectorString = directory.get(DirectoryNodeService.class).lookupId(identifier);
-                        
-                        currentConnector = GenericConnectorFactory.newNodeConnector(connectorString);
-                        currentConnector.connect();
-                    }
-                    if(currentConnector != null){
-                          break;
+
+                    String connectorString = directory.get(DirectoryNodeService.class).lookupId(identifier);
+
+                    currentConnector = GenericConnectorFactory.newConnector(connectorString);
+
+                    currentConnector.connect();
+
+
+                    if (currentConnector != null) {
+                        break;
                     }
                 } catch (RemoteException ex) {
                     Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -160,20 +154,7 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
         }
         return executor;
     }
-//    public Map<String, Map<String, String>> getDirectoryMap(){
-//        Map<String, Map<String, String>> directoryMap = new HashMap<String,Map<String, String>>();
-//        for (DirectoryNodeService directory : gridClient.getDirectories()) {
-//            try {
-//                directoryMap.put(directory.getId(), directory.getDirectoryMap());
-//            } catch (RemoteException ex) {
-//                Logger.getLogger(DirectoryLookupProviderGridClient.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//
-//
-//        }
-//        return directoryMap;
-//
-//    }
+
 
     public Map<String, String> getDirectoryMap() {
         throw new UnsupportedOperationException("Not supported yet.");

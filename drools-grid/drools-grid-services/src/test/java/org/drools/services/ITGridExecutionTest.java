@@ -14,40 +14,25 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package org.drools.services;
 
 import java.io.IOException;
 import org.junit.Assert;
-import org.drools.grid.services.configuration.GenericProvider;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
-import org.drools.grid.AcceptorService;
 import org.drools.grid.ConnectorException;
-import org.drools.grid.DirectoryNodeService;
-import org.drools.grid.ExecutionNode;
-import org.drools.grid.ExecutionNodeService;
-import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
-import org.drools.grid.services.configuration.LocalProvider;
+import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
+import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
+import org.drools.grid.services.configuration.GridTopologyConfiguration;
 import org.drools.grid.services.configuration.RioProvider;
-import org.drools.grid.services.strategies.ExecutionEnvByPrioritySelectionStrategy;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.grid.services.factory.GridTopologyFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 //import net.jini.core.lookup.ServiceItem;
 //import org.rioproject.gnostic.Gnostic;
 //import org.rioproject.sla.RuleMap;
@@ -62,13 +47,14 @@ import org.junit.runner.RunWith;
 //    @RunWith(RioTestRunner.class)
 public class ITGridExecutionTest {
 
+    private GridTopology grid;
 //    AcceptorService server;
 //    @SetTestManager
 //    static TestManager testManager;
 //    private GridTopology grid;
 //    private List<ExecutionNodeService> executionNodes = new ArrayList<ExecutionNodeService>();
 //    private List<DirectoryNodeService> directoryNodes = new ArrayList<DirectoryNodeService>();
-    
+
     public ITGridExecutionTest() {
     }
 
@@ -105,7 +91,6 @@ public class ITGridExecutionTest {
 //                executionNodes.add((ExecutionNodeService) nodeServiceItems[i].service);
 //            }
 //        }
-
     }
 
     @After
@@ -113,22 +98,26 @@ public class ITGridExecutionTest {
 //        System.out.println("Disconecting all clients");
 //        grid.dispose();
 //
-        
     }
+
     @Test
-    public void doNothing(){}
-    
-     @Test
-     public void rioProviderTest() throws ConnectorException, RemoteException {
-//        grid = new GridTopology("MyBusinessUnit");
+    public void doNothing() {
+    }
+
+    @Test
+    public void rioProviderTest() throws ConnectorException, RemoteException {
+
+//        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+//        gridTopologyConfiguration.addExecutionEnvironment(
+//                new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new RioProvider()));
+//        gridTopologyConfiguration.addDirectoryInstance(
+//                new DirectoryInstanceConfiguration("MyMinaExecutionEnv2", new RioProvider()));
 //
+//        grid = GridTopologyFactory.build(gridTopologyConfiguration);
 //
-//        GenericProvider rioProvider = new RioProvider();
-//        GenericProvider rioDirProvider = new RioProvider();
-//
-//
-//        grid.registerExecutionEnvironment("MyRioEnv", rioProvider);
-//        grid.registerDirectoryInstance("MyRioDir", rioDirProvider);
+//        Assert.assertNotNull(grid);
+
+
 //
 //
 //
@@ -183,8 +172,7 @@ public class ITGridExecutionTest {
 
 
 
-     }
-
+    }
 //      private void waitForRule(Gnostic g, String rule) {
 //        Throwable thrown = null;
 //        long t0 = System.currentTimeMillis();
@@ -218,5 +206,4 @@ public class ITGridExecutionTest {
 //
 //        }
 //    }
-
 }

@@ -54,7 +54,7 @@ public class DirectoryNodeLocalImpl implements DirectoryNodeService {
     public GenericNodeConnector lookup(String executorId) throws ConnectorException, RemoteException {
         String nodeConnectorId = (String) executorsMap.get(executorId);
 
-        return GenericConnectorFactory.newNodeConnector(nodeConnectorId);
+        return GenericConnectorFactory.newConnector(nodeConnectorId);
     }
 
     public void registerKBase(String kbaseId, KnowledgeBase kbase) throws ConnectorException, RemoteException {

@@ -53,7 +53,7 @@ public class LocalNodeConnector implements GenericNodeConnector {
     }
 
     public String getId() throws ConnectorException {
-        return "Local:";
+        return "Local:Local:Node";
     }
 
     public void write(Message msg, MessageResponseHandler responseHandler) {

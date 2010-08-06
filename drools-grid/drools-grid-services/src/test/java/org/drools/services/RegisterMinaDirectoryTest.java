@@ -41,9 +41,12 @@ import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.grid.services.DirectoryInstance;
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
-import org.drools.grid.services.configuration.GenericProvider;
+import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
+import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
+import org.drools.grid.services.configuration.GridTopologyConfiguration;
 import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
+import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.services.strategies.DirectoryInstanceByPrioritySelectionStrategy;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -117,6 +120,8 @@ public class RegisterMinaDirectoryTest {
 
         grid.dispose();
 
+        Thread.sleep(5000);
+
         Assert.assertEquals(0, serverDir.getCurrentSessions());
         serverDir.stop();
         System.out.println("Dir Server Stopped!");
@@ -130,16 +135,18 @@ public class RegisterMinaDirectoryTest {
 
     @Test
      public void directoryRemoteTest() throws ConnectorException, RemoteException {
-        grid = new GridTopology("MyBusinessUnit");
 
-        GenericProvider remoteDirProvider = new MinaProvider("127.0.0.1", 9123);
-        GenericProvider localEnvProvider = new LocalProvider();
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyMinaDir", new MinaProvider("127.0.0.1", 9123)));
+        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
+        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyRemoteEnv", new MinaProvider("127.0.0.1", 9124)));
 
-        MinaProvider remoteEnvProvider = new MinaProvider("127.0.0.1", 9124);
 
-        grid.registerDirectoryInstance("MyMinaDir", remoteDirProvider);
-        grid.registerExecutionEnvironment("MyLocalEnv", localEnvProvider);
-        grid.registerExecutionEnvironment("MyRemoteEnv", remoteEnvProvider);
+        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+
+
+        Assert.assertNotNull(grid);
+       
 
 
         DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
@@ -224,21 +231,18 @@ public class RegisterMinaDirectoryTest {
      @Test
     public void directoryInstanceRetriveKSessionFromEE() throws ConnectorException, RemoteException {
 
-        //This APIs are used to create the Execution Environment Topology that will define which logical set of nodes
-        //will be used for a specific situation/use case.
-
-        //The Execution Environment Topology will contain the Runtime state, persistent in time to be able to restore the
-        //topology in case of failure or restarting
-        grid = new GridTopology("MyCompanyTopology");
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyMinaDir", new MinaProvider("127.0.0.1", 9123)));
+        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new MinaProvider("127.0.0.1", 9124)));
 
 
-        //Create the provider
-        MinaProvider provider = new MinaProvider("127.0.0.1", 9124);
-        GenericProvider remoteDirProvider = new MinaProvider("127.0.0.1", 9123);
-        //Register the provider into the topology
-        
-        grid.registerDirectoryInstance("MyMinaDir", remoteDirProvider);
-        grid.registerExecutionEnvironment("MyMinaExecutionEnv1", provider);
+        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+
+
+        Assert.assertNotNull(grid);
+
+
+       
 
         //Then we can get the registered Execution Environments by Name
 

@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.GetKnowledgeBaseCommand;
@@ -31,7 +32,7 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService {
 
     public DirectoryNodeServiceImpl() {
         executionNodes = new ArrayList<ExecutionNodeService>();
-        this.id = "Distributed:Directory";
+        this.id = "Distributed:Rio:Directory"+UUID.randomUUID().toString();
     }
 
     @Override
@@ -65,7 +66,7 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService {
             }
         }
         
-        return GenericConnectorFactory.newNodeConnector(nodeService.getId());
+        return GenericConnectorFactory.newConnector(nodeService.getId());
     }
 
     public void setExecutionNodes(Iterable<ExecutionNodeService> executionNodes) {

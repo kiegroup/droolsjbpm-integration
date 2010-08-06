@@ -1,7 +1,6 @@
 package org.drools.grid.distributed;
 
 
-import org.drools.grid.ExecutionNodeService;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -9,7 +8,6 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.SystemEventListenerFactory;
 
 import org.drools.command.FinishedCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
@@ -35,8 +33,9 @@ public class KnowledgeBaseProviderGridClient
         
         this.connection = connection;
         this.messageSession = new MessageSession();
-        this.connector = new DistributedRioNodeConnector("client 1", SystemEventListenerFactory.getSystemEventListener(), 
-                                            ((DistributedRioNodeConnector)connector).getExecutionNodeService());
+        //this.connector = new DistributedRioNodeConnector("client 1", SystemEventListenerFactory.getSystemEventListener(),
+        //                                    ((DistributedRioNodeConnector)connector).getExecutionNodeService());
+        this.connector = connector;
 
     }
 

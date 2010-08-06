@@ -1,22 +1,22 @@
 package org.drools.grid.services.factory;
 
 import org.drools.grid.services.GridTopology;
-import org.drools.grid.services.configuration.DirectoryInstanceView;
-import org.drools.grid.services.configuration.ExecutionEnvironmentView;
-import org.drools.grid.services.configuration.GridTopologyView;
-import org.drools.grid.services.configuration.TaskServerInstanceView;
+import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
+import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
+import org.drools.grid.services.configuration.GridTopologyConfiguration;
+import org.drools.grid.services.configuration.TaskServerInstanceConfiguration;
 
 public class GridTopologyFactory {
 	
-	public static GridTopology build(GridTopologyView gridConfiguration){
+	public static GridTopology build(GridTopologyConfiguration gridConfiguration){
 		GridTopology topology = new GridTopology(gridConfiguration.getName());
-		for (DirectoryInstanceView directoryInstanceView : gridConfiguration.getDirectoryInstances()) {
+		for (DirectoryInstanceConfiguration directoryInstanceView : gridConfiguration.getDirectoryInstances()) {
 			topology.registerDirectoryInstance(directoryInstanceView.getName(), directoryInstanceView.getProvider());
 		}
-		for (ExecutionEnvironmentView executionEnvironmentView : gridConfiguration.getExecutionEnvironments()) {
+		for (ExecutionEnvironmentConfiguration executionEnvironmentView : gridConfiguration.getExecutionEnvironments()) {
 			topology.registerExecutionEnvironment(executionEnvironmentView.getName(), executionEnvironmentView.getProvider());
 		}
-		for (TaskServerInstanceView taskServerInstanceView : gridConfiguration.getTaskServers()) {
+		for (TaskServerInstanceConfiguration taskServerInstanceView : gridConfiguration.getTaskServers()) {
 			topology.registerTaskServerInstance(taskServerInstanceView.getName(), taskServerInstanceView.getProvider());
 		}
 

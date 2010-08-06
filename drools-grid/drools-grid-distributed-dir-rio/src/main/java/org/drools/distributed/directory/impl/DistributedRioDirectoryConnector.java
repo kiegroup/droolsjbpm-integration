@@ -1,9 +1,12 @@
 package org.drools.distributed.directory.impl;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.drools.KnowledgeBase;
 
 import org.drools.SystemEventListener;
@@ -16,6 +19,7 @@ import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.GridConnection;
+import org.drools.grid.distributed.util.RioResourceLocator;
 
 public class DistributedRioDirectoryConnector
         implements GenericNodeConnector, DirectoryNodeService {
@@ -26,6 +30,8 @@ public class DistributedRioDirectoryConnector
     protected SocketAddress address;
     protected SystemEventListener eventListener;
     protected GenericConnection connection;
+    private String directoryNodeServiceId;
+
     public DistributedRioDirectoryConnector(String name,
             SystemEventListener eventListener) {
         if (name == null) {
@@ -48,7 +54,20 @@ public class DistributedRioDirectoryConnector
         this.counter = new AtomicInteger();
         this.eventListener = eventListener;
         this.directoryNodeService = directoryNode;
-        this.connection = new GridConnection(); 
+        this.connection = new GridConnection();
+
+    }
+
+    public DistributedRioDirectoryConnector(String name,
+            SystemEventListener eventListener, String directoryNodeServiceId) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name can not be null");
+        }
+        this.name = name;
+        this.counter = new AtomicInteger();
+        this.eventListener = eventListener;
+        this.directoryNodeServiceId = directoryNodeServiceId;
+        this.connection = new GridConnection();
 
     }
 
@@ -90,10 +109,24 @@ public class DistributedRioDirectoryConnector
         return directoryNodeService;
     }
 
-    
-
     public void connect() throws ConnectorException {
-        //do nothing, here we use auto discover
+        if(this.directoryNodeService == null && !"".equals(this.directoryNodeServiceId)){
+            try {
+                this.directoryNodeService = RioResourceLocator.locateDirectoryNodeById(this.directoryNodeServiceId);
+            } catch (IOException ex) {
+                Logger.getLogger(DistributedRioDirectoryConnector.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DistributedRioDirectoryConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            try {
+                this.directoryNodeService = RioResourceLocator.locateDirectoryNodes().get(0);
+            } catch (IOException ex) {
+                Logger.getLogger(DistributedRioDirectoryConnector.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DistributedRioDirectoryConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void disconnect() throws ConnectorException {

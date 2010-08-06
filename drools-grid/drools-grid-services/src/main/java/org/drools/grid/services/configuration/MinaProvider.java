@@ -1,18 +1,19 @@
 package org.drools.grid.services.configuration;
 
-
-
+import org.drools.grid.GenericConnectorFactory;
+import org.drools.grid.GenericNodeConnector;
 
 /**
  * @author salaboy
  */
-public class MinaProvider extends GenericProvider {
-    
+public class MinaProvider implements GenericProvider {
+
     private String providerAddress;
     private int providerPort;
 
-    public MinaProvider() {	}
-    
+    public MinaProvider() {
+    }
+
     public MinaProvider(String providerAddress, int providerPort) {
         this.providerAddress = providerAddress;
         this.providerPort = providerPort;
@@ -26,21 +27,26 @@ public class MinaProvider extends GenericProvider {
         return providerPort;
     }
 
-	public void setProviderAddress(String providerAddress) {
-		this.providerAddress = providerAddress;
-	}
+    public void setProviderAddress(String providerAddress) {
+        this.providerAddress = providerAddress;
+    }
 
-	public void setProviderPort(int providerPort) {
-		this.providerPort = providerPort;
-	}
+    public void setProviderPort(int providerPort) {
+        this.providerPort = providerPort;
+    }
 
-	@Override
-	public String getId() {
-		return "MinaProvider:"+providerAddress+":"+providerPort;
-	}
-	
-	@Override
-	public ProviderType getProviderType() {
-		return ProviderType.RemoteMina;
-	}
+    public String getId() {
+        return "MinaProvider:" + providerAddress + ":" + providerPort;
+    }
+
+    public ProviderType getProviderType() {
+        return ProviderType.RemoteMina;
+    }
+
+    public GenericNodeConnector getConnector(String connectorString){
+          return GenericConnectorFactory
+                  .newConnector(connectorString+":"+this.getProviderAddress()+":"+this.getProviderPort());
+
+
+    }
 }

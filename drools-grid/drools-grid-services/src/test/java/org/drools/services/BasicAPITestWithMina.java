@@ -12,20 +12,23 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.ExecutionNode;
-import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.GenericMessageHandlerImpl;
 import org.drools.grid.internal.NodeData;
 import org.drools.grid.remote.mina.MinaAcceptor;
 import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
+import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
+import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
+import org.drools.grid.services.configuration.GridTopologyConfiguration;
+import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
+import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.services.strategies.RandomEnvironmentSelectionStrategy;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -94,19 +97,14 @@ public class BasicAPITestWithMina {
     @Test
     public void singleMinaProvider() throws ConnectorException, RemoteException, RemoteException, RemoteException, RemoteException {
 
-        //This APIs are used to create the Execution Environment Topology that will define which logical set of nodes
-        //will be used for a specific situation/use case.
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        gridTopologyConfiguration.addExecutionEnvironment(
+                        new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1",new MinaProvider("127.0.0.1", 9123)));
 
-        //The Execution Environment Topology will contain the Runtime state, persistent in time to be able to restore the
-        //topology in case of failure or restarting
-        grid = new GridTopology("MyCompanyTopology");
+        grid = GridTopologyFactory.build(gridTopologyConfiguration);
 
-      
-        //Create the provider
-        MinaProvider provider = new MinaProvider("127.0.0.1", 9123);
-        //Register the provider into the topology
-        grid.registerExecutionEnvironment("MyMinaExecutionEnv1", provider);
-
+        Assert.assertNotNull(grid);
+        
         //Then we can get the registered Execution Environments by Name
 
         ExecutionEnvironment ee = grid.getExecutionEnvironment("MyMinaExecutionEnv1");
@@ -168,26 +166,15 @@ public class BasicAPITestWithMina {
     @Test
     public void multiMinaProvider() throws ConnectorException {
 
-        //This APIs are used to create the Execution Environment Topology that will define which logical set of nodes
-        //will be used for a specific situation/use case.
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        gridTopologyConfiguration.addExecutionEnvironment(
+                        new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1",new MinaProvider("127.0.0.1", 9123)));
+        gridTopologyConfiguration.addExecutionEnvironment(
+                        new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv2",new MinaProvider("127.0.0.1", 9124)));
 
-        //The Execution Environment Topology will contain the Runtime state, persistent in time to be able to restore the 
-        //topology in case of failure or restarting
+        grid = GridTopologyFactory.build(gridTopologyConfiguration);
 
-        
-        grid = new GridTopology("MyCompanyTopology");
-
-       
-        //Create the provider
-        MinaProvider provider1 = new MinaProvider("127.0.0.1", 9123);
-        //Register the provider into the topology
-        grid.registerExecutionEnvironment("MyMinaExecutionEnv1", provider1);
-
-
-        //Create the provider
-         MinaProvider provider2 = new MinaProvider("127.0.0.1", 9124);
-        //Register the provider into the topology
-        grid.registerExecutionEnvironment("MyMinaExecutionEnv2", provider2);
+        Assert.assertNotNull(grid);
 
         //Then we can get the registered Execution Environments by Name
         ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new RandomEnvironmentSelectionStrategy());

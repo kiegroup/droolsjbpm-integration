@@ -11,6 +11,7 @@ import net.jini.core.lookup.ServiceItem;
 import org.drools.SystemEventListenerFactory;
 import org.drools.distributed.directory.impl.DistributedRioDirectoryConnector;
 import org.drools.grid.DirectoryNodeService;
+import org.drools.grid.distributed.impl.DistributedRioNodeConnector;
 import org.junit.After;
 
 
@@ -55,7 +56,7 @@ public class ITGridExecutionTest extends ExecutionNodeBaseTest {
             if (nodeServiceItems[i].service instanceof ExecutionNodeService) {
                 connection.addExecutionNode(new DistributedRioNodeConnector("node"+i,
                                 SystemEventListenerFactory.getSystemEventListener(),
-                                (ExecutionNodeService) nodeServiceItems[i].service));
+                                ((ExecutionNodeService) nodeServiceItems[i].service).getId()));
             }
         }
 

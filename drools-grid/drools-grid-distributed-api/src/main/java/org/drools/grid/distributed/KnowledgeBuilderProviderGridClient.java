@@ -6,12 +6,10 @@ package org.drools.grid.distributed;
 
 import com.sun.tools.xjc.Options;
 import org.drools.builder.JaxbConfiguration;
-import org.drools.grid.ExecutionNodeService;
 import java.util.Properties;
 import java.util.UUID;
 
 import org.drools.KnowledgeBase;
-import org.drools.SystemEventListenerFactory;
 import org.drools.builder.DecisionTableConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
@@ -30,14 +28,15 @@ public class KnowledgeBuilderProviderGridClient
     KnowledgeBuilderFactoryService {
     
     private MessageSession messageSession;
-    private GenericNodeConnector client;
+    private GenericNodeConnector connector;
 
 
 
     public KnowledgeBuilderProviderGridClient(GenericNodeConnector connector, GenericConnection connection) {
             this.messageSession = new MessageSession();
-            client = new DistributedRioNodeConnector("client 1", SystemEventListenerFactory.getSystemEventListener(),
-                                                    ((DistributedRioNodeConnector)connector).getExecutionNodeService());
+            //client = new DistributedRioNodeConnector("client 1", SystemEventListenerFactory.getSystemEventListener(),
+              //                                      ((DistributedRioNodeConnector)connector).getExecutionNodeService());
+            this.connector = connector;
         
     }
 
@@ -57,7 +56,7 @@ public class KnowledgeBuilderProviderGridClient
                                                            new NewKnowledgeBuilderCommand( null ) ) );
 
         try {
-            Object object = client.write( msg ).getPayload();
+            Object object = connector.write( msg ).getPayload();
 
             if ( !(object instanceof FinishedCommand) ) {
                 throw new RuntimeException( "Response was not correctly ended" );
@@ -69,7 +68,7 @@ public class KnowledgeBuilderProviderGridClient
         }
 
         return new KnowledgeBuilderGridClient( localId,
-                                                 client, messageSession );
+                                                 connector, messageSession );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {

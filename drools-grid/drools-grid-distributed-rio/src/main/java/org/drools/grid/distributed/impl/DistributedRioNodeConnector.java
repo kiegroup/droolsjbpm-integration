@@ -1,8 +1,11 @@
-package org.drools.grid.distributed;
+package org.drools.grid.distributed.impl;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.rmi.RemoteException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.drools.SystemEventListener;
 import org.drools.grid.ConnectorException;
@@ -14,6 +17,8 @@ import org.drools.grid.internal.MessageResponseHandler;
 import org.drools.grid.ExecutionNodeService;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.GridConnection;
+import org.drools.grid.distributed.DistributedConnectionNode;
+import org.drools.grid.distributed.util.RioResourceLocator;
 
 public class DistributedRioNodeConnector
         implements GenericNodeConnector {
@@ -24,8 +29,9 @@ public class DistributedRioNodeConnector
     protected SocketAddress address;
     protected SystemEventListener eventListener;
     protected GenericConnection connection;
+    protected String executionNodeId;
 
-    public DistributedRioNodeConnector(String name,
+     public DistributedRioNodeConnector(String name,
             SystemEventListener eventListener) {
         if (name == null) {
             throw new IllegalArgumentException("Name can not be null");
@@ -34,8 +40,10 @@ public class DistributedRioNodeConnector
         this.counter = new AtomicInteger();
         this.eventListener = eventListener;
         this.connection = new GridConnection();
-        
+
     }
+
+
 
     public DistributedRioNodeConnector(String name,
             SystemEventListener eventListener,
@@ -48,6 +56,20 @@ public class DistributedRioNodeConnector
         this.eventListener = eventListener;
         this.executionNodeService = executionNodeService;
         this.connection = new GridConnection();
+
+    }
+
+    public DistributedRioNodeConnector(String name,
+            SystemEventListener eventListener,
+            String executionNodeId) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name can not be null");
+        }
+        this.name = name;
+        this.counter = new AtomicInteger();
+        this.eventListener = eventListener;
+        this.connection = new GridConnection();
+        this.executionNodeId = executionNodeId;
 
     }
 
@@ -89,7 +111,27 @@ public class DistributedRioNodeConnector
     
 
     public void connect() throws ConnectorException {
-        //do nothing, here we use auto discover
+        if(this.executionNodeService != null){
+            return;
+        }
+        if( !this.executionNodeId.equals("")){
+            try {
+                this.executionNodeService = RioResourceLocator.locateExecutionNodeById(this.executionNodeId);
+            } catch (IOException ex) {
+                Logger.getLogger(DistributedRioNodeConnector.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DistributedRioNodeConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            try {
+                this.executionNodeService = RioResourceLocator.locateExecutionNodes().get(0);
+            } catch (IOException ex) {
+                Logger.getLogger(DistributedRioNodeConnector.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DistributedRioNodeConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
 
     public void disconnect() throws ConnectorException {

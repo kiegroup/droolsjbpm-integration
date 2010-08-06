@@ -1,6 +1,7 @@
 package org.drools.grid.services.factory;
 
 import org.drools.grid.services.configuration.GenericProvider;
+import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.configuration.RioProvider;
 
@@ -9,7 +10,7 @@ public class GenericProviderContainerFactoryHelper {
 	public static <T> T doOnGenericProvider(GenericProvider provider, GenericProviderContainerBuilder<T> builder){
         switch (provider.getProviderType()){
             case Local: {
-            	return builder.onLocalProvider();
+            	return builder.onLocalProvider((LocalProvider)provider);
             }
             case RemoteMina: {
             	return builder.onMinaProvider((MinaProvider)provider);

@@ -45,8 +45,13 @@ import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
 import org.drools.grid.services.TaskServerInstance;
+import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
 import org.drools.grid.services.configuration.GenericProvider;
+import org.drools.grid.services.configuration.GridTopologyConfiguration;
+import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
+import org.drools.grid.services.configuration.TaskServerInstanceConfiguration;
+import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.task.CommandBasedServicesWSHumanTaskHandler;
 import org.drools.grid.task.HumanTaskService;
 import org.drools.grid.task.TaskServerMessageHandlerImpl;
@@ -82,6 +87,7 @@ import org.mvel2.compiler.ExpressionCompiler;
  * @author salaboy
  */
 public class RegisterTaskTest {
+
     private GridTopology grid;
     private MinaAcceptor serverTask;
     private MinaAcceptor serverNode;
@@ -95,6 +101,7 @@ public class RegisterTaskTest {
     protected static final int MANAGER_COMPLETION_WAIT_TIME = DEFAULT_WAIT_TIME;
     protected static final int MANAGER_ABORT_WAIT_TIME = DEFAULT_WAIT_TIME;
     protected CommandBasedServicesWSHumanTaskHandler handler;
+
     public RegisterTaskTest() {
     }
 
@@ -147,7 +154,7 @@ public class RegisterTaskTest {
         }
 
 
-         // Human task Server configuration
+        // Human task Server configuration
         SocketAddress htAddress = new InetSocketAddress("127.0.0.1", 9123);
         SocketAcceptor htAcceptor = new NioSocketAcceptor();
 
@@ -161,7 +168,7 @@ public class RegisterTaskTest {
 
         //Execution Node related stuff
 
-           System.out.println("Server 1 Starting!");
+        System.out.println("Server 1 Starting!");
         // the servers should be started in a different machine (jvm or physical) or in another thread
         SocketAddress address = new InetSocketAddress("127.0.0.1", 9124);
         NodeData nodeData = new NodeData();
@@ -184,8 +191,8 @@ public class RegisterTaskTest {
 
         grid.dispose();
 
-        
-        
+
+
         handler.dispose();
         Assert.assertEquals(0, serverNode.getCurrentSessions());
         serverNode.stop();
@@ -193,11 +200,11 @@ public class RegisterTaskTest {
         Assert.assertEquals(0, serverTask.getCurrentSessions());
         serverTask.stop();
         System.out.println("Task Server Stopped!");
-        
+
         taskSession.dispose();
         emf.close();
-        
-        
+
+
 
 
 
@@ -205,24 +212,27 @@ public class RegisterTaskTest {
 
     @Test
     public void MinaTaskTest() throws InterruptedException, ConnectorException {
-        grid = new GridTopology("MyBusinessUnit");
 
-        GenericProvider remoteTaskProvider = new MinaProvider("127.0.0.1", 9123);
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        gridTopologyConfiguration.addTaskServerInstance(new TaskServerInstanceConfiguration("MyMinaTask", new MinaProvider("127.0.0.1", 9123)));
+        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new MinaProvider("127.0.0.1", 9124)));
 
-        grid.registerTaskServerInstance("MyMinaTask", remoteTaskProvider);
+
+        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+
+
+        Assert.assertNotNull(grid);
+
 
         TaskServerInstance taskServer = grid.getTaskServerInstance("MyMinaTask");
 
-        //Create the provider
-        MinaProvider provider = new MinaProvider("127.0.0.1", 9124);
-        //Register the provider into the topology
-        grid.registerExecutionEnvironment("MyMinaExecutionEnv1", provider);
+
 
         Assert.assertNotNull(taskServer);
 
         client = (HumanTaskService) taskServer.getTaskClient();
         Assert.assertNotNull(client);
-        
+
 
         //Create a task to test the HT client. For that we need to have a ksession with a workitem that creates it
         ExecutionEnvironment ee = grid.getExecutionEnvironment("MyMinaExecutionEnv1");
@@ -233,7 +243,7 @@ public class RegisterTaskTest {
         ExecutionNode node = ee.getExecutionNode();
 
         Assert.assertNotNull(node);
-         KnowledgeBuilder kbuilder =
+        KnowledgeBuilder kbuilder =
                 node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
 
 
@@ -256,7 +266,7 @@ public class RegisterTaskTest {
         workItem.setParameter("Comment", "Comment");
         workItem.setParameter("Priority", "10");
         workItem.setParameter("ActorId", "Darth Vader");
-        handler.executeWorkItem(workItem,  manager);
+        handler.executeWorkItem(workItem, manager);
 
         Thread.sleep(500);
 
@@ -319,92 +329,86 @@ public class RegisterTaskTest {
         vars.put("now", new Date());
         return MVEL.executeExpression(compiler.compile(context), vars);
     }
-
-    
-
 }
 
 class TestWorkItemManager implements WorkItemManager {
 
-        private volatile boolean completed;
-        private volatile boolean aborted;
-        private volatile Map<String, Object> results;
+    private volatile boolean completed;
+    private volatile boolean aborted;
+    private volatile Map<String, Object> results;
 
-        public synchronized boolean waitTillCompleted(long time) {
-            if (!isCompleted()) {
-                try {
-                    wait(time);
-                } catch (InterruptedException e) {
-                    // swallow and return state of completed
-                }
+    public synchronized boolean waitTillCompleted(long time) {
+        if (!isCompleted()) {
+            try {
+                wait(time);
+            } catch (InterruptedException e) {
+                // swallow and return state of completed
             }
-
-            return isCompleted();
         }
 
-        public synchronized boolean waitTillAborted(long time) {
-            if (!isAborted()) {
-                try {
-                    wait(time);
-                } catch (InterruptedException e) {
-                    // swallow and return state of aborted
-                }
-            }
-
-            return isAborted();
-        }
-
-        public void abortWorkItem(long id) {
-            setAborted(true);
-        }
-
-        public synchronized boolean isAborted() {
-            return aborted;
-        }
-
-        private synchronized void setAborted(boolean aborted) {
-            this.aborted = aborted;
-            notifyAll();
-        }
-
-        public void completeWorkItem(long id, Map<String, Object> results) {
-            this.results = results;
-            setCompleted(true);
-        }
-
-        private synchronized void setCompleted(boolean completed) {
-            this.completed = completed;
-            notifyAll();
-        }
-
-        public synchronized boolean isCompleted() {
-            return completed;
-        }
-
-        public WorkItem getWorkItem(long id) {
-            return null;
-        }
-
-        public Set<WorkItem> getWorkItems() {
-            return null;
-        }
-
-        public Map<String, Object> getResults() {
-            return results;
-        }
-
-        public void internalAbortWorkItem(long id) {
-        }
-
-        public void internalAddWorkItem(WorkItem workItem) {
-        }
-
-        public void internalExecuteWorkItem(WorkItem workItem) {
-        }
-
-        public void registerWorkItemHandler(String workItemName, WorkItemHandler handler) {
-        }
-
-
-
+        return isCompleted();
     }
+
+    public synchronized boolean waitTillAborted(long time) {
+        if (!isAborted()) {
+            try {
+                wait(time);
+            } catch (InterruptedException e) {
+                // swallow and return state of aborted
+            }
+        }
+
+        return isAborted();
+    }
+
+    public void abortWorkItem(long id) {
+        setAborted(true);
+    }
+
+    public synchronized boolean isAborted() {
+        return aborted;
+    }
+
+    private synchronized void setAborted(boolean aborted) {
+        this.aborted = aborted;
+        notifyAll();
+    }
+
+    public void completeWorkItem(long id, Map<String, Object> results) {
+        this.results = results;
+        setCompleted(true);
+    }
+
+    private synchronized void setCompleted(boolean completed) {
+        this.completed = completed;
+        notifyAll();
+    }
+
+    public synchronized boolean isCompleted() {
+        return completed;
+    }
+
+    public WorkItem getWorkItem(long id) {
+        return null;
+    }
+
+    public Set<WorkItem> getWorkItems() {
+        return null;
+    }
+
+    public Map<String, Object> getResults() {
+        return results;
+    }
+
+    public void internalAbortWorkItem(long id) {
+    }
+
+    public void internalAddWorkItem(WorkItem workItem) {
+    }
+
+    public void internalExecuteWorkItem(WorkItem workItem) {
+    }
+
+    public void registerWorkItemHandler(String workItemName, WorkItemHandler handler) {
+    }
+}

@@ -16,16 +16,10 @@
  */
 package org.drools.grid.services.factory;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.drools.SystemEventListenerFactory;
-//import org.drools.distributed.directory.impl.DistributedRioDirectoryConnector;
-import org.drools.grid.local.LocalDirectoryConnector;
-import org.drools.grid.remote.directory.RemoteMinaDirectoryConnector;
 
 import org.drools.grid.services.DirectoryInstance;
 import org.drools.grid.services.configuration.GenericProvider;
+import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.configuration.RioProvider;
 
@@ -46,32 +40,22 @@ public class DirectoryInstanceFactory {
             this.name = directoryInstanceName;
         }
 
-        public DirectoryInstance onLocalProvider() {
-            return new DirectoryInstance(name, new LocalDirectoryConnector());
+        public DirectoryInstance onLocalProvider(LocalProvider provider) {
+            return new DirectoryInstance(name,
+                    //provider.getConnector("org.drools.grid.local.LocalDirectoryConnector"));
+                    provider.getConnector("Local:Local:Directory"));
         }
 
         public DirectoryInstance onMinaProvider(MinaProvider provider) {
             return new DirectoryInstance(name,
-                    new RemoteMinaDirectoryConnector(name,
-                    ((MinaProvider) provider).getProviderAddress(),
-                    ((MinaProvider) provider).getProviderPort(),
-                    SystemEventListenerFactory.getSystemEventListener()));
+                   //provider.getConnector("org.drools.grid.remote.directory.RemoteMinaDirectoryConnector"));
+                   provider.getConnector("Remote:Mina:Directory"));
         }
 
-        public DirectoryInstance onRioProvider(RioProvider rioProvider) {
-            throw new UnsupportedOperationException("Uncomment RIO DEPS and this method!");
-//            try {
-//                rioProvider.lookupDirectoryNodeServices();
-//            } catch (IOException ex) {
-//                Logger.getLogger(ExecutionEnvironmentFactory.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(ExecutionEnvironmentFactory.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            return new DirectoryInstance(name,
-//                    new DistributedRioDirectoryConnector(name,
-//                            SystemEventListenerFactory.getSystemEventListener(),
-//                            rioProvider.getDirectoryNode()));
-
+        public DirectoryInstance onRioProvider(RioProvider provider) {
+            return new DirectoryInstance(name,
+                    //provider.getConnector("org.drools.distributed.directory.impl.DistributedRioDirectoryConnector"));
+                    provider.getConnector("Distributed:Rio:Directory"));
         }
 
         public DirectoryInstance onHornetQProvider() {

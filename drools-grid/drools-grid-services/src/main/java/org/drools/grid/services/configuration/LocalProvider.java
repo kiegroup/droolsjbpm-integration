@@ -16,23 +16,30 @@
  */
 package org.drools.grid.services.configuration;
 
+import org.drools.grid.GenericConnectorFactory;
+import org.drools.grid.GenericNodeConnector;
 
 /**
  *
  * @author salaboy
  */
-public class LocalProvider extends GenericProvider {
+public class LocalProvider implements GenericProvider {
+
+
 
     public LocalProvider() {
     }
 
-    @Override
     public String getId() {
         return "LocalProvider:";
     }
 
-    @Override
     public ProviderType getProviderType() {
         return ProviderType.Local;
+    }
+
+    public GenericNodeConnector getConnector(String connectorString) {
+          return GenericConnectorFactory.newConnector(connectorString);
+
     }
 }

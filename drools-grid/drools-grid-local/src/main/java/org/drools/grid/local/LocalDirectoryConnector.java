@@ -49,7 +49,7 @@ public class LocalDirectoryConnector implements GenericNodeConnector{
     }
 
     public String getId() throws ConnectorException {
-        return "Local:Directory";
+        return "Local:Local:Directory";
     }
 
 //    public DirectoryNodeService getDirectoryNodeService(){

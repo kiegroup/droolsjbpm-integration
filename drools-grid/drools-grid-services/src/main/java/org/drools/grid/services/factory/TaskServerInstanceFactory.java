@@ -19,6 +19,7 @@ package org.drools.grid.services.factory;
 import org.drools.SystemEventListenerFactory;
 import org.drools.grid.services.TaskServerInstance;
 import org.drools.grid.services.configuration.GenericProvider;
+import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.configuration.RioProvider;
 import org.drools.grid.task.RemoteMinaHumanTaskConnector;
@@ -41,7 +42,7 @@ public class TaskServerInstanceFactory {
             throw new UnsupportedOperationException("We don't have a HortnetQ implementation for the Task Service. Yet!");
         }
 
-        public TaskServerInstance onLocalProvider() {
+        public TaskServerInstance onLocalProvider(LocalProvider provider) {
             throw new UnsupportedOperationException("We don't have a local implementation for the Task Service. Yet!");
         }
 

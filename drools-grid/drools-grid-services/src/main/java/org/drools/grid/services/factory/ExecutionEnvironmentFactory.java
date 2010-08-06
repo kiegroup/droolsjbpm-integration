@@ -19,12 +19,11 @@ package org.drools.grid.services.factory;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.drools.SystemEventListenerFactory;
-import org.drools.grid.distributed.DistributedRioNodeConnector;
-import org.drools.grid.local.LocalNodeConnector;
-import org.drools.grid.remote.mina.RemoteMinaNodeConnector;
+
+
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.configuration.GenericProvider;
+import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.configuration.RioProvider;
 
@@ -45,30 +44,23 @@ public class ExecutionEnvironmentFactory {
             this.name = executionEnvironmentName;
         }
 
-        public ExecutionEnvironment onLocalProvider() {
-            return new ExecutionEnvironment(name, new LocalNodeConnector());
+        public ExecutionEnvironment onLocalProvider(LocalProvider provider) {
+            return new ExecutionEnvironment(name,
+                    //provider.getConnector("org.drools.grid.local.LocalNodeConnector"));
+                    provider.getConnector("Local:Local:Node"));
         }
 
         public ExecutionEnvironment onMinaProvider(MinaProvider provider) {
             return new ExecutionEnvironment(name,
-                    new RemoteMinaNodeConnector(name,
-                    provider.getProviderAddress(),
-                    provider.getProviderPort(),
-                    SystemEventListenerFactory.getSystemEventListener()));
+                    //provider.getConnector("org.drools.grid.remote.mina.RemoteMinaNodeConnector"));
+                    provider.getConnector("Remote:Mina:Node"));
         }
 
-        public ExecutionEnvironment onRioProvider(RioProvider rioProvider) {
-            try {
-                rioProvider.lookupExecutionNodeServices();
-            } catch (IOException ex) {
-                Logger.getLogger(ExecutionEnvironmentFactory.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ExecutionEnvironmentFactory.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        public ExecutionEnvironment onRioProvider(RioProvider provider) {
+            
             return new ExecutionEnvironment(name,
-                    new DistributedRioNodeConnector(name,
-                    SystemEventListenerFactory.getSystemEventListener(),
-                    rioProvider.getExecutionNode()));
+                    //provider.getConnector("org.drools.grid.distributed.DistributedRioNodeConnector"));
+                    provider.getConnector("Distributed:Rio:Node"));
         }
 
         public ExecutionEnvironment onHornetQProvider() {

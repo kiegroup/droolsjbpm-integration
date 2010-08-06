@@ -42,6 +42,10 @@ import org.drools.grid.remote.mina.MinaAcceptor;
 import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
+import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
+import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
+import org.drools.grid.services.configuration.GridTopologyConfiguration;
+import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.services.strategies.ExecutionEnvByPrioritySelectionStrategy;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -99,15 +103,19 @@ public class ServiceAPITest {
 
     
      @Test
-     public void mixedTopologyMinaAndLocal() throws ConnectorException {
-        grid = new GridTopology("MyBusinessUnit");
-       
-        GenericProvider minaProvider = new MinaProvider("127.0.0.1", 9123 );
-        GenericProvider localProvider = new LocalProvider();
+     public void mixedTopologyMinaAndLocal() throws ConnectorException, RemoteException {
 
-        grid.registerExecutionEnvironment("MyMinaEnv", minaProvider);
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaEnv", new MinaProvider("127.0.0.1", 9123)));
+        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
 
-        grid.registerExecutionEnvironment("MyLocalEnv", localProvider);
+
+        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+
+
+        Assert.assertNotNull(grid);
+
+        
 
         ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
         Assert.assertNotNull(ee);
@@ -156,7 +164,7 @@ public class ServiceAPITest {
         Assert.assertEquals(2, fired);
 
 
-
+        grid.dispose();
 
 
      }

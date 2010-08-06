@@ -6,16 +6,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GridTopologyView implements Serializable{
+public class GridTopologyConfiguration implements Serializable{
 	
 	private String name;
-	private Map<String, ExecutionEnvironmentView> executionEnvironments = new HashMap<String, ExecutionEnvironmentView>();
-	private Map<String, DirectoryInstanceView> directoryInstances = new HashMap<String, DirectoryInstanceView>();
-	private Map<String, TaskServerInstanceView> taskServerInstances = new HashMap<String, TaskServerInstanceView>();
+	private Map<String, ExecutionEnvironmentConfiguration> executionEnvironments = new HashMap<String, ExecutionEnvironmentConfiguration>();
+	private Map<String, DirectoryInstanceConfiguration> directoryInstances = new HashMap<String, DirectoryInstanceConfiguration>();
+	private Map<String, TaskServerInstanceConfiguration> taskServerInstances = new HashMap<String, TaskServerInstanceConfiguration>();
 
-	public GridTopologyView() { }
+	public GridTopologyConfiguration() { }
 	
-	public GridTopologyView(String name) {
+	public GridTopologyConfiguration(String name) {
 		this.name = name;
 	}
 
@@ -27,45 +27,45 @@ public class GridTopologyView implements Serializable{
 		this.name = name;
 	}
 
-	public Collection<ExecutionEnvironmentView> getExecutionEnvironments() {
+	public Collection<ExecutionEnvironmentConfiguration> getExecutionEnvironments() {
 		return Collections.unmodifiableCollection(executionEnvironments.values());
 	}
 	
-	public Collection<DirectoryInstanceView> getDirectoryInstances() {
+	public Collection<DirectoryInstanceConfiguration> getDirectoryInstances() {
 		return Collections.unmodifiableCollection(directoryInstances.values());
 	}
 	
-	public Collection<TaskServerInstanceView> getTaskServers(){
+	public Collection<TaskServerInstanceConfiguration> getTaskServers(){
 		return Collections.unmodifiableCollection(taskServerInstances.values());
 	}
 
-	public void addExecutionEnvironment(ExecutionEnvironmentView newExecutionEnvironment) {
+	public void addExecutionEnvironment(ExecutionEnvironmentConfiguration newExecutionEnvironment) {
 		String newGridResourceName = newExecutionEnvironment.getName();
 		checkUniqueName(newGridResourceName, directoryInstances, taskServerInstances);
 		executionEnvironments.put(newGridResourceName, newExecutionEnvironment);
 	}
 	
-	public void addDirectoryInstance(DirectoryInstanceView newDirectoryInstance){
+	public void addDirectoryInstance(DirectoryInstanceConfiguration newDirectoryInstance){
 		String newGridResourceName = newDirectoryInstance.getName();
 		checkUniqueName(newGridResourceName, executionEnvironments, taskServerInstances);
 		directoryInstances.put(newGridResourceName, newDirectoryInstance);
 	}
 	
-	public void addTaskServerInstance(TaskServerInstanceView newTaskServerInstance){
+	public void addTaskServerInstance(TaskServerInstanceConfiguration newTaskServerInstance){
 		String newGridResourceName = newTaskServerInstance.getName();
 		checkUniqueName(newGridResourceName, executionEnvironments, directoryInstances);
 		taskServerInstances.put(newGridResourceName, newTaskServerInstance);
 	}
 	
-	public ExecutionEnvironmentView getExecutionEnvironment(String name){
+	public ExecutionEnvironmentConfiguration getExecutionEnvironment(String name){
 		return executionEnvironments.get(name);
 	}
 	
-	public DirectoryInstanceView getDirectoryInstance(String name){
+	public DirectoryInstanceConfiguration getDirectoryInstance(String name){
 		return directoryInstances.get(name);
 	}
 
-	public TaskServerInstanceView getTaskServerInstance(String name) {
+	public TaskServerInstanceConfiguration getTaskServerInstance(String name) {
 		return taskServerInstances.get(name);
 	}
 	
@@ -76,8 +76,8 @@ public class GridTopologyView implements Serializable{
 	}
 
 	private void checkUniqueName(String newGridResourceName, 
-			Map<String, ? extends GridResourceView> firstResources, 
-			Map<String, ? extends GridResourceView> secondResources) {
+			Map<String, ? extends GridResourceConfiguration> firstResources,
+			Map<String, ? extends GridResourceConfiguration> secondResources) {
 		if(null != firstResources.get(newGridResourceName) || null != secondResources.get(newGridResourceName))
 			throw new IllegalArgumentException("Existing resource with name: " + newGridResourceName);
 	}

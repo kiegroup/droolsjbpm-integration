@@ -48,7 +48,7 @@ import org.rioproject.watch.CounterWatch;
     private Long instanceID;
 
     public ExecutionNodeServiceImpl() {
-        this.id = "Distributed:Node:" + UUID.randomUUID().toString();
+        this.id = "Distributed:Rio:Node:" + UUID.randomUUID().toString();
         handler = new GenericMessageGridHandlerImpl(new NodeData(), SystemEventListenerFactory.getSystemEventListener());
     }
 

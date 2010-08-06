@@ -118,7 +118,7 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
                 Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            client = GenericConnectorFactory.newNodeConnector(connectorString);
+            client = GenericConnectorFactory.newConnector(connectorString);
             try {
                 client.connect();
             } catch (RemoteException ex) {

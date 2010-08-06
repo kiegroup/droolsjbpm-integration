@@ -109,7 +109,7 @@ public class RemoteMinaDirectoryConnector implements GenericNodeConnector{
     public String getId() {
         String hostName = ((InetSocketAddress)this.address).getHostName();
         int hostPort = ((InetSocketAddress)this.address).getPort();
-        return "Mina:"+this.providerName+":"+hostName+":"+hostPort;
+        return "Remote:Mina:Directory:"+hostName+":"+hostPort;
     }
 
     public int getSessionId() {

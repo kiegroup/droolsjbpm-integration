@@ -77,7 +77,7 @@ public class DirectoryNodeRemoteClient implements DirectoryNodeService {
         BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
         write(msg, handler);
         SimpleCommand resultcmd = (SimpleCommand)handler.getMessage().getPayload();
-        return GenericConnectorFactory.newNodeConnector((String)resultcmd.getArguments().get(0));
+        return GenericConnectorFactory.newConnector((String)resultcmd.getArguments().get(0));
     }
 
     public void registerKBase(String kbaseId, String resourceId) throws ConnectorException {
@@ -99,14 +99,14 @@ public class DirectoryNodeRemoteClient implements DirectoryNodeService {
         write(msg, handler);
         SimpleCommand resultcmd = (SimpleCommand)handler.getMessage().getPayload();
         String connectorString = (String)resultcmd.getArguments().get(0);
-        GenericNodeConnector connector = GenericConnectorFactory.newNodeConnector(connectorString);
+        GenericNodeConnector currentConnector = GenericConnectorFactory.newConnector(connectorString);
         try {
-            connector.connect();
+            currentConnector.connect();
         } catch (RemoteException ex) {
             Logger.getLogger(DirectoryNodeRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return new KnowledgeBaseRemoteClient(kbaseId, connector, new MessageSession() );
+        return new KnowledgeBaseRemoteClient(kbaseId, currentConnector, new MessageSession() );
     }
 
    
