@@ -122,7 +122,7 @@ public class RemoteMinaNodeConnector
     public String getId() {
         String hostName = ((InetSocketAddress) this.address).getHostName();
         int hostPort = ((InetSocketAddress) this.address).getPort();
-        return "Mina:" + this.name + ":" + hostName + ":" + hostPort;
+        return "Remote:Mina:Node:" + hostName + ":" + hostPort;
     }
 
 
