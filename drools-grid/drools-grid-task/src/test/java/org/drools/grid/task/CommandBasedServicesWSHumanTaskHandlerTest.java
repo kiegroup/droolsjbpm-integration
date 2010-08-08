@@ -70,7 +70,7 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
     
     protected static TaskService taskService;
     protected TaskServiceSession taskSession;
-    protected GenericHumanTaskConnector htMinaClient;
+    protected GenericNodeConnector htMinaClient;
     protected GenericNodeConnector minaClient;
     @Before
     public void setUpTaskService() throws Exception {

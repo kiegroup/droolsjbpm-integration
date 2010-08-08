@@ -119,7 +119,7 @@ public class RegisterMinaDirectoryTest {
     @After
     public void tearDown() throws InterruptedException, ConnectorException, RemoteException {
 
-        
+        Thread.sleep(3000);
         
         Assert.assertEquals(0, serverNode.getCurrentSessions());
         serverNode.stop();
@@ -149,7 +149,7 @@ public class RegisterMinaDirectoryTest {
         DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
         Assert.assertNotNull(directory);
 
-        DirectoryNodeService dir = directory.getDirectoryService().get(DirectoryNodeService.class);
+        DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
         Assert.assertNotNull(dir);
         Map<String, String> dirMap = dir.getExecutorsMap();
         
@@ -297,7 +297,7 @@ public class RegisterMinaDirectoryTest {
         grid.disconnect();
 
         DirectoryInstance directoryInstance = grid.getDirectoryInstance();
-        DirectoryNodeService directory = directoryInstance.getDirectoryService().get(DirectoryNodeService.class);
+        DirectoryNodeService directory = directoryInstance.getDirectoryNode().get(DirectoryNodeService.class);
         GenericNodeConnector connector = directory.lookup("sessionName");
         
         directoryInstance.getConnector().disconnect();

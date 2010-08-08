@@ -2,6 +2,7 @@ package org.drools.grid.task;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.rmi.RemoteException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,6 +10,7 @@ import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
+import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
@@ -19,8 +21,9 @@ import org.drools.SystemEventListenerFactory;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.GenericConnection;
-import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.HumanTaskNodeService;
+import org.drools.grid.NodeConnectionType;
 
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
@@ -30,7 +33,7 @@ import org.drools.grid.remote.mina.MinaIoHandler;
 
 public class RemoteMinaHumanTaskConnector
         implements
-        GenericHumanTaskConnector {
+        GenericNodeConnector {
 
     protected IoSession session;
     protected final String name;
@@ -148,11 +151,19 @@ public class RemoteMinaHumanTaskConnector
         return this.connection;
     }
 
-    public HumanTaskNodeService getHumanTaskNodeService() throws ConnectorException {
-        return new HumanTaskServiceImpl(this, (int) this.session.getId());
-    }
-
     public ConnectorType getConnectorType() {
         return ConnectorType.REMOTE;
+    }
+
+    public NodeConnectionType getNodeConnectionType() throws ConnectorException, RemoteException {
+        return new RemoteMinaConnectionHumanTask();
+    }
+
+    public int getSessionId() {
+        return (int) session.getId();
+    }
+
+    public AtomicInteger getCounter() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

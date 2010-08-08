@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.drools.grid.task;
 
+import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.HumanTaskNodeService;
 
 /**
@@ -28,22 +29,22 @@ import org.drools.grid.HumanTaskNodeService;
  */
 public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactoryService {
 
-    private GenericHumanTaskConnector connector;
+    private GenericNodeConnector connector;
     private int id;
 
     public HumanTaskServiceProviderRemoteClient() {
     }
 
-    public HumanTaskServiceProviderRemoteClient(GenericHumanTaskConnector connector, int id) {
+    public HumanTaskServiceProviderRemoteClient(GenericNodeConnector connector, int id) {
         this.connector = connector;
         this.id = id;
     }
 
-    public GenericHumanTaskConnector getConnector() {
+    public GenericNodeConnector getConnector() {
         return connector;
     }
 
-    public void setConnector(GenericHumanTaskConnector connector) {
+    public void setConnector(GenericNodeConnector connector) {
         this.connector = connector;
     }
 
@@ -58,16 +59,15 @@ public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactorySer
     public HumanTaskNodeService newHumanTaskService() {
         HumanTaskServiceImpl humanTaskServiceImpl = null;
         try {
+
             this.connector.connect();
-            humanTaskServiceImpl = new HumanTaskServiceImpl(this.connector, this.id);
+        } catch (RemoteException ex) {
+            Logger.getLogger(HumanTaskServiceProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+
         } catch (ConnectorException ex) {
             Logger.getLogger(HumanTaskServiceProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        }
+        humanTaskServiceImpl = new HumanTaskServiceImpl(this.connector, this.id);
         return humanTaskServiceImpl;
     }
-
-    
-
-
-
 }

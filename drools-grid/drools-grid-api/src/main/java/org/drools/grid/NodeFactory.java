@@ -16,7 +16,6 @@
  */
 
 package org.drools.grid;
-
 /**
  *
  * @author salaboy
@@ -33,6 +32,15 @@ public class NodeFactory {
     public static DirectoryNode newDirectoryNode(NodeConnectionType type){
         type.init();
         DirectoryNode node = new DirectoryNode();
+        for(Class serviceClass : type.getServicesKeys()){
+            node.set(serviceClass, type.getServiceImpl(serviceClass));
+        }
+        return node;
+    }
+
+    public static HumanTaskNode newHumanTaskNode(NodeConnectionType type){
+        type.init();
+        HumanTaskNode node = new HumanTaskNode();
         for(Class serviceClass : type.getServicesKeys()){
             node.set(serviceClass, type.getServiceImpl(serviceClass));
         }

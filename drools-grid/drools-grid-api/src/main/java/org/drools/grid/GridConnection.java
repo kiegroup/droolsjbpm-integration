@@ -22,11 +22,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.drools.grid.strategies.DirectorySelectionStrategy;
-import org.drools.grid.strategies.HumanTaskSelectionStrategy;
+
 import org.drools.grid.strategies.NodeSelectionStrategy;
-import org.drools.grid.strategies.StaticIncrementalDirectorySelectionStrategy;
-import org.drools.grid.strategies.StaticIncrementalNodeSelectionStrategy;
+import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
+
 
 /**
  *
@@ -36,12 +35,13 @@ public class GridConnection implements GenericConnection {
 
     private List<GenericNodeConnector> executionNodeConnectors;
     private List<GenericNodeConnector> directoryNodeConnectors;
-    private List<GenericHumanTaskConnector> humanTaskNodeConnectors;
+    private List<GenericNodeConnector> humanTaskNodeConnectors;
+    private NodeSelectionStrategy defaultStrategy = new ReturnAlwaysTheFirstSelectionStrategy();
 
     public GridConnection() {
         this.executionNodeConnectors = new ArrayList<GenericNodeConnector>();
         this.directoryNodeConnectors = new ArrayList<GenericNodeConnector>();
-        this.humanTaskNodeConnectors = new ArrayList<GenericHumanTaskConnector>();
+        this.humanTaskNodeConnectors = new ArrayList<GenericNodeConnector>();
     }
 
     public void addExecutionNode(GenericNodeConnector execNodeConnector) {
@@ -53,7 +53,7 @@ public class GridConnection implements GenericConnection {
 
     }
 
-    public void addHumanTaskNode(GenericHumanTaskConnector humanTaskNodeConnector) {
+    public void addHumanTaskNode(GenericNodeConnector humanTaskNodeConnector) {
         this.humanTaskNodeConnectors.add(humanTaskNodeConnector);
     }
 
@@ -64,13 +64,9 @@ public class GridConnection implements GenericConnection {
     public ExecutionNode getExecutionNode(NodeSelectionStrategy strategy) throws ConnectorException {
         ExecutionNode node = null;
         GenericNodeConnector connector = null;
-        //if the strategy is null use the default one
-        if (strategy == null) {
-            connector = getBestNode(new StaticIncrementalNodeSelectionStrategy());
-        } else {
-            connector = getBestNode(strategy);
-        }
 
+        connector = getBestNode(strategy);
+        
         NodeConnectionType type;
         try {
             type = connector.getNodeConnectionType();
@@ -88,21 +84,18 @@ public class GridConnection implements GenericConnection {
 
         return node;
     }
+    
+    public ExecutionNode getExecutionNode() throws ConnectorException{
+        return getExecutionNode(defaultStrategy);
+    }
 
-    public DirectoryNode getDirectoryNode(DirectorySelectionStrategy strategy) throws ConnectorException {
+    public DirectoryNode getDirectoryNode(NodeSelectionStrategy strategy) throws ConnectorException {
 
 
         GenericNodeConnector connector = null;
-        //if the strategy is null use the default one
-
-
-        if (strategy == null) {
-            connector = getBestDirectory(new StaticIncrementalDirectorySelectionStrategy());
-        } else {
-            connector = getBestDirectory(strategy);
-        }
-
-
+        
+        connector = getBestDirectory(strategy);
+ 
         NodeConnectionType type;
         DirectoryNode directoryNode = null;
         try {
@@ -122,32 +115,39 @@ public class GridConnection implements GenericConnection {
         return directoryNode;
     }
 
-    public DirectoryNode getDirectoryNode() throws ConnectorException {
-        return getDirectoryNode(null);
+    public DirectoryNode getDirectoryNode() throws ConnectorException{
+        return getDirectoryNode(defaultStrategy);
     }
 
-    public ExecutionNode getExecutionNode() throws ConnectorException {
-        return getExecutionNode(null);
-    }
+    public HumanTaskNode getHumanTaskNode(NodeSelectionStrategy strategy) throws ConnectorException {
 
-    public HumanTaskNodeService getHumanTaskNode(HumanTaskSelectionStrategy humanTaskSelectionStrategy) throws ConnectorException {
-        if (humanTaskNodeConnectors.isEmpty()) {
-            return null;
+        GenericNodeConnector connector = null;
+
+        connector = getBestHumanTask(strategy);
+
+        NodeConnectionType type;
+        HumanTaskNode humanTaskNode = null;
+        try {
+            type = connector.getNodeConnectionType();
+
+            connector.connect();
+
+            type.setConnector(connector);
+            type.setConnection(this);
+
+            humanTaskNode = NodeFactory.newHumanTaskNode(type);
+        } catch (RemoteException ex) {
+            Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        // humanTaskSelectionStrategy.getBestHumanTask(humanTaskNodeConnectors);
-        GenericHumanTaskConnector connector = humanTaskNodeConnectors.get(0);
 
-        connector.connect();
-
-        HumanTaskNodeService humanTaskNode = connector.getHumanTaskNodeService();
 
         return humanTaskNode;
 
     }
 
-    public HumanTaskNodeService getHumanTaskNode() throws ConnectorException {
-        return getHumanTaskNode(null);
-    }
+   public HumanTaskNode getHumanTaskNode() throws ConnectorException {
+       return getHumanTaskNode(defaultStrategy);
+   }
 
     public List<ExecutionNode> getExecutionNodes() throws ConnectorException {
         List<ExecutionNode> executionNodes = new ArrayList<ExecutionNode>();
@@ -187,7 +187,7 @@ public class GridConnection implements GenericConnection {
 
     }
 
-    public List<HumanTaskNodeService> getHumanTaskNodes() {
+    public List<HumanTaskNode> getHumanTaskNodes() {
         throw new UnsupportedOperationException("not Implemented yet!");
     }
 
@@ -206,8 +206,12 @@ public class GridConnection implements GenericConnection {
                 Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        for (GenericHumanTaskConnector connector : humanTaskNodeConnectors) {
-            connector.disconnect();
+        for (GenericNodeConnector connector : humanTaskNodeConnectors) {
+            try {
+                connector.disconnect();
+            } catch (RemoteException ex) {
+                Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
@@ -216,11 +220,11 @@ public class GridConnection implements GenericConnection {
         return nodeSelectionStrategy.getBestNode(this.executionNodeConnectors);
     }
 
-    private GenericNodeConnector getBestDirectory(DirectorySelectionStrategy directorySelectionStrategy) {
-        return directorySelectionStrategy.getBestDirectory(this.directoryNodeConnectors);
+    private GenericNodeConnector getBestDirectory(NodeSelectionStrategy directorySelectionStrategy) {
+        return directorySelectionStrategy.getBestNode(this.directoryNodeConnectors);
     }
 
-    private GenericHumanTaskConnector getBestHumanTask(HumanTaskSelectionStrategy humanTaskSelectionStrategy) {
-        return humanTaskSelectionStrategy.getBestHumanTask(this.humanTaskNodeConnectors);
+    private GenericNodeConnector getBestHumanTask(NodeSelectionStrategy humanTaskSelectionStrategy) {
+        return humanTaskSelectionStrategy.getBestNode(this.humanTaskNodeConnectors);
     }
 }

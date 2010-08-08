@@ -9,7 +9,7 @@ import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.impl.ExecutionResultImpl;
 
-public class GenericMessageHandlerImpl implements GenericMessageHandler {
+public class GenericMessageHandlerImpl implements GenericMessageHandler { 
     private SystemEventListener systemEventListener;
 
     private NodeData  data;

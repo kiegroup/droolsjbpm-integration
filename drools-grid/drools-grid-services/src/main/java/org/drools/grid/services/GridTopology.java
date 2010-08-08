@@ -90,28 +90,20 @@ public class GridTopology {
      *  6) Register the Execution Environment inside all the currently available Directory Instances
      */
     public void registerExecutionEnvironment(String name, GenericProvider provider) {
-        //Create the executionEnvironment using the provider
 
         ExecutionEnvironment environment = ExecutionEnvironmentFactory.newExecutionEnvironment(name, provider);
-        //Get the connector
         GenericNodeConnector connector = environment.getConnector();
-        //Get the connection
         GenericConnection connection = connector.getConnection();
-        //Adding the connector to the conection collection of connectors
         connection.addExecutionNode(connector);
-        //We need to add all the other exec envs connectors inside this connection
+
         for (ExecutionEnvironment e : executionEnvironments.values()) {
             connection.addExecutionNode(e.getConnector());
-            //I need to add this execution node to all the other EE
             e.getConnector().getConnection().addExecutionNode(connector);
         }
-        //We need to add all the other directory connectors inside this connection
         for (DirectoryInstance d : directoryInstances.values()) {
             connection.addDirectoryNode(d.getConnector());
-            //I need to add this execution node to all the other DI
             d.getConnector().getConnection().addExecutionNode(connector);
         }
-        //Adding the env to the local cache
         executionEnvironments.put(name, environment);
 
         try {
@@ -121,7 +113,6 @@ public class GridTopology {
         } catch (RemoteException ex) {
             Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //Register all the Execution Environments into the current directories
         registerResourceInDirectories(name, provider.getId());
 
     }
@@ -133,29 +124,29 @@ public class GridTopology {
      *  1) Get the ExecutionEnvironment from the executionEnvironmentMap
      *  2) Get the ExecutionEnvironment connector
      *     2.1) Remove the ExecutionEnvironment from the executionEnvironmentByConnectorId map
-     *     2.2) Disconnect the connector
+     *     2.2) Dispose the connection that the connector contains
+     *     2.3) Disconnect the connector
      *  3) Remove the executionEnvironment from the executionEnvironmentMap
      *  4) Unregister the ExecutionEnvironment from the running Directory Instances
      *
      */
     public void unregisterExecutionEnvironment(String name) {
+
         ExecutionEnvironment ee = executionEnvironments.get(name);
         try {
 
             GenericNodeConnector connector = ee.getConnector();
-            connector.getConnection().dispose();
             executionEnvironmentsByConnectorId.remove(connector.getId());
+            connector.getConnection().dispose();
             connector.disconnect();
+
         } catch (ConnectorException ex) {
             Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
         } catch (RemoteException ex) {
             Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
-        //Remove Execution Environment
         executionEnvironments.remove(name);
-        //UnRegister EE from current Directories
         unregisterResourceFromDirectories(name);
 
     }
@@ -163,12 +154,14 @@ public class GridTopology {
      * Get Execution Environment by Name
      * @param name: String Execution Environment Name
      */
+
     public ExecutionEnvironment getExecutionEnvironment(String name) {
         return executionEnvironments.get(name);
     }
 
     /*
      * Get ExecutionEnvironment by connector
+     * @param connector: using this connector id, this method will return an ExecutionEnvironment
      */
     public ExecutionEnvironment getExecutionEnvironment(GenericNodeConnector connector) {
         ExecutionEnvironment ee = null;
@@ -227,22 +220,19 @@ public class GridTopology {
             connection.addExecutionNode(e.getConnector());
         }
         for (DirectoryInstance d : directoryInstances.values()) {
-            connection.addDirectoryNode(d.getConnector());
             d.getConnector().getConnection().addDirectoryNode(connector);
+            connection.addDirectoryNode(d.getConnector());
         }
 
-
-        
-
         directoryInstances.put(name, directory);
-
         registerResourceInDirectories(name, provider.getId());
-        
+
     }
     /*
      * Get the Best DirectoryInstance based on a DirectoryInstanceSelectionStrategy
      * @param strategy it's the strategy used to choose the best DirectoryInstance available
      */
+
     public DirectoryInstance getBestDirectoryInstance(DirectoryInstanceSelectionStrategy strategy) {
         return (DirectoryInstance) strategy.getBestDirectoryInstance(directoryInstances);
     }
@@ -268,14 +258,16 @@ public class GridTopology {
      * a DirectoryInstance from the GridTopology:
      *  1) Get the Directory Instance from the directoryInstances Map
      *  2) Get the DirectoryInstance connector
-     *     2.1) Disconnect the connector
+     *     2.1) Dispose the internal connection from the connector
+     *     2.2) Disconnect the connector
      *  3) Unregister the DirectoryInstance from the running Directory Instances
      *  4) Remove the DirectoryInstance from the directoryInstances Map
      */
     public void unregisterDirectoryInstance(String name) {
+
         DirectoryInstance dir = directoryInstances.get(name);
         GenericNodeConnector connector = dir.getConnector();
-        
+
         try {
             connector.getConnection().dispose();
             connector.disconnect();
@@ -286,83 +278,152 @@ public class GridTopology {
         }
 
         unregisterResourceFromDirectories(name);
-
         directoryInstances.remove(name);
 
     }
 
-     /*
+    /*
      * This method will register a new Task Server  based on the configured Provider.
      * The provider will contain all the information to be able to establish a connection with the Task Server.
      * The following steps are executed inside this method:
-     *  1) Create the new ExecutionEnvironment object that will represent a remote host for our knowledge sessions.
-     *  2) Each ExecutionEnvironment will have an underlaying connection to support remote/distribtued interactions
+     *  1) Create the new TaskServerInstance object that will represent a remote service to execute human tasks for
+     *     business processes.
+     *  2) Each TaskServiceInstance will have an underlaying connection to support remote/distribtued interactions
      *  3) for each Execution Environment registered in this topology
-     *     3.1) We need to inject the reference from the newly created Execution Enviroment to the existing ones
-     *     3.2) We need to inject the reference from all the existing Execution Environments to the newly created
+     *     3.1) We need to inject the reference from the newly created Task Server Instance to the existing ExecutionEnvironments
+     *     3.2) We need to inject the reference from all the existing Execution Environments to the newly created TaskServer Instance
      *  4) for each Directory Instance registered in this topology
-     *     4.1) We need to inject the reference from the newly created Execution Environment in each exisiting Directory
-     *     4.2) We need to inject a reference from each existing directory to the newly created Execution Environment
-     *  5) Add the newly created Execution Environment to the topology maps. We keep to maps for Execution Environments
-     *     to be able to look based on the underlaying connector and based on the defined Execution Environment name.
-     *  6) Register the Execution Environment inside all the currently available Directory Instances
+     *     4.1) We need to inject the reference from the newly created TaskServiceInstance in each exisiting Directory
+     *     4.2) We need to inject a reference from each existing directory to the newly created TaskServerInstance
+     *  5) Add the newly created TaskServerInstance to the topology maps.
+     *  6) Register the TaskServer Instance inside all the currently available Directory Instances
      */
     public void registerTaskServerInstance(String name, GenericProvider provider) {
 
         TaskServerInstance taskServer = TaskServerInstanceFactory.newTaskServerInstance(name, provider);
-        GenericHumanTaskConnector connector = taskServer.getConnector();
+        GenericNodeConnector connector = taskServer.getConnector();
         GenericConnection connection = connector.getConnection();
         connection.addHumanTaskNode(connector);
+
+        for (ExecutionEnvironment e : executionEnvironments.values()) {
+            e.getConnector().getConnection().addHumanTaskNode(connector);
+            connection.addExecutionNode(e.getConnector());
+        }
+        for (DirectoryInstance d : directoryInstances.values()) {
+            d.getConnector().getConnection().addHumanTaskNode(connector);
+            connection.addDirectoryNode(d.getConnector());
+        }
 
         taskServerInstances.put(name, taskServer);
         registerResourceInDirectories(name, provider.getId());
 
     }
 
+    /*
+     * Get TaskServer Instance by name
+     * @param name: it's the name used to register a specific task server instance
+     */
     public TaskServerInstance getTaskServerInstance(String name) {
         return taskServerInstances.get(name);
     }
 
+    /*
+     * Get the best task server instance available based on a strategy
+     * @param strategy: a TaskServerInstanceSelectionStrategy it's used to retrieve the best instance
+     * currently available
+     */
     public TaskServerInstance getBestTaskServerInstance(TaskServerInstanceSelectionStrategy strategy) {
         return (TaskServerInstance) strategy.getBestTaskServerInstance(taskServerInstances);
     }
 
+    /*
+     * Get the best task server instance based on the default selection strategy
+     */
     public TaskServerInstance getBestTaskServerInstance() {
         return DEFAULT_TASK_STRATEGY.getBestTaskServerInstance(taskServerInstances);
     }
 
+    /*
+     * Unregister a TaskServer Instance from this running GridTopology
+     * This method unregister the TaskServer Instance from this running instance of the grid topology
+     * based on the name. The following steps are executed in order to unregister
+     * a TaskServerInstance from the GridTopology:
+     *  1) Get the TaskServer Instance from the taskServerInstances Map
+     *  2) Get the TaskServer Instance connector
+     *     2.1) Dispose the internal connection from the connector
+     *     2.2) Disconnect the connector
+     *  3) Remove the TaskServerInstance from the directoryInstances Map
+     *  4) Unregister the TaskServer Instance from the running DirectoryInstances
+     */
     public void unregisterTaskServerInstance(String name) {
-        //Remove Task Server Instance
-        taskServerInstances.remove(name);
-        //UnRegister task Server instance from current Directories
-        unregisterResourceFromDirectories(name);
 
+        TaskServerInstance taskServer = taskServerInstances.get(name);
+        GenericNodeConnector connector = taskServer.getConnector();
+
+        try {
+            connector.getConnection().dispose();
+            connector.disconnect();
+        } catch (RemoteException ex) {
+            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (ConnectorException ex) {
+            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        taskServerInstances.remove(name);
+        unregisterResourceFromDirectories(name);
 
     }
 
+    /*
+     * Close and Dispose all connections and connectors to remote services
+     * without removing/unregister the references from those services
+     */
     public void disconnect() throws ConnectorException, RemoteException {
+        disconnectExecutionEnvironments();
+        disconnectDirectoryInstances();
+        disconnectTaskServerInstances();
+    }
 
-        for (String key : executionEnvironments.keySet()) {
-            ExecutionEnvironment ee = executionEnvironments.get(key);
-            GenericNodeConnector connector = ee.getConnector();
+    /*
+     * Disconnect all the taskServerInstances ongoing connections
+     */
+    private void disconnectTaskServerInstances() throws ConnectorException, RemoteException {
+        for (String key : taskServerInstances.keySet()) {
+            TaskServerInstance taskServer = taskServerInstances.get(key);
+            GenericNodeConnector connector = taskServer.getConnector();
             connector.getConnection().dispose();
             connector.disconnect();
         }
+    }
+    /*
+     * Disconnect all the directoryInstances ongoing connections
+     */
+
+    private void disconnectDirectoryInstances() throws RemoteException, ConnectorException {
         for (String key : directoryInstances.keySet()) {
             DirectoryInstance dir = directoryInstances.get(key);
             GenericNodeConnector connector = dir.getConnector();
             connector.getConnection().dispose();
             connector.disconnect();
         }
-        for (String key : taskServerInstances.keySet()) {
-            TaskServerInstance taskServer = taskServerInstances.get(key);
-            GenericHumanTaskConnector connector = taskServer.getConnector();
+    }
+
+    /*
+     * Disconnect all the executionEnvironments ongoing connections
+     */
+    private void disconnectExecutionEnvironments() throws ConnectorException, RemoteException {
+        for (String key : executionEnvironments.keySet()) {
+            ExecutionEnvironment ee = executionEnvironments.get(key);
+            GenericNodeConnector connector = ee.getConnector();
             connector.getConnection().dispose();
             connector.disconnect();
         }
     }
 
-
+    /*
+     * Clean the GridTopology object to be disposed
+     */
     public void dispose() throws ConnectorException, RemoteException {
 
         for (String key : executionEnvironments.keySet()) {
@@ -376,11 +437,15 @@ public class GridTopology {
         }
     }
 
+    /*
+     * Register the resource id (ExecutionEnvironment, DirectoryInstance, TaskServerInstance)
+     * inside all the current available directory instances.
+     */
     private void registerResourceInDirectories(String name, String resourceId) {
         for (DirectoryInstance directory : directoryInstances.values()) {
 
             try {
-                DirectoryNodeService directoryNode = directory.getDirectoryService().get(DirectoryNodeService.class);
+                DirectoryNodeService directoryNode = directory.getDirectoryNode().get(DirectoryNodeService.class);
                 if (directoryNode != null) {
                     try {
                         directoryNode.register(name, resourceId);
@@ -398,12 +463,16 @@ public class GridTopology {
             }
         }
     }
+    /*
+     * Unregister a resource (ExecutionEnvironment, DirectoryInstance, TaskServerInstance)
+     * from all the current available directory instances.
+     */
 
     private void unregisterResourceFromDirectories(String name) {
         for (DirectoryInstance directory : directoryInstances.values()) {
 
             try {
-                DirectoryNodeService directoryNode = directory.getDirectoryService().get(DirectoryNodeService.class);
+                DirectoryNodeService directoryNode = directory.getDirectoryNode().get(DirectoryNodeService.class);
                 if (directoryNode != null) {
                     try {
                         directoryNode.unregister(name);

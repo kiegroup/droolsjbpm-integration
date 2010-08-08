@@ -15,14 +15,11 @@
  *  under the License.
  */
 
-package org.drools.grid.remote;
+package org.drools.grid.task;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.DirectoryLookupFactoryService;
-import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
@@ -32,17 +29,17 @@ import org.drools.grid.NodeConnectionType;
  *
  * @author salaboy 
  */
-public class RemoteConnectionNode implements NodeConnectionType {
+public class RemoteMinaConnectionHumanTask implements NodeConnectionType {
     private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
     private GenericNodeConnector connector;
     private GenericConnection connection;
 
-    public RemoteConnectionNode() {
+    public RemoteMinaConnectionHumanTask() {
         
     }
 
     
-    public RemoteConnectionNode(GenericNodeConnector connector, GenericConnection connection) {
+    public RemoteMinaConnectionHumanTask(GenericNodeConnector connector, GenericConnection connection) {
         
         this.connector = connector;
         this.connection = connection;
@@ -50,9 +47,8 @@ public class RemoteConnectionNode implements NodeConnectionType {
     }
 
     public void init(){
-        services.put(KnowledgeBuilderFactoryService.class, new KnowledgeBuilderProviderRemoteClient(connector));
-        services.put(KnowledgeBaseFactoryService.class, new KnowledgeBaseProviderRemoteClient(connector));
-        services.put(DirectoryLookupFactoryService.class, new DirectoryLookupProviderRemoteClient(connector, connection));
+        services.put(HumanTaskService.class, new HumanTaskServiceImpl(connector, connector.getSessionId()));
+        
     }
 
 

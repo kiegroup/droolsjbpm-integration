@@ -20,10 +20,12 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.drools.eventmessaging.EventKey;
 import org.drools.grid.ConnectorException;
-import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddAttachmentMessageResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddCommentMessageResponseHandler;
@@ -53,12 +55,12 @@ import org.drools.task.service.Operation;
  */
 public class HumanTaskServiceImpl implements HumanTaskService {
 
-    private final GenericHumanTaskConnector client;
+    private final GenericNodeConnector client;
     private final AtomicInteger counter;
     private int sessionId;
     private String clientName;
 
-    public HumanTaskServiceImpl(GenericHumanTaskConnector client, int sessionId) {
+    public HumanTaskServiceImpl(GenericNodeConnector client, int sessionId) {
         this.client = client;
         this.counter = new AtomicInteger();
         this.clientName = String.valueOf(sessionId);
@@ -69,7 +71,11 @@ public class HumanTaskServiceImpl implements HumanTaskService {
 
 
     public void disconnect() throws ConnectorException {
+        try {
             this.client.disconnect();
+        } catch (RemoteException ex) {
+            Logger.getLogger(HumanTaskServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
         }
 
     public void addTask(Task task, ContentData content, AddTaskMessageResponseHandler responseHandler) {

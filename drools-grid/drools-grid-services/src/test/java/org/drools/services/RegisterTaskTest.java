@@ -215,7 +215,7 @@ public class RegisterTaskTest {
     }
 
     @Test
-    public void MinaTaskTest() throws InterruptedException, ConnectorException {
+    public void MinaTaskTest() throws InterruptedException, ConnectorException, RemoteException {
 
         GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
         gridTopologyConfiguration.addTaskServerInstance(new TaskServerInstanceConfiguration("MyMinaTask", new MinaProvider("127.0.0.1", 9123)));
@@ -234,7 +234,7 @@ public class RegisterTaskTest {
 
         Assert.assertNotNull(taskServer);
 
-        client = (HumanTaskService) taskServer.getTaskClient();
+        client = taskServer.getHumanTaskNode().get(HumanTaskService.class);
         Assert.assertNotNull(client);
 
 

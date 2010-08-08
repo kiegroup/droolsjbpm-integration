@@ -18,8 +18,7 @@ package org.drools.grid;
 
 import java.util.List;
 import org.drools.grid.strategies.NodeSelectionStrategy;
-import org.drools.grid.strategies.DirectorySelectionStrategy;
-import org.drools.grid.strategies.HumanTaskSelectionStrategy;
+
 
 
 /**
@@ -33,7 +32,7 @@ public interface GenericConnection {
 
     public void addDirectoryNode(GenericNodeConnector directoryNodeConnector);
 
-    public void addHumanTaskNode(GenericHumanTaskConnector humanTaskNodeConnector);
+    public void addHumanTaskNode(GenericNodeConnector humanTaskNodeConnector);
 
     //Get ExecutionNode(s) with live connections
     public ExecutionNode getExecutionNode(NodeSelectionStrategy strategy) throws ConnectorException;
@@ -43,18 +42,18 @@ public interface GenericConnection {
     public List<ExecutionNode> getExecutionNodes() throws ConnectorException;
 
     //Get DirectoryNode(s) with live connections
-    public DirectoryNode getDirectoryNode(DirectorySelectionStrategy directorySelectionStrategy) throws ConnectorException;
+    public DirectoryNode getDirectoryNode(NodeSelectionStrategy strategy) throws ConnectorException;
 
     public DirectoryNode getDirectoryNode() throws ConnectorException;
 
     public List<DirectoryNode> getDirectoryNodes() throws ConnectorException;
 
     //Get HumanTaskNode(s) with live connections
-    public HumanTaskNodeService getHumanTaskNode(HumanTaskSelectionStrategy humanTaskSelectionStrategy) throws ConnectorException;
+    public HumanTaskNode getHumanTaskNode(NodeSelectionStrategy strategy) throws ConnectorException;
 
-    public HumanTaskNodeService getHumanTaskNode() throws ConnectorException;
+    public HumanTaskNode getHumanTaskNode() throws ConnectorException;
 
-    public List<HumanTaskNodeService> getHumanTaskNodes() throws ConnectorException;
+    public List<HumanTaskNode> getHumanTaskNodes() throws ConnectorException;
 
     // Dispose all the live connections
     public void dispose() throws ConnectorException;

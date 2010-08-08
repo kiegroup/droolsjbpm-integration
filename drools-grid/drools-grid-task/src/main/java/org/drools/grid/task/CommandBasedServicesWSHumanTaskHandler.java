@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.drools.grid.task;
 
 import java.io.ByteArrayInputStream;
@@ -21,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ import org.drools.SystemEventListenerFactory;
 import org.drools.eventmessaging.EventKey;
 import org.drools.eventmessaging.Payload;
 import org.drools.grid.ConnectorException;
-import org.drools.grid.GenericHumanTaskConnector;
+import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.AddTaskMessageResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.GetContentMessageResponseHandler;
@@ -68,13 +68,11 @@ import org.drools.task.service.responsehandlers.AbstractBaseResponseHandler;
  * @author Lucas Amador
  *
  */
-
 public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
 
     private String ipAddress = "127.0.0.1";
     private int port = 9124;
-
-    private GenericHumanTaskConnector connector;
+    private GenericNodeConnector connector;
     private HumanTaskServiceImpl client;
     private KnowledgeRuntime session;
     private Map<Long, Long> idMapping = new HashMap<Long, Long>();
@@ -84,12 +82,13 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
         this.session = session;
 
     }
-    public void setAddress(String ipAddress, int port){
+
+    public void setAddress(String ipAddress, int port) {
         this.ipAddress = ipAddress;
         this.port = port;
     }
 
-    public void connect() throws ConnectorException {
+    public void connect() throws ConnectorException, RemoteException {
         if (connector == null) {
             connector = new RemoteMinaHumanTaskConnector("client ht",
                     ipAddress, port,
@@ -103,9 +102,12 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
         try {
             connect();
-		} catch (ConnectorException ex) {
+        } catch (RemoteException ex) {
             Logger.getLogger(CommandBasedServicesWSHumanTaskHandler.class.getName()).log(Level.SEVERE, null, ex);
-		    return;
+
+        } catch (ConnectorException ex) {
+            Logger.getLogger(CommandBasedServicesWSHumanTaskHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return;
         }
         Task task = new Task();
         String taskName = (String) workItem.getParameter("TaskName");
@@ -211,7 +213,7 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
         client.addTask(task, content, taskResponseHandler);
     }
 
-    public void dispose() throws ConnectorException  {
+    public void dispose() throws ConnectorException, RemoteException {
         if (connector != null) {
             connector.disconnect();
         }

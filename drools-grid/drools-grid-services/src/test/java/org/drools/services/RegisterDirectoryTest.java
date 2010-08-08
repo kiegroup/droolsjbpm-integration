@@ -85,7 +85,7 @@ public class RegisterDirectoryTest {
         DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
         Assert.assertNotNull("Directory Instance null", directory);
 
-        DirectoryNodeService dir = directory.getDirectoryService().get(DirectoryNodeService.class);
+        DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
         directory.getConnector().disconnect();
 
         Assert.assertNotNull("Dir Null", dir);
@@ -119,7 +119,7 @@ public class RegisterDirectoryTest {
         DirectoryInstance directory = grid.getDirectoryInstance("MyLocalDir");
         Assert.assertNotNull("DirInstance is null!", directory);
 
-        DirectoryNodeService dir = directory.getDirectoryService().get(DirectoryNodeService.class);
+        DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
         ;
         Assert.assertNotNull("Dir is null!", dir);
         //This assertion is not deterministic
@@ -128,7 +128,7 @@ public class RegisterDirectoryTest {
         DirectoryInstance directory2 = grid.getDirectoryInstance("MyLocalDir2");
         Assert.assertNotNull("DirInstance 2 is null!", directory2);
 
-        DirectoryNodeService dir2 = directory2.getDirectoryService().get(DirectoryNodeService.class);
+        DirectoryNodeService dir2 = directory2.getDirectoryNode().get(DirectoryNodeService.class);
         ;
         Assert.assertNotNull("Dir 2 is null!", dir2);
         //This assertion is not deterministic
@@ -208,7 +208,7 @@ public class RegisterDirectoryTest {
         DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
         Assert.assertNotNull("Directory Instance null", directory);
 
-        DirectoryNodeService dirService = directory.getDirectoryService().get(DirectoryNodeService.class);
+        DirectoryNodeService dirService = directory.getDirectoryNode().get(DirectoryNodeService.class);
 
         kbase = dirService.lookupKBase("DoctorsKBase");
         Assert.assertNotNull(kbase);

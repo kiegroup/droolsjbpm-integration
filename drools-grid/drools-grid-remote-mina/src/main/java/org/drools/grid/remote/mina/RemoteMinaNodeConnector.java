@@ -25,7 +25,6 @@ import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.GridConnection;
-import org.drools.grid.remote.RemoteConnectionNode;
 
 public class RemoteMinaNodeConnector
         implements
@@ -145,7 +144,7 @@ public class RemoteMinaNodeConnector
     }
 
     public NodeConnectionType getNodeConnectionType() throws ConnectorException {
-        return new RemoteConnectionNode();
+        return new RemoteMinaConnectionNode();
     }
 
     public ConnectorType getConnectorType() {
