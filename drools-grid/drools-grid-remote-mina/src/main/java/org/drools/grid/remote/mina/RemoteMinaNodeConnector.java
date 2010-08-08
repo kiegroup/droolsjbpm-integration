@@ -2,11 +2,13 @@ package org.drools.grid.remote.mina;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.rmi.RemoteException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.IoFuture;
+import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
@@ -41,27 +43,27 @@ public class RemoteMinaNodeConnector
             String providerAddress, Integer providerPort,
             SystemEventListener eventListener) {
 
-        SocketConnector minaconnector = new NioSocketConnector();
-        minaconnector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
+
         if (name == null) {
             throw new IllegalArgumentException("Name can not be null");
         }
         this.name = name;
         this.counter = new AtomicInteger();
         this.address = new InetSocketAddress(providerAddress, providerPort);
-        this.connector = minaconnector;
+
         this.eventListener = eventListener;
         this.connection = new GridConnection();
     }
 
     public void connect() throws ConnectorException {
         if (session != null && session.isConnected()) {
-            return;
-            //throw new IllegalStateException("Already connected. Disconnect first.");
+            throw new IllegalStateException("Already connected. Disconnect first.");
         }
 
         try {
-            this.connector.getFilterChain().addLast(this.name+"codec",
+            this.connector = new NioSocketConnector();
+            this.connector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
+            this.connector.getFilterChain().addLast(this.name + "codec",
                     new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
 
             ConnectFuture future1 = this.connector.connect(this.address);
@@ -74,17 +76,30 @@ public class RemoteMinaNodeConnector
             eventListener.info("connected : " + address);
             this.session = future1.getSession();
         } catch (Exception e) {
-             throw new ConnectorException(e);
+            throw new ConnectorException(e);
         }
     }
 
     public void disconnect() throws ConnectorException {
-        this.connector.getFilterChain().clear();
+        
         if (session != null && session.isConnected()) {
+            
+            CloseFuture future = session.getCloseFuture();
+
+            future.addListener((IoFutureListener<?>) new IoFutureListener<IoFuture>() {
+
+                public void operationComplete(IoFuture future) {
+                    System.out.println("The remote node session is now closed");
+                }
+            });
+
             session.close(false);
-            session.getCloseFuture().join();
+            future.awaitUninterruptibly();
+
+            connector.dispose();
         }
-        //this.connector.dispose();
+
+        
     }
 
     private void addResponseHandler(int id,
@@ -125,13 +140,11 @@ public class RemoteMinaNodeConnector
         return "Remote:Mina:Node:" + hostName + ":" + hostPort;
     }
 
-
     public GenericConnection getConnection() {
         return this.connection;
     }
 
-
-    public NodeConnectionType getNodeConnectionType() throws ConnectorException{
+    public NodeConnectionType getNodeConnectionType() throws ConnectorException {
         return new RemoteConnectionNode();
     }
 

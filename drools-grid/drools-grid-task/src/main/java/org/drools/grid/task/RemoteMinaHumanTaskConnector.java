@@ -2,11 +2,13 @@ package org.drools.grid.task;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.rmi.RemoteException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.IoFuture;
+import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
@@ -57,8 +59,8 @@ public class RemoteMinaHumanTaskConnector
 
     public void connect() throws ConnectorException {
         if (session != null && session.isConnected()) {
-            //throw new IllegalStateException("Already connected. Disconnect first.");
-            return;
+            throw new IllegalStateException("Already connected. Disconnect first.");
+            
         }
 
         try {
@@ -82,9 +84,22 @@ public class RemoteMinaHumanTaskConnector
     public void disconnect() throws ConnectorException {
 
         if (session != null && session.isConnected()) {
-            session.close();
-            session.getCloseFuture().join();
+
+            CloseFuture future = session.getCloseFuture();
+
+            future.addListener((IoFutureListener<?>) new IoFutureListener<IoFuture>() {
+
+                public void operationComplete(IoFuture future) {
+                    System.out.println("The human task connector session is now closed");
+                }
+            });
+
+            session.close(false);
+            future.awaitUninterruptibly();
+
+            connector.dispose();
         }
+
     }
 
     private void addResponseHandler(int id,

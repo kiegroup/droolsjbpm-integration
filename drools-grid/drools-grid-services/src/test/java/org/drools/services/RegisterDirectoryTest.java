@@ -23,6 +23,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.grid.ConnectorException;
+import org.drools.grid.DirectoryNode;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.services.DirectoryInstance;
@@ -30,10 +31,8 @@ import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
 import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
 import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
-import org.drools.grid.services.configuration.GenericProvider;
 import org.drools.grid.services.configuration.GridTopologyConfiguration;
 import org.drools.grid.services.configuration.LocalProvider;
-import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.services.strategies.DirectoryInstanceByPrioritySelectionStrategy;
 import org.drools.grid.services.strategies.ExecutionEnvByPrioritySelectionStrategy;
@@ -87,9 +86,10 @@ public class RegisterDirectoryTest {
         Assert.assertNotNull("Directory Instance null", directory);
 
         DirectoryNodeService dir = directory.getDirectoryService().get(DirectoryNodeService.class);
+        directory.getConnector().disconnect();
 
         Assert.assertNotNull("Dir Null", dir);
-
+        System.out.println("Dir = " + dir.getExecutorsMap());
         Assert.assertEquals(2, dir.getExecutorsMap().size());
 
         grid.dispose();
@@ -212,7 +212,7 @@ public class RegisterDirectoryTest {
 
         kbase = dirService.lookupKBase("DoctorsKBase");
         Assert.assertNotNull(kbase);
-
+        directory.getConnector().disconnect();
         grid.dispose();
 
 

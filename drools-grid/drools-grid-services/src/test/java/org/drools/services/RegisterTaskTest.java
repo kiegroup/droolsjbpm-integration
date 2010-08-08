@@ -194,12 +194,16 @@ public class RegisterTaskTest {
 
 
         handler.dispose();
+
         Assert.assertEquals(0, serverNode.getCurrentSessions());
         serverNode.stop();
         System.out.println("Execution Server Stopped!");
+
         Assert.assertEquals(0, serverTask.getCurrentSessions());
         serverTask.stop();
         System.out.println("Task Server Stopped!");
+        
+
 
         taskSession.dispose();
         emf.close();
@@ -296,7 +300,7 @@ public class RegisterTaskTest {
         Assert.assertTrue(manager.waitTillCompleted(DEFAULT_WAIT_TIME));
         Thread.sleep(500);
 
-
+        taskServer.getConnector().disconnect();
     }
 
     private Object eval(Reader reader, Map<String, Object> vars) {

@@ -151,7 +151,6 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
                 9124,
                 SystemEventListenerFactory.getSystemEventListener());
 
-         htMinaClient.connect();
          
 
         // setup RemoteService client
