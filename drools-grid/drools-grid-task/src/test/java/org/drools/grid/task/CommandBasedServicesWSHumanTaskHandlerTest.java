@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import junit.framework.Assert;
 import org.apache.commons.collections.map.HashedMap;
 
 import org.apache.mina.transport.socket.SocketAcceptor;
@@ -34,8 +35,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
-import org.drools.grid.ExecutionNode;
-import org.drools.grid.GenericHumanTaskConnector;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -164,9 +163,9 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
 
 
         connection.addExecutionNode(minaClient);
-
+        connection.addHumanTaskNode(htMinaClient);
         node = connection.getExecutionNode(new ReturnAlwaysTheFirstSelectionStrategy());
-        //nodeConnection.connect();
+        
         
         
         
@@ -174,12 +173,8 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
         
         KnowledgeBase kbase = this.node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        int sessionId = ksession.getId();
-
-        node.set(HumanTaskFactoryService.class, new HumanTaskServiceProviderRemoteClient(htMinaClient, sessionId));
-
-        this.humanTaskClient = (HumanTaskService) this.node.get(HumanTaskFactoryService.class).newHumanTaskService();
-        
+       
+        this.humanTaskClient = connection.getHumanTaskNode().get(HumanTaskService.class);
 
         this.handler = new CommandBasedServicesWSHumanTaskHandler(ksession);
         
@@ -187,12 +182,15 @@ public class CommandBasedServicesWSHumanTaskHandlerTest extends BaseTaskServiceT
     }
     @After
     public void tearDown() throws Exception {
-        this.humanTaskClient.disconnect();
+
+        Thread.sleep(3000);
         
         connection.dispose();
-        
+        this.humanTaskClient.disconnect();
+        Assert.assertEquals(0, server.getCurrentSessions());
         this.handler.dispose();
         this.server.stop();
+        Assert.assertEquals(0, humanTaskServer.getCurrentSessions());
         this.humanTaskServer.stop();
         
         taskSession.dispose();

@@ -50,7 +50,7 @@ public class TaskServerInstanceByPrioritySelectionStrategy implements TaskServer
             private Map<ConnectorType , Integer> priorities
                         = new HashMap<ConnectorType, Integer>() {
                 {
-                    put(ConnectorType.LOCAL, 1);
+                   // put(ConnectorType.LOCAL, 1);
                    // put("RioEnvironmentProvider", 2);
                    // put("HornetQEnvironmentProvider", 3);
                    put(ConnectorType.REMOTE, 4);

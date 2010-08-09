@@ -25,18 +25,17 @@ import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageSession;
 
 public class KnowledgeBaseRemoteClient
-    implements
-    KnowledgeBase {
+        implements
+        KnowledgeBase {
 
-
-    private GenericNodeConnector       client;
-    private MessageSession              messageSession;
-    private String                     instanceId;
+    private GenericNodeConnector connector;
+    private MessageSession messageSession;
+    private String instanceId;
 
     public KnowledgeBaseRemoteClient(String instanceId,
-                                     GenericNodeConnector client, MessageSession messageSession) {
+            GenericNodeConnector connector, MessageSession messageSession) {
         this.instanceId = instanceId;
-        this.client = client;
+        this.connector = connector;
         this.messageSession = messageSession;
     }
 
@@ -44,30 +43,31 @@ public class KnowledgeBaseRemoteClient
         String kresultsId = "kresults_" + messageSession.getSessionId();
 
         String kuilderInstanceId = ((CollectionClient<KnowledgePackage>) kpackages).getParentInstanceId();
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
-                                   false,
-                                   new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
-                                                                                  kuilderInstanceId,
-                                                                                  instanceId,
-                                                                                  null,
-                                                                                  kresultsId ) );
-        
+        Message msg = new Message(messageSession.getSessionId(),
+                messageSession.counter.incrementAndGet(),
+                false,
+                new KnowledgeContextResolveFromContextCommand(new KnowledgeBaseAddKnowledgePackagesCommand(),
+                kuilderInstanceId,
+                instanceId,
+                null,
+                kresultsId));
+
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write(msg).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
+            if (!(object instanceof FinishedCommand)) {
+                throw new RuntimeException("Response was not correctly ended");
             }
-
-        } catch ( Exception e ) {
-            throw new RuntimeException( "Unable to execute message",
-                                        e );
+            connector.disconnect();
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to execute message",
+                    e);
         }
     }
 
     public FactType getFactType(String packageName,
-                                String typeName) {
+            String typeName) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -88,47 +88,48 @@ public class KnowledgeBaseRemoteClient
     }
 
     public Rule getRule(String packageName,
-                        String ruleName) {
+            String ruleName) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public StatefulKnowledgeSession newStatefulKnowledgeSession() {
-        return newStatefulKnowledgeSession( null,
-                                            null );
+        return newStatefulKnowledgeSession(null,
+                null);
     }
 
     public StatefulKnowledgeSession newStatefulKnowledgeSession(KnowledgeSessionConfiguration conf,
-                                                                Environment environment) {
+            Environment environment) {
         String kresultsId = "kresults_" + messageSession.getSessionId();
 
         String localId = UUID.randomUUID().toString();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
-                                   false,
-                                   new SetVariableCommand( "__TEMP__",
-                                                           localId,
-                                                           new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf ),
-                                                                                                          null,
-                                                                                                          instanceId,
-                                                                                                          null,
-                                                                                                          kresultsId ) ) );
+        Message msg = new Message(messageSession.getSessionId(),
+                messageSession.counter.incrementAndGet(),
+                false,
+                new SetVariableCommand("__TEMP__",
+                localId,
+                new KnowledgeContextResolveFromContextCommand(new NewStatefulKnowledgeSessionCommand(conf),
+                null,
+                instanceId,
+                null,
+                kresultsId)));
 
         try {
-            Object object = client.write( msg ).getPayload();
-            
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+            connector.connect();
+            Object object = connector.write(msg).getPayload();
 
-        } catch ( Exception e ) {
-            throw new RuntimeException( "Unable to execute message",
-                                        e );
+            if (!(object instanceof FinishedCommand)) {
+                throw new RuntimeException("Response was not correctly ended");
+            }
+            connector.disconnect();
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to execute message",
+                    e);
         }
 
-        return new StatefulKnowledgeSessionRemoteClient( localId,
-                                                         client, messageSession );
+        return new StatefulKnowledgeSessionRemoteClient(localId,
+                connector, messageSession);
     }
 
     public StatelessKnowledgeSession newStatelessKnowledgeSession(KnowledgeSessionConfiguration conf) {
@@ -143,23 +144,19 @@ public class KnowledgeBaseRemoteClient
 
     public void removeKnowledgePackage(String packageName) {
         // TODO Auto-generated method stub
-
     }
 
     public void removeProcess(String processId) {
         // TODO Auto-generated method stub
-
     }
 
     public void removeRule(String packageName,
-                           String ruleName) {
+            String ruleName) {
         // TODO Auto-generated method stub
-
     }
 
     public void addEventListener(KnowledgeBaseEventListener listener) {
         // TODO Auto-generated method stub
-
     }
 
     public Collection<KnowledgeBaseEventListener> getKnowledgeBaseEventListeners() {
@@ -169,12 +166,11 @@ public class KnowledgeBaseRemoteClient
 
     public void removeEventListener(KnowledgeBaseEventListener listener) {
         // TODO Auto-generated method stub
-
     }
 
-	public void removeFunction(String packageName, String ruleName) {
-		// TODO Auto-generated method stub
-	}
+    public void removeFunction(String packageName, String ruleName) {
+        // TODO Auto-generated method stub
+    }
 
     public Query getQuery(String packageName, String queryName) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -187,5 +183,4 @@ public class KnowledgeBaseRemoteClient
     public Collection<StatefulKnowledgeSession> getStatefulKnowledgeSessions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }

@@ -75,21 +75,21 @@ public class RegisterDirectoryTest {
     public void directoryLocalTest() throws ConnectorException, RemoteException {
 
         GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir", new LocalProvider()));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
+        gridTopologyConfiguration
+                .addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir", new LocalProvider()));
+        gridTopologyConfiguration
+                .addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
 
         grid = GridTopologyFactory.build(gridTopologyConfiguration);
-
         Assert.assertNotNull(grid);
 
         DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
         Assert.assertNotNull("Directory Instance null", directory);
 
         DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
-        directory.getConnector().disconnect();
+        //directory.getConnector().disconnect();
 
         Assert.assertNotNull("Dir Null", dir);
-        System.out.println("Dir = " + dir.getExecutorsMap());
         Assert.assertEquals(2, dir.getExecutorsMap().size());
 
         grid.dispose();
@@ -106,21 +106,15 @@ public class RegisterDirectoryTest {
         gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
         gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv2", new LocalProvider()));
 
-
         grid = GridTopologyFactory.build(gridTopologyConfiguration);
-
 
         Assert.assertNotNull(grid);
 
-
-
-
-        //DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
         DirectoryInstance directory = grid.getDirectoryInstance("MyLocalDir");
         Assert.assertNotNull("DirInstance is null!", directory);
 
         DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
-        ;
+        
         Assert.assertNotNull("Dir is null!", dir);
         //This assertion is not deterministic
         //Assert.assertEquals(4, dir.getExecutorsMap().size());
@@ -129,14 +123,12 @@ public class RegisterDirectoryTest {
         Assert.assertNotNull("DirInstance 2 is null!", directory2);
 
         DirectoryNodeService dir2 = directory2.getDirectoryNode().get(DirectoryNodeService.class);
-        ;
+        
         Assert.assertNotNull("Dir 2 is null!", dir2);
         //This assertion is not deterministic
         //Assert.assertEquals(3, dir2.getExecutorsMap().size());
 
         // the only thing that is for sure is
-        System.out.println("dir1 exec map" + dir.getExecutorsMap());
-        System.out.println("dir2 exec map" + dir2.getExecutorsMap());
         Assert.assertTrue((dir2.getExecutorsMap().size() + dir.getExecutorsMap().size()) > 4);
 
         grid.dispose();
@@ -149,26 +141,14 @@ public class RegisterDirectoryTest {
 
         GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
         gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir", new LocalProvider()));
-
-
         gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
 
-
-
         grid = GridTopologyFactory.build(gridTopologyConfiguration);
-
-
         Assert.assertNotNull(grid);
-
-
-
-
-
 
         ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
         Assert.assertNotNull(ee);
-        System.out.println("EE Name = " + ee.getName());
-
+        
         ExecutionNode node = ee.getExecutionNode();
         Assert.assertNotNull(node);
 
@@ -212,7 +192,8 @@ public class RegisterDirectoryTest {
 
         kbase = dirService.lookupKBase("DoctorsKBase");
         Assert.assertNotNull(kbase);
-        directory.getConnector().disconnect();
+        //directory.getConnector().disconnect();
+
         grid.dispose();
 
 

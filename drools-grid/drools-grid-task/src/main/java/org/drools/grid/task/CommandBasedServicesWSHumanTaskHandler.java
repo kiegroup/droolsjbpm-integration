@@ -73,7 +73,7 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
     private String ipAddress = "127.0.0.1";
     private int port = 9124;
     private GenericNodeConnector connector;
-    private HumanTaskServiceImpl client;
+    private HumanTaskServiceRemoteClient client;
     private KnowledgeRuntime session;
     private Map<Long, Long> idMapping = new HashMap<Long, Long>();
     private Map<Long, WorkItemManager> managers = new HashMap<Long, WorkItemManager>();
@@ -93,9 +93,9 @@ public class CommandBasedServicesWSHumanTaskHandler implements WorkItemHandler {
             connector = new RemoteMinaHumanTaskConnector("client ht",
                     ipAddress, port,
                     SystemEventListenerFactory.getSystemEventListener());
-            connector.connect();
             int id = ((StatefulKnowledgeSession) session).getId();
-            client = new HumanTaskServiceImpl(connector, id);
+            connector.connect();
+            client = new HumanTaskServiceRemoteClient(connector, id);
         }
     }
 

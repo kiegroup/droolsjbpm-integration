@@ -20,7 +20,7 @@ public class WorkItemManagerRemoteClient implements WorkItemManager, Serializabl
 
 	private static final long serialVersionUID = 1L;
 	
-	private GenericNodeConnector     client;
+	private GenericNodeConnector     connector;
         private MessageSession              messageSession;
 	private String instanceId;
 
@@ -39,7 +39,9 @@ public class WorkItemManagerRemoteClient implements WorkItemManager, Serializabl
                                                                                   instanceId,
                                                                                   kresultsId ) );
         try {
-            client.write( msg );
+            connector.connect();
+            connector.write( msg );
+            connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message", e );
         }
@@ -49,8 +51,8 @@ public class WorkItemManagerRemoteClient implements WorkItemManager, Serializabl
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-        public void setClient(GenericNodeConnector client) {
-            this.client = client;
+        public void setConnector(GenericNodeConnector connector) {
+            this.connector = connector;
         }
 
         public void setMessageSession(MessageSession messageSession) {

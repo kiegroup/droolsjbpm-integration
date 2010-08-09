@@ -2,6 +2,7 @@ package org.drools.grid.remote.mina;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +63,7 @@ public class RemoteMinaNodeConnector
         try {
             this.connector = new NioSocketConnector();
             this.connector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
-            this.connector.getFilterChain().addLast(this.name + "codec",
+            this.connector.getFilterChain().addLast(this.name + "codec"+UUID.randomUUID().toString(),
                     new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
 
             ConnectFuture future1 = this.connector.connect(this.address);

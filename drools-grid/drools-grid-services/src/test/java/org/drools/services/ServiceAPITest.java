@@ -21,10 +21,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import org.junit.Assert;
-import org.drools.grid.services.configuration.GenericProvider;
 import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
-
 import java.rmi.RemoteException;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -42,7 +40,6 @@ import org.drools.grid.remote.mina.MinaAcceptor;
 import org.drools.grid.remote.mina.MinaIoHandler;
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
-import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
 import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
 import org.drools.grid.services.configuration.GridTopologyConfiguration;
 import org.drools.grid.services.factory.GridTopologyFactory;
@@ -61,7 +58,7 @@ import org.junit.Test;
  */
 public class ServiceAPITest {
 
-    private MinaAcceptor server1;
+    private MinaAcceptor server;
     private GridTopology grid;
     
     public ServiceAPITest() {
@@ -86,19 +83,19 @@ public class ServiceAPITest {
         acceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(),
                 new GenericMessageHandlerImpl(nodeData,
                 SystemEventListenerFactory.getSystemEventListener())));
-        server1 = new MinaAcceptor(acceptor, address);
-        server1.start();
+        server = new MinaAcceptor(acceptor, address);
+        server.start();
         System.out.println("Server 1 Started! at = " + address.toString());
 
     }
 
     @After
     public void tearDown() throws ConnectorException, RemoteException {
-        System.out.println("Disconecting all clients");
+        
         grid.dispose();
         System.out.println("Stoping Server 1!");
-        Assert.assertEquals(0, server1.getCurrentSessions());
-        server1.stop();
+        Assert.assertEquals(0, server.getCurrentSessions());
+        server.stop();
     }
 
     
@@ -106,20 +103,16 @@ public class ServiceAPITest {
      public void mixedTopologyMinaAndLocal() throws ConnectorException, RemoteException {
 
         GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaEnv", new MinaProvider("127.0.0.1", 9123)));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
-
+        gridTopologyConfiguration
+                .addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaEnv", new MinaProvider("127.0.0.1", 9123)));
+        gridTopologyConfiguration
+                .addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
 
         grid = GridTopologyFactory.build(gridTopologyConfiguration);
-
-
         Assert.assertNotNull(grid);
-
-        
 
         ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
         Assert.assertNotNull(ee);
-        System.out.println("EE Name = "+ee.getName());
 
         ExecutionNode node = ee.getExecutionNode();
         Assert.assertNotNull(node);
@@ -162,10 +155,6 @@ public class ServiceAPITest {
 
         int fired = ksession.fireAllRules();
         Assert.assertEquals(2, fired);
-
-
-        grid.dispose();
-
 
      }
 

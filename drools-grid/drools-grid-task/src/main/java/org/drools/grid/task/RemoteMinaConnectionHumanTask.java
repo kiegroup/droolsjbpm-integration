@@ -47,7 +47,7 @@ public class RemoteMinaConnectionHumanTask implements NodeConnectionType {
     }
 
     public void init(){
-        services.put(HumanTaskService.class, new HumanTaskServiceImpl(connector, connector.getSessionId()));
+        services.put(HumanTaskService.class, new HumanTaskServiceRemoteClient(connector, connector.getSessionId()));
         
     }
 

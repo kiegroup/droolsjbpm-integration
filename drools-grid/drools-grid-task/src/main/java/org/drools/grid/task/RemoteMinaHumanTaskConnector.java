@@ -3,6 +3,8 @@ package org.drools.grid.task;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.rmi.RemoteException;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,7 +12,6 @@ import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
-import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
@@ -22,7 +23,6 @@ import org.drools.grid.ConnectorException;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
-import org.drools.grid.HumanTaskNodeService;
 import org.drools.grid.NodeConnectionType;
 
 import org.drools.grid.internal.Message;
@@ -36,6 +36,7 @@ public class RemoteMinaHumanTaskConnector
         GenericNodeConnector {
 
     protected IoSession session;
+    protected int sessionId;
     protected final String name;
     protected AtomicInteger counter;
     protected SocketConnector connector;
@@ -47,17 +48,16 @@ public class RemoteMinaHumanTaskConnector
             String providerAddress, Integer providerPort,
             SystemEventListener eventListener) {
 
-        SocketConnector minaconnector = new NioSocketConnector();
-        minaconnector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
+       
         if (name == null) {
             throw new IllegalArgumentException("Name can not be null");
         }
         this.name = name;
         this.counter = new AtomicInteger();
         this.address = new InetSocketAddress(providerAddress, providerPort);
-        this.connector = minaconnector;
         this.eventListener = eventListener;
         this.connection = new GridConnection();
+        this.sessionId = new Random().nextInt();
     }
 
     public void connect() throws ConnectorException {
@@ -67,7 +67,9 @@ public class RemoteMinaHumanTaskConnector
         }
 
         try {
-            this.connector.getFilterChain().addLast("codec",
+            this.connector =  new NioSocketConnector();
+            this.connector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
+            this.connector.getFilterChain().addLast(this.name+"codec"+UUID.randomUUID().toString(),
                     new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
 
             ConnectFuture future1 = this.connector.connect(this.address);
@@ -160,7 +162,7 @@ public class RemoteMinaHumanTaskConnector
     }
 
     public int getSessionId() {
-        return (int) session.getId();
+        return this.sessionId;
     }
 
     public AtomicInteger getCounter() {

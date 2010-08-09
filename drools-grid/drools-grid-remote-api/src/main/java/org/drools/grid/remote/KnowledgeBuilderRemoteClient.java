@@ -25,13 +25,13 @@ public class KnowledgeBuilderRemoteClient
     KnowledgeBuilder {
     
     private String                     instanceId;
-    private final GenericNodeConnector client;
+    private final GenericNodeConnector connector;
     private final MessageSession messageSession;
 
     public KnowledgeBuilderRemoteClient(String instanceId,
-                                        GenericNodeConnector client, MessageSession messageSession) {
+                                        GenericNodeConnector connector, MessageSession messageSession) {
         this.instanceId = instanceId;
-        this.client = client;
+        this.connector = connector;
         this.messageSession = messageSession;
     }
 
@@ -57,12 +57,13 @@ public class KnowledgeBuilderRemoteClient
                                                                                   null ) );
 
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( !(object instanceof FinishedCommand) ) {
                 throw new RuntimeException( "Response was not correctly ended" );
             }
-
+            connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
@@ -84,12 +85,13 @@ public class KnowledgeBuilderRemoteClient
                                                                                   kresultsId ) );
 
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
-
+            connector.disconnect();
             return (KnowledgeBuilderErrors) ((ExecutionResults) object).getValue( commandId );            
 
         } catch ( Exception e ) {
@@ -117,12 +119,13 @@ public class KnowledgeBuilderRemoteClient
                                                                                   kresultsId ) );
 
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
-
+            connector.disconnect();
             return (Boolean) ((ExecutionResults) object).getValue( commandId );
 
         } catch ( Exception e ) {

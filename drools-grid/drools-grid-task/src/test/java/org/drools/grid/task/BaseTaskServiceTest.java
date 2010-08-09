@@ -96,7 +96,7 @@ public abstract class BaseTaskServiceTest {
         System.out.println("Completing task " + task.getId());
         operationResponseHandler = new BlockingTaskOperationMessageResponseHandler();
         humanTaskClient.complete(task.getId(), "Darth Vader", null, operationResponseHandler);
-        operationResponseHandler.waitTillDone(15000);
+        
         System.out.println("Completed task " + task.getId());
         Assert.assertTrue(manager.waitTillCompleted(DEFAULT_WAIT_TIME));
         Thread.sleep(500);

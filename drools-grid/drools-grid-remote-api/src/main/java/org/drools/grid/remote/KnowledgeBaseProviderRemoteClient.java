@@ -25,10 +25,10 @@ public class KnowledgeBaseProviderRemoteClient
     implements
     KnowledgeBaseFactoryService {
     
-    private GenericNodeConnector client;
+    private GenericNodeConnector connector;
     private MessageSession          messageSession;
-    public KnowledgeBaseProviderRemoteClient(GenericNodeConnector client) {
-         this.client = client;
+    public KnowledgeBaseProviderRemoteClient(GenericNodeConnector connector) {
+         this.connector = connector;
          this.messageSession = new MessageSession();
     }
 
@@ -53,19 +53,20 @@ public class KnowledgeBaseProviderRemoteClient
                                                            localId,
                                                            new NewKnowledgeBaseCommand( conf ) ) );
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( !(object instanceof FinishedCommand) ) {
                 throw new RuntimeException( "Response was not correctly ended" );
             }
-
+            connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBaseRemoteClient( localId,
-                                              client, messageSession );
+                                              connector, messageSession );
 
     }
 
@@ -103,27 +104,28 @@ public class KnowledgeBaseProviderRemoteClient
         registerKBaseInDirectories(kbaseId);
 
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( !(object instanceof FinishedCommand) ) {
                 throw new RuntimeException( "Response was not correctly ended" );
             }
-
+            connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBaseRemoteClient( localId,
-                                              client, messageSession );
+                                              connector, messageSession );
         
     }
 
     private void registerKBaseInDirectories(String kbaseId) {
         try {
-            DirectoryNodeService directory = client.getConnection().getDirectoryNode().get(DirectoryNodeService.class);
-            directory.registerKBase(kbaseId, client.getId());
-            directory.dispose();
+            DirectoryNodeService directory = connector.getConnection().getDirectoryNode().get(DirectoryNodeService.class);
+            directory.registerKBase(kbaseId, connector.getId());
+            
         } catch (RemoteException ex) {
             Logger.getLogger(KnowledgeBaseProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ConnectorException ex) {
@@ -145,19 +147,20 @@ public class KnowledgeBaseProviderRemoteClient
         registerKBaseInDirectories(kbaseId);
 
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( !(object instanceof FinishedCommand) ) {
                 throw new RuntimeException( "Response was not correctly ended" );
             }
-
+            connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBaseRemoteClient( localId,
-                                              client, messageSession );
+                                              connector, messageSession );
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties, ClassLoader... classLoader) {

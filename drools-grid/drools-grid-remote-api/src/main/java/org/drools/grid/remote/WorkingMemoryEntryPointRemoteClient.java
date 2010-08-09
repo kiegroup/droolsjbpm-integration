@@ -36,12 +36,12 @@ import org.drools.runtime.ObjectFilter;
  */
 public class WorkingMemoryEntryPointRemoteClient implements WorkingMemoryEntryPoint{
 
-     private GenericNodeConnector     client;
+     private GenericNodeConnector     connector;
     private MessageSession              messageSession;
     private String                      instanceId;
 
-    public WorkingMemoryEntryPointRemoteClient(String instanceId, GenericNodeConnector client, MessageSession messageSession) {
-        this.client = client;
+    public WorkingMemoryEntryPointRemoteClient(String instanceId, GenericNodeConnector connector, MessageSession messageSession) {
+        this.connector = connector;
         this.messageSession = messageSession;
         this.instanceId = instanceId;
     }
@@ -62,12 +62,13 @@ public class WorkingMemoryEntryPointRemoteClient implements WorkingMemoryEntryPo
                                                                                   kresultsId ) );
 
         try {
-            Object result = client.write( msg ).getPayload();
+            connector.connect();
+            Object result = connector.write( msg ).getPayload();
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
             FactHandle handle = new DisconnectedFactHandle(((ExecutionResults) result).getFactHandle( String.valueOf(object.hashCode()) ).toString()) ;
-            
+            connector.disconnect();
             return  handle;
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

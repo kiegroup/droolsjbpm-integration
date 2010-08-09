@@ -70,8 +70,7 @@ public class GridConnection implements GenericConnection {
         NodeConnectionType type;
         try {
             type = connector.getNodeConnectionType();
-            connector.connect();
-
+           
             type.setConnector(connector);
             type.setConnection(this);
 
@@ -101,8 +100,6 @@ public class GridConnection implements GenericConnection {
         try {
             type = connector.getNodeConnectionType();
 
-            connector.connect();
-
             type.setConnector(connector);
             type.setConnection(this);
 
@@ -129,9 +126,7 @@ public class GridConnection implements GenericConnection {
         HumanTaskNode humanTaskNode = null;
         try {
             type = connector.getNodeConnectionType();
-
             connector.connect();
-
             type.setConnector(connector);
             type.setConnection(this);
 
@@ -156,8 +151,6 @@ public class GridConnection implements GenericConnection {
             try {
                 type = connector.getNodeConnectionType();
 
-                connector.connect();
-
                 type.setConnector(connector);
                 type.setConnection(this);
                 executionNodes.add(NodeFactory.newExecutionNode(type));
@@ -175,7 +168,6 @@ public class GridConnection implements GenericConnection {
             try {
                 type = connector.getNodeConnectionType();
 
-                connector.connect();
                 type.setConnector(connector);
                 type.setConnection(this);
                 directoryNodes.add(NodeFactory.newDirectoryNode(type));
@@ -187,14 +179,28 @@ public class GridConnection implements GenericConnection {
 
     }
 
-    public List<HumanTaskNode> getHumanTaskNodes() {
-        throw new UnsupportedOperationException("not Implemented yet!");
+    public List<HumanTaskNode> getHumanTaskNodes() throws ConnectorException {
+        List<HumanTaskNode> humanTaskNodes = new ArrayList<HumanTaskNode>();
+        for (GenericNodeConnector connector : humanTaskNodeConnectors) {
+            NodeConnectionType type;
+            try {
+                type = connector.getNodeConnectionType();
+
+                type.setConnector(connector);
+                type.setConnection(this);
+                humanTaskNodes.add(NodeFactory.newHumanTaskNode(type));
+            } catch (RemoteException ex) {
+                Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return humanTaskNodes;
     }
 
     public void dispose() throws ConnectorException {
         for (GenericNodeConnector connector : executionNodeConnectors) {
             try {
                 connector.disconnect();
+                
             } catch (RemoteException ex) {
                 Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -202,6 +208,7 @@ public class GridConnection implements GenericConnection {
         for (GenericNodeConnector connector : directoryNodeConnectors) {
             try {
                 connector.disconnect();
+                
             } catch (RemoteException ex) {
                 Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -209,6 +216,7 @@ public class GridConnection implements GenericConnection {
         for (GenericNodeConnector connector : humanTaskNodeConnectors) {
             try {
                 connector.disconnect();
+                
             } catch (RemoteException ex) {
                 Logger.getLogger(GridConnection.class.getName()).log(Level.SEVERE, null, ex);
             }

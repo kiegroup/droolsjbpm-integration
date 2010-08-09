@@ -65,10 +65,11 @@ import org.junit.Test;
  * @author salaboy
  */
 public class RegisterMinaDirectoryTest {
+
     private GridTopology grid;
     private MinaAcceptor serverDir;
     private MinaAcceptor serverNode;
- 
+
     public RegisterMinaDirectoryTest() {
     }
 
@@ -83,8 +84,8 @@ public class RegisterMinaDirectoryTest {
     @Before
     public void setUp() throws InterruptedException, IOException {
 
-       System.out.println("Dir Server 1 Starting!");
-         // Directory Server configuration
+        System.out.println("Dir Server 1 Starting!");
+        // Directory Server configuration
         SocketAddress dirAddress = new InetSocketAddress("127.0.0.1", 9123);
         SocketAcceptor dirAcceptor = new NioSocketAcceptor();
 
@@ -99,7 +100,7 @@ public class RegisterMinaDirectoryTest {
 
         //Execution Node related stuff
 
-           System.out.println("Exec Server 1 Starting!");
+        System.out.println("Exec Server 1 Starting!");
         // the servers should be started in a different machine (jvm or physical) or in another thread
         SocketAddress address = new InetSocketAddress("127.0.0.1", 9124);
         NodeData nodeData = new NodeData();
@@ -112,7 +113,7 @@ public class RegisterMinaDirectoryTest {
         serverNode.start();
         System.out.println("Exec Server 1 Started! at = " + address.toString());
 
-        
+
 
     }
 
@@ -120,7 +121,7 @@ public class RegisterMinaDirectoryTest {
     public void tearDown() throws InterruptedException, ConnectorException, RemoteException {
 
         Thread.sleep(3000);
-        
+
         Assert.assertEquals(0, serverNode.getCurrentSessions());
         serverNode.stop();
         System.out.println("Execution Server Stopped!");
@@ -133,18 +134,14 @@ public class RegisterMinaDirectoryTest {
     }
 
     @Test
-     public void directoryRemoteTest() throws ConnectorException, RemoteException {
+    public void directoryRemoteTest() throws ConnectorException, RemoteException {
         GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
         gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyMinaDir", new MinaProvider("127.0.0.1", 9123)));
         gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
         gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyRemoteEnv", new MinaProvider("127.0.0.1", 9124)));
 
-
         grid = GridTopologyFactory.build(gridTopologyConfiguration);
-
         Assert.assertNotNull(grid);
-       
-
 
         DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
         Assert.assertNotNull(directory);
@@ -153,14 +150,11 @@ public class RegisterMinaDirectoryTest {
         Assert.assertNotNull(dir);
         Map<String, String> dirMap = dir.getExecutorsMap();
         
-        directory.getConnector().disconnect();
-
-
         Assert.assertNotNull("Dir Null", dirMap);
 
         Assert.assertEquals(3, dirMap.size());
 
-        System.out.println("dir.getDirectoryMap() = "+dirMap);
+        System.out.println("dir.getDirectoryMap() = " + dirMap);
 
         Assert.assertEquals(3, dirMap.size());
         Assert.assertEquals(0, serverNode.getCurrentSessions());
@@ -168,7 +162,7 @@ public class RegisterMinaDirectoryTest {
 
         ExecutionEnvironment ee = grid.getExecutionEnvironment("MyRemoteEnv");
         Assert.assertNotNull(ee);
-        
+
         // Give me an ExecutionNode in the selected environment
         // For the Mina we have just one Execution Node per server instance
         ExecutionNode node = ee.getExecutionNode();
@@ -219,16 +213,13 @@ public class RegisterMinaDirectoryTest {
         int fired = ksession.fireAllRules();
 
         Assert.assertEquals(2, fired);
-
-        
-
         grid.dispose();
 
-        
 
-     }
 
-     @Test
+    }
+
+    @Test
     public void directoryInstanceRetriveKSessionFromEE() throws ConnectorException, RemoteException {
 
         GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
@@ -237,13 +228,7 @@ public class RegisterMinaDirectoryTest {
 
 
         grid = GridTopologyFactory.build(gridTopologyConfiguration);
-
-
         Assert.assertNotNull(grid);
-
-
-       
-
         //Then we can get the registered Execution Environments by Name
 
         ExecutionEnvironment ee = grid.getExecutionEnvironment("MyMinaExecutionEnv1");
@@ -293,27 +278,18 @@ public class RegisterMinaDirectoryTest {
         Assert.assertNotNull(ksession);
 
         node.get(DirectoryLookupFactoryService.class).register("sessionName", ksession);
-       
+
         grid.disconnect();
 
         DirectoryInstance directoryInstance = grid.getDirectoryInstance();
         DirectoryNodeService directory = directoryInstance.getDirectoryNode().get(DirectoryNodeService.class);
         GenericNodeConnector connector = directory.lookup("sessionName");
-        
-        directoryInstance.getConnector().disconnect();
 
-        
-        //System.out.println("Connector -->"+connector.getId());
+        node = grid.getExecutionEnvironment(connector).getExecutionNode();
+        ksession = (StatefulKnowledgeSession) node.get(DirectoryLookupFactoryService.class).lookup("sessionName");
+        Assert.assertNotNull(ksession);
 
-       node = grid.getExecutionEnvironment(connector).getExecutionNode();
-//
-       ksession = (StatefulKnowledgeSession) node.get(DirectoryLookupFactoryService.class).lookup("sessionName");
-       Assert.assertNotNull(ksession);
-
-       grid.dispose();
+        grid.dispose();
 
     }
-
-
-   
 }

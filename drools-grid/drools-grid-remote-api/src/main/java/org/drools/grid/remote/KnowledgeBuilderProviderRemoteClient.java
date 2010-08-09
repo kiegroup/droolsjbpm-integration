@@ -24,12 +24,12 @@ public class KnowledgeBuilderProviderRemoteClient
     implements
     KnowledgeBuilderFactoryService {
     
-    private GenericNodeConnector client;
+    private GenericNodeConnector connector;
     private MessageSession messageSession;
-    public KnowledgeBuilderProviderRemoteClient(GenericNodeConnector client) {
+    public KnowledgeBuilderProviderRemoteClient(GenericNodeConnector connector) {
         
         this.messageSession = new MessageSession();
-        this.client = client;
+        this.connector = connector;
 
     }
 
@@ -48,19 +48,20 @@ public class KnowledgeBuilderProviderRemoteClient
                                                            new NewKnowledgeBuilderCommand( null ) ) );
 
         try {
-            Object object = client.write( msg ).getPayload();
+            connector.connect();
+            Object object = connector.write( msg ).getPayload();
 
             if ( !(object instanceof FinishedCommand) ) {
                 throw new RuntimeException( "Response was not correctly ended" );
             }
-
+            connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBuilderRemoteClient( localId,
-                                                 client, messageSession );
+                                                 connector, messageSession );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {

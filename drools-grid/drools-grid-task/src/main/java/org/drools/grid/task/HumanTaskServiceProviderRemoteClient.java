@@ -15,11 +15,6 @@
  */
 package org.drools.grid.task;
 
-import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.drools.grid.ConnectorException;
-import org.drools.grid.GenericHumanTaskConnector;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.HumanTaskNodeService;
 
@@ -57,17 +52,7 @@ public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactorySer
     }
 
     public HumanTaskNodeService newHumanTaskService() {
-        HumanTaskServiceImpl humanTaskServiceImpl = null;
-        try {
-
-            this.connector.connect();
-        } catch (RemoteException ex) {
-            Logger.getLogger(HumanTaskServiceProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
-
-        } catch (ConnectorException ex) {
-            Logger.getLogger(HumanTaskServiceProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        humanTaskServiceImpl = new HumanTaskServiceImpl(this.connector, this.id);
+        HumanTaskServiceRemoteClient humanTaskServiceImpl = new HumanTaskServiceRemoteClient(this.connector, this.id);
         return humanTaskServiceImpl;
     }
 }

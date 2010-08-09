@@ -26,31 +26,49 @@ public class TaskServerInstance {
     /*
      * Creates a new TaskServer Instance that will be associated to a name using the
      * GenericNodeConnector provided.
+     * @param name
+     * @param connector
      */
     public TaskServerInstance(String name, GenericNodeConnector connector) {
         this.name = name;
         this.connector = connector;
     }
 
+    /*
+     * Get a HumanTaskNode based on the default NodeSelectionStrategy
+     */
     public HumanTaskNode getHumanTaskNode() throws ConnectorException {
         return getHumanTaskNode(defaultStrategy);
     }
 
+    /*
+     * Get a HumanTaskNode based on the provided NodeSelectionStrategy
+     * @param strategy
+     */
     public HumanTaskNode getHumanTaskNode(NodeSelectionStrategy strategy) throws ConnectorException{
         GenericConnection connection = getConnector().getConnection();
         return connection.getHumanTaskNode(strategy);
     }
 
+    /*
+     * Get all the HumanTaskNodes inside the TaskServerInstance.
+     * This can be expensive because it needs to get a connection to all the HumanTaskNodes.
+     */
     public List<HumanTaskNode> getHumanTaskNodes() throws ConnectorException{
         GenericConnection connection = getConnector().getConnection();
         return connection.getHumanTaskNodes();
     }
 
-
+    /*
+     * Get the GenericNodeConnector from this TaskServerInstance
+     */
     public GenericNodeConnector getConnector(){
         return this.connector;
     }
 
+    /*
+     * Get the TaskServerInstance name
+     */
     public String getName() {
         return name;
     }

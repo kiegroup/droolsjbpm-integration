@@ -43,12 +43,12 @@ import org.drools.grid.internal.commands.UnRegisterCommand;
  */
 public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFactoryService {
 
-    private GenericNodeConnector client;
+    private GenericNodeConnector connector;
     private GenericConnection connection;
     private MessageSession messageSession;
 
-    public DirectoryLookupProviderRemoteClient(GenericNodeConnector client, GenericConnection connection) {
-        this.client = client;
+    public DirectoryLookupProviderRemoteClient(GenericNodeConnector connector, GenericConnection connection) {
+        this.connector = connector;
         this.messageSession = new MessageSession();
         this.connection = connection;
     }
@@ -68,7 +68,7 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
             DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
             try {
                 
-                directoryNode.register(identifier, client.getId());
+                directoryNode.register(identifier, connector.getId());
             } catch (RemoteException ex) {
                 Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -84,10 +84,12 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
 
 
             try {
-                Object object = client.write(msg).getPayload();
+                connector.connect();
+                Object object = connector.write(msg).getPayload();
                 if (!(object instanceof FinishedCommand)) {
                     throw new RuntimeException("Response was not correctly ended");
                 }
+                connector.disconnect();
             } catch (Exception e) {
                 throw new RuntimeException("Unable to execute message", e);
             }
@@ -118,17 +120,14 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
                 Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            client = GenericConnectorFactory.newConnector(connectorString);
-            try {
-                client.connect();
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            connector = GenericConnectorFactory.newConnector(connectorString);
+           
             //I need to add the new Connector to the connection to be able to clean it up/disconect it!
-            connection.addExecutionNode(client);
+            connection.addExecutionNode(connector);
 
             try {
-                Object object = client.write(msg).getPayload();
+                connector.connect();
+                Object object = connector.write(msg).getPayload();
                 if (object == null) {
                     throw new RuntimeException("Response was not correctly received");
                 }
@@ -138,13 +137,13 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
                 CommandExecutor executor = null;
                 switch (Integer.parseInt(type)) {
                     case 0: {
-                        executor = new StatefulKnowledgeSessionRemoteClient(instanceId, client, messageSession);
+                        executor = new StatefulKnowledgeSessionRemoteClient(instanceId, connector, messageSession);
                         break;
                     }
                     default: {
                     }
                 }
-
+                connector.disconnect();
                 return executor;
             } catch (Exception e) {
                 throw new RuntimeException("Unable to execute message", e);
@@ -201,18 +200,16 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
 
 
             try {
-                Object object = client.write(msg).getPayload();
+                connector.connect();
+                Object object = connector.write(msg).getPayload();
                 if (!(object instanceof FinishedCommand)) {
                     throw new RuntimeException("Response was not correctly ended");
                 }
+                connector.disconnect();
             } catch (Exception e) {
                 throw new RuntimeException("Unable to execute message", e);
             }
-            try {
-                directoryNode.dispose();
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
-            }
+           
 
         } catch (ConnectorException ex) {
             Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
