@@ -1806,7 +1806,7 @@ public class JSonBatchExecutionTest extends TestCase {
         GridConnection connection = new GridConnection();
         connection.addExecutionNode(new LocalNodeConnector());
         connection.addDirectoryNode(new LocalDirectoryConnector());
-        ExecutionNode node = connection.getExecutionNode(null);
+        ExecutionNode node = connection.getExecutionNode();
 
         StatefulKnowledgeSession ksession = getExecutionNodeSessionStateful(node, ResourceFactory.newByteArrayResource( str.getBytes() ) );
 
