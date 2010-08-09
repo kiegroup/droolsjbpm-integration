@@ -86,7 +86,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         GridConnection connection = new GridConnection();
         connection.addExecutionNode(new LocalNodeConnector());
         connection.addDirectoryNode(new LocalDirectoryConnector());
-        node = connection.getExecutionNode(null);
+        node = connection.getExecutionNode();
         node.setId("node");
         context.bind("node", node);
         node.get(DirectoryLookupFactoryService.class).register("ksession1", this.exec);

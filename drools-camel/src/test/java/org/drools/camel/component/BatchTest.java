@@ -129,7 +129,7 @@ public abstract class BatchTest extends ContextTestSupport {
         GridConnection connection = new GridConnection();
         connection.addExecutionNode(new LocalNodeConnector());
         connection.addDirectoryNode(new LocalDirectoryConnector());
-        node = connection.getExecutionNode( null );
+        node = connection.getExecutionNode();
         node.setId( "node" );
         context.bind( "node",
                       node );
