@@ -27,12 +27,10 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.base.MapGlobalResolver;
-import org.drools.builder.JPAKnowledgeFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
-import org.drools.persistence.jpa.grid.JPAKnowledgeProviderLocalClient;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -45,6 +43,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.drools.grid.local.LocalDirectoryConnector;
 import org.drools.grid.local.LocalNodeConnector;
 import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
+import org.drools.persistence.jpa.impl.KnowledgeStoreServiceImpl;
 
 /**
  *
@@ -88,7 +87,7 @@ public class LocalExecutionNodeTest extends ExecutionNodeBase{
         connection.addExecutionNode(new LocalNodeConnector());
         connection.addDirectoryNode(new LocalDirectoryConnector());
         node = connection.getExecutionNode(new ReturnAlwaysTheFirstSelectionStrategy());
-        node.set(JPAKnowledgeFactoryService.class, new JPAKnowledgeProviderLocalClient());
+        node.set(KnowledgeStoreServiceImpl.class, new KnowledgeStoreServiceImpl());
     }
     
     private Environment newEnvironment() {
@@ -137,7 +136,7 @@ public class LocalExecutionNodeTest extends ExecutionNodeBase{
 
 
         StatefulKnowledgeSession ksession = node
-                                                .get(JPAKnowledgeFactoryService.class)
+                                                .get(KnowledgeStoreServiceImpl.class)
                                                 .newStatefulKnowledgeSession(kbase, null, env);
 
         Assert.assertNotNull(ksession);
