@@ -12,6 +12,7 @@ import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.common.DefaultFactHandle;
 import org.drools.common.DisconnectedFactHandle;
 import org.drools.grid.internal.commands.RegisterRemoteWorkItemHandlerCommand;
 import org.drools.event.process.ProcessEventListener;
@@ -95,7 +96,8 @@ public class StatefulKnowledgeSessionRemoteClient
                 throw new RuntimeException("Response was not correctly received");
             }
             connector.disconnect();
-            return (Integer) ((ExecutionResults) object).getValue(commandId);
+            //return (Integer) ((ExecutionResults) object).getValue(commandId);
+            return (Integer)  object;
         } catch (Exception e) {
             throw new RuntimeException("Unable to execute message",
                     e);
@@ -332,7 +334,7 @@ public class StatefulKnowledgeSessionRemoteClient
         Message msg = new Message(messageSession.getSessionId(),
                 messageSession.counter.incrementAndGet(),
                 false,
-                new KnowledgeContextResolveFromContextCommand(new InsertObjectCommand(object, String.valueOf(object.hashCode())),
+                new KnowledgeContextResolveFromContextCommand(new InsertObjectCommand(object, true),
                 null,
                 null,
                 instanceId,
@@ -344,7 +346,8 @@ public class StatefulKnowledgeSessionRemoteClient
             if (object == null) {
                 throw new RuntimeException("Response was not correctly received");
             }
-            FactHandle handle = new DisconnectedFactHandle(((ExecutionResults) result).getFactHandle(String.valueOf(object.hashCode())).toString());
+            DefaultFactHandle handle = (DefaultFactHandle) result;
+            
             connector.disconnect();
             return handle;
         } catch (Exception e) {

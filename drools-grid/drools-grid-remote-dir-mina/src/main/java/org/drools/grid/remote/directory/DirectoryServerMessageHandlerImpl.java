@@ -63,11 +63,11 @@ public class DirectoryServerMessageHandlerImpl implements GenericMessageHandler 
                     directory.unregister(executorId);
                     
 
-                    SimpleCommand resultsCmnd = new SimpleCommand(cmd.getId(), SimpleCommandName.OperationResponse, null);
-                    session.write(new Message( msg.getSessionId(),
-                                        msg.getResponseId(),
-                                        msg.isAsync(),
-                                        resultsCmnd ), null);
+//                    SimpleCommand resultsCmnd = new SimpleCommand(cmd.getId(), SimpleCommandName.OperationResponse, null);
+//                    session.write(new Message( msg.getSessionId(),
+//                                        msg.getResponseId(),
+//                                        msg.isAsync(),
+//                                        resultsCmnd ), null);
 
                     break;
                 }

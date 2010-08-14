@@ -154,7 +154,6 @@ public class RegisterMinaDirectoryTest {
 
         Assert.assertEquals(3, dirMap.size());
 
-        System.out.println("dir.getDirectoryMap() = " + dirMap);
 
         Assert.assertEquals(3, dirMap.size());
         Assert.assertEquals(0, serverNode.getCurrentSessions());
@@ -279,6 +278,7 @@ public class RegisterMinaDirectoryTest {
 
         node.get(DirectoryLookupFactoryService.class).register("sessionName", ksession);
 
+        //We disconnect the grid in order to close all the active connections to remote services
         grid.disconnect();
 
         DirectoryInstance directoryInstance = grid.getDirectoryInstance();

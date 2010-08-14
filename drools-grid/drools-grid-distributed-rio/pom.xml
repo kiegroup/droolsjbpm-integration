@@ -36,13 +36,11 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-distributed-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -138,7 +136,7 @@
 
                         <property>
                             <name>opstring</name>
-                            <value>src/main/resources/org/drools/executionNodeService.groovy</value>
+                            <value>src/test/resources/org/drools/executionNodeServiceTest.groovy</value>
                         </property>
                         <property>
                             <name>org.rioproject.test.config</name>

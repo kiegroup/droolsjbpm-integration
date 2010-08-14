@@ -7,7 +7,7 @@ import java.util.Map;
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.command.ExecuteCommand;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
@@ -226,9 +226,9 @@ public class StatefulKnowledgeSessionGridClient
                 throw new RuntimeException( "Response was not correctly received = null" );
             }
 
-            if ( !(result instanceof FinishedCommand)) {
-                throw new RuntimeException( "Response was not correctly received" );
-            }
+//            if ( !(result instanceof FinishedCommand)) {
+//                throw new RuntimeException( "Response was not correctly received" );
+//            }
 
             
         } catch ( Exception e ) {
@@ -371,7 +371,7 @@ public class StatefulKnowledgeSessionGridClient
                                                                                    kresultsId ) );
          try {
              Object payload = connector.write( msg ).getPayload();
-             WorkItemManager workItemManager = (WorkItemManager) ((ExecutionResults) payload).getValue( "workItemManager" );
+             WorkItemManager workItemManager = (WorkItemManager)  payload;
              ((WorkItemManagerGridClient)workItemManager).setClient(connector);
              ((WorkItemManagerGridClient)workItemManager).setMessageSession(messageSession);
              ((WorkItemManagerGridClient)workItemManager).setInstanceId(instanceId);
@@ -430,7 +430,7 @@ public class StatefulKnowledgeSessionGridClient
                 throw new RuntimeException( "Response was not correctly received" );
             }
 
-            return (ProcessInstance) ((ExecutionResults) object).getValue( processId );
+            return (ProcessInstance) object;
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );

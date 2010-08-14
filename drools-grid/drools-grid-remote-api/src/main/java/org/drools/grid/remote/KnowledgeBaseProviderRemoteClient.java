@@ -10,7 +10,7 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.grid.ConnectorException;
@@ -56,9 +56,9 @@ public class KnowledgeBaseProviderRemoteClient
             connector.connect();
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
             connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -107,9 +107,9 @@ public class KnowledgeBaseProviderRemoteClient
             connector.connect();
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
             connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -150,9 +150,9 @@ public class KnowledgeBaseProviderRemoteClient
             connector.connect();
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
             connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

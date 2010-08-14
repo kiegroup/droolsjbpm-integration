@@ -14,7 +14,7 @@ import org.drools.builder.DecisionTableConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.grid.GenericConnection;
@@ -34,8 +34,6 @@ public class KnowledgeBuilderProviderGridClient
 
     public KnowledgeBuilderProviderGridClient(GenericNodeConnector connector, GenericConnection connection) {
             this.messageSession = new MessageSession();
-            //client = new DistributedRioNodeConnector("client 1", SystemEventListenerFactory.getSystemEventListener(),
-              //                                      ((DistributedRioNodeConnector)connector).getExecutionNodeService());
             this.connector = connector;
         
     }
@@ -58,9 +56,9 @@ public class KnowledgeBuilderProviderGridClient
         try {
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

@@ -17,19 +17,14 @@
 
 package org.drools.grid.services.strategies;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.drools.grid.ConnectorException;
 
 import org.drools.grid.ConnectorType;
-import org.drools.grid.services.DirectoryInstance;
 import org.drools.grid.services.TaskServerInstance;
 
 

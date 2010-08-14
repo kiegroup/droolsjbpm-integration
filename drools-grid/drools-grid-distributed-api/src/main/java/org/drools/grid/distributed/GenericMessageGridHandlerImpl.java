@@ -87,13 +87,14 @@ public class GenericMessageGridHandlerImpl implements GenericMessageHandler {
 
 
         // we always need to process a List, for genericity, but don't force a List on the payload
-        List<GenericCommand> commands;
-        if ( msg.getPayload() instanceof List ) {
-            commands = (List<GenericCommand>) msg.getPayload();
-        } else {
-            commands = new ArrayList<GenericCommand>();
-            commands.add( (GenericCommand) msg.getPayload() );
-        }
+//        List<GenericCommand> commands;
+//        if ( msg.getPayload() instanceof List ) {
+//            commands = (List<GenericCommand>) msg.getPayload();
+//        } else {
+//            commands = new ArrayList<GenericCommand>();
+//            commands.add( (GenericCommand) msg.getPayload() );
+//        }
+        GenericCommand command = (GenericCommand) msg.getPayload();
 
         // Setup the evaluation context 
         ContextImpl localSessionContext = new ContextImpl( "session_" + msg.getSessionId(),
@@ -105,31 +106,40 @@ public class GenericMessageGridHandlerImpl implements GenericMessageHandler {
         //@TODO: replace with Environment ?? this needs to change..
         localSessionContext.set("registry", directory);
         
-        for ( GenericCommand cmd : commands ) {
-            // evaluate the commands
-            cmd.execute( localSessionContext );
-        }
+//        for ( GenericCommand cmd : commands ) {
+//            // evaluate the commands
+//            cmd.execute( localSessionContext );
+//        }
+
+        Object result = command.execute( localSessionContext );
+
 
         if(localSessionContext.get("kbase") != null){
             session.write( new Message( msg.getSessionId(),
                                         msg.getResponseId(),
                                         msg.isAsync(),
                                         localSessionContext.get("kbase") ), null );
-        
-        } else if ( !msg.isAsync() && localKresults.getIdentifiers().isEmpty() ) {
-            // if it's not an async invocation and their are no results, just send a simple notification message
-            session.write( new Message( msg.getSessionId(),
-                                        msg.getResponseId(),
-                                        msg.isAsync(),
-                                        new FinishedCommand() ), null );
-
-
-        }  else{
-            // return the payload
-            session.write( new Message( msg.getSessionId(),
-                                        msg.getResponseId(),
-                                        msg.isAsync(),
-                                        localKresults ), null );
+            return;
         }
+        session.write( new Message( msg.getSessionId(),
+                                        msg.getResponseId(),
+                                        msg.isAsync(),
+                                        result ), null );
+
+//        else if ( !msg.isAsync() && localKresults.getIdentifiers().isEmpty() ) {
+//            // if it's not an async invocation and their are no results, just send a simple notification message
+//            session.write( new Message( msg.getSessionId(),
+//                                        msg.getResponseId(),
+//                                        msg.isAsync(),
+//                                        new FinishedCommand() ), null );
+//
+//
+//        }  else{
+//            // return the payload
+//            session.write( new Message( msg.getSessionId(),
+//                                        msg.getResponseId(),
+//                                        msg.isAsync(),
+//                                        localKresults ), null );
+//        }
     }
 }

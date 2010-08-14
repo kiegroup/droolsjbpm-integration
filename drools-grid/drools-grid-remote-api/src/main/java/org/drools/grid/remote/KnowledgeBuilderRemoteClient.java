@@ -7,7 +7,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
@@ -60,9 +60,9 @@ public class KnowledgeBuilderRemoteClient
             connector.connect();
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
             connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -126,7 +126,8 @@ public class KnowledgeBuilderRemoteClient
                 throw new RuntimeException( "Response was not correctly received" );
             }
             connector.disconnect();
-            return (Boolean) ((ExecutionResults) object).getValue( commandId );
+            //return (Boolean) ((ExecutionResults) object).getValue( commandId );
+            return (Boolean) object;
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

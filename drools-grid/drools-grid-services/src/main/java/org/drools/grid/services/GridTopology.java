@@ -74,6 +74,8 @@ public class GridTopology {
     }
 
     /*
+     * @param name: name associated to this ExecutionEnvironment
+     * @param provider: used to create a new ExecutionEnvironment instance
      * This method will register a new Execution Environment based on the configured Provider.
      * The provider will contain all the information to be able to establish a connection with it.
      * The following steps are executed inside this method:
@@ -118,6 +120,7 @@ public class GridTopology {
     }
 
     /*
+     * @param name: of the ExecutionEnvironment to unregister
      * This method unregister the Execution Environment from this running instance of the grid topology
      * based on the name. The following steps are executed in order to unregister
      * an ExecutionEnvironment from the GridTopology:
@@ -344,6 +347,7 @@ public class GridTopology {
     }
 
     /*
+     * @param name: of the TaskServiceInstance that we want to unregister
      * Unregister a TaskServer Instance from this running GridTopology
      * This method unregister the TaskServer Instance from this running instance of the grid topology
      * based on the name. The following steps are executed in order to unregister
@@ -438,6 +442,8 @@ public class GridTopology {
     }
 
     /*
+     * @param name: that will be associated with the resource id
+     * @param resourceId: Id of the resource that we want to associate with the name
      * Register the resource id (ExecutionEnvironment, DirectoryInstance, TaskServerInstance)
      * inside all the current available directory instances.
      */
@@ -464,6 +470,7 @@ public class GridTopology {
         }
     }
     /*
+     * @param name: of the resource that we want to unregister from current Directories
      * Unregister a resource (ExecutionEnvironment, DirectoryInstance, TaskServerInstance)
      * from all the current available directory instances.
      */

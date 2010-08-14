@@ -21,15 +21,11 @@ import java.util.Collection;
 import org.drools.FactException;
 import org.drools.FactHandle;
 import org.drools.WorkingMemoryEntryPoint;
-import org.drools.command.ExecuteCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.InsertObjectInEntryPointCommand;
-import org.drools.common.DisconnectedFactHandle;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageSession;
-import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.ObjectFilter;
 
 /**
@@ -38,12 +34,12 @@ import org.drools.runtime.ObjectFilter;
  */
 public class WorkingMemoryEntryPointGridClient implements WorkingMemoryEntryPoint{
 
-     private GenericNodeConnector     client;
+     private GenericNodeConnector     connector;
     private MessageSession              messageSession;
     private String                      instanceId;
 
-    public WorkingMemoryEntryPointGridClient(String instanceId, GenericNodeConnector client, MessageSession messageSession) {
-        this.client = client;
+    public WorkingMemoryEntryPointGridClient(String instanceId, GenericNodeConnector connector, MessageSession messageSession) {
+        this.connector = connector;
         this.messageSession = messageSession;
         this.instanceId = instanceId;
     }
@@ -64,13 +60,13 @@ public class WorkingMemoryEntryPointGridClient implements WorkingMemoryEntryPoin
                                                                                   kresultsId ) );
 
         try {
-            Object result = client.write( msg ).getPayload();
+            Object result = connector.write( msg ).getPayload();
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
-            FactHandle handle = new DisconnectedFactHandle(((ExecutionResults) result).getFactHandle( String.valueOf(object.hashCode()) ).toString()) ;
+             
             
-            return  handle;
+            return (FactHandle) result;
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );

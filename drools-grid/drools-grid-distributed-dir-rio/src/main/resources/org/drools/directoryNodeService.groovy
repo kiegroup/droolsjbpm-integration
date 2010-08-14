@@ -19,9 +19,8 @@ deployment(name:'directoryNodeService',  debug: 'true') {
      * classifier used for the 'download' jar */
     artifact id:'service-dir', 'org.drools:drools-grid-distributed-dir-rio:5.2.0.SNAPSHOT'
     artifact id:'service-dir-dl', 'org.drools:drools-grid-distributed-dir-rio:dl:5.2.0.SNAPSHOT'
-    artifact id:'service', 'org.drools:drools-grid-distributed-rio:5.2.0.SNAPSHOT'
-    artifact id:'service-dl', 'org.drools:drools-grid-distributed-rio:dl:5.2.0.SNAPSHOT'
-
+   // artifact id:'service', 'org.drools:drools-grid-distributed-rio:5.2.0.SNAPSHOT'
+   // artifact id:'service-dl', 'org.drools:drools-grid-distributed-rio:dl:5.2.0.SNAPSHOT'
     /*
      * Declare the service to be deployed. The number of instances deployed
      * defaults to 1. If you require > 1 instances change as needed

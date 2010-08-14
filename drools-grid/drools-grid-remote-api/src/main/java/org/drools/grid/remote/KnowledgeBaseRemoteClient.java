@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.drools.KnowledgeBase;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
@@ -56,9 +56,9 @@ public class KnowledgeBaseRemoteClient
             connector.connect();
             Object object = connector.write(msg).getPayload();
 
-            if (!(object instanceof FinishedCommand)) {
-                throw new RuntimeException("Response was not correctly ended");
-            }
+//            if (!(object instanceof FinishedCommand)) {
+//                throw new RuntimeException("Response was not correctly ended");
+//            }
             connector.disconnect();
         } catch (Exception e) {
             throw new RuntimeException("Unable to execute message",
@@ -119,9 +119,9 @@ public class KnowledgeBaseRemoteClient
             connector.connect();
             Object object = connector.write(msg).getPayload();
 
-            if (!(object instanceof FinishedCommand)) {
-                throw new RuntimeException("Response was not correctly ended");
-            }
+//            if (!(object instanceof FinishedCommand)) {
+//                throw new RuntimeException("Response was not correctly ended");
+//            }
             connector.disconnect();
         } catch (Exception e) {
             throw new RuntimeException("Unable to execute message",

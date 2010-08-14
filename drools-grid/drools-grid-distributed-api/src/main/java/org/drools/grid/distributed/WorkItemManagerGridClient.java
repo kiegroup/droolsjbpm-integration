@@ -22,8 +22,8 @@ public class WorkItemManagerGridClient implements WorkItemManager, Serializable 
 
 	private static final long serialVersionUID = 1L;
 	
-	//private GridExecutionNodeConnection nodeConnection;
-        private GenericNodeConnector client;
+	
+        private GenericNodeConnector connector;
         private MessageSession messageSession;
 	private String instanceId;
 
@@ -42,7 +42,7 @@ public class WorkItemManagerGridClient implements WorkItemManager, Serializable 
                                                                                   instanceId,
                                                                                   kresultsId ) );
         try {
-            client.write( msg );
+            connector.write( msg );
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message", e );
         }
@@ -53,7 +53,7 @@ public class WorkItemManagerGridClient implements WorkItemManager, Serializable 
 	}
 
         public void setClient(GenericNodeConnector client) {
-            this.client = client;
+            this.connector = client;
         }
 
         public void setMessageSession(MessageSession messageSession) {

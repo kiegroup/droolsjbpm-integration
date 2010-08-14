@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.drools.builder.DirectoryLookupFactoryService;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.runtime.CommandExecutor;
@@ -86,9 +86,9 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
             try {
                 connector.connect();
                 Object object = connector.write(msg).getPayload();
-                if (!(object instanceof FinishedCommand)) {
-                    throw new RuntimeException("Response was not correctly ended");
-                }
+//                if (!(object instanceof FinishedCommand)) {
+//                    throw new RuntimeException("Response was not correctly ended");
+//                }
                 connector.disconnect();
             } catch (Exception e) {
                 throw new RuntimeException("Unable to execute message", e);
@@ -131,7 +131,7 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
                 if (object == null) {
                     throw new RuntimeException("Response was not correctly received");
                 }
-                String value = (String) ((ExecutionResults) object).getValue(commandId);
+                String value = (String)  object;
                 String type = String.valueOf(value.charAt(0));
                 String instanceId = value.substring(2);
                 CommandExecutor executor = null;
@@ -202,9 +202,9 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
             try {
                 connector.connect();
                 Object object = connector.write(msg).getPayload();
-                if (!(object instanceof FinishedCommand)) {
-                    throw new RuntimeException("Response was not correctly ended");
-                }
+//                if (!(object instanceof FinishedCommand)) {
+//                    throw new RuntimeException("Response was not correctly ended");
+//                }
                 connector.disconnect();
             } catch (Exception e) {
                 throw new RuntimeException("Unable to execute message", e);

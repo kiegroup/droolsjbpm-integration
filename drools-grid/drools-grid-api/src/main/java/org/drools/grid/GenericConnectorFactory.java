@@ -311,7 +311,7 @@ public class GenericConnectorFactory {
 
             String[] connectorDetails = getConnectorDetails(connectorString);
             Class clazz = Class.forName(DISTRIBUTED_RIO_DIRECTORY_CONNECTOR_CLASS);
-            if(!"".equals(connectorDetails[3])){
+            if(connectorDetails.length > 3 && !"".equals(connectorDetails[3])){
                 Constructor constructor = clazz.getConstructor(String.class, SystemEventListener.class, String.class);
                 connector = (GenericNodeConnector) constructor.newInstance(connectorString,
                         SystemEventListenerFactory.getSystemEventListener(),

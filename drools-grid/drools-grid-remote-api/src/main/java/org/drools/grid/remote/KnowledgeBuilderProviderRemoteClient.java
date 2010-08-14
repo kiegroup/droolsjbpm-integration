@@ -13,7 +13,7 @@ import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.grid.GenericNodeConnector;
@@ -51,9 +51,9 @@ public class KnowledgeBuilderProviderRemoteClient
             connector.connect();
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
             connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

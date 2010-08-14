@@ -279,7 +279,7 @@ public abstract class ExecutionNodeBaseTest {
 
         System.out.println("Let's go for the Second ksession");
         //Switching to another node
-        node = connection.getExecutionNode(null);
+        node = connection.getExecutionNode();
 
         KnowledgeBuilder kbuilder2 = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
         Assert.assertNotNull(kbuilder2);

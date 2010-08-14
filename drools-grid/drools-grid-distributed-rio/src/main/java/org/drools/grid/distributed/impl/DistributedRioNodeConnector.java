@@ -75,6 +75,7 @@ public class DistributedRioNodeConnector
 
     
     public Message write(Message msg) throws ConnectorException, RemoteException {
+        connect();
         if (executionNodeService != null) {
 
 

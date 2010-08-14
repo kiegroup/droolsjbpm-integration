@@ -9,7 +9,7 @@ import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
 
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.grid.GenericConnection;
@@ -33,8 +33,6 @@ public class KnowledgeBaseProviderGridClient
         
         this.connection = connection;
         this.messageSession = new MessageSession();
-        //this.connector = new DistributedRioNodeConnector("client 1", SystemEventListenerFactory.getSystemEventListener(),
-        //                                    ((DistributedRioNodeConnector)connector).getExecutionNodeService());
         this.connector = connector;
 
     }
@@ -64,9 +62,9 @@ public class KnowledgeBaseProviderGridClient
         try {
             Object object = connector.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

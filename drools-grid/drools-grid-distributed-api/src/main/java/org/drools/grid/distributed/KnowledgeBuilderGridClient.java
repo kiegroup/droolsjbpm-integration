@@ -8,14 +8,13 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
 import org.drools.command.builder.KnowledgeBuilderHasErrorsCommand;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
-import org.drools.runtime.ExecutionResults;
 import org.drools.grid.internal.CollectionClient;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
@@ -63,9 +62,9 @@ public class KnowledgeBuilderGridClient
         try {
             Object object = client.write( msg ).getPayload();
 
-            if ( !(object instanceof FinishedCommand) ) {
-                throw new RuntimeException( "Response was not correctly ended" );
-            }
+//            if ( !(object instanceof FinishedCommand) ) {
+//                throw new RuntimeException( "Response was not correctly ended" );
+//            }
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -94,7 +93,7 @@ public class KnowledgeBuilderGridClient
                 throw new RuntimeException( "Response was not correctly received" );
             }
 
-            return (KnowledgeBuilderErrors) ((ExecutionResults) object).getValue( commandId );            
+            return (KnowledgeBuilderErrors)  object;            
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -127,7 +126,7 @@ public class KnowledgeBuilderGridClient
                 throw new RuntimeException( "Response was not correctly received" );
             }
 
-            return (Boolean) ((ExecutionResults) object).getValue( commandId );
+            return (Boolean) object;
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.drools.builder.DirectoryLookupFactoryService;
-import org.drools.command.FinishedCommand;
+//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.grid.DirectoryNode;
 import org.drools.grid.GenericConnection;
@@ -65,7 +65,11 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
             } else {
                 throw new IllegalArgumentException("Type is not supported for registration");
             }
-            Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new RegisterCommand(identifier, ((StatefulKnowledgeSessionGridClient) executor).getInstanceId(), type), null, null, null, null));
+            Message msg = new Message(messageSession.getSessionId(), 
+                                            messageSession.getCounter().incrementAndGet(),
+                                            false, new KnowledgeContextResolveFromContextCommand(
+                                                    new RegisterCommand(identifier, ((StatefulKnowledgeSessionGridClient) executor)
+                                                                        .getInstanceId(), type), null, null, null, null));
 
             for (DirectoryNode directory : connection.getDirectoryNodes()) {
                 try {
@@ -81,9 +85,9 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
             }
             try {
                 Object object = currentConnector.write(msg).getPayload();
-                if (!(object instanceof FinishedCommand)) {
-                    throw new RuntimeException("Response was not correctly ended");
-                }
+//                if (!(object instanceof FinishedCommand)) {
+//                    throw new RuntimeException("Response was not correctly ended");
+//                }
             } catch (Exception e) {
                 throw new RuntimeException("Unable to execute message", e);
             }
@@ -132,7 +136,7 @@ public class DirectoryLookupProviderGridClient implements DirectoryLookupFactory
                 if (object == null) {
                     throw new RuntimeException("Response was not correctly received");
                 }
-                String value = (String) ((ExecutionResults) object).getValue(commandId);
+                String value = (String) object;
                 String type = String.valueOf(value.charAt(0));
                 String instanceId = value.substring(2);
 

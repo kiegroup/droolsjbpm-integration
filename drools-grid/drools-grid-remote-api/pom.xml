@@ -30,7 +30,6 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
         </dependency>
 
          <!-- REMOVE -->
