@@ -24,22 +24,32 @@ import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ *
+ * @author Mark Proctor
+ * @author Esteban Aliverti
+ */
 public class DroolsSpringJpaManager
     implements
     JpaManager {
+
+    Logger                               logger                                            = LoggerFactory.getLogger( getClass() );
+
     Environment                  env;
 
     private EntityManagerFactory emf;
 
     private EntityManager        appScopedEntityManager;
-    
+
     private boolean              internalAppScopedEntityManager;
-    
+
     public DroolsSpringJpaManager(Environment env) {
         this.env = env;
         this.emf = ( EntityManagerFactory ) env.get( EnvironmentName.ENTITY_MANAGER_FACTORY );
-        
+
         getApplicationScopedEntityManager(); // we create this on initialisation so that we own the EMF reference
                                              // otherwise Spring will close it after the transaction finishes
     }
@@ -51,51 +61,78 @@ public class DroolsSpringJpaManager
             if ( this.appScopedEntityManager != null && !this.appScopedEntityManager.isOpen() ) {
                 throw new RuntimeException("Provided APP_SCOPED_ENTITY_MANAGER is not open");
             }
-            
+
             if ( this.appScopedEntityManager == null ) {
                 EntityManagerHolder emHolder = ( EntityManagerHolder ) TransactionSynchronizationManager.getResource( this.emf );
                 if ( emHolder == null ) {
                     this.appScopedEntityManager = this.emf.createEntityManager();
                     emHolder =  new EntityManagerHolder( this.appScopedEntityManager );
-                    TransactionSynchronizationManager.bindResource( emf, 
-                                                                    emHolder );                    
+                    TransactionSynchronizationManager.bindResource( this.emf,
+                                                                    emHolder );
+                    internalAppScopedEntityManager = true;
                 } else {
                     this.appScopedEntityManager = emHolder.getEntityManager();
                 }
-                
+
 
                 this.env.set( EnvironmentName.APP_SCOPED_ENTITY_MANAGER,
                               emHolder.getEntityManager() );
-                internalAppScopedEntityManager = true;
-            }          
+            }
+        }
+        if (TransactionSynchronizationManager.isActualTransactionActive()){
+            this.appScopedEntityManager.joinTransaction();
         }
         return this.appScopedEntityManager;
     }
 
     public EntityManager getCommandScopedEntityManager() {
-        return getApplicationScopedEntityManager();
+        return (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
     }
 
     public void beginCommandScopedEntityManager() {
-        this.env.set( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER,
-                      this.appScopedEntityManager );
+        if ( this.getCommandScopedEntityManager() == null || !this.getCommandScopedEntityManager().isOpen() ) {
+            EntityManagerHolder emHolder = ( EntityManagerHolder ) TransactionSynchronizationManager.getResource( "cmdEM" );
+            EntityManager em = null;
+            if ( emHolder == null ) {
+                em = this.emf.createEntityManager();
+                emHolder =  new EntityManagerHolder( em );
+                TransactionSynchronizationManager.bindResource( "cmdEM",
+                                                                emHolder );
+            } else {
+                em = emHolder.getEntityManager();
+            }
+            this.env.set( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER,
+                          em );
+        }
+
+        this.getCommandScopedEntityManager().joinTransaction();
+        this.appScopedEntityManager.joinTransaction();
+
     }
 
     public void endCommandScopedEntityManager() {
-        this.env.set( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, 
-                      null );
+        if (TransactionSynchronizationManager.hasResource("cmdEM")){
+            TransactionSynchronizationManager.unbindResource("cmdEM");
+            if (getCommandScopedEntityManager() != null){
+                getCommandScopedEntityManager().close();
+            }
+
+        }
     }
 
     public void dispose() {
+        logger.trace("Disposing DroolsSpringJpaManager");
         if ( internalAppScopedEntityManager ) {
-            TransactionSynchronizationManager.unbindResource( this.emf );            
+            //TransactionSynchronizationManager.unbindResource( "appEM" );
+            TransactionSynchronizationManager.unbindResource( this.emf );
             if ( this.appScopedEntityManager != null && this.appScopedEntityManager.isOpen()  ) {
                 this.appScopedEntityManager.close();
                 this.internalAppScopedEntityManager = false;
                 this.env.set( EnvironmentName.APP_SCOPED_ENTITY_MANAGER, null );
-                this.env.set( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, null );
             }
+            this.endCommandScopedEntityManager();
         }
     }
 
 }
+

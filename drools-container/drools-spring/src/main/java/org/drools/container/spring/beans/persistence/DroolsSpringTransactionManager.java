@@ -23,11 +23,19 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ *
+ * @author Mark Proctor
+ * @author Esteban Aliverti
+ */
 public class DroolsSpringTransactionManager
     implements
     TransactionManager {
 
+    Logger                               logger                                            = LoggerFactory.getLogger( getClass() );
     private AbstractPlatformTransactionManager ptm;
 
     TransactionDefinition                      td                 = new DefaultTransactionDefinition();
@@ -36,7 +44,7 @@ public class DroolsSpringTransactionManager
     public DroolsSpringTransactionManager(AbstractPlatformTransactionManager ptm) {
         this.ptm = ptm;
     }
-    
+
     private boolean localTransaction;
 
     public void begin() {
@@ -46,7 +54,7 @@ public class DroolsSpringTransactionManager
             currentTransaction = this.ptm.getTransaction( td );
             localTransaction = true;
         } else {
-            localTransaction = false;   
+            localTransaction = false;
         }
     }
 
@@ -55,12 +63,16 @@ public class DroolsSpringTransactionManager
             // if we didn't begin this transaction, then do nothing
             this.localTransaction = false;
             this.ptm.commit( currentTransaction );
+            currentTransaction = null;
         }
     }
 
     public void rollback() {
-        this.localTransaction = false;        
-        this.ptm.rollback( currentTransaction );
+	if ( this.localTransaction ) {
+        	this.localTransaction = false;
+        	this.ptm.rollback( currentTransaction );
+		currentTransaction = null;
+	}
     }
 
     /**
@@ -71,6 +83,8 @@ public class DroolsSpringTransactionManager
         if ( ptm == null ) {
             return TransactionManager.STATUS_NO_TRANSACTION;
         }
+
+        logger.debug("Current TX name (According to TransactionSynchronizationManager) : "+TransactionSynchronizationManager.getCurrentTransactionName());
         if ( TransactionSynchronizationManager.isActualTransactionActive() ) {
             TransactionStatus transaction = null;
             try {
@@ -82,6 +96,7 @@ public class DroolsSpringTransactionManager
                 } else {
                     transaction = currentTransaction;
                 }
+                logger.debug("Current TX: "+transaction);
                 // If SynchronizationManager thinks it has an active transaction but
                 // our transaction is a new one
                 // then we must be in the middle of committing
