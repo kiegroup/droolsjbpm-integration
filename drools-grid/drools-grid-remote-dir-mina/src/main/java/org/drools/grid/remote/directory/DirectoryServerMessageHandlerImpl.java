@@ -48,10 +48,10 @@ public class DirectoryServerMessageHandlerImpl implements GenericMessageHandler 
                     
 
                     SimpleCommand resultsCmnd = new SimpleCommand(cmd.getId(), SimpleCommandName.OperationResponse, null);
-                    session.write(new Message( msg.getSessionId(),
-                                        msg.getResponseId(),
-                                        msg.isAsync(),
-                                        resultsCmnd ), null);
+//                    session.write(new Message( msg.getSessionId(),
+//                                        msg.getResponseId(),
+//                                        msg.isAsync(),
+//                                        resultsCmnd ), null);
 
                     break;
                 }
