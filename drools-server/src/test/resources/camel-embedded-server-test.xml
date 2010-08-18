@@ -28,6 +28,7 @@
 
 	<import resource="classpath:META-INF/cxf/cxf.xml"/>
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/>
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml"/>
 
 
@@ -37,12 +38,25 @@
        <cxf:providers>
            <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
        </cxf:providers>
-  </cxf:rsServer>  
+  </cxf:rsServer>
+  
+  <cxf:cxfEndpoint id="soapServer"
+  					address="http://localhost:9002/soap"
+   					serviceName="ns:CommandExecutor"
+   					endpointName="ns:CommandExecutorPort" 
+					wsdlURL="soap.wsdl"
+					xmlns:ns="http://soap.jax.drools.org/" >
+    <cxf:properties>
+      <entry key="dataFormat" value="MESSAGE"/>
+      <entry key="defaultOperationName" value="execute"/>
+    </cxf:properties>
+  </cxf:cxfEndpoint>
   
   <!-- Leave this, as it's needed to make Camel "drools" aware -->
   <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />  
     
   <camelContext id="camel-server-ctx" xmlns="http://camel.apache.org/schema/spring">    
+
     <route>
        <from uri="cxfrs://bean://rsServer"/>
        <policy ref="droolsPolicy">
@@ -51,7 +65,16 @@
 	       <marshal ref="xstream" />
        </policy>
     </route>    
-            
+
+    <route>
+      <from uri="cxf://bean://soapServer"/>
+      <policy ref="droolsPolicy">
+        <unmarshal ref="xstream" />       
+        <to uri="drools:node1/ksession1" />
+        <marshal ref="xstream" />
+      </policy>
+    </route>
+
   </camelContext>
   
 </beans>

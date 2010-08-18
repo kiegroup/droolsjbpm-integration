@@ -22,7 +22,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import junit.framework.TestCase;
 
 public class CxfRsClientServerTest extends TestCase {
-      
     
     public void test1() throws Exception {
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:beans-test.xml");

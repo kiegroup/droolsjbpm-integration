@@ -31,5 +31,5 @@
 	</drools:kbase>
 	
 	<drools:ksession id="ksession1" type="stateless" kbase="kbase1" node="node1"/>	
-
+	
 </beans>

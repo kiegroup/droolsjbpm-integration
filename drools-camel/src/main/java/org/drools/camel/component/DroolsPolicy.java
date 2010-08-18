@@ -16,36 +16,25 @@
 
 package org.drools.camel.component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
-import org.apache.camel.Navigate;
 import org.apache.camel.Processor;
-import org.apache.camel.Route;
 import org.apache.camel.component.cxf.CxfConstants;
 import org.apache.camel.model.BeanDefinition;
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.MarshalDefinition;
-import org.apache.camel.model.PolicyDefinition;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.model.SendDefinition;
 import org.apache.camel.model.ToDefinition;
 import org.apache.camel.model.UnmarshalDefinition;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.apache.camel.model.dataformat.JsonDataFormat;
 import org.apache.camel.model.dataformat.XStreamDataFormat;
-import org.apache.camel.processor.DelegateProcessor;
-import org.apache.camel.processor.SendProcessor;
-import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spi.Policy;
 import org.apache.camel.spi.RouteContext;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
@@ -60,16 +49,17 @@ import org.drools.command.runtime.rule.GetObjectsCommand;
 import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.ModifyCommand;
+import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
 import org.drools.command.runtime.rule.QueryCommand;
 import org.drools.command.runtime.rule.RetractCommand;
-import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
 import org.drools.common.DefaultFactHandle;
 import org.drools.core.util.StringUtils;
+import org.drools.jax.soap.PostCxfSoap;
+import org.drools.jax.soap.PreCxfSoap;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
 import org.drools.xml.jaxb.util.JaxbListWrapper;
-import org.mvel2.optimizers.impl.refl.nodes.ArrayLength;
 
 public class DroolsPolicy
     implements
@@ -109,7 +99,7 @@ public class DroolsPolicy
         }
         return toDrools;
     }    
-    
+
     public static void augmentNodes(RouteContext routeContext, ProcessorDefinition nav, Set visited) {
         if ( !nav.getOutputs().isEmpty() ) {
 
@@ -127,77 +117,24 @@ public class DroolsPolicy
                         outputs.add( i+2, beanDef ); // insert after cxfrs
                         i = i + 2;// adjust for the two inserts
                     }
-                    
+                    else if (to.getUri().startsWith( "cxf" ) && !visited.contains( to ) ) {                        
+                        BeanDefinition beanDef = new BeanDefinition();
+                        beanDef.setBeanType( PreCxfSoap.class );
+                        outputs.add( i, beanDef ); // insert before cxf
+                        beanDef = new BeanDefinition();
+                        beanDef.setBeanType( PostCxfSoap.class );
+                        outputs.add( i+2, beanDef ); // insert after cxf
+                        i = i + 2;// adjust for the two inserts
+                    }
                 } else if ( child instanceof MarshalDefinition ) {
                     MarshalDefinition m = (MarshalDefinition) child;
-
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();    
-                    
-                    if ( dformatDefinition == null ) {
-                        String ref = m.getRef();
-                        if ( "json".equals( ref ) ) {
-                            dformatDefinition = new XStreamDataFormat();
-                            ((XStreamDataFormat)dformatDefinition).setDriver( "json" );                            
-                        } else if ( "xstream".equals( ref ) ) {
-                            dformatDefinition = new XStreamDataFormat();
-                        } else if ( "jaxb".equals( ref ) ) {
-                            dformatDefinition = new JaxbDataFormat();
-                        } else {
-                            dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition(ref);
-                        }
-                    }
-                    
-                    // always clone before changing
-                    dformatDefinition = new FastCloner().deepClone( dformatDefinition );                    
-                    
-                    if ( dformatDefinition instanceof JaxbDataFormat ) {
-                        dformatDefinition = augmentJaxbDataFormatDefinition( (JaxbDataFormat) dformatDefinition );                    
-                    } else if ( dformatDefinition instanceof XStreamDataFormat ) { 
-                        XStreamDataFormat xstreamDataFormat = ( XStreamDataFormat )dformatDefinition;
-                        if ( "json".equals( xstreamDataFormat.getDriver() )) {
-                            dformatDefinition =  XStreamJson.newJSonMarshaller( xstreamDataFormat );;    
-                        } else {
-                            dformatDefinition = XStreamXml.newXStreamMarshaller( (XStreamDataFormat) dformatDefinition );    
-                        }
-                        
-                    } 
+                    dformatDefinition = processDataFormatType( routeContext, m.getRef(), dformatDefinition );
                     m.setDataFormatType( dformatDefinition ); // repoint the marshaller, if it was cloned
-                    
-                    
                 } else if ( child instanceof UnmarshalDefinition ) {
                     UnmarshalDefinition m = (UnmarshalDefinition) child;
-                    
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();
-                    
-                    if ( dformatDefinition == null ) {
-                        String ref = m.getRef();
-                        if ( "json".equals( ref ) ) {
-                            dformatDefinition = new XStreamDataFormat();
-                            ((XStreamDataFormat)dformatDefinition).setDriver( "json" );
-                        } else if ( "xstream".equals( ref ) ) {
-                            dformatDefinition = new XStreamDataFormat();
-                        } else if ( "jaxb".equals( ref ) ) {
-                            dformatDefinition = new JaxbDataFormat();
-                        } else {
-                            dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition(ref);
-                        }
-                    }
-                    
-                    // always clone before changing
-                    dformatDefinition = new FastCloner().deepClone( dformatDefinition );                                       
-                    
-                    // Augment the Jaxb DataFormatDefinition, but clone first so we don't alter the original.
-                    if ( dformatDefinition instanceof JaxbDataFormat ) {
-                        dformatDefinition = augmentJaxbDataFormatDefinition( (JaxbDataFormat) dformatDefinition );                    
-                    } else if ( dformatDefinition instanceof XStreamDataFormat ) { 
-                        XStreamDataFormat xstreamDataFormat = ( XStreamDataFormat )dformatDefinition;
-                        if ( "json".equals( xstreamDataFormat.getDriver() )) {
-                            dformatDefinition =  XStreamJson.newJSonMarshaller( xstreamDataFormat );;    
-                        } else {
-                            dformatDefinition = XStreamXml.newXStreamMarshaller( (XStreamDataFormat) dformatDefinition );    
-                        }
-                    }
-                     
+                    dformatDefinition = processDataFormatType( routeContext, m.getRef(), dformatDefinition );
                     m.setDataFormatType( dformatDefinition ); // repoint the marshaller, if it was cloned                    
                 }
             }
@@ -210,6 +147,37 @@ public class DroolsPolicy
             }
         }        
     }
+
+	private static DataFormatDefinition processDataFormatType( RouteContext routeContext, String ref, DataFormatDefinition dformatDefinition) {
+		if ( dformatDefinition == null ) {
+		    if ( "json".equals( ref ) ) {
+		        dformatDefinition = new XStreamDataFormat();
+		        ((XStreamDataFormat)dformatDefinition).setDriver( "json" );                            
+		    } else if ( "xstream".equals( ref ) ) {
+		        dformatDefinition = new XStreamDataFormat();
+		    } else if ( "jaxb".equals( ref ) ) {
+		        dformatDefinition = new JaxbDataFormat();
+		    } else {
+		        dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition(ref);
+		    }
+		}
+		
+		// always clone before changing
+		dformatDefinition = new FastCloner().deepClone( dformatDefinition );                    
+		
+		if ( dformatDefinition instanceof JaxbDataFormat ) {
+		    dformatDefinition = augmentJaxbDataFormatDefinition( (JaxbDataFormat) dformatDefinition );                    
+		} else if ( dformatDefinition instanceof XStreamDataFormat ) { 
+		    XStreamDataFormat xstreamDataFormat = ( XStreamDataFormat )dformatDefinition;
+		    if ( "json".equals( xstreamDataFormat.getDriver() )) {
+		        dformatDefinition =  XStreamJson.newJSonMarshaller( xstreamDataFormat );;    
+		    } else {
+		        dformatDefinition = XStreamXml.newXStreamMarshaller( (XStreamDataFormat) dformatDefinition );    
+		    }
+		    
+		}
+		return dformatDefinition;
+	}
 
     private ToDefinition getDroolsNode(ProcessorDefinition nav) {
         if ( !nav.getOutputs().isEmpty() ) {

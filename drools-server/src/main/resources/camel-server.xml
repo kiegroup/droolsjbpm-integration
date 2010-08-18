@@ -28,6 +28,7 @@
     
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/> 
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
   <!--
@@ -42,12 +43,29 @@
    !   Different Camel routes can handle different end point paths.
     --> 
   <cxf:rsServer id="rsServer"  
-                address="/kservice/rest"
+                address="/rest"
                 serviceClass="org.drools.jax.rs.CommandExecutorImpl">
        <cxf:providers>
            <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
        </cxf:providers>
   </cxf:rsServer>  
+  
+  <cxf:cxfEndpoint id="soapServer"
+  					address="/soap"
+   					serviceName="ns:CommandExecutor"
+   					endpointName="ns:CommandExecutorPort" 
+					wsdlURL="soap.wsdl"
+					xmlns:ns="http://soap.jax.drools.org/" >
+    <cxf:properties>
+      <entry key="dataFormat" value="MESSAGE"/>
+      <entry key="defaultOperationName" value="execute"/>
+    </cxf:properties>
+  </cxf:cxfEndpoint>
+
+  <!-- Beans to transform the soap invocation -->
+  <bean id="preCxfSoapProcessor" class="org.drools.jax.soap.PreCxfSoapProcessor" />
+
+  <bean id="postCxfSoapProcessor" class="org.drools.jax.soap.PostCxfSoapProcessor" />
   
   <!-- Leave this, as it's needed to make Camel "drools" aware -->
   <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />  
@@ -67,7 +85,18 @@
 	       <marshal ref="xstream" />
        </policy>
     </route>    
+
+    <route>
+      <from uri="cxf://bean://soapServer"/>
+      <process ref="preCxfSoapProcessor" />
+      <policy ref="droolsPolicy">
+        <unmarshal ref="xstream" />       
+        <to uri="drools:node1/ksession1" />
+        <marshal ref="xstream" />
+      </policy>
+      <process ref="postCxfSoapProcessor" />
+    </route>
         
   </camelContext>
-  
+
 </beans>
