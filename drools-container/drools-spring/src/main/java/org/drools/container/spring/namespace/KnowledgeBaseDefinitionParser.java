@@ -55,7 +55,9 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
     
     private static final String EVALUATORS                       = "evaluators";
     
-    private static final String EVALUATOR                        = "evaluator";    
+    private static final String EVALUATOR                        = "evaluator";
+
+    private static final String CONSEQUENCE_EXCEPTION_HANDLER    = "consequenceExceptionHandler";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -118,7 +120,12 @@ public class KnowledgeBaseDefinitionParser extends AbstractBeanDefinitionParser 
                     }
                     factory.addPropertyValue( "evaluators", evaluators );                    
                 }
-            }            
+            }
+
+            e = DomUtils.getChildElementByTagName(kbaseConf, CONSEQUENCE_EXCEPTION_HANDLER);
+            if ( e != null && !StringUtils.isEmpty( e.getAttribute( "handler" ) )) {
+                rbaseConfBuilder.addPropertyValue( "consequenceExceptionHandler", e.getAttribute( "handler" ) );
+            }
             
             factory.addPropertyValue( "conf", rbaseConfBuilder.getBeanDefinition() );
         }

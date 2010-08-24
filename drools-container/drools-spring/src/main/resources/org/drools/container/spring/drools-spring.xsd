@@ -108,7 +108,13 @@
 				                	    </xsd:element>				                	    
 				                	</xsd:choice>
 							    </xsd:complexType>	                        
-	                        </xsd:element>		                        
+	                        </xsd:element>
+
+                                <xsd:element name="consequenceExceptionHandler" minOccurs="0">
+							    <xsd:complexType>
+							        <xsd:attribute name="handler" type="xsd:string"/>
+							    </xsd:complexType>
+	                        </xsd:element>
 	                                                	                        
 						</xsd:all>
 					</xsd:complexType>				

@@ -41,7 +41,9 @@
 	         <drools:evaluator name="ed2" ref="red2" />
 	      </drools:evaluators>
 	      
-	      <drools:assert-behavior mode="IDENTITY" />	      
+	      <drools:assert-behavior mode="IDENTITY" />
+
+              <drools:consequenceExceptionHandler handler="org.drools.container.spring.MockConsequenceExceptionHandler" />
 	      
 	   </drools:configuration>
 	</drools:kbase>

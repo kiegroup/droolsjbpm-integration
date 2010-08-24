@@ -182,7 +182,8 @@ public class SpringDroolsTest extends TestCase {
         assertEquals( 5, rconf.getMaxThreads() );
         assertEquals( EventProcessingOption.STREAM, rconf.getEventProcessingMode() );
         assertEquals( AssertBehaviour.IDENTITY, rconf.getAssertBehaviour() );
-        
+        assertEquals( "org.drools.container.spring.MockConsequenceExceptionHandler", rconf.getConsequenceExceptionHandler() );
+
         KnowledgeBaseImpl kbase2 = ( KnowledgeBaseImpl ) context.getBean( "kbase2" );
         rconf = ((InternalRuleBase)kbase2.getRuleBase()).getConfiguration();
         assertFalse( rconf.isAdvancedProcessRuleIntegration() );
@@ -210,7 +211,7 @@ public class SpringDroolsTest extends TestCase {
         sconf = ksession2.session.getSessionConfiguration();
         assertFalse( sconf.isKeepReference() );
         assertEquals( ClockType.PSEUDO_CLOCK, sconf.getClockType() );        
-        
+
         
     }
 }
