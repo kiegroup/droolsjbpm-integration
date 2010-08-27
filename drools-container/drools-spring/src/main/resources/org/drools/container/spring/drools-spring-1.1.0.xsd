@@ -39,7 +39,7 @@
 			<xsd:complexContent>
 				<xsd:extension base="resourceType">
 					<xsd:attribute name="id" use="optional" type="xsd:ID"/>
-                                        <xsd:attribute name="basic-authentication" use="optional" type="xsd:string"/>
+                                        <xsd:attribute name="basic-authentication" use="optional" type="enabledDisabledEnum"/>
                                         <xsd:attribute name="username" use="optional" type="xsd:string"/>
                                         <xsd:attribute name="password" use="optional" type="xsd:string"/>
 				</xsd:extension>
@@ -247,7 +247,14 @@
 			<xsd:enumeration value="STREAM" />
 			<xsd:enumeration value="CLOUD" />
 		</xsd:restriction>
-	</xsd:simpleType>	
+	</xsd:simpleType>
+
+        <xsd:simpleType name="enabledDisabledEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="enabled" />
+			<xsd:enumeration value="disabled" />
+		</xsd:restriction>
+	</xsd:simpleType>
 	
 	
 	<xsd:simpleType name="assertBehaviorEnum">
