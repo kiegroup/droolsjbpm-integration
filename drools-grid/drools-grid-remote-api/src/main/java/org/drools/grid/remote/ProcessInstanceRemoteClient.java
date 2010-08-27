@@ -19,6 +19,7 @@ package org.drools.grid.remote;
 
 import java.io.Serializable;
 
+import org.drools.definition.process.Process;
 import org.drools.runtime.process.ProcessInstance;
 
 /**
@@ -35,7 +36,8 @@ public class ProcessInstanceRemoteClient
     private String   processName;
     private int      state;
     private String[] eventTypes;
-
+    private Process process;
+    
     public ProcessInstanceRemoteClient() {
     }
 
@@ -73,5 +75,9 @@ public class ProcessInstanceRemoteClient
     public String[] getEventTypes() {
         return this.eventTypes;
     }
+
+	public Process getProcess() {
+		return process;
+	}
 
 }
