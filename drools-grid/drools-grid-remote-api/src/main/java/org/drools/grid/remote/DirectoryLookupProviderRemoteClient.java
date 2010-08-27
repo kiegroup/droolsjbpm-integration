@@ -16,91 +16,103 @@
  */
 package org.drools.grid.remote;
 
-import org.drools.grid.GenericConnectorFactory;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.drools.builder.DirectoryLookupFactoryService;
-//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.grid.DirectoryNodeService;
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.grid.internal.commands.LookupCommand;
-import org.drools.grid.internal.commands.RegisterCommand;
 import org.drools.grid.ConnectorException;
+import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnection;
+import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageSession;
+import org.drools.grid.internal.commands.LookupCommand;
+import org.drools.grid.internal.commands.RegisterCommand;
 import org.drools.grid.internal.commands.UnRegisterCommand;
+import org.drools.runtime.CommandExecutor;
+import org.drools.runtime.StatefulKnowledgeSession;
 
 /**
  *
  * @author salaboy
  */
-public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFactoryService {
+public class DirectoryLookupProviderRemoteClient
+    implements
+    DirectoryLookupFactoryService {
 
     private GenericNodeConnector connector;
-    private GenericConnection connection;
-    private MessageSession messageSession;
+    private GenericConnection    connection;
+    private MessageSession       messageSession;
 
-    public DirectoryLookupProviderRemoteClient(GenericNodeConnector connector, GenericConnection connection) {
+    public DirectoryLookupProviderRemoteClient(GenericNodeConnector connector,
+                                               GenericConnection connection) {
         this.connector = connector;
         this.messageSession = new MessageSession();
         this.connection = connection;
     }
 
     public void register(String identifier,
-            CommandExecutor executor) {
+                         CommandExecutor executor) {
         try {
-            String commandId = "client.lookup" + messageSession.getNextId();
-            String kresultsId = "kresults_" + messageSession.getSessionId();
+            String commandId = "client.lookup" + this.messageSession.getNextId();
+            String kresultsId = "kresults_" + this.messageSession.getSessionId();
             int type;
-            if (executor instanceof StatefulKnowledgeSession) {
+            if ( executor instanceof StatefulKnowledgeSession ) {
                 type = 0;
             } else {
-                throw new IllegalArgumentException("Type is not supported for registration");
+                throw new IllegalArgumentException( "Type is not supported for registration" );
             }
 
-            DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
+            DirectoryNodeService directoryNode = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
             try {
-                
-                directoryNode.register(identifier, connector.getId());
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+
+                directoryNode.register( identifier,
+                                        this.connector.getId() );
+            } catch ( RemoteException ex ) {
+                Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                             null,
+                                                                                             ex );
             }
 
-
-            Message msg = new Message(messageSession.getSessionId(),
-                    messageSession.getCounter().incrementAndGet(),
-                    false,
-                    new KnowledgeContextResolveFromContextCommand(
-                    new RegisterCommand(identifier,
-                    ((StatefulKnowledgeSessionRemoteClient) executor).getInstanceId(), type),
-                    null, null, null, null));
-
+            Message msg = new Message( this.messageSession.getSessionId(),
+                                       this.messageSession.getCounter().incrementAndGet(),
+                                       false,
+                                       new KnowledgeContextResolveFromContextCommand(
+                                                                                      new RegisterCommand( identifier,
+                                                                                                           ((StatefulKnowledgeSessionRemoteClient) executor).getInstanceId(),
+                                                                                                           type ),
+                                                                                      null,
+                                                                                      null,
+                                                                                      null,
+                                                                                      null ) );
 
             try {
-                connector.connect();
-                Object object = connector.write(msg).getPayload();
-//                if (!(object instanceof FinishedCommand)) {
-//                    throw new RuntimeException("Response was not correctly ended");
-//                }
-                connector.disconnect();
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to execute message", e);
+                this.connector.connect();
+                Object object = this.connector.write( msg ).getPayload();
+                //                if (!(object instanceof FinishedCommand)) {
+                //                    throw new RuntimeException("Response was not correctly ended");
+                //                }
+                this.connector.disconnect();
+            } catch ( Exception e ) {
+                throw new RuntimeException( "Unable to execute message",
+                                            e );
             }
             try {
                 directoryNode.dispose();
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+            } catch ( RemoteException ex ) {
+                Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                             null,
+                                                                                             ex );
             }
 
-        } catch (ConnectorException ex) {
-            Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                         null,
+                                                                                         ex );
         }
 
     }
@@ -108,48 +120,63 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
     public CommandExecutor lookup(String identifier) {
 
         try {
-            String commandId = "client.lookup" + messageSession.getNextId();
-            String kresultsId = "kresults_" + messageSession.getSessionId();
-            Message msg = new Message(messageSession.getSessionId(), messageSession.getCounter().incrementAndGet(), false, new KnowledgeContextResolveFromContextCommand(new LookupCommand(identifier, commandId), null, null, null, kresultsId));
-            DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
+            String commandId = "client.lookup" + this.messageSession.getNextId();
+            String kresultsId = "kresults_" + this.messageSession.getSessionId();
+            Message msg = new Message( this.messageSession.getSessionId(),
+                                       this.messageSession.getCounter().incrementAndGet(),
+                                       false,
+                                       new KnowledgeContextResolveFromContextCommand( new LookupCommand( identifier,
+                                                                                                         commandId ),
+                                                                                      null,
+                                                                                      null,
+                                                                                      null,
+                                                                                      kresultsId ) );
+            DirectoryNodeService directoryNode = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
             String connectorString = "";
             try {
-                connectorString = directoryNode.lookupId(identifier);
+                connectorString = directoryNode.lookupId( identifier );
                 directoryNode.dispose();
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+            } catch ( RemoteException ex ) {
+                Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                             null,
+                                                                                             ex );
             }
 
-            connector = GenericConnectorFactory.newConnector(connectorString);
-           
+            this.connector = GenericConnectorFactory.newConnector( connectorString );
+
             //I need to add the new Connector to the connection to be able to clean it up/disconect it!
-            connection.addExecutionNode(connector);
+            this.connection.addExecutionNode( this.connector );
 
             try {
-                connector.connect();
-                Object object = connector.write(msg).getPayload();
-                if (object == null) {
-                    throw new RuntimeException("Response was not correctly received");
+                this.connector.connect();
+                Object object = this.connector.write( msg ).getPayload();
+                if ( object == null ) {
+                    throw new RuntimeException( "Response was not correctly received" );
                 }
-                String value = (String)  object;
-                String type = String.valueOf(value.charAt(0));
-                String instanceId = value.substring(2);
+                String value = (String) object;
+                String type = String.valueOf( value.charAt( 0 ) );
+                String instanceId = value.substring( 2 );
                 CommandExecutor executor = null;
-                switch (Integer.parseInt(type)) {
-                    case 0: {
-                        executor = new StatefulKnowledgeSessionRemoteClient(instanceId, connector, messageSession);
+                switch ( Integer.parseInt( type ) ) {
+                    case 0 : {
+                        executor = new StatefulKnowledgeSessionRemoteClient( instanceId,
+                                                                             this.connector,
+                                                                             this.messageSession );
                         break;
                     }
-                    default: {
+                    default : {
                     }
                 }
-                connector.disconnect();
+                this.connector.disconnect();
                 return executor;
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to execute message", e);
+            } catch ( Exception e ) {
+                throw new RuntimeException( "Unable to execute message",
+                                            e );
             }
-        } catch (ConnectorException ex) {
-            Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                         null,
+                                                                                         ex );
         }
         return null;
     }
@@ -157,62 +184,71 @@ public class DirectoryLookupProviderRemoteClient implements DirectoryLookupFacto
     public Map<String, String> getDirectoryMap() {
         Map<String, String> directory = null;
         try {
-            DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
+            DirectoryNodeService directoryNode = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
             directory = directoryNode.getExecutorsMap();
-        } catch (RemoteException ex) {
-            Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                         null,
+                                                                                         ex );
 
-        } catch (ConnectorException ex) {
-            Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                         null,
+                                                                                         ex );
         }
         return directory;
     }
 
-    public void registerId(String key, String value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void registerId(String key,
+                           String value) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public String lookupId(String key) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public void unregister(String identifier) {
         try {
-            String commandId = "client.lookup" + messageSession.getNextId();
-            String kresultsId = "kresults_" + messageSession.getSessionId();
+            String commandId = "client.lookup" + this.messageSession.getNextId();
+            String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-
-            DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
+            DirectoryNodeService directoryNode = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
             try {
 
-                directoryNode.unregister(identifier);
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+                directoryNode.unregister( identifier );
+            } catch ( RemoteException ex ) {
+                Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                             null,
+                                                                                             ex );
             }
 
-
-            Message msg = new Message(messageSession.getSessionId(),
-                    messageSession.getCounter().incrementAndGet(),
-                    false,
-                    new KnowledgeContextResolveFromContextCommand(
-                    new UnRegisterCommand(identifier),
-                    null, null, null, null));
-
+            Message msg = new Message( this.messageSession.getSessionId(),
+                                       this.messageSession.getCounter().incrementAndGet(),
+                                       false,
+                                       new KnowledgeContextResolveFromContextCommand(
+                                                                                      new UnRegisterCommand( identifier ),
+                                                                                      null,
+                                                                                      null,
+                                                                                      null,
+                                                                                      null ) );
 
             try {
-                connector.connect();
-                Object object = connector.write(msg).getPayload();
-//                if (!(object instanceof FinishedCommand)) {
-//                    throw new RuntimeException("Response was not correctly ended");
-//                }
-                connector.disconnect();
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to execute message", e);
+                this.connector.connect();
+                Object object = this.connector.write( msg ).getPayload();
+                //                if (!(object instanceof FinishedCommand)) {
+                //                    throw new RuntimeException("Response was not correctly ended");
+                //                }
+                this.connector.disconnect();
+            } catch ( Exception e ) {
+                throw new RuntimeException( "Unable to execute message",
+                                            e );
             }
-           
 
-        } catch (ConnectorException ex) {
-            Logger.getLogger(DirectoryLookupProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( DirectoryLookupProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                         null,
+                                                                                         ex );
         }
     }
 }

@@ -17,16 +17,19 @@
 package org.drools.grid.strategies;
 
 import java.util.List;
+
 import org.drools.grid.GenericNodeConnector;
 
 /**
  *
  * @author salaboy
  */
-public class ReturnAlwaysTheFirstSelectionStrategy implements NodeSelectionStrategy {
+public class ReturnAlwaysTheFirstSelectionStrategy
+    implements
+    NodeSelectionStrategy {
 
     public GenericNodeConnector getBestNode(List<GenericNodeConnector> connectors) {
 
-        return connectors.get(0);
+        return connectors.get( 0 );
     }
 }

@@ -17,19 +17,19 @@ public class KnowledgeBaseProviderLocalClient
     implements
     KnowledgeBaseFactoryService {
 
-    private GenericNodeConnector nodeConnector;
+    private GenericNodeConnector        nodeConnector;
     private KnowledgeBaseFactoryService decoratee = new KnowledgeBaseFactoryServiceImpl();
-    
+
     public KnowledgeBaseProviderLocalClient(GenericNodeConnector connector) {
         this.nodeConnector = connector;
     }
-    
+
     public Environment newEnvironment() {
         return KnowledgeBaseFactory.newEnvironment();
     }
 
     public KnowledgeBase newKnowledgeBase() {
-        return newKnowledgeBase( ( KnowledgeBaseConfiguration ) null );
+        return newKnowledgeBase( (KnowledgeBaseConfiguration) null );
     }
 
     public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
@@ -57,35 +57,43 @@ public class KnowledgeBaseProviderLocalClient
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId) {
-        KnowledgeBase kbase = decoratee.newKnowledgeBase(kbaseId);
-        registerKbaseInDirectories(kbaseId, kbase);
+        KnowledgeBase kbase = this.decoratee.newKnowledgeBase( kbaseId );
+        registerKbaseInDirectories( kbaseId,
+                                    kbase );
         return kbase;
     }
 
-    private void registerKbaseInDirectories(String kbaseId, KnowledgeBase kbase) throws IllegalStateException {
+    private void registerKbaseInDirectories(String kbaseId,
+                                            KnowledgeBase kbase) throws IllegalStateException {
         try {
-            ConnectorType connectorType = nodeConnector.getConnectorType();
-            DirectoryNodeService directory = nodeConnector.getConnection().getDirectoryNode().get(DirectoryNodeService.class);
-            if (connectorType == ConnectorType.LOCAL) {
-                directory.registerKBase(kbaseId, kbase);
+            ConnectorType connectorType = this.nodeConnector.getConnectorType();
+            DirectoryNodeService directory = this.nodeConnector.getConnection().getDirectoryNode().get( DirectoryNodeService.class );
+            if ( connectorType == ConnectorType.LOCAL ) {
+                directory.registerKBase( kbaseId,
+                                         kbase );
             } else {
-                directory.registerKBase(kbaseId, nodeConnector.getId());
+                directory.registerKBase( kbaseId,
+                                         this.nodeConnector.getId() );
             }
             directory.dispose();
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to register kbase " + kbaseId + " in directory", e);
+        } catch ( Exception e ) {
+            throw new IllegalStateException( "Unable to register kbase " + kbaseId + " in directory",
+                                             e );
         }
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId,
                                           KnowledgeBaseConfiguration conf) {
-        KnowledgeBase kbase = decoratee.newKnowledgeBase(kbaseId,conf);
-        registerKbaseInDirectories(kbaseId, kbase);
+        KnowledgeBase kbase = this.decoratee.newKnowledgeBase( kbaseId,
+                                                               conf );
+        registerKbaseInDirectories( kbaseId,
+                                    kbase );
         return kbase;
     }
 
-    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties, ClassLoader... classLoader) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
+                                                                    ClassLoader... classLoader) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

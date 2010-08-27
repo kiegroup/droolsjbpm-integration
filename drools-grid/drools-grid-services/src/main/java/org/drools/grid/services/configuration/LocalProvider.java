@@ -23,9 +23,9 @@ import org.drools.grid.GenericNodeConnector;
  *
  * @author salaboy
  */
-public class LocalProvider implements GenericProvider {
-
-
+public class LocalProvider
+    implements
+    GenericProvider {
 
     public LocalProvider() {
     }
@@ -39,7 +39,7 @@ public class LocalProvider implements GenericProvider {
     }
 
     public GenericNodeConnector getConnector(String connectorString) {
-          return GenericConnectorFactory.newConnector(connectorString);
+        return GenericConnectorFactory.newConnector( connectorString );
 
     }
 }

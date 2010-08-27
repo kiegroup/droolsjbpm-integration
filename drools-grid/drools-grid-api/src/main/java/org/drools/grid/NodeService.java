@@ -24,7 +24,13 @@ import java.rmi.RemoteException;
  * @author salaboy
  */
 public interface NodeService {
-    public enum ServiceType{ LOCAL, REMOTE, DISTRIBUTED };
-    public String getId() throws ConnectorException, RemoteException;
-    public ServiceType getServiceType() throws ConnectorException, RemoteException;;
+    public enum ServiceType {
+        LOCAL, REMOTE, DISTRIBUTED
+    };
+
+    public String getId() throws ConnectorException,
+                         RemoteException;
+
+    public ServiceType getServiceType() throws ConnectorException,
+                                       RemoteException;;
 }

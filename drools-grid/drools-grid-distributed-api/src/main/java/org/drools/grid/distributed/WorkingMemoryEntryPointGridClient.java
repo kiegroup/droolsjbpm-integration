@@ -18,6 +18,7 @@
 package org.drools.grid.distributed;
 
 import java.util.Collection;
+
 import org.drools.FactException;
 import org.drools.FactHandle;
 import org.drools.WorkingMemoryEntryPoint;
@@ -32,40 +33,42 @@ import org.drools.runtime.ObjectFilter;
  *
  * @author salaboy
  */
-public class WorkingMemoryEntryPointGridClient implements WorkingMemoryEntryPoint{
+public class WorkingMemoryEntryPointGridClient
+    implements
+    WorkingMemoryEntryPoint {
 
-     private GenericNodeConnector     connector;
-    private MessageSession              messageSession;
-    private String                      instanceId;
+    private GenericNodeConnector connector;
+    private MessageSession       messageSession;
+    private String               instanceId;
 
-    public WorkingMemoryEntryPointGridClient(String instanceId, GenericNodeConnector connector, MessageSession messageSession) {
+    public WorkingMemoryEntryPointGridClient(String instanceId,
+                                             GenericNodeConnector connector,
+                                             MessageSession messageSession) {
         this.connector = connector;
         this.messageSession = messageSession;
         this.instanceId = instanceId;
     }
 
-
-
     public FactHandle insert(Object object) throws FactException {
-         String commandId = "ksession.insert" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        String commandId = "ksession.insert" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
-                                   new KnowledgeContextResolveFromContextCommand( new InsertObjectInEntryPointCommand(object, String.valueOf(object.hashCode()) ),
+                                   new KnowledgeContextResolveFromContextCommand( new InsertObjectInEntryPointCommand( object,
+                                                                                                                       String.valueOf( object.hashCode() ) ),
                                                                                   null,
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
 
         try {
-            Object result = connector.write( msg ).getPayload();
+            Object result = this.connector.write( msg ).getPayload();
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
-             
-            
+
             return (FactHandle) result;
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -73,52 +76,54 @@ public class WorkingMemoryEntryPointGridClient implements WorkingMemoryEntryPoin
         }
     }
 
-    public FactHandle insert(Object object, boolean dynamic) throws FactException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public FactHandle insert(Object object,
+                             boolean dynamic) throws FactException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public void retract(org.drools.runtime.rule.FactHandle handle) throws FactException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void update(org.drools.runtime.rule.FactHandle handle, Object object) throws FactException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void update(org.drools.runtime.rule.FactHandle handle,
+                       Object object) throws FactException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public WorkingMemoryEntryPoint getWorkingMemoryEntryPoint(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public String getEntryPointId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public org.drools.runtime.rule.FactHandle getFactHandle(Object object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Object getObject(org.drools.runtime.rule.FactHandle factHandle) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Collection<Object> getObjects() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Collection<Object> getObjects(ObjectFilter filter) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public <T extends org.drools.runtime.rule.FactHandle> Collection<T> getFactHandles() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public <T extends org.drools.runtime.rule.FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public long getFactCount() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

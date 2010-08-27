@@ -18,6 +18,7 @@
 package org.drools.grid.services.strategies;
 
 import java.util.Map;
+
 import org.drools.grid.services.TaskServerInstance;
 
 /**

@@ -20,6 +20,7 @@ package org.drools.grid.remote.mina;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilderFactoryService;
@@ -35,36 +36,41 @@ import org.drools.grid.remote.KnowledgeBuilderProviderRemoteClient;
  *
  * @author salaboy 
  */
-public class RemoteMinaConnectionNode implements NodeConnectionType {
-    private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
-    private GenericNodeConnector connector;
-    private GenericConnection connection;
+public class RemoteMinaConnectionNode
+    implements
+    NodeConnectionType {
+    private final Map<Class< ? >, Object> services = new ConcurrentHashMap<Class< ? >, Object>();
+    private GenericNodeConnector          connector;
+    private GenericConnection             connection;
 
     public RemoteMinaConnectionNode() {
-        
+
     }
 
-    
-    public RemoteMinaConnectionNode(GenericNodeConnector connector, GenericConnection connection) {
-        
+    public RemoteMinaConnectionNode(GenericNodeConnector connector,
+                                    GenericConnection connection) {
+
         this.connector = connector;
         this.connection = connection;
-        
+
     }
 
-    public void init(){
-        services.put(KnowledgeBuilderFactoryService.class, new KnowledgeBuilderProviderRemoteClient(connector));
-        services.put(KnowledgeBaseFactoryService.class, new KnowledgeBaseProviderRemoteClient(connector));
-        services.put(DirectoryLookupFactoryService.class, new DirectoryLookupProviderRemoteClient(connector, connection));
+    public void init() {
+        this.services.put( KnowledgeBuilderFactoryService.class,
+                           new KnowledgeBuilderProviderRemoteClient( this.connector ) );
+        this.services.put( KnowledgeBaseFactoryService.class,
+                           new KnowledgeBaseProviderRemoteClient( this.connector ) );
+        this.services.put( DirectoryLookupFactoryService.class,
+                           new DirectoryLookupProviderRemoteClient( this.connector,
+                                                                    this.connection ) );
     }
 
-
-    public Set<Class<?>> getServicesKeys() {
-        return services.keySet(); 
+    public Set<Class< ? >> getServicesKeys() {
+        return this.services.keySet();
     }
 
     public <T> T getServiceImpl(Class<T> clazz) {
-        return (T) services.get(clazz);
+        return (T) this.services.get( clazz );
     }
 
     public void setConnector(GenericNodeConnector connector) {

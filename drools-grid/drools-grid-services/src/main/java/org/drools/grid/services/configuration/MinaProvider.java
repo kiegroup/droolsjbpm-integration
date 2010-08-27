@@ -6,25 +6,28 @@ import org.drools.grid.GenericNodeConnector;
 /**
  * @author salaboy
  */
-public class MinaProvider implements GenericProvider {
+public class MinaProvider
+    implements
+    GenericProvider {
 
     private String providerAddress;
-    private int providerPort;
+    private int    providerPort;
 
     public MinaProvider() {
     }
 
-    public MinaProvider(String providerAddress, int providerPort) {
+    public MinaProvider(String providerAddress,
+                        int providerPort) {
         this.providerAddress = providerAddress;
         this.providerPort = providerPort;
     }
 
     public String getProviderAddress() {
-        return providerAddress;
+        return this.providerAddress;
     }
 
     public int getProviderPort() {
-        return providerPort;
+        return this.providerPort;
     }
 
     public void setProviderAddress(String providerAddress) {
@@ -36,17 +39,16 @@ public class MinaProvider implements GenericProvider {
     }
 
     public String getId() {
-        return "MinaProvider:" + providerAddress + ":" + providerPort;
+        return "MinaProvider:" + this.providerAddress + ":" + this.providerPort;
     }
 
     public ProviderType getProviderType() {
         return ProviderType.RemoteMina;
     }
 
-    public GenericNodeConnector getConnector(String connectorString){
-          return GenericConnectorFactory
-                  .newConnector(connectorString+":"+this.getProviderAddress()+":"+this.getProviderPort());
-
+    public GenericNodeConnector getConnector(String connectorString) {
+        return GenericConnectorFactory
+                .newConnector( connectorString + ":" + this.getProviderAddress() + ":" + this.getProviderPort() );
 
     }
 }

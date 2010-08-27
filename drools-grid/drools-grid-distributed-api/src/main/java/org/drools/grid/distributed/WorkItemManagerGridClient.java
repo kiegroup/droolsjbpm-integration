@@ -1,69 +1,71 @@
 package org.drools.grid.distributed;
 
-
 import java.io.Serializable;
 import java.util.Map;
 
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.runtime.process.WorkItemHandler;
-import org.drools.runtime.process.WorkItemManager;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageSession;
-
+import org.drools.runtime.process.WorkItemHandler;
+import org.drools.runtime.process.WorkItemManager;
 
 /**
  *
  * @author Lucas Amador
  * @author salaboy: salaboy@gmail.com
  */
-public class WorkItemManagerGridClient implements WorkItemManager, Serializable {
+public class WorkItemManagerGridClient
+    implements
+    WorkItemManager,
+    Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	
-        private GenericNodeConnector connector;
-        private MessageSession messageSession;
-	private String instanceId;
+    private static final long    serialVersionUID = 1L;
 
-	public void abortWorkItem(long id) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+    private GenericNodeConnector connector;
+    private MessageSession       messageSession;
+    private String               instanceId;
 
-	public void completeWorkItem(long id, Map<String, Object> results) {
-		String kresultsId = "kresults_" + messageSession.getSessionId();
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+    public void abortWorkItem(long id) {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public void completeWorkItem(long id,
+                                 Map<String, Object> results) {
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    true,
-                                   new KnowledgeContextResolveFromContextCommand( new CompleteWorkItemCommand(id, results),
+                                   new KnowledgeContextResolveFromContextCommand( new CompleteWorkItemCommand( id,
+                                                                                                               results ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
         try {
-            connector.write( msg );
+            this.connector.write( msg );
         } catch ( Exception e ) {
-            throw new RuntimeException( "Unable to execute message", e );
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
-	}
+    }
 
-	public void registerWorkItemHandler(String workItemName, WorkItemHandler handler) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+    public void registerWorkItemHandler(String workItemName,
+                                        WorkItemHandler handler) {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
 
-        public void setClient(GenericNodeConnector client) {
-            this.connector = client;
-        }
+    public void setClient(GenericNodeConnector client) {
+        this.connector = client;
+    }
 
-        public void setMessageSession(MessageSession messageSession) {
-            this.messageSession = messageSession;
-        }
+    public void setMessageSession(MessageSession messageSession) {
+        this.messageSession = messageSession;
+    }
 
-	
-
-	public void setInstanceId(String instanceId) {
-		this.instanceId = instanceId;
-	}
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
 
 }

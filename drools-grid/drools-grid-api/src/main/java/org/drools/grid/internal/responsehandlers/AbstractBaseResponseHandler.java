@@ -22,11 +22,11 @@ public abstract class AbstractBaseResponseHandler
     private RuntimeException error;
 
     public synchronized boolean hasError() {
-        return error != null;
+        return this.error != null;
     }
 
     public synchronized RuntimeException getError() {
-        return error;
+        return this.error;
     }
 
     public synchronized void setError(RuntimeException error) {
@@ -35,7 +35,7 @@ public abstract class AbstractBaseResponseHandler
     }
 
     public synchronized boolean isDone() {
-        return done;
+        return this.done;
     }
 
     protected synchronized void setDone(boolean done) {

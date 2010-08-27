@@ -17,13 +17,15 @@
 package org.drools.grid.task.responseHandlers;
 
 import org.drools.grid.internal.Message;
-import org.drools.task.service.responsehandlers.BlockingTaskOperationResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.TaskOperationMessageResponseHandler;
+import org.drools.task.service.responsehandlers.BlockingTaskOperationResponseHandler;
 
-public class BlockingTaskOperationMessageResponseHandler extends BlockingTaskOperationResponseHandler implements TaskOperationMessageResponseHandler {
+public class BlockingTaskOperationMessageResponseHandler extends BlockingTaskOperationResponseHandler
+    implements
+    TaskOperationMessageResponseHandler {
 
-	public void receive(Message message) {
-		setDone(true);
-	}
+    public void receive(Message message) {
+        setDone( true );
+    }
 
 }

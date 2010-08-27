@@ -1,6 +1,5 @@
 package org.drools.grid.remote.mina;
 
-
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -14,7 +13,7 @@ public class MinaIoHandler extends IoHandlerAdapter {
     /**
      * Listener used for logging
      */
-    private final SystemEventListener systemEventListener;
+    private final SystemEventListener    systemEventListener;
 
     private ClientGenericMessageReceiver clientMessageReceiver;
 
@@ -38,17 +37,19 @@ public class MinaIoHandler extends IoHandlerAdapter {
                                                        responseHandler );
     }
 
+    @Override
     public void exceptionCaught(IoSession session,
                                 Throwable cause) throws Exception {
-        systemEventListener.exception( "Uncaught exception on Server",
-                                       cause );
+        this.systemEventListener.exception( "Uncaught exception on Server",
+                                            cause );
     }
 
+    @Override
     public void messageReceived(IoSession session,
                                 Object object) throws Exception {
         Message msg = (Message) object;
-        clientMessageReceiver.messageReceived( new MinaIoWriter( session ),
-                                               msg );
+        this.clientMessageReceiver.messageReceived( new MinaIoWriter( session ),
+                                                    msg );
     }
 
     @Override

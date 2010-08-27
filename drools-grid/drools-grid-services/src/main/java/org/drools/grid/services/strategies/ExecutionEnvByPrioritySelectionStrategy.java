@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.drools.grid.ConnectorType;
 import org.drools.grid.services.ExecutionEnvironment;
 
@@ -29,47 +30,51 @@ import org.drools.grid.services.ExecutionEnvironment;
  *
  * @author salaboy
  */
-public class ExecutionEnvByPrioritySelectionStrategy implements ExecutionEnvironmentSelectionStrategy {
+public class ExecutionEnvByPrioritySelectionStrategy
+    implements
+    ExecutionEnvironmentSelectionStrategy {
 
     private List<ExecutionEnvironment> executionEnvironments;
 
     public ExecutionEnvironment getBestExecutionEnvironment() {
-        Collections.sort(executionEnvironments, new Comparator<ExecutionEnvironment>() {
+        Collections.sort( this.executionEnvironments,
+                          new Comparator<ExecutionEnvironment>() {
 
-            private Map<ConnectorType, Integer> priorities = new HashMap<ConnectorType, Integer>() {
+                              private Map<ConnectorType, Integer> priorities = new HashMap<ConnectorType, Integer>() {
 
-                {
-                    put(ConnectorType.LOCAL, 1);
-                    put(ConnectorType.DISTRIBUTED, 2);
-                    // put("HornetQEnvironmentProvider", 3);
-                    put(ConnectorType.REMOTE, 4);
-                }
-            };
+                                                                                 {
+                                                                                     put( ConnectorType.LOCAL,
+                                                                                          1 );
+                                                                                     put( ConnectorType.DISTRIBUTED,
+                                                                                          2 );
+                                                                                     // put("HornetQEnvironmentProvider", 3);
+                                                                                     put( ConnectorType.REMOTE,
+                                                                                          4 );
+                                                                                 }
+                                                                             };
 
-            public int compare(ExecutionEnvironment o1, ExecutionEnvironment o2) {
-                return priorities.get(o1.getConnector().getConnectorType()).compareTo(priorities.get(o2.getConnector().getConnectorType()));
-            }
-        });
+                              public int compare(ExecutionEnvironment o1,
+                                                 ExecutionEnvironment o2) {
+                                  return this.priorities.get( o1.getConnector().getConnectorType() ).compareTo( this.priorities.get( o2.getConnector().getConnectorType() ) );
+                              }
+                          } );
 
-
-
-        return executionEnvironments.get(0);
+        return this.executionEnvironments.get( 0 );
     }
 
     public void setExecutionEnvironments(Map<String, ExecutionEnvironment> executionEnvironments) {
 
         List<ExecutionEnvironment> eeList = new ArrayList<ExecutionEnvironment>();
-        for (ExecutionEnvironment ee : executionEnvironments.values()) {
-            eeList.add(ee);
+        for ( ExecutionEnvironment ee : executionEnvironments.values() ) {
+            eeList.add( ee );
         }
         this.executionEnvironments = eeList;
 
     }
 
     public ExecutionEnvironment getBestExecutionEnvironment(Map<String, ExecutionEnvironment> executionEnvironments) {
-        setExecutionEnvironments(executionEnvironments);
+        setExecutionEnvironments( executionEnvironments );
         return getBestExecutionEnvironment();
     }
 
-    
 }

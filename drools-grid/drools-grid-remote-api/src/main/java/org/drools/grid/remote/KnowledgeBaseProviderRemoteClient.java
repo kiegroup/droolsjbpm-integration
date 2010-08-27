@@ -10,26 +10,26 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
-//import org.drools.command.FinishedCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.DirectoryNodeService;
-import org.drools.runtime.Environment;
-import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageSession;
+import org.drools.runtime.Environment;
+import org.drools.runtime.KnowledgeSessionConfiguration;
 
 public class KnowledgeBaseProviderRemoteClient
     implements
     KnowledgeBaseFactoryService {
-    
+
     private GenericNodeConnector connector;
-    private MessageSession          messageSession;
+    private MessageSession       messageSession;
+
     public KnowledgeBaseProviderRemoteClient(GenericNodeConnector connector) {
-         this.connector = connector;
-         this.messageSession = new MessageSession();
+        this.connector = connector;
+        this.messageSession = new MessageSession();
     }
 
     public Environment newEnvironment() {
@@ -38,35 +38,35 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeBase newKnowledgeBase() {
-        return newKnowledgeBase( ( KnowledgeBaseConfiguration ) null );
+        return newKnowledgeBase( (KnowledgeBaseConfiguration) null );
     }
 
     public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
-        
 
         String localId = UUID.randomUUID().toString();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new SetVariableCommand( "__TEMP__",
                                                            localId,
                                                            new NewKnowledgeBaseCommand( conf ) ) );
         try {
-            connector.connect();
-            Object object = connector.write( msg ).getPayload();
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
 
-//            if ( !(object instanceof FinishedCommand) ) {
-//                throw new RuntimeException( "Response was not correctly ended" );
-//            }
-            connector.disconnect();
+            //            if ( !(object instanceof FinishedCommand) ) {
+            //                throw new RuntimeException( "Response was not correctly ended" );
+            //            }
+            this.connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBaseRemoteClient( localId,
-                                              connector, messageSession );
+                                              this.connector,
+                                              this.messageSession );
 
     }
 
@@ -95,41 +95,47 @@ public class KnowledgeBaseProviderRemoteClient
         //String localId = UUID.randomUUID().toString();
         String localId = kbaseId;
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new SetVariableCommand( "__TEMP__",
                                                            localId,
                                                            new NewKnowledgeBaseCommand( null ) ) );
-        registerKBaseInDirectories(kbaseId);
+        registerKBaseInDirectories( kbaseId );
 
         try {
-            connector.connect();
-            Object object = connector.write( msg ).getPayload();
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
 
-//            if ( !(object instanceof FinishedCommand) ) {
-//                throw new RuntimeException( "Response was not correctly ended" );
-//            }
-            connector.disconnect();
+            //            if ( !(object instanceof FinishedCommand) ) {
+            //                throw new RuntimeException( "Response was not correctly ended" );
+            //            }
+            this.connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBaseRemoteClient( localId,
-                                              connector, messageSession );
-        
+                                              this.connector,
+                                              this.messageSession );
+
     }
 
     private void registerKBaseInDirectories(String kbaseId) {
         try {
-            DirectoryNodeService directory = connector.getConnection().getDirectoryNode().get(DirectoryNodeService.class);
-            directory.registerKBase(kbaseId, connector.getId());
-            
-        } catch (RemoteException ex) {
-            Logger.getLogger(KnowledgeBaseProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ConnectorException ex) {
-            Logger.getLogger(KnowledgeBaseProviderRemoteClient.class.getName()).log(Level.SEVERE, null, ex);
+            DirectoryNodeService directory = this.connector.getConnection().getDirectoryNode().get( DirectoryNodeService.class );
+            directory.registerKBase( kbaseId,
+                                     this.connector.getId() );
+
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( KnowledgeBaseProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                       null,
+                                                                                       ex );
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( KnowledgeBaseProviderRemoteClient.class.getName() ).log( Level.SEVERE,
+                                                                                       null,
+                                                                                       ex );
         }
     }
 
@@ -138,33 +144,35 @@ public class KnowledgeBaseProviderRemoteClient
         //TODO: I need to replace this random id with the kbase ID and test it
         //String localId = UUID.randomUUID().toString();
         String localId = kbaseId;
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new SetVariableCommand( "__TEMP__",
                                                            localId,
                                                            new NewKnowledgeBaseCommand( conf ) ) );
-        registerKBaseInDirectories(kbaseId);
+        registerKBaseInDirectories( kbaseId );
 
         try {
-            connector.connect();
-            Object object = connector.write( msg ).getPayload();
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
 
-//            if ( !(object instanceof FinishedCommand) ) {
-//                throw new RuntimeException( "Response was not correctly ended" );
-//            }
-            connector.disconnect();
+            //            if ( !(object instanceof FinishedCommand) ) {
+            //                throw new RuntimeException( "Response was not correctly ended" );
+            //            }
+            this.connector.disconnect();
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
 
         return new KnowledgeBaseRemoteClient( localId,
-                                              connector, messageSession );
+                                              this.connector,
+                                              this.messageSession );
     }
 
-    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties, ClassLoader... classLoader) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
+                                                                    ClassLoader... classLoader) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

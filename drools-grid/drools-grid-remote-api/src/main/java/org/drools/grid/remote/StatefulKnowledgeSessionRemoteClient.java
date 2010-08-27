@@ -13,11 +13,16 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.DefaultFactHandle;
-import org.drools.common.DisconnectedFactHandle;
-import org.drools.grid.internal.commands.RegisterRemoteWorkItemHandlerCommand;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
+import org.drools.grid.GenericNodeConnector;
+import org.drools.grid.internal.Message;
+import org.drools.grid.internal.MessageSession;
+import org.drools.grid.internal.commands.RegisterRemoteWorkItemHandlerCommand;
+import org.drools.grid.remote.internal.commands.GetWorkItemManagerCommand;
+import org.drools.grid.remote.internal.commands.GetWorkingMemoryEntryPointRemoteCommand;
+import org.drools.grid.remote.internal.commands.StartProcessRemoteCommand;
 import org.drools.runtime.Calendars;
 import org.drools.runtime.Channel;
 import org.drools.runtime.Environment;
@@ -35,28 +40,22 @@ import org.drools.runtime.rule.LiveQuery;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.ViewChangedEventListener;
 import org.drools.runtime.rule.WorkingMemoryEntryPoint;
-import org.drools.grid.GenericNodeConnector;
 import org.drools.time.SessionClock;
-import org.drools.grid.internal.Message;
-import org.drools.grid.internal.MessageSession;
-import org.drools.grid.remote.internal.commands.GetWorkItemManagerCommand;
-import org.drools.grid.remote.internal.commands.GetWorkingMemoryEntryPointRemoteCommand;
-import org.drools.grid.remote.internal.commands.StartProcessRemoteCommand;
-
 
 /*
  * @author: salaboy
  */
 public class StatefulKnowledgeSessionRemoteClient
-        implements
-        StatefulKnowledgeSession {
+    implements
+    StatefulKnowledgeSession {
 
     private GenericNodeConnector connector;
-    private MessageSession messageSession;
-    private String instanceId;
+    private MessageSession       messageSession;
+    private String               instanceId;
 
     public StatefulKnowledgeSessionRemoteClient(String instanceId,
-            GenericNodeConnector connector, MessageSession messageSession) {
+                                                GenericNodeConnector connector,
+                                                MessageSession messageSession) {
         this.instanceId = instanceId;
         this.connector = connector;
         this.messageSession = messageSession;
@@ -77,30 +76,30 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public int fireAllRules() {
-        String commandId = "ksession.fireAllRules" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.fireAllRules" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(CommandFactory.newFireAllRules(commandId),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( CommandFactory.newFireAllRules( commandId ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
         try {
-            connector.connect();
-            Object object = connector.write(msg).getPayload();
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
 
-            if (object == null) {
-                throw new RuntimeException("Response was not correctly received");
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
             }
-            connector.disconnect();
+            this.connector.disconnect();
             //return (Integer) ((ExecutionResults) object).getValue(commandId);
-            return (Integer)  object;
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+            return (Integer) object;
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
@@ -123,30 +122,30 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public ExecutionResults execute(Command command) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new ExecuteCommand(commandId,
-                command),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new ExecuteCommand( commandId,
+                                                                                                      command ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            Object object = connector.write(msg).getPayload();
-            if (object == null) {
-                throw new RuntimeException("Response was not correctly received");
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
             }
-            connector.disconnect();
-            return (ExecutionResults) ((ExecutionResults) object).getValue(commandId);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+            this.connector.disconnect();
+            return (ExecutionResults) ((ExecutionResults) object).getValue( commandId );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
@@ -156,31 +155,30 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public Object getGlobal(String identifier) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new GetGlobalCommand(identifier),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new GetGlobalCommand( identifier ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            Object result = connector.write(msg).getPayload();
-            if (result == null) {
-                throw new RuntimeException("Response was not correctly received = null");
+            this.connector.connect();
+            Object result = this.connector.write( msg ).getPayload();
+            if ( result == null ) {
+                throw new RuntimeException( "Response was not correctly received = null" );
             }
-            connector.disconnect();
+            this.connector.disconnect();
             return result;
 
-
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
@@ -200,40 +198,40 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void registerExitPoint(String name,
-            ExitPoint exitPoint) {
+                                  ExitPoint exitPoint) {
         // TODO Auto-generated method stub
     }
 
     public void setGlobal(String identifier,
-            Object object) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+                          Object object) {
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new SetGlobalCommand(identifier,
-                object),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new SetGlobalCommand( identifier,
+                                                                                                        object ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            Object result = connector.write(msg).getPayload();
-            if (result == null) {
-                throw new RuntimeException("Response was not correctly received = null");
+            this.connector.connect();
+            Object result = this.connector.write( msg ).getPayload();
+            if ( result == null ) {
+                throw new RuntimeException( "Response was not correctly received = null" );
             }
 
-            if (!(result instanceof FinishedCommand)) {
-                throw new RuntimeException("Response was not correctly received");
+            if ( !(result instanceof FinishedCommand) ) {
+                throw new RuntimeException( "Response was not correctly received" );
             }
-            connector.disconnect();
+            this.connector.disconnect();
 
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
 
     }
@@ -253,41 +251,43 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public QueryResults getQueryResults(String query,
-            Object[] arguments) {
+                                        Object[] arguments) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public WorkingMemoryEntryPoint getWorkingMemoryEntryPoint(String name) {
-        String commandId = "ksession.getWorkingMemoryEntryPoint" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.getWorkingMemoryEntryPoint" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new GetWorkingMemoryEntryPointRemoteCommand(name),
-                null,
-                null,
-                instanceId,
-                name,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointRemoteCommand( name ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  name,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            Object object = connector.write(msg).getPayload();
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
 
-            if (object == null) {
-                throw new RuntimeException("Response was not correctly received");
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
             }
-            connector.disconnect();
-            return new WorkingMemoryEntryPointRemoteClient(name, connector, messageSession);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+            this.connector.disconnect();
+            return new WorkingMemoryEntryPointRemoteClient( name,
+                                                            this.connector,
+                                                            this.messageSession );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
-    public Collection<? extends WorkingMemoryEntryPoint> getWorkingMemoryEntryPoints() {
+    public Collection< ? extends WorkingMemoryEntryPoint> getWorkingMemoryEntryPoints() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -327,32 +327,32 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public FactHandle insert(Object object) {
-        String commandId = "ksession.insert" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.insert" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new InsertObjectCommand(object, true),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( object,
+                                                                                                           true ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            Object result = connector.write(msg).getPayload();
-            if (object == null) {
-                throw new RuntimeException("Response was not correctly received");
+            this.connector.connect();
+            Object result = this.connector.write( msg ).getPayload();
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
             }
             DefaultFactHandle handle = (DefaultFactHandle) result;
-            
-            connector.disconnect();
+
+            this.connector.disconnect();
             return handle;
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
@@ -361,7 +361,7 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void update(FactHandle handle,
-            Object object) {
+                       Object object) {
         // TODO Auto-generated method stub
     }
 
@@ -380,89 +380,91 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public WorkItemManager getWorkItemManager() {
-        String kresultsId = "kresults_" + messageSession.getSessionId();
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                true,
-                new KnowledgeContextResolveFromContextCommand(new GetWorkItemManagerCommand(),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   true,
+                                   new KnowledgeContextResolveFromContextCommand( new GetWorkItemManagerCommand(),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
         try {
-            connector.connect();
-            Object payload = connector.write(msg).getPayload();
-            WorkItemManager workItemManager = (WorkItemManager) ((ExecutionResults) payload).getValue("workItemManager");
-            ((WorkItemManagerRemoteClient) workItemManager).setConnector(connector);
-            ((WorkItemManagerRemoteClient) workItemManager).setMessageSession(messageSession);
-            ((WorkItemManagerRemoteClient) workItemManager).setInstanceId(instanceId);
-            connector.disconnect();
+            this.connector.connect();
+            Object payload = this.connector.write( msg ).getPayload();
+            WorkItemManager workItemManager = (WorkItemManager) ((ExecutionResults) payload).getValue( "workItemManager" );
+            ((WorkItemManagerRemoteClient) workItemManager).setConnector( this.connector );
+            ((WorkItemManagerRemoteClient) workItemManager).setMessageSession( this.messageSession );
+            ((WorkItemManagerRemoteClient) workItemManager).setInstanceId( this.instanceId );
+            this.connector.disconnect();
             return workItemManager;
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message", e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
-    public void registerWorkItemHandler(String name, String workItemHandler) {
+    public void registerWorkItemHandler(String name,
+                                        String workItemHandler) {
 
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new RegisterRemoteWorkItemHandlerCommand(name, workItemHandler),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new RegisterRemoteWorkItemHandlerCommand( name,
+                                                                                                                            workItemHandler ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            connector.write(msg);
-            connector.disconnect();
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+            this.connector.connect();
+            this.connector.write( msg );
+            this.connector.disconnect();
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
-
 
     }
 
     public void signalEvent(String type,
-            Object event) {
+                            Object event) {
         // TODO Auto-generated method stub
     }
 
     public ProcessInstance startProcess(String processId) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new StartProcessRemoteCommand(processId),
-                null,
-                null,
-                instanceId,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new StartProcessRemoteCommand( processId ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
 
         try {
-            connector.connect();
-            Object object = connector.write(msg).getPayload();
-            if (object == null) {
-                throw new RuntimeException("Response was not correctly received");
+            this.connector.connect();
+            Object object = this.connector.write( msg ).getPayload();
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
             }
-            connector.disconnect();
-            return (ProcessInstance) ((ExecutionResults) object).getValue(processId);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+            this.connector.disconnect();
+            return (ProcessInstance) ((ExecutionResults) object).getValue( processId );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
 
     }
 
     public ProcessInstance startProcess(String processId,
-            Map<String, Object> parameters) {
+                                        Map<String, Object> parameters) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -517,8 +519,8 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void signalEvent(String type,
-            Object event,
-            long processInstanceId) {
+                            Object event,
+                            long processInstanceId) {
         // TODO Auto-generated method stub
     }
 
@@ -527,19 +529,22 @@ public class StatefulKnowledgeSessionRemoteClient
         return null;
     }
 
-    public void registerChannel(String name, Channel channel) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void registerChannel(String name,
+                                Channel channel) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public void unregisterChannel(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Map<String, Channel> getChannels() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public LiveQuery openLiveQuery(String query, Object[] arguments, ViewChangedEventListener listener) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public LiveQuery openLiveQuery(String query,
+                                   Object[] arguments,
+                                   ViewChangedEventListener listener) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 }

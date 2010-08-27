@@ -1,13 +1,11 @@
 package org.drools.grid.distributed;
 
-
 import java.util.Collection;
 import java.util.Map;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.command.ExecuteCommand;
-//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
@@ -15,6 +13,13 @@ import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
+import org.drools.grid.GenericNodeConnector;
+import org.drools.grid.distributed.command.GetWorkingMemoryEntryPointGridCommand;
+import org.drools.grid.internal.Message;
+import org.drools.grid.internal.MessageSession;
+import org.drools.grid.internal.commands.RegisterRemoteWorkItemHandlerCommand;
+import org.drools.grid.remote.internal.commands.GetWorkItemManagerCommand;
+import org.drools.grid.remote.internal.commands.StartProcessRemoteCommand;
 import org.drools.runtime.Calendars;
 import org.drools.runtime.Channel;
 import org.drools.runtime.Environment;
@@ -32,37 +37,23 @@ import org.drools.runtime.rule.LiveQuery;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.ViewChangedEventListener;
 import org.drools.runtime.rule.WorkingMemoryEntryPoint;
-import org.drools.grid.distributed.command.GetWorkingMemoryEntryPointGridCommand;
-import org.drools.grid.GenericNodeConnector;
-import org.drools.grid.internal.Message;
-import org.drools.grid.internal.MessageSession;
-import org.drools.grid.internal.commands.RegisterRemoteWorkItemHandlerCommand;
-import org.drools.grid.remote.internal.commands.GetWorkItemManagerCommand;
-import org.drools.grid.remote.internal.commands.StartProcessRemoteCommand;
 import org.drools.time.SessionClock;
-
 
 public class StatefulKnowledgeSessionGridClient
     implements
     StatefulKnowledgeSession {
 
-    private GenericNodeConnector     connector;
-    private String                      instanceId;
-    private MessageSession              messageSession;
-    
+    private GenericNodeConnector connector;
+    private String               instanceId;
+    private MessageSession       messageSession;
 
-    
-
-    
-
-    public StatefulKnowledgeSessionGridClient(String instanceId, GenericNodeConnector connector, MessageSession messageSession) {
+    public StatefulKnowledgeSessionGridClient(String instanceId,
+                                              GenericNodeConnector connector,
+                                              MessageSession messageSession) {
         this.instanceId = instanceId;
         this.connector = connector;
         this.messageSession = messageSession;
     }
-
-
-
 
     public String getInstanceId() {
         return this.instanceId;
@@ -79,19 +70,19 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public int fireAllRules() {
-        String commandId = "ksession.fireAllRules" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.fireAllRules" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                  messageSession.getCounter().incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.getCounter().incrementAndGet(),
                                    false,
                                    new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand( commandId ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
         try {
-            Object object = connector.write( msg ).getPayload();
+            Object object = this.connector.write( msg ).getPayload();
 
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
@@ -125,21 +116,21 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public ExecutionResults execute(Command command) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new KnowledgeContextResolveFromContextCommand( new ExecuteCommand( commandId,
                                                                                                       command ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
 
         try {
-            Object object = connector.write( msg ).getPayload();
+            Object object = this.connector.write( msg ).getPayload();
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
@@ -157,26 +148,25 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public Object getGlobal(String identifier) {
-         String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new KnowledgeContextResolveFromContextCommand( new GetGlobalCommand( identifier ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
 
         try {
-            Object result = connector.write( msg ).getPayload();
+            Object result = this.connector.write( msg ).getPayload();
             if ( result == null ) {
                 throw new RuntimeException( "Response was not correctly received = null" );
             }
 
-           return result;
-
+            return result;
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
@@ -207,30 +197,29 @@ public class StatefulKnowledgeSessionGridClient
 
     public void setGlobal(String identifier,
                           Object object) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new KnowledgeContextResolveFromContextCommand( new SetGlobalCommand( identifier,
-                                                                                                      object ),
+                                                                                                        object ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
 
         try {
-            Object result = connector.write( msg ).getPayload();
+            Object result = this.connector.write( msg ).getPayload();
             if ( result == null ) {
                 throw new RuntimeException( "Response was not correctly received = null" );
             }
 
-//            if ( !(result instanceof FinishedCommand)) {
-//                throw new RuntimeException( "Response was not correctly received" );
-//            }
+            //            if ( !(result instanceof FinishedCommand)) {
+            //                throw new RuntimeException( "Response was not correctly received" );
+            //            }
 
-            
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
@@ -260,32 +249,34 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public WorkingMemoryEntryPoint getWorkingMemoryEntryPoint(String name) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointGridCommand( name ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   name,
                                                                                   kresultsId ) );
 
         try {
-            Object object = connector.write( msg ).getPayload();
-            
+            Object object = this.connector.write( msg ).getPayload();
+
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
 
-            return new WorkingMemoryEntryPointGridClient(name, connector, messageSession);
+            return new WorkingMemoryEntryPointGridClient( name,
+                                                          this.connector,
+                                                          this.messageSession );
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
-        
+
     }
 
     public Collection< ? extends WorkingMemoryEntryPoint> getWorkingMemoryEntryPoints() {
@@ -360,48 +351,50 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public WorkItemManager getWorkItemManager() {
-    	 String kresultsId = "kresults_" + messageSession.getSessionId();
-         Message msg = new Message( messageSession.getSessionId(),
-                                    messageSession.counter.incrementAndGet(),
-                                    true,
-                                    new KnowledgeContextResolveFromContextCommand( new GetWorkItemManagerCommand(),
-                                                                                   null,
-                                                                                   null,
-                                                                                   instanceId,
-                                                                                   kresultsId ) );
-         try {
-             Object payload = connector.write( msg ).getPayload();
-             WorkItemManager workItemManager = (WorkItemManager)  payload;
-             ((WorkItemManagerGridClient)workItemManager).setClient(connector);
-             ((WorkItemManagerGridClient)workItemManager).setMessageSession(messageSession);
-             ((WorkItemManagerGridClient)workItemManager).setInstanceId(instanceId);
-             return workItemManager;
-         } catch ( Exception e ) {
-             throw new RuntimeException( "Unable to execute message", e );
-         }
-    }
-    
-    public void registerWorkItemHandler(String name, String workItemHandler){
-        
-        String kresultsId = "kresults_" + messageSession.getSessionId();
-
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
-                                   false,
-                                   new KnowledgeContextResolveFromContextCommand( new RegisterRemoteWorkItemHandlerCommand(name, workItemHandler ),
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   true,
+                                   new KnowledgeContextResolveFromContextCommand( new GetWorkItemManagerCommand(),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
-
         try {
-            connector.write( msg );
-            
+            Object payload = this.connector.write( msg ).getPayload();
+            WorkItemManager workItemManager = (WorkItemManager) payload;
+            ((WorkItemManagerGridClient) workItemManager).setClient( this.connector );
+            ((WorkItemManagerGridClient) workItemManager).setMessageSession( this.messageSession );
+            ((WorkItemManagerGridClient) workItemManager).setInstanceId( this.instanceId );
+            return workItemManager;
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
+    }
 
+    public void registerWorkItemHandler(String name,
+                                        String workItemHandler) {
+
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
+
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new RegisterRemoteWorkItemHandlerCommand( name,
+                                                                                                                            workItemHandler ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
+
+        try {
+            this.connector.write( msg );
+
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
+        }
 
     }
 
@@ -412,20 +405,20 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public ProcessInstance startProcess(String processId) {
-        String commandId = "ksession.execute" + messageSession.getNextId();
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
-        Message msg = new Message( messageSession.getSessionId(),
-                                   messageSession.counter.incrementAndGet(),
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
                                    false,
                                    new KnowledgeContextResolveFromContextCommand( new StartProcessRemoteCommand( processId ),
                                                                                   null,
                                                                                   null,
-                                                                                  instanceId,
+                                                                                  this.instanceId,
                                                                                   kresultsId ) );
 
         try {
-            Object object = connector.write( msg ).getPayload();
+            Object object = this.connector.write( msg ).getPayload();
             if ( object == null ) {
                 throw new RuntimeException( "Response was not correctly received" );
             }
@@ -435,7 +428,7 @@ public class StatefulKnowledgeSessionGridClient
             throw new RuntimeException( "Unable to execute message",
                                         e );
         }
-        
+
     }
 
     public ProcessInstance startProcess(String processId,
@@ -503,7 +496,7 @@ public class StatefulKnowledgeSessionGridClient
                             Object event,
                             long processInstanceId) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public Calendars getCalendars() {
@@ -511,20 +504,23 @@ public class StatefulKnowledgeSessionGridClient
         return null;
     }
 
-    public void registerChannel(String name, Channel channel) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void registerChannel(String name,
+                                Channel channel) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public void unregisterChannel(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Map<String, Channel> getChannels() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public LiveQuery openLiveQuery(String query, Object[] arguments, ViewChangedEventListener listener) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public LiveQuery openLiveQuery(String query,
+                                   Object[] arguments,
+                                   ViewChangedEventListener listener) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

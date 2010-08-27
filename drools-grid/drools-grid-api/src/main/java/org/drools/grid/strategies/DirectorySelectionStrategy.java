@@ -18,6 +18,7 @@
 package org.drools.grid.strategies;
 
 import java.util.List;
+
 import org.drools.grid.GenericNodeConnector;
 
 /**

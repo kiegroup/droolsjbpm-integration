@@ -1,65 +1,64 @@
 package org.drools.grid.internal.commands;
 
-
 public enum SimpleCommandName {
     OperationRequest,
     OperationResponse,
-    
+
     ClaimRequest,
     ClaimResponse,
-    
+
     StartRequest,
     StartResponse,
-    
+
     StopRequest,
     StopResponse,
-    
+
     ReleaseRequest,
-    ReleaseResponse,  
-    
+    ReleaseResponse,
+
     SuspendRequest,
-    SuspendResponse, 
-    
+    SuspendResponse,
+
     ResumeRequest,
-    ResumeResponse, 
-    
+    ResumeResponse,
+
     SkipRequest,
-    SkipResponse,  
-    
+    SkipResponse,
+
     DelegateRequest,
     DelegateResponse,
-    
+
     ForwardRequest,
     ForwardResponse,
-    
+
     CompleteRequest,
-    CompleteResponse,   
-    
+    CompleteResponse,
+
     FailRequest,
     FailResponse,
-    
+
     GetTaskRequest,
     GetTaskResponse,
-    
+
     AddTaskRequest,
     AddTaskResponse,
-    
+
     AddAttachmentRequest,
-    AddAttachmentResponse,    
+    AddAttachmentResponse,
     DeleteAttachmentRequest,
     DeleteAttachmentResponse,
-        
+
     SetDocumentContentRequest,
     SetDocumentContentResponse,
     GetContentRequest,
     GetContentResponse,
-    
+
     AddCommentRequest,
-    AddCommentResponse,    
-    DeleteCommentRequest,    
-    DeleteCommentResponse,    
-    
-    QueryTasksOwned,    
+    AddCommentResponse,
+    DeleteCommentRequest,
+    DeleteCommentResponse,
+
+    QueryTasksOwned,
     QueryTasksAssignedAsBusinessAdministrator,
     QueryTasksAssignedAsExcludedOwner,
     QueryTasksAssignedAsPotentialOwner,
@@ -69,12 +68,12 @@ public enum SimpleCommandName {
     QueryGetSubTasksByParentTaskId,
     QueryTasksAssignedAsRecipient,
     QueryTasksAssignedAsTaskInitiator,
-    QueryTasksAssignedAsTaskStakeholder,    
+    QueryTasksAssignedAsTaskStakeholder,
     QueryTaskSummaryResponse,
-    
+
     RegisterForEventRequest,
     EventTriggerResponse,
-    
+
     RegisterClient,
 
     RegisterExecutor,

@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilderFactoryService;
@@ -32,16 +33,20 @@ import org.drools.grid.NodeConnectionType;
  *
  * @author salaboy 
  */
-public class DistributedConnectionNode implements NodeConnectionType, Serializable {
+public class DistributedConnectionNode
+    implements
+    NodeConnectionType,
+    Serializable {
 
-    private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
-    private GenericNodeConnector connector;
-    private GenericConnection connection;
+    private final Map<Class< ? >, Object> services = new ConcurrentHashMap<Class< ? >, Object>();
+    private GenericNodeConnector          connector;
+    private GenericConnection             connection;
 
     public DistributedConnectionNode() {
     }
 
-    public DistributedConnectionNode(GenericNodeConnector connector, GenericConnection connection) {
+    public DistributedConnectionNode(GenericNodeConnector connector,
+                                     GenericConnection connection) {
 
         this.connector = connector;
         this.connection = connection;
@@ -49,17 +54,23 @@ public class DistributedConnectionNode implements NodeConnectionType, Serializab
     }
 
     public void init() {
-        services.put(KnowledgeBuilderFactoryService.class, new KnowledgeBuilderProviderGridClient(connector, connection));
-        services.put(KnowledgeBaseFactoryService.class, new KnowledgeBaseProviderGridClient(connector, connection));
-        services.put(DirectoryLookupFactoryService.class, new DirectoryLookupProviderGridClient(connector, connection));
+        this.services.put( KnowledgeBuilderFactoryService.class,
+                           new KnowledgeBuilderProviderGridClient( this.connector,
+                                                                   this.connection ) );
+        this.services.put( KnowledgeBaseFactoryService.class,
+                           new KnowledgeBaseProviderGridClient( this.connector,
+                                                                this.connection ) );
+        this.services.put( DirectoryLookupFactoryService.class,
+                           new DirectoryLookupProviderGridClient( this.connector,
+                                                                  this.connection ) );
     }
 
-    public Set<Class<?>> getServicesKeys() {
-        return services.keySet();
+    public Set<Class< ? >> getServicesKeys() {
+        return this.services.keySet();
     }
 
     public <T> T getServiceImpl(Class<T> clazz) {
-        return (T) services.get(clazz);
+        return (T) this.services.get( clazz );
     }
 
     public void setConnector(GenericNodeConnector connector) {

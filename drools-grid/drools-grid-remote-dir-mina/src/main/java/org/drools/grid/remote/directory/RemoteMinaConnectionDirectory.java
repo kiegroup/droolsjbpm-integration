@@ -19,6 +19,7 @@ package org.drools.grid.remote.directory;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.drools.grid.ConnectorType;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnection;
@@ -29,20 +30,23 @@ import org.drools.grid.NodeConnectionType;
  *
  * @author salaboy
  */
-public class RemoteMinaConnectionDirectory implements NodeConnectionType {
+public class RemoteMinaConnectionDirectory
+    implements
+    NodeConnectionType {
 
-    private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
-    private GenericNodeConnector connector;
-    private GenericConnection connection;
+    private final Map<Class< ? >, Object> services = new ConcurrentHashMap<Class< ? >, Object>();
+    private GenericNodeConnector          connector;
+    private GenericConnection             connection;
+
     public RemoteMinaConnectionDirectory() {
     }
 
-    public Set<Class<?>> getServicesKeys() {
-        return services.keySet();
+    public Set<Class< ? >> getServicesKeys() {
+        return this.services.keySet();
     }
 
     public <T> T getServiceImpl(Class<T> clazz) {
-        return (T) services.get(clazz);
+        return (T) this.services.get( clazz );
     }
 
     public void setConnector(GenericNodeConnector connector) {
@@ -54,7 +58,8 @@ public class RemoteMinaConnectionDirectory implements NodeConnectionType {
     }
 
     public void init() {
-        services.put(DirectoryNodeService.class, new DirectoryNodeRemoteClient(connector));
+        this.services.put( DirectoryNodeService.class,
+                           new DirectoryNodeRemoteClient( this.connector ) );
     }
 
     public ConnectorType getConnectorType() {

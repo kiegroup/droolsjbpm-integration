@@ -8,7 +8,7 @@ import org.drools.grid.internal.MessageResponseHandler;
 public class MinaIoWriter
     implements
     GenericIoWriter {
-    
+
     private IoSession session;
 
     public MinaIoWriter(IoSession session) {

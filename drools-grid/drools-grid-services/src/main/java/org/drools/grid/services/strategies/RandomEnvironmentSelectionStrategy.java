@@ -18,25 +18,28 @@
 package org.drools.grid.services.strategies;
 
 import java.util.Map;
-import org.drools.grid.services.ExecutionEnvironment;
 
+import org.drools.grid.services.ExecutionEnvironment;
 
 /**
  *
  * @author salaboy
  */
-public class RandomEnvironmentSelectionStrategy implements ExecutionEnvironmentSelectionStrategy{
+public class RandomEnvironmentSelectionStrategy
+    implements
+    ExecutionEnvironmentSelectionStrategy {
 
     private Map<String, ExecutionEnvironment> environments;
+
     public ExecutionEnvironment getBestExecutionEnvironment() {
-        int elementToGet = (new Double(Math.random() * 100).intValue() % environments.size());
+        int elementToGet = (new Double( Math.random() * 100 ).intValue() % this.environments.size());
         int counter = 0;
         ExecutionEnvironment selectedEnv = null;
-        for(String key : environments.keySet()){
-           if(counter == elementToGet){
-            selectedEnv = environments.get(key);
-           }
-           counter++;
+        for ( String key : this.environments.keySet() ) {
+            if ( counter == elementToGet ) {
+                selectedEnv = this.environments.get( key );
+            }
+            counter++;
         }
         return selectedEnv;
     }
@@ -45,10 +48,8 @@ public class RandomEnvironmentSelectionStrategy implements ExecutionEnvironmentS
         this.environments = environments;
     }
 
-
-
     public ExecutionEnvironment getBestExecutionEnvironment(Map<String, ExecutionEnvironment> executionEnvironments) {
-        setExecutionEnvironment(environments);
+        setExecutionEnvironment( this.environments );
         return getBestExecutionEnvironment();
     }
 

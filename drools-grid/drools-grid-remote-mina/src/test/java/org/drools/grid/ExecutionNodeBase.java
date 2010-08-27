@@ -17,19 +17,17 @@
 
 package org.drools.grid;
 
-
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
-import org.drools.command.CommandFactory;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.Assert;
 import org.junit.Test;
+
 /**
  *
  * @author salaboy
@@ -38,14 +36,13 @@ import org.junit.Test;
 public abstract class ExecutionNodeBase {
 
     protected ExecutionNode node;
-    
+
     public ExecutionNodeBase() {
-        
+
     }
 
-
     @Test
-    public void fireAllRules(){
+    public void fireAllRules() {
 
         String str = "";
         str += "package org.drools \n";
@@ -63,9 +60,8 @@ public abstract class ExecutionNodeBase {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-         
         KnowledgeBuilder kbuilder =
-                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
+                this.node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                       ResourceType.DRL );
 
@@ -74,22 +70,23 @@ public abstract class ExecutionNodeBase {
         }
 
         KnowledgeBase kbase =
-                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+                this.node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        Assert.assertNotNull(ksession);
+        Assert.assertNotNull( ksession );
 
         int fired = ksession.fireAllRules();
-        Assert.assertEquals( 2, fired );
-
+        Assert.assertEquals( 2,
+                             fired );
 
     }
+
     @Test
     public void testExecute() throws Exception {
-        
+
         String str = "";
         str += "package org.drools \n";
         str += "global java.util.List list \n";
@@ -106,7 +103,7 @@ public abstract class ExecutionNodeBase {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-        KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
+        KnowledgeBuilder kbuilder = this.node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                       ResourceType.DRL );
 
@@ -114,21 +111,22 @@ public abstract class ExecutionNodeBase {
             System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
-        KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+        KnowledgeBase kbase = this.node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        int fired = (Integer) ksession.fireAllRules();
+        int fired = ksession.fireAllRules();
 
         Assert.assertEquals( 2,
-                      fired );
+                             fired );
     }
+
     @Test
     public void testNamedService() throws Exception {
-        
+
         String str = "";
         str += "package org.drools \n";
         str += "global java.util.List list \n";
@@ -145,8 +143,8 @@ public abstract class ExecutionNodeBase {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-        KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-        
+        KnowledgeBuilder kbuilder = this.node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+
         kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                       ResourceType.DRL );
 
@@ -154,26 +152,26 @@ public abstract class ExecutionNodeBase {
             System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
-        KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
-
+        KnowledgeBase kbase = this.node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        node.get(DirectoryLookupFactoryService.class).register( "ksession1",
-                              ksession );
+        this.node.get( DirectoryLookupFactoryService.class ).register( "ksession1",
+                                                                       ksession );
 
-        int fired = (Integer) ((StatefulKnowledgeSession)node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" )).fireAllRules();
+        int fired = ((StatefulKnowledgeSession) this.node.get( DirectoryLookupFactoryService.class ).lookup( "ksession1" )).fireAllRules();
 
         Assert.assertEquals( 2,
-                      fired );
-       
+                             fired );
+
     }
+
     @Test
     public void testVsmPipeline() throws Exception {
-        
+
         String str = "";
         str += "package org.drools \n";
         str += "global java.util.List list \n";
@@ -190,8 +188,8 @@ public abstract class ExecutionNodeBase {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-        KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-        
+        KnowledgeBuilder kbuilder = this.node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+
         kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                       ResourceType.DRL );
 
@@ -199,21 +197,21 @@ public abstract class ExecutionNodeBase {
             System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
-        KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+        KnowledgeBase kbase = this.node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        node.get(DirectoryLookupFactoryService.class).register( "ksession1",
-                              ksession );
+        this.node.get( DirectoryLookupFactoryService.class ).register( "ksession1",
+                                                                       ksession );
 
-        int fired = (Integer) ((StatefulKnowledgeSession)node.get(DirectoryLookupFactoryService.class).lookup( "ksession1" )).fireAllRules();
+        int fired = ((StatefulKnowledgeSession) this.node.get( DirectoryLookupFactoryService.class ).lookup( "ksession1" )).fireAllRules();
 
-        Assert.assertEquals( 2, fired );
-        
+        Assert.assertEquals( 2,
+                             fired );
+
     }
-  
 
 }

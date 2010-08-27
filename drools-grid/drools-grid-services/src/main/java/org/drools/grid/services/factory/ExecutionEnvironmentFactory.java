@@ -16,11 +16,6 @@
  */
 package org.drools.grid.services.factory;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-
 import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.configuration.GenericProvider;
 import org.drools.grid.services.configuration.LocalProvider;
@@ -29,11 +24,15 @@ import org.drools.grid.services.configuration.RioProvider;
 
 public class ExecutionEnvironmentFactory {
 
-    public static ExecutionEnvironment newExecutionEnvironment(String name, GenericProvider provider) {
-        return GenericProviderContainerFactoryHelper.doOnGenericProvider(provider, new ExecutionEnvironmentBuilder(name));
+    public static ExecutionEnvironment newExecutionEnvironment(String name,
+                                                               GenericProvider provider) {
+        return GenericProviderContainerFactoryHelper.doOnGenericProvider( provider,
+                                                                          new ExecutionEnvironmentBuilder( name ) );
     }
 
-    private static class ExecutionEnvironmentBuilder implements GenericProviderContainerBuilder<ExecutionEnvironment> {
+    private static class ExecutionEnvironmentBuilder
+        implements
+        GenericProviderContainerBuilder<ExecutionEnvironment> {
 
         private String name;
 
@@ -45,22 +44,22 @@ public class ExecutionEnvironmentFactory {
         }
 
         public ExecutionEnvironment onLocalProvider(LocalProvider provider) {
-            return new ExecutionEnvironment(name,
-                    //provider.getConnector("org.drools.grid.local.LocalNodeConnector"));
-                    provider.getConnector("Local:Local:Node"));
+            return new ExecutionEnvironment( this.name,
+                                             //provider.getConnector("org.drools.grid.local.LocalNodeConnector"));
+                                             provider.getConnector( "Local:Local:Node" ) );
         }
 
         public ExecutionEnvironment onMinaProvider(MinaProvider provider) {
-            return new ExecutionEnvironment(name,
-                    //provider.getConnector("org.drools.grid.remote.mina.RemoteMinaNodeConnector"));
-                    provider.getConnector("Remote:Mina:Node"));
+            return new ExecutionEnvironment( this.name,
+                                             //provider.getConnector("org.drools.grid.remote.mina.RemoteMinaNodeConnector"));
+                                             provider.getConnector( "Remote:Mina:Node" ) );
         }
 
         public ExecutionEnvironment onRioProvider(RioProvider provider) {
-            
-            return new ExecutionEnvironment(name,
-                    //provider.getConnector("org.drools.grid.distributed.DistributedRioNodeConnector"));
-                    provider.getConnector("Distributed:Rio:Node"));
+
+            return new ExecutionEnvironment( this.name,
+                                             //provider.getConnector("org.drools.grid.distributed.DistributedRioNodeConnector"));
+                                             provider.getConnector( "Distributed:Rio:Node" ) );
         }
 
         public ExecutionEnvironment onHornetQProvider() {

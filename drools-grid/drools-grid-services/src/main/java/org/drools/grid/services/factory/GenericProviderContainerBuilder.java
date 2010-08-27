@@ -6,12 +6,12 @@ import org.drools.grid.services.configuration.RioProvider;
 
 public interface GenericProviderContainerBuilder<T> {
 
-	T onLocalProvider(LocalProvider provider);
+    T onLocalProvider(LocalProvider provider);
 
-	T onMinaProvider(MinaProvider provider);
+    T onMinaProvider(MinaProvider provider);
 
-	T onHornetQProvider();
+    T onHornetQProvider();
 
-	T onRioProvider(RioProvider provider);
+    T onRioProvider(RioProvider provider);
 
 }

@@ -23,8 +23,8 @@ public class RegisterCommand
     public Void execute(Context context) {
         NodeData data = (NodeData) context.get( NodeData.NODE_DATA );
 
-        data.getRoot().set( identifier,
-                            type + ":" + instanceId );
+        data.getRoot().set( this.identifier,
+                            this.type + ":" + this.instanceId );
 
         return null;
     }

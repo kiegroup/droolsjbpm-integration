@@ -7,16 +7,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.SystemEventListener;
-import org.drools.grid.internal.commands.SimpleCommand;
-
-
-
-
 import org.drools.grid.internal.ClientGenericMessageReceiver;
 import org.drools.grid.internal.GenericIoWriter;
 import org.drools.grid.internal.GenericMessageHandler;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
+import org.drools.grid.internal.commands.SimpleCommand;
 
 public class ClientGenericMessageReceiverImpl
     implements
@@ -49,21 +45,22 @@ public class ClientGenericMessageReceiverImpl
     public void messageReceived(GenericIoWriter writer,
                                 Message msg) throws Exception {
 
-        systemEventListener.debug( "Message receieved : " + msg );
+        this.systemEventListener.debug( "Message receieved : " + msg );
 
-        MessageResponseHandler responseHandler = (MessageResponseHandler) responseHandlers.remove( msg.getResponseId() );
+        MessageResponseHandler responseHandler = this.responseHandlers.remove( msg.getResponseId() );
 
         if ( responseHandler != null ) {
             Object payload = msg.getPayload();
-            if (payload instanceof SimpleCommand && ((SimpleCommand)msg.getPayload()).getArguments().size() > 0 &&
-            	((SimpleCommand)msg.getPayload()).getArguments().get(0) instanceof RuntimeException)
-            	payload = ((SimpleCommand)msg.getPayload()).getArguments().get(0);
-            if (( payload != null && payload instanceof RuntimeException )) {
+            if ( payload instanceof SimpleCommand && ((SimpleCommand) msg.getPayload()).getArguments().size() > 0 &&
+                 ((SimpleCommand) msg.getPayload()).getArguments().get( 0 ) instanceof RuntimeException ) {
+                payload = ((SimpleCommand) msg.getPayload()).getArguments().get( 0 );
+            }
+            if ( (payload != null && payload instanceof RuntimeException) ) {
                 responseHandler.setError( (RuntimeException) payload );
             } else {
                 responseHandler.receive( msg );
             }
-        } else if ( handler != null ) {
+        } else if ( this.handler != null ) {
             this.handler.messageReceived( writer,
                                           msg );
         } else {

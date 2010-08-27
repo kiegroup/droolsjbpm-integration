@@ -24,19 +24,23 @@ import java.rmi.RemoteException;
  */
 public interface GenericDirectoryConnector {
 
-    public String getId() throws ConnectorException, RemoteException;
+    public String getId() throws ConnectorException,
+                         RemoteException;
 
-    void connect() throws ConnectorException, RemoteException;
+    void connect() throws ConnectorException,
+                  RemoteException;
 
-    void disconnect() throws ConnectorException,  RemoteException;
+    void disconnect() throws ConnectorException,
+                     RemoteException;
 
-    public DirectoryNodeService getDirectoryNodeService() throws ConnectorException, RemoteException;
+    public DirectoryNodeService getDirectoryNodeService() throws ConnectorException,
+                                                         RemoteException;
 
     public GenericConnection getConnection();
 
-    public ConnectorType getConnectorType() ;
+    public ConnectorType getConnectorType();
 
-    NodeConnectionType getNodeConnectionType()  throws ConnectorException, RemoteException ;
-
+    NodeConnectionType getNodeConnectionType() throws ConnectorException,
+                                              RemoteException;
 
 }

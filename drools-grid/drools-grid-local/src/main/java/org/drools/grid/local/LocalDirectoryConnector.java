@@ -19,9 +19,9 @@ package org.drools.grid.local;
 
 import java.rmi.RemoteException;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.drools.grid.ConnectorException;
 import org.drools.grid.ConnectorType;
-import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.GridConnection;
@@ -33,8 +33,10 @@ import org.drools.grid.internal.MessageResponseHandler;
  *
  * @author salaboy
  */
-public class LocalDirectoryConnector implements GenericNodeConnector{
-    
+public class LocalDirectoryConnector
+    implements
+    GenericNodeConnector {
+
     private GenericConnection connection;
 
     public LocalDirectoryConnector() {
@@ -44,6 +46,7 @@ public class LocalDirectoryConnector implements GenericNodeConnector{
     public void connect() throws ConnectorException {
         //do nothing
     }
+
     public void disconnect() throws ConnectorException {
         //do nothing
     }
@@ -52,36 +55,39 @@ public class LocalDirectoryConnector implements GenericNodeConnector{
         return "Local:Local:Directory";
     }
 
-//    public DirectoryNodeService getDirectoryNodeService(){
-//        return directoryNode;
-//    }
+    //    public DirectoryNodeService getDirectoryNodeService(){
+    //        return directoryNode;
+    //    }
 
     public GenericConnection getConnection() {
-        return connection;
+        return this.connection;
     }
 
     public ConnectorType getConnectorType() {
         return ConnectorType.LOCAL;
     }
 
-    public NodeConnectionType getNodeConnectionType() throws ConnectorException, RemoteException {
+    public NodeConnectionType getNodeConnectionType() throws ConnectorException,
+                                                     RemoteException {
         return new LocalConnectionDirectory();
     }
 
-    public Message write(Message msg) throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Message write(Message msg) throws ConnectorException,
+                                     RemoteException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void write(Message msg, MessageResponseHandler responseHandler) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void write(Message msg,
+                      MessageResponseHandler responseHandler) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public int getSessionId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public AtomicInteger getCounter() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

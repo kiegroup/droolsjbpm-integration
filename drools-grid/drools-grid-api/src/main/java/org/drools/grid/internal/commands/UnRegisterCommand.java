@@ -9,17 +9,16 @@ public class UnRegisterCommand
     GenericCommand<Void> {
 
     private String identifier;
-   
 
     public UnRegisterCommand(String identifier) {
         this.identifier = identifier;
-       
+
     }
 
     public Void execute(Context context) {
         NodeData data = (NodeData) context.get( NodeData.NODE_DATA );
 
-        data.getRoot().remove( identifier );
+        data.getRoot().remove( this.identifier );
 
         return null;
     }

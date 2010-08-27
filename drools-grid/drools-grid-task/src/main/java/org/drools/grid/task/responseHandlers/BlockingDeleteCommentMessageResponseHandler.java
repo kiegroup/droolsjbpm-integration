@@ -17,13 +17,15 @@
 package org.drools.grid.task.responseHandlers;
 
 import org.drools.grid.internal.Message;
-import org.drools.task.service.responsehandlers.BlockingDeleteCommentResponseHandler;
 import org.drools.grid.task.TaskClientMessageHandlerImpl.DeleteCommentMessageResponseHandler;
+import org.drools.task.service.responsehandlers.BlockingDeleteCommentResponseHandler;
 
-public class BlockingDeleteCommentMessageResponseHandler extends BlockingDeleteCommentResponseHandler implements DeleteCommentMessageResponseHandler {
+public class BlockingDeleteCommentMessageResponseHandler extends BlockingDeleteCommentResponseHandler
+    implements
+    DeleteCommentMessageResponseHandler {
 
-	public void receive(Message message) {
-		setIsDone(true);
-	}
+    public void receive(Message message) {
+        setIsDone( true );
+    }
 
 }

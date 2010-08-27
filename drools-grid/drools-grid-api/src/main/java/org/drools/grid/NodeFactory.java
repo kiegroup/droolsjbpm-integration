@@ -16,35 +16,40 @@
  */
 
 package org.drools.grid;
+
 /**
  *
  * @author salaboy
  */
 public class NodeFactory {
-    public static ExecutionNode newExecutionNode(NodeConnectionType type){
+    public static ExecutionNode newExecutionNode(NodeConnectionType type) {
         type.init();
         ExecutionNode node = new ExecutionNode();
-        for(Class serviceClass : type.getServicesKeys()){
-            node.set(serviceClass, type.getServiceImpl(serviceClass));
-        }
-        return node;
-    }
-    public static DirectoryNode newDirectoryNode(NodeConnectionType type){
-        type.init();
-        DirectoryNode node = new DirectoryNode();
-        for(Class serviceClass : type.getServicesKeys()){
-            node.set(serviceClass, type.getServiceImpl(serviceClass));
+        for ( Class serviceClass : type.getServicesKeys() ) {
+            node.set( serviceClass,
+                      type.getServiceImpl( serviceClass ) );
         }
         return node;
     }
 
-    public static HumanTaskNode newHumanTaskNode(NodeConnectionType type){
+    public static DirectoryNode newDirectoryNode(NodeConnectionType type) {
         type.init();
-        HumanTaskNode node = new HumanTaskNode();
-        for(Class serviceClass : type.getServicesKeys()){
-            node.set(serviceClass, type.getServiceImpl(serviceClass));
+        DirectoryNode node = new DirectoryNode();
+        for ( Class serviceClass : type.getServicesKeys() ) {
+            node.set( serviceClass,
+                      type.getServiceImpl( serviceClass ) );
         }
         return node;
     }
-   
+
+    public static HumanTaskNode newHumanTaskNode(NodeConnectionType type) {
+        type.init();
+        HumanTaskNode node = new HumanTaskNode();
+        for ( Class serviceClass : type.getServicesKeys() ) {
+            node.set( serviceClass,
+                      type.getServiceImpl( serviceClass ) );
+        }
+        return node;
+    }
+
 }

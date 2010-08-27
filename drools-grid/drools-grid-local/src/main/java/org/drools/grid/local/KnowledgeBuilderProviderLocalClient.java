@@ -3,20 +3,16 @@
  */
 package org.drools.grid.local;
 
-
-
-
 import java.util.Properties;
-
 
 import org.drools.KnowledgeBase;
 import org.drools.builder.DecisionTableConfiguration;
 import org.drools.builder.JaxbConfiguration;
-
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
+
 import com.sun.tools.xjc.Options;
 
 public class KnowledgeBuilderProviderLocalClient
@@ -55,14 +51,14 @@ public class KnowledgeBuilderProviderLocalClient
                                                                          classLoader );
     }
 
-    public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties, ClassLoader... classLoader) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties,
+                                                                          ClassLoader... classLoader) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public JaxbConfiguration newJaxbConfiguration(Options xjcOpts, String systemId) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,
+                                                  String systemId) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
-
-    
 
 }

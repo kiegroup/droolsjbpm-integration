@@ -17,9 +17,8 @@
 package org.drools.grid;
 
 import java.util.List;
+
 import org.drools.grid.strategies.NodeSelectionStrategy;
-
-
 
 /**
  *
@@ -57,6 +56,5 @@ public interface GenericConnection {
 
     // Dispose all the live connections
     public void dispose() throws ConnectorException;
-
 
 }

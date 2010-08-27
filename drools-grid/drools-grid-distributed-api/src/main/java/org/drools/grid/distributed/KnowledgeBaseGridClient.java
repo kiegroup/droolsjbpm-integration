@@ -1,47 +1,47 @@
 package org.drools.grid.distributed;
 
-import org.drools.definition.rule.Query;
-import org.drools.grid.ConnectorException;
-import org.drools.grid.DirectoryNodeService;
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.util.Collection;
-import java.util.UUID;
-
 import org.drools.KnowledgeBase;
-//import org.drools.command.FinishedCommand;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.definition.KnowledgePackage;
 import org.drools.definition.process.Process;
+import org.drools.definition.rule.Query;
 import org.drools.definition.rule.Rule;
 import org.drools.definition.type.FactType;
 import org.drools.event.knowledgebase.KnowledgeBaseEventListener;
+import org.drools.grid.ConnectorException;
+import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnection;
+import org.drools.grid.GenericNodeConnector;
+import org.drools.grid.distributed.command.NewStatefulKnowledgeSessionGridCommand;
+import org.drools.grid.internal.CollectionClient;
+import org.drools.grid.internal.Message;
+import org.drools.grid.internal.MessageSession;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.grid.internal.CollectionClient;
-import org.drools.grid.GenericNodeConnector;
-import org.drools.grid.internal.Message;
-import org.drools.grid.internal.MessageSession;
-import org.drools.grid.distributed.command.NewStatefulKnowledgeSessionGridCommand;
 
 public class KnowledgeBaseGridClient
-        implements
-        KnowledgeBase {
+    implements
+    KnowledgeBase {
 
     private GenericNodeConnector connector;
-    private MessageSession messageSession;
-    private String instanceId;
-    private GenericConnection connection;
+    private MessageSession       messageSession;
+    private String               instanceId;
+    private GenericConnection    connection;
 
     public KnowledgeBaseGridClient(String instanceId,
-            GenericNodeConnector client, MessageSession messageSession, GenericConnection connection) {
+                                   GenericNodeConnector client,
+                                   MessageSession messageSession,
+                                   GenericConnection connection) {
         this.instanceId = instanceId;
 
         this.connector = client;
@@ -50,55 +50,60 @@ public class KnowledgeBaseGridClient
     }
 
     public void addKnowledgePackages(Collection<KnowledgePackage> kpackages) {
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
         String kuilderInstanceId = ((CollectionClient<KnowledgePackage>) kpackages).getParentInstanceId();
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new KnowledgeContextResolveFromContextCommand(new KnowledgeBaseAddKnowledgePackagesCommand(),
-                kuilderInstanceId,
-                instanceId,
-                null,
-                kresultsId));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
+                                                                                  kuilderInstanceId,
+                                                                                  this.instanceId,
+                                                                                  null,
+                                                                                  kresultsId ) );
 
         //I should register the kbase ID??
         DirectoryNodeService directory = null;
         try {
             //get best directory????????/
-            directory = connection.getDirectoryNode().get(DirectoryNodeService.class);
-        } catch (ConnectorException ex) {
-            Logger.getLogger(KnowledgeBaseGridClient.class.getName()).log(Level.SEVERE, null, ex);
+            directory = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( KnowledgeBaseGridClient.class.getName() ).log( Level.SEVERE,
+                                                                             null,
+                                                                             ex );
         }
-        if (directory != null) {
+        if ( directory != null ) {
             try {
                 try {
-                    directory.registerKBase(instanceId, connector.getId());
-                } catch (RemoteException ex) {
-                    Logger.getLogger(KnowledgeBaseGridClient.class.getName()).log(Level.SEVERE, null, ex);
+                    directory.registerKBase( this.instanceId,
+                                             this.connector.getId() );
+                } catch ( RemoteException ex ) {
+                    Logger.getLogger( KnowledgeBaseGridClient.class.getName() ).log( Level.SEVERE,
+                                                                                     null,
+                                                                                     ex );
                 }
-            } catch (ConnectorException ex) {
-                Logger.getLogger(KnowledgeBaseGridClient.class.getName()).log(Level.SEVERE, null, ex);
+            } catch ( ConnectorException ex ) {
+                Logger.getLogger( KnowledgeBaseGridClient.class.getName() ).log( Level.SEVERE,
+                                                                                 null,
+                                                                                 ex );
             }
         }
 
-
-
         try {
-            Object object = connector.write(msg).getPayload();
+            Object object = this.connector.write( msg ).getPayload();
 
-//            if (!(object instanceof FinishedCommand)) {
-//                throw new RuntimeException("Response was not correctly ended");
-//            }
+            //            if (!(object instanceof FinishedCommand)) {
+            //                throw new RuntimeException("Response was not correctly ended");
+            //            }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
     }
 
     public FactType getFactType(String packageName,
-            String typeName) {
+                                String typeName) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -119,47 +124,49 @@ public class KnowledgeBaseGridClient
     }
 
     public Rule getRule(String packageName,
-            String ruleName) {
+                        String ruleName) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public StatefulKnowledgeSession newStatefulKnowledgeSession() {
-        return newStatefulKnowledgeSession(null,
-                null);
+        return newStatefulKnowledgeSession( null,
+                                            null );
     }
 
     public StatefulKnowledgeSession newStatefulKnowledgeSession(KnowledgeSessionConfiguration conf,
-            Environment environment) {
-        String kresultsId = "kresults_" + messageSession.getSessionId();
+                                                                Environment environment) {
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
         String localId = UUID.randomUUID().toString();
 
-        Message msg = new Message(messageSession.getSessionId(),
-                messageSession.counter.incrementAndGet(),
-                false,
-                new SetVariableCommand("__TEMP__",
-                localId,
-                new KnowledgeContextResolveFromContextCommand(new NewStatefulKnowledgeSessionGridCommand(null, instanceId),
-                null,
-                instanceId,
-                null,
-                kresultsId)));
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new SetVariableCommand( "__TEMP__",
+                                                           localId,
+                                                           new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionGridCommand( null,
+                                                                                                                                                      this.instanceId ),
+                                                                                                          null,
+                                                                                                          this.instanceId,
+                                                                                                          null,
+                                                                                                          kresultsId ) ) );
 
         try {
-            Object object = connector.write(msg).getPayload();
+            Object object = this.connector.write( msg ).getPayload();
 
-//            if (!(object instanceof FinishedCommand)) {
-//                throw new RuntimeException("Response was not correctly ended");
-//            }
+            //            if (!(object instanceof FinishedCommand)) {
+            //                throw new RuntimeException("Response was not correctly ended");
+            //            }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to execute message",
-                    e);
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
         }
 
-        return new StatefulKnowledgeSessionGridClient(localId,
-                connector, messageSession);
+        return new StatefulKnowledgeSessionGridClient( localId,
+                                                       this.connector,
+                                                       this.messageSession );
     }
 
     public StatelessKnowledgeSession newStatelessKnowledgeSession(KnowledgeSessionConfiguration conf) {
@@ -181,7 +188,7 @@ public class KnowledgeBaseGridClient
     }
 
     public void removeRule(String packageName,
-            String ruleName) {
+                           String ruleName) {
         // TODO Auto-generated method stub
     }
 
@@ -198,19 +205,22 @@ public class KnowledgeBaseGridClient
         // TODO Auto-generated method stub
     }
 
-    public void removeFunction(String packageName, String ruleName) {
+    public void removeFunction(String packageName,
+                               String ruleName) {
         // TODO Auto-generated method stub
     }
 
-    public Query getQuery(String packageName, String queryName) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Query getQuery(String packageName,
+                          String queryName) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void removeQuery(String packageName, String queryName) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void removeQuery(String packageName,
+                            String queryName) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Collection<StatefulKnowledgeSession> getStatefulKnowledgeSessions() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 }

@@ -1,6 +1,7 @@
 package org.drools.grid.services;
 
 import java.util.List;
+
 import org.drools.grid.ConnectorException;
 import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
@@ -19,8 +20,8 @@ import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
  */
 public class TaskServerInstance {
 
-    private String name;
-    private GenericNodeConnector connector;
+    private String                name;
+    private GenericNodeConnector  connector;
     private NodeSelectionStrategy defaultStrategy = new ReturnAlwaysTheFirstSelectionStrategy();
 
     /*
@@ -29,7 +30,8 @@ public class TaskServerInstance {
      * @param name
      * @param connector
      */
-    public TaskServerInstance(String name, GenericNodeConnector connector) {
+    public TaskServerInstance(String name,
+                              GenericNodeConnector connector) {
         this.name = name;
         this.connector = connector;
     }
@@ -38,23 +40,23 @@ public class TaskServerInstance {
      * Get a HumanTaskNode based on the default NodeSelectionStrategy
      */
     public HumanTaskNode getHumanTaskNode() throws ConnectorException {
-        return getHumanTaskNode(defaultStrategy);
+        return getHumanTaskNode( this.defaultStrategy );
     }
 
     /*
      * Get a HumanTaskNode based on the provided NodeSelectionStrategy
      * @param strategy
      */
-    public HumanTaskNode getHumanTaskNode(NodeSelectionStrategy strategy) throws ConnectorException{
+    public HumanTaskNode getHumanTaskNode(NodeSelectionStrategy strategy) throws ConnectorException {
         GenericConnection connection = getConnector().getConnection();
-        return connection.getHumanTaskNode(strategy);
+        return connection.getHumanTaskNode( strategy );
     }
 
     /*
      * Get all the HumanTaskNodes inside the TaskServerInstance.
      * This can be expensive because it needs to get a connection to all the HumanTaskNodes.
      */
-    public List<HumanTaskNode> getHumanTaskNodes() throws ConnectorException{
+    public List<HumanTaskNode> getHumanTaskNodes() throws ConnectorException {
         GenericConnection connection = getConnector().getConnection();
         return connection.getHumanTaskNodes();
     }
@@ -62,7 +64,7 @@ public class TaskServerInstance {
     /*
      * Get the GenericNodeConnector from this TaskServerInstance
      */
-    public GenericNodeConnector getConnector(){
+    public GenericNodeConnector getConnector() {
         return this.connector;
     }
 
@@ -70,8 +72,7 @@ public class TaskServerInstance {
      * Get the TaskServerInstance name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    
 }

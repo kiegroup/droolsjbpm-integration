@@ -33,23 +33,25 @@ import org.drools.grid.NodeConnectionType;
  *
  * @author salaboy 
  */
-public class LocalConnectionNode implements NodeConnectionType {
-    private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
-    private GenericNodeConnector nodeConnector;
-    private GenericConnection connection;
-    public LocalConnectionNode(GenericNodeConnector nodeConnector, GenericConnection connection) {
+public class LocalConnectionNode
+    implements
+    NodeConnectionType {
+    private final Map<Class< ? >, Object> services = new ConcurrentHashMap<Class< ? >, Object>();
+    private GenericNodeConnector          nodeConnector;
+    private GenericConnection             connection;
+
+    public LocalConnectionNode(GenericNodeConnector nodeConnector,
+                               GenericConnection connection) {
         this.nodeConnector = nodeConnector;
         this.connection = connection;
     }
 
-    
-
-    public Set<Class<?>> getServicesKeys() {
-        return services.keySet(); 
+    public Set<Class< ? >> getServicesKeys() {
+        return this.services.keySet();
     }
 
     public <T> T getServiceImpl(Class<T> clazz) {
-        return (T) services.get(clazz);
+        return (T) this.services.get( clazz );
     }
 
     public void setConnector(GenericNodeConnector connector) {
@@ -61,9 +63,13 @@ public class LocalConnectionNode implements NodeConnectionType {
     }
 
     public void init() {
-        services.put(KnowledgeBuilderFactoryService.class, new KnowledgeBuilderProviderLocalClient());
-        services.put(KnowledgeBaseFactoryService.class, new KnowledgeBaseProviderLocalClient(nodeConnector));
-        services.put(DirectoryLookupFactoryService.class, new DirectoryLookupProviderLocalClient(nodeConnector, connection));
+        this.services.put( KnowledgeBuilderFactoryService.class,
+                           new KnowledgeBuilderProviderLocalClient() );
+        this.services.put( KnowledgeBaseFactoryService.class,
+                           new KnowledgeBaseProviderLocalClient( this.nodeConnector ) );
+        this.services.put( DirectoryLookupFactoryService.class,
+                           new DirectoryLookupProviderLocalClient( this.nodeConnector,
+                                                                   this.connection ) );
     }
 
     public ConnectorType getConnectorType() {

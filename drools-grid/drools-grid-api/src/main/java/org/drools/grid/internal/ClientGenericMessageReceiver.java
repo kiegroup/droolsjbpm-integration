@@ -1,11 +1,5 @@
 package org.drools.grid.internal;
 
-import org.drools.grid.internal.GenericIoWriter;
-import org.drools.grid.internal.GenericIoWriter;
-import org.drools.grid.internal.MessageResponseHandler;
-import org.drools.grid.internal.Message;
-import org.drools.grid.internal.Message;
-import org.drools.grid.internal.MessageResponseHandler;
 
 public interface ClientGenericMessageReceiver {
 

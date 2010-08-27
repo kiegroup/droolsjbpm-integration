@@ -20,21 +20,20 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.drools.KnowledgeBase;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.DirectoryNodeService;
+import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.NodeConnectionType;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
+import org.drools.grid.internal.MessageSession;
 import org.drools.grid.internal.commands.SimpleCommand;
 import org.drools.grid.internal.commands.SimpleCommandName;
 import org.drools.grid.internal.responsehandlers.BlockingMessageDirectoryMapRequestResponseHandler;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
-import org.drools.grid.GenericConnectorFactory;
-import org.drools.grid.internal.MessageSession;
 import org.drools.grid.remote.KnowledgeBaseRemoteClient;
 import org.drools.grid.remote.mina.MinaIoHandler;
 
@@ -42,7 +41,9 @@ import org.drools.grid.remote.mina.MinaIoHandler;
  *
  * @author salaboy
  */
-public class DirectoryNodeRemoteClient implements DirectoryNodeService {
+public class DirectoryNodeRemoteClient
+    implements
+    DirectoryNodeService {
 
     private GenericNodeConnector connector;
 
@@ -50,121 +51,170 @@ public class DirectoryNodeRemoteClient implements DirectoryNodeService {
         this.connector = connector;
     }
 
-    public void register(String executorId, String resourceId) throws ConnectorException, RemoteException {
-        connector.connect();
-        List<Object> args = new ArrayList<Object>(2);
-        args.add(executorId);
-        args.add(resourceId);
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RegisterExecutor, args);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
-        write(msg, null);
-        connector.disconnect();
+    public void register(String executorId,
+                         String resourceId) throws ConnectorException,
+                                           RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 2 );
+        args.add( executorId );
+        args.add( resourceId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RegisterExecutor,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
+        write( msg,
+               null );
+        this.connector.disconnect();
 
     }
 
-    public void register(String executorId, GenericNodeConnector resourceConnector) throws ConnectorException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void register(String executorId,
+                         GenericNodeConnector resourceConnector) throws ConnectorException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public GenericNodeConnector lookup(String resourceId) throws ConnectorException, RemoteException {
-        connector.connect();
-        List<Object> args = new ArrayList<Object>(1);
-        args.add(resourceId);
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RequestLookupSessionId, args);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
+    public GenericNodeConnector lookup(String resourceId) throws ConnectorException,
+                                                         RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 1 );
+        args.add( resourceId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RequestLookupSessionId,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
         BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
-        write(msg, handler);
+        write( msg,
+               handler );
         SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
-        connector.disconnect();
-        return GenericConnectorFactory.newConnector((String) resultcmd.getArguments().get(0));
+        this.connector.disconnect();
+        return GenericConnectorFactory.newConnector( (String) resultcmd.getArguments().get( 0 ) );
     }
 
-    public void registerKBase(String kbaseId, String resourceId) throws ConnectorException, RemoteException {
-        connector.connect();
-        List<Object> args = new ArrayList<Object>(2);
-        args.add(kbaseId);
-        args.add(resourceId);
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RegisterKBase, args);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
-        write(msg, null);
-        connector.disconnect();
-    }
-
-    public KnowledgeBase lookupKBase(String kbaseId) throws ConnectorException, RemoteException {
-        connector.connect();
-        List<Object> args = new ArrayList<Object>(1);
-        args.add(kbaseId);
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RequestKBaseId, args);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
-        BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
-        write(msg, handler);
-        SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
-        String connectorString = (String) resultcmd.getArguments().get(0);
-        GenericNodeConnector currentConnector = GenericConnectorFactory.newConnector(connectorString);
-        connector.disconnect();
-        return new KnowledgeBaseRemoteClient(kbaseId, currentConnector, new MessageSession());
-    }
-
-    public Map<String, String> getExecutorsMap() throws ConnectorException, RemoteException {
-        connector.connect();
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RequestExecutorsMap, null);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
-        BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
-        write(msg, handler);
-        SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
-        connector.disconnect();
-        return (Map<String, String>) resultcmd.getArguments().get(0);
-    }
-
-    public void dispose() throws ConnectorException, RemoteException {
+    public void registerKBase(String kbaseId,
+                              String resourceId) throws ConnectorException,
+                                                RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 2 );
+        args.add( kbaseId );
+        args.add( resourceId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RegisterKBase,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
+        write( msg,
+               null );
         this.connector.disconnect();
     }
 
-    public String lookupId(String resourceId) throws ConnectorException, RemoteException {
-        connector.connect();
-        List<Object> args = new ArrayList<Object>(1);
-        args.add(resourceId);
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RequestLookupSessionId, args);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
+    public KnowledgeBase lookupKBase(String kbaseId) throws ConnectorException,
+                                                    RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 1 );
+        args.add( kbaseId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RequestKBaseId,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
         BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
-        write(msg, handler);
+        write( msg,
+               handler );
         SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
-        connector.disconnect();
-        return (String) resultcmd.getArguments().get(0);
+        String connectorString = (String) resultcmd.getArguments().get( 0 );
+        GenericNodeConnector currentConnector = GenericConnectorFactory.newConnector( connectorString );
+        this.connector.disconnect();
+        return new KnowledgeBaseRemoteClient( kbaseId,
+                                              currentConnector,
+                                              new MessageSession() );
     }
 
-    private Message write(Message msg) throws ConnectorException, RemoteException {
+    public Map<String, String> getExecutorsMap() throws ConnectorException,
+                                                RemoteException {
+        this.connector.connect();
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RequestExecutorsMap,
+                                               null );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
+        BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
+        write( msg,
+               handler );
+        SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
+        this.connector.disconnect();
+        return (Map<String, String>) resultcmd.getArguments().get( 0 );
+    }
+
+    public void dispose() throws ConnectorException,
+                         RemoteException {
+        this.connector.disconnect();
+    }
+
+    public String lookupId(String resourceId) throws ConnectorException,
+                                             RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 1 );
+        args.add( resourceId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RequestLookupSessionId,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
+        BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
+        write( msg,
+               handler );
+        SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
+        this.connector.disconnect();
+        return (String) resultcmd.getArguments().get( 0 );
+    }
+
+    private Message write(Message msg) throws ConnectorException,
+                                      RemoteException {
         BlockingMessageResponseHandler responseHandler = new BlockingMessageResponseHandler();
 
-        if (responseHandler != null) {
-            addResponseHandler(msg.getResponseId(),
-                    responseHandler);
+        if ( responseHandler != null ) {
+            addResponseHandler( msg.getResponseId(),
+                                responseHandler );
         }
-        ((RemoteMinaDirectoryConnector) this.connector).getSession().write(msg);
+        ((RemoteMinaDirectoryConnector) this.connector).getSession().write( msg );
 
         Message returnMessage = responseHandler.getMessage();
-        if (responseHandler.getError() != null) {
+        if ( responseHandler.getError() != null ) {
             throw responseHandler.getError();
         }
 
         return returnMessage;
     }
 
-    private void write(Message msg, MessageResponseHandler responseHandler) {
-        if (responseHandler != null) {
-            addResponseHandler(msg.getResponseId(),
-                    responseHandler);
+    private void write(Message msg,
+                       MessageResponseHandler responseHandler) {
+        if ( responseHandler != null ) {
+            addResponseHandler( msg.getResponseId(),
+                                responseHandler );
         }
 
-        ((RemoteMinaDirectoryConnector) this.connector).getSession().write(msg);
-
+        ((RemoteMinaDirectoryConnector) this.connector).getSession().write( msg );
 
     }
 
     private void addResponseHandler(int id,
-            MessageResponseHandler responseHandler) {
-        ((MinaIoHandler) ((RemoteMinaDirectoryConnector) this.connector).getSession().getHandler()).addResponseHandler(id,
-                responseHandler);
+                                    MessageResponseHandler responseHandler) {
+        ((MinaIoHandler) ((RemoteMinaDirectoryConnector) this.connector).getSession().getHandler()).addResponseHandler( id,
+                                                                                                                        responseHandler );
 
     }
 
@@ -172,40 +222,59 @@ public class DirectoryNodeRemoteClient implements DirectoryNodeService {
         return "Remote:Directory";
     }
 
-    public void unregister(String executorId) throws ConnectorException, RemoteException {
-        connector.connect();
-        List<Object> args = new ArrayList<Object>(2);
-        args.add(executorId);
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.UnRegisterExecutor, args);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
-        write(msg, null);
-        connector.disconnect();
+    public void unregister(String executorId) throws ConnectorException,
+                                             RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 2 );
+        args.add( executorId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.UnRegisterExecutor,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
+        write( msg,
+               null );
+        this.connector.disconnect();
     }
 
-    public Map<String, String> getKBasesMap() throws ConnectorException, RemoteException {
-        connector.connect();
-        SimpleCommand cmd = new SimpleCommand(connector.getCounter().getAndIncrement(), SimpleCommandName.RequestKBasesMap, null);
-        Message msg = new Message(connector.getSessionId(), connector.getCounter().incrementAndGet(), false, cmd);
+    public Map<String, String> getKBasesMap() throws ConnectorException,
+                                             RemoteException {
+        this.connector.connect();
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RequestKBasesMap,
+                                               null );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
         BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
-        write(msg, handler);
+        write( msg,
+               handler );
         SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
-        connector.disconnect();
-        return (Map<String, String>) resultcmd.getArguments().get(0);
+        this.connector.disconnect();
+        return (Map<String, String>) resultcmd.getArguments().get( 0 );
     }
 
-    public void registerKBase(String kbaseId, KnowledgeBase kbase) throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void registerKBase(String kbaseId,
+                              KnowledgeBase kbase) throws ConnectorException,
+                                                  RemoteException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void unregisterKBase(String kbaseId) throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void unregisterKBase(String kbaseId) throws ConnectorException,
+                                               RemoteException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public NodeConnectionType getNodeConnectionType() throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public NodeConnectionType getNodeConnectionType() throws ConnectorException,
+                                                     RemoteException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public ServiceType getServiceType() throws ConnectorException, RemoteException {
+    public ServiceType getServiceType() throws ConnectorException,
+                                       RemoteException {
         return ServiceType.REMOTE;
     }
 }

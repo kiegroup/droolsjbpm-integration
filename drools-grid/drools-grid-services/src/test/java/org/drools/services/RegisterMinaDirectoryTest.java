@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.rmi.RemoteException;
 import java.util.Map;
+
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.drools.KnowledgeBase;
@@ -51,8 +52,6 @@ import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.services.strategies.DirectoryInstanceByPrioritySelectionStrategy;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -82,92 +81,106 @@ public class RegisterMinaDirectoryTest {
     }
 
     @Before
-    public void setUp() throws InterruptedException, IOException {
+    public void setUp() throws InterruptedException,
+                       IOException {
 
-        System.out.println("Dir Server 1 Starting!");
+        System.out.println( "Dir Server 1 Starting!" );
         // Directory Server configuration
-        SocketAddress dirAddress = new InetSocketAddress("127.0.0.1", 9123);
+        SocketAddress dirAddress = new InetSocketAddress( "127.0.0.1",
+                                                          9123 );
         SocketAcceptor dirAcceptor = new NioSocketAcceptor();
 
-        dirAcceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(),
-                new DirectoryServerMessageHandlerImpl(
-                SystemEventListenerFactory.getSystemEventListener())));
-        this.serverDir = new MinaAcceptor(dirAcceptor, dirAddress);
+        dirAcceptor.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener(),
+                                                   new DirectoryServerMessageHandlerImpl(
+                                                                                          SystemEventListenerFactory.getSystemEventListener() ) ) );
+        this.serverDir = new MinaAcceptor( dirAcceptor,
+                                           dirAddress );
         this.serverDir.start();
-        System.out.println("Dir Server 1 Started! at = " + dirAddress.toString());
+        System.out.println( "Dir Server 1 Started! at = " + dirAddress.toString() );
 
         // End Execution Server
 
         //Execution Node related stuff
 
-        System.out.println("Exec Server 1 Starting!");
+        System.out.println( "Exec Server 1 Starting!" );
         // the servers should be started in a different machine (jvm or physical) or in another thread
-        SocketAddress address = new InetSocketAddress("127.0.0.1", 9124);
+        SocketAddress address = new InetSocketAddress( "127.0.0.1",
+                                                       9124 );
         NodeData nodeData = new NodeData();
         // setup Server
         SocketAcceptor acceptor = new NioSocketAcceptor();
-        acceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(),
-                new GenericMessageHandlerImpl(nodeData,
-                SystemEventListenerFactory.getSystemEventListener())));
-        serverNode = new MinaAcceptor(acceptor, address);
-        serverNode.start();
-        System.out.println("Exec Server 1 Started! at = " + address.toString());
-
-
+        acceptor.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener(),
+                                                new GenericMessageHandlerImpl( nodeData,
+                                                                               SystemEventListenerFactory.getSystemEventListener() ) ) );
+        this.serverNode = new MinaAcceptor( acceptor,
+                                            address );
+        this.serverNode.start();
+        System.out.println( "Exec Server 1 Started! at = " + address.toString() );
 
     }
 
     @After
-    public void tearDown() throws InterruptedException, ConnectorException, RemoteException {
+    public void tearDown() throws InterruptedException,
+                          ConnectorException,
+                          RemoteException {
 
-        Thread.sleep(3000);
+        Thread.sleep( 3000 );
 
-        Assert.assertEquals(0, serverNode.getCurrentSessions());
-        serverNode.stop();
-        System.out.println("Execution Server Stopped!");
+        Assert.assertEquals( 0,
+                             this.serverNode.getCurrentSessions() );
+        this.serverNode.stop();
+        System.out.println( "Execution Server Stopped!" );
 
-        Assert.assertEquals(0, serverDir.getCurrentSessions());
-        serverDir.stop();
-        System.out.println("Dir Server Stopped!");
-
+        Assert.assertEquals( 0,
+                             this.serverDir.getCurrentSessions() );
+        this.serverDir.stop();
+        System.out.println( "Dir Server Stopped!" );
 
     }
 
     @Test
-    public void directoryRemoteTest() throws ConnectorException, RemoteException {
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyMinaDir", new MinaProvider("127.0.0.1", 9123)));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyRemoteEnv", new MinaProvider("127.0.0.1", 9124)));
+    public void directoryRemoteTest() throws ConnectorException,
+                                     RemoteException {
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
+        gridTopologyConfiguration.addDirectoryInstance( new DirectoryInstanceConfiguration( "MyMinaDir",
+                                                                                            new MinaProvider( "127.0.0.1",
+                                                                                                              9123 ) ) );
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyLocalEnv",
+                                                                                                  new LocalProvider() ) );
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyRemoteEnv",
+                                                                                                  new MinaProvider( "127.0.0.1",
+                                                                                                                    9124 ) ) );
 
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
-        Assert.assertNotNull(grid);
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
+        Assert.assertNotNull( this.grid );
 
-        DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
-        Assert.assertNotNull(directory);
+        DirectoryInstance directory = this.grid.getBestDirectoryInstance( new DirectoryInstanceByPrioritySelectionStrategy() );
+        Assert.assertNotNull( directory );
 
-        DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
-        Assert.assertNotNull(dir);
+        DirectoryNodeService dir = directory.getDirectoryNode().get( DirectoryNodeService.class );
+        Assert.assertNotNull( dir );
         Map<String, String> dirMap = dir.getExecutorsMap();
-        
-        Assert.assertNotNull("Dir Null", dirMap);
 
-        Assert.assertEquals(3, dirMap.size());
+        Assert.assertNotNull( "Dir Null",
+                              dirMap );
 
+        Assert.assertEquals( 3,
+                             dirMap.size() );
 
-        Assert.assertEquals(3, dirMap.size());
-        Assert.assertEquals(0, serverNode.getCurrentSessions());
+        Assert.assertEquals( 3,
+                             dirMap.size() );
+        Assert.assertEquals( 0,
+                             this.serverNode.getCurrentSessions() );
         //Then we can get the registered Execution Environments by Name
 
-        ExecutionEnvironment ee = grid.getExecutionEnvironment("MyRemoteEnv");
-        Assert.assertNotNull(ee);
+        ExecutionEnvironment ee = this.grid.getExecutionEnvironment( "MyRemoteEnv" );
+        Assert.assertNotNull( ee );
 
         // Give me an ExecutionNode in the selected environment
         // For the Mina we have just one Execution Node per server instance
         ExecutionNode node = ee.getExecutionNode();
 
-        Assert.assertNotNull(node);
-
+        Assert.assertNotNull( node );
 
         // Do a basic Runtime Test that register a ksession and fire some rules.
         String str = "";
@@ -186,59 +199,61 @@ public class RegisterMinaDirectoryTest {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-
         KnowledgeBuilder kbuilder =
-                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newByteArrayResource(str.getBytes()),
-                ResourceType.DRL);
+                node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                      ResourceType.DRL );
 
-        if (kbuilder.hasErrors()) {
-            System.out.println("Errors: " + kbuilder.getErrors());
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
         KnowledgeBase kbase =
-                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+                node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        Assert.assertNotNull(ksession);
+        Assert.assertNotNull( ksession );
 
-        node.get(DirectoryLookupFactoryService.class).register("ksession1", ksession);
+        node.get( DirectoryLookupFactoryService.class ).register( "ksession1",
+                                                                  ksession );
 
-        ksession = (StatefulKnowledgeSession) node.get(DirectoryLookupFactoryService.class).lookup("ksession1");
+        ksession = (StatefulKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "ksession1" );
 
         int fired = ksession.fireAllRules();
 
-        Assert.assertEquals(2, fired);
-        grid.dispose();
-
-
+        Assert.assertEquals( 2,
+                             fired );
+        this.grid.dispose();
 
     }
 
     @Test
-    public void directoryInstanceRetriveKSessionFromEE() throws ConnectorException, RemoteException {
+    public void directoryInstanceRetriveKSessionFromEE() throws ConnectorException,
+                                                        RemoteException {
 
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyMinaDir", new MinaProvider("127.0.0.1", 9123)));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new MinaProvider("127.0.0.1", 9124)));
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
+        gridTopologyConfiguration.addDirectoryInstance( new DirectoryInstanceConfiguration( "MyMinaDir",
+                                                                                            new MinaProvider( "127.0.0.1",
+                                                                                                              9123 ) ) );
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyMinaExecutionEnv1",
+                                                                                                  new MinaProvider( "127.0.0.1",
+                                                                                                                    9124 ) ) );
 
-
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
-        Assert.assertNotNull(grid);
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
+        Assert.assertNotNull( this.grid );
         //Then we can get the registered Execution Environments by Name
 
-        ExecutionEnvironment ee = grid.getExecutionEnvironment("MyMinaExecutionEnv1");
-        Assert.assertNotNull(ee);
+        ExecutionEnvironment ee = this.grid.getExecutionEnvironment( "MyMinaExecutionEnv1" );
+        Assert.assertNotNull( ee );
 
         // Give me an ExecutionNode in the selected environment
         // For the Mina we have just one Execution Node per server instance
         ExecutionNode node = ee.getExecutionNode();
 
-        Assert.assertNotNull(node);
-
+        Assert.assertNotNull( node );
 
         // Do a basic Runtime Test that register a ksession and fire some rules.
         String str = "";
@@ -257,39 +272,39 @@ public class RegisterMinaDirectoryTest {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-
         KnowledgeBuilder kbuilder =
-                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newByteArrayResource(str.getBytes()),
-                ResourceType.DRL);
+                node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                      ResourceType.DRL );
 
-        if (kbuilder.hasErrors()) {
-            System.out.println("Errors: " + kbuilder.getErrors());
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
         KnowledgeBase kbase =
-                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+                node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        Assert.assertNotNull(ksession);
+        Assert.assertNotNull( ksession );
 
-        node.get(DirectoryLookupFactoryService.class).register("sessionName", ksession);
+        node.get( DirectoryLookupFactoryService.class ).register( "sessionName",
+                                                                  ksession );
 
         //We disconnect the grid in order to close all the active connections to remote services
-        grid.disconnect();
+        this.grid.disconnect();
 
-        DirectoryInstance directoryInstance = grid.getDirectoryInstance();
-        DirectoryNodeService directory = directoryInstance.getDirectoryNode().get(DirectoryNodeService.class);
-        GenericNodeConnector connector = directory.lookup("sessionName");
+        DirectoryInstance directoryInstance = this.grid.getDirectoryInstance();
+        DirectoryNodeService directory = directoryInstance.getDirectoryNode().get( DirectoryNodeService.class );
+        GenericNodeConnector connector = directory.lookup( "sessionName" );
 
-        node = grid.getExecutionEnvironment(connector).getExecutionNode();
-        ksession = (StatefulKnowledgeSession) node.get(DirectoryLookupFactoryService.class).lookup("sessionName");
-        Assert.assertNotNull(ksession);
+        node = this.grid.getExecutionEnvironment( connector ).getExecutionNode();
+        ksession = (StatefulKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "sessionName" );
+        Assert.assertNotNull( ksession );
 
-        grid.dispose();
+        this.grid.dispose();
 
     }
 }

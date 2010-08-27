@@ -2,40 +2,45 @@ package org.drools.grid.services.configuration;
 
 import java.io.Serializable;
 
-public class GridResourceInfo implements Serializable{
-	private Status status;
-	private String address;
-	private int port;
+public class GridResourceInfo
+    implements
+    Serializable {
+    private Status status;
+    private String address;
+    private int    port;
 
-	public GridResourceInfo() {	}
-	
-	public GridResourceInfo(Status status) {
-		this.status = status;
-	}
+    public GridResourceInfo() {
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public GridResourceInfo(Status status) {
+        this.status = status;
+    }
 
-	public void setStatus(Status status) {
-		this.status = status;
-	}
+    public Status getStatus() {
+        return this.status;
+    }
 
-	static public enum Status {RUNNING, MISSING}
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    static public enum Status {
+        RUNNING, MISSING
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public String getAddress() {
+        return this.address;
+    }
 
-	public int getPort() {
-		return port;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public int getPort() {
+        return this.port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

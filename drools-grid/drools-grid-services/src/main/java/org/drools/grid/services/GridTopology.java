@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnection;
-import org.drools.grid.GenericHumanTaskConnector;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.services.configuration.GenericProvider;
 import org.drools.grid.services.factory.DirectoryInstanceFactory;
@@ -47,15 +46,14 @@ import org.drools.grid.services.strategies.TaskServerInstanceSelectionStrategy;
  */
 public class GridTopology {
 
-    private String topologyName;
-    private Map<String, ExecutionEnvironment> executionEnvironments = new ConcurrentHashMap<String, ExecutionEnvironment>();
-    private Map<String, String> executionEnvironmentsByConnectorId = new ConcurrentHashMap<String, String>();
-    private Map<String, DirectoryInstance> directoryInstances = new ConcurrentHashMap<String, DirectoryInstance>();
-    private Map<String, TaskServerInstance> taskServerInstances = new ConcurrentHashMap<String, TaskServerInstance>();
-    private final ExecutionEnvironmentSelectionStrategy DEFAULT_EXECTUTION_STRATEGY = new ExecutionEnvByPrioritySelectionStrategy();
-    private final DirectoryInstanceSelectionStrategy DEFAULT_DIRECTORY_STRATEGY = new DirectoryInstanceByPrioritySelectionStrategy();
-    private final TaskServerInstanceSelectionStrategy DEFAULT_TASK_STRATEGY = new TaskServerInstanceByPrioritySelectionStrategy();
-
+    private String                                      topologyName;
+    private Map<String, ExecutionEnvironment>           executionEnvironments              = new ConcurrentHashMap<String, ExecutionEnvironment>();
+    private Map<String, String>                         executionEnvironmentsByConnectorId = new ConcurrentHashMap<String, String>();
+    private Map<String, DirectoryInstance>              directoryInstances                 = new ConcurrentHashMap<String, DirectoryInstance>();
+    private Map<String, TaskServerInstance>             taskServerInstances                = new ConcurrentHashMap<String, TaskServerInstance>();
+    private final ExecutionEnvironmentSelectionStrategy DEFAULT_EXECTUTION_STRATEGY        = new ExecutionEnvByPrioritySelectionStrategy();
+    private final DirectoryInstanceSelectionStrategy    DEFAULT_DIRECTORY_STRATEGY         = new DirectoryInstanceByPrioritySelectionStrategy();
+    private final TaskServerInstanceSelectionStrategy   DEFAULT_TASK_STRATEGY              = new TaskServerInstanceByPrioritySelectionStrategy();
 
     /*
      * Create a new Grid Topology
@@ -70,7 +68,7 @@ public class GridTopology {
      * Get the GridTopology name
      */
     public String getTopologyName() {
-        return topologyName;
+        return this.topologyName;
     }
 
     /*
@@ -91,31 +89,40 @@ public class GridTopology {
      *     to be able to look based on the underlaying connector and based on the defined Execution Environment name.
      *  6) Register the Execution Environment inside all the currently available Directory Instances
      */
-    public void registerExecutionEnvironment(String name, GenericProvider provider) {
+    public void registerExecutionEnvironment(String name,
+                                             GenericProvider provider) {
 
-        ExecutionEnvironment environment = ExecutionEnvironmentFactory.newExecutionEnvironment(name, provider);
+        ExecutionEnvironment environment = ExecutionEnvironmentFactory.newExecutionEnvironment( name,
+                                                                                                provider );
         GenericNodeConnector connector = environment.getConnector();
         GenericConnection connection = connector.getConnection();
-        connection.addExecutionNode(connector);
+        connection.addExecutionNode( connector );
 
-        for (ExecutionEnvironment e : executionEnvironments.values()) {
-            connection.addExecutionNode(e.getConnector());
-            e.getConnector().getConnection().addExecutionNode(connector);
+        for ( ExecutionEnvironment e : this.executionEnvironments.values() ) {
+            connection.addExecutionNode( e.getConnector() );
+            e.getConnector().getConnection().addExecutionNode( connector );
         }
-        for (DirectoryInstance d : directoryInstances.values()) {
-            connection.addDirectoryNode(d.getConnector());
-            d.getConnector().getConnection().addExecutionNode(connector);
+        for ( DirectoryInstance d : this.directoryInstances.values() ) {
+            connection.addDirectoryNode( d.getConnector() );
+            d.getConnector().getConnection().addExecutionNode( connector );
         }
-        executionEnvironments.put(name, environment);
+        this.executionEnvironments.put( name,
+                                        environment );
 
         try {
-            executionEnvironmentsByConnectorId.put(connector.getId(), environment.getName());
-        } catch (ConnectorException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RemoteException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+            this.executionEnvironmentsByConnectorId.put( connector.getId(),
+                                                         environment.getName() );
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
         }
-        registerResourceInDirectories(name, provider.getId());
+        registerResourceInDirectories( name,
+                                       provider.getId() );
 
     }
 
@@ -135,31 +142,36 @@ public class GridTopology {
      */
     public void unregisterExecutionEnvironment(String name) {
 
-        ExecutionEnvironment ee = executionEnvironments.get(name);
+        ExecutionEnvironment ee = this.executionEnvironments.get( name );
         try {
 
             GenericNodeConnector connector = ee.getConnector();
-            executionEnvironmentsByConnectorId.remove(connector.getId());
+            this.executionEnvironmentsByConnectorId.remove( connector.getId() );
             connector.getConnection().dispose();
             connector.disconnect();
 
-        } catch (ConnectorException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RemoteException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
         }
 
-        executionEnvironments.remove(name);
-        unregisterResourceFromDirectories(name);
+        this.executionEnvironments.remove( name );
+        unregisterResourceFromDirectories( name );
 
     }
+
     /*
      * Get Execution Environment by Name
      * @param name: String Execution Environment Name
      */
 
     public ExecutionEnvironment getExecutionEnvironment(String name) {
-        return executionEnvironments.get(name);
+        return this.executionEnvironments.get( name );
     }
 
     /*
@@ -169,12 +181,16 @@ public class GridTopology {
     public ExecutionEnvironment getExecutionEnvironment(GenericNodeConnector connector) {
         ExecutionEnvironment ee = null;
         try {
-            String eeName = executionEnvironmentsByConnectorId.get(connector.getId());
-            ee = executionEnvironments.get(eeName);
-        } catch (ConnectorException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RemoteException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+            String eeName = this.executionEnvironmentsByConnectorId.get( connector.getId() );
+            ee = this.executionEnvironments.get( eeName );
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
         }
         return ee;
     }
@@ -184,14 +200,14 @@ public class GridTopology {
      * @param strategy: it's an implementation of the ExecutionEnvironmentSelectionStrategy interface
      */
     public ExecutionEnvironment getBestExecutionEnvironment(ExecutionEnvironmentSelectionStrategy strategy) {
-        return strategy.getBestExecutionEnvironment(executionEnvironments);
+        return strategy.getBestExecutionEnvironment( this.executionEnvironments );
     }
 
     /*
      * Get the Best ExecutionEnvironment available based on the default ExecutionEnvironmentSelectionStrategy
      */
     public ExecutionEnvironment getExecutionEnvironment() {
-        return DEFAULT_EXECTUTION_STRATEGY.getBestExecutionEnvironment(executionEnvironments);
+        return this.DEFAULT_EXECTUTION_STRATEGY.getBestExecutionEnvironment( this.executionEnvironments );
     }
 
     /*
@@ -211,47 +227,52 @@ public class GridTopology {
      *     to be able to lookup based on the Directory Instance name.
      *  6) Register the Directory Instance inside all the currently available Directory Instances
      */
-    public void registerDirectoryInstance(String name, GenericProvider provider) {
+    public void registerDirectoryInstance(String name,
+                                          GenericProvider provider) {
 
-        DirectoryInstance directory = DirectoryInstanceFactory.newDirectoryInstance(name, provider);
+        DirectoryInstance directory = DirectoryInstanceFactory.newDirectoryInstance( name,
+                                                                                     provider );
         GenericNodeConnector connector = directory.getConnector();
         GenericConnection connection = connector.getConnection();
-        connection.addDirectoryNode(connector);
+        connection.addDirectoryNode( connector );
 
-        for (ExecutionEnvironment e : executionEnvironments.values()) {
-            e.getConnector().getConnection().addDirectoryNode(connector);
-            connection.addExecutionNode(e.getConnector());
+        for ( ExecutionEnvironment e : this.executionEnvironments.values() ) {
+            e.getConnector().getConnection().addDirectoryNode( connector );
+            connection.addExecutionNode( e.getConnector() );
         }
-        for (DirectoryInstance d : directoryInstances.values()) {
-            d.getConnector().getConnection().addDirectoryNode(connector);
-            connection.addDirectoryNode(d.getConnector());
+        for ( DirectoryInstance d : this.directoryInstances.values() ) {
+            d.getConnector().getConnection().addDirectoryNode( connector );
+            connection.addDirectoryNode( d.getConnector() );
         }
 
-        directoryInstances.put(name, directory);
-        registerResourceInDirectories(name, provider.getId());
+        this.directoryInstances.put( name,
+                                     directory );
+        registerResourceInDirectories( name,
+                                       provider.getId() );
 
     }
+
     /*
      * Get the Best DirectoryInstance based on a DirectoryInstanceSelectionStrategy
      * @param strategy it's the strategy used to choose the best DirectoryInstance available
      */
 
     public DirectoryInstance getBestDirectoryInstance(DirectoryInstanceSelectionStrategy strategy) {
-        return (DirectoryInstance) strategy.getBestDirectoryInstance(directoryInstances);
+        return strategy.getBestDirectoryInstance( this.directoryInstances );
     }
 
     /*
      * Get the Directory Instance based on a default strategy
      */
     public DirectoryInstance getDirectoryInstance() {
-        return DEFAULT_DIRECTORY_STRATEGY.getBestDirectoryInstance(directoryInstances);
+        return this.DEFAULT_DIRECTORY_STRATEGY.getBestDirectoryInstance( this.directoryInstances );
     }
 
     /*
      * Get a Directory Instance by Name
      */
     public DirectoryInstance getDirectoryInstance(String name) {
-        return directoryInstances.get(name);
+        return this.directoryInstances.get( name );
     }
 
     /*
@@ -268,20 +289,24 @@ public class GridTopology {
      */
     public void unregisterDirectoryInstance(String name) {
 
-        DirectoryInstance dir = directoryInstances.get(name);
+        DirectoryInstance dir = this.directoryInstances.get( name );
         GenericNodeConnector connector = dir.getConnector();
 
         try {
             connector.getConnection().dispose();
             connector.disconnect();
-        } catch (ConnectorException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RemoteException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
         }
 
-        unregisterResourceFromDirectories(name);
-        directoryInstances.remove(name);
+        unregisterResourceFromDirectories( name );
+        this.directoryInstances.remove( name );
 
     }
 
@@ -301,24 +326,28 @@ public class GridTopology {
      *  5) Add the newly created TaskServerInstance to the topology maps.
      *  6) Register the TaskServer Instance inside all the currently available Directory Instances
      */
-    public void registerTaskServerInstance(String name, GenericProvider provider) {
+    public void registerTaskServerInstance(String name,
+                                           GenericProvider provider) {
 
-        TaskServerInstance taskServer = TaskServerInstanceFactory.newTaskServerInstance(name, provider);
+        TaskServerInstance taskServer = TaskServerInstanceFactory.newTaskServerInstance( name,
+                                                                                         provider );
         GenericNodeConnector connector = taskServer.getConnector();
         GenericConnection connection = connector.getConnection();
-        connection.addHumanTaskNode(connector);
+        connection.addHumanTaskNode( connector );
 
-        for (ExecutionEnvironment e : executionEnvironments.values()) {
-            e.getConnector().getConnection().addHumanTaskNode(connector);
-            connection.addExecutionNode(e.getConnector());
+        for ( ExecutionEnvironment e : this.executionEnvironments.values() ) {
+            e.getConnector().getConnection().addHumanTaskNode( connector );
+            connection.addExecutionNode( e.getConnector() );
         }
-        for (DirectoryInstance d : directoryInstances.values()) {
-            d.getConnector().getConnection().addHumanTaskNode(connector);
-            connection.addDirectoryNode(d.getConnector());
+        for ( DirectoryInstance d : this.directoryInstances.values() ) {
+            d.getConnector().getConnection().addHumanTaskNode( connector );
+            connection.addDirectoryNode( d.getConnector() );
         }
 
-        taskServerInstances.put(name, taskServer);
-        registerResourceInDirectories(name, provider.getId());
+        this.taskServerInstances.put( name,
+                                      taskServer );
+        registerResourceInDirectories( name,
+                                       provider.getId() );
 
     }
 
@@ -327,7 +356,7 @@ public class GridTopology {
      * @param name: it's the name used to register a specific task server instance
      */
     public TaskServerInstance getTaskServerInstance(String name) {
-        return taskServerInstances.get(name);
+        return this.taskServerInstances.get( name );
     }
 
     /*
@@ -336,14 +365,14 @@ public class GridTopology {
      * currently available
      */
     public TaskServerInstance getBestTaskServerInstance(TaskServerInstanceSelectionStrategy strategy) {
-        return (TaskServerInstance) strategy.getBestTaskServerInstance(taskServerInstances);
+        return strategy.getBestTaskServerInstance( this.taskServerInstances );
     }
 
     /*
      * Get the best task server instance based on the default selection strategy
      */
     public TaskServerInstance getBestTaskServerInstance() {
-        return DEFAULT_TASK_STRATEGY.getBestTaskServerInstance(taskServerInstances);
+        return this.DEFAULT_TASK_STRATEGY.getBestTaskServerInstance( this.taskServerInstances );
     }
 
     /*
@@ -361,21 +390,25 @@ public class GridTopology {
      */
     public void unregisterTaskServerInstance(String name) {
 
-        TaskServerInstance taskServer = taskServerInstances.get(name);
+        TaskServerInstance taskServer = this.taskServerInstances.get( name );
         GenericNodeConnector connector = taskServer.getConnector();
 
         try {
             connector.getConnection().dispose();
             connector.disconnect();
-        } catch (RemoteException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
 
-        } catch (ConnectorException ex) {
-            Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                  null,
+                                                                  ex );
         }
 
-        taskServerInstances.remove(name);
-        unregisterResourceFromDirectories(name);
+        this.taskServerInstances.remove( name );
+        unregisterResourceFromDirectories( name );
 
     }
 
@@ -383,7 +416,8 @@ public class GridTopology {
      * Close and Dispose all connections and connectors to remote services
      * without removing/unregister the references from those services
      */
-    public void disconnect() throws ConnectorException, RemoteException {
+    public void disconnect() throws ConnectorException,
+                            RemoteException {
         disconnectExecutionEnvironments();
         disconnectDirectoryInstances();
         disconnectTaskServerInstances();
@@ -392,21 +426,24 @@ public class GridTopology {
     /*
      * Disconnect all the taskServerInstances ongoing connections
      */
-    private void disconnectTaskServerInstances() throws ConnectorException, RemoteException {
-        for (String key : taskServerInstances.keySet()) {
-            TaskServerInstance taskServer = taskServerInstances.get(key);
+    private void disconnectTaskServerInstances() throws ConnectorException,
+                                                RemoteException {
+        for ( String key : this.taskServerInstances.keySet() ) {
+            TaskServerInstance taskServer = this.taskServerInstances.get( key );
             GenericNodeConnector connector = taskServer.getConnector();
             connector.getConnection().dispose();
             connector.disconnect();
         }
     }
+
     /*
      * Disconnect all the directoryInstances ongoing connections
      */
 
-    private void disconnectDirectoryInstances() throws RemoteException, ConnectorException {
-        for (String key : directoryInstances.keySet()) {
-            DirectoryInstance dir = directoryInstances.get(key);
+    private void disconnectDirectoryInstances() throws RemoteException,
+                                               ConnectorException {
+        for ( String key : this.directoryInstances.keySet() ) {
+            DirectoryInstance dir = this.directoryInstances.get( key );
             GenericNodeConnector connector = dir.getConnector();
             connector.getConnection().dispose();
             connector.disconnect();
@@ -416,9 +453,10 @@ public class GridTopology {
     /*
      * Disconnect all the executionEnvironments ongoing connections
      */
-    private void disconnectExecutionEnvironments() throws ConnectorException, RemoteException {
-        for (String key : executionEnvironments.keySet()) {
-            ExecutionEnvironment ee = executionEnvironments.get(key);
+    private void disconnectExecutionEnvironments() throws ConnectorException,
+                                                  RemoteException {
+        for ( String key : this.executionEnvironments.keySet() ) {
+            ExecutionEnvironment ee = this.executionEnvironments.get( key );
             GenericNodeConnector connector = ee.getConnector();
             connector.getConnection().dispose();
             connector.disconnect();
@@ -428,16 +466,17 @@ public class GridTopology {
     /*
      * Clean the GridTopology object to be disposed
      */
-    public void dispose() throws ConnectorException, RemoteException {
+    public void dispose() throws ConnectorException,
+                         RemoteException {
 
-        for (String key : executionEnvironments.keySet()) {
-            unregisterExecutionEnvironment(key);
+        for ( String key : this.executionEnvironments.keySet() ) {
+            unregisterExecutionEnvironment( key );
         }
-        for (String key : directoryInstances.keySet()) {
-            unregisterDirectoryInstance(key);
+        for ( String key : this.directoryInstances.keySet() ) {
+            unregisterDirectoryInstance( key );
         }
-        for (String key : taskServerInstances.keySet()) {
-            unregisterTaskServerInstance(key);
+        for ( String key : this.taskServerInstances.keySet() ) {
+            unregisterTaskServerInstance( key );
         }
     }
 
@@ -447,28 +486,37 @@ public class GridTopology {
      * Register the resource id (ExecutionEnvironment, DirectoryInstance, TaskServerInstance)
      * inside all the current available directory instances.
      */
-    private void registerResourceInDirectories(String name, String resourceId) {
-        for (DirectoryInstance directory : directoryInstances.values()) {
+    private void registerResourceInDirectories(String name,
+                                               String resourceId) {
+        for ( DirectoryInstance directory : this.directoryInstances.values() ) {
 
             try {
-                DirectoryNodeService directoryNode = directory.getDirectoryNode().get(DirectoryNodeService.class);
-                if (directoryNode != null) {
+                DirectoryNodeService directoryNode = directory.getDirectoryNode().get( DirectoryNodeService.class );
+                if ( directoryNode != null ) {
                     try {
-                        directoryNode.register(name, resourceId);
-                    } catch (RemoteException ex) {
-                        Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+                        directoryNode.register( name,
+                                                resourceId );
+                    } catch ( RemoteException ex ) {
+                        Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                              null,
+                                                                              ex );
                     }
                 }
                 try {
                     directory.getConnector().disconnect();
-                } catch (RemoteException ex) {
-                    Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+                } catch ( RemoteException ex ) {
+                    Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                          null,
+                                                                          ex );
                 }
-            } catch (ConnectorException e) {
-                Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, e);
+            } catch ( ConnectorException e ) {
+                Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                      null,
+                                                                      e );
             }
         }
     }
+
     /*
      * @param name: of the resource that we want to unregister from current Directories
      * Unregister a resource (ExecutionEnvironment, DirectoryInstance, TaskServerInstance)
@@ -476,24 +524,30 @@ public class GridTopology {
      */
 
     private void unregisterResourceFromDirectories(String name) {
-        for (DirectoryInstance directory : directoryInstances.values()) {
+        for ( DirectoryInstance directory : this.directoryInstances.values() ) {
 
             try {
-                DirectoryNodeService directoryNode = directory.getDirectoryNode().get(DirectoryNodeService.class);
-                if (directoryNode != null) {
+                DirectoryNodeService directoryNode = directory.getDirectoryNode().get( DirectoryNodeService.class );
+                if ( directoryNode != null ) {
                     try {
-                        directoryNode.unregister(name);
-                    } catch (RemoteException ex) {
-                        Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+                        directoryNode.unregister( name );
+                    } catch ( RemoteException ex ) {
+                        Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                              null,
+                                                                              ex );
                     }
                 }
                 try {
                     directory.getConnector().disconnect();
-                } catch (RemoteException ex) {
-                    Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, ex);
+                } catch ( RemoteException ex ) {
+                    Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                          null,
+                                                                          ex );
                 }
-            } catch (ConnectorException e) {
-                Logger.getLogger(GridTopology.class.getName()).log(Level.SEVERE, null, e);
+            } catch ( ConnectorException e ) {
+                Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
+                                                                      null,
+                                                                      e );
             }
         }
     }

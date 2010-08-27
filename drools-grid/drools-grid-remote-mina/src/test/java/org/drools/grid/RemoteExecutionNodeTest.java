@@ -37,20 +37,18 @@ import org.junit.Before;
  *
  * @author salaboy
  */
-public class RemoteExecutionNodeTest extends ExecutionNodeBase{
-    private MinaAcceptor server;
+public class RemoteExecutionNodeTest extends ExecutionNodeBase {
+    private MinaAcceptor      server;
     private GenericConnection connection;
-    
+
     public RemoteExecutionNodeTest() {
     }
 
-   
-
     @Before
-    public void configureNode() throws IOException, ConnectorException {
+    public void configureNode() throws IOException,
+                               ConnectorException {
 
         //Starting the server
-        
 
         StaticIncrementalNodeSelectionStrategy.counter = 0;
 
@@ -64,38 +62,36 @@ public class RemoteExecutionNodeTest extends ExecutionNodeBase{
                                                 new GenericMessageHandlerImpl( nodeData,
                                                                                SystemEventListenerFactory.getSystemEventListener() ) ) );
         this.server = new MinaAcceptor( acceptor,
-                                        address, port );
+                                        address,
+                                        port );
         this.server.start();
-        System.out.println("Server Started!");
-
+        System.out.println( "Server Started!" );
 
         //Client configuration
-        connection = new GridConnection();
+        this.connection = new GridConnection();
         GenericNodeConnector localDirectory = new LocalDirectoryConnector();
-        connection.addDirectoryNode(localDirectory);
+        this.connection.addDirectoryNode( localDirectory );
 
         // setup Client
-        
+
         GenericNodeConnector minaClient = new RemoteMinaNodeConnector( "client 1",
-                                                         address,
-                                                         port,
-                                                         SystemEventListenerFactory.getSystemEventListener() );
-        connection.addExecutionNode(minaClient);
-        
-        node = connection.getExecutionNode();
-        Assert.assertNotNull(node);
-        
+                                                                       address,
+                                                                       port,
+                                                                       SystemEventListenerFactory.getSystemEventListener() );
+        this.connection.addExecutionNode( minaClient );
+
+        this.node = this.connection.getExecutionNode();
+        Assert.assertNotNull( this.node );
+
     }
-    
+
     @After
     public void tearDown() throws ConnectorException {
-        System.out.println("Stopping the server and all the clients!");
-        connection.dispose();
-       
+        System.out.println( "Stopping the server and all the clients!" );
+        this.connection.dispose();
+
         this.server.stop();
 
     }
-
-    
 
 }

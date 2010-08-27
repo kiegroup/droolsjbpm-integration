@@ -22,21 +22,24 @@ import org.drools.grid.HumanTaskNodeService;
  *
  * @author salaboy
  */
-public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactoryService {
+public class HumanTaskServiceProviderRemoteClient
+    implements
+    HumanTaskFactoryService {
 
     private GenericNodeConnector connector;
-    private int id;
+    private int                  id;
 
     public HumanTaskServiceProviderRemoteClient() {
     }
 
-    public HumanTaskServiceProviderRemoteClient(GenericNodeConnector connector, int id) {
+    public HumanTaskServiceProviderRemoteClient(GenericNodeConnector connector,
+                                                int id) {
         this.connector = connector;
         this.id = id;
     }
 
     public GenericNodeConnector getConnector() {
-        return connector;
+        return this.connector;
     }
 
     public void setConnector(GenericNodeConnector connector) {
@@ -44,7 +47,7 @@ public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactorySer
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(int id) {
@@ -52,7 +55,8 @@ public class HumanTaskServiceProviderRemoteClient implements HumanTaskFactorySer
     }
 
     public HumanTaskNodeService newHumanTaskService() {
-        HumanTaskServiceRemoteClient humanTaskServiceImpl = new HumanTaskServiceRemoteClient(this.connector, this.id);
+        HumanTaskServiceRemoteClient humanTaskServiceImpl = new HumanTaskServiceRemoteClient( this.connector,
+                                                                                              this.id );
         return humanTaskServiceImpl;
     }
 }

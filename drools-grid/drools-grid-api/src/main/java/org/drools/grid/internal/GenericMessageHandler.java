@@ -1,7 +1,5 @@
 package org.drools.grid.internal;
 
-import org.drools.grid.internal.GenericIoWriter;
-import org.drools.grid.internal.Message;
 
 public interface GenericMessageHandler {
 

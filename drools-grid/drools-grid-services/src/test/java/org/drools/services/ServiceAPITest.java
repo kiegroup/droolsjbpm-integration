@@ -20,10 +20,8 @@ package org.drools.services;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import org.junit.Assert;
-import org.drools.grid.services.configuration.LocalProvider;
-import org.drools.grid.services.configuration.MinaProvider;
 import java.rmi.RemoteException;
+
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.drools.KnowledgeBase;
@@ -42,12 +40,15 @@ import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
 import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
 import org.drools.grid.services.configuration.GridTopologyConfiguration;
+import org.drools.grid.services.configuration.LocalProvider;
+import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.factory.GridTopologyFactory;
 import org.drools.grid.services.strategies.ExecutionEnvByPrioritySelectionStrategy;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class ServiceAPITest {
 
     private MinaAcceptor server;
     private GridTopology grid;
-    
+
     public ServiceAPITest() {
     }
 
@@ -74,50 +75,57 @@ public class ServiceAPITest {
 
     @Before
     public void setUp() throws IOException {
-         System.out.println("Server 1 Starting!");
+        System.out.println( "Server 1 Starting!" );
         // the servers should be started in a different machine (jvm or physical) or in another thread
-        SocketAddress address = new InetSocketAddress("127.0.0.1", 9123);
+        SocketAddress address = new InetSocketAddress( "127.0.0.1",
+                                                       9123 );
         NodeData nodeData = new NodeData();
         // setup Server
         SocketAcceptor acceptor = new NioSocketAcceptor();
-        acceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(),
-                new GenericMessageHandlerImpl(nodeData,
-                SystemEventListenerFactory.getSystemEventListener())));
-        server = new MinaAcceptor(acceptor, address);
-        server.start();
-        System.out.println("Server 1 Started! at = " + address.toString());
+        acceptor.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener(),
+                                                new GenericMessageHandlerImpl( nodeData,
+                                                                               SystemEventListenerFactory.getSystemEventListener() ) ) );
+        this.server = new MinaAcceptor( acceptor,
+                                        address );
+        this.server.start();
+        System.out.println( "Server 1 Started! at = " + address.toString() );
 
     }
 
     @After
-    public void tearDown() throws ConnectorException, RemoteException {
-        
-        grid.dispose();
-        System.out.println("Stoping Server 1!");
-        Assert.assertEquals(0, server.getCurrentSessions());
-        server.stop();
+    public void tearDown() throws ConnectorException,
+                          RemoteException {
+
+        this.grid.dispose();
+        System.out.println( "Stoping Server 1!" );
+        Assert.assertEquals( 0,
+                             this.server.getCurrentSessions() );
+        this.server.stop();
     }
 
-    
-     @Test
-     public void mixedTopologyMinaAndLocal() throws ConnectorException, RemoteException {
+    @Test
+    public void mixedTopologyMinaAndLocal() throws ConnectorException,
+                                           RemoteException {
 
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
         gridTopologyConfiguration
-                .addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaEnv", new MinaProvider("127.0.0.1", 9123)));
+                .addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyMinaEnv",
+                                                                                 new MinaProvider( "127.0.0.1",
+                                                                                                   9123 ) ) );
         gridTopologyConfiguration
-                .addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
+                .addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyLocalEnv",
+                                                                                 new LocalProvider() ) );
 
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
-        Assert.assertNotNull(grid);
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
+        Assert.assertNotNull( this.grid );
 
-        ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
-        Assert.assertNotNull(ee);
+        ExecutionEnvironment ee = this.grid.getBestExecutionEnvironment( new ExecutionEnvByPrioritySelectionStrategy() );
+        Assert.assertNotNull( ee );
 
         ExecutionNode node = ee.getExecutionNode();
-        Assert.assertNotNull(node);
+        Assert.assertNotNull( node );
 
-         // Do a basic Runtime Test that register a ksession and fire some rules.
+        // Do a basic Runtime Test that register a ksession and fire some rules.
         String str = "";
         str += "package org.drools \n";
         str += "global java.util.List list \n";
@@ -134,28 +142,28 @@ public class ServiceAPITest {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-
         KnowledgeBuilder kbuilder =
-                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newByteArrayResource(str.getBytes()),
-                ResourceType.DRL);
+                node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                      ResourceType.DRL );
 
-        if (kbuilder.hasErrors()) {
-            System.out.println("Errors: " + kbuilder.getErrors());
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
         KnowledgeBase kbase =
-                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+                node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        Assert.assertNotNull(ksession);
+        Assert.assertNotNull( ksession );
 
         int fired = ksession.fireAllRules();
-        Assert.assertEquals(2, fired);
+        Assert.assertEquals( 2,
+                             fired );
 
-     }
+    }
 
 }

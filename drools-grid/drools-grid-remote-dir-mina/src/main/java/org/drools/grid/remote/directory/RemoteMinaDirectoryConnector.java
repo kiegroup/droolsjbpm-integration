@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFuture;
@@ -48,75 +49,81 @@ import org.drools.grid.remote.mina.MinaIoHandler;
  *
  * @author salaboy
  */
-public class RemoteMinaDirectoryConnector implements GenericNodeConnector {
+public class RemoteMinaDirectoryConnector
+    implements
+    GenericNodeConnector {
 
-    private GridConnection connection;
-    private String providerName;
+    private GridConnection      connection;
+    private String              providerName;
     private SystemEventListener eventListener;
-    protected IoSession session;
-    private AtomicInteger counter;
-    private SocketConnector connector;
-    private SocketAddress address;
-    
+    protected IoSession         session;
+    private AtomicInteger       counter;
+    private SocketConnector     connector;
+    private SocketAddress       address;
 
-    public RemoteMinaDirectoryConnector(String providerName, String providerAddress,
-            Integer providerPort, SystemEventListener systemEventListener) {
+    public RemoteMinaDirectoryConnector(String providerName,
+                                        String providerAddress,
+                                        Integer providerPort,
+                                        SystemEventListener systemEventListener) {
 
-        if (providerName == null) {
-            throw new IllegalArgumentException("Name can not be null");
+        if ( providerName == null ) {
+            throw new IllegalArgumentException( "Name can not be null" );
         }
         this.counter = new AtomicInteger();
         this.providerName = providerName;
         this.eventListener = systemEventListener;
-        this.address = new InetSocketAddress(providerAddress, providerPort);
+        this.address = new InetSocketAddress( providerAddress,
+                                              providerPort );
         this.connection = new GridConnection();
 
     }
 
     public void connect() throws ConnectorException {
-        if (session != null && session.isConnected()) {
-            throw new IllegalStateException("Already connected. Disconnect first.");
+        if ( this.session != null && this.session.isConnected() ) {
+            throw new IllegalStateException( "Already connected. Disconnect first." );
         }
 
         try {
             this.connector = new NioSocketConnector();
-            this.connector.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener()));
-            this.connector.getFilterChain().addLast("codec" + UUID.randomUUID().toString(),
-                    new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
-            
-            ConnectFuture future1 = this.connector.connect(this.address);
-            future1.await(2000);
-            if (!future1.isConnected()) {
-                eventListener.info("unable to connect : " + address + " : " + future1.getException());
-                Logger.getLogger(RemoteMinaDirectoryConnector.class.getName()).log(Level.SEVERE, null, "The Directory Connection Failed!");
-                throw new ConnectorException("unable to connect : " + address + " : " + future1.getException());
+            this.connector.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener() ) );
+            this.connector.getFilterChain().addLast( "codec" + UUID.randomUUID().toString(),
+                                                     new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
+
+            ConnectFuture future1 = this.connector.connect( this.address );
+            future1.await( 2000 );
+            if ( !future1.isConnected() ) {
+                this.eventListener.info( "unable to connect : " + this.address + " : " + future1.getException() );
+                Logger.getLogger( RemoteMinaDirectoryConnector.class.getName() ).log( Level.SEVERE,
+                                                                                      null,
+                                                                                      "The Directory Connection Failed!" );
+                throw new ConnectorException( "unable to connect : " + this.address + " : " + future1.getException() );
             }
-            eventListener.info("connected : " + address);
+            this.eventListener.info( "connected : " + this.address );
             this.session = future1.getSession();
 
-        } catch (Exception e) {
-            throw new ConnectorException(e);
+        } catch ( Exception e ) {
+            throw new ConnectorException( e );
         }
     }
 
     public void disconnect() throws ConnectorException {
-        
-        if (session != null && session.isConnected()) {
-            
-            CloseFuture future = session.getCloseFuture();
-            future.addListener((IoFutureListener<?>) new IoFutureListener<IoFuture>() {
+
+        if ( this.session != null && this.session.isConnected() ) {
+
+            CloseFuture future = this.session.getCloseFuture();
+            future.addListener( new IoFutureListener<IoFuture>() {
 
                 public void operationComplete(IoFuture future) {
-                    System.out.println("The remote directory session is now closed");
+                    System.out.println( "The remote directory session is now closed" );
                 }
-            });
-            session.close(false);
-            
+            } );
+            this.session.close( false );
+
             future.awaitUninterruptibly();
 
-            connector.dispose();
+            this.connector.dispose();
         }
-        
+
     }
 
     public String getId() {
@@ -126,11 +133,11 @@ public class RemoteMinaDirectoryConnector implements GenericNodeConnector {
     }
 
     public int getSessionId() {
-        return (int) session.getId();
+        return (int) this.session.getId();
     }
 
     public IoSession getSession() {
-        return session;
+        return this.session;
     }
 
     public GenericConnection getConnection() {
@@ -141,20 +148,23 @@ public class RemoteMinaDirectoryConnector implements GenericNodeConnector {
         return ConnectorType.REMOTE;
     }
 
-    public Message write(Message msg) throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Message write(Message msg) throws ConnectorException,
+                                     RemoteException {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public NodeConnectionType getNodeConnectionType() throws ConnectorException, RemoteException {
+    public NodeConnectionType getNodeConnectionType() throws ConnectorException,
+                                                     RemoteException {
         return new RemoteMinaConnectionDirectory();
 
     }
 
-    public void write(Message msg, MessageResponseHandler responseHandler) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void write(Message msg,
+                      MessageResponseHandler responseHandler) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public AtomicInteger getCounter() {
-        return counter;
+        return this.counter;
     }
 }

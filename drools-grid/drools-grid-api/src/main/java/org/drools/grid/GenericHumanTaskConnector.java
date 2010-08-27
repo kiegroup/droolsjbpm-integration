@@ -23,7 +23,9 @@ import org.drools.grid.internal.Message;
  *
  * @author salaboy
  */
-public interface GenericHumanTaskConnector extends GenericIoWriter{
+public interface GenericHumanTaskConnector
+    extends
+    GenericIoWriter {
 
     public String getId() throws ConnectorException;
 

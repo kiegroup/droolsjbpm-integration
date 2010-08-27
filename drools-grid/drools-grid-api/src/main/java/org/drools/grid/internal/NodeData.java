@@ -13,11 +13,11 @@ public class NodeData {
     private Context        root;
     private Context        temp;
 
-    public static String   ROOT                 = "ROOT";
-    public static String   TEMP                 = "__TEMP__";
-    public static String   NODE_DATA = "__NodeData__";
+    public static String   ROOT             = "ROOT";
+    public static String   TEMP             = "__TEMP__";
+    public static String   NODE_DATA        = "__NodeData__";
 
-    private AtomicInteger  sessionIdCounter     = new AtomicInteger();
+    private AtomicInteger  sessionIdCounter = new AtomicInteger();
 
     public NodeData() {
         // Setup ROOT context, this will hold all long lived intances and instanceIds
@@ -37,11 +37,11 @@ public class NodeData {
     }
 
     public AtomicInteger getSessionIdCounter() {
-        return sessionIdCounter;
+        return this.sessionIdCounter;
     }
 
     public ContextManager getContextManager() {
-        return contextManager;
+        return this.contextManager;
     }
 
     public void setContextManager(ContextManager contextManager) {
@@ -49,7 +49,7 @@ public class NodeData {
     }
 
     public Context getRoot() {
-        return root;
+        return this.root;
     }
 
     public void setRoot(Context root) {
@@ -57,7 +57,7 @@ public class NodeData {
     }
 
     public Context getTemp() {
-        return temp;
+        return this.temp;
     }
 
     public void setTemp(Context temp) {

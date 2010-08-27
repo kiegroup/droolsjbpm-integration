@@ -17,24 +17,27 @@
 package org.drools.grid.strategies;
 
 import java.util.List;
+
 import org.drools.grid.GenericNodeConnector;
 
 /**
  *
  * @author salaboy
  */
-public class StaticIncrementalNodeSelectionStrategy implements NodeSelectionStrategy {
+public class StaticIncrementalNodeSelectionStrategy
+    implements
+    NodeSelectionStrategy {
 
     public static int counter = 0;
 
     public GenericNodeConnector getBestNode(List<GenericNodeConnector> connectors) {
-        if(counter >= connectors.size()){
+        if ( counter >= connectors.size() ) {
             counter = 0;
         }
-        GenericNodeConnector connector = connectors.get(counter);
+        GenericNodeConnector connector = connectors.get( counter );
         StaticIncrementalNodeSelectionStrategy.counter = counter + 1;
-        
+
         return connector;
-        
+
     }
 }

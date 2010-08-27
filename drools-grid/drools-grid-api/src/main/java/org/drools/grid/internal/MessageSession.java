@@ -25,17 +25,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MessageSession {
 
-    public AtomicInteger    counter;
-    private int sessionId = -1;
+    public AtomicInteger counter;
+    private int          sessionId = -1;
 
     public MessageSession() {
-        counter = new AtomicInteger();
+        this.counter = new AtomicInteger();
     }
 
-
-
     public AtomicInteger getCounter() {
-        return counter;
+        return this.counter;
     }
 
     public void setCounter(AtomicInteger counter) {
@@ -43,7 +41,7 @@ public class MessageSession {
     }
 
     public int getSessionId() {
-        return sessionId;
+        return this.sessionId;
     }
 
     public void setSessionId(int sessionId) {

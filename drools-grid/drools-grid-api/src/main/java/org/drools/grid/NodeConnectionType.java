@@ -25,9 +25,14 @@ import java.util.Set;
  */
 public interface NodeConnectionType {
     public void setConnector(GenericNodeConnector connector);
+
     public void setConnection(GenericConnection connection);
-    public Set<Class<?>> getServicesKeys();
-    public <T> T  getServiceImpl(Class<T> clazz);
+
+    public Set<Class< ? >> getServicesKeys();
+
+    public <T> T getServiceImpl(Class<T> clazz);
+
     public ConnectorType getConnectorType();
+
     public void init();
 }

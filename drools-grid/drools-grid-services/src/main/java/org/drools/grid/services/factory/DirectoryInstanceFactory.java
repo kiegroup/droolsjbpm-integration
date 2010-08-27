@@ -16,7 +16,6 @@
  */
 package org.drools.grid.services.factory;
 
-
 import org.drools.grid.services.DirectoryInstance;
 import org.drools.grid.services.configuration.GenericProvider;
 import org.drools.grid.services.configuration.LocalProvider;
@@ -25,11 +24,15 @@ import org.drools.grid.services.configuration.RioProvider;
 
 public class DirectoryInstanceFactory {
 
-    public static DirectoryInstance newDirectoryInstance(String name, GenericProvider provider) {
-        return GenericProviderContainerFactoryHelper.doOnGenericProvider(provider, new DirectoryInstanceBuilder(name));
+    public static DirectoryInstance newDirectoryInstance(String name,
+                                                         GenericProvider provider) {
+        return GenericProviderContainerFactoryHelper.doOnGenericProvider( provider,
+                                                                          new DirectoryInstanceBuilder( name ) );
     }
 
-    private static class DirectoryInstanceBuilder implements GenericProviderContainerBuilder<DirectoryInstance> {
+    private static class DirectoryInstanceBuilder
+        implements
+        GenericProviderContainerBuilder<DirectoryInstance> {
 
         private String name;
 
@@ -41,21 +44,21 @@ public class DirectoryInstanceFactory {
         }
 
         public DirectoryInstance onLocalProvider(LocalProvider provider) {
-            return new DirectoryInstance(name,
-                    //provider.getConnector("org.drools.grid.local.LocalDirectoryConnector"));
-                    provider.getConnector("Local:Local:Directory"));
+            return new DirectoryInstance( this.name,
+                                          //provider.getConnector("org.drools.grid.local.LocalDirectoryConnector"));
+                                          provider.getConnector( "Local:Local:Directory" ) );
         }
 
         public DirectoryInstance onMinaProvider(MinaProvider provider) {
-            return new DirectoryInstance(name,
-                   //provider.getConnector("org.drools.grid.remote.directory.RemoteMinaDirectoryConnector"));
-                   provider.getConnector("Remote:Mina:Directory"));
+            return new DirectoryInstance( this.name,
+                                          //provider.getConnector("org.drools.grid.remote.directory.RemoteMinaDirectoryConnector"));
+                                          provider.getConnector( "Remote:Mina:Directory" ) );
         }
 
         public DirectoryInstance onRioProvider(RioProvider provider) {
-            return new DirectoryInstance(name,
-                    //provider.getConnector("org.drools.distributed.directory.impl.DistributedRioDirectoryConnector"));
-                    provider.getConnector("Distributed:Rio:Directory"));
+            return new DirectoryInstance( this.name,
+                                          //provider.getConnector("org.drools.distributed.directory.impl.DistributedRioDirectoryConnector"));
+                                          provider.getConnector( "Distributed:Rio:Directory" ) );
         }
 
         public DirectoryInstance onHornetQProvider() {

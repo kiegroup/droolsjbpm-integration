@@ -30,23 +30,24 @@ public class Message
     }
 
     public int getSessionId() {
-        return sessionId;
+        return this.sessionId;
     }
 
     public int getResponseId() {
-        return responseId;
+        return this.responseId;
     }
 
     public boolean isAsync() {
-        return async;
+        return this.async;
     }
 
     public Object getPayload() {
-        return payload;
+        return this.payload;
     }
 
+    @Override
     public String toString() {
-        return "sessionId=" + this.sessionId + " responseId=" + responseId + " async=" + this.async + " payload=" + this.payload;
+        return "sessionId=" + this.sessionId + " responseId=" + this.responseId + " async=" + this.async + " payload=" + this.payload;
     }
 
 }

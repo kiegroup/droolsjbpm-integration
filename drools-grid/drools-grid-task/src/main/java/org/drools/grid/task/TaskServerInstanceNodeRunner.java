@@ -16,7 +16,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.drools.SystemEventListenerFactory;
 import org.drools.grid.remote.mina.MinaAcceptor;
 import org.drools.grid.remote.mina.MinaIoHandler;
-
 import org.drools.task.UserInfo;
 import org.drools.task.service.TaskService;
 import org.drools.task.service.TaskServiceSession;
@@ -25,43 +24,48 @@ import org.slf4j.LoggerFactory;
 
 public class TaskServerInstanceNodeRunner {
 
-	private static Logger logger = LoggerFactory.getLogger(TaskServerInstanceNodeRunner.class);
+    private static Logger logger = LoggerFactory.getLogger( TaskServerInstanceNodeRunner.class );
 
-	
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         OptionParser parser = new OptionParser();
-        OptionSpec<String> addressOpt = parser.accepts("address", "the address to bind the node").withRequiredArg().ofType(String.class);
-        OptionSpec<Integer> portOpt = parser.accepts("port", "the port to listen in the given address").withRequiredArg().ofType(Integer.class);
-        OptionSet options = parser.parse(args);
+        OptionSpec<String> addressOpt = parser.accepts( "address",
+                                                        "the address to bind the node" ).withRequiredArg().ofType( String.class );
+        OptionSpec<Integer> portOpt = parser.accepts( "port",
+                                                      "the port to listen in the given address" ).withRequiredArg().ofType( Integer.class );
+        OptionSet options = parser.parse( args );
 
-		String address = options.valueOf(addressOpt);
-		int port = options.valueOf(portOpt);
+        String address = options.valueOf( addressOpt );
+        int port = options.valueOf( portOpt );
 
-		
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.drools.task");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.task" );
 
-		TaskService taskService = new TaskService(emf, SystemEventListenerFactory.getSystemEventListener());
-		TaskServiceSession taskSession = taskService.createSession();
-		UserInfo userInfo = new DefaultUserInfo();
-		taskService.setUserinfo(userInfo);
+        TaskService taskService = new TaskService( emf,
+                                                   SystemEventListenerFactory.getSystemEventListener() );
+        TaskServiceSession taskSession = taskService.createSession();
+        UserInfo userInfo = new DefaultUserInfo();
+        taskService.setUserinfo( userInfo );
 
-		SocketAddress htAddress = new InetSocketAddress(address, port);
-		SocketAcceptor htAcceptor = new NioSocketAcceptor();
+        SocketAddress htAddress = new InetSocketAddress( address,
+                                                         port );
+        SocketAcceptor htAcceptor = new NioSocketAcceptor();
 
-		htAcceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(), 
-				new TaskServerMessageHandlerImpl(taskService, SystemEventListenerFactory.getSystemEventListener())));
-		final MinaAcceptor humanTaskServer = new MinaAcceptor(htAcceptor, htAddress);
-		
-       Runtime.getRuntime().addShutdownHook(new Thread() {
-           public void run() {
-        	   logger.info("stoping server...");
-        	   humanTaskServer.stop();
-               logger.info("server stoped...");
-           }
-        });
+        htAcceptor.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener(),
+                                                  new TaskServerMessageHandlerImpl( taskService,
+                                                                                    SystemEventListenerFactory.getSystemEventListener() ) ) );
+        final MinaAcceptor humanTaskServer = new MinaAcceptor( htAcceptor,
+                                                               htAddress );
 
-		humanTaskServer.start();
-	    logger.info("server started at "+ htAddress.toString() +" ... (ctrl-c to stop it)");
+        Runtime.getRuntime().addShutdownHook( new Thread() {
+            @Override
+            public void run() {
+                logger.info( "stoping server..." );
+                humanTaskServer.stop();
+                logger.info( "server stoped..." );
+            }
+        } );
 
-	}
+        humanTaskServer.start();
+        logger.info( "server started at " + htAddress.toString() + " ... (ctrl-c to stop it)" );
+
+    }
 }

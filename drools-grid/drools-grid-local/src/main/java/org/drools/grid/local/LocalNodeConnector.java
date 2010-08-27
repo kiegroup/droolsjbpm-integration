@@ -18,6 +18,7 @@
 package org.drools.grid.local;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.drools.grid.ConnectorException;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.GenericConnection;
@@ -31,13 +32,16 @@ import org.drools.grid.internal.MessageResponseHandler;
  *
  * @author salaboy
  */
-public class LocalNodeConnector implements GenericNodeConnector {
+public class LocalNodeConnector
+    implements
+    GenericNodeConnector {
 
-    private GridConnection connection = new GridConnection();;
-    private NodeConnectionType connectionNode = new LocalConnectionNode(this, connection);
+    private GridConnection     connection     = new GridConnection();                       ;
+    private NodeConnectionType connectionNode = new LocalConnectionNode( this,
+                                                                         this.connection );
+
     public LocalNodeConnector() {
-        
-        
+
     }
 
     public void connect() throws ConnectorException {
@@ -49,21 +53,23 @@ public class LocalNodeConnector implements GenericNodeConnector {
     }
 
     public Message write(Message msg) throws ConnectorException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public String getId() throws ConnectorException {
         return "Local:Local:Node";
     }
 
-    public void write(Message msg, MessageResponseHandler responseHandler) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void write(Message msg,
+                      MessageResponseHandler responseHandler) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
+
     public GenericConnection getConnection() {
         return this.connection;
     }
 
-   public NodeConnectionType getNodeConnectionType() throws ConnectorException {
+    public NodeConnectionType getNodeConnectionType() throws ConnectorException {
         return this.connectionNode;
     }
 
@@ -72,10 +78,10 @@ public class LocalNodeConnector implements GenericNodeConnector {
     }
 
     public int getSessionId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public AtomicInteger getCounter() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 }

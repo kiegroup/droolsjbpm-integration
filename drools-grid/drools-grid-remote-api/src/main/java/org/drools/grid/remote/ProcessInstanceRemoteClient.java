@@ -18,53 +18,60 @@
 package org.drools.grid.remote;
 
 import java.io.Serializable;
+
 import org.drools.runtime.process.ProcessInstance;
 
 /**
  *
  * @author salaboy
  */
-public class ProcessInstanceRemoteClient implements ProcessInstance, Serializable {
+public class ProcessInstanceRemoteClient
+    implements
+    ProcessInstance,
+    Serializable {
 
-    private String processId;
-    private long id;
-    private String processName;
-    private int state;
+    private String   processId;
+    private long     id;
+    private String   processName;
+    private int      state;
     private String[] eventTypes;
+
     public ProcessInstanceRemoteClient() {
     }
 
-    public ProcessInstanceRemoteClient(long id, String processId, String processName, int state) {
+    public ProcessInstanceRemoteClient(long id,
+                                       String processId,
+                                       String processName,
+                                       int state) {
         this.processId = processId;
         this.id = id;
         this.processName = processName;
         this.state = state;
     }
 
-
-
     public String getProcessId() {
-        return processId;
+        return this.processId;
     }
 
     public long getId() {
-        return id;
+        return this.id;
     }
 
     public String getProcessName() {
-        return processName;
+        return this.processName;
     }
 
     public int getState() {
-        return state;
+        return this.state;
     }
 
-    public void signalEvent(String type, Object event) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void signalEvent(String type,
+                            Object event) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public String[] getEventTypes() {
-        return eventTypes;
+        return this.eventTypes;
     }
 
 }

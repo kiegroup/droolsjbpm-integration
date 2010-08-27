@@ -27,58 +27,56 @@ import java.util.Map;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.services.TaskServerInstance;
 
-
 /**
  *
  * @author salaboy
  */
-public class TaskServerInstanceByPrioritySelectionStrategy implements TaskServerInstanceSelectionStrategy{
+public class TaskServerInstanceByPrioritySelectionStrategy
+    implements
+    TaskServerInstanceSelectionStrategy {
 
     private List<TaskServerInstance> taskServers;
 
     public TaskServerInstance getBestTaskServerInstance() {
 
+        Collections.sort( this.taskServers,
+                          new Comparator<TaskServerInstance>() {
 
+                              private Map<ConnectorType, Integer> priorities
+                                                                             = new HashMap<ConnectorType, Integer>() {
+                                                                                 {
+                                                                                     // put(ConnectorType.LOCAL, 1);
+                                                                                     // put("RioEnvironmentProvider", 2);
+                                                                                     // put("HornetQEnvironmentProvider", 3);
+                                                                                     put( ConnectorType.REMOTE,
+                                                                                          4 );
+                                                                                 }
+                                                                             };
 
-        Collections.sort(taskServers, new Comparator<TaskServerInstance>() {
+                              public int compare(TaskServerInstance o1,
+                                                 TaskServerInstance o2) {
+                                  return this.priorities.get( o1.getConnector().getConnectorType() ).compareTo(
+                                                                                                                this.priorities.get( o2.getConnector().getConnectorType() ) );
 
-            private Map<ConnectorType , Integer> priorities
-                        = new HashMap<ConnectorType, Integer>() {
-                {
-                   // put(ConnectorType.LOCAL, 1);
-                   // put("RioEnvironmentProvider", 2);
-                   // put("HornetQEnvironmentProvider", 3);
-                   put(ConnectorType.REMOTE, 4);
-                }
-            };
+                              }
+                          } );
 
-            public int compare(TaskServerInstance o1, TaskServerInstance o2) {
-                    return priorities.get(o1.getConnector().getConnectorType()).compareTo(
-                            priorities.get(o2.getConnector().getConnectorType()));
-
-            }
-        });
-
-
-
-        return taskServers.get(0);
+        return this.taskServers.get( 0 );
     }
 
     public void setTaskServerInstances(Map<String, TaskServerInstance> taskServerInstances) {
         List<TaskServerInstance> serverList = new ArrayList<TaskServerInstance>();
-        for(TaskServerInstance taskServer : taskServerInstances.values()){
-            
-                serverList.add(taskServer);
-            
+        for ( TaskServerInstance taskServer : taskServerInstances.values() ) {
+
+            serverList.add( taskServer );
+
         }
         this.taskServers = serverList;
     }
 
     public TaskServerInstance getBestTaskServerInstance(Map<String, TaskServerInstance> taskServerInstances) {
-        setTaskServerInstances(taskServerInstances);
+        setTaskServerInstances( taskServerInstances );
         return getBestTaskServerInstance();
     }
-
-   
 
 }

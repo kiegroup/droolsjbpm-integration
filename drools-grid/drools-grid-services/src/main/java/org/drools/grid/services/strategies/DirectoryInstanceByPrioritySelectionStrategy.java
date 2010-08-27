@@ -27,57 +27,56 @@ import java.util.Map;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.services.DirectoryInstance;
 
-
 /**
  *
  * @author salaboy
  */
-public class DirectoryInstanceByPrioritySelectionStrategy implements DirectoryInstanceSelectionStrategy{
+public class DirectoryInstanceByPrioritySelectionStrategy
+    implements
+    DirectoryInstanceSelectionStrategy {
 
     private List<DirectoryInstance> directories;
 
     public DirectoryInstance getBestDirectoryInstance() {
 
+        Collections.sort( this.directories,
+                          new Comparator<DirectoryInstance>() {
 
+                              private Map<ConnectorType, Integer> priorities
+                                                                             = new HashMap<ConnectorType, Integer>() {
+                                                                                 {
+                                                                                     put( ConnectorType.LOCAL,
+                                                                                          1 );
+                                                                                     // put("RioEnvironmentProvider", 2);
+                                                                                     // put("HornetQEnvironmentProvider", 3);
+                                                                                     put( ConnectorType.REMOTE,
+                                                                                          4 );
+                                                                                 }
+                                                                             };
 
-        Collections.sort(directories, new Comparator<DirectoryInstance>() {
+                              public int compare(DirectoryInstance o1,
+                                                 DirectoryInstance o2) {
+                                  return this.priorities.get( o1.getConnector().getConnectorType() )
+                                          .compareTo( this.priorities.get( o2.getConnector().getConnectorType() ) );
+                              }
+                          } );
 
-            private Map<ConnectorType , Integer> priorities
-                        = new HashMap<ConnectorType, Integer>() {
-                {
-                    put(ConnectorType.LOCAL, 1);
-                   // put("RioEnvironmentProvider", 2);
-                   // put("HornetQEnvironmentProvider", 3);
-                   put(ConnectorType.REMOTE, 4);
-                }
-            };
-
-            public int compare(DirectoryInstance o1, DirectoryInstance o2) {
-                return priorities.get(o1.getConnector().getConnectorType())
-                        .compareTo(priorities.get(o2.getConnector().getConnectorType()));
-            }
-        });
-
-
-
-        return directories.get(0);
+        return this.directories.get( 0 );
     }
 
     public void setDirectoryInstances(Map<String, DirectoryInstance> directoryInstances) {
         List<DirectoryInstance> dirList = new ArrayList<DirectoryInstance>();
-        for(DirectoryInstance directory : directoryInstances.values()){
-            
-                dirList.add(directory);
-            
+        for ( DirectoryInstance directory : directoryInstances.values() ) {
+
+            dirList.add( directory );
+
         }
         this.directories = dirList;
     }
 
     public DirectoryInstance getBestDirectoryInstance(Map<String, DirectoryInstance> directoryInstances) {
-        setDirectoryInstances(directoryInstances);
+        setDirectoryInstances( directoryInstances );
         return getBestDirectoryInstance();
     }
-
-   
 
 }

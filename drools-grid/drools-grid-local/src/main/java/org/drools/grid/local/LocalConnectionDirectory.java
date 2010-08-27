@@ -32,23 +32,24 @@ import org.drools.grid.NodeConnectionType;
  *
  * @author salaboy 
  */
-public class LocalConnectionDirectory implements NodeConnectionType {
-    private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();
-    private static DirectoryNodeService directory = new DirectoryNodeLocalImpl();
+public class LocalConnectionDirectory
+    implements
+    NodeConnectionType {
+    private final Map<Class< ? >, Object> services  = new ConcurrentHashMap<Class< ? >, Object>();
+    private static DirectoryNodeService   directory = new DirectoryNodeLocalImpl();
 
     public LocalConnectionDirectory() {
-        services.put(DirectoryNodeService.class, directory);
-        
+        this.services.put( DirectoryNodeService.class,
+                           directory );
+
     }
 
-    
-
-    public Set<Class<?>> getServicesKeys() {
-        return services.keySet(); 
+    public Set<Class< ? >> getServicesKeys() {
+        return this.services.keySet();
     }
 
     public <T> T getServiceImpl(Class<T> clazz) {
-        return (T) services.get(clazz);
+        return (T) this.services.get( clazz );
     }
 
     public void setConnector(GenericNodeConnector connector) {

@@ -18,6 +18,7 @@
 package org.drools.grid.strategies;
 
 import java.util.List;
+
 import org.drools.grid.GenericNodeConnector;
 
 /**
@@ -27,5 +28,5 @@ import org.drools.grid.GenericNodeConnector;
 public interface NodeSelectionStrategy {
 
     public GenericNodeConnector getBestNode(List<GenericNodeConnector> connectors);
-    
+
 }

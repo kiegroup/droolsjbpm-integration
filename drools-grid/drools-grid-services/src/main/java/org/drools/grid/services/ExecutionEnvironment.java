@@ -38,16 +38,17 @@ import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
  * create and execute knowledge.
  *
  */
-public class ExecutionEnvironment  {
+public class ExecutionEnvironment {
 
-    private String name;
+    private String                name;
     private GenericNodeConnector  connector;
     private NodeSelectionStrategy defaultStrategy = new ReturnAlwaysTheFirstSelectionStrategy();
 
     /*
      * Creates a new ExecutionEnvironment using a name and a GenericNodeConnector
      */
-    public ExecutionEnvironment(String name, GenericNodeConnector connector) {
+    public ExecutionEnvironment(String name,
+                                GenericNodeConnector connector) {
         this.name = name;
         this.connector = connector;
     }
@@ -59,7 +60,7 @@ public class ExecutionEnvironment  {
      * rules remotely.
      */
     public ExecutionNode getExecutionNode() throws ConnectorException {
-        return getExecutionNode(defaultStrategy);
+        return getExecutionNode( this.defaultStrategy );
     }
 
     /*
@@ -68,14 +69,14 @@ public class ExecutionEnvironment  {
      */
     public ExecutionNode getExecutionNode(NodeSelectionStrategy strategy) throws ConnectorException {
         GenericConnection connection = getConnector().getConnection();
-        return connection.getExecutionNode(strategy);
+        return connection.getExecutionNode( strategy );
     }
 
     /*
      * This method will create a connection to all the ExecutionNodes provided by this
      * ExecutionEnvironments. This can be expensive, but it's useful for monitoring purposes.
      */
-    public List<ExecutionNode> getExecutionNodes() throws ConnectorException{
+    public List<ExecutionNode> getExecutionNodes() throws ConnectorException {
         GenericConnection connection = getConnector().getConnection();
         return connection.getExecutionNodes();
     }
@@ -83,7 +84,7 @@ public class ExecutionEnvironment  {
     /*
      * Return the ExecutionEnvironment connector
      */
-    public GenericNodeConnector getConnector(){
+    public GenericNodeConnector getConnector() {
         return this.connector;
     }
 
@@ -91,7 +92,7 @@ public class ExecutionEnvironment  {
      * Return the ExecutionEnvironment Name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
-    
+
 }

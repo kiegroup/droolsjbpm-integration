@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.DirectoryNodeService;
@@ -32,37 +33,48 @@ import org.drools.runtime.CommandExecutor;
  *
  * @author salaboy
  */
-public class DirectoryLookupProviderLocalClient implements DirectoryLookupFactoryService {
+public class DirectoryLookupProviderLocalClient
+    implements
+    DirectoryLookupFactoryService {
 
     private static Map<String, CommandExecutor> services = new HashMap<String, CommandExecutor>();
-    private GenericConnection connection;
-    private GenericNodeConnector client;
+    private GenericConnection                   connection;
+    private GenericNodeConnector                client;
 
-    public DirectoryLookupProviderLocalClient(GenericNodeConnector client, GenericConnection connection) {
+    public DirectoryLookupProviderLocalClient(GenericNodeConnector client,
+                                              GenericConnection connection) {
         this.connection = connection;
         this.client = client;
     }
 
-    public void register(String key, CommandExecutor executor) {
-            try {
-                DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
-                directoryNode.register(key, client.getId());
-            } catch (ConnectorException ex) {
-                Logger.getLogger(DirectoryLookupProviderLocalClient.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderLocalClient.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        services.put(key, executor);
+    public void register(String key,
+                         CommandExecutor executor) {
+        try {
+            DirectoryNodeService directoryNode = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
+            directoryNode.register( key,
+                                    this.client.getId() );
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( DirectoryLookupProviderLocalClient.class.getName() ).log( Level.SEVERE,
+                                                                                        null,
+                                                                                        ex );
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( DirectoryLookupProviderLocalClient.class.getName() ).log( Level.SEVERE,
+                                                                                        null,
+                                                                                        ex );
+        }
+        services.put( key,
+                      executor );
     }
 
     public CommandExecutor lookup(String key) {
-        return services.get(key);
+        return services.get( key );
     }
 
     public Map<String, String> getDirectoryMap() {
         Map<String, String> directory = new HashMap<String, String>();
-        for (String key : services.keySet()) {
-            directory.put(key, services.get(key).toString());
+        for ( String key : services.keySet() ) {
+            directory.put( key,
+                           services.get( key ).toString() );
 
         }
         return directory;
@@ -71,13 +83,17 @@ public class DirectoryLookupProviderLocalClient implements DirectoryLookupFactor
 
     public void unregister(String key) {
         try {
-                DirectoryNodeService directoryNode = connection.getDirectoryNode().get(DirectoryNodeService.class);
-                directoryNode.unregister(key);
-            } catch (ConnectorException ex) {
-                Logger.getLogger(DirectoryLookupProviderLocalClient.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (RemoteException ex) {
-                Logger.getLogger(DirectoryLookupProviderLocalClient.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        services.remove(key);
+            DirectoryNodeService directoryNode = this.connection.getDirectoryNode().get( DirectoryNodeService.class );
+            directoryNode.unregister( key );
+        } catch ( ConnectorException ex ) {
+            Logger.getLogger( DirectoryLookupProviderLocalClient.class.getName() ).log( Level.SEVERE,
+                                                                                        null,
+                                                                                        ex );
+        } catch ( RemoteException ex ) {
+            Logger.getLogger( DirectoryLookupProviderLocalClient.class.getName() ).log( Level.SEVERE,
+                                                                                        null,
+                                                                                        ex );
+        }
+        services.remove( key );
     }
 }

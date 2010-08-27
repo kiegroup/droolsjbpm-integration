@@ -22,7 +22,6 @@ package org.drools.grid.distributed.command;
  * @author salaboy
  */
 
-
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
@@ -41,14 +40,16 @@ public class GetWorkingMemoryEntryPointGridCommand
 
     public WorkingMemoryEntryPoint execute(Context context) {
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
-        WorkingMemoryEntryPoint ep = ksession.getWorkingMemoryEntryPoint( name );
-        
-        context.getContextManager().getDefaultContext().set(name, ep); //setWorkingMemoryEntryPoint( ep );
+        WorkingMemoryEntryPoint ep = ksession.getWorkingMemoryEntryPoint( this.name );
+
+        context.getContextManager().getDefaultContext().set( this.name,
+                                                             ep ); //setWorkingMemoryEntryPoint( ep );
         //((KnowledgeCommandContext) context.getContextManager() ).set(name, ep);
         return ep;
     }
 
+    @Override
     public String toString() {
-        return "session.getWorkingMemoryEntryPoint( " + name + " );";
+        return "session.getWorkingMemoryEntryPoint( " + this.name + " );";
     }
 }

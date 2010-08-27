@@ -17,13 +17,13 @@
 package org.drools.services;
 
 import java.rmi.RemoteException;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.grid.ConnectorException;
-import org.drools.grid.DirectoryNode;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNode;
 import org.drools.grid.services.DirectoryInstance;
@@ -72,85 +72,101 @@ public class RegisterDirectoryTest {
     }
 
     @Test
-    public void directoryLocalTest() throws ConnectorException, RemoteException {
+    public void directoryLocalTest() throws ConnectorException,
+                                    RemoteException {
 
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
         gridTopologyConfiguration
-                .addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir", new LocalProvider()));
+                .addDirectoryInstance( new DirectoryInstanceConfiguration( "MyLocalDir",
+                                                                           new LocalProvider() ) );
         gridTopologyConfiguration
-                .addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
+                .addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyLocalEnv",
+                                                                                 new LocalProvider() ) );
 
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
-        Assert.assertNotNull(grid);
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
+        Assert.assertNotNull( this.grid );
 
-        DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
-        Assert.assertNotNull("Directory Instance null", directory);
+        DirectoryInstance directory = this.grid.getBestDirectoryInstance( new DirectoryInstanceByPrioritySelectionStrategy() );
+        Assert.assertNotNull( "Directory Instance null",
+                              directory );
 
-        DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
+        DirectoryNodeService dir = directory.getDirectoryNode().get( DirectoryNodeService.class );
         //directory.getConnector().disconnect();
 
-        Assert.assertNotNull("Dir Null", dir);
-        Assert.assertEquals(2, dir.getExecutorsMap().size());
+        Assert.assertNotNull( "Dir Null",
+                              dir );
+        Assert.assertEquals( 2,
+                             dir.getExecutorsMap().size() );
 
-        grid.dispose();
+        this.grid.dispose();
     }
 
     @Test
-    public void multiDirectoryLocalTest() throws ConnectorException, RemoteException {
+    public void multiDirectoryLocalTest() throws ConnectorException,
+                                         RemoteException {
 
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
+        gridTopologyConfiguration.addDirectoryInstance( new DirectoryInstanceConfiguration( "MyLocalDir",
+                                                                                            new LocalProvider() ) );
+        gridTopologyConfiguration.addDirectoryInstance( new DirectoryInstanceConfiguration( "MyLocalDir2",
+                                                                                            new LocalProvider() ) );
 
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir", new LocalProvider()));
-        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir2", new LocalProvider()));
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyLocalEnv",
+                                                                                                  new LocalProvider() ) );
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyLocalEnv2",
+                                                                                                  new LocalProvider() ) );
 
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv2", new LocalProvider()));
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
 
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+        Assert.assertNotNull( this.grid );
 
-        Assert.assertNotNull(grid);
+        DirectoryInstance directory = this.grid.getDirectoryInstance( "MyLocalDir" );
+        Assert.assertNotNull( "DirInstance is null!",
+                              directory );
 
-        DirectoryInstance directory = grid.getDirectoryInstance("MyLocalDir");
-        Assert.assertNotNull("DirInstance is null!", directory);
+        DirectoryNodeService dir = directory.getDirectoryNode().get( DirectoryNodeService.class );
 
-        DirectoryNodeService dir = directory.getDirectoryNode().get(DirectoryNodeService.class);
-        
-        Assert.assertNotNull("Dir is null!", dir);
+        Assert.assertNotNull( "Dir is null!",
+                              dir );
         //This assertion is not deterministic
         //Assert.assertEquals(4, dir.getExecutorsMap().size());
 
-        DirectoryInstance directory2 = grid.getDirectoryInstance("MyLocalDir2");
-        Assert.assertNotNull("DirInstance 2 is null!", directory2);
+        DirectoryInstance directory2 = this.grid.getDirectoryInstance( "MyLocalDir2" );
+        Assert.assertNotNull( "DirInstance 2 is null!",
+                              directory2 );
 
-        DirectoryNodeService dir2 = directory2.getDirectoryNode().get(DirectoryNodeService.class);
-        
-        Assert.assertNotNull("Dir 2 is null!", dir2);
+        DirectoryNodeService dir2 = directory2.getDirectoryNode().get( DirectoryNodeService.class );
+
+        Assert.assertNotNull( "Dir 2 is null!",
+                              dir2 );
         //This assertion is not deterministic
         //Assert.assertEquals(3, dir2.getExecutorsMap().size());
 
         // the only thing that is for sure is
-        Assert.assertTrue((dir2.getExecutorsMap().size() + dir.getExecutorsMap().size()) > 4);
+        Assert.assertTrue( (dir2.getExecutorsMap().size() + dir.getExecutorsMap().size()) > 4 );
 
-        grid.dispose();
+        this.grid.dispose();
 
     }
 
     @Test
-    public void registerKbaseInLocalDirectoryTest() throws ConnectorException, RemoteException {
+    public void registerKbaseInLocalDirectoryTest() throws ConnectorException,
+                                                   RemoteException {
 
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
+        gridTopologyConfiguration.addDirectoryInstance( new DirectoryInstanceConfiguration( "MyLocalDir",
+                                                                                            new LocalProvider() ) );
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyLocalEnv",
+                                                                                                  new LocalProvider() ) );
 
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addDirectoryInstance(new DirectoryInstanceConfiguration("MyLocalDir", new LocalProvider()));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyLocalEnv", new LocalProvider()));
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
+        Assert.assertNotNull( this.grid );
 
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
-        Assert.assertNotNull(grid);
+        ExecutionEnvironment ee = this.grid.getBestExecutionEnvironment( new ExecutionEnvByPrioritySelectionStrategy() );
+        Assert.assertNotNull( ee );
 
-        ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
-        Assert.assertNotNull(ee);
-        
         ExecutionNode node = ee.getExecutionNode();
-        Assert.assertNotNull(node);
+        Assert.assertNotNull( node );
 
         // Do a basic Runtime Test that register a ksession and fire some rules.
         String str = "";
@@ -169,33 +185,32 @@ public class RegisterDirectoryTest {
         str += "    System.out.println( \"hello2!!!\" ); \n";
         str += "end \n";
 
-
         KnowledgeBuilder kbuilder =
-                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newByteArrayResource(str.getBytes()),
-                ResourceType.DRL);
+                node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                      ResourceType.DRL );
 
-        if (kbuilder.hasErrors()) {
-            System.out.println("Errors: " + kbuilder.getErrors());
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( "Errors: " + kbuilder.getErrors() );
         }
 
         KnowledgeBase kbase =
-                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase("DoctorsKBase");
-        Assert.assertNotNull(kbase);
+                node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase( "DoctorsKBase" );
+        Assert.assertNotNull( kbase );
 
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
-        DirectoryInstance directory = grid.getBestDirectoryInstance(new DirectoryInstanceByPrioritySelectionStrategy());
-        Assert.assertNotNull("Directory Instance null", directory);
+        DirectoryInstance directory = this.grid.getBestDirectoryInstance( new DirectoryInstanceByPrioritySelectionStrategy() );
+        Assert.assertNotNull( "Directory Instance null",
+                              directory );
 
-        DirectoryNodeService dirService = directory.getDirectoryNode().get(DirectoryNodeService.class);
+        DirectoryNodeService dirService = directory.getDirectoryNode().get( DirectoryNodeService.class );
 
-        kbase = dirService.lookupKBase("DoctorsKBase");
-        Assert.assertNotNull(kbase);
+        kbase = dirService.lookupKBase( "DoctorsKBase" );
+        Assert.assertNotNull( kbase );
         //directory.getConnector().disconnect();
 
-        grid.dispose();
-
+        this.grid.dispose();
 
     }
 }

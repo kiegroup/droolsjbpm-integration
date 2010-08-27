@@ -3,15 +3,16 @@
  */
 package org.drools.grid.internal;
 
+public class BlockingGenericIoWriter
+    implements
+    GenericIoWriter {
 
-public class BlockingGenericIoWriter implements GenericIoWriter {
-    
     private Message msg;
 
     public void write(Message message) {
         this.msg = message;
     }
-    
+
     public Message getMessage() {
         return this.msg;
     }
@@ -24,5 +25,5 @@ public class BlockingGenericIoWriter implements GenericIoWriter {
             throw new UnsupportedOperationException();
         }
     }
-    
+
 }

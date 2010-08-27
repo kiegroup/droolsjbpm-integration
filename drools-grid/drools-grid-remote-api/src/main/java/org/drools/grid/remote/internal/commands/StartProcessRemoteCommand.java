@@ -20,34 +20,36 @@ package org.drools.grid.remote.internal.commands;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
+import org.drools.grid.remote.ProcessInstanceRemoteClient;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.process.ProcessInstance;
-import org.drools.grid.remote.ProcessInstanceRemoteClient;
 
 /**
  *
  * @author salaboy
  */
-public class StartProcessRemoteCommand implements GenericCommand<ExecutionResults>{
-    private String processId;
+public class StartProcessRemoteCommand
+    implements
+    GenericCommand<ExecutionResults> {
+    private String              processId;
     private Map<String, Object> parameters = new HashMap<String, Object>();
-    private List<Object> data = null;
+    private List<Object>        data       = null;
 
     public StartProcessRemoteCommand() {
     }
-
 
     public StartProcessRemoteCommand(String processId) {
         this.processId = processId;
     }
 
     public List<Object> getData() {
-        return data;
+        return this.data;
     }
 
     public void setData(List<Object> data) {
@@ -55,7 +57,7 @@ public class StartProcessRemoteCommand implements GenericCommand<ExecutionResult
     }
 
     public Map<String, Object> getParameters() {
-        return parameters;
+        return this.parameters;
     }
 
     public void setParameters(Map<String, Object> parameters) {
@@ -63,46 +65,50 @@ public class StartProcessRemoteCommand implements GenericCommand<ExecutionResult
     }
 
     public String getProcessId() {
-        return processId;
+        return this.processId;
     }
 
     public void setProcessId(String processId) {
         this.processId = processId;
     }
 
-
     public ExecutionResults execute(Context context) {
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
 
-		if (data != null) {
-			for (Object o: data) {
-				ksession.insert(o);
-			}
-		}
-		ProcessInstance processInstance = (ProcessInstance) ksession.startProcess(processId, parameters);
+        if ( this.data != null ) {
+            for ( Object o : this.data ) {
+                ksession.insert( o );
+            }
+        }
+        ProcessInstance processInstance = ksession.startProcess( this.processId,
+                                                                 this.parameters );
 
-                ((ExecutionResultImpl)((KnowledgeCommandContext) context ).getExecutionResults()).getResults().put( processId, getRemoteClient(processInstance) );
+        ((ExecutionResultImpl) ((KnowledgeCommandContext) context).getExecutionResults()).getResults().put( this.processId,
+                                                                                                            getRemoteClient( processInstance ) );
 
-		return ((ExecutionResultImpl)((KnowledgeCommandContext) context ).getExecutionResults());
-	}
+        return (((KnowledgeCommandContext) context).getExecutionResults());
+    }
 
-	public String toString() {
-		String result = "session.startProcess(" + processId + ", [";
-		if (parameters != null) {
-			int i = 0;
-			for (Map.Entry<String, Object> entry: parameters.entrySet()) {
-				if (i++ > 0) {
-					result += ", ";
-				}
-				result += entry.getKey() + "=" + entry.getValue();
-			}
-		}
-		result += "]);";
-		return result;
-	}
+    @Override
+    public String toString() {
+        String result = "session.startProcess(" + this.processId + ", [";
+        if ( this.parameters != null ) {
+            int i = 0;
+            for ( Map.Entry<String, Object> entry : this.parameters.entrySet() ) {
+                if ( i++ > 0 ) {
+                    result += ", ";
+                }
+                result += entry.getKey() + "=" + entry.getValue();
+            }
+        }
+        result += "]);";
+        return result;
+    }
 
     private ProcessInstance getRemoteClient(ProcessInstance processInstance) {
-        return new ProcessInstanceRemoteClient(processInstance.getId(), processInstance.getProcessId(),
-                 processInstance.getProcessName(), processInstance.getState());
+        return new ProcessInstanceRemoteClient( processInstance.getId(),
+                                                processInstance.getProcessId(),
+                                                processInstance.getProcessName(),
+                                                processInstance.getState() );
     }
 }

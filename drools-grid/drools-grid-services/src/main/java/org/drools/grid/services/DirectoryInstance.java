@@ -6,7 +6,6 @@ import org.drools.grid.ConnectorException;
 import org.drools.grid.DirectoryNode;
 import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
-import org.drools.grid.strategies.DirectorySelectionStrategy;
 import org.drools.grid.strategies.NodeSelectionStrategy;
 import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
 
@@ -20,8 +19,8 @@ import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
  */
 public class DirectoryInstance {
 
-    private String name;
-    private GenericNodeConnector connector;
+    private String                name;
+    private GenericNodeConnector  connector;
     private NodeSelectionStrategy defaultStrategy = new ReturnAlwaysTheFirstSelectionStrategy();
 
     /*
@@ -31,7 +30,8 @@ public class DirectoryInstance {
      * @param name
      * @param connector
      */
-    public DirectoryInstance(String name, GenericNodeConnector connector) {
+    public DirectoryInstance(String name,
+                             GenericNodeConnector connector) {
         this.name = name;
         this.connector = connector;
     }
@@ -40,7 +40,7 @@ public class DirectoryInstance {
      * Get a DirectoryNode based on the default NodeSelectionStrategy
      */
     public DirectoryNode getDirectoryNode() throws ConnectorException {
-        return getDirectoryNode(defaultStrategy);
+        return getDirectoryNode( this.defaultStrategy );
     }
 
     /*
@@ -48,8 +48,9 @@ public class DirectoryInstance {
      */
     public DirectoryNode getDirectoryNode(NodeSelectionStrategy strategy) throws ConnectorException {
         GenericConnection connection = getConnector().getConnection();
-        return connection.getDirectoryNode(strategy);
+        return connection.getDirectoryNode( strategy );
     }
+
     /*
      * Get all the DirectoryNodes available from the DirectoryInstance. This can be
      * expensive because it needs to be able to connect to all the services.
@@ -59,16 +60,18 @@ public class DirectoryInstance {
         GenericConnection connection = getConnector().getConnection();
         return connection.getDirectoryNodes();
     }
+
     /*
      * Get the DirectoryInstance connector
      */
     public GenericNodeConnector getConnector() {
         return this.connector;
     }
+
     /*
      * Get the DirectoryInstance name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 }

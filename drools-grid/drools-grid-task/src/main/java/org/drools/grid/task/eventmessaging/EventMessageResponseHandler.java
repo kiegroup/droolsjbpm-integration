@@ -19,8 +19,8 @@ package org.drools.grid.task.eventmessaging;
 import org.drools.eventmessaging.Payload;
 import org.drools.grid.internal.MessageResponseHandler;
 
-
-
-public interface EventMessageResponseHandler extends MessageResponseHandler {
+public interface EventMessageResponseHandler
+    extends
+    MessageResponseHandler {
     public void execute(Payload payload);
 }

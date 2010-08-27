@@ -21,18 +21,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class MockUserInfo implements UserInfo {
+public class MockUserInfo
+    implements
+    UserInfo {
 
-    private Map<Group, List<OrganizationalEntity>> groups = new HashMap<Group, List<OrganizationalEntity>>();
+    private Map<Group, List<OrganizationalEntity>> groups       = new HashMap<Group, List<OrganizationalEntity>>();
 
-    private Map<OrganizationalEntity, String> emails = new HashMap<OrganizationalEntity, String>();
+    private Map<OrganizationalEntity, String>      emails       = new HashMap<OrganizationalEntity, String>();
 
-    private Map<OrganizationalEntity, String> languages = new HashMap<OrganizationalEntity, String>();
+    private Map<OrganizationalEntity, String>      languages    = new HashMap<OrganizationalEntity, String>();
 
-    private Map<OrganizationalEntity, String> displayNames = new HashMap<OrganizationalEntity, String>();
+    private Map<OrganizationalEntity, String>      displayNames = new HashMap<OrganizationalEntity, String>();
 
     public Map<Group, List<OrganizationalEntity>> getGroups() {
-        return groups;
+        return this.groups;
     }
 
     public void setGroups(Map<Group, List<OrganizationalEntity>> groups) {
@@ -40,7 +42,7 @@ public class MockUserInfo implements UserInfo {
     }
 
     public Map<OrganizationalEntity, String> getEmails() {
-        return emails;
+        return this.emails;
     }
 
     public void setEmails(Map<OrganizationalEntity, String> emails) {
@@ -48,13 +50,11 @@ public class MockUserInfo implements UserInfo {
     }
 
     public String getEmailForEntity(OrganizationalEntity entity) {
-        return emails.get( entity );
+        return this.emails.get( entity );
     }
 
-
-
     public Map<OrganizationalEntity, String> getDisplayNames() {
-        return displayNames;
+        return this.displayNames;
     }
 
     public void setDisplayNames(Map<OrganizationalEntity, String> displayNames) {
@@ -62,7 +62,7 @@ public class MockUserInfo implements UserInfo {
     }
 
     public Map<OrganizationalEntity, String> getLanguages() {
-        return languages;
+        return this.languages;
     }
 
     public void setLanguages(Map<OrganizationalEntity, String> languages) {
@@ -70,21 +70,20 @@ public class MockUserInfo implements UserInfo {
     }
 
     public Iterator<OrganizationalEntity> getMembersForGroup(Group group) {
-        return groups.get( group ).iterator();
+        return this.groups.get( group ).iterator();
     }
 
     public boolean hasEmail(Group group) {
-        return emails.containsKey( group );
+        return this.emails.containsKey( group );
     }
 
     public String getDisplayName(OrganizationalEntity entity) {
-        String displayName = displayNames.get( entity );
-        return ( displayName != null ) ? displayName : entity.getId();
+        String displayName = this.displayNames.get( entity );
+        return (displayName != null) ? displayName : entity.getId();
     }
 
     public String getLanguageForEntity(OrganizationalEntity entity) {
-        return languages.get( entity );
+        return this.languages.get( entity );
     }
-
 
 }

@@ -26,8 +26,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -46,9 +48,7 @@ import org.drools.grid.services.ExecutionEnvironment;
 import org.drools.grid.services.GridTopology;
 import org.drools.grid.services.TaskServerInstance;
 import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
-import org.drools.grid.services.configuration.GenericProvider;
 import org.drools.grid.services.configuration.GridTopologyConfiguration;
-import org.drools.grid.services.configuration.LocalProvider;
 import org.drools.grid.services.configuration.MinaProvider;
 import org.drools.grid.services.configuration.TaskServerInstanceConfiguration;
 import org.drools.grid.services.factory.GridTopologyFactory;
@@ -63,7 +63,6 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
-
 import org.drools.services.task.MockUserInfo;
 import org.drools.task.Group;
 import org.drools.task.Status;
@@ -71,7 +70,6 @@ import org.drools.task.User;
 import org.drools.task.query.TaskSummary;
 import org.drools.task.service.TaskService;
 import org.drools.task.service.TaskServiceSession;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -88,18 +86,18 @@ import org.mvel2.compiler.ExpressionCompiler;
  */
 public class RegisterTaskTest {
 
-    private GridTopology grid;
-    private MinaAcceptor serverTask;
-    private MinaAcceptor serverNode;
-    private HumanTaskService client;
-    private EntityManagerFactory emf;
-    private TaskService taskService;
-    private TaskServiceSession taskSession;
-    protected Map<String, User> users;
-    protected Map<String, Group> groups;
-    protected static final int DEFAULT_WAIT_TIME = 5000;
-    protected static final int MANAGER_COMPLETION_WAIT_TIME = DEFAULT_WAIT_TIME;
-    protected static final int MANAGER_ABORT_WAIT_TIME = DEFAULT_WAIT_TIME;
+    private GridTopology                             grid;
+    private MinaAcceptor                             serverTask;
+    private MinaAcceptor                             serverNode;
+    private HumanTaskService                         client;
+    private EntityManagerFactory                     emf;
+    private TaskService                              taskService;
+    private TaskServiceSession                       taskSession;
+    protected Map<String, User>                      users;
+    protected Map<String, Group>                     groups;
+    protected static final int                       DEFAULT_WAIT_TIME            = 5000;
+    protected static final int                       MANAGER_COMPLETION_WAIT_TIME = DEFAULT_WAIT_TIME;
+    protected static final int                       MANAGER_ABORT_WAIT_TIME      = DEFAULT_WAIT_TIME;
     protected CommandBasedServicesWSHumanTaskHandler handler;
 
     public RegisterTaskTest() {
@@ -114,238 +112,267 @@ public class RegisterTaskTest {
     }
 
     @Before
-    public void setUp() throws InterruptedException, IOException {
+    public void setUp() throws InterruptedException,
+                       IOException {
 
         //Task Related Stuff
         // Use persistence.xml configuration
-        emf = Persistence.createEntityManagerFactory("org.drools.task");
+        this.emf = Persistence.createEntityManagerFactory( "org.drools.task" );
 
-        taskService = new TaskService(emf, SystemEventListenerFactory.getSystemEventListener());
-        taskSession = taskService.createSession();
+        this.taskService = new TaskService( this.emf,
+                                            SystemEventListenerFactory.getSystemEventListener() );
+        this.taskSession = this.taskService.createSession();
         MockUserInfo userInfo = new MockUserInfo();
-        taskService.setUserinfo(userInfo);
+        this.taskService.setUserinfo( userInfo );
         Map vars = new HashedMap();
 
         Reader reader = null;
 
         try {
-            reader = new InputStreamReader(new ClassPathResource("org/drools/task/LoadUsers.mvel").getInputStream());
-            users = (Map<String, User>) eval(reader, vars);
-            for (User user : users.values()) {
-                taskSession.addUser(user);
+            reader = new InputStreamReader( new ClassPathResource( "org/drools/task/LoadUsers.mvel" ).getInputStream() );
+            this.users = (Map<String, User>) eval( reader,
+                                                   vars );
+            for ( User user : this.users.values() ) {
+                this.taskSession.addUser( user );
             }
         } finally {
-            if (reader != null) {
+            if ( reader != null ) {
                 reader.close();
             }
             reader = null;
         }
 
         try {
-            reader = new InputStreamReader(new ClassPathResource("org/drools/task/LoadGroups.mvel").getInputStream());
-            groups = (Map<String, Group>) eval(reader, vars);
-            for (Group group : groups.values()) {
-                taskSession.addGroup(group);
+            reader = new InputStreamReader( new ClassPathResource( "org/drools/task/LoadGroups.mvel" ).getInputStream() );
+            this.groups = (Map<String, Group>) eval( reader,
+                                                     vars );
+            for ( Group group : this.groups.values() ) {
+                this.taskSession.addGroup( group );
             }
         } finally {
-            if (reader != null) {
+            if ( reader != null ) {
                 reader.close();
             }
         }
 
-
         // Human task Server configuration
-        SocketAddress htAddress = new InetSocketAddress("127.0.0.1", 9123);
+        SocketAddress htAddress = new InetSocketAddress( "127.0.0.1",
+                                                         9123 );
         SocketAcceptor htAcceptor = new NioSocketAcceptor();
 
-        htAcceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(),
-                new TaskServerMessageHandlerImpl(taskService,
-                SystemEventListenerFactory.getSystemEventListener())));
-        this.serverTask = new MinaAcceptor(htAcceptor, htAddress);
+        htAcceptor.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener(),
+                                                  new TaskServerMessageHandlerImpl( this.taskService,
+                                                                                    SystemEventListenerFactory.getSystemEventListener() ) ) );
+        this.serverTask = new MinaAcceptor( htAcceptor,
+                                            htAddress );
         this.serverTask.start();
-        Thread.sleep(5000);
+        Thread.sleep( 5000 );
         // End Execution Server
 
         //Execution Node related stuff
 
-        System.out.println("Server 1 Starting!");
+        System.out.println( "Server 1 Starting!" );
         // the servers should be started in a different machine (jvm or physical) or in another thread
-        SocketAddress address = new InetSocketAddress("127.0.0.1", 9124);
+        SocketAddress address = new InetSocketAddress( "127.0.0.1",
+                                                       9124 );
         NodeData nodeData = new NodeData();
         // setup Server
         SocketAcceptor acceptor = new NioSocketAcceptor();
-        acceptor.setHandler(new MinaIoHandler(SystemEventListenerFactory.getSystemEventListener(),
-                new GenericMessageHandlerImpl(nodeData,
-                SystemEventListenerFactory.getSystemEventListener())));
-        serverNode = new MinaAcceptor(acceptor, address);
-        serverNode.start();
-        System.out.println("Server 1 Started! at = " + address.toString());
+        acceptor.setHandler( new MinaIoHandler( SystemEventListenerFactory.getSystemEventListener(),
+                                                new GenericMessageHandlerImpl( nodeData,
+                                                                               SystemEventListenerFactory.getSystemEventListener() ) ) );
+        this.serverNode = new MinaAcceptor( acceptor,
+                                            address );
+        this.serverNode.start();
+        System.out.println( "Server 1 Started! at = " + address.toString() );
 
-        Thread.sleep(5000);
+        Thread.sleep( 5000 );
 
     }
 
     @After
-    public void tearDown() throws InterruptedException, ConnectorException, RemoteException {
-        client.disconnect();
+    public void tearDown() throws InterruptedException,
+                          ConnectorException,
+                          RemoteException {
+        this.client.disconnect();
 
-        grid.dispose();
+        this.grid.dispose();
 
+        this.handler.dispose();
 
+        Assert.assertEquals( 0,
+                             this.serverNode.getCurrentSessions() );
+        this.serverNode.stop();
+        System.out.println( "Execution Server Stopped!" );
 
-        handler.dispose();
+        Assert.assertEquals( 0,
+                             this.serverTask.getCurrentSessions() );
+        this.serverTask.stop();
+        System.out.println( "Task Server Stopped!" );
 
-        Assert.assertEquals(0, serverNode.getCurrentSessions());
-        serverNode.stop();
-        System.out.println("Execution Server Stopped!");
-
-        Assert.assertEquals(0, serverTask.getCurrentSessions());
-        serverTask.stop();
-        System.out.println("Task Server Stopped!");
-        
-
-
-        taskSession.dispose();
-        emf.close();
-
-
-
-
+        this.taskSession.dispose();
+        this.emf.close();
 
     }
 
     @Test
-    public void MinaTaskTest() throws InterruptedException, ConnectorException, RemoteException {
+    public void MinaTaskTest() throws InterruptedException,
+                              ConnectorException,
+                              RemoteException {
 
-        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-        gridTopologyConfiguration.addTaskServerInstance(new TaskServerInstanceConfiguration("MyMinaTask", new MinaProvider("127.0.0.1", 9123)));
-        gridTopologyConfiguration.addExecutionEnvironment(new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new MinaProvider("127.0.0.1", 9124)));
+        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration( "MyTopology" );
+        gridTopologyConfiguration.addTaskServerInstance( new TaskServerInstanceConfiguration( "MyMinaTask",
+                                                                                              new MinaProvider( "127.0.0.1",
+                                                                                                                9123 ) ) );
+        gridTopologyConfiguration.addExecutionEnvironment( new ExecutionEnvironmentConfiguration( "MyMinaExecutionEnv1",
+                                                                                                  new MinaProvider( "127.0.0.1",
+                                                                                                                    9124 ) ) );
 
+        this.grid = GridTopologyFactory.build( gridTopologyConfiguration );
 
-        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+        Assert.assertNotNull( this.grid );
 
+        TaskServerInstance taskServer = this.grid.getTaskServerInstance( "MyMinaTask" );
 
-        Assert.assertNotNull(grid);
+        Assert.assertNotNull( taskServer );
 
-
-        TaskServerInstance taskServer = grid.getTaskServerInstance("MyMinaTask");
-
-
-
-        Assert.assertNotNull(taskServer);
-
-        client = taskServer.getHumanTaskNode().get(HumanTaskService.class);
-        Assert.assertNotNull(client);
-
+        this.client = taskServer.getHumanTaskNode().get( HumanTaskService.class );
+        Assert.assertNotNull( this.client );
 
         //Create a task to test the HT client. For that we need to have a ksession with a workitem that creates it
-        ExecutionEnvironment ee = grid.getExecutionEnvironment("MyMinaExecutionEnv1");
-        Assert.assertNotNull(ee);
+        ExecutionEnvironment ee = this.grid.getExecutionEnvironment( "MyMinaExecutionEnv1" );
+        Assert.assertNotNull( ee );
 
         // Give me an ExecutionNode in the selected environment
         // For the Mina we have just one Execution Node per server instance
         ExecutionNode node = ee.getExecutionNode();
 
-        Assert.assertNotNull(node);
+        Assert.assertNotNull( node );
         KnowledgeBuilder kbuilder =
-                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-
+                node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
         KnowledgeBase kbase =
-                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-        Assert.assertNotNull(kbase);
+                node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        Assert.assertNotNull( kbase );
 
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-        Assert.assertNotNull(ksession);
+        Assert.assertNotNull( ksession );
 
-        handler = new CommandBasedServicesWSHumanTaskHandler(ksession);
-        handler.setAddress("127.0.0.1", 9123);
+        this.handler = new CommandBasedServicesWSHumanTaskHandler( ksession );
+        this.handler.setAddress( "127.0.0.1",
+                                 9123 );
 
         TestWorkItemManager manager = new TestWorkItemManager();
         WorkItemImpl workItem = new WorkItemImpl();
-        workItem.setName("Human Task");
-        workItem.setParameter("TaskName", "TaskName");
-        workItem.setParameter("Comment", "Comment");
-        workItem.setParameter("Priority", "10");
-        workItem.setParameter("ActorId", "Darth Vader");
-        handler.executeWorkItem(workItem, manager);
+        workItem.setName( "Human Task" );
+        workItem.setParameter( "TaskName",
+                               "TaskName" );
+        workItem.setParameter( "Comment",
+                               "Comment" );
+        workItem.setParameter( "Priority",
+                               "10" );
+        workItem.setParameter( "ActorId",
+                               "Darth Vader" );
+        this.handler.executeWorkItem( workItem,
+                                      manager );
 
-        Thread.sleep(500);
+        Thread.sleep( 500 );
 
         BlockingTaskSummaryMessageResponseHandler responseHandler = new BlockingTaskSummaryMessageResponseHandler();
-        client.getTasksAssignedAsPotentialOwner("Darth Vader", "en-UK", responseHandler);
-        responseHandler.waitTillDone(DEFAULT_WAIT_TIME);
+        this.client.getTasksAssignedAsPotentialOwner( "Darth Vader",
+                                                      "en-UK",
+                                                      responseHandler );
+        responseHandler.waitTillDone( DEFAULT_WAIT_TIME );
         List<TaskSummary> tasks = responseHandler.getResults();
-        Assert.assertEquals(1, tasks.size());
-        TaskSummary task = tasks.get(0);
-        Assert.assertEquals("TaskName", task.getName());
-        Assert.assertEquals(10, task.getPriority());
-        Assert.assertEquals("Comment", task.getDescription());
-        Assert.assertEquals(Status.Reserved, task.getStatus());
-        Assert.assertEquals("Darth Vader", task.getActualOwner().getId());
+        Assert.assertEquals( 1,
+                             tasks.size() );
+        TaskSummary task = tasks.get( 0 );
+        Assert.assertEquals( "TaskName",
+                             task.getName() );
+        Assert.assertEquals( 10,
+                             task.getPriority() );
+        Assert.assertEquals( "Comment",
+                             task.getDescription() );
+        Assert.assertEquals( Status.Reserved,
+                             task.getStatus() );
+        Assert.assertEquals( "Darth Vader",
+                             task.getActualOwner().getId() );
 
-        System.out.println("Starting task " + task.getId());
+        System.out.println( "Starting task " + task.getId() );
         BlockingTaskOperationMessageResponseHandler operationResponseHandler = new BlockingTaskOperationMessageResponseHandler();
-        client.start(task.getId(), "Darth Vader", operationResponseHandler);
-        operationResponseHandler.waitTillDone(DEFAULT_WAIT_TIME);
-        System.out.println("Started task " + task.getId());
+        this.client.start( task.getId(),
+                           "Darth Vader",
+                           operationResponseHandler );
+        operationResponseHandler.waitTillDone( DEFAULT_WAIT_TIME );
+        System.out.println( "Started task " + task.getId() );
 
-        System.out.println("Completing task " + task.getId());
+        System.out.println( "Completing task " + task.getId() );
         operationResponseHandler = new BlockingTaskOperationMessageResponseHandler();
-        client.complete(task.getId(), "Darth Vader", null, operationResponseHandler);
-        operationResponseHandler.waitTillDone(15000);
-        System.out.println("Completed task " + task.getId());
-        Assert.assertTrue(manager.waitTillCompleted(DEFAULT_WAIT_TIME));
-        Thread.sleep(500);
+        this.client.complete( task.getId(),
+                              "Darth Vader",
+                              null,
+                              operationResponseHandler );
+        operationResponseHandler.waitTillDone( 15000 );
+        System.out.println( "Completed task " + task.getId() );
+        Assert.assertTrue( manager.waitTillCompleted( DEFAULT_WAIT_TIME ) );
+        Thread.sleep( 500 );
 
         taskServer.getConnector().disconnect();
     }
 
-    private Object eval(Reader reader, Map<String, Object> vars) {
+    private Object eval(Reader reader,
+                        Map<String, Object> vars) {
         try {
-            return eval(toString(reader), vars);
-        } catch (IOException e) {
-            throw new RuntimeException("Exception Thrown", e);
+            return eval( toString( reader ),
+                         vars );
+        } catch ( IOException e ) {
+            throw new RuntimeException( "Exception Thrown",
+                                        e );
         }
     }
 
     private String toString(Reader reader) throws IOException {
         int charValue = 0;
-        StringBuffer sb = new StringBuffer(1024);
-        while ((charValue = reader.read()) != -1) {
+        StringBuffer sb = new StringBuffer( 1024 );
+        while ( (charValue = reader.read()) != -1 ) {
             // result = result + (char) charValue;
-            sb.append((char) charValue);
+            sb.append( (char) charValue );
         }
         return sb.toString();
     }
 
-    private Object eval(String str, Map<String, Object> vars) {
-        ExpressionCompiler compiler = new ExpressionCompiler(str.trim());
+    private Object eval(String str,
+                        Map<String, Object> vars) {
+        ExpressionCompiler compiler = new ExpressionCompiler( str.trim() );
 
         ParserContext context = new ParserContext();
-        context.addPackageImport("org.drools.task");
-        context.addPackageImport("org.drools.task.service");
-        context.addPackageImport("org.drools.task.query");
-        context.addPackageImport("java.util");
+        context.addPackageImport( "org.drools.task" );
+        context.addPackageImport( "org.drools.task.service" );
+        context.addPackageImport( "org.drools.task.query" );
+        context.addPackageImport( "java.util" );
 
-        vars.put("now", new Date());
-        return MVEL.executeExpression(compiler.compile(context), vars);
+        vars.put( "now",
+                  new Date() );
+        return MVEL.executeExpression( compiler.compile( context ),
+                                       vars );
     }
 }
 
-class TestWorkItemManager implements WorkItemManager {
+class TestWorkItemManager
+    implements
+    WorkItemManager {
 
-    private volatile boolean completed;
-    private volatile boolean aborted;
+    private volatile boolean             completed;
+    private volatile boolean             aborted;
     private volatile Map<String, Object> results;
 
     public synchronized boolean waitTillCompleted(long time) {
-        if (!isCompleted()) {
+        if ( !isCompleted() ) {
             try {
-                wait(time);
-            } catch (InterruptedException e) {
+                wait( time );
+            } catch ( InterruptedException e ) {
                 // swallow and return state of completed
             }
         }
@@ -354,10 +381,10 @@ class TestWorkItemManager implements WorkItemManager {
     }
 
     public synchronized boolean waitTillAborted(long time) {
-        if (!isAborted()) {
+        if ( !isAborted() ) {
             try {
-                wait(time);
-            } catch (InterruptedException e) {
+                wait( time );
+            } catch ( InterruptedException e ) {
                 // swallow and return state of aborted
             }
         }
@@ -366,11 +393,11 @@ class TestWorkItemManager implements WorkItemManager {
     }
 
     public void abortWorkItem(long id) {
-        setAborted(true);
+        setAborted( true );
     }
 
     public synchronized boolean isAborted() {
-        return aborted;
+        return this.aborted;
     }
 
     private synchronized void setAborted(boolean aborted) {
@@ -378,9 +405,10 @@ class TestWorkItemManager implements WorkItemManager {
         notifyAll();
     }
 
-    public void completeWorkItem(long id, Map<String, Object> results) {
+    public void completeWorkItem(long id,
+                                 Map<String, Object> results) {
         this.results = results;
-        setCompleted(true);
+        setCompleted( true );
     }
 
     private synchronized void setCompleted(boolean completed) {
@@ -389,7 +417,7 @@ class TestWorkItemManager implements WorkItemManager {
     }
 
     public synchronized boolean isCompleted() {
-        return completed;
+        return this.completed;
     }
 
     public WorkItem getWorkItem(long id) {
@@ -401,7 +429,7 @@ class TestWorkItemManager implements WorkItemManager {
     }
 
     public Map<String, Object> getResults() {
-        return results;
+        return this.results;
     }
 
     public void internalAbortWorkItem(long id) {
@@ -413,6 +441,7 @@ class TestWorkItemManager implements WorkItemManager {
     public void internalExecuteWorkItem(WorkItem workItem) {
     }
 
-    public void registerWorkItemHandler(String workItemName, WorkItemHandler handler) {
+    public void registerWorkItemHandler(String workItemName,
+                                        WorkItemHandler handler) {
     }
 }

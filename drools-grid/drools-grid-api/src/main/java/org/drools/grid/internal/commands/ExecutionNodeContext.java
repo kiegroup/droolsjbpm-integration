@@ -7,11 +7,11 @@ import org.drools.grid.internal.NodeData;
 public class ExecutionNodeContext
     implements
     Context {
-    private Context            context;
+    private Context  context;
     private NodeData data;
 
     public ExecutionNodeContext(Context context,
-                                       NodeData data) {
+                                NodeData data) {
         this.data = data;
     }
 
@@ -20,25 +20,25 @@ public class ExecutionNodeContext
     }
 
     public ContextManager getContextManager() {
-        return context.getContextManager();
+        return this.context.getContextManager();
     }
 
     public String getName() {
-        return context.getName();
+        return this.context.getName();
     }
 
     public Object get(String identifier) {
-        return context.get( identifier );
+        return this.context.get( identifier );
     }
 
     public void set(String identifier,
                     Object value) {
-        context.set( identifier,
-                     value );
+        this.context.set( identifier,
+                          value );
     }
 
     public void remove(String name) {
-        context.remove(name);
+        this.context.remove( name );
     }
 
 }

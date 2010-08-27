@@ -2,32 +2,35 @@ package org.drools.grid.services.configuration;
 
 import java.io.Serializable;
 
+public abstract class GridResourceConfiguration
+    implements
+    Serializable {
 
-public abstract class GridResourceConfiguration implements Serializable{
+    private String          name;
+    private GenericProvider provider;
 
-	private String name;
-	private GenericProvider provider;
-	
-	public GridResourceConfiguration() {	}
-	
-	public GridResourceConfiguration(String name, GenericProvider provider) {
-		this.name = name;
-		this.provider = provider;
-	}
+    public GridResourceConfiguration() {
+    }
 
-	public String getName() {
-		return name;
-	}
+    public GridResourceConfiguration(String name,
+                                     GenericProvider provider) {
+        this.name = name;
+        this.provider = provider;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public void setProvider(GenericProvider provider) {
-		this.provider = provider;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public GenericProvider getProvider() {
-		return provider;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setProvider(GenericProvider provider) {
+        this.provider = provider;
+    }
+
+    public GenericProvider getProvider() {
+        return this.provider;
+    }
 }

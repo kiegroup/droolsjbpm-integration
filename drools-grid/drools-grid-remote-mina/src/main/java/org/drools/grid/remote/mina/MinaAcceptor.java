@@ -13,47 +13,48 @@ import org.apache.mina.transport.socket.SocketAcceptor;
 import org.drools.grid.AcceptorService;
 
 public class MinaAcceptor
-        implements
-        AcceptorService {
+    implements
+    AcceptorService {
 
     protected SocketAcceptor acceptor;
-    protected SocketAddress address;
-
+    protected SocketAddress  address;
 
     public MinaAcceptor(SocketAcceptor acceptor,
-            SocketAddress address) {
+                        SocketAddress address) {
         this.acceptor = acceptor;
         this.address = address;
     }
 
-     public MinaAcceptor(SocketAcceptor acceptor,
-            String address, int port) {
+    public MinaAcceptor(SocketAcceptor acceptor,
+                        String address,
+                        int port) {
         this.acceptor = acceptor;
-        this.address = new InetSocketAddress(address, port);
-        
+        this.address = new InetSocketAddress( address,
+                                              port );
+
     }
 
     public synchronized void start() throws IOException {
-        acceptor.getFilterChain().addLast("logger",
-                new LoggingFilter());
-        acceptor.getFilterChain().addLast("codec",
-                new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
-        acceptor.getSessionConfig().setReadBufferSize(2048);
-        acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE,
-                10);
-        acceptor.bind(address);
+        this.acceptor.getFilterChain().addLast( "logger",
+                                                new LoggingFilter() );
+        this.acceptor.getFilterChain().addLast( "codec",
+                                                new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
+        this.acceptor.getSessionConfig().setReadBufferSize( 2048 );
+        this.acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE,
+                                                      10 );
+        this.acceptor.bind( this.address );
     }
 
     public synchronized void stop() {
 
-        acceptor.dispose();
+        this.acceptor.dispose();
     }
 
     public synchronized IoAcceptor getIoAcceptor() {
-        return acceptor;
+        return this.acceptor;
     }
 
     public int getCurrentSessions() {
-        return acceptor.getManagedSessionCount();
+        return this.acceptor.getManagedSessionCount();
     }
 }

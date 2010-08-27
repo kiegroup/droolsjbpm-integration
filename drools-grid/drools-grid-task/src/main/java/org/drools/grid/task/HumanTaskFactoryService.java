@@ -16,12 +16,11 @@
 
 package org.drools.grid.task;
 
-import org.drools.grid.HumanTaskNodeService;
 import org.drools.Service;
+import org.drools.grid.HumanTaskNodeService;
 
-
-
-
-public interface HumanTaskFactoryService extends Service {
-      public HumanTaskNodeService newHumanTaskService();
+public interface HumanTaskFactoryService
+    extends
+    Service {
+    public HumanTaskNodeService newHumanTaskService();
 }

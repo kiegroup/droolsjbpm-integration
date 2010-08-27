@@ -17,28 +17,15 @@
 package org.drools.services;
 
 import java.io.IOException;
-import org.junit.Assert;
-
 import java.rmi.RemoteException;
 
 import org.drools.grid.ConnectorException;
 import org.drools.grid.services.GridTopology;
-import org.drools.grid.services.configuration.DirectoryInstanceConfiguration;
-import org.drools.grid.services.configuration.ExecutionEnvironmentConfiguration;
-import org.drools.grid.services.configuration.GridTopologyConfiguration;
-import org.drools.grid.services.configuration.RioProvider;
-import org.drools.grid.services.factory.GridTopologyFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-//import net.jini.core.lookup.ServiceItem;
-//import org.rioproject.gnostic.Gnostic;
-//import org.rioproject.sla.RuleMap;
-//import org.rioproject.test.RioTestRunner;
-//import org.rioproject.test.SetTestManager;
-//import org.rioproject.test.TestManager;
 
 /**
  *
@@ -48,12 +35,13 @@ import org.junit.Test;
 public class ITGridExecutionTest {
 
     private GridTopology grid;
-//    AcceptorService server;
-//    @SetTestManager
-//    static TestManager testManager;
-//    private GridTopology grid;
-//    private List<ExecutionNodeService> executionNodes = new ArrayList<ExecutionNodeService>();
-//    private List<DirectoryNodeService> directoryNodes = new ArrayList<DirectoryNodeService>();
+
+    //    AcceptorService server;
+    //    @SetTestManager
+    //    static TestManager testManager;
+    //    private GridTopology grid;
+    //    private List<ExecutionNodeService> executionNodes = new ArrayList<ExecutionNodeService>();
+    //    private List<DirectoryNodeService> directoryNodes = new ArrayList<DirectoryNodeService>();
 
     public ITGridExecutionTest() {
     }
@@ -68,36 +56,37 @@ public class ITGridExecutionTest {
 
     @Before
     public void setUp() throws IOException {
-//        Assert.assertNotNull(testManager);
-//        //setup all the services using the Rio Test Framework
-//        //In real scenarios all this code will happen inside the connection.connect() method
-//
-//        DirectoryNodeService directoryService = (DirectoryNodeService) testManager.waitForService(DirectoryNodeService.class);
-//        Assert.assertNotNull(directoryService);
-//        directoryNodes.add(directoryService);
-//        Gnostic gnostic = (Gnostic)testManager.waitForService(Gnostic.class);
-//
-//        waitForRule(gnostic, "SLAKsessions");
-//
-//
-//
-//        ExecutionNodeService executionNode = (ExecutionNodeService) testManager.waitForService(ExecutionNodeService.class);
-//        Assert.assertNotNull(executionNode);
-//        ServiceItem[] nodeServiceItems = testManager.getServiceItems(ExecutionNodeService.class);
-//        System.out.println("ExecutionNodes Items =" + nodeServiceItems.length);
-//
-//        for (int i = 0; i < nodeServiceItems.length; i++) {
-//            if (nodeServiceItems[i].service instanceof ExecutionNodeService) {
-//                executionNodes.add((ExecutionNodeService) nodeServiceItems[i].service);
-//            }
-//        }
+        //        Assert.assertNotNull(testManager);
+        //        //setup all the services using the Rio Test Framework
+        //        //In real scenarios all this code will happen inside the connection.connect() method
+        //
+        //        DirectoryNodeService directoryService = (DirectoryNodeService) testManager.waitForService(DirectoryNodeService.class);
+        //        Assert.assertNotNull(directoryService);
+        //        directoryNodes.add(directoryService);
+        //        Gnostic gnostic = (Gnostic)testManager.waitForService(Gnostic.class);
+        //
+        //        waitForRule(gnostic, "SLAKsessions");
+        //
+        //
+        //
+        //        ExecutionNodeService executionNode = (ExecutionNodeService) testManager.waitForService(ExecutionNodeService.class);
+        //        Assert.assertNotNull(executionNode);
+        //        ServiceItem[] nodeServiceItems = testManager.getServiceItems(ExecutionNodeService.class);
+        //        System.out.println("ExecutionNodes Items =" + nodeServiceItems.length);
+        //
+        //        for (int i = 0; i < nodeServiceItems.length; i++) {
+        //            if (nodeServiceItems[i].service instanceof ExecutionNodeService) {
+        //                executionNodes.add((ExecutionNodeService) nodeServiceItems[i].service);
+        //            }
+        //        }
     }
 
     @After
-    public void tearDown() throws ConnectorException, RemoteException {
-//        System.out.println("Disconecting all clients");
-//        grid.dispose();
-//
+    public void tearDown() throws ConnectorException,
+                          RemoteException {
+        //        System.out.println("Disconecting all clients");
+        //        grid.dispose();
+        //
     }
 
     @Test
@@ -105,105 +94,102 @@ public class ITGridExecutionTest {
     }
 
     @Test
-    public void rioProviderTest() throws ConnectorException, RemoteException {
+    public void rioProviderTest() throws ConnectorException,
+                                 RemoteException {
 
-//        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
-//        gridTopologyConfiguration.addExecutionEnvironment(
-//                new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new RioProvider()));
-//        gridTopologyConfiguration.addDirectoryInstance(
-//                new DirectoryInstanceConfiguration("MyMinaExecutionEnv2", new RioProvider()));
-//
-//        grid = GridTopologyFactory.build(gridTopologyConfiguration);
-//
-//        Assert.assertNotNull(grid);
+        //        GridTopologyConfiguration gridTopologyConfiguration = new GridTopologyConfiguration("MyTopology");
+        //        gridTopologyConfiguration.addExecutionEnvironment(
+        //                new ExecutionEnvironmentConfiguration("MyMinaExecutionEnv1", new RioProvider()));
+        //        gridTopologyConfiguration.addDirectoryInstance(
+        //                new DirectoryInstanceConfiguration("MyMinaExecutionEnv2", new RioProvider()));
+        //
+        //        grid = GridTopologyFactory.build(gridTopologyConfiguration);
+        //
+        //        Assert.assertNotNull(grid);
 
-
-//
-//
-//
-//        ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
-//        Assert.assertNotNull(ee);
-//        System.out.println("EE Name = "+ee.getName());
-//        System.out.println("Connector Id = "+ee.getConnector().getId());
-//
-//        ExecutionNode node = ee.getExecutionNode();
-//        Assert.assertNotNull(node);
-//
-//         // Do a basic Runtime Test that register a ksession and fire some rules.
-//        String str = "";
-//        str += "package org.drools \n";
-//        str += "global java.util.List list \n";
-//        str += "rule rule1 \n";
-//        str += "    dialect \"java\" \n";
-//        str += "when \n";
-//        str += "then \n";
-//        str += "    System.out.println( \"hello1!!!\" ); \n";
-//        str += "end \n";
-//        str += "rule rule2 \n";
-//        str += "    dialect \"java\" \n";
-//        str += "when \n";
-//        str += "then \n";
-//        str += "    System.out.println( \"hello2!!!\" ); \n";
-//        str += "end \n";
-//
-//
-//        KnowledgeBuilder kbuilder =
-//                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
-//        kbuilder.add(ResourceFactory.newByteArrayResource(str.getBytes()),
-//                ResourceType.DRL);
-//
-//        if (kbuilder.hasErrors()) {
-//            System.out.println("Errors: " + kbuilder.getErrors());
-//        }
-//
-//        KnowledgeBase kbase =
-//                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-//        Assert.assertNotNull(kbase);
-//
-//        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-//
-//        StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-//        Assert.assertNotNull(ksession);
-//
-//        int fired = ksession.fireAllRules();
-//        Assert.assertEquals(2, fired);
-//
-
-
-
+        //
+        //
+        //
+        //        ExecutionEnvironment ee = grid.getBestExecutionEnvironment(new ExecutionEnvByPrioritySelectionStrategy());
+        //        Assert.assertNotNull(ee);
+        //        System.out.println("EE Name = "+ee.getName());
+        //        System.out.println("Connector Id = "+ee.getConnector().getId());
+        //
+        //        ExecutionNode node = ee.getExecutionNode();
+        //        Assert.assertNotNull(node);
+        //
+        //         // Do a basic Runtime Test that register a ksession and fire some rules.
+        //        String str = "";
+        //        str += "package org.drools \n";
+        //        str += "global java.util.List list \n";
+        //        str += "rule rule1 \n";
+        //        str += "    dialect \"java\" \n";
+        //        str += "when \n";
+        //        str += "then \n";
+        //        str += "    System.out.println( \"hello1!!!\" ); \n";
+        //        str += "end \n";
+        //        str += "rule rule2 \n";
+        //        str += "    dialect \"java\" \n";
+        //        str += "when \n";
+        //        str += "then \n";
+        //        str += "    System.out.println( \"hello2!!!\" ); \n";
+        //        str += "end \n";
+        //
+        //
+        //        KnowledgeBuilder kbuilder =
+        //                node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
+        //        kbuilder.add(ResourceFactory.newByteArrayResource(str.getBytes()),
+        //                ResourceType.DRL);
+        //
+        //        if (kbuilder.hasErrors()) {
+        //            System.out.println("Errors: " + kbuilder.getErrors());
+        //        }
+        //
+        //        KnowledgeBase kbase =
+        //                node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
+        //        Assert.assertNotNull(kbase);
+        //
+        //        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        //
+        //        StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+        //        Assert.assertNotNull(ksession);
+        //
+        //        int fired = ksession.fireAllRules();
+        //        Assert.assertEquals(2, fired);
+        //
 
     }
-//      private void waitForRule(Gnostic g, String rule) {
-//        Throwable thrown = null;
-//        long t0 = System.currentTimeMillis();
-//        try {
-//            while (!hasRule(g.get(), rule)) {
-//                sleep(500);
-//            }
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//            thrown = e;
-//        }
-//        Assert.assertNull(thrown);
-//        System.out.println("Rule loaded in " + (System.currentTimeMillis() - t0) + " millis");
-//    }
-//
-//     private boolean hasRule(List<RuleMap> ruleMaps, String rule) {
-//        boolean hasRule = false;
-//        for (RuleMap ruleMap : ruleMaps) {
-//            System.out.println("===> rule: " + ruleMap.getRuleDefinition().getResource());
-//            if (ruleMap.getRuleDefinition().getResource().indexOf(rule) != -1) {
-//                hasRule = true;
-//                break;
-//            }
-//        }
-//        return hasRule;
-//    }
-//    public static void sleep(long l) {
-//        try {
-//            Thread.sleep(l);
-//        } catch (InterruptedException e) {
-//
-//        }
-//    }
+    //      private void waitForRule(Gnostic g, String rule) {
+    //        Throwable thrown = null;
+    //        long t0 = System.currentTimeMillis();
+    //        try {
+    //            while (!hasRule(g.get(), rule)) {
+    //                sleep(500);
+    //            }
+    //        } catch (RemoteException e) {
+    //            e.printStackTrace();
+    //            thrown = e;
+    //        }
+    //        Assert.assertNull(thrown);
+    //        System.out.println("Rule loaded in " + (System.currentTimeMillis() - t0) + " millis");
+    //    }
+    //
+    //     private boolean hasRule(List<RuleMap> ruleMaps, String rule) {
+    //        boolean hasRule = false;
+    //        for (RuleMap ruleMap : ruleMaps) {
+    //            System.out.println("===> rule: " + ruleMap.getRuleDefinition().getResource());
+    //            if (ruleMap.getRuleDefinition().getResource().indexOf(rule) != -1) {
+    //                hasRule = true;
+    //                break;
+    //            }
+    //        }
+    //        return hasRule;
+    //    }
+    //    public static void sleep(long l) {
+    //        try {
+    //            Thread.sleep(l);
+    //        } catch (InterruptedException e) {
+    //
+    //        }
+    //    }
 }
