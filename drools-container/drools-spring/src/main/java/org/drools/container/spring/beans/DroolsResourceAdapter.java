@@ -52,6 +52,31 @@ public class DroolsResourceAdapter
         }
     }
 
+
+    public void setBasicAuthenticationEnabled(Boolean enabled){
+        if (enabled && !(this.resource instanceof UrlResource)){
+            throw new IllegalArgumentException("Authentication Attributes are only valid for URL Resources");
+        }
+
+        if (this.resource instanceof UrlResource){
+            ((UrlResource)this.resource).setBasicAuthentication(enabled?"enabled":"disabled");
+        }
+    }
+
+    public void setBasicAuthenticationUsername(String username){
+        if (!(this.resource instanceof UrlResource)){
+            throw new IllegalArgumentException("Authentication Attributes are only valid for URL Resources");
+        }
+        ((UrlResource)this.resource).setUsername(username);
+    }
+
+    public void setBasicAuthenticationPassword(String password){
+        if (!(this.resource instanceof UrlResource)){
+            throw new IllegalArgumentException("Authentication Attributes are only valid for URL Resources");
+        }
+        ((UrlResource)this.resource).setPassword(password);
+    }
+
     public DroolsResourceAdapter(String resource,
                                  ResourceType resourceType) {
         this( resource,

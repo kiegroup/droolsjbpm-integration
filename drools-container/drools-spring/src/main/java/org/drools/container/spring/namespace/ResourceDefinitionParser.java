@@ -36,6 +36,9 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String INPUT_TYPE_ATTRIBUTE     = "input-type";
     private static final String TYPE_ATTRIBUTE           = "type";
     private static final String SOURCE_ATTRIBUTE         = "source";
+    private static final String BASIC_AUTHENTICATION_ATTRIBUTE = "basic-authentication";
+    private static final String USERNAME_ATTRIBUTE         = "username";
+    private static final String PASSWORD_ATTRIBUTE         = "password";
     private static final String REF                      = "ref";
 
 
@@ -66,6 +69,17 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
 
         factory.addPropertyValue( "resourceType",
                                   resourceType );
+
+        boolean basicAuthenticationEnabled = element.getAttribute( BASIC_AUTHENTICATION_ATTRIBUTE ) != null && element.getAttribute( BASIC_AUTHENTICATION_ATTRIBUTE ).equalsIgnoreCase("enabled");
+        factory.addPropertyValue("basicAuthenticationEnabled", basicAuthenticationEnabled);
+
+        if (basicAuthenticationEnabled){
+            String username = element.getAttribute( USERNAME_ATTRIBUTE );
+            factory.addPropertyValue("basicAuthenticationUsername", username);
+
+            String password = element.getAttribute( PASSWORD_ATTRIBUTE );
+            factory.addPropertyValue("basicAuthenticationPassword", password);
+        }
 
         if ( "xsd".equals( resourceType.toLowerCase() ) ) {
             XsdParser.parse( element, parserContext, factory );

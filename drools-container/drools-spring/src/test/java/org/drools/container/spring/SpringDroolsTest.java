@@ -31,12 +31,15 @@ import org.drools.agent.impl.KnowledgeAgentImpl;
 import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.common.InternalRuleBase;
 import org.drools.conf.EventProcessingOption;
+import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.drools.grid.ExecutionNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
+import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.io.impl.ResourceChangeScannerImpl;
+import org.drools.io.impl.UrlResource;
 import org.drools.process.instance.impl.humantask.HumanTaskHandler;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
@@ -59,7 +62,7 @@ public class SpringDroolsTest extends TestCase {
             ExecutionNode node2 = (ExecutionNode) context.getBean( "node2" );
             assertNotNull( node2 );
     }
-    
+
     public void testNoNodeKSessions() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/no-node-beans.xml" );
 
@@ -213,5 +216,35 @@ public class SpringDroolsTest extends TestCase {
         assertEquals( ClockType.PSEUDO_CLOCK, sconf.getClockType() );        
 
         
+    }
+
+    public void testResourceAuthenication() throws Exception {
+            ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+
+            //Secure Resource
+            DroolsResourceAdapter resourceAdapter = (DroolsResourceAdapter) context.getBean( "secureResource" );
+            assertNotNull( resourceAdapter );
+
+            Resource resource = resourceAdapter.getDroolsResource();
+            assertTrue(resource instanceof UrlResource);
+
+            UrlResource ur = (UrlResource)resource;
+
+            assertEquals("enabled",ur.getBasicAuthentication());
+            assertEquals("someUser",ur.getUsername());
+            assertEquals("somePassword",ur.getPassword());
+
+            //Insecure Resource
+            resourceAdapter = (DroolsResourceAdapter) context.getBean( "insecureResource" );
+            assertNotNull( resourceAdapter );
+
+            resource = resourceAdapter.getDroolsResource();
+            assertTrue(resource instanceof UrlResource);
+
+            ur = (UrlResource)resource;
+
+            assertEquals("disabled",ur.getBasicAuthentication());
+            assertEquals("",ur.getUsername());
+            assertEquals("",ur.getPassword());
     }
 }
