@@ -57,19 +57,13 @@ public class CxfSoapTest extends CamelSpringTestSupport {
 
 		body.addTextNode(cmd);
 
-		OutputStream out = new ByteArrayOutputStream();
-		soapMessage.writeTo(out);
-
-		String request = out.toString();
-		System.out.println("Request = " + request);
-
 		Object object = this.context.createProducerTemplate().requestBody("direct://http", soapMessage);
-		System.out.println(object.getClass().getCanonicalName());
+
+		OutputStream out = new ByteArrayOutputStream();
 		out = new ByteArrayOutputStream();
 		soapMessage = (SOAPMessage) object;
 		soapMessage.writeTo(out);
 		String response = out.toString();
-		System.out.println("Response = "+response);
 		assertTrue(response.contains("fact-handle identifier=\"salaboy\""));
 	}
 

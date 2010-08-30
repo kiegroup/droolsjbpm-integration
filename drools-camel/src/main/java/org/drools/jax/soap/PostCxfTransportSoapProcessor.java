@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * 
- */
 package org.drools.jax.soap;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
@@ -31,20 +28,25 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.drools.core.util.StringUtils;
 
-public class PostCxfSoap implements Processor {
+public class PostCxfTransportSoapProcessor implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
-		InputStream is = (InputStream) exchange.getIn().getBody();
-		if (is != null) {
-			SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
-			SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
-			QName payloadName = new QName("http://soap.jax.drools.org", "executeResponse", "ns1");
-			SOAPBodyElement payload = body.addBodyElement(payloadName);
-			payload.addChildElement("responseType");
-			body.addTextNode(StringUtils.toString( is ));
-			exchange.getOut().setBody( soapMessage );
-		}
 
-	}        
+		byte[] body2 = (byte[]) exchange.getOut().getBody();
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(body2);
+
+		SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
+		SOAPBody soapBody = soapMessage.getSOAPPart().getEnvelope().getBody();
+		QName payloadName = new QName("http://soap.jax.drools.org", "executeResponse", "ns1");
+		SOAPBodyElement payload = soapBody.addBodyElement(payloadName);
+		payload.addChildElement("responseType");
+		soapBody.addTextNode(StringUtils.toString(bais));
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		soapMessage.writeTo(baos);
+
+		exchange.getOut().setBody(new String(baos.toByteArray()));
+	}
 
 }

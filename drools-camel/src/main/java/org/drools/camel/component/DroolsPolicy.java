@@ -26,6 +26,7 @@ import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.component.cxf.CxfConstants;
+import org.apache.camel.component.cxf.CxfSpringEndpoint;
 import org.apache.camel.model.BeanDefinition;
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.MarshalDefinition;
@@ -54,8 +55,10 @@ import org.drools.command.runtime.rule.QueryCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.core.util.StringUtils;
-import org.drools.jax.soap.PostCxfSoap;
-import org.drools.jax.soap.PreCxfSoap;
+import org.drools.jax.soap.PostCxfSoapProcessor;
+import org.drools.jax.soap.PostCxfTransportSoapProcessor;
+import org.drools.jax.soap.PreCxfSoapProcessor;
+import org.drools.jax.soap.PreCxfTransportSoapProcessor;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
@@ -64,7 +67,8 @@ import org.drools.xml.jaxb.util.JaxbListWrapper;
 public class DroolsPolicy
     implements
     Policy {
-    private DroolsEndpoint dep;
+    private static boolean augmented;
+	private DroolsEndpoint dep;
     
     public void beforeWrap(RouteContext routeContext,
                            ProcessorDefinition processorDefinition) {
@@ -119,12 +123,13 @@ public class DroolsPolicy
                     }
                     else if (to.getUri().startsWith( "cxf" ) && !visited.contains( to ) ) {                        
                         BeanDefinition beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PreCxfSoap.class );
+                        beanDef.setBeanType( PreCxfSoapProcessor.class );
                         outputs.add( i, beanDef ); // insert before cxf
                         beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PostCxfSoap.class );
+                        beanDef.setBeanType( PostCxfSoapProcessor.class );
                         outputs.add( i+2, beanDef ); // insert after cxf
                         i = i + 2;// adjust for the two inserts
+                        augmented = true;
                     }
                 } else if ( child instanceof MarshalDefinition ) {
                     MarshalDefinition m = (MarshalDefinition) child;
@@ -310,7 +315,15 @@ public class DroolsPolicy
                 exchange.setProperty( "drools-context",
                                       context );
 
+                boolean soap = false;
+                if (!augmented && exchange.getFromEndpoint() instanceof CxfSpringEndpoint) {
+                	new PreCxfTransportSoapProcessor().process( exchange );
+                	soap = true;
+                }
                 processor.process( exchange );
+                if (soap) {
+                	new PostCxfTransportSoapProcessor().process( exchange );
+                }
             } finally {
                 Thread.currentThread().setContextClassLoader( originalClassLoader );
             }

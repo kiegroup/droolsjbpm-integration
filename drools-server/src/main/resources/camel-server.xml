@@ -62,11 +62,6 @@
     </cxf:properties>
   </cxf:cxfEndpoint>
 
-  <!-- Beans to transform the soap invocation -->
-  <bean id="preCxfSoapProcessor" class="org.drools.jax.soap.PreCxfSoapProcessor" />
-
-  <bean id="postCxfSoapProcessor" class="org.drools.jax.soap.PostCxfSoapProcessor" />
-  
   <!-- Leave this, as it's needed to make Camel "drools" aware -->
   <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />  
     
@@ -88,13 +83,11 @@
 
     <route>
       <from uri="cxf://bean://soapServer"/>
-      <process ref="preCxfSoapProcessor" />
       <policy ref="droolsPolicy">
         <unmarshal ref="xstream" />       
         <to uri="drools:node1/ksession1" />
         <marshal ref="xstream" />
       </policy>
-      <process ref="postCxfSoapProcessor" />
     </route>
         
   </camelContext>

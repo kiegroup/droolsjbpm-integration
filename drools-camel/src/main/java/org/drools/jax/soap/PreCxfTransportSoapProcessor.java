@@ -13,31 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * 
- */
 package org.drools.jax.soap;
 
+import java.io.InputStream;
+import java.util.Map;
+
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPMessage;
+
 import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.service.model.BindingOperationInfo;
 
-public class PreCxfSoap implements Processor {
-
-	private static final transient Log LOG = LogFactory.getLog(PreCxfSoap.class);
+public class PreCxfTransportSoapProcessor implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
-		exchange.setPattern(ExchangePattern.InOut);
-		BindingOperationInfo boi = (BindingOperationInfo)exchange.getProperty(BindingOperationInfo.class.toString());
-		if (boi != null) {
-			LOG.info("boi.isUnwrapped" + boi.isUnwrapped());
+		InputStream is = (InputStream)exchange.getIn().getBody();
+		Map<String, Object> headers = exchange.getIn().getHeaders();
+		MimeHeaders mimeHeaders = new MimeHeaders();
+		for (String header : headers.keySet()) {
+			mimeHeaders.addHeader(header, (String) headers.get(header));
 		}
-		SOAPMessage soapMessage = (SOAPMessage)exchange.getIn().getBody();
-		exchange.getOut().setBody(soapMessage.getSOAPBody().getTextContent());
-	}        
+		SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(mimeHeaders, is);
+		exchange.getOut().setBody(soapMessage.getSOAPBody().getTextContent().trim());
+		exchange.getIn().setBody(soapMessage.getSOAPBody().getTextContent().trim());
+	}
+
 }
