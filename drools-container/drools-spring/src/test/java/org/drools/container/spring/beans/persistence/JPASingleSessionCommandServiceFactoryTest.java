@@ -32,6 +32,7 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.ProcessBuilder;
+import org.drools.compiler.ProcessBuilderImpl;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.process.core.Work;
@@ -341,7 +342,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
                             Node.CONNECTION_DEFAULT_TYPE );
 
         PackageBuilder packageBuilder = new PackageBuilder();
-        ProcessBuilder processBuilder = new ProcessBuilder( packageBuilder );
+        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
 
@@ -459,7 +460,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
                             Node.CONNECTION_DEFAULT_TYPE );
 
         PackageBuilder packageBuilder = new PackageBuilder();
-        ProcessBuilder processBuilder = new ProcessBuilder( packageBuilder );
+        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
 
@@ -591,7 +592,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
                             Node.CONNECTION_DEFAULT_TYPE );
 
         PackageBuilder packageBuilder = new PackageBuilder();
-        ProcessBuilder processBuilder = new ProcessBuilder( packageBuilder );
+        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
         return packageBuilder.getPackage();
@@ -664,7 +665,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
                             Node.CONNECTION_DEFAULT_TYPE );
 
         PackageBuilder packageBuilder = new PackageBuilder();
-        ProcessBuilder processBuilder = new ProcessBuilder( packageBuilder );
+        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
         return packageBuilder.getPackage();
