@@ -30,12 +30,6 @@
     		<artifactId>drools-compiler</artifactId>
     	</dependency>
     	
-    	<!--dependency>
-    		<groupId>org.drools</groupId>
-    		<artifactId>drools-server-spring</artifactId>
-    		<version>${project.version}</version>
-    	</dependency-->
-    	
     	<dependency>
     		<groupId>org.drools</groupId>
     		<artifactId>drools-decisiontables</artifactId>
