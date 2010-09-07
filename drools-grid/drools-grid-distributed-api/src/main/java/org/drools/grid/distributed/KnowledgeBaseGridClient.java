@@ -123,6 +123,11 @@ public class KnowledgeBaseGridClient
         return null;
     }
 
+    public Collection<Process> getProcesses() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public Rule getRule(String packageName,
                         String ruleName) {
         // TODO Auto-generated method stub

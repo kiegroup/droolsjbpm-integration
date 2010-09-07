@@ -26,6 +26,7 @@ import org.drools.runtime.Environment;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.ExitPoint;
 import org.drools.runtime.Globals;
+import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.ObjectFilter;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.ProcessInstance;
@@ -521,6 +522,10 @@ public class StatefulKnowledgeSessionGridClient
                                    Object[] arguments,
                                    ViewChangedEventListener listener) {
         throw new UnsupportedOperationException( "Not supported yet." );
+    }
+    
+    public KnowledgeSessionConfiguration getSessionConfiguration() {
+    	throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }
