@@ -41,7 +41,7 @@ public class PostCxfTransportSoapProcessor implements Processor {
 		QName payloadName = new QName("http://soap.jax.drools.org/", "executeResponse", "ns1");
 		SOAPBodyElement payload = soapBody.addBodyElement(payloadName);
 		payload.addChildElement("responseType");
-		soapBody.addTextNode(StringUtils.toString(bais));
+		payload.addTextNode(StringUtils.toString(bais));
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		soapMessage.writeTo(baos);
