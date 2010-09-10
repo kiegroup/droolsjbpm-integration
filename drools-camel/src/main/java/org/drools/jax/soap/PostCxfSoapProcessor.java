@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.drools.jax.soap;
 
@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.Exchange;
@@ -33,17 +34,18 @@ import org.drools.core.util.StringUtils;
 
 public class PostCxfSoapProcessor implements Processor {
 
-	public void process(Exchange exchange) throws Exception {
-		InputStream is = (InputStream) exchange.getIn().getBody();
-		if (is != null) {
-			SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
-			SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
-			QName payloadName = new QName("http://soap.jax.drools.org/", "executeResponse", "ns1");
-			SOAPBodyElement payload = body.addBodyElement(payloadName);
-			payload.addChildElement("responseType");
-			payload.addTextNode(StringUtils.toString( is ));
-			exchange.getOut().setBody( soapMessage );
-		}
-	}        
+    public void process(Exchange exchange) throws Exception {
+        InputStream is = (InputStream) exchange.getIn().getBody();
+        if (is != null) {
+            SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
+            SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
+            QName payloadName = new QName("http://soap.jax.drools.org/", "executeResponse", "ns1");
+            QName responseName = new QName("http://soap.jax.drools.org/", "return", "ns1");
+            SOAPBodyElement payload = body.addBodyElement(payloadName);
+            SOAPElement response = payload.addChildElement(responseName);
+            response.addTextNode(StringUtils.toString( is ));
+            exchange.getOut().setBody( soapMessage );
+        }
+    }
 
 }

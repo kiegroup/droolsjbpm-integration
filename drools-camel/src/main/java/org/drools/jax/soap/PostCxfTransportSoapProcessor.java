@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.Exchange;
@@ -39,9 +40,10 @@ public class PostCxfTransportSoapProcessor implements Processor {
 		SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
 		SOAPBody soapBody = soapMessage.getSOAPPart().getEnvelope().getBody();
 		QName payloadName = new QName("http://soap.jax.drools.org/", "executeResponse", "ns1");
+		QName responseName = new QName("http://soap.jax.drools.org/", "return", "ns1");
 		SOAPBodyElement payload = soapBody.addBodyElement(payloadName);
-		payload.addChildElement("responseType");
-		payload.addTextNode(StringUtils.toString(bais));
+		SOAPElement response = payload.addChildElement(responseName);
+		response.addTextNode(StringUtils.toString(bais));
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		soapMessage.writeTo(baos);
