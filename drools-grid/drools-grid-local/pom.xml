@@ -55,7 +55,7 @@
 
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>drools-persistence-jpa</artifactId>
+            <artifactId>drools-flow-persistence-jpa</artifactId>
             <scope>test</scope>
             <type>jar</type>
         </dependency>

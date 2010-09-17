@@ -37,7 +37,7 @@
     	
     	 <dependency>
     		<groupId>org.drools</groupId>
-    		<artifactId>drools-persistence-jpa</artifactId>
+    		<artifactId>drools-flow-persistence-jpa</artifactId>
     		<optional>true</optional>
     	</dependency>
     	
