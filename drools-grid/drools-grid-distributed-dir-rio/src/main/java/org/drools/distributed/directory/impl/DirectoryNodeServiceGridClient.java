@@ -17,12 +17,14 @@
 
 package org.drools.distributed.directory.impl;
 
+import org.drools.grid.distributed.connectors.DistributedRioDirectoryConnector;
 import java.rmi.RemoteException;
 import java.util.Map;
 import org.drools.KnowledgeBase;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnection;
+import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
 
 /**
@@ -30,41 +32,60 @@ import org.drools.grid.GenericNodeConnector;
  * @author salaboy
  */
 public class DirectoryNodeServiceGridClient implements DirectoryNodeService {
-    private DirectoryNodeService client;
+    
+    private GenericNodeConnector connector;
     
     public DirectoryNodeServiceGridClient(GenericNodeConnector connector, GenericConnection connection) {
         
 
-
-        this.client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        this.connector = connector;
+    
     }
 
 
 
     public void register(String executorId, String resourceId) throws ConnectorException, RemoteException {
-        
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
         client.register(executorId, resourceId);
+        connector.disconnect();
     }
 
     public void register(String executorId, GenericNodeConnector resourceConnector) throws ConnectorException, RemoteException {
-        
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
         client.register(executorId, resourceConnector);
+        connector.disconnect();
     }
 
     public void unregister(String executorId) throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        client.unregister(executorId);
+        connector.disconnect();
     }
 
     public GenericNodeConnector lookup(String resourceId) throws ConnectorException, RemoteException {
-        return client.lookup(resourceId);
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        GenericNodeConnector result = GenericConnectorFactory.newConnector(client.lookupId(resourceId));
+        connector.disconnect();
+        return result;
     }
 
     public String lookupId(String resourceId) throws ConnectorException, RemoteException {
-        return client.lookupId(resourceId);
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        String result = client.lookupId(resourceId);
+        connector.disconnect();
+        return result;
     }
 
     public void registerKBase(String kbaseId, String resourceId) throws ConnectorException, RemoteException {
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
         client.registerKBase(kbaseId, resourceId);
+        connector.disconnect();
     }
 
     public void registerKBase(String kbaseId, KnowledgeBase kbase) throws ConnectorException, RemoteException {
@@ -76,15 +97,27 @@ public class DirectoryNodeServiceGridClient implements DirectoryNodeService {
     }
 
     public KnowledgeBase lookupKBase(String kbaseId) throws ConnectorException, RemoteException {
-        return client.lookupKBase(kbaseId);
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        KnowledgeBase result = client.lookupKBase(kbaseId);
+        connector.disconnect();
+        return result;
     }
 
     public Map<String, String> getExecutorsMap() throws ConnectorException, RemoteException {
-        return client.getExecutorsMap();
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        Map<String, String>  result = client.getExecutorsMap();
+        connector.disconnect();
+        return result;
     }
 
     public Map<String, String> getKBasesMap() throws ConnectorException, RemoteException {
-        return client.getKBasesMap();
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        Map<String, String>  result = client.getKBasesMap();
+        connector.disconnect();
+        return result; 
     }
 
     public void dispose() throws ConnectorException, RemoteException {

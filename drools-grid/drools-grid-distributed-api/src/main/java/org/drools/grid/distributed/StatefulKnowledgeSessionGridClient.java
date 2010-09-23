@@ -10,6 +10,8 @@ import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
+import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.common.DefaultFactHandle;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
@@ -89,7 +91,7 @@ public class StatefulKnowledgeSessionGridClient
                 throw new RuntimeException( "Response was not correctly received" );
             }
 
-            return (Integer) ((ExecutionResults) object).getValue( commandId );
+            return (Integer)  object;
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",
                                         e );
@@ -321,8 +323,33 @@ public class StatefulKnowledgeSessionGridClient
     }
 
     public FactHandle insert(Object object) {
-        // TODO Auto-generated method stub
-        return null;
+       String commandId = "ksession.insert" + this.messageSession.getNextId();
+        String kresultsId = "kresults_" + this.messageSession.getSessionId();
+
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( object,
+                                                                                                           true ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId ) );
+
+        try {
+            
+            Object result = this.connector.write( msg ).getPayload();
+            if ( object == null ) {
+                throw new RuntimeException( "Response was not correctly received" );
+            }
+            DefaultFactHandle handle = (DefaultFactHandle) result;
+
+            
+            return handle;
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
+        }
     }
 
     public void retract(FactHandle handle) {

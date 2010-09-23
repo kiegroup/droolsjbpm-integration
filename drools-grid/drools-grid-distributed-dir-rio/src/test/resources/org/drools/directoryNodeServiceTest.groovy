@@ -17,6 +17,7 @@ deployment(name:'directoryNodeService',  debug: 'true') {
 
     /* Declares the artifacts required for deployment. Note the 'dl'
      * classifier used for the 'download' jar */
+    artifact id:'api', 'org.drools:drools-grid-distributed-api:5.2.0.SNAPSHOT'
     artifact id:'service-dir', 'org.drools:drools-grid-distributed-dir-rio:5.2.0.SNAPSHOT'
     artifact id:'service-dir-dl', 'org.drools:drools-grid-distributed-dir-rio:dl:5.2.0.SNAPSHOT'
     artifact id:'service', 'org.drools:drools-grid-distributed-rio:5.2.0.SNAPSHOT'
@@ -53,5 +54,6 @@ deployment(name:'directoryNodeService',  debug: 'true') {
         maintain 1
     }
 
+    
 
 }

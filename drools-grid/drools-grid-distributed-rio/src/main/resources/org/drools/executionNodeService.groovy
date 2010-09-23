@@ -20,6 +20,7 @@ deployment(name:'executionNodeService',  debug: 'true') {
 
     /* Declares the artifacts required for deployment. Note the 'dl'
      * classifier used for the 'download' jar */
+    artifact id:'api', 'org.drools:drools-grid-distributed-api:5.2.0.SNAPSHOT'
     artifact id:'service', 'org.drools:drools-grid-distributed-rio:5.2.0.SNAPSHOT'
     artifact id:'service-dl', 'org.drools:drools-grid-distributed-rio:dl:5.2.0.SNAPSHOT'
 
@@ -27,7 +28,7 @@ deployment(name:'executionNodeService',  debug: 'true') {
      * Declare the service to be deployed. The number of instances deployed
      * defaults to 1. If you require > 1 instances change as needed
      */
-    service(name: 'ExecutionNodeService', fork: 'yes') { //fork yes, works only in unix machines
+    service(name: 'ExecutionNodeService', fork: 'no') { //fork yes, works only in unix machines
         interfaces {
             classes 'org.drools.grid.ExecutionNodeService'
             artifact ref:'service-dl'

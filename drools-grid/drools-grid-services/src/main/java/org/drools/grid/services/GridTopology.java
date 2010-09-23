@@ -110,8 +110,10 @@ public class GridTopology {
                                         environment );
 
         try {
+            connector.connect();
             this.executionEnvironmentsByConnectorId.put( connector.getId(),
                                                          environment.getName() );
+            connector.disconnect();
         } catch ( ConnectorException ex ) {
             Logger.getLogger( GridTopology.class.getName() ).log( Level.SEVERE,
                                                                   null,

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.runtime.GetKnowledgeBaseCommand;
+import org.drools.grid.distributed.directory.commands.GetKnowledgeBaseGridCommand;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.internal.Message;
 import org.drools.grid.ExecutionNodeService;
@@ -57,10 +57,11 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService {
     @Override
     public GenericNodeConnector lookup(String sessionId) throws ConnectorException, RemoteException {
         ExecutionNodeService nodeService = null;
+        System.out.println("SessionID inside Lookup = "+sessionId);
         String sessionServiceId = (String) directoryMap.get(sessionId);
-        
+        System.out.println("SessionID from directoryMap = "+sessionServiceId);
         for (ExecutionNodeService ss : executionNodes) {
-        
+            System.out.println("NodeService = "+ss.getId() +" must match with = "+sessionServiceId);
             if (ss.getId().equals(sessionServiceId)) {
                 nodeService = ss;
             }
@@ -94,7 +95,7 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService {
 
         try {
             //@TODO: This is a bad hack.. I need to improve this a lot
-            Message msg = executionNode.write(new Message(999, 1000, false, new KnowledgeContextResolveFromContextCommand(new GetKnowledgeBaseCommand(), null, kbaseId, null, null)));
+            Message msg = executionNode.write(new Message(999, 1000, false, new KnowledgeContextResolveFromContextCommand(new GetKnowledgeBaseGridCommand(), null, kbaseId, null, null)));
 
             if (msg.getPayload() instanceof KnowledgeBase) {
                 return (KnowledgeBase) msg.getPayload();
@@ -135,7 +136,7 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService {
 
     @Override
     public Map<String, String> getKBasesMap() throws ConnectorException, RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return kbaseDirectoryMap;
     }
 
     @Override

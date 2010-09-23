@@ -126,7 +126,7 @@ public class GridConnection
         HumanTaskNode humanTaskNode = null;
         try {
             type = connector.getNodeConnectionType();
-            connector.connect();
+            
             type.setConnector( connector );
             type.setConnection( this );
 

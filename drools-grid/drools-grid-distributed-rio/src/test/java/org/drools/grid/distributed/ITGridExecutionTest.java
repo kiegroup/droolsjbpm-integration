@@ -9,9 +9,9 @@ import junit.framework.Assert;
 
 import net.jini.core.lookup.ServiceItem;
 import org.drools.SystemEventListenerFactory;
-import org.drools.distributed.directory.impl.DistributedRioDirectoryConnector;
+import org.drools.grid.distributed.connectors.DistributedRioDirectoryConnector;
 import org.drools.grid.DirectoryNodeService;
-import org.drools.grid.distributed.impl.DistributedRioNodeConnector;
+import org.drools.grid.distributed.connectors.DistributedRioNodeConnector;
 import org.junit.After;
 
 

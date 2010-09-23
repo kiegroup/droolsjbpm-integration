@@ -1,4 +1,4 @@
-package org.drools.grid.distributed.impl;
+package org.drools.grid.distributed.connectors;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -75,16 +75,17 @@ public class DistributedRioNodeConnector
 
     
     public Message write(Message msg) throws ConnectorException, RemoteException {
-        connect();
-        if (executionNodeService != null) {
+        if (executionNodeService == null) {
+            connect();
+        }
 
 
             Message returnMessage = this.executionNodeService.write(msg);
             return returnMessage;
 
 
-        }
-        throw new IllegalStateException("executionNode should not be null");
+        
+        
     }
 
     public void write(Message msg,
@@ -93,7 +94,9 @@ public class DistributedRioNodeConnector
     }
 
     public String getId() throws ConnectorException, RemoteException {
-
+        if(executionNodeService == null){
+            connect();
+        }
         return executionNodeService.getId();
 
 
@@ -115,7 +118,7 @@ public class DistributedRioNodeConnector
         if(this.executionNodeService != null){
             return;
         }
-        if( !this.executionNodeId.equals("")){
+        if( !this.executionNodeId.equals("") && !this.executionNodeId.equals("Distributed:Rio:Node")){
             try {
                 this.executionNodeService = RioResourceLocator.locateExecutionNodeById(this.executionNodeId);
             } catch (IOException ex) {

@@ -96,8 +96,33 @@ public class KnowledgeBaseProviderGridClient
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId) {
-        // TODO Auto-generated method stub
-        return null;
+        
+            this.localId = kbaseId;
+        
+
+        Message msg = new Message( this.messageSession.getSessionId(),
+                                   this.messageSession.counter.incrementAndGet(),
+                                   false,
+                                   new SetVariableCommand( "__TEMP__",
+                                                           this.localId,
+                                                           new NewKnowledgeBaseCommand( null ) ) );
+        try {
+            Object object = this.connector.write( msg ).getPayload();
+
+            //            if ( !(object instanceof FinishedCommand) ) {
+            //                throw new RuntimeException( "Response was not correctly ended" );
+            //            }
+
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to execute message",
+                                        e );
+        }
+
+        return new KnowledgeBaseGridClient( this.localId,
+                                            this.connector,
+                                            this.messageSession,
+                                            this.connection );
+
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId,

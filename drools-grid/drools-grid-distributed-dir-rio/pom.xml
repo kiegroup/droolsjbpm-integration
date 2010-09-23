@@ -36,13 +36,11 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-distributed-api</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
         </dependency>
 
      <!-- RIO Runtime -->
@@ -72,7 +70,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -99,8 +97,10 @@
                         <topclasses>
                             <topclass>org.drools.grid.ExecutionNodeService</topclass>
                             <topclass>org.drools.grid.DirectoryNodeService</topclass>
-                            <topclass>org.drools.grid.distributed.RioNodeConnector</topclass>
+                            <topclass>org.drools.grid.distributed.connectors.DistributedRioNodeConnector</topclass>
+                            <topclass>org.drools.grid.distributed.connectors.DistributedRioDirectoryConnector</topclass>
                             <topclass>org.drools.grid.distributed.util.IDEntry</topclass>
+                            <topclass>org.drools.grid.distributed.directory.commands.GetKnowledgeBaseGridCommand</topclass>
                             <topclass>org.drools.grid.distributed.util.RioResourceLocator</topclass>
                             <topclass>org.drools.grid.distributed.command.NewStatefulKnowledgeSessionGridCommand</topclass>
                             <topclass>org.drools.impl.SystemEventListenerServiceImpl</topclass>

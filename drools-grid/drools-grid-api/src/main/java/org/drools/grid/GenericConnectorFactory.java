@@ -39,8 +39,8 @@ public class GenericConnectorFactory {
     private static final String REMOTE_HORNETQ_NODE_CONNECTOR_CLASS       = "";
     private static final String REMOTE_HORNETQ_DIRECTORY_CONNECTOR_CLASS  = "";
     private static final String REMOTE_HORNETQ_TASK_CONNECTOR_CLASS       = "";
-    private static final String DISTRIBUTED_RIO_NODE_CONNECTOR_CLASS      = "org.drools.grid.distributed.impl.DistributedRioNodeConnector";
-    private static final String DISTRIBUTED_RIO_DIRECTORY_CONNECTOR_CLASS = "org.drools.distributed.directory.impl.DistributedRioDirectoryConnector";
+    private static final String DISTRIBUTED_RIO_NODE_CONNECTOR_CLASS      = "org.drools.grid.distributed.connectors.DistributedRioNodeConnector";
+    private static final String DISTRIBUTED_RIO_DIRECTORY_CONNECTOR_CLASS = "org.drools.grid.distributed.connectors.DistributedRioDirectoryConnector";
     private static final String DISTRIBUTED_RIO_TASK_CONNECTOR_CLASS      = "";
 
     /* connectorString format:
@@ -336,7 +336,7 @@ public class GenericConnectorFactory {
 
             String[] connectorDetails = getConnectorDetails( connectorString );
             Class clazz = Class.forName( DISTRIBUTED_RIO_NODE_CONNECTOR_CLASS );
-            if ( !"".equals( connectorDetails[3] ) ) {
+            if ( connectorDetails.length < 4 || !"".equals( connectorDetails[3] ) ) {
                 Constructor constructor = clazz.getConstructor( String.class,
                                                                 SystemEventListener.class,
                                                                 String.class );

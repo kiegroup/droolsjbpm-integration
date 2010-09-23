@@ -47,7 +47,6 @@ public class DistributedConnectionNode
 
     public DistributedConnectionNode(GenericNodeConnector connector,
                                      GenericConnection connection) {
-
         this.connector = connector;
         this.connection = connection;
 

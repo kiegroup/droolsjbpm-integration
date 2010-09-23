@@ -1,4 +1,4 @@
-package org.drools.distributed.directory.impl;
+package org.drools.grid.distributed.connectors;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.drools.KnowledgeBase;
 
 import org.drools.SystemEventListener;
+import org.drools.distributed.directory.impl.DistributedConnectionDirectory;
 import org.drools.grid.ConnectorException;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.DirectoryNodeService;
@@ -110,7 +111,7 @@ public class DistributedRioDirectoryConnector
     }
 
     public void connect() throws ConnectorException {
-        if(this.directoryNodeService == null && !"".equals(this.directoryNodeServiceId)){
+        if(this.directoryNodeService == null && this.directoryNodeServiceId != null && !"".equals(this.directoryNodeServiceId)){
             try {
                 this.directoryNodeService = RioResourceLocator.locateDirectoryNodeById(this.directoryNodeServiceId);
             } catch (IOException ex) {
