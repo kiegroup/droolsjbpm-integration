@@ -112,6 +112,13 @@ public class RemoteMinaHumanTaskConnector
 
     private void addResponseHandler(int id,
                                     MessageResponseHandler responseHandler) {
+        if(this.connector == null){
+            try {
+                connect();
+            } catch (ConnectorException ex) {
+                Logger.getLogger(RemoteMinaHumanTaskConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         ((MinaIoHandler) this.connector.getHandler()).addResponseHandler( id,
                                                                           responseHandler );
     }
