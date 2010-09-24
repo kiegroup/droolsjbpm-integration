@@ -63,7 +63,7 @@ public class ExecutionEnvByPrioritySelectionStrategy
     }
 
     public void setExecutionEnvironments(Map<String, ExecutionEnvironment> executionEnvironments) {
-
+        
         List<ExecutionEnvironment> eeList = new ArrayList<ExecutionEnvironment>();
         for ( ExecutionEnvironment ee : executionEnvironments.values() ) {
             eeList.add( ee );

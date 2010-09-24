@@ -143,7 +143,7 @@ public class GridTopology {
      *
      */
     public void unregisterExecutionEnvironment(String name) {
-
+        
         ExecutionEnvironment ee = this.executionEnvironments.get( name );
         try {
 
@@ -470,15 +470,15 @@ public class GridTopology {
      */
     public void dispose() throws ConnectorException,
                          RemoteException {
-
+        System.out.println("I'm Disposing the topology!!!");
         for ( String key : this.executionEnvironments.keySet() ) {
-            unregisterExecutionEnvironment( key );
+           // unregisterExecutionEnvironment( key );
         }
         for ( String key : this.directoryInstances.keySet() ) {
-            unregisterDirectoryInstance( key );
+           // unregisterDirectoryInstance( key );
         }
         for ( String key : this.taskServerInstances.keySet() ) {
-            unregisterTaskServerInstance( key );
+           // unregisterTaskServerInstance( key );
         }
     }
 

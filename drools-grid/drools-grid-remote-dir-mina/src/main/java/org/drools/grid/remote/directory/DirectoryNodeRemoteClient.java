@@ -277,4 +277,23 @@ public class DirectoryNodeRemoteClient
                                        RemoteException {
         return ServiceType.REMOTE;
     }
+
+    public String lookupKBaseLocationId(String kbaseId) throws ConnectorException, RemoteException {
+        this.connector.connect();
+        List<Object> args = new ArrayList<Object>( 1 );
+        args.add( kbaseId );
+        SimpleCommand cmd = new SimpleCommand( this.connector.getCounter().getAndIncrement(),
+                                               SimpleCommandName.RequestKBaseId,
+                                               args );
+        Message msg = new Message( this.connector.getSessionId(),
+                                   this.connector.getCounter().incrementAndGet(),
+                                   false,
+                                   cmd );
+        BlockingMessageDirectoryMapRequestResponseHandler handler = new BlockingMessageDirectoryMapRequestResponseHandler();
+        write( msg,
+               handler );
+        SimpleCommand resultcmd = (SimpleCommand) handler.getMessage().getPayload();
+        String connectorString = (String) resultcmd.getArguments().get( 0 );
+        return connectorString;
+    }
 }

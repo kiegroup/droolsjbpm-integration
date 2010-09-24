@@ -10,13 +10,13 @@ public class GridTopologyFactory {
 
     public static GridTopology build(GridTopologyConfiguration gridConfiguration) {
         GridTopology topology = new GridTopology( gridConfiguration.getName() );
-        for ( DirectoryInstanceConfiguration directoryInstanceView : gridConfiguration.getDirectoryInstances() ) {
-            topology.registerDirectoryInstance( directoryInstanceView.getName(),
-                                                directoryInstanceView.getProvider() );
+        for ( DirectoryInstanceConfiguration directoryInstanceConfiguration : gridConfiguration.getDirectoryInstances() ) {
+            topology.registerDirectoryInstance( directoryInstanceConfiguration.getName(),
+                                                directoryInstanceConfiguration.getProvider() );
         }
-        for ( ExecutionEnvironmentConfiguration executionEnvironmentView : gridConfiguration.getExecutionEnvironments() ) {
-            topology.registerExecutionEnvironment( executionEnvironmentView.getName(),
-                                                   executionEnvironmentView.getProvider() );
+        for ( ExecutionEnvironmentConfiguration executionEnvironmentConfiguration : gridConfiguration.getExecutionEnvironments() ) {
+            topology.registerExecutionEnvironment( executionEnvironmentConfiguration.getName(),
+                                                   executionEnvironmentConfiguration.getProvider() );
         }
         for ( TaskServerInstanceConfiguration taskServerInstanceView : gridConfiguration.getTaskServers() ) {
             topology.registerTaskServerInstance( taskServerInstanceView.getName(),

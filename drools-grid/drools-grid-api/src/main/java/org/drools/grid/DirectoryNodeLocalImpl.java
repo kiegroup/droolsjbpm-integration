@@ -87,7 +87,7 @@ public class DirectoryNodeLocalImpl
         if ( resourceId.equals( "local" ) ) {
             return this.kbasesInstancesMap.get( kbaseId );
         }
-
+        
         return KnowledgeBaseClientFactory.newKnowledgeBaseClient( resourceId );
 
     }
@@ -127,6 +127,10 @@ public class DirectoryNodeLocalImpl
 
     public ServiceType getServiceType() {
         return ServiceType.LOCAL;
+    }
+
+    public String lookupKBaseLocationId(String kbaseId) throws ConnectorException, RemoteException {
+        return this.kbasesMap.get( kbaseId );
     }
 
 }

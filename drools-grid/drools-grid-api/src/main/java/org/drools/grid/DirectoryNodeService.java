@@ -50,6 +50,9 @@ public interface DirectoryNodeService
 
     public KnowledgeBase lookupKBase(String kbaseId) throws ConnectorException,
                                                     RemoteException;
+    
+    public String lookupKBaseLocationId(String kbaseId) throws ConnectorException,
+                                                    RemoteException;
 
     public Map<String, String> getExecutorsMap() throws ConnectorException,
                                                 RemoteException;

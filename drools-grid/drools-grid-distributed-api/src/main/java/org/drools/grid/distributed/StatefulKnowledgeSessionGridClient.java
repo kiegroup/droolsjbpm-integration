@@ -200,7 +200,7 @@ public class StatefulKnowledgeSessionGridClient
 
     public void setGlobal(String identifier,
                           Object object) {
-        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String commandId = "ksession.setGlobal" + this.messageSession.getNextId();
         String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
         Message msg = new Message( this.messageSession.getSessionId(),
@@ -214,14 +214,10 @@ public class StatefulKnowledgeSessionGridClient
                                                                                   kresultsId ) );
 
         try {
-            Object result = this.connector.write( msg ).getPayload();
-            if ( result == null ) {
-                throw new RuntimeException( "Response was not correctly received = null" );
-            }
+            this.connector.write( msg ).getPayload();
+           
 
-            //            if ( !(result instanceof FinishedCommand)) {
-            //                throw new RuntimeException( "Response was not correctly received" );
-            //            }
+            
 
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to execute message",

@@ -25,16 +25,25 @@ import org.drools.KnowledgeBase;
  */
 public class KnowledgeBaseClientFactory {
     public static KnowledgeBase newKnowledgeBaseClient(String connectorString) {
-
+        KnowledgeBase client =  null;
         String[] connectorDetails = connectorString.split( ":" );
         String connectorType = connectorDetails[0];
 
         if ( connectorType.equals( "Remote" ) ) {
-            // I need to use reflection to create this remote client, that contain a node conector that can be create using
-            //the node connector factorynew KnowledgeBaseRemoteClient();
-
+            String provider = connectorDetails[1];
+            if(provider.equals("Mina")){
+                //@TODO use reflection to create a KnowledgeBaseRemoteClient
+            }
         }
-        return null;
+        if ( connectorType.equals( "Distributed" ) ) {
+            String provider = connectorDetails[1];
+            if(provider.equals("Rio")){
+                //@TODO use reflection to create a KnowledgeBaseGridClient
+            }
+        }
+        
+        
+        return client;
 
     }
 }

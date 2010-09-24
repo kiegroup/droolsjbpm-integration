@@ -71,6 +71,14 @@
             <type>jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-grid-distributed-rio</artifactId>
+            <version>5.2.0.SNAPSHOT</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+       
          <!-- RIO Test framework -->
         <!--dependency>
             <groupId>org.rioproject</groupId>

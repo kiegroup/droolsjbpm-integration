@@ -205,7 +205,7 @@ public class StatefulKnowledgeSessionRemoteClient
 
     public void setGlobal(String identifier,
                           Object object) {
-        String commandId = "ksession.execute" + this.messageSession.getNextId();
+        String commandId = "ksession.setGlobal" + this.messageSession.getNextId();
         String kresultsId = "kresults_" + this.messageSession.getSessionId();
 
         Message msg = new Message( this.messageSession.getSessionId(),
