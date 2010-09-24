@@ -10,14 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.grid.distributed.directory.commands.GetKnowledgeBaseGridCommand;
 import org.drools.grid.ConnectorException;
-import org.drools.grid.internal.Message;
 import org.drools.grid.ExecutionNodeService;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
+import org.drools.grid.distributed.KnowledgeBaseGridClient;
+import org.drools.grid.internal.MessageSession;
 
 /**
  *
@@ -95,16 +94,31 @@ public class DirectoryNodeServiceImpl implements DirectoryNodeService {
 
         try {
             //@TODO: This is a bad hack.. I need to improve this a lot
-            Message msg = executionNode.write(new Message(999, 1000, false, new KnowledgeContextResolveFromContextCommand(new GetKnowledgeBaseGridCommand(), null, kbaseId, null, null)));
-
-            if (msg.getPayload() instanceof KnowledgeBase) {
-                return (KnowledgeBase) msg.getPayload();
-            }
-            return null;
+//            Message msg = executionNode.write(new Message(999, 1000, false, new KnowledgeContextResolveFromContextCommand(new GetKnowledgeBaseGridCommand(), null, kbaseId, null, null)));
+//            
+//            if (msg.getPayload() instanceof KnowledgeBase) {
+//                return (KnowledgeBase) msg.getPayload();
+//            }
+            //@TODO: I need to create a client with the executionNode and the kbaseId
+            GenericNodeConnector connector = GenericConnectorFactory.newConnector(executionNode.getId());
+            return new KnowledgeBaseGridClient( kbaseId,
+                                            connector,
+                                            new MessageSession(),
+                                            connector.getConnection() );
+            
+            
         } catch (Exception e) {
             throw new RuntimeException("Unable to execute message",
                     e);
         }
+    }
+    
+    @Override
+    public String lookupKBaseLocationId(String kbaseId) throws ConnectorException, RemoteException {
+        ExecutionNodeService executionNode = null;
+        String execNodeId = (String) kbaseDirectoryMap.get(kbaseId);
+
+        return execNodeId;
     }
 
     @Override

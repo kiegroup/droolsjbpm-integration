@@ -135,6 +135,14 @@ public class DirectoryNodeServiceGridClient implements DirectoryNodeService {
         return ServiceType.DISTRIBUTED;
     }
 
+    public String lookupKBaseLocationId(String kbaseId) throws ConnectorException, RemoteException {
+        connector.connect();
+        DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
+        String result = client.lookupKBaseLocationId(kbaseId);
+        connector.disconnect();
+        return result;
+    }
+
     
    
   

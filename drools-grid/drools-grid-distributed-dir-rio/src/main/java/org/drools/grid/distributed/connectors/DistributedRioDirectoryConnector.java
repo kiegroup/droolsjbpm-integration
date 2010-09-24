@@ -206,4 +206,8 @@ public class DistributedRioDirectoryConnector
     public ServiceType getServiceType() throws ConnectorException, RemoteException {
         return ServiceType.DISTRIBUTED;
     }
+
+    public String lookupKBaseLocationId(String kbaseId) throws ConnectorException, RemoteException {
+        return this.directoryNodeService.lookupKBaseLocationId(kbaseId);
+    }
 }
