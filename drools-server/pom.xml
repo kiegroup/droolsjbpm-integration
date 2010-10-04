@@ -17,7 +17,7 @@
    
    <dependencies>
 
-		<!-- Drools -->
+    <!-- Drools -->
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-api</artifactId>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-spring</artifactId>
-        </dependency>        				
+        </dependency>
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-api</artifactId>
@@ -58,8 +58,8 @@
             <groupId>org.drools</groupId>
             <artifactId>drools-camel</artifactId>
         </dependency>        
-		
-		 <!-- Camel -->
+
+     <!-- Camel -->
          <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-xstream</artifactId>
-        </dependency>     		
+        </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jaxb</artifactId>
@@ -89,87 +89,87 @@
             <artifactId>camel-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>		
-		
-		<!-- Spring -->
+        </dependency>
+
+    <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
         </dependency>
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>  
-		</dependency>  		
-		
-	    <!-- CXF deps -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-bundle-jaxrs</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xercesImpl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xmlParserAPIs</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.geronimo.specs</groupId>
-					<artifactId>geronimo-servlet_2.5_spec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jaxen</groupId>
-					<artifactId>jaxen</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.xmlbeans</groupId>
-					<artifactId>xmlbeans</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>	
 
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-xjc</artifactId>
-		</dependency>
+      <!-- CXF deps -->
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle-jaxrs</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xmlParserAPIs</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-servlet_2.5_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jaxen</groupId>
+          <artifactId>jaxen</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.xmlbeans</groupId>
+          <artifactId>xmlbeans</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		
-		<!-- web app deps -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>		
-	  
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>  
-		</dependency> 
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>		
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-xjc</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>test</scope>
-		</dependency>	
-		
+
+    <!-- web app deps -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+
    </dependencies>
    
 </project>
