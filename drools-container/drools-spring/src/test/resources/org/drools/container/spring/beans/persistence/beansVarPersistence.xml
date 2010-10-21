@@ -42,11 +42,7 @@
 			<drools:jpa-persistence>
 	            <drools:transaction-manager ref="txManager" />
 	            <drools:entity-manager-factory ref="myEmf" />
-				<drools:variable-persisters>
-					<drools:persister for-class="javax.persistence.Entity" implementation="org.drools.persistence.processinstance.persisters.JPAVariablePersister"/>
-					<drools:persister for-class="java.lang.String" implementation="org.drools.container.spring.beans.persistence.StringVariablePersister"/>
-					<drools:persister for-class="java.io.Serializable" implementation="org.drools.persistence.processinstance.persisters.SerializableVariablePersister"/>
-				</drools:variable-persisters>               	    
+				
 		    </drools:jpa-persistence>
 	    </drools:configuration>    
 	</drools:ksession>

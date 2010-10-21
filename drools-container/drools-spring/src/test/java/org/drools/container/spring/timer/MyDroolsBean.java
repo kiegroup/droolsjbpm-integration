@@ -77,6 +77,7 @@ public class MyDroolsBean {
         environment.set(EnvironmentName.ENTITY_MANAGER_FACTORY, emf);
         environment.set(EnvironmentName.TRANSACTION_MANAGER, txm);
         environment.set(EnvironmentName.GLOBALS, new MapGlobalResolver());
+        
         return environment;
     }
 

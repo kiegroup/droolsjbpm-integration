@@ -16,6 +16,12 @@
 
 package org.drools.container.spring.beans.persistence;
 
+import javax.naming.NamingException;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -25,14 +31,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.naming.InitialContext;
+import javax.persistence.EntityManager;
 
 import javax.persistence.EntityManagerFactory;
+import javax.transaction.UserTransaction;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.base.MapGlobalResolver;
+import org.drools.marshalling.ObjectMarshallingStrategy;
+import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
+import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.JPAKnowledgeService;
 import org.drools.persistence.jpa.KnowledgeStoreService;
+import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -115,6 +128,8 @@ public class VariablePersistenceStrategyTest {
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
 		env.set( EnvironmentName.TRANSACTION_MANAGER, txManager);
 		env.set( EnvironmentName.GLOBALS, new MapGlobalResolver() );
+                env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES, new ObjectMarshallingStrategy[]{new JPAPlaceholderResolverStrategy(env), 
+                                                                    new SerializablePlaceholderResolverStrategy(ClassObjectMarshallingStrategyAcceptor.DEFAULT)} );
 		
     	final KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
         final KnowledgeBase kbRollback = ( KnowledgeBase ) ctx.getBean( "kbRollback" );
@@ -216,7 +231,20 @@ public class VariablePersistenceStrategyTest {
     }
     
     @Test
-    public void testPersistenceVariables() {
+    public void testPersistenceVariables() throws NamingException, NotSupportedException, SystemException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+        MyEntity myEntity = new MyEntity( "This is a test Entity with annotation in fields" );
+        MyEntityMethods myEntityMethods = new MyEntityMethods( "This is a test Entity with annotations in methods" );
+        MyEntityOnlyFields myEntityOnlyFields = new MyEntityOnlyFields( "This is a test Entity with annotations in fields and without accesors methods" ) ;
+        MyVariableSerializable myVariableSerializable = new MyVariableSerializable( "This is a test SerializableObject" );
+        EntityManager em = ((EntityManagerFactory)ctx.getBean( "myEmf" )).createEntityManager();
+        
+        em.getTransaction().begin();
+        em.persist(myEntity);
+        em.persist(myEntityMethods);
+        em.persist(myEntityOnlyFields);
+        em.getTransaction().commit();
+        em.close();
+        
         log.info( "---> get bean jpaSingleSessionCommandService" );
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
@@ -228,13 +256,13 @@ public class VariablePersistenceStrategyTest {
         parameters.put( "x",
                         "SomeString" );
         parameters.put( "y",
-                        new MyEntity( "This is a test Entity with annotation in fields" ) );
+                         myEntity);
         parameters.put( "m",
-                        new MyEntityMethods( "This is a test Entity with annotations in methods" ) );
+                         myEntityMethods);
         parameters.put( "f",
-                        new MyEntityOnlyFields( "This is a test Entity with annotations in fields and without accesors methods" ) );
+                        myEntityOnlyFields);
         parameters.put( "z",
-                        new MyVariableSerializable( "This is a test SerializableObject" ) );
+                         myVariableSerializable);
         WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.startProcess( "com.sample.ruleflow", parameters );
         log.info( "Started process instance {}",
                   processInstance.getId() );
@@ -246,14 +274,18 @@ public class VariablePersistenceStrategyTest {
 
         EntityManagerFactory emf = (EntityManagerFactory) ctx.getBean( "myEmf" );
 
-        List< ? > result = emf.createEntityManager().createQuery( "select i from VariableInstanceInfo i" ).getResultList();
-        assertEquals( 5,
-                      result.size() );
+//        List< ? > result = emf.createEntityManager().createQuery( "select i from VariableInstanceInfo i" ).getResultList();
+//        assertEquals( 5,
+//                      result.size() );
         log.info( "### Retrieving process instance ###" );
 
         Environment env = KnowledgeBaseFactory.newEnvironment();
-        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
-        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));      
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, emf);
+        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));  
+        env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES, new ObjectMarshallingStrategy[]{
+                                                                  //  new JPAPlaceholderResolverStrategy(env),
+                                                                    new SerializablePlaceholderResolverStrategy(ClassObjectMarshallingStrategyAcceptor.DEFAULT)
+                                                                });
 
         KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbase1" );

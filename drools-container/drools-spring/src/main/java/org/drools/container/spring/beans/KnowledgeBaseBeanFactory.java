@@ -178,6 +178,6 @@ public class KnowledgeBaseBeanFactory
 
     public void setNode(ExecutionNode executionNode) {
         this.node = executionNode;
-    }
+    } 
 
 }

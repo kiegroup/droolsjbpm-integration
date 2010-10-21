@@ -16,7 +16,6 @@
 
 package org.drools.container.spring.beans;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
@@ -24,9 +23,10 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.SessionConfiguration;
 import org.drools.command.Command;
+import org.drools.marshalling.ObjectMarshallingStrategy;
+import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
+import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.JPAKnowledgeService;
-import org.drools.persistence.processinstance.VariablePersistenceStrategyFactory;
-import org.drools.persistence.processinstance.persisters.VariablePersister;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
@@ -64,19 +64,15 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
         }
         
         if ( jpaConfiguration != null ) {
-            if ( !jpaConfiguration.getVariablePersisters().isEmpty() ) {
-                for ( Map.Entry<String, Class< ? extends VariablePersister>> entry : jpaConfiguration.getVariablePersisters().entrySet() ) {
-                    VariablePersistenceStrategyFactory.getVariablePersistenceStrategy().setPersister( entry.getKey(),
-                                                                                                      entry.getValue().getName() );
-                }
-            }
+           
             
             Environment env = KnowledgeBaseFactory.newEnvironment();
             env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                      jpaConfiguration.getEntityManagerFactory() );
             env.set( EnvironmentName.TRANSACTION_MANAGER,
                      jpaConfiguration.getPlatformTransactionManager() );
-            
+             env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES,
+                     new ObjectMarshallingStrategy[]{ new SerializablePlaceholderResolverStrategy(ClassObjectMarshallingStrategyAcceptor.DEFAULT)} );
             
             if ( jpaConfiguration.getId() >= 0 ) {
                 ksession = JPAKnowledgeService.loadStatefulKnowledgeSession( jpaConfiguration.getId(),
@@ -106,7 +102,7 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
 
         private int                        id = -1;
         
-        private Map<String, Class< ? extends VariablePersister>> variablePersisters;        
+        
 
         public EntityManagerFactory getEntityManagerFactory() {
             return this.emf;
@@ -132,15 +128,6 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
             this.id = id;
         }
         
-        public Map<String, Class< ? extends VariablePersister>> getVariablePersisters() {
-            if ( variablePersisters == null ) {
-                variablePersisters = new HashMap<String, Class< ? extends VariablePersister>>();
-            }
-            return variablePersisters;
-        }
-
-        public void setVariablePersisters(Map<String, Class< ? extends VariablePersister>> variablePersisters) {
-            this.variablePersisters = variablePersisters;
-        }        
+        
     }
 }
