@@ -1,0 +1,336 @@
+package org.drools.grid.time.impl;
+
+import java.io.Serializable;
+import org.drools.grid.timer.impl.UuidJobHandle;
+import org.drools.grid.timer.impl.ScheduledJob;
+import java.net.InetSocketAddress;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.drools.SystemEventListener;
+import org.drools.SystemEventListenerFactory;
+import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
+import org.drools.grid.io.Acceptor;
+import org.drools.grid.io.Connector;
+import org.drools.grid.io.Conversation;
+import org.drools.grid.io.ConversationManager;
+import org.drools.grid.io.Message;
+import org.drools.grid.io.MessageReceiverHandler;
+import org.drools.grid.io.impl.ConversationManagerImpl;
+import org.drools.grid.remote.mina.MinaAcceptor;
+import org.drools.grid.remote.mina.MinaConnector;
+import org.drools.time.Job;
+import org.drools.time.JobContext;
+import org.drools.time.JobHandle;
+import org.drools.time.TimerService;
+import org.drools.time.Trigger;
+
+import junit.framework.TestCase;
+import org.drools.grid.GridPeerConfiguration;
+import org.drools.grid.GridPeerServiceConfiguration;
+import org.drools.grid.GridServiceDescription;
+import org.drools.grid.MultiplexSocketService;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.impl.MultiplexSocketServerImpl;
+import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
+import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
+import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
+import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
+import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
+import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
+import org.drools.grid.timer.Scheduler;
+import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
+import org.drools.grid.timer.impl.SchedulerImpl;
+import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
+import org.drools.grid.timer.impl.SchedulerRemoteConfiguration;
+import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
+
+public class DistributedSchedulerTest extends TestCase {
+
+    private Acceptor acc = new MinaAcceptor();
+    private SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
+
+    @Override
+    public void setUp() {
+    }
+
+    @Override
+    public void tearDown() {
+    }
+
+    public void test1() throws Exception {
+
+
+
+        MessageReceiverHandler accHandler = new MessageReceiverHandler() {
+
+            private String id;
+            private AtomicLong counter = new AtomicLong();
+
+            public void messageReceived(Conversation conversation,
+                    Message msgIn) {
+                conversation.respond("echo: " + msgIn.getBody());
+            }
+        };
+
+        acc.open(new InetSocketAddress("127.0.0.1",
+                5012),
+                accHandler,
+                l);
+
+
+        Connector conn = new MinaConnector();
+
+        ConversationManager cm = new ConversationManagerImpl("s1",
+                conn,
+                l);
+
+        Conversation cv = cm.startConversation(new InetSocketAddress("127.0.0.1",
+                5012),
+                "r1");
+
+        BlockingMessageResponseHandler blockHandler = new BlockingMessageResponseHandler();
+
+        cv.sendMessage("hello",
+                blockHandler);
+
+        Message msg = blockHandler.getMessage(5000);
+        System.out.println(msg.getBody());
+        conn.close();
+        acc.close();
+    }
+
+    public void testDistributedJobSchedullingLocal() {
+
+        GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
+        grid.addService(Scheduler.class, new SchedulerImpl(grid));
+
+        Scheduler scheduler = grid.get(Scheduler.class);
+
+        UuidJobHandle handle = new UuidJobHandle();
+        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        ScheduledJob sj2 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+
+        scheduler.scheduleJob(sj1);
+
+
+
+    }
+
+    public void testDistributedJobSchedulingRemote() {
+        //Core services Map Definition
+        Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+        //SystemEvent Listener
+        SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
+
+
+        //Grid View 
+        GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
+
+        //Local Grid Configuration, for our client
+        GridPeerConfiguration conf = new GridPeerConfiguration();
+
+        //Configuring the Core Services White Pages
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
+        conf.addConfiguration(coreSeviceWPConf);
+
+        //Configuring the Core Services Scheduler
+        GridPeerServiceConfiguration coreSeviceSchedulerConf = new CoreServicesSchedulerConfiguration(coreServicesMap);
+        conf.addConfiguration(coreSeviceSchedulerConf);
+
+        
+        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration(new MultiplexSocketServerImpl("127.0.0.1",
+                new MinaAcceptorFactoryService(),
+                l));
+        conf.addConfiguration(socketConf);
+
+        GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
+        conf.addConfiguration(wplConf);
+
+        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(5012);
+        conf.addConfiguration(wpsc);
+
+
+        //Create a Local Scheduler
+        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration();
+        conf.addConfiguration(schlConf);
+
+        //Expose it to the Grid so it can be accesed by different nodes
+        // I need to use the same port to reuse the service multiplexer
+        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration(5012);
+        conf.addConfiguration(schlsc);
+
+        conf.configure(grid);
+
+
+
+        GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        conf = new GridPeerConfiguration();
+
+        coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
+        conf.addConfiguration(coreSeviceWPConf);
+
+        Connector conn = new MinaConnector();
+
+        ConversationManager cm = new ConversationManagerImpl("s1",
+                conn,
+                l);
+
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration(cm);
+        conf.addConfiguration(wprConf);
+
+        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration(cm);
+        conf.addConfiguration(schedRemoteClientConf);
+
+        conf.configure(grid2);
+
+        UuidJobHandle handle = new UuidJobHandle();
+        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+
+        Scheduler scheduler = grid2.get(Scheduler.class);
+
+        scheduler.scheduleJob(sj1);
+        //Close the peer connection
+        conn.close();
+        //Shutdown the MultiplexSocketService 
+        grid.get(MultiplexSocketService.class).close();
+
+
+
+
+    }
+
+    public static class MockJobContext implements JobContext, Serializable {
+
+        private String text;
+
+        public MockJobContext() {
+        }
+
+        public MockJobContext(String text) {
+            this.text = text;
+        }
+
+        public JobHandle getJobHandle() {
+            return null;
+        }
+
+        public void setJobHandle(JobHandle jobHandle) {
+        }
+
+        public String getText() {
+            return this.text;
+        }
+    }
+
+    public static class MockTrigger implements Trigger, Serializable {
+
+        private Date date;
+
+        public MockTrigger() {
+        }
+
+        public MockTrigger(Date date) {
+            this.date = date;
+
+        }
+
+        public Date hasNextFireTime() {
+            return this.date;
+        }
+
+        public Date nextFireTime() {
+            Date tmp = new Date();
+            tmp.setTime(this.date.getTime());
+            this.date = null;
+            return tmp;
+        }
+    }
+
+    public static class DisTimerService
+            implements
+            TimerService {
+
+        public long getCurrentTime() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public long getTimeToNextJob() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public boolean removeJob(JobHandle jobHandle) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        public JobHandle scheduleJob(Job job,
+                JobContext ctx,
+                Trigger trigger) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public void shutdown() {
+            // TODO Auto-generated method stub
+        }
+    }
+
+    public static class TimerServiceClusterManager {
+
+        private String[] ids;
+        private int redundancyCount;
+
+        public void configure(String[] ids,
+                int redundancyCount) {
+            this.ids = ids;
+            this.redundancyCount = redundancyCount;
+            if (redundancyCount >= ids.length) {
+                throw new IllegalArgumentException("Redundancy must be less than or equal to to total-1");
+            }
+        }
+
+        private int indexOf(final int hashCode,
+                final int dataSize) {
+            return hashCode & (dataSize - 1);
+        }
+    }
+
+    public static class RemoteTimerService
+            implements
+            TimerService {
+
+        public long getCurrentTime() {
+            throw new UnsupportedOperationException("not supported");
+        }
+
+        public long getTimeToNextJob() {
+            throw new UnsupportedOperationException("not supported");
+        }
+
+        public boolean removeJob(JobHandle jobHandle) {
+            return false;
+        }
+
+        public JobHandle scheduleJob(Job job,
+                JobContext ctx,
+                Trigger trigger) {
+            UuidJobHandle jhandle = new UuidJobHandle();
+
+            ScheduledJob sj = new ScheduledJob(jhandle,
+                    job,
+                    ctx,
+                    trigger);
+            return jhandle;
+        }
+
+        public void shutdown() {
+            throw new UnsupportedOperationException("not supported");
+        }
+    }
+}
