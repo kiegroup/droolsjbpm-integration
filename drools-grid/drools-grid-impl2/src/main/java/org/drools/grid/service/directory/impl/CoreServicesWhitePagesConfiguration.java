@@ -10,7 +10,6 @@ import org.drools.grid.Grid;
 import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesImpl;
 
 public class CoreServicesWhitePagesConfiguration
     implements

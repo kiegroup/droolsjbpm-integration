@@ -17,8 +17,10 @@
 
 package org.drools.grid.timer.impl;
 
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import org.drools.SystemEventListenerFactory;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
@@ -26,6 +28,8 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.io.impl.ConversationManagerImpl;
+import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.timer.Scheduler;
 
@@ -40,13 +44,29 @@ public class SchedulerClient implements Scheduler,
 
     private ConversationManager    conversationManager;
 
-    public SchedulerClient(GridServiceDescription schedulerGsd, ConversationManager conversationManager) {
+    private String id;
+    
+    public SchedulerClient(String id, GridServiceDescription schedulerGsd) {
+        this.id = id;
+        this.schedulerGsd = schedulerGsd;
+        this.conversationManager = new ConversationManagerImpl(id, new MinaConnector(), SystemEventListenerFactory.getSystemEventListener());
+    }
+    
+    public SchedulerClient(String id, GridServiceDescription schedulerGsd, ConversationManager conversationManager) {
+        this.id = id;
         this.schedulerGsd = schedulerGsd;
         this.conversationManager = conversationManager;
     }
     
     
-    
+    public void scheduleJob(ScheduledJob job, Serializable addr) {
+        CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
+                                           Arrays.asList( new Object[]{ job } ) ); 
+        sendMessage( this.conversationManager,
+                     addr,
+                     this.schedulerGsd.getId(),
+                     cmd );     
+    }
     public void scheduleJob(ScheduledJob job) {
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) schedulerGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
@@ -54,7 +74,7 @@ public class SchedulerClient implements Scheduler,
         sendMessage( this.conversationManager,
                      sockets,
                      this.schedulerGsd.getId(),
-                     cmd );        
+                     cmd );    
     }
 
     public void removeJob(String jobId) {
@@ -62,14 +82,24 @@ public class SchedulerClient implements Scheduler,
     }
     
     public static Object sendMessage(ConversationManager conversationManager,
-                                     InetSocketAddress[] sockets,
+                                     Serializable addr,
                                      String id,
                                      Object body) {
+        
+        InetSocketAddress[] sockets = null;
+        if(addr instanceof InetSocketAddress[]){
+            sockets = (InetSocketAddress[])addr;
+        }else if (addr instanceof InetSocketAddress){
+            sockets = new InetSocketAddress[1];
+            sockets[0] = (InetSocketAddress)addr;
+        }
+        
+        
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
         for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation( sockets[0],
+                Conversation conv = conversationManager.startConversation( socket,
                                                                            id );
                 conv.sendMessage( body,
                                   handler );
@@ -96,6 +126,10 @@ public class SchedulerClient implements Scheduler,
 
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new SchedulerServer( this );
+    }
+
+    public String getId() {
+        return this.id;
     }
 
 }

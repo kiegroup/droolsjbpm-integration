@@ -99,5 +99,13 @@ public class GridServiceDescriptionJpa
         hash = 89 * hash + (this.detached != null ? this.detached.hashCode() : 0);
         return hash;
     }
+
+    public Class getServiceTypeClass() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setServiceTypeClass(Class clazz) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
      
 }

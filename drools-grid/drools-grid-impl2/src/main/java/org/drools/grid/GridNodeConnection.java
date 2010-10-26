@@ -16,8 +16,6 @@
  */
 package org.drools.grid;
 
-import java.util.List;
-
 /**
  *
  * @author salaboy

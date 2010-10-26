@@ -111,6 +111,7 @@ public class ScheduledJob implements Externalizable {
         out.writeObject( this.trigger );
         out.writeLong( this.nextFireTime.getTime() );
         out.writeObject( this.ctx );
+        out.writeObject( this.configuration);
     }
     
     public void readExternal(ObjectInput in) throws IOException,
@@ -120,6 +121,7 @@ public class ScheduledJob implements Externalizable {
         this.trigger = ( Serializable ) in.readObject();
         this.nextFireTime = new Date( in.readLong() );
         this.ctx = ( Serializable ) in.readObject();
+        this.configuration = (ScheduledJobConfiguration) in.readObject();
     }
 
 

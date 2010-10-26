@@ -27,6 +27,7 @@ import org.drools.grid.timer.impl.ScheduledJob;
  * @author salaboy
  */
 public interface Scheduler {
+    public String getId();
     public void scheduleJob(ScheduledJob job);
     public void removeJob(String jobId);
     

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import junit.framework.Assert;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
@@ -29,6 +30,8 @@ import org.drools.time.TimerService;
 import org.drools.time.Trigger;
 
 import junit.framework.TestCase;
+import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.Grid;
 import org.drools.grid.GridPeerConfiguration;
 import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.GridServiceDescription;
@@ -43,6 +46,7 @@ import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.Scheduler;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
+import org.drools.grid.timer.impl.ScheduledJobConfiguration;
 import org.drools.grid.timer.impl.SchedulerImpl;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.grid.timer.impl.SchedulerRemoteConfiguration;
@@ -52,7 +56,7 @@ public class DistributedSchedulerTest extends TestCase {
 
     private Acceptor acc = new MinaAcceptor();
     private SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
-
+    private Map<String, GridServiceDescription> coreServicesMap;
     @Override
     public void setUp() {
     }
@@ -106,13 +110,13 @@ public class DistributedSchedulerTest extends TestCase {
     public void testDistributedJobSchedullingLocal() {
 
         GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
-        grid.addService(Scheduler.class, new SchedulerImpl(grid));
+        grid.addService(Scheduler.class, new SchedulerImpl("myLocalSched",grid));
 
         Scheduler scheduler = grid.get(Scheduler.class);
 
         UuidJobHandle handle = new UuidJobHandle();
-        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
-        ScheduledJob sj2 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
+        ScheduledJob sj2 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
 
         scheduler.scheduleJob(sj1);
 
@@ -120,88 +124,92 @@ public class DistributedSchedulerTest extends TestCase {
 
     }
 
+    /*
+     * Test Including:
+     *    - 1 Core Service White Pages 
+     *    - 1 Core Service Scheduler
+     *    - 1 MultiplexService 
+     *    - 1 White Pages (Local)
+     *    - 1 Scheduler (Local)
+     *
+     */
     public void testDistributedJobSchedulingRemote() {
         //Core services Map Definition
-        Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-        //SystemEvent Listener
-        SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
-
+        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+        
 
         //Grid View 
-        GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
-
-        //Local Grid Configuration, for our client
-        GridPeerConfiguration conf = new GridPeerConfiguration();
-
-        //Configuring the Core Services White Pages
-        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceWPConf);
-
-        //Configuring the Core Services Scheduler
-        GridPeerServiceConfiguration coreSeviceSchedulerConf = new CoreServicesSchedulerConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceSchedulerConf);
+        GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        //Configure grid with: 
+        //  core whitepages
+        //  core scheduler
+        //  local whitepages
+        //  local scheduler
+        //  expose multiplex socket
+        configureGrid1(grid1, 5012);
+        
 
         
-        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration(new MultiplexSocketServerImpl("127.0.0.1",
-                new MinaAcceptorFactoryService(),
-                l));
-        conf.addConfiguration(socketConf);
 
-        GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
-        conf.addConfiguration(wplConf);
-
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(5012);
-        conf.addConfiguration(wpsc);
-
-
-        //Create a Local Scheduler
-        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration();
-        conf.addConfiguration(schlConf);
-
-        //Expose it to the Grid so it can be accesed by different nodes
-        // I need to use the same port to reuse the service multiplexer
-        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration(5012);
-        conf.addConfiguration(schlsc);
-
-        conf.configure(grid);
-
-
-
+        
         GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
-        conf = new GridPeerConfiguration();
-
-        coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceWPConf);
-
         Connector conn = new MinaConnector();
-
-        ConversationManager cm = new ConversationManagerImpl("s1",
-                conn,
-                l);
-
-        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration(cm);
-        conf.addConfiguration(wprConf);
-
-        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration(cm);
-        conf.addConfiguration(schedRemoteClientConf);
-
-        conf.configure(grid2);
-
+        configureGrid2(grid2, conn);
+        
+        
+        //Create a Job
         UuidJobHandle handle = new UuidJobHandle();
-        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
 
+        //From grid2 I get the Scheduler (that it's a client)
         Scheduler scheduler = grid2.get(Scheduler.class);
 
+        //Schedule remotely the Job
         scheduler.scheduleJob(sj1);
+        
+        
         //Close the peer connection
         conn.close();
-        //Shutdown the MultiplexSocketService 
-        grid.get(MultiplexSocketService.class).close();
+        
+        //Shutdown the MultiplexSocketService
+        grid1.get(MultiplexSocketService.class).close();
 
 
 
 
     }
+    
+    public void testMultipleSchedulersTest(){
+          //Core services Map Definition
+        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+        
+        //Grid View 
+        GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        configureGrid1(grid1, 5012);
+        
+        
+        GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        configureGrid1(grid2, 5013);
+        
+        
+        
+        GridImpl grid3 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        Connector conn = new MinaConnector();
+        configureGrid3(grid3, conn);
+        
+        CoreServicesWhitePages corewp = grid3.get(CoreServicesWhitePages.class);
+        
+        GridServiceDescription gsd = corewp.lookup(Scheduler.class);
+                
+        Assert.assertEquals(2, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
+        
+        
+        conn.close();
+        grid1.get(MultiplexSocketService.class).close();
+        grid2.get(MultiplexSocketService.class).close();
+    
+    }
+    
 
     public static class MockJobContext implements JobContext, Serializable {
 
@@ -332,5 +340,88 @@ public class DistributedSchedulerTest extends TestCase {
         public void shutdown() {
             throw new UnsupportedOperationException("not supported");
         }
+    }
+    
+    private void configureGrid1(Grid grid, int port){
+    
+        //Local Grid Configuration, for our client
+        GridPeerConfiguration conf = new GridPeerConfiguration();
+
+        //Configuring the Core Services White Pages
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
+        conf.addConfiguration(coreSeviceWPConf);
+
+        //Configuring the Core Services Scheduler
+        GridPeerServiceConfiguration coreSeviceSchedulerConf = new CoreServicesSchedulerConfiguration();
+        conf.addConfiguration(coreSeviceSchedulerConf);
+
+        //Configuring the MultiplexSocketService
+        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration(new MultiplexSocketServerImpl("127.0.0.1",
+                new MinaAcceptorFactoryService(),
+                l));
+        conf.addConfiguration(socketConf);
+        
+        //Configuring the WhitePages 
+        GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
+        conf.addConfiguration(wplConf);
+        
+        //Exposing Local WhitePages
+        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(port);
+        conf.addConfiguration(wpsc);
+
+
+        //Create a Local Scheduler
+        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration("myLocalSched");
+        conf.addConfiguration(schlConf);
+
+        //Expose it to the Grid so it can be accesed by different nodes
+        // I need to use the same port to reuse the service multiplexer
+        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration(port);
+        conf.addConfiguration(schlsc);
+
+        conf.configure(grid);
+        
+    
+    }
+    
+    private void configureGrid2(Grid grid2, Connector conn){
+        GridPeerConfiguration conf = new GridPeerConfiguration();
+
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
+        conf.addConfiguration(coreSeviceWPConf);
+
+
+        ConversationManager cm = new ConversationManagerImpl("s1",
+                conn,
+                l);
+
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration(cm);
+        conf.addConfiguration(wprConf);
+
+        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration( cm);
+        conf.addConfiguration(schedRemoteClientConf);
+
+        conf.configure(grid2);
+    }
+    
+    
+    private void configureGrid3(Grid grid3, Connector conn){
+        GridPeerConfiguration conf = new GridPeerConfiguration();
+
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
+        conf.addConfiguration(coreSeviceWPConf);
+
+
+        ConversationManager cm = new ConversationManagerImpl("s1",
+                conn,
+                l);
+
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration(cm);
+        conf.addConfiguration(wprConf);
+
+        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration(cm);
+        conf.addConfiguration(schedRemoteClientConf);
+
+        conf.configure(grid3);
     }
 }

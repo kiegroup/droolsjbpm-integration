@@ -1,9 +1,12 @@
 package org.drools.grid.service.directory.impl;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.service.directory.Address;
@@ -16,7 +19,7 @@ public class GridServiceDescriptionImpl
     private String               id;
 
     private Class                implementedClass;
-  
+    
     private Map<String, Address> addresses = new HashMap<String, Address>();
     
     public GridServiceDescriptionImpl() {
@@ -24,10 +27,12 @@ public class GridServiceDescriptionImpl
     }
 
     public GridServiceDescriptionImpl(Class cls) {
-        this( cls.getName() );
+        this( cls.getCanonicalName() );
+        this.implementedClass = cls;
     }
     
     public GridServiceDescriptionImpl(String id) {
+        
         this.id = id;
     }
 
@@ -82,5 +87,22 @@ public class GridServiceDescriptionImpl
         }
         return true;
     }
+
+
+    @Override
+    public String toString() {
+        String result =  id + "@";
+        
+        Set<String> keys = addresses.keySet();
+        for(String key : keys){
+            if(addresses.get(key).getObject() instanceof InetSocketAddress[] ){
+                result += key+"=["+((InetSocketAddress[])addresses.get(key).getObject())[0].getHostName()+":"+
+                        ((InetSocketAddress[])addresses.get(key).getObject())[0].getPort()+"]/"+addresses.get(key).getTransport();
+            }
+        }
+        return result;
+    }
+    
+    
 
 }

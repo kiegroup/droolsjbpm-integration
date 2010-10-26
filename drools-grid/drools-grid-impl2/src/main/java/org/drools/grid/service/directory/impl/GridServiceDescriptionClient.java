@@ -105,6 +105,14 @@ public class GridServiceDescriptionClient
         return hash;
     }
 
+    public Class getServiceTypeClass() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setServiceTypeClass(Class clazz) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     
     
 

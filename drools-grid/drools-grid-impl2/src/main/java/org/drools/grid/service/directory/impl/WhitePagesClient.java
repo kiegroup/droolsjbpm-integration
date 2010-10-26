@@ -1,7 +1,10 @@
 package org.drools.grid.service.directory.impl;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import org.drools.SystemEventListenerFactory;
 
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
@@ -10,6 +13,8 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.io.impl.ConversationManagerImpl;
+import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 
@@ -26,6 +31,11 @@ public class WhitePagesClient
         this.whitePagesGsd = gsd;
         this.conversationManager = conversationManager;
     }
+    
+    public WhitePagesClient(GridServiceDescription gsd) {
+        this.whitePagesGsd = gsd;
+        this.conversationManager = new ConversationManagerImpl("wpclient", new MinaConnector(), SystemEventListenerFactory.getSystemEventListener());
+    }
 
     public static Object sendMessage(ConversationManager conversationManager,
                                      InetSocketAddress[] sockets,
@@ -35,7 +45,7 @@ public class WhitePagesClient
         Exception exception = null;
         for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation( sockets[0],
+                Conversation conv = conversationManager.startConversation( socket,
                                                                            id );
                 conv.sendMessage( body,
                                   handler );
@@ -97,6 +107,26 @@ public class WhitePagesClient
 
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new WhitePagesServer( this );
+    }
+
+    public List<GridServiceDescription> lookupServices(Class clazz) {
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        CommandImpl cmd = new CommandImpl( "WhitePages.lookupServices",
+                                           Arrays.asList( new Object[]{ clazz } ) );
+        List<GridServiceDescription> gsds = ( List<GridServiceDescription> ) sendMessage( this.conversationManager,
+                                                                             sockets,
+                                                                             this.whitePagesGsd.getId(),
+                                                                             cmd);
+        List<GridServiceDescription> result = new ArrayList<GridServiceDescription>();                                                                    
+        
+        for(GridServiceDescription gsd : gsds){
+           result.add( new GridServiceDescriptionClient(gsd,
+                                        this.whitePagesGsd,
+                                        this.conversationManager )); 
+        }
+         
+             
+        return result;
     }
 
     //    public void addAddress(String id,

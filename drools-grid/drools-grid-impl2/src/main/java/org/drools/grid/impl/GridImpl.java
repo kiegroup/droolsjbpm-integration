@@ -11,13 +11,9 @@ import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.MessageReceiverHandlerFactoryService;
-import org.drools.grid.MultiplexSocketService;
 import org.drools.grid.local.LocalGridConnection;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.AddressImpl;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 
 public class GridImpl implements Grid {
     private Map<String, Object> services;

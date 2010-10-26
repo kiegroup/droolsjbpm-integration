@@ -14,9 +14,11 @@ import org.drools.grid.timer.Scheduler;
 public class SchedulerRemoteConfiguration
     implements
     GridPeerServiceConfiguration {
-    ConversationManager cm;
+    private ConversationManager cm;
+    
 
-    public SchedulerRemoteConfiguration(ConversationManager cm) {
+    public SchedulerRemoteConfiguration( ConversationManager cm) {
+        
         this.cm = cm;
     }
 
@@ -25,7 +27,7 @@ public class SchedulerRemoteConfiguration
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServices.lookup( Scheduler.class );
 
-        Scheduler scheduler = new SchedulerClient( gsd, 
+        Scheduler scheduler = new SchedulerClient(gsd.getId(), gsd, 
                                               cm );
         ((GridImpl) grid).addService( Scheduler.class,
                                       scheduler );

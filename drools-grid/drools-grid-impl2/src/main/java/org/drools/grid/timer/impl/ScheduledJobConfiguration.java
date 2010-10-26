@@ -29,6 +29,10 @@ import java.io.ObjectOutput;
 public class ScheduledJobConfiguration implements Externalizable {
     private int redundancy = 1;
 
+    public ScheduledJobConfiguration() {
+    }
+
+    
     public ScheduledJobConfiguration(int redundancy) {
         this.redundancy = redundancy;
     }
@@ -44,11 +48,11 @@ public class ScheduledJobConfiguration implements Externalizable {
     
     
     public void writeExternal(ObjectOutput out) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        out.writeInt(redundancy);
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.redundancy = in.readInt();
     }
     
 }

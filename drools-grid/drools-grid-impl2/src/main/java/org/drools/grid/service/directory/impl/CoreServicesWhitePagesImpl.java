@@ -11,13 +11,13 @@ public class CoreServicesWhitePagesImpl implements CoreServicesWhitePages {
     public CoreServicesWhitePagesImpl(Map<String, GridServiceDescription> services) {
         this.services = services;
     }
-    
+
     public Map<String, GridServiceDescription> getServices() {
         return services;
     }
 
     public GridServiceDescription lookup(Class cls) {
-        return this.services.get( cls.getName() );
+        return this.services.get(cls.getName());
     }
 
 }

@@ -17,13 +17,14 @@
 
 package org.drools.grid.timer.impl;
 
-import java.util.Map;
-import org.drools.grid.CoreServicesWhitePages;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.drools.grid.ServiceFactory;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesImpl;
+import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.timer.Scheduler;
 import org.drools.time.TimerService;
 import org.drools.time.impl.JDKTimerService;
@@ -34,21 +35,27 @@ import org.drools.time.impl.JDKTimerService;
  */
 public class SchedulerImpl implements Scheduler, MessageReceiverHandlerFactoryService{
     private TimerService timer =  new JDKTimerService();
+    private String id;
     private Grid grid; 
     
-    public SchedulerImpl(Grid grid){
+    public SchedulerImpl(String id, Grid grid){
+        this.id = id;
         this.grid = grid;
     }
     
     public void scheduleJob(ScheduledJob job) {
-      //  if(job.getConfiguration().getRedundancy() == 1){
+        if(job.getConfiguration().getRedundancy() == 1){
             timer.scheduleJob(job.getJob(), job.getJobContext(), job.getTrigger());
         
-//        }else if(job.getConfiguration().getRedundancy() > 1){
-//           CoreServicesWhitePagesImpl coreWhitePages = (CoreServicesWhitePagesImpl)grid.get(CoreServicesWhitePages.class);
-//           Map<String, GridServiceDescription> services = coreWhitePages.getServices();
-//           services.get(Scheduler)
-//        }
+        }else if(job.getConfiguration().getRedundancy() > 1){
+           WhitePages wp = grid.get(WhitePages.class);
+           GridServiceDescription schedservice = wp.lookup(Scheduler.class.getName()); 
+           
+           Scheduler sched = ServiceFactory.newServiceInstance(Scheduler.class, schedservice);
+           sched.scheduleJob(job);
+           
+           
+        }
         
     }
 
@@ -58,6 +65,14 @@ public class SchedulerImpl implements Scheduler, MessageReceiverHandlerFactorySe
 
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new SchedulerServer(this);
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public Grid getGrid() {
+        return grid;
     }
     
     

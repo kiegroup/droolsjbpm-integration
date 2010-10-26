@@ -9,6 +9,7 @@ import org.drools.grid.GridPeerServiceConfiguration;
 public class WhitePagesPeeredConfiguration
     implements
     GridPeerServiceConfiguration {
+    
     public void configureService(Grid grid) {
 
     }

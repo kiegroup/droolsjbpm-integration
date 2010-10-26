@@ -1,8 +1,7 @@
 package org.drools.grid.service.directory.impl;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -52,6 +51,10 @@ public class JpaWhitePages
 
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new WhitePagesServer( this );
+    }
+
+    public List<GridServiceDescription> lookupServices(Class clazz) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     //    public GridServiceDescription create(GridServiceDescription serviceDescription) {
