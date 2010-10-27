@@ -47,7 +47,6 @@ import org.drools.simulation.Step;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.TestGenerator;
 
 import junit.framework.TestCase;
 
