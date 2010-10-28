@@ -15,7 +15,7 @@ public class CoreServicesSchedulerConfiguration
     implements
     GridPeerServiceConfiguration {
 
-    public CoreServicesSchedulerConfiguration() {
+    public CoreServicesSchedulerConfiguration() { 
         
     }
 

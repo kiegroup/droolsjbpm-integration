@@ -3,13 +3,14 @@
  */
 package org.drools.grid.timer.impl;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import org.drools.time.JobHandle;
 
 public class UuidJobHandle
     implements
-    JobHandle {
+    JobHandle, Serializable {
     private UUID uuid;
 
     public UuidJobHandle() {

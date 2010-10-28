@@ -19,7 +19,7 @@ public class WhitePagesImpl implements WhitePages, MessageReceiverHandlerFactory
         
         //GridServiceDescription gsd = new GridServiceDescriptionImpl( serviceDescriptionId );
         GridServiceDescription gsd = GridServiceDescriptionFactory.newGridServiceDescritpion( serviceDescriptionId );
-        this.directory.put( serviceDescriptionId, gsd ); 
+        this.directory.put(gsd.getId() , gsd ); 
         return gsd;
     }
 

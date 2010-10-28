@@ -1,7 +1,6 @@
 package org.drools.grid.service.directory.impl;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +20,8 @@ public class GridServiceDescriptionImpl
     private Class                implementedClass;
     
     private Map<String, Address> addresses = new HashMap<String, Address>();
+    
+    //private Object               data;
     
     public GridServiceDescriptionImpl() {
     	
@@ -102,6 +103,10 @@ public class GridServiceDescriptionImpl
         }
         return result;
     }
+
+//    public Object getData() {
+//        return data;
+//    }
     
     
 

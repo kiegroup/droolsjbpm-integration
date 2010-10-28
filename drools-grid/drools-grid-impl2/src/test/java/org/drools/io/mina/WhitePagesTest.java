@@ -1,7 +1,6 @@
 package org.drools.io.mina;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import junit.framework.Assert;
@@ -27,8 +26,8 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
-import org.drools.grid.timer.Scheduler;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
+import org.drools.time.SchedulerService;
 
 
 public class WhitePagesTest extends TestCase {
@@ -126,10 +125,11 @@ public class WhitePagesTest extends TestCase {
         
         
         WhitePages wplocal= grid1.get(WhitePages.class);
-        
-        GridServiceDescription schedulersgsd = wplocal.lookup(Scheduler.class.getName());
-        
-        Assert.assertEquals(2, schedulersgsd.getAddresses().size());
+        Assert.assertNotNull(wplocal);
+        GridServiceDescription schedulersgsd = wplocal.lookup(SchedulerService.class.getName());
+    
+        Assert.assertNotNull(schedulersgsd);
+  
         
         
         

@@ -19,7 +19,6 @@
 
       <attributes>
           <id name="id" />        
-          
           <one-to-many name="addresses" mapped-by="gridServiceDescription" target-entity="org.drools.grid.service.directory.impl.AddressImpl" fetch="EAGER" >
               <map-key name="transport" /> 
               <cascade>

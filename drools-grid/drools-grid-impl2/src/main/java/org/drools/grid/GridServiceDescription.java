@@ -17,4 +17,6 @@ public interface GridServiceDescription {
     public Address addAddress(String transport);
 
     public void removeAddress(String transport);
+    
+   // public Object getData();
 }

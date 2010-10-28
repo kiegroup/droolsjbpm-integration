@@ -9,7 +9,8 @@ import org.drools.grid.Grid;
 import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.io.ConversationManager;
-import org.drools.grid.timer.Scheduler;
+import org.drools.time.SchedulerService;
+
 
 public class SchedulerRemoteConfiguration
     implements
@@ -25,11 +26,11 @@ public class SchedulerRemoteConfiguration
     public void configureService(Grid grid) {
         CoreServicesWhitePagesImpl coreServices = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
 
-        GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServices.lookup( Scheduler.class );
+        GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServices.lookup( SchedulerService.class );
 
-        Scheduler scheduler = new SchedulerClient(gsd.getId(), gsd, 
+        SchedulerService scheduler = new SchedulerClient(gsd.getId(), gsd, 
                                               cm );
-        ((GridImpl) grid).addService( Scheduler.class,
+        ((GridImpl) grid).addService( SchedulerService.class,
                                       scheduler );
         
     }

@@ -17,23 +17,23 @@
 
 package org.drools.grid.timer.impl;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.drools.grid.ServiceFactory;
 import org.drools.grid.Grid;
-import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.timer.Scheduler;
+import org.drools.time.Job;
+import org.drools.time.JobContext;
+import org.drools.time.JobHandle;
+import org.drools.time.SchedulerService;
+
 import org.drools.time.TimerService;
+import org.drools.time.Trigger;
 import org.drools.time.impl.JDKTimerService;
 
 /**
  *
  * @author salaboy
  */
-public class SchedulerImpl implements Scheduler, MessageReceiverHandlerFactoryService{
+public class SchedulerImpl implements SchedulerService, MessageReceiverHandlerFactoryService{
     private TimerService timer =  new JDKTimerService();
     private String id;
     private Grid grid; 
@@ -43,26 +43,6 @@ public class SchedulerImpl implements Scheduler, MessageReceiverHandlerFactorySe
         this.grid = grid;
     }
     
-    public void scheduleJob(ScheduledJob job) {
-        if(job.getConfiguration().getRedundancy() == 1){
-            timer.scheduleJob(job.getJob(), job.getJobContext(), job.getTrigger());
-        
-        }else if(job.getConfiguration().getRedundancy() > 1){
-           WhitePages wp = grid.get(WhitePages.class);
-           GridServiceDescription schedservice = wp.lookup(Scheduler.class.getName()); 
-           
-           Scheduler sched = ServiceFactory.newServiceInstance(Scheduler.class, schedservice);
-           sched.scheduleJob(job);
-           
-           
-        }
-        
-    }
-
-    public void removeJob(String jobId) {
-        
-    }
-
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new SchedulerServer(this);
     }
@@ -73,6 +53,14 @@ public class SchedulerImpl implements Scheduler, MessageReceiverHandlerFactorySe
 
     public Grid getGrid() {
         return grid;
+    }
+
+    public JobHandle scheduleJob(Job job, JobContext ctx, Trigger trigger) {
+        return timer.scheduleJob(job, ctx, trigger);
+    }
+
+    public boolean removeJob(JobHandle jobHandle) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     

@@ -44,13 +44,13 @@ import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguratio
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
-import org.drools.grid.timer.Scheduler;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.grid.timer.impl.ScheduledJobConfiguration;
 import org.drools.grid.timer.impl.SchedulerImpl;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.grid.timer.impl.SchedulerRemoteConfiguration;
 import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
+import org.drools.time.SchedulerService;
 
 public class DistributedSchedulerTest extends TestCase {
 
@@ -110,15 +110,15 @@ public class DistributedSchedulerTest extends TestCase {
     public void testDistributedJobSchedullingLocal() {
 
         GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
-        grid.addService(Scheduler.class, new SchedulerImpl("myLocalSched",grid));
+        grid.addService(SchedulerService.class, new SchedulerImpl("myLocalSched",grid));
 
-        Scheduler scheduler = grid.get(Scheduler.class);
+        SchedulerService scheduler = grid.get(SchedulerService.class);
 
         UuidJobHandle handle = new UuidJobHandle();
         ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
         ScheduledJob sj2 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
 
-        scheduler.scheduleJob(sj1);
+        scheduler.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
 
 
 
@@ -162,10 +162,10 @@ public class DistributedSchedulerTest extends TestCase {
         ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
 
         //From grid2 I get the Scheduler (that it's a client)
-        Scheduler scheduler = grid2.get(Scheduler.class);
+        SchedulerService scheduler = grid2.get(SchedulerService.class);
 
         //Schedule remotely the Job
-        scheduler.scheduleJob(sj1);
+        scheduler.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
         
         
         //Close the peer connection
@@ -199,7 +199,7 @@ public class DistributedSchedulerTest extends TestCase {
         
         CoreServicesWhitePages corewp = grid3.get(CoreServicesWhitePages.class);
         
-        GridServiceDescription gsd = corewp.lookup(Scheduler.class);
+        GridServiceDescription gsd = corewp.lookup(SchedulerService.class);
                 
         Assert.assertEquals(2, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
         

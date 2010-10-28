@@ -82,6 +82,18 @@ public class GridServiceDescriptionClient
                      whitePagesGsd.getId(),
                      cmd );
     }
+    
+    public Object getData() {
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        CommandImpl cmd = new CommandImpl( "GridServiceDescription.getData",
+                                           null );
+        Object data = (Object) sendMessage( this.conversationManager,
+                     sockets,
+                     whitePagesGsd.getId(),
+                     cmd );
+        return data;
+    }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -105,14 +117,8 @@ public class GridServiceDescriptionClient
         return hash;
     }
 
-    public Class getServiceTypeClass() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
-    public void setServiceTypeClass(Class clazz) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
     
     
 

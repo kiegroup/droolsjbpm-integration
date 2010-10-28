@@ -18,7 +18,8 @@
 package org.drools.grid.timer.impl;
 
 import org.drools.grid.timer.CoreServicesScheduler;
-import org.drools.grid.timer.Scheduler;
+import org.drools.time.SchedulerService;
+
 
 /**
  *
@@ -27,15 +28,15 @@ import org.drools.grid.timer.Scheduler;
 public class CoreServicesSchedulerImpl implements CoreServicesScheduler {
 
     
-    private Scheduler scheduler;
+    private SchedulerService scheduler;
     
     
-    public CoreServicesSchedulerImpl(Scheduler scheduler) {
+    public CoreServicesSchedulerImpl(SchedulerService scheduler) {
         this.scheduler = scheduler;
     }
 
     public void scheduleJob(ScheduledJob job) {
-        this.scheduler.scheduleJob(job);
+        this.scheduler.scheduleJob(job.getJob(), job.getJobContext(), job.getTrigger());
     }
 
 }

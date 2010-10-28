@@ -83,6 +83,17 @@ public class GridServiceDescriptionJpa
         return this.detached;
     }
 
+//     public Object getData() {
+//        EntityManager em = this.emf.createEntityManager();
+//        em.getTransaction().begin();
+//        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
+//        Object data = this.detached.getData();
+//        em.getTransaction().commit();
+//        em.close();
+//        return data;
+//    }
+
+    
    @Override
     public boolean equals(Object obj) {
         //@TODO: improve equals comparision
@@ -100,12 +111,7 @@ public class GridServiceDescriptionJpa
         return hash;
     }
 
-    public Class getServiceTypeClass() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setServiceTypeClass(Class clazz) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+   
+  
      
 }

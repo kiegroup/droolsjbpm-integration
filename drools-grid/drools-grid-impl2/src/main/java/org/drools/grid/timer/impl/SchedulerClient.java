@@ -31,13 +31,17 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
-import org.drools.grid.timer.Scheduler;
+import org.drools.time.Job;
+import org.drools.time.JobContext;
+import org.drools.time.JobHandle;
+import org.drools.time.SchedulerService;
+import org.drools.time.Trigger;
 
 /**
  *
  * @author salaboy
  */
-public class SchedulerClient implements Scheduler,
+public class SchedulerClient implements SchedulerService,
     MessageReceiverHandlerFactoryService{
 
     private GridServiceDescription schedulerGsd;
@@ -62,24 +66,13 @@ public class SchedulerClient implements Scheduler,
     public void scheduleJob(ScheduledJob job, Serializable addr) {
         CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
                                            Arrays.asList( new Object[]{ job } ) ); 
+        
         sendMessage( this.conversationManager,
                      addr,
                      this.schedulerGsd.getId(),
                      cmd );     
     }
-    public void scheduleJob(ScheduledJob job) {
-        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) schedulerGsd.getAddresses().get( "socket" )).getObject();
-        CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
-                                           Arrays.asList( new Object[]{ job } ) ); 
-        sendMessage( this.conversationManager,
-                     sockets,
-                     this.schedulerGsd.getId(),
-                     cmd );    
-    }
-
-    public void removeJob(String jobId) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+   
     
     public static Object sendMessage(ConversationManager conversationManager,
                                      Serializable addr,
@@ -130,6 +123,20 @@ public class SchedulerClient implements Scheduler,
 
     public String getId() {
         return this.id;
+    }
+
+    public JobHandle scheduleJob(Job job, JobContext ctx, Trigger trigger) {
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) schedulerGsd.getAddresses().get( "socket" )).getObject();
+        CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
+                                           Arrays.asList( new Object[]{ new ScheduledJob(new UuidJobHandle(), job, ctx, trigger, null) } ) ); 
+        return (UuidJobHandle) sendMessage( this.conversationManager,
+                     sockets,
+                     this.schedulerGsd.getId(),
+                     cmd );    
+    }
+
+    public boolean removeJob(JobHandle jobHandle) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

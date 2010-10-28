@@ -34,9 +34,11 @@ public class GridServiceDescriptionFactory {
             
             String[] clazzName = serviceId.split(":");
             if(clazzName[0].equals("scheduler")){
+                ((GridServiceDescriptionImpl)gsd).setId("org.drools.time.SchedulerService");
                 gsd.setImplementedClass(Class.forName("org.drools.grid.timer.impl.SchedulerImpl"));
             }
              if(clazzName[0].equals("schedulerclient")){
+                ((GridServiceDescriptionImpl)gsd).setId("org.drools.time.SchedulerService");
                 gsd.setImplementedClass(Class.forName("org.drools.grid.timer.impl.SchedulerClient"));
             }
             

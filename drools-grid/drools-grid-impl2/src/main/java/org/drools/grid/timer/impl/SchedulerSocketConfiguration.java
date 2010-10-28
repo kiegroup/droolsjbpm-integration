@@ -13,8 +13,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.MultiplexSocketService;
 import org.drools.grid.service.directory.Address;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.timer.Scheduler;
+import org.drools.time.SchedulerService;
 
 public class SchedulerSocketConfiguration
 implements
@@ -30,22 +29,22 @@ GridPeerServiceConfiguration {
     }
     
     public void configureService(Grid grid) {
-        Scheduler sched = grid.get( Scheduler.class );
+        SchedulerService sched = grid.get( SchedulerService.class );
 
         if ( port != -1 ) {
             CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
 
-            GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup(Scheduler.class);
+            GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup(SchedulerService.class);
             if ( gsd == null ) {
-                gsd = new GridServiceDescriptionImpl( Scheduler.class );
+                gsd = new GridServiceDescriptionImpl( SchedulerService.class );
             }
 
             MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
 
             
-            GridServiceDescription service = coreServicesWP.getServices().get( Scheduler.class.getName() );
+            GridServiceDescription service = coreServicesWP.getServices().get( SchedulerService.class.getName() );
             if( service == null){
-                coreServicesWP.getServices().put(Scheduler.class.getName(), gsd);
+                coreServicesWP.getServices().put(SchedulerService.class.getName(), gsd);
                 service = gsd;
             }
             Address address = null;
@@ -69,7 +68,7 @@ GridPeerServiceConfiguration {
            
             
             mss.addService( this.port,
-                            Scheduler.class.getName(),
+                            SchedulerService.class.getName(),
                             ((MessageReceiverHandlerFactoryService) sched   ).getMessageReceiverHandler() );
         }
     }

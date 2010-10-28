@@ -24,7 +24,8 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.grid.timer.Scheduler;
+import org.drools.time.SchedulerService;
+
 
 /**
  *
@@ -32,9 +33,9 @@ import org.drools.grid.timer.Scheduler;
  */
 public class SchedulerServer implements
     MessageReceiverHandler{
-    private Scheduler scheduler = null; 
+    private SchedulerService scheduler = null; 
 
-    public SchedulerServer(Scheduler scheduler) {
+    public SchedulerServer(SchedulerService scheduler) {
         this.scheduler = scheduler;
     }
     
@@ -54,10 +55,10 @@ public class SchedulerServer implements
                                                                          Conversation con,
                                                                          Message msg,
                                                                          CommandImpl cmd) {
-                                                         Scheduler scheduler = (Scheduler) object;
+                                                         SchedulerService scheduler = (SchedulerService) object;
                                                          final List list = cmd.getArguments();
-                                                         scheduler.scheduleJob((ScheduledJob)list.get(0));
-                                                         con.respond( true );
+                                                         scheduler.scheduleJob(((ScheduledJob)list.get(0)).getJob(),((ScheduledJob)list.get(0)).getJobContext(), ((ScheduledJob)list.get(0)).getTrigger());
+                                                         con.respond( ((ScheduledJob)list.get(0)).getJobHandle() );
                                                      }
                                                  } );
                                         }
