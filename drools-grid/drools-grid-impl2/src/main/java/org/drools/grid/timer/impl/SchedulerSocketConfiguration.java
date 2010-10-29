@@ -54,17 +54,37 @@ GridPeerServiceConfiguration {
                 address = service.addAddress( "socket" );
             }
             InetSocketAddress[] addresses = (InetSocketAddress[])address.getObject();
-            int newAddressesLenght = 1;
-            if(addresses != null){
-                newAddressesLenght = addresses.length + 1;
-            }
-            InetSocketAddress[] newAddresses = new InetSocketAddress[newAddressesLenght];
-            if(addresses !=null){
-                System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
-            }
-            newAddresses[newAddressesLenght-1]= new InetSocketAddress( mss.getIp(),
+            if(addresses != null && addresses.length >= 1){
+                 InetSocketAddress[] newAddresses = new InetSocketAddress[addresses.length+1];
+                if(addresses !=null){
+                    System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
+                }
+                newAddresses[addresses.length]= new InetSocketAddress( mss.getIp(),
+                                                             this.port);
+                 ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddresses);
+                 service.setData(conf);
+            }else{
+                 InetSocketAddress[] newAddress = new InetSocketAddress[1];
+                 newAddress[0]= new InetSocketAddress( mss.getIp(),
                                                          this.port);
-            address.setObject(  newAddresses );
+                 address.setObject(  newAddress );
+                 ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddress);
+                 service.setData(conf);
+            }
+            
+//            int newAddressesLenght = 1;
+//            if(addresses != null){
+//                newAddressesLenght = addresses.length + 1;
+//            }
+//            InetSocketAddress[] newAddresses = new InetSocketAddress[newAddressesLenght];
+//            if(addresses !=null){
+//                System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
+//            }
+//            newAddresses[newAddressesLenght-1]= new InetSocketAddress( mss.getIp(),
+//                                                         this.port);
+//            address.setObject(  newAddresses );
+            
+           
            
             
             mss.addService( this.port,

@@ -26,6 +26,9 @@ public class UuidJobHandle
         final int prime = 31;
         int result = 1;
         result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+        if(result < 0){
+            result *= -1;
+        }
         return result;
     }
 

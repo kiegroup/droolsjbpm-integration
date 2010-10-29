@@ -28,7 +28,7 @@ public class SchedulerRemoteConfiguration
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServices.lookup( SchedulerService.class );
 
-        SchedulerService scheduler = new SchedulerClient(gsd.getId(), gsd, 
+        SchedulerService scheduler = new SchedulerClient(grid, gsd, 
                                               cm );
         ((GridImpl) grid).addService( SchedulerService.class,
                                       scheduler );

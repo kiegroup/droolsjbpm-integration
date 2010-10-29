@@ -46,9 +46,11 @@ import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.grid.timer.impl.ScheduledJobConfiguration;
+import org.drools.grid.timer.impl.SchedulerClient;
 import org.drools.grid.timer.impl.SchedulerImpl;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.grid.timer.impl.SchedulerRemoteConfiguration;
+import org.drools.grid.timer.impl.SchedulerServiceConfiguration;
 import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
 import org.drools.time.SchedulerService;
 
@@ -201,9 +203,52 @@ public class DistributedSchedulerTest extends TestCase {
         
         GridServiceDescription gsd = corewp.lookup(SchedulerService.class);
                 
-        Assert.assertEquals(2, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
+        Assert.assertEquals(1, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
+        
+        Assert.assertEquals(2, ((InetSocketAddress[])((SchedulerServiceConfiguration)gsd.getData()).getServices(grid3)).length);
         
         
+        conn.close();
+        grid1.get(MultiplexSocketService.class).close();
+        grid2.get(MultiplexSocketService.class).close();
+    
+    }
+    
+    public void testGetDataFromCoreServices(){
+    
+          coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+        
+        //Grid View 
+        GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        configureGrid1(grid1, 5012);
+        
+        GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        configureGrid1(grid2, 5013);
+        
+        CoreServicesWhitePages corewp = grid1.get(CoreServicesWhitePages.class);
+        
+        //Get Scheduler Service
+        GridServiceDescription gsd = corewp.lookup(SchedulerService.class);
+       
+        
+        Assert.assertEquals(1, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
+        
+        Assert.assertEquals(2, ((InetSocketAddress[])((SchedulerServiceConfiguration)gsd.getData()).getServices(grid1)).length);
+        
+        
+        Connector conn = new MinaConnector();
+
+        ConversationManager cm = new ConversationManagerImpl("s1",
+                conn,
+                l);
+
+
+        SchedulerClient schedulerClient = new SchedulerClient(grid1,gsd, cm);
+        
+        
+        JobHandle handle = schedulerClient.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+    
+
         conn.close();
         grid1.get(MultiplexSocketService.class).close();
         grid2.get(MultiplexSocketService.class).close();

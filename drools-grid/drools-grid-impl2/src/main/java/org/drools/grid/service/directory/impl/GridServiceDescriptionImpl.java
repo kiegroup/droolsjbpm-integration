@@ -21,7 +21,7 @@ public class GridServiceDescriptionImpl
     
     private Map<String, Address> addresses = new HashMap<String, Address>();
     
-    //private Object               data;
+    private Serializable               data;
     
     public GridServiceDescriptionImpl() {
     	
@@ -104,9 +104,13 @@ public class GridServiceDescriptionImpl
         return result;
     }
 
-//    public Object getData() {
-//        return data;
-//    }
+    public Serializable getData() {
+        return data;
+    }
+
+    public void setData(Serializable data) {
+        this.data = data;
+    }
     
     
 

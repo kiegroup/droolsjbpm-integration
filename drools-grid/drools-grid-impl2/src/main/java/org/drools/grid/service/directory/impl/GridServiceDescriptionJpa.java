@@ -1,9 +1,5 @@
 package org.drools.grid.service.directory.impl;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Collections;
@@ -83,15 +79,15 @@ public class GridServiceDescriptionJpa
         return this.detached;
     }
 
-//     public Object getData() {
-//        EntityManager em = this.emf.createEntityManager();
-//        em.getTransaction().begin();
-//        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
-//        Object data = this.detached.getData();
-//        em.getTransaction().commit();
-//        em.close();
-//        return data;
-//    }
+     public Serializable getData() {
+        EntityManager em = this.emf.createEntityManager();
+        em.getTransaction().begin();
+        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
+        Serializable data = this.detached.getData();
+        em.getTransaction().commit();
+        em.close();
+        return data;
+    }
 
     
    @Override
@@ -109,6 +105,15 @@ public class GridServiceDescriptionJpa
         int hash = 7;
         hash = 89 * hash + (this.detached != null ? this.detached.hashCode() : 0);
         return hash;
+    }
+
+    public void setData(Serializable data) {
+        EntityManager em = this.emf.createEntityManager();
+        em.getTransaction().begin();
+        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
+        this.detached.setData(data);
+        em.getTransaction().commit();
+        em.close();
     }
 
    

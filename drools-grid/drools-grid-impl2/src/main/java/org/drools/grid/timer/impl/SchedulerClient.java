@@ -19,8 +19,10 @@ package org.drools.grid.timer.impl;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
-import org.drools.SystemEventListenerFactory;
+import java.util.List;
+import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
@@ -28,14 +30,13 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.grid.io.impl.ConversationManagerImpl;
-import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
 import org.drools.time.SchedulerService;
 import org.drools.time.Trigger;
+import org.drools.time.impl.MultiJobHandle;
 
 /**
  *
@@ -48,31 +49,12 @@ public class SchedulerClient implements SchedulerService,
 
     private ConversationManager    conversationManager;
 
-    private String id;
-    
-    public SchedulerClient(String id, GridServiceDescription schedulerGsd) {
-        this.id = id;
-        this.schedulerGsd = schedulerGsd;
-        this.conversationManager = new ConversationManagerImpl(id, new MinaConnector(), SystemEventListenerFactory.getSystemEventListener());
-    }
-    
-    public SchedulerClient(String id, GridServiceDescription schedulerGsd, ConversationManager conversationManager) {
-        this.id = id;
+    private Grid grid;
+    public SchedulerClient(Grid grid, GridServiceDescription schedulerGsd, ConversationManager conversationManager) {
+        this.grid = grid;
         this.schedulerGsd = schedulerGsd;
         this.conversationManager = conversationManager;
     }
-    
-    
-    public void scheduleJob(ScheduledJob job, Serializable addr) {
-        CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
-                                           Arrays.asList( new Object[]{ job } ) ); 
-        
-        sendMessage( this.conversationManager,
-                     addr,
-                     this.schedulerGsd.getId(),
-                     cmd );     
-    }
-   
     
     public static Object sendMessage(ConversationManager conversationManager,
                                      Serializable addr,
@@ -121,18 +103,27 @@ public class SchedulerClient implements SchedulerService,
         return new SchedulerServer( this );
     }
 
-    public String getId() {
-        return this.id;
-    }
 
     public JobHandle scheduleJob(Job job, JobContext ctx, Trigger trigger) {
-        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) schedulerGsd.getAddresses().get( "socket" )).getObject();
-        CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
-                                           Arrays.asList( new Object[]{ new ScheduledJob(new UuidJobHandle(), job, ctx, trigger, null) } ) ); 
-        return (UuidJobHandle) sendMessage( this.conversationManager,
-                     sockets,
+        SchedulerServiceConfiguration conf = (SchedulerServiceConfiguration) schedulerGsd.getData();
+        List<JobHandle> jobHandles = new ArrayList<JobHandle>();
+        UuidJobHandle jobhandle = new UuidJobHandle();
+        for( int i = 0; i < conf.getRedundancy(); i ++){
+            int bucket = (int)jobhandle.hashCode() % conf.getServices(grid).length;
+            //InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) schedulerGsd.getAddresses().get( "socket" )).getObject();
+            InetSocketAddress socket =  conf.getServices(grid)[bucket];
+            CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
+                                           Arrays.asList( new Object[]{ new ScheduledJob(jobhandle, job, ctx, trigger, null) } ) ); 
+            UuidJobHandle  handle = (UuidJobHandle) sendMessage( this.conversationManager,
+                     socket,
                      this.schedulerGsd.getId(),
-                     cmd );    
+                     cmd ); 
+          
+            jobHandles.add(handle);
+        }
+        
+        return new MultiJobHandle(jobHandles);
+        
     }
 
     public boolean removeJob(JobHandle jobHandle) {

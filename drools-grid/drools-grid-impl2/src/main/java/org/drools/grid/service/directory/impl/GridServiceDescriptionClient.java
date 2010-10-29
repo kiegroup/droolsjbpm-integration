@@ -1,5 +1,6 @@
 package org.drools.grid.service.directory.impl;
 
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,6 +25,7 @@ public class GridServiceDescriptionClient
 
     private GridServiceDescription detachedLocal;
 
+    
     public GridServiceDescriptionClient(GridServiceDescription detachedLocal,
                                         GridServiceDescription whitePagesGsd,
                                         ConversationManager conversationManager) {
@@ -82,17 +84,7 @@ public class GridServiceDescriptionClient
                      whitePagesGsd.getId(),
                      cmd );
     }
-    
-    public Object getData() {
-        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-        CommandImpl cmd = new CommandImpl( "GridServiceDescription.getData",
-                                           null );
-        Object data = (Object) sendMessage( this.conversationManager,
-                     sockets,
-                     whitePagesGsd.getId(),
-                     cmd );
-        return data;
-    }
+ 
 
 
     @Override
@@ -115,6 +107,28 @@ public class GridServiceDescriptionClient
         hash = 47 * hash + (this.conversationManager != null ? this.conversationManager.hashCode() : 0);
         hash = 47 * hash + (this.detachedLocal != null ? this.detachedLocal.hashCode() : 0);
         return hash;
+    }
+
+    public Serializable getData() {
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        CommandImpl cmd = new CommandImpl( "GridServiceDescription.getData",
+                                           null );
+        Serializable data = (Serializable) sendMessage( this.conversationManager,
+                     sockets,
+                     whitePagesGsd.getId(),
+                     cmd );
+        return data;
+    }
+
+    public void setData(Serializable data) {
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        CommandImpl cmd = new CommandImpl( "GridServiceDescription.setData",
+                                           Arrays.asList( new Object[]{ data } ) );
+         sendMessage( this.conversationManager,
+                     sockets,
+                     whitePagesGsd.getId(),
+                     cmd );
+        
     }
 
 

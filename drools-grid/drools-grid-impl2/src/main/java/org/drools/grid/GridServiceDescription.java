@@ -1,5 +1,6 @@
 package org.drools.grid;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
@@ -18,5 +19,7 @@ public interface GridServiceDescription {
 
     public void removeAddress(String transport);
     
-   // public Object getData();
+    public Serializable getData();
+    
+    public void setData(Serializable data);
 }
