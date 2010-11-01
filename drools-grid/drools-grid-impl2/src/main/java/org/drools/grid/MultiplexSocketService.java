@@ -1,5 +1,6 @@
 package org.drools.grid;
 
+import java.util.Set;
 import org.drools.grid.io.MessageReceiverHandler;
 
 public interface MultiplexSocketService {
@@ -12,6 +13,8 @@ public interface MultiplexSocketService {
                        String id);
 
     String getIp();
+    
+    Set<Integer> getPorts();
     
     void close();
 }

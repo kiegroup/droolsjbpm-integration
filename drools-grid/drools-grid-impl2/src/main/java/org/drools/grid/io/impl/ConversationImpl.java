@@ -70,7 +70,7 @@ public class ConversationImpl
     }
 
     public void sendMessage(Object body,
-                            MessageReceiverHandler handler) {
+                                MessageReceiverHandler handler) {
         int requestId = -1;
         if ( handler != null ) {
             requestId = this.requestId.getAndIncrement();

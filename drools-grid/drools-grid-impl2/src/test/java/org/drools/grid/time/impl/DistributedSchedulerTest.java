@@ -1,6 +1,8 @@
 package org.drools.grid.time.impl;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.drools.grid.timer.impl.UuidJobHandle;
 import org.drools.grid.timer.impl.ScheduledJob;
 import java.net.InetSocketAddress;
@@ -41,10 +43,12 @@ import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
+import org.drools.grid.service.directory.impl.RegisterWhitePagesConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
+import org.drools.grid.timer.impl.RegisterSchedulerConfiguration;
 import org.drools.grid.timer.impl.ScheduledJobConfiguration;
 import org.drools.grid.timer.impl.SchedulerClient;
 import org.drools.grid.timer.impl.SchedulerImpl;
@@ -61,10 +65,12 @@ public class DistributedSchedulerTest extends TestCase {
     private Map<String, GridServiceDescription> coreServicesMap;
     @Override
     public void setUp() {
+        
     }
 
     @Override
     public void tearDown() {
+        MockJob.counter = 0;
     }
 
     public void test1() throws Exception {
@@ -110,7 +116,7 @@ public class DistributedSchedulerTest extends TestCase {
     }
 
     public void testDistributedJobSchedullingLocal() {
-
+        
         GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
         grid.addService(SchedulerService.class, new SchedulerImpl("myLocalSched",grid));
 
@@ -121,7 +127,13 @@ public class DistributedSchedulerTest extends TestCase {
         ScheduledJob sj2 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
 
         scheduler.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
-
+        //The Job Will be executed in 1 second
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DistributedSchedulerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        assertEquals(1, MockJob.counter);
 
 
     }
@@ -168,14 +180,20 @@ public class DistributedSchedulerTest extends TestCase {
 
         //Schedule remotely the Job
         scheduler.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DistributedSchedulerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
+        assertEquals(1, MockJob.counter);
         
         //Close the peer connection
         conn.close();
         
         //Shutdown the MultiplexSocketService
         grid1.get(MultiplexSocketService.class).close();
-
+        
 
 
 
@@ -207,16 +225,19 @@ public class DistributedSchedulerTest extends TestCase {
         
         Assert.assertEquals(2, ((InetSocketAddress[])((SchedulerServiceConfiguration)gsd.getData()).getServices(grid3)).length);
         
+        Assert.assertEquals(0, MockJob.counter);
         
         conn.close();
         grid1.get(MultiplexSocketService.class).close();
         grid2.get(MultiplexSocketService.class).close();
+        
+        
     
     }
     
     public void testGetDataFromCoreServices(){
     
-          coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
         
         //Grid View 
         GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
@@ -244,16 +265,24 @@ public class DistributedSchedulerTest extends TestCase {
 
 
         SchedulerClient schedulerClient = new SchedulerClient(grid1,gsd, cm);
-        
+        ((SchedulerServiceConfiguration)gsd.getData()).setRedundancy(3);
         
         JobHandle handle = schedulerClient.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
-    
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DistributedSchedulerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        assertEquals(3, MockJob.counter);
+        
         conn.close();
         grid1.get(MultiplexSocketService.class).close();
         grid2.get(MultiplexSocketService.class).close();
     
     }
+    
+    
     
 
     public static class MockJobContext implements JobContext, Serializable {
@@ -413,7 +442,8 @@ public class DistributedSchedulerTest extends TestCase {
         //Exposing Local WhitePages
         GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(port);
         conf.addConfiguration(wpsc);
-
+        GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
+        conf.addConfiguration(registerwpincore);
 
         //Create a Local Scheduler
         GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration("myLocalSched");
@@ -423,6 +453,9 @@ public class DistributedSchedulerTest extends TestCase {
         // I need to use the same port to reuse the service multiplexer
         GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration(port);
         conf.addConfiguration(schlsc);
+        
+        GridPeerServiceConfiguration registerschedincore = new RegisterSchedulerConfiguration();
+        conf.addConfiguration(registerschedincore);
 
         conf.configure(grid);
         

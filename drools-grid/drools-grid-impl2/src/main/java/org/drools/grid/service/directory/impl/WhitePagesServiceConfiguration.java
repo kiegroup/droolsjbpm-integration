@@ -15,19 +15,30 @@
  * under the License.
  */
 
-package org.drools.grid.time.impl;
+package org.drools.grid.service.directory.impl;
 
-import org.drools.time.Job;
-import org.drools.time.JobContext;
+import org.drools.grid.timer.impl.*;
+import java.net.InetSocketAddress;
+import org.drools.grid.Grid;
 
 /**
  *
  * @author salaboy
  */
- public class MockJob implements Job {
-        public static int counter = 0;
-        public void execute(JobContext ctx) {
-            System.out.println("Job Executed!");
-            counter++;
-        }        
+public class WhitePagesServiceConfiguration implements ServiceConfiguration{
+    
+    private InetSocketAddress[] addresses;
+    
+    public WhitePagesServiceConfiguration(InetSocketAddress[] addresses) {
+        this.addresses = addresses;
     }
+
+    public InetSocketAddress[] getServices(Grid grid) {
+        //get addresses from the grid.. or whatever
+        return addresses;
+    }
+ 
+    
+    
+    
+}

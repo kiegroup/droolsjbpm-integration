@@ -41,30 +41,30 @@ GridPeerServiceConfiguration {
 
             MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
 
-            GridServiceDescription service = coreServicesWP.getServices().get( WhitePages.class.getName() );
-            if( service == null){
-                coreServicesWP.getServices().put(WhitePages.class.getName(), gsd);
-                service = gsd;
-            }
-            
-            Address address = null;
-            if(service.getAddresses().get("socket") != null){
-                address = service.getAddresses().get("socket");
-            } else{
-                address = service.addAddress( "socket" );
-            }
-            InetSocketAddress[] addresses = (InetSocketAddress[])address.getObject();
-            int newAddressesLenght = 1;
-            if(addresses != null){
-                newAddressesLenght = addresses.length + 1;
-            }
-            InetSocketAddress[] newAddresses = new InetSocketAddress[newAddressesLenght];
-            if(addresses !=null){
-                System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
-            }
-            newAddresses[newAddressesLenght-1]= new InetSocketAddress( mss.getIp(),
-                                                         this.port);
-            address.setObject(  newAddresses );
+//            GridServiceDescription service = coreServicesWP.getServices().get( WhitePages.class.getName() );
+//            if( service == null){
+//                coreServicesWP.getServices().put(WhitePages.class.getName(), gsd);
+//                service = gsd;
+//            }
+//            
+//            Address address = null;
+//            if(service.getAddresses().get("socket") != null){
+//                address = service.getAddresses().get("socket");
+//            } else{
+//                address = service.addAddress( "socket" );
+//            }
+//            InetSocketAddress[] addresses = (InetSocketAddress[])address.getObject();
+//            int newAddressesLenght = 1;
+//            if(addresses != null){
+//                newAddressesLenght = addresses.length + 1;
+//            }
+//            InetSocketAddress[] newAddresses = new InetSocketAddress[newAddressesLenght];
+//            if(addresses !=null){
+//                System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
+//            }
+//            newAddresses[newAddressesLenght-1]= new InetSocketAddress( mss.getIp(),
+//                                                         this.port);
+//            address.setObject(  newAddresses );
                                            
             mss.addService( this.port,
                             WhitePages.class.getName(),

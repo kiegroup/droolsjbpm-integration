@@ -22,6 +22,8 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
@@ -105,13 +107,39 @@ public class SchedulerClient implements SchedulerService,
 
 
     public JobHandle scheduleJob(Job job, JobContext ctx, Trigger trigger) {
-        SchedulerServiceConfiguration conf = (SchedulerServiceConfiguration) schedulerGsd.getData();
         List<JobHandle> jobHandles = new ArrayList<JobHandle>();
         UuidJobHandle jobhandle = new UuidJobHandle();
-        for( int i = 0; i < conf.getRedundancy(); i ++){
-            int bucket = (int)jobhandle.hashCode() % conf.getServices(grid).length;
+        // Get the Service Configuration from the Data field
+        SchedulerServiceConfiguration conf = (SchedulerServiceConfiguration) schedulerGsd.getData();
+        // If the GSD doesn't have conf and it doesn't have addresses, we can use the local SchedulerService
+        if(conf == null && schedulerGsd.getAddresses().get("socket") == null){
+            SchedulerService sched = null;
+            try {
+                // We use the ID that contains the type of the service that we are using -> refactor this and include serviceType in GSD
+                sched = grid.get((Class<SchedulerService>)Class.forName(schedulerGsd.getId()));
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(SchedulerClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return sched.scheduleJob(job, ctx, trigger);
+        }
+        // If we have a service configuration
+        int redundancy = 1;
+        InetSocketAddress[] addresses = null;
+        if(conf != null){
+            redundancy = conf.getRedundancy();
+            addresses = conf.getServices(grid);
+        }
+        // If we have an address use that address. 
+        if(addresses == null){
+            if(schedulerGsd.getAddresses() != null && schedulerGsd.getAddresses().get("socket") != null){
+                addresses = (InetSocketAddress[])schedulerGsd.getAddresses().get("socket").getObject();
+            }
+        }
+        //If not use the configuration and the bucket systems.
+        for( int i = 0; i < redundancy; i ++){
+            int bucket = (int)jobhandle.hashCode() % addresses.length;
             //InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) schedulerGsd.getAddresses().get( "socket" )).getObject();
-            InetSocketAddress socket =  conf.getServices(grid)[bucket];
+            InetSocketAddress socket =  addresses[bucket];
             CommandImpl cmd = new CommandImpl( "Scheduler.scheduleJob",
                                            Arrays.asList( new Object[]{ new ScheduledJob(jobhandle, job, ctx, trigger, null) } ) ); 
             UuidJobHandle  handle = (UuidJobHandle) sendMessage( this.conversationManager,

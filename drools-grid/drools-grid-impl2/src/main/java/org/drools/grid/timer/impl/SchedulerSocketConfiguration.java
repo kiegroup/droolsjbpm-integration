@@ -42,48 +42,37 @@ GridPeerServiceConfiguration {
             MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
 
             
-            GridServiceDescription service = coreServicesWP.getServices().get( SchedulerService.class.getName() );
-            if( service == null){
-                coreServicesWP.getServices().put(SchedulerService.class.getName(), gsd);
-                service = gsd;
-            }
-            Address address = null;
-            if(service.getAddresses().get("socket") != null){
-                address = service.getAddresses().get("socket");
-            } else{
-                address = service.addAddress( "socket" );
-            }
-            InetSocketAddress[] addresses = (InetSocketAddress[])address.getObject();
-            if(addresses != null && addresses.length >= 1){
-                 InetSocketAddress[] newAddresses = new InetSocketAddress[addresses.length+1];
-                if(addresses !=null){
-                    System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
-                }
-                newAddresses[addresses.length]= new InetSocketAddress( mss.getIp(),
-                                                             this.port);
-                 ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddresses);
-                 service.setData(conf);
-            }else{
-                 InetSocketAddress[] newAddress = new InetSocketAddress[1];
-                 newAddress[0]= new InetSocketAddress( mss.getIp(),
-                                                         this.port);
-                 address.setObject(  newAddress );
-                 ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddress);
-                 service.setData(conf);
-            }
-            
-//            int newAddressesLenght = 1;
-//            if(addresses != null){
-//                newAddressesLenght = addresses.length + 1;
+//            GridServiceDescription service = coreServicesWP.getServices().get( SchedulerService.class.getName() );
+//            if( service == null){
+//                coreServicesWP.getServices().put(SchedulerService.class.getName(), gsd);
+//                service = gsd;
 //            }
-//            InetSocketAddress[] newAddresses = new InetSocketAddress[newAddressesLenght];
-//            if(addresses !=null){
-//                System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
+//            Address address = null;
+//            if(service.getAddresses().get("socket") != null){
+//                address = service.getAddresses().get("socket");
+//            } else{
+//                address = service.addAddress( "socket" );
 //            }
-//            newAddresses[newAddressesLenght-1]= new InetSocketAddress( mss.getIp(),
+//            InetSocketAddress[] addresses = (InetSocketAddress[])address.getObject();
+//            if(addresses != null && addresses.length >= 1){
+//                 InetSocketAddress[] newAddresses = new InetSocketAddress[addresses.length+1];
+//                if(addresses !=null){
+//                    System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
+//                }
+//                newAddresses[addresses.length]= new InetSocketAddress( mss.getIp(),
+//                                                             this.port);
+//                 ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddresses);
+//                 service.setData(conf);
+//            }else{
+//                 InetSocketAddress[] newAddress = new InetSocketAddress[1];
+//                 newAddress[0]= new InetSocketAddress( mss.getIp(),
 //                                                         this.port);
-//            address.setObject(  newAddresses );
+//                 address.setObject(  newAddress );
+//                 ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddress);
+//                 service.setData(conf);
+//            }
             
+
            
            
             

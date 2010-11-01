@@ -3,6 +3,7 @@ package org.drools.grid.impl;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.drools.SystemEventListener;
 import org.drools.grid.MultiplexSocketService;
@@ -76,5 +77,9 @@ public class MultiplexSocketServerImpl implements MultiplexSocketService {
 
     public String getIp() {
         return this.ip;
+    }
+    
+    public Set<Integer> getPorts(){
+        return acceptors.keySet();
     }
 }

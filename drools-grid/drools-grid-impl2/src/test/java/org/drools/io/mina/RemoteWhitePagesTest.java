@@ -25,6 +25,7 @@ import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
+import org.drools.grid.service.directory.impl.RegisterWhitePagesConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
@@ -55,6 +56,9 @@ public class RemoteWhitePagesTest extends TestCase {
         
         GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(5012);
         conf.addConfiguration( wpsc );
+        
+        GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
+        conf.addConfiguration(registerwpincore);
 
         conf.configure( grid1 );
 
