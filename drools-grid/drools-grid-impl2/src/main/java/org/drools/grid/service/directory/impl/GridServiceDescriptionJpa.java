@@ -116,6 +116,14 @@ public class GridServiceDescriptionJpa
         em.close();
     }
 
+    public Class getServiceInterface() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setServiceInterface(Class cls) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
    
   
      

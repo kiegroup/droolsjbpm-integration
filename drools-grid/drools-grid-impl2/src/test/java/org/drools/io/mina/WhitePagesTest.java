@@ -82,17 +82,18 @@ public class WhitePagesTest extends TestCase {
         conf.configure( grid2 );
 
         WhitePages wpClient = grid2.get( WhitePages.class );
+        
 
-        GridServiceDescription test1Gsd  = wpClient.create( "test1@domain1" );
+        GridServiceDescription test1Gsd  = wpClient.create( "test:string@domain1" );
 
-        GridServiceDescription testGsd_2 = wpClient.lookup( "test1@domain1" );
+        GridServiceDescription testGsd_2 = wpClient.lookup( "test:string@domain1" );
         assertEquals( test1Gsd,
                       testGsd_2 );
         assertNotSame( test1Gsd,
                        testGsd_2 );
 
         WhitePages localWhitePages = grid1.get( WhitePages.class );
-        GridServiceDescription testGsd_3 = localWhitePages.lookup( "test1@domain1" );
+        GridServiceDescription testGsd_3 = localWhitePages.lookup( "test:string@domain1" );
 
         assertEquals( test1Gsd,
                       testGsd_3 );
@@ -130,7 +131,7 @@ public class WhitePagesTest extends TestCase {
         
         WhitePages wplocal= grid1.get(WhitePages.class);
         Assert.assertNotNull(wplocal);
-        GridServiceDescription schedulersgsd = wplocal.lookup(SchedulerService.class.getName());
+        GridServiceDescription schedulersgsd = wplocal.lookup("scheduler:"+"myLocalSched1"+SchedulerService.class.getName());
     
         Assert.assertNotNull(schedulersgsd);
   

@@ -131,6 +131,14 @@ public class GridServiceDescriptionClient
         
     }
 
+    public Class getServiceInterface() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setServiceInterface(Class cls) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 
     
     

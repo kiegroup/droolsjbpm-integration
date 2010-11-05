@@ -141,7 +141,7 @@ public class RegisterServicesTest {
         WhitePages wp = grid.get(WhitePages.class);
 
         //Local sched in Local WP
-        GridServiceDescription gsdLocalSched = wp.lookup(SchedulerService.class.getName());
+        GridServiceDescription gsdLocalSched = wp.lookup("scheduler:"+"myLocalSched"+SchedulerService.class.getName());
 
         //Get the CoreWhitePages
         CoreServicesWhitePages corewp = grid.get(CoreServicesWhitePages.class);
@@ -166,14 +166,14 @@ public class RegisterServicesTest {
         SchedulerClient sched = null;
         
         
-        GridServiceDescription clientSched1 = wp.lookup(SchedulerService.class.getName());
+        GridServiceDescription clientSched1 = wp.lookup("scheduler:"+"myLocalSched"+SchedulerService.class.getName());
         sched = new SchedulerClient(grid, clientSched1, cm);
         sched.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
         
         sched = new SchedulerClient(grid, gsdLocalButExposedSched, cm);
         sched.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
         
-        //@TODO: FIX THIS! something weird is happening with the handlers..
+        
         //GridServiceDescription clientSched2 = new WhitePagesClient( gsdLocalButExposedWp, cm).lookup(SchedulerService.class.getName());
         
         

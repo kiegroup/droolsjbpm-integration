@@ -9,6 +9,10 @@ import org.drools.grid.service.directory.Address;
 public interface GridServiceDescription {
     public String getId();
 
+    public Class getServiceInterface();
+
+    public void setServiceInterface(Class cls);
+    
     public Class getImplementedClass();
 
     public void setImplementedClass(Class cls);

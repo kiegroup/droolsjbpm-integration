@@ -29,7 +29,7 @@ public class SchedulerLocalConfiguration
         SchedulerService sched = (this.scheduler != null) ? this.scheduler : new SchedulerImpl(this.id, grid);
         ((GridImpl) grid).addService( SchedulerService.class,
                                       sched );
-        wp.create("scheduler:"+id+"@local/local");
+        wp.create("scheduler:"+this.id+SchedulerService.class.getName());
 
     }
 

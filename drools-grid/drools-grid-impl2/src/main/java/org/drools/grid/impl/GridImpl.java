@@ -12,6 +12,7 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.local.LocalGridConnection;
+import org.drools.grid.remote.RemoteGridConnection;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 
@@ -91,14 +92,39 @@ public class GridImpl implements Grid {
     }
 
     public GridNode createGridNode(String id) {
-        GridNodeConnection connection = new LocalGridConnection( id );
+        GridServiceDescription gsd = GridServiceDescriptionFactory.newGridServiceDescritpion(id);
+        return createGridNode(gsd);
+        
+    }
+    
+    public GridNode createGridNode(GridServiceDescription gsd){
+        GridNodeConnection connection = NodeConnectionFactory.newGridNodeConnection(gsd);
         GridNode gnode = connection.getGridNode();
-        localNodes.put( id, gnode );
-                
+        if(gnode instanceof GridNodeImpl){
+            localNodes.put( gsd.getId(), gnode );
+        }
+        
         WhitePages pages = get( WhitePages.class );
-        pages.create( id );
+        pages.create( gsd.getId() );
         
         return gnode;
+    }
+    
+    public GridNode getGridNode(String id){
+        if(isLocalNode(id)){
+            return localNodes.get(id);
+        }
+        WhitePages pages = get( WhitePages.class );
+        GridServiceDescription gsd = pages.lookup(id);
+        return new RemoteGridConnection(gsd).getGridNode();
+        
+    }
+    
+    private boolean isLocalNode(String id){
+        if(id.contains("@local")){
+            return true;
+        }
+        return false;
     }
 
 }

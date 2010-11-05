@@ -1,26 +1,23 @@
 /**
  * 
  */
-package org.drools.grid.timer.impl;
+package org.drools.grid.impl;
 
 import org.drools.grid.service.directory.impl.*;
-import java.net.InetSocketAddress;
 import org.drools.grid.CoreServicesWhitePages;
 
 import org.drools.grid.Grid;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridPeerServiceConfiguration;
-import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.MultiplexSocketService;
-import org.drools.grid.service.directory.Address;
-import org.drools.time.SchedulerService;
 
-public class SchedulerSocketConfiguration
+public class GridNodeSocketConfiguration
 implements
 GridPeerServiceConfiguration {
     private int port = -1;
     
-    public SchedulerSocketConfiguration(int port) {
+    public GridNodeSocketConfiguration(int port) {
         this.port = port;
     }
 
@@ -29,14 +26,14 @@ GridPeerServiceConfiguration {
     }
     
     public void configureService(Grid grid) {
-        SchedulerService sched = grid.get( SchedulerService.class );
+        GridNode gnode = grid.get( GridNode.class );
 
         if ( port != -1 ) {
             CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
 
-            GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup(SchedulerService.class);
+            GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup(GridNode.class);
             if ( gsd == null ) {
-                gsd = new GridServiceDescriptionImpl( SchedulerService.class );
+                gsd = new GridServiceDescriptionImpl( GridNode.class );
             }
 
             MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
@@ -77,8 +74,8 @@ GridPeerServiceConfiguration {
            
             
             mss.addService( this.port,
-                            SchedulerService.class.getName(),
-                            ((MessageReceiverHandlerFactoryService) sched ).getMessageReceiverHandler() );
+                            GridNode.class.getName(),
+                            ((MessageReceiverHandlerFactoryService) gnode ).getMessageReceiverHandler() );
         }
     }
 }

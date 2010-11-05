@@ -21,6 +21,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.grid.GridNode;
+import org.drools.grid.MessageReceiverHandlerFactoryService;
+import org.drools.grid.io.MessageReceiverHandler;
+import org.drools.grid.io.impl.NodeData;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 
@@ -28,7 +31,7 @@ import org.drools.util.ServiceRegistryImpl;
  *
  * @author salaboy
  */
-public class GridNodeImpl implements GridNode {
+public class GridNodeImpl implements GridNode, MessageReceiverHandlerFactoryService {
 
     private String id;
     private final Map<String, Object> localContext = new ConcurrentHashMap<String, Object>();
@@ -84,6 +87,10 @@ public class GridNodeImpl implements GridNode {
     }
 
     public void init(Object context) {       
+    }
+
+    public MessageReceiverHandler getMessageReceiverHandler() {
+        return new GridNodeServer(this, new NodeData());
     }
     
 }

@@ -19,6 +19,8 @@ public class GridServiceDescriptionImpl
 
     private Class                implementedClass;
     
+    private Class                serviceInterface;
+    
     private Map<String, Address> addresses = new HashMap<String, Address>();
     
     private Serializable               data;
@@ -45,6 +47,14 @@ public class GridServiceDescriptionImpl
     	this.id = id;
     }
 
+    public Class getServiceInterface(){
+        return this.serviceInterface;
+    }
+    
+    public void setServiceInterface(Class serviceInterface){
+        this.serviceInterface = serviceInterface;
+    }
+    
     public Class getImplementedClass() {
         return implementedClass;
     }

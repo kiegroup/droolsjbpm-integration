@@ -116,7 +116,7 @@ public class SchedulerClient implements SchedulerService,
             SchedulerService sched = null;
             try {
                 // We use the ID that contains the type of the service that we are using -> refactor this and include serviceType in GSD
-                sched = grid.get((Class<SchedulerService>)Class.forName(schedulerGsd.getId()));
+                sched = grid.get((Class<SchedulerService>)Class.forName(schedulerGsd.getServiceInterface().getCanonicalName()));
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(SchedulerClient.class.getName()).log(Level.SEVERE, null, ex);
             }
