@@ -72,8 +72,7 @@ public class GridNodeServer implements
                                                         localSessionContext.set( "kresults_" + cmd.getName(),
                                                                                  localKresults );
 
-                                                        //for ( GenericCommand cmd : commands ) {
-                                                        // evaluate the commands
+                                                       
 
                                                         Object result = command.execute( localSessionContext );
                                                          

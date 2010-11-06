@@ -78,7 +78,7 @@ public class KnowledgeBuilderProviderRemoteClient implements KnowledgeBuilderFac
                 this.gsd.getServiceInterface().getName(),
                 cmd);
         
-        return new KnowledgeBuilderRemoteClient( localId, this.cm );
+        return new KnowledgeBuilderRemoteClient( localId,this.gsd, this.cm );
 
     }
 

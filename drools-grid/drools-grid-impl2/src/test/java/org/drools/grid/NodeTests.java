@@ -17,6 +17,7 @@
 
 package org.drools.grid;
 
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,11 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
 import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderError;
+import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
+import org.drools.builder.ResourceType;
+import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.GridNodeLocalConfiguration;
 import org.drools.grid.impl.GridNodeSocketConfiguration;
@@ -43,7 +48,9 @@ import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.grid.timer.impl.RegisterSchedulerConfiguration;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
+import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.FactHandle;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -56,6 +63,8 @@ import org.junit.Test;
  * @author salaboy
  */
 public class NodeTests {
+
+    
 
     private Map<String, GridServiceDescription> coreServicesMap;
     
@@ -152,9 +161,29 @@ public class NodeTests {
          
          Assert.assertNotNull(kbuilder);
          
+         String rule = "package test\n"
+                 + "Rule \"test\""
+                 + "  when"
+                 + "  then"
+                 + "      System.out.println(\"Rule Fired!\");"
+                 + " end";
+         
+         kbuilder.add(new ByteArrayResource(rule.getBytes()), ResourceType.DRL);
+         
+         KnowledgeBuilderErrors errors = kbuilder.getErrors();
+         if(errors != null && errors.size() > 0){
+             for(KnowledgeBuilderError error : errors){
+                 System.out.println("Error: "+error.getMessage());
+
+             }
+             return;
+         }
+         
          KnowledgeBase kbase = gnode.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
          
          Assert.assertNotNull(kbase);
+         
+         kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
          
          StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
          
@@ -167,11 +196,19 @@ public class NodeTests {
          
          
          Assert.assertNotNull(gnode);
-                 
-                 
+         
+         FactHandle handle = session.insert(new MyObject());
+         Assert.assertNotNull(handle);
+         
+         int i = session.fireAllRules();
+         Assert.assertEquals(1, i);        
+        
+         
      
      }
      
+      
+      
      
      private void configureGrid1(Grid grid, int port){
     
@@ -227,5 +264,9 @@ public class NodeTests {
     
     }
      
+    private static class MyObject implements Serializable{
 
+        public MyObject() {
+        }
+    }
 }

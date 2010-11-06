@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
+import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommand;
@@ -36,6 +37,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
+import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -59,7 +61,22 @@ public class KnowledgeBaseRemoteClient implements KnowledgeBase{
     }
 
     public void addKnowledgePackages(Collection<KnowledgePackage> kpackages) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String kuilderInstanceId = ((CollectionClient<KnowledgePackage>) kpackages).getParentInstanceId();
+        String kresultsId = "kresults_" + this.cm.toString();
+        String localId = UUID.randomUUID().toString();
+        
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
+                                                                                  kuilderInstanceId,
+                                                                                  this.instanceId,
+                                                                                  null,
+                                                                                  kresultsId )}));
+        
+        sendMessage(this.cm,
+                (InetSocketAddress[]) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getServiceInterface().getName(),
+                cmd);
+        
     }
 
     public Collection<KnowledgePackage> getKnowledgePackages() {
@@ -133,37 +150,7 @@ public class KnowledgeBaseRemoteClient implements KnowledgeBase{
                                                          this.cm );
         
         
-//        String kresultsId = "kresults_" + this.messageSession.getSessionId();
-//
-//        String localId = UUID.randomUUID().toString();
-//
-//        Message msg = new Message( this.messageSession.getSessionId(),
-//                                   this.messageSession.counter.incrementAndGet(),
-//                                   false,
-//                                   new SetVariableCommand( "__TEMP__",
-//                                                           localId,
-//                                                           new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf ),
-//                                                                                                          null,
-//                                                                                                          this.instanceId,
-//                                                                                                          null,
-//                                                                                                          kresultsId ) ) );
-//
-//        try {
-//            this.connector.connect();
-//            Object object = this.connector.write( msg ).getPayload();
-//
-//            //            if (!(object instanceof FinishedCommand)) {
-//            //                throw new RuntimeException("Response was not correctly ended");
-//            //            }
-//            this.connector.disconnect();
-//        } catch ( Exception e ) {
-//            throw new RuntimeException( "Unable to execute message",
-//                                        e );
-//        }
-//
-//        return new StatefulKnowledgeSessionRemoteClient( localId,
-//                                                         this.connector,
-//                                                         this.messageSession );
+
     }
 
     public StatefulKnowledgeSession newStatefulKnowledgeSession() {
