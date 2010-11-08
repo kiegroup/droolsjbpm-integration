@@ -43,13 +43,7 @@
 
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-grid-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-grid-local</artifactId>
+      <artifactId>drools-grid-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
 
