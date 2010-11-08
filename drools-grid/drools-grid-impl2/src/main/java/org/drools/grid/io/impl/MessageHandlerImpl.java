@@ -49,12 +49,12 @@ public class MessageHandlerImpl
 
         Object result = command.execute( localSessionContext );
 
-//        session.write( new MessageImpl( msg.getConversationId(),
-//                                    msg.getRequestId(),
-//                                    null,
-//                                    1,
-//                                    result ),
-//                       null );
+        //        session.write( new MessageImpl( msg.getConversationId(),
+        //                                    msg.getRequestId(),
+        //                                    null,
+        //                                    1,
+        //                                    result ),
+        //                       null );
 
         //        if ( !msg.isAsync() && localKresults.getIdentifiers().isEmpty() ) {
         //            // if it's not an async invocation and their are no results, just send a simple notification message

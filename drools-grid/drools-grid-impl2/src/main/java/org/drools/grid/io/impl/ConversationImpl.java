@@ -18,7 +18,7 @@ public class ConversationImpl
     private IoWriter                        writer;
     private String                          conversationId;
     private String                          senderId;
-    private String                        recipientId;
+    private String                          recipientId;
     private AtomicInteger                   requestId;
     private RequestResponseDispatchListener dispathListener;
     private ConversationManager             conversationManager;

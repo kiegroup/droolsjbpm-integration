@@ -25,18 +25,19 @@ import org.drools.grid.GridPeerServiceConfiguration;
  *
  * @author salaboy
  */
-public class GridNodeLocalConfiguration implements GridPeerServiceConfiguration {
+public class GridNodeLocalConfiguration
+    implements
+    GridPeerServiceConfiguration {
 
     private GridNode gnode;
+
     public GridNodeLocalConfiguration() {
     }
 
     public void setGnode(GridNode gnode) {
         this.gnode = gnode;
     }
-    
-    
-    
+
     public void configureService(Grid grid) {
         GridNode gnode = (this.gnode != null) ? this.gnode : new GridNodeImpl();
         ((GridImpl) grid).addService( GridNode.class,

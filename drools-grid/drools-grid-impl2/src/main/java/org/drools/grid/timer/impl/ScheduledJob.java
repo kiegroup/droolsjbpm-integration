@@ -16,22 +16,23 @@ import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
 import org.drools.time.Trigger;
 
-public class ScheduledJob implements Externalizable {
-    private static final long serialVersionUID = 510l;
+public class ScheduledJob
+    implements
+    Externalizable {
+    private static final long         serialVersionUID = 510l;
 
-    private String            id;
-    private UuidJobHandle     jobHandle;
-    private Class             jobClass;
-    private Serializable      trigger;
-    private Date              nextFireTime;
+    private String                    id;
+    private UuidJobHandle             jobHandle;
+    private Class                     jobClass;
+    private Serializable              trigger;
+    private Date                      nextFireTime;
     private ScheduledJobConfiguration configuration;
-    private Serializable      ctx;
-    
+    private Serializable              ctx;
+
     public ScheduledJob() {
-        
+
     }
 
-    
     public ScheduledJob(UuidJobHandle jobHandle,
                         final Job job,
                         final JobContext context,
@@ -42,8 +43,9 @@ public class ScheduledJob implements Externalizable {
         this.ctx = (Serializable) context;
         this.trigger = (Serializable) trigger;
         this.nextFireTime = trigger.hasNextFireTime();
-        
+
     }
+
     /**
      * @param jhandle 
      * @param timestamp
@@ -55,14 +57,17 @@ public class ScheduledJob implements Externalizable {
                         final JobContext context,
                         final Trigger trigger,
                         final ScheduledJobConfiguration conf) {
-        this(jobHandle, job, context, trigger);
+        this( jobHandle,
+              job,
+              context,
+              trigger );
         this.configuration = conf;
     }
 
     public JobHandle getJobHandle() {
         if ( this.jobHandle == null ) {
             // it's transient on persistence, so restore on demand
-            this.jobHandle = new UuidJobHandle( UUID.fromString( this.id ));
+            this.jobHandle = new UuidJobHandle( UUID.fromString( this.id ) );
         }
         return this.jobHandle;
     }
@@ -74,11 +79,11 @@ public class ScheduledJob implements Externalizable {
             throw new RuntimeException( e );
         }
     }
-    
+
     public String getId() {
         return this.id;
     }
-    
+
     public Date getNextFireTime() {
         return this.nextFireTime;
     }
@@ -98,8 +103,6 @@ public class ScheduledJob implements Externalizable {
     public void setConfiguration(ScheduledJobConfiguration configuration) {
         this.configuration = configuration;
     }
-    
-    
 
     public String toString() {
         return "ScheduledJob( job=" + jobClass.getName() + " trigger=" + trigger + " context=" + ctx + " )";
@@ -111,18 +114,17 @@ public class ScheduledJob implements Externalizable {
         out.writeObject( this.trigger );
         out.writeLong( this.nextFireTime.getTime() );
         out.writeObject( this.ctx );
-        out.writeObject( this.configuration);
+        out.writeObject( this.configuration );
     }
-    
+
     public void readExternal(ObjectInput in) throws IOException,
                                             ClassNotFoundException {
         this.id = in.readUTF();
-        this.jobClass = ( Class ) Class.forName(in.readUTF());
-        this.trigger = ( Serializable ) in.readObject();
+        this.jobClass = (Class) Class.forName( in.readUTF() );
+        this.trigger = (Serializable) in.readObject();
         this.nextFireTime = new Date( in.readLong() );
-        this.ctx = ( Serializable ) in.readObject();
+        this.ctx = (Serializable) in.readObject();
         this.configuration = (ScheduledJobConfiguration) in.readObject();
     }
-
 
 }

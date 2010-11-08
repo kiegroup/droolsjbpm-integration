@@ -17,17 +17,17 @@ public class ConversationManagerImpl
     implements
     ConversationManager {
 
-    private Connector              conn;
-   
-    private SystemEventListener    systemEventListener;
+    private Connector           conn;
 
-    private String                 senderId;
+    private SystemEventListener systemEventListener;
 
-    private AtomicLong             conversationIdCounter;
+    private String              senderId;
+
+    private AtomicLong          conversationIdCounter;
 
     public ConversationManagerImpl(String senderId,
                                    Connector conn,
-                                   SystemEventListener    systemEventListener) {
+                                   SystemEventListener systemEventListener) {
         this.conn = conn;
         this.senderId = senderId;
         this.conversationIdCounter = new AtomicLong();
@@ -36,7 +36,7 @@ public class ConversationManagerImpl
 
     public Conversation startConversation(InetSocketAddress address,
                                           String recipientId) {
-        RequestResponseDispatchListener dispathListener = new RequestResponseDispatchListener();  
+        RequestResponseDispatchListener dispathListener = new RequestResponseDispatchListener();
         IoWriter writer = this.conn.open( address,
                                           dispathListener,
                                           systemEventListener );
@@ -47,7 +47,7 @@ public class ConversationManagerImpl
                                      writer,
                                      this );
     }
-    
+
     public void endConversation() {
         this.conn.close();
     }

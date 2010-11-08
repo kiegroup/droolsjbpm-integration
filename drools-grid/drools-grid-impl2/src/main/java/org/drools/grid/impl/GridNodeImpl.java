@@ -31,11 +31,14 @@ import org.drools.util.ServiceRegistryImpl;
  *
  * @author salaboy
  */
-public class GridNodeImpl implements GridNode, MessageReceiverHandlerFactoryService {
+public class GridNodeImpl
+    implements
+    GridNode,
+    MessageReceiverHandlerFactoryService {
 
-    private String id;
-    private final Map<String, Object> localContext = new ConcurrentHashMap<String, Object>();
-    private final ServiceRegistry serviceRegistry = ServiceRegistryImpl.getInstance();
+    private String                    id;
+    private final Map<String, Object> localContext    = new ConcurrentHashMap<String, Object>();
+    private final ServiceRegistry     serviceRegistry = ServiceRegistryImpl.getInstance();
 
     public GridNodeImpl() {
         this.id = UUID.randomUUID().toString();
@@ -48,28 +51,31 @@ public class GridNodeImpl implements GridNode, MessageReceiverHandlerFactoryServ
     /* (non-Javadoc)
      * @see org.drools.grid.GridNode#get(java.lang.String, java.lang.Class)
      */
-    public <T> T get(String identifier, Class<T> cls) {
-        T service = (T) localContext.get(identifier);
+    public <T> T get(String identifier,
+                     Class<T> cls) {
+        T service = (T) localContext.get( identifier );
         if ( service == null ) {
             service = this.serviceRegistry.get( cls );
         }
-        
-        
+
         return service;
     }
-    
+
     /* (non-Javadoc)
      * @see org.drools.grid.GridNode#get(java.lang.Class)
      */
     public <T> T get(Class<T> serviceClass) {
-        return get( serviceClass.getName(), serviceClass );
+        return get( serviceClass.getName(),
+                    serviceClass );
     }
 
     /* (non-Javadoc)
      * @see org.drools.grid.GridNode#set(java.lang.String, java.lang.Object)
      */
-    public void set(String identifier, Object object) {
-        this.localContext.put( identifier, object );
+    public void set(String identifier,
+                    Object object) {
+        this.localContext.put( identifier,
+                               object );
     }
 
     /* (non-Javadoc)
@@ -86,11 +92,12 @@ public class GridNodeImpl implements GridNode, MessageReceiverHandlerFactoryServ
     public void dispose() {
     }
 
-    public void init(Object context) {       
+    public void init(Object context) {
     }
 
     public MessageReceiverHandler getMessageReceiverHandler() {
-        return new GridNodeServer(this, new NodeData());
+        return new GridNodeServer( this,
+                                   new NodeData() );
     }
-    
+
 }

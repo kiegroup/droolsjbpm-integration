@@ -29,13 +29,13 @@ import org.drools.grid.remote.RemoteGridConnection;
 public class NodeConnectionFactory {
 
     public static GridNodeConnection newGridNodeConnection(GridServiceDescription gsd) {
-        if(gsd.getAddresses().get("local") != null){
-            return new LocalGridConnection(gsd.getId());
+        if ( gsd.getAddresses().get( "local" ) != null ) {
+            return new LocalGridConnection( gsd.getId() );
         }
-        if(gsd.getAddresses().get("socket") != null){
-            return new RemoteGridConnection(gsd);
+        if ( gsd.getAddresses().get( "socket" ) != null ) {
+            return new RemoteGridConnection( gsd );
         }
         return null;
     }
-    
+
 }

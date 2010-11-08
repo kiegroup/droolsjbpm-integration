@@ -30,7 +30,6 @@ import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.time.SchedulerService;
 
-
 public class WhitePagesTest extends TestCase {
 
     public void test1() throws Exception {
@@ -52,16 +51,14 @@ public class WhitePagesTest extends TestCase {
 
         GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
         conf.addConfiguration( wplConf );
-        
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(5012);
+
+        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration( 5012 );
         conf.addConfiguration( wpsc );
-        
+
         GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
-        conf.addConfiguration(registerwpincore);
+        conf.addConfiguration( registerwpincore );
 
         conf.configure( grid1 );
-        
-        
 
         GridImpl grid2 = new GridImpl( new ConcurrentHashMap<String, Object>() );
         conf = new GridPeerConfiguration();
@@ -82,9 +79,8 @@ public class WhitePagesTest extends TestCase {
         conf.configure( grid2 );
 
         WhitePages wpClient = grid2.get( WhitePages.class );
-        
 
-        GridServiceDescription test1Gsd  = wpClient.create( "test:string@domain1" );
+        GridServiceDescription test1Gsd = wpClient.create( "test:string@domain1" );
 
         GridServiceDescription testGsd_2 = wpClient.lookup( "test:string@domain1" );
         assertEquals( test1Gsd,
@@ -98,12 +94,12 @@ public class WhitePagesTest extends TestCase {
         assertEquals( test1Gsd,
                       testGsd_3 );
         assertNotSame( test1Gsd,
-                      testGsd_3 );
+                       testGsd_3 );
         conn.close();
-        grid1.get(MultiplexSocketService.class).close();
+        grid1.get( MultiplexSocketService.class ).close();
     }
-    
-    public void testWhitePagesLookupServices(){
+
+    public void testWhitePagesLookupServices() {
         Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
 
         SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
@@ -114,34 +110,26 @@ public class WhitePagesTest extends TestCase {
 
         GridPeerServiceConfiguration coreSeviceConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
-        
+
         GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
         conf.addConfiguration( wplConf );
-        
+
         //Create a Local Scheduler
-        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration("myLocalSched1");
-        conf.addConfiguration(schlConf);
-        
+        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched1" );
+        conf.addConfiguration( schlConf );
+
         //Create a Local Scheduler
-        GridPeerServiceConfiguration schlConf2 = new SchedulerLocalConfiguration("myLocalSched2");
-        conf.addConfiguration(schlConf2);
-    
+        GridPeerServiceConfiguration schlConf2 = new SchedulerLocalConfiguration( "myLocalSched2" );
+        conf.addConfiguration( schlConf2 );
+
         conf.configure( grid1 );
-        
-        
-        WhitePages wplocal= grid1.get(WhitePages.class);
-        Assert.assertNotNull(wplocal);
-        GridServiceDescription schedulersgsd = wplocal.lookup("scheduler:"+"myLocalSched1"+SchedulerService.class.getName());
-    
-        Assert.assertNotNull(schedulersgsd);
-  
-        
-        
-        
-        
-        
+
+        WhitePages wplocal = grid1.get( WhitePages.class );
+        Assert.assertNotNull( wplocal );
+        GridServiceDescription schedulersgsd = wplocal.lookup( "scheduler:" + "myLocalSched1" + SchedulerService.class.getName() );
+
+        Assert.assertNotNull( schedulersgsd );
+
     }
-    
-    
 
 }

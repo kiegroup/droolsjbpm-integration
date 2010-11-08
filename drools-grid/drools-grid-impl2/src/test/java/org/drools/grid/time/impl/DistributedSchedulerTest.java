@@ -60,12 +60,13 @@ import org.drools.time.SchedulerService;
 
 public class DistributedSchedulerTest extends TestCase {
 
-    private Acceptor acc = new MinaAcceptor();
-    private SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
+    private Acceptor                            acc = new MinaAcceptor();
+    private SystemEventListener                 l   = SystemEventListenerFactory.getSystemEventListener();
     private Map<String, GridServiceDescription> coreServicesMap;
+
     @Override
     public void setUp() {
-        
+
     }
 
     @Override
@@ -75,66 +76,77 @@ public class DistributedSchedulerTest extends TestCase {
 
     public void test1() throws Exception {
 
-
-
         MessageReceiverHandler accHandler = new MessageReceiverHandler() {
 
-            private String id;
+            private String     id;
             private AtomicLong counter = new AtomicLong();
 
             public void messageReceived(Conversation conversation,
-                    Message msgIn) {
-                conversation.respond("echo: " + msgIn.getBody());
+                                        Message msgIn) {
+                conversation.respond( "echo: " + msgIn.getBody() );
             }
         };
 
-        acc.open(new InetSocketAddress("127.0.0.1",
-                5012),
-                accHandler,
-                l);
-
+        acc.open( new InetSocketAddress( "127.0.0.1",
+                                         5012 ),
+                  accHandler,
+                  l );
 
         Connector conn = new MinaConnector();
 
-        ConversationManager cm = new ConversationManagerImpl("s1",
-                conn,
-                l);
+        ConversationManager cm = new ConversationManagerImpl( "s1",
+                                                              conn,
+                                                              l );
 
-        Conversation cv = cm.startConversation(new InetSocketAddress("127.0.0.1",
-                5012),
-                "r1");
+        Conversation cv = cm.startConversation( new InetSocketAddress( "127.0.0.1",
+                                                                       5012 ),
+                                                "r1" );
 
         BlockingMessageResponseHandler blockHandler = new BlockingMessageResponseHandler();
 
-        cv.sendMessage("hello",
-                blockHandler);
+        cv.sendMessage( "hello",
+                        blockHandler );
 
-        Message msg = blockHandler.getMessage(5000);
-        System.out.println(msg.getBody());
+        Message msg = blockHandler.getMessage( 5000 );
+        System.out.println( msg.getBody() );
         conn.close();
         acc.close();
     }
 
     public void testDistributedJobSchedullingLocal() {
-        
-        GridImpl grid = new GridImpl(new ConcurrentHashMap<String, Object>());
-        grid.addService(SchedulerService.class, new SchedulerImpl("myLocalSched",grid));
 
-        SchedulerService scheduler = grid.get(SchedulerService.class);
+        GridImpl grid = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        grid.addService( SchedulerService.class,
+                         new SchedulerImpl( "myLocalSched",
+                                            grid ) );
+
+        SchedulerService scheduler = grid.get( SchedulerService.class );
 
         UuidJobHandle handle = new UuidJobHandle();
-        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
-        ScheduledJob sj2 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
+        ScheduledJob sj1 = new ScheduledJob( handle,
+                                             new MockJob(),
+                                             new MockJobContext( "xxx" ),
+                                             new MockTrigger( new Date( 1000 ) ),
+                                             new ScheduledJobConfiguration( 1 ) );
+        ScheduledJob sj2 = new ScheduledJob( handle,
+                                             new MockJob(),
+                                             new MockJobContext( "xxx" ),
+                                             new MockTrigger( new Date( 1000 ) ),
+                                             new ScheduledJobConfiguration( 1 ) );
 
-        scheduler.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        scheduler.scheduleJob( new MockJob(),
+                               new MockJobContext( "xxx" ),
+                               new MockTrigger( new Date( 1000 ) ) );
         //The Job Will be executed in 1 second
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(DistributedSchedulerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Thread.sleep( 1000 );
+        } catch ( InterruptedException ex ) {
+            Logger.getLogger( DistributedSchedulerTest.class.getName() ).log( Level.SEVERE,
+                                                                              null,
+                                                                              ex );
         }
-        assertEquals(1, MockJob.counter);
-
+        assertEquals( 1,
+                      MockJob.counter );
 
     }
 
@@ -150,142 +162,153 @@ public class DistributedSchedulerTest extends TestCase {
     public void testDistributedJobSchedulingRemote() {
         //Core services Map Definition
         coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-        
 
         //Grid View 
-        GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
         //Configure grid with: 
         //  core whitepages
         //  core scheduler
         //  local whitepages
         //  local scheduler
         //  expose multiplex socket
-        configureGrid1(grid1, 5012);
-        
+        configureGrid1( grid1,
+                        5012 );
 
-        
-
-        
-        GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        GridImpl grid2 = new GridImpl( new ConcurrentHashMap<String, Object>() );
         Connector conn = new MinaConnector();
-        configureGrid2(grid2, conn);
-        
-        
+        configureGrid2( grid2,
+                        conn );
+
         //Create a Job
         UuidJobHandle handle = new UuidJobHandle();
-        ScheduledJob sj1 = new ScheduledJob(handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)), new ScheduledJobConfiguration(1));
+        ScheduledJob sj1 = new ScheduledJob( handle,
+                                             new MockJob(),
+                                             new MockJobContext( "xxx" ),
+                                             new MockTrigger( new Date( 1000 ) ),
+                                             new ScheduledJobConfiguration( 1 ) );
 
         //From grid2 I get the Scheduler (that it's a client)
-        SchedulerService scheduler = grid2.get(SchedulerService.class);
+        SchedulerService scheduler = grid2.get( SchedulerService.class );
 
         //Schedule remotely the Job
-        scheduler.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        scheduler.scheduleJob( new MockJob(),
+                               new MockJobContext( "xxx" ),
+                               new MockTrigger( new Date( 1000 ) ) );
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(DistributedSchedulerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Thread.sleep( 1000 );
+        } catch ( InterruptedException ex ) {
+            Logger.getLogger( DistributedSchedulerTest.class.getName() ).log( Level.SEVERE,
+                                                                              null,
+                                                                              ex );
         }
-        
-        assertEquals(1, MockJob.counter);
-        
+
+        assertEquals( 1,
+                      MockJob.counter );
+
         //Close the peer connection
         conn.close();
-        
+
         //Shutdown the MultiplexSocketService
-        grid1.get(MultiplexSocketService.class).close();
-        
-
-
+        grid1.get( MultiplexSocketService.class ).close();
 
     }
-    
-    public void testMultipleSchedulersTest(){
-          //Core services Map Definition
+
+    public void testMultipleSchedulersTest() {
+        //Core services Map Definition
         coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-        
+
         //Grid View 
-        GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
-        configureGrid1(grid1, 5012);
-        
-        
-        GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
-        configureGrid1(grid2, 5013);
-        
-        
-        
-        GridImpl grid3 = new GridImpl(new ConcurrentHashMap<String, Object>());
+        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        configureGrid1( grid1,
+                        5012 );
+
+        GridImpl grid2 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        configureGrid1( grid2,
+                        5013 );
+
+        GridImpl grid3 = new GridImpl( new ConcurrentHashMap<String, Object>() );
         Connector conn = new MinaConnector();
-        configureGrid3(grid3, conn);
-        
-        CoreServicesWhitePages corewp = grid3.get(CoreServicesWhitePages.class);
-        
-        GridServiceDescription gsd = corewp.lookup(SchedulerService.class);
-                
-        Assert.assertEquals(1, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
-        
-        Assert.assertEquals(2, ((InetSocketAddress[])((SchedulerServiceConfiguration)gsd.getData()).getServices(grid3)).length);
-        
-        Assert.assertEquals(0, MockJob.counter);
-        
+        configureGrid3( grid3,
+                        conn );
+
+        CoreServicesWhitePages corewp = grid3.get( CoreServicesWhitePages.class );
+
+        GridServiceDescription gsd = corewp.lookup( SchedulerService.class );
+
+        Assert.assertEquals( 1,
+                             ((InetSocketAddress[]) gsd.getAddresses().values().iterator().next().getObject()).length );
+
+        Assert.assertEquals( 2,
+                             ((InetSocketAddress[]) ((SchedulerServiceConfiguration) gsd.getData()).getServices( grid3 )).length );
+
+        Assert.assertEquals( 0,
+                             MockJob.counter );
+
         conn.close();
-        grid1.get(MultiplexSocketService.class).close();
-        grid2.get(MultiplexSocketService.class).close();
-        
-        
-    
+        grid1.get( MultiplexSocketService.class ).close();
+        grid2.get( MultiplexSocketService.class ).close();
+
     }
-    
-    public void testGetDataFromCoreServices(){
-    
+
+    public void testGetDataFromCoreServices() {
+
         coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-        
+
         //Grid View 
-        GridImpl grid1 = new GridImpl(new ConcurrentHashMap<String, Object>());
-        configureGrid1(grid1, 5012);
-        
-        GridImpl grid2 = new GridImpl(new ConcurrentHashMap<String, Object>());
-        configureGrid1(grid2, 5013);
-        
-        CoreServicesWhitePages corewp = grid1.get(CoreServicesWhitePages.class);
-        
+        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        configureGrid1( grid1,
+                        5012 );
+
+        GridImpl grid2 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        configureGrid1( grid2,
+                        5013 );
+
+        CoreServicesWhitePages corewp = grid1.get( CoreServicesWhitePages.class );
+
         //Get Scheduler Service
-        GridServiceDescription gsd = corewp.lookup(SchedulerService.class);
-       
-        
-        Assert.assertEquals(1, ((InetSocketAddress[])gsd.getAddresses().values().iterator().next().getObject()).length);
-        
-        Assert.assertEquals(2, ((InetSocketAddress[])((SchedulerServiceConfiguration)gsd.getData()).getServices(grid1)).length);
-        
-        
+        GridServiceDescription gsd = corewp.lookup( SchedulerService.class );
+
+        Assert.assertEquals( 1,
+                             ((InetSocketAddress[]) gsd.getAddresses().values().iterator().next().getObject()).length );
+
+        Assert.assertEquals( 2,
+                             ((InetSocketAddress[]) ((SchedulerServiceConfiguration) gsd.getData()).getServices( grid1 )).length );
+
         Connector conn = new MinaConnector();
 
-        ConversationManager cm = new ConversationManagerImpl("s1",
-                conn,
-                l);
+        ConversationManager cm = new ConversationManagerImpl( "s1",
+                                                              conn,
+                                                              l );
 
+        SchedulerClient schedulerClient = new SchedulerClient( grid1,
+                                                               gsd,
+                                                               cm );
+        ((SchedulerServiceConfiguration) gsd.getData()).setRedundancy( 3 );
 
-        SchedulerClient schedulerClient = new SchedulerClient(grid1,gsd, cm);
-        ((SchedulerServiceConfiguration)gsd.getData()).setRedundancy(3);
-        
-        JobHandle handle = schedulerClient.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
+        JobHandle handle = schedulerClient.scheduleJob( new MockJob(),
+                                                        new MockJobContext( "xxx" ),
+                                                        new MockTrigger( new Date( 1000 ) ) );
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(DistributedSchedulerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Thread.sleep( 1000 );
+        } catch ( InterruptedException ex ) {
+            Logger.getLogger( DistributedSchedulerTest.class.getName() ).log( Level.SEVERE,
+                                                                              null,
+                                                                              ex );
         }
-        
-        assertEquals(3, MockJob.counter);
-        
-        conn.close();
-        grid1.get(MultiplexSocketService.class).close();
-        grid2.get(MultiplexSocketService.class).close();
-    
-    }
-    
-    
-    
 
-    public static class MockJobContext implements JobContext, Serializable {
+        assertEquals( 3,
+                      MockJob.counter );
+
+        conn.close();
+        grid1.get( MultiplexSocketService.class ).close();
+        grid2.get( MultiplexSocketService.class ).close();
+
+    }
+
+    public static class MockJobContext
+        implements
+        JobContext,
+        Serializable {
 
         private String text;
 
@@ -308,7 +331,10 @@ public class DistributedSchedulerTest extends TestCase {
         }
     }
 
-    public static class MockTrigger implements Trigger, Serializable {
+    public static class MockTrigger
+        implements
+        Trigger,
+        Serializable {
 
         private Date date;
 
@@ -326,7 +352,7 @@ public class DistributedSchedulerTest extends TestCase {
 
         public Date nextFireTime() {
             Date tmp = new Date();
-            tmp.setTime(this.date.getTime());
+            tmp.setTime( this.date.getTime() );
             this.date = null;
             return tmp;
         }
@@ -352,8 +378,8 @@ public class DistributedSchedulerTest extends TestCase {
         }
 
         public JobHandle scheduleJob(Job job,
-                JobContext ctx,
-                Trigger trigger) {
+                                     JobContext ctx,
+                                     Trigger trigger) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -366,19 +392,19 @@ public class DistributedSchedulerTest extends TestCase {
     public static class TimerServiceClusterManager {
 
         private String[] ids;
-        private int redundancyCount;
+        private int      redundancyCount;
 
         public void configure(String[] ids,
-                int redundancyCount) {
+                              int redundancyCount) {
             this.ids = ids;
             this.redundancyCount = redundancyCount;
-            if (redundancyCount >= ids.length) {
-                throw new IllegalArgumentException("Redundancy must be less than or equal to to total-1");
+            if ( redundancyCount >= ids.length ) {
+                throw new IllegalArgumentException( "Redundancy must be less than or equal to to total-1" );
             }
         }
 
         private int indexOf(final int hashCode,
-                final int dataSize) {
+                            final int dataSize) {
             return hashCode & (dataSize - 1);
         }
     }
@@ -388,11 +414,11 @@ public class DistributedSchedulerTest extends TestCase {
             TimerService {
 
         public long getCurrentTime() {
-            throw new UnsupportedOperationException("not supported");
+            throw new UnsupportedOperationException( "not supported" );
         }
 
         public long getTimeToNextJob() {
-            throw new UnsupportedOperationException("not supported");
+            throw new UnsupportedOperationException( "not supported" );
         }
 
         public boolean removeJob(JobHandle jobHandle) {
@@ -400,106 +426,105 @@ public class DistributedSchedulerTest extends TestCase {
         }
 
         public JobHandle scheduleJob(Job job,
-                JobContext ctx,
-                Trigger trigger) {
+                                     JobContext ctx,
+                                     Trigger trigger) {
             UuidJobHandle jhandle = new UuidJobHandle();
 
-            ScheduledJob sj = new ScheduledJob(jhandle,
-                    job,
-                    ctx,
-                    trigger);
+            ScheduledJob sj = new ScheduledJob( jhandle,
+                                                job,
+                                                ctx,
+                                                trigger );
             return jhandle;
         }
 
         public void shutdown() {
-            throw new UnsupportedOperationException("not supported");
+            throw new UnsupportedOperationException( "not supported" );
         }
     }
-    
-    private void configureGrid1(Grid grid, int port){
-    
+
+    private void configureGrid1(Grid grid,
+                                int port) {
+
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
         //Configuring the Core Services White Pages
-        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceWPConf);
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        conf.addConfiguration( coreSeviceWPConf );
 
         //Configuring the Core Services Scheduler
         GridPeerServiceConfiguration coreSeviceSchedulerConf = new CoreServicesSchedulerConfiguration();
-        conf.addConfiguration(coreSeviceSchedulerConf);
+        conf.addConfiguration( coreSeviceSchedulerConf );
 
         //Configuring the MultiplexSocketService
-        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration(new MultiplexSocketServerImpl("127.0.0.1",
-                new MinaAcceptorFactoryService(),
-                l));
-        conf.addConfiguration(socketConf);
-        
+        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
+                                                                                                                          new MinaAcceptorFactoryService(),
+                                                                                                                          l ) );
+        conf.addConfiguration( socketConf );
+
         //Configuring the WhitePages 
         GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
-        conf.addConfiguration(wplConf);
-        
+        conf.addConfiguration( wplConf );
+
         //Exposing Local WhitePages
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(port);
-        conf.addConfiguration(wpsc);
+        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration( port );
+        conf.addConfiguration( wpsc );
         GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
-        conf.addConfiguration(registerwpincore);
+        conf.addConfiguration( registerwpincore );
 
         //Create a Local Scheduler
-        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration("myLocalSched");
-        conf.addConfiguration(schlConf);
+        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
+        conf.addConfiguration( schlConf );
 
         //Expose it to the Grid so it can be accesed by different nodes
         // I need to use the same port to reuse the service multiplexer
-        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration(port);
-        conf.addConfiguration(schlsc);
-        
+        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration( port );
+        conf.addConfiguration( schlsc );
+
         GridPeerServiceConfiguration registerschedincore = new RegisterSchedulerConfiguration();
-        conf.addConfiguration(registerschedincore);
+        conf.addConfiguration( registerschedincore );
 
-        conf.configure(grid);
-        
-    
+        conf.configure( grid );
+
     }
-    
-    private void configureGrid2(Grid grid2, Connector conn){
+
+    private void configureGrid2(Grid grid2,
+                                Connector conn) {
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
-        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceWPConf);
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        conf.addConfiguration( coreSeviceWPConf );
 
+        ConversationManager cm = new ConversationManagerImpl( "s1",
+                                                              conn,
+                                                              l );
 
-        ConversationManager cm = new ConversationManagerImpl("s1",
-                conn,
-                l);
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration( cm );
+        conf.addConfiguration( wprConf );
 
-        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration(cm);
-        conf.addConfiguration(wprConf);
+        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration( cm );
+        conf.addConfiguration( schedRemoteClientConf );
 
-        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration( cm);
-        conf.addConfiguration(schedRemoteClientConf);
-
-        conf.configure(grid2);
+        conf.configure( grid2 );
     }
-    
-    
-    private void configureGrid3(Grid grid3, Connector conn){
+
+    private void configureGrid3(Grid grid3,
+                                Connector conn) {
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
-        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceWPConf);
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        conf.addConfiguration( coreSeviceWPConf );
 
+        ConversationManager cm = new ConversationManagerImpl( "s1",
+                                                              conn,
+                                                              l );
 
-        ConversationManager cm = new ConversationManagerImpl("s1",
-                conn,
-                l);
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration( cm );
+        conf.addConfiguration( wprConf );
 
-        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration(cm);
-        conf.addConfiguration(wprConf);
+        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration( cm );
+        conf.addConfiguration( schedRemoteClientConf );
 
-        GridPeerServiceConfiguration schedRemoteClientConf = new SchedulerRemoteConfiguration(cm);
-        conf.addConfiguration(schedRemoteClientConf);
-
-        conf.configure(grid3);
+        conf.configure( grid3 );
     }
 }

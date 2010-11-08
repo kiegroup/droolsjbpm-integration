@@ -33,7 +33,7 @@ import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 public class RemoteWhitePagesTest extends TestCase {
 
     public void test1() {
-        
+
         Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
 
         SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
@@ -53,12 +53,12 @@ public class RemoteWhitePagesTest extends TestCase {
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
         wplConf.setWhitePages( new JpaWhitePages( Persistence.createEntityManagerFactory( "org.drools.grid" ) ) );
         conf.addConfiguration( wplConf );
-        
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(5012);
+
+        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration( 5012 );
         conf.addConfiguration( wpsc );
-        
+
         GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
-        conf.addConfiguration(registerwpincore);
+        conf.addConfiguration( registerwpincore );
 
         conf.configure( grid1 );
 
@@ -106,19 +106,17 @@ public class RemoteWhitePagesTest extends TestCase {
                       gs1.getAddresses().size() );
         assertEquals( "v1",
                       gs1.getAddresses().get( "p1" ).getObject() );
-        
+
         wp.remove( "s1" );
-        
+
         assertNull( wp.lookup( "s1" ) );
 
         GridServiceDescription gs2 = wp.lookup( "s2" );
         assertNotNull( gs2 );
-        
+
         conn.close();
-        
+
         grid1.get( MultiplexSocketService.class ).close();
-        
-        
-        
+
     }
 }

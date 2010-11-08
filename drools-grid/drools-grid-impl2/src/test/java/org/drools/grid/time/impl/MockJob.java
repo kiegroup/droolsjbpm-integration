@@ -24,10 +24,13 @@ import org.drools.time.JobContext;
  *
  * @author salaboy
  */
- public class MockJob implements Job {
-        public static int counter = 0;
-        public void execute(JobContext ctx) {
-            System.out.println("Job Executed!");
-            counter++;
-        }        
+public class MockJob
+    implements
+    Job {
+    public static int counter = 0;
+
+    public void execute(JobContext ctx) {
+        System.out.println( "Job Executed!" );
+        counter++;
     }
+}

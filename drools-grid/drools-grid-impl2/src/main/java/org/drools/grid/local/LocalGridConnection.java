@@ -4,15 +4,17 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.impl.GridNodeImpl;
 
-public class LocalGridConnection implements GridNodeConnection {
+public class LocalGridConnection
+    implements
+    GridNodeConnection {
     private GridNode gridNode;
-    
+
     public LocalGridConnection(GridNode gridNode) {
         this.gridNode = gridNode;
     }
-    
+
     public LocalGridConnection(String id) {
-        gridNode = new GridNodeImpl(id);
+        gridNode = new GridNodeImpl( id );
     }
 
     public void connect() {

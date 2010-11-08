@@ -26,13 +26,14 @@ import java.io.ObjectOutput;
  *
  * @author salaboy
  */
-public class ScheduledJobConfiguration implements Externalizable {
+public class ScheduledJobConfiguration
+    implements
+    Externalizable {
     private int redundancy = 1;
 
     public ScheduledJobConfiguration() {
     }
 
-    
     public ScheduledJobConfiguration(int redundancy) {
         this.redundancy = redundancy;
     }
@@ -44,15 +45,14 @@ public class ScheduledJobConfiguration implements Externalizable {
     public void setRedundancy(int redundancy) {
         this.redundancy = redundancy;
     }
-    
-    
-    
+
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt(redundancy);
+        out.writeInt( redundancy );
     }
 
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException,
+                                            ClassNotFoundException {
         this.redundancy = in.readInt();
     }
-    
+
 }

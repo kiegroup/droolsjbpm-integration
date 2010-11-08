@@ -26,27 +26,28 @@ import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.time.SchedulerService;
 
-
 /**
  *
  * @author salaboy
  */
-public class SchedulerServer implements
-    MessageReceiverHandler{
-    private SchedulerService scheduler = null; 
+public class SchedulerServer
+    implements
+    MessageReceiverHandler {
+    private SchedulerService scheduler = null;
 
     public SchedulerServer(SchedulerService scheduler) {
         this.scheduler = scheduler;
     }
-    
-    public void messageReceived(Conversation conversation, Message msg) {
+
+    public void messageReceived(Conversation conversation,
+                                Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
         this.execs.get( cmd.getName() ).execute( scheduler,
                                                  conversation,
                                                  msg,
                                                  cmd );
     }
-    
+
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
                                         {
                                             put( "Scheduler.scheduleJob",
@@ -57,8 +58,10 @@ public class SchedulerServer implements
                                                                          CommandImpl cmd) {
                                                          SchedulerService scheduler = (SchedulerService) object;
                                                          final List list = cmd.getArguments();
-                                                         scheduler.scheduleJob(((ScheduledJob)list.get(0)).getJob(),((ScheduledJob)list.get(0)).getJobContext(), ((ScheduledJob)list.get(0)).getTrigger());
-                                                         con.respond( ((ScheduledJob)list.get(0)).getJobHandle() );
+                                                         scheduler.scheduleJob( ((ScheduledJob) list.get( 0 )).getJob(),
+                                                                                ((ScheduledJob) list.get( 0 )).getJobContext(),
+                                                                                ((ScheduledJob) list.get( 0 )).getTrigger() );
+                                                         con.respond( ((ScheduledJob) list.get( 0 )).getJobHandle() );
                                                      }
                                                  } );
                                         }
@@ -70,6 +73,5 @@ public class SchedulerServer implements
                      Message msg,
                      CommandImpl cmd);
     }
-
 
 }

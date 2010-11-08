@@ -24,10 +24,12 @@ import org.drools.grid.Grid;
  *
  * @author salaboy
  */
-public class SchedulerServiceConfiguration implements ServiceConfiguration{
-    private int redundancy = 1; //Default 1, 0 all
+public class SchedulerServiceConfiguration
+    implements
+    ServiceConfiguration {
+    private int                 redundancy = 1; //Default 1, 0 all
     private InetSocketAddress[] addresses;
-    
+
     public SchedulerServiceConfiguration(InetSocketAddress[] addresses) {
         this.addresses = addresses;
     }
@@ -36,14 +38,13 @@ public class SchedulerServiceConfiguration implements ServiceConfiguration{
         //get addresses from the grid.. or whatever
         return addresses;
     }
- 
-    public int getRedundancy(){
+
+    public int getRedundancy() {
         return this.redundancy;
     }
-    
-    public void setRedundancy(int redundancy){
+
+    public void setRedundancy(int redundancy) {
         this.redundancy = redundancy;
     }
-    
-    
+
 }

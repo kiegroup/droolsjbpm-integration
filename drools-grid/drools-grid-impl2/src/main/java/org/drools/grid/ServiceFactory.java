@@ -27,28 +27,45 @@ import java.util.logging.Logger;
  * @author salaboy
  */
 public class ServiceFactory {
-    public static <T> T newServiceInstance(Class<T> serviceClass, GridServiceDescription gsd) {
+    public static <T> T newServiceInstance(Class<T> serviceClass,
+                                           GridServiceDescription gsd) {
         T t = null;
         try {
-            Class clazz =  Class.forName(gsd.getImplementedClass().getCanonicalName());
-            Constructor constructor = clazz.getConstructor(String.class, GridServiceDescription.class);
-            t = (T)constructor.newInstance("thisID", gsd);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ServiceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            Class clazz = Class.forName( gsd.getImplementedClass().getCanonicalName() );
+            Constructor constructor = clazz.getConstructor( String.class,
+                                                            GridServiceDescription.class );
+            t = (T) constructor.newInstance( "thisID",
+                                             gsd );
+        } catch ( InstantiationException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
+        } catch ( IllegalAccessException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
+        } catch ( IllegalArgumentException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
+        } catch ( InvocationTargetException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
+        } catch ( NoSuchMethodException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
+        } catch ( SecurityException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
+        } catch ( ClassNotFoundException ex ) {
+            Logger.getLogger( ServiceFactory.class.getName() ).log( Level.SEVERE,
+                                                                    null,
+                                                                    ex );
         }
         return t;
-    
+
     }
 }

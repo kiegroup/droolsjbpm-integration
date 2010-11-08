@@ -13,8 +13,8 @@ public interface MultiplexSocketService {
                        String id);
 
     String getIp();
-    
+
     Set<Integer> getPorts();
-    
+
     void close();
 }

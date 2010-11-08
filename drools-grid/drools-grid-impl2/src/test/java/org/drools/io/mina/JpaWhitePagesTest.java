@@ -39,11 +39,11 @@ public class JpaWhitePagesTest extends TestCase {
                       gs1.getAddresses().size() );
         assertEquals( "v1",
                       gs1.getAddresses().get( "p1" ).getObject() );
-        
+
         wp.remove( "s1" );
-        
+
         assertNull( wp.lookup( "s1" ) );
-        
+
         GridServiceDescription gs2 = wp.lookup( "s2" );
         assertNotNull( gs2 );
 

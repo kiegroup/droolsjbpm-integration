@@ -21,11 +21,12 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 
-public class LocalGridNodeTest extends TestCase { 
-    
-    public void test(){
-    
+public class LocalGridNodeTest extends TestCase {
+
+    public void test() {
+
     }
+
     public void testConnectWithId() {
         GridNodeConnection connection = new LocalGridConnection( "test-id" );
         GridNode gnode = connection.getGridNode();
@@ -60,18 +61,18 @@ public class LocalGridNodeTest extends TestCase {
     }
 
     public void testNodeCreationAndWhitePagesRegistration() {
-        Grid grid = new GridImpl(new HashMap<String,Object>());
-        
+        Grid grid = new GridImpl( new HashMap<String, Object>() );
+
         GridPeerConfiguration conf = new GridPeerConfiguration();
-        
+
         //Configuring the WhitePages 
         GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
-        conf.addConfiguration(wplConf);
-        
-        conf.configure(grid);
-        
-        GridServiceDescription gsd = new GridServiceDescriptionImpl("test1@local");
-        gsd.addAddress("local");
+        conf.addConfiguration( wplConf );
+
+        conf.configure( grid );
+
+        GridServiceDescription gsd = new GridServiceDescriptionImpl( "test1@local" );
+        gsd.addAddress( "local" );
         GridNode gnode = grid.createGridNode( gsd );
 
         WhitePages pages = grid.get( WhitePages.class );
@@ -83,36 +84,36 @@ public class LocalGridNodeTest extends TestCase {
                     connection.getGridNode() );
     }
 
-//    public void testWhitePagesAddRemoveAddresss() {
-//        Grid grid = new GridImpl(new HashMap<String,Object>());
-//
-//        GridNode gnode = grid.createGridNode( "test1@domain.com" );
-//        assertNotNull( gnode );
-//
-//        WhitePages pages = grid.get( WhitePages.class );
-//        GridServiceDescription serviceDescription = pages.lookup( "test1@domain.com" );
-//
-//        assertEquals( 0,
-//                      serviceDescription.getAddresses().size() );
-//
-//        Address address = new AddressImpl( "test1@domain.com",
-//                                           "socket",
-//                                           new InetSocketAddress( getLocalAddress(),
-//                                                                  9201 ) );
-//        pages.addAddress( "test1@domain.com",
-//                          address );
-//
-//        assertEquals( 1,
-//                      serviceDescription.getAddresses().size() );
-//        assertSame( address,
-//                    serviceDescription.getAddresses().get( "socket" ) );
-//
-//        pages.removeAddress( "test1@domain.com",
-//                             address );
-//        assertEquals( 0,
-//                      serviceDescription.getAddresses().size() );
-//
-//    }
+    //    public void testWhitePagesAddRemoveAddresss() {
+    //        Grid grid = new GridImpl(new HashMap<String,Object>());
+    //
+    //        GridNode gnode = grid.createGridNode( "test1@domain.com" );
+    //        assertNotNull( gnode );
+    //
+    //        WhitePages pages = grid.get( WhitePages.class );
+    //        GridServiceDescription serviceDescription = pages.lookup( "test1@domain.com" );
+    //
+    //        assertEquals( 0,
+    //                      serviceDescription.getAddresses().size() );
+    //
+    //        Address address = new AddressImpl( "test1@domain.com",
+    //                                           "socket",
+    //                                           new InetSocketAddress( getLocalAddress(),
+    //                                                                  9201 ) );
+    //        pages.addAddress( "test1@domain.com",
+    //                          address );
+    //
+    //        assertEquals( 1,
+    //                      serviceDescription.getAddresses().size() );
+    //        assertSame( address,
+    //                    serviceDescription.getAddresses().get( "socket" ) );
+    //
+    //        pages.removeAddress( "test1@domain.com",
+    //                             address );
+    //        assertEquals( 0,
+    //                      serviceDescription.getAddresses().size() );
+    //
+    //    }
 
     private InetAddress getLocalAddress() {
         try {

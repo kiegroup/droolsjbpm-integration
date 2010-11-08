@@ -40,98 +40,103 @@ import org.drools.grid.io.impl.CommandImpl;
  *
  * @author salaboy
  */
-public class KnowledgeBuilderProviderRemoteClient implements KnowledgeBuilderFactoryService {
+public class KnowledgeBuilderProviderRemoteClient
+    implements
+    KnowledgeBuilderFactoryService {
 
-    private ConversationManager cm;
+    private ConversationManager    cm;
     private GridServiceDescription gsd;
 
-    public KnowledgeBuilderProviderRemoteClient(ConversationManager cm, GridServiceDescription gsd) {
+    public KnowledgeBuilderProviderRemoteClient(ConversationManager cm,
+                                                GridServiceDescription gsd) {
         this.cm = cm;
         this.gsd = gsd;
     }
-    
-    
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties, ClassLoader... classLoader) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties,
+                                                                          ClassLoader... classLoader) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public DecisionTableConfiguration newDecisionTableConfiguration() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder() {
 
         String localId = UUID.randomUUID().toString();
-        
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{new SetVariableCommand( "__TEMP__",
-                                                           localId,
-                                                           new NewKnowledgeBuilderCommand( null ) )}));
-        
-        sendMessage(this.cm,
-                (InetSocketAddress[]) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getServiceInterface().getName(),
-                cmd);
-        
-        return new KnowledgeBuilderRemoteClient( localId,this.gsd, this.cm );
+
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
+                                                                                                localId,
+                                                                                                new NewKnowledgeBuilderCommand( null ) ) } ) );
+
+        sendMessage( this.cm,
+                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getServiceInterface().getName(),
+                     cmd );
+
+        return new KnowledgeBuilderRemoteClient( localId,
+                                                 this.gsd,
+                                                 this.cm );
 
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase, KnowledgeBuilderConfiguration conf) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase,
+                                                KnowledgeBuilderConfiguration conf) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public JaxbConfiguration newJaxbConfiguration(Options xjcOpts, String systemId) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,
+                                                  String systemId) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public static Object sendMessage(ConversationManager conversationManager,
-            Serializable addr,
-            String id,
-            Object body) {
+                                     Serializable addr,
+                                     String id,
+                                     Object body) {
 
         InetSocketAddress[] sockets = null;
-        if (addr instanceof InetSocketAddress[]) {
+        if ( addr instanceof InetSocketAddress[] ) {
             sockets = (InetSocketAddress[]) addr;
-        } else if (addr instanceof InetSocketAddress) {
-            sockets = new InetSocketAddress[1];
+        } else if ( addr instanceof InetSocketAddress ) {
+            sockets = new InetSocketAddress[ 1 ];
             sockets[0] = (InetSocketAddress) addr;
         }
 
-
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
-        for (InetSocketAddress socket : sockets) {
+        for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation(socket,
-                        id);
-                conv.sendMessage(body,
-                        handler);
+                Conversation conv = conversationManager.startConversation( socket,
+                                                                           id );
+                conv.sendMessage( body,
+                                  handler );
                 exception = null;
-            } catch (Exception e) {
+            } catch ( Exception e ) {
                 exception = e;
                 conversationManager.endConversation();
             }
-            if (exception == null) {
+            if ( exception == null ) {
                 break;
             }
         }
-        if (exception != null) {
-            throw new RuntimeException("Unable to send message",
-                    exception);
+        if ( exception != null ) {
+            throw new RuntimeException( "Unable to send message",
+                                        exception );
         }
         try {
             return handler.getMessage().getBody();

@@ -14,9 +14,10 @@ import org.drools.grid.service.directory.Address;
 
 public class GridServiceDescriptionJpa
     implements
-    GridServiceDescription, Serializable {
+    GridServiceDescription,
+    Serializable {
     private GridServiceDescription detached;
-    
+
     private EntityManagerFactory   emf;
 
     public GridServiceDescriptionJpa(GridServiceDescription detached,
@@ -29,7 +30,8 @@ public class GridServiceDescriptionJpa
         EntityManager em = this.emf.createEntityManager();
         Map<String, Address> addresses = new HashMap<String, Address>();
         for ( Address address : this.detached.getAddresses().values() ) {
-            addresses.put( address.getTransport(), new AddressJpa( address,
+            addresses.put( address.getTransport(),
+                           new AddressJpa( address,
                                                                    this.emf ) );
         }
         em.close();
@@ -39,18 +41,21 @@ public class GridServiceDescriptionJpa
     public Address addAddress(String transport) {
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
-        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
+        this.detached = em.find( GridServiceDescriptionImpl.class,
+                                 this.detached.getId() );
         Address address = this.detached.addAddress( transport );
         em.getTransaction().commit();
         em.close();
-        return new AddressJpa( address, this.emf );
+        return new AddressJpa( address,
+                               this.emf );
     }
 
     public void removeAddress(String transport) {
         EntityManager em = this.emf.createEntityManager();
 
-        em.getTransaction().begin();        
-        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );        
+        em.getTransaction().begin();
+        this.detached = em.find( GridServiceDescriptionImpl.class,
+                                 this.detached.getId() );
         Address address = this.detached.getAddresses().get( transport );
         this.detached.removeAddress( transport );
         em.remove( address ); //because jpa does not automatically remove orphans
@@ -69,7 +74,8 @@ public class GridServiceDescriptionJpa
     public void setImplementedClass(Class cls) {
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
-        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
+        this.detached = em.find( GridServiceDescriptionImpl.class,
+                                 this.detached.getId() );
         this.detached.setImplementedClass( cls );
         em.getTransaction().commit();
         em.close();
@@ -79,22 +85,22 @@ public class GridServiceDescriptionJpa
         return this.detached;
     }
 
-     public Serializable getData() {
+    public Serializable getData() {
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
-        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
+        this.detached = em.find( GridServiceDescriptionImpl.class,
+                                 this.detached.getId() );
         Serializable data = this.detached.getData();
         em.getTransaction().commit();
         em.close();
         return data;
     }
 
-    
-   @Override
+    @Override
     public boolean equals(Object obj) {
         //@TODO: improve equals comparision
         final GridServiceDescription other = (GridServiceDescription) obj;
-        if (!this.getId().equals(other.getId() )) {
+        if ( !this.getId().equals( other.getId() ) ) {
             return false;
         }
         return true;
@@ -110,21 +116,19 @@ public class GridServiceDescriptionJpa
     public void setData(Serializable data) {
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
-        this.detached = em.find( GridServiceDescriptionImpl.class, this.detached.getId() );
-        this.detached.setData(data);
+        this.detached = em.find( GridServiceDescriptionImpl.class,
+                                 this.detached.getId() );
+        this.detached.setData( data );
         em.getTransaction().commit();
         em.close();
     }
 
     public Class getServiceInterface() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public void setServiceInterface(Class cls) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-   
-  
-     
 }

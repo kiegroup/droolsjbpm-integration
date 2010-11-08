@@ -14,10 +14,10 @@ public class SchedulerLocalConfiguration
     GridPeerServiceConfiguration {
 
     private SchedulerService scheduler;
-    private String id;
+    private String           id;
 
     public SchedulerLocalConfiguration(String id) {
-        this.id =  id;
+        this.id = id;
     }
 
     public void setScheduler(SchedulerService scheduler) {
@@ -25,11 +25,12 @@ public class SchedulerLocalConfiguration
     }
 
     public void configureService(Grid grid) {
-        WhitePages wp = grid.get(WhitePages.class);
-        SchedulerService sched = (this.scheduler != null) ? this.scheduler : new SchedulerImpl(this.id, grid);
+        WhitePages wp = grid.get( WhitePages.class );
+        SchedulerService sched = (this.scheduler != null) ? this.scheduler : new SchedulerImpl( this.id,
+                                                                                                grid );
         ((GridImpl) grid).addService( SchedulerService.class,
                                       sched );
-        wp.create("scheduler:"+this.id+SchedulerService.class.getName());
+        wp.create( "scheduler:" + this.id + SchedulerService.class.getName() );
 
     }
 

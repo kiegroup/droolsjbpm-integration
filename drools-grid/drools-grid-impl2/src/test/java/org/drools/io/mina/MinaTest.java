@@ -38,7 +38,7 @@ public class MinaTest extends TestCase {
 
             public void messageReceived(Conversation conversation,
                                         Message msgIn) {
-                conversation.respond(  "echo: " + msgIn.getBody() );
+                conversation.respond( "echo: " + msgIn.getBody() );
             }
 
         };
@@ -53,25 +53,26 @@ public class MinaTest extends TestCase {
 
         ConversationManager cm = new ConversationManagerImpl( "s1",
                                                               conn,
-                                                              l);
+                                                              l );
 
         Conversation cv = cm.startConversation( new InetSocketAddress( "127.0.0.1",
                                                                        5012 ),
                                                                        "r1" );
-        
+
         BlockingMessageResponseHandler blockHandler = new BlockingMessageResponseHandler();
 
         cv.sendMessage( "hello",
                         blockHandler );
-        
+
         Message msg = blockHandler.getMessage( 5000 );
         System.out.println( msg.getBody() );
-        
+
         conn.close();
-        if(acc.isOpen()){
+        if ( acc.isOpen() ) {
             acc.close();
         }
-        assertEquals(false, acc.isOpen());
+        assertEquals( false,
+                      acc.isOpen() );
     }
 
 }

@@ -33,18 +33,22 @@ import org.drools.time.impl.JDKTimerService;
  *
  * @author salaboy
  */
-public class SchedulerImpl implements SchedulerService, MessageReceiverHandlerFactoryService{
-    private TimerService timer =  new JDKTimerService();
-    private String id;
-    private Grid grid; 
-    
-    public SchedulerImpl(String id, Grid grid){
+public class SchedulerImpl
+    implements
+    SchedulerService,
+    MessageReceiverHandlerFactoryService {
+    private TimerService timer = new JDKTimerService();
+    private String       id;
+    private Grid         grid;
+
+    public SchedulerImpl(String id,
+                         Grid grid) {
         this.id = id;
         this.grid = grid;
     }
-    
+
     public MessageReceiverHandler getMessageReceiverHandler() {
-        return new SchedulerServer(this);
+        return new SchedulerServer( this );
     }
 
     public String getId() {
@@ -55,18 +59,16 @@ public class SchedulerImpl implements SchedulerService, MessageReceiverHandlerFa
         return grid;
     }
 
-    public JobHandle scheduleJob(Job job, JobContext ctx, Trigger trigger) {
-        return timer.scheduleJob(job, ctx, trigger);
+    public JobHandle scheduleJob(Job job,
+                                 JobContext ctx,
+                                 Trigger trigger) {
+        return timer.scheduleJob( job,
+                                  ctx,
+                                  trigger );
     }
 
     public boolean removeJob(JobHandle jobHandle) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
-    
-    
-   
-    
-    
-    
-    
+
 }

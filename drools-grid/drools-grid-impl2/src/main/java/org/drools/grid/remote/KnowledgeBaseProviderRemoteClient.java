@@ -39,101 +39,105 @@ import org.drools.runtime.KnowledgeSessionConfiguration;
  *
  * @author salaboy
  */
-public class KnowledgeBaseProviderRemoteClient implements KnowledgeBaseFactoryService {
+public class KnowledgeBaseProviderRemoteClient
+    implements
+    KnowledgeBaseFactoryService {
 
-    private ConversationManager cm;
+    private ConversationManager    cm;
     private GridServiceDescription gsd;
-    public KnowledgeBaseProviderRemoteClient(ConversationManager cm, GridServiceDescription gsd) {
+
+    public KnowledgeBaseProviderRemoteClient(ConversationManager cm,
+                                             GridServiceDescription gsd) {
         this.cm = cm;
         this.gsd = gsd;
     }
 
-    
-    
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties, ClassLoader... classLoader) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
+                                                                    ClassLoader... classLoader) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeSessionConfiguration newKnowledgeSessionConfiguration() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeSessionConfiguration newKnowledgeSessionConfiguration(Properties properties) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeBase newKnowledgeBase() {
         String localId = UUID.randomUUID().toString();
-        
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{new SetVariableCommand( "__TEMP__",
-                                                           localId,
-                                                           new NewKnowledgeBaseCommand( null ) )}));
-        
-        sendMessage(this.cm,
-                (InetSocketAddress[]) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getServiceInterface().getName(),
-                cmd);
-        
-        return new KnowledgeBaseRemoteClient( localId, this.gsd, this.cm );  
-        
- 
+
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
+                                                                                                localId,
+                                                                                                new NewKnowledgeBaseCommand( null ) ) } ) );
+
+        sendMessage( this.cm,
+                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getServiceInterface().getName(),
+                     cmd );
+
+        return new KnowledgeBaseRemoteClient( localId,
+                                              this.gsd,
+                                              this.cm );
+
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeBase newKnowledgeBase(String kbaseId, KnowledgeBaseConfiguration conf) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public KnowledgeBase newKnowledgeBase(String kbaseId,
+                                          KnowledgeBaseConfiguration conf) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Environment newEnvironment() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public static Object sendMessage(ConversationManager conversationManager,
-            Serializable addr,
-            String id,
-            Object body) {
+                                     Serializable addr,
+                                     String id,
+                                     Object body) {
 
         InetSocketAddress[] sockets = null;
-        if (addr instanceof InetSocketAddress[]) {
+        if ( addr instanceof InetSocketAddress[] ) {
             sockets = (InetSocketAddress[]) addr;
-        } else if (addr instanceof InetSocketAddress) {
-            sockets = new InetSocketAddress[1];
+        } else if ( addr instanceof InetSocketAddress ) {
+            sockets = new InetSocketAddress[ 1 ];
             sockets[0] = (InetSocketAddress) addr;
         }
 
-
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
-        for (InetSocketAddress socket : sockets) {
+        for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation(socket,
-                        id);
-                conv.sendMessage(body,
-                        handler);
+                Conversation conv = conversationManager.startConversation( socket,
+                                                                           id );
+                conv.sendMessage( body,
+                                  handler );
                 exception = null;
-            } catch (Exception e) {
+            } catch ( Exception e ) {
                 exception = e;
                 conversationManager.endConversation();
             }
-            if (exception == null) {
+            if ( exception == null ) {
                 break;
             }
         }
-        if (exception != null) {
-            throw new RuntimeException("Unable to send message",
-                    exception);
+        if ( exception != null ) {
+            throw new RuntimeException( "Unable to send message",
+                                        exception );
         }
         try {
             return handler.getMessage().getBody();

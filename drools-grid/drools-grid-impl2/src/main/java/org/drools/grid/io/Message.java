@@ -9,7 +9,7 @@ public interface Message {
     public String getRecipientId();
 
     public int getRequestId();
-    
+
     public int getResponseId();
 
     public Object getBody();

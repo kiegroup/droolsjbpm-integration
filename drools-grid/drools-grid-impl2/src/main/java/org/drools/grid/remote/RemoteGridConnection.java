@@ -21,24 +21,25 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 
-
 /**
  *
  * @author salaboy
  */
-public class RemoteGridConnection implements GridNodeConnection {
+public class RemoteGridConnection
+    implements
+    GridNodeConnection {
     private GridNode gridNode;
-    
+
     public RemoteGridConnection(GridServiceDescription gsd) {
-        this.gridNode = new GridNodeRemoteClient(gsd);
+        this.gridNode = new GridNodeRemoteClient( gsd );
     }
 
     public void connect() {
-        
+
     }
 
     public void disconnect() {
-        
+
     }
 
     public GridNode getGridNode() {

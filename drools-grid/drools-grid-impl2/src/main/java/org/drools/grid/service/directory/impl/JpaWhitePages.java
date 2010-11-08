@@ -1,6 +1,5 @@
 package org.drools.grid.service.directory.impl;
 
-
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,20 +27,23 @@ public class JpaWhitePages
         em.persist( gsd );
         em.getTransaction().commit();
         em.close();
-        return new GridServiceDescriptionJpa( gsd, emf );
+        return new GridServiceDescriptionJpa( gsd,
+                                              emf );
     }
 
     public GridServiceDescription lookup(String serviceDescriptionId) {
         GridServiceDescription gsd = this.emf.createEntityManager().find( GridServiceDescriptionImpl.class,
                                                                           serviceDescriptionId );
-        return ( gsd == null ) ? null : new GridServiceDescriptionJpa( gsd, emf );
+        return (gsd == null) ? null : new GridServiceDescriptionJpa( gsd,
+                                                                     emf );
     }
 
     public void remove(String serviceDescriptionId) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        GridServiceDescription gsd = em.find( GridServiceDescriptionImpl.class, serviceDescriptionId );
-        for ( Address address :gsd.getAddresses().values() ) { // because JPA won't cascade delete to orphans
+        GridServiceDescription gsd = em.find( GridServiceDescriptionImpl.class,
+                                              serviceDescriptionId );
+        for ( Address address : gsd.getAddresses().values() ) { // because JPA won't cascade delete to orphans
             em.remove( address );
         }
         em.remove( gsd );
@@ -54,7 +56,7 @@ public class JpaWhitePages
     }
 
     public List<GridServiceDescription> lookupServices(Class clazz) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     //    public GridServiceDescription create(GridServiceDescription serviceDescription) {

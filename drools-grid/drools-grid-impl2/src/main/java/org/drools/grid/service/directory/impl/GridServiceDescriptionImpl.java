@@ -14,47 +14,47 @@ public class GridServiceDescriptionImpl
     implements
     GridServiceDescription,
     Serializable {
-	
+
     private String               id;
 
     private Class                implementedClass;
-    
+
     private Class                serviceInterface;
-    
+
     private Map<String, Address> addresses = new HashMap<String, Address>();
-    
-    private Serializable               data;
-    
+
+    private Serializable         data;
+
     public GridServiceDescriptionImpl() {
-    	
+
     }
 
     public GridServiceDescriptionImpl(Class cls) {
         this( cls.getCanonicalName() );
         this.implementedClass = cls;
     }
-    
+
     public GridServiceDescriptionImpl(String id) {
-        
+
         this.id = id;
     }
 
     public String getId() {
         return id;
     }
-    
+
     public void setId(String id) {
-    	this.id = id;
+        this.id = id;
     }
 
-    public Class getServiceInterface(){
+    public Class getServiceInterface() {
         return this.serviceInterface;
     }
-    
-    public void setServiceInterface(Class serviceInterface){
+
+    public void setServiceInterface(Class serviceInterface) {
         this.serviceInterface = serviceInterface;
     }
-    
+
     public Class getImplementedClass() {
         return implementedClass;
     }
@@ -64,7 +64,9 @@ public class GridServiceDescriptionImpl
     }
 
     public synchronized Address addAddress(String protocol) {
-        AddressImpl address = new AddressImpl( this, protocol, null );
+        AddressImpl address = new AddressImpl( this,
+                                               protocol,
+                                               null );
         this.addresses.put( address.getTransport(),
                             address );
         return address;
@@ -77,7 +79,6 @@ public class GridServiceDescriptionImpl
     public synchronized void removeAddress(String transport) {
         this.addresses.remove( transport );
     }
-   
 
     @Override
     public int hashCode() {
@@ -93,22 +94,21 @@ public class GridServiceDescriptionImpl
     public boolean equals(Object obj) {
         //@TODO: improve equals comparision
         final GridServiceDescription other = (GridServiceDescription) obj;
-        if (!this.getId().equals(other.getId() )) {
+        if ( !this.getId().equals( other.getId() ) ) {
             return false;
         }
         return true;
     }
 
-
     @Override
     public String toString() {
-        String result =  id + "@";
-        
+        String result = id + "@";
+
         Set<String> keys = addresses.keySet();
-        for(String key : keys){
-            if(addresses.get(key).getObject() instanceof InetSocketAddress[] ){
-                result += key+"=["+((InetSocketAddress[])addresses.get(key).getObject())[0].getHostName()+":"+
-                        ((InetSocketAddress[])addresses.get(key).getObject())[0].getPort()+"]/"+addresses.get(key).getTransport();
+        for ( String key : keys ) {
+            if ( addresses.get( key ).getObject() instanceof InetSocketAddress[] ) {
+                result += key + "=[" + ((InetSocketAddress[]) addresses.get( key ).getObject())[0].getHostName() + ":" +
+                          ((InetSocketAddress[]) addresses.get( key ).getObject())[0].getPort() + "]/" + addresses.get( key ).getTransport();
             }
         }
         return result;
@@ -121,7 +121,5 @@ public class GridServiceDescriptionImpl
     public void setData(Serializable data) {
         this.data = data;
     }
-    
-    
 
 }

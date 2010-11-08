@@ -23,12 +23,12 @@ import org.drools.grid.io.MessageReceiverHandler;
 public class MinaConnector
     implements
     Connector {
-    
-    protected MinaIoWriter        writer;
 
-    protected SocketConnector     connector;
+    protected MinaIoWriter    writer;
 
-    public MinaConnector() {        
+    protected SocketConnector connector;
+
+    public MinaConnector() {
     }
 
     /**
@@ -60,23 +60,23 @@ public class MinaConnector
                                                      new ProtocolCodecFilter(
                                                                               new ObjectSerializationCodecFactory() ) );
         }
-        
-//        this.handler = new MessageHandler() {
-//            private Map<Integer, MessageResponseHandler> map = new HashMap<Integer, MessageResponseHandler>();
-//            
-//            public void messageReceived(IoWriter session,
-//                                        Message msg) throws Exception {
-//                MessageResponseHandler responseHandler = map.remove( msg.getRequestId() );
-//                if ( responseHandler != null ) {
-//                    responseHandler.receive( msg );
-//                }
-//            }
-//            
-//            public void addResponseHandler(int id,
-//                                           MessageResponseHandler responseHandler) {
-//                map.put( id, responseHandler );
-//            }
-//        };        
+
+        //        this.handler = new MessageHandler() {
+        //            private Map<Integer, MessageResponseHandler> map = new HashMap<Integer, MessageResponseHandler>();
+        //            
+        //            public void messageReceived(IoWriter session,
+        //                                        Message msg) throws Exception {
+        //                MessageResponseHandler responseHandler = map.remove( msg.getRequestId() );
+        //                if ( responseHandler != null ) {
+        //                    responseHandler.receive( msg );
+        //                }
+        //            }
+        //            
+        //            public void addResponseHandler(int id,
+        //                                           MessageResponseHandler responseHandler) {
+        //                map.put( id, responseHandler );
+        //            }
+        //        };        
 
         this.connector.setHandler( new MinaIoHandler( systemEventListener,
                                                       handler ) );

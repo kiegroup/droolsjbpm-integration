@@ -62,7 +62,7 @@ import org.junit.Test;
  */
 public class RegisterServicesTest {
 
-    private SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
+    private SystemEventListener                 l = SystemEventListenerFactory.getSystemEventListener();
     private Map<String, GridServiceDescription> coreServicesMap;
 
     public RegisterServicesTest() {
@@ -86,100 +86,101 @@ public class RegisterServicesTest {
 
     @Test
     public void testRegisterInCoreServices() {
-        
+
         coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-        
-        GridImpl grid = new GridImpl(new HashMap<String, Object>());
+
+        GridImpl grid = new GridImpl( new HashMap<String, Object>() );
 
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
         //Configuring the Core Services White Pages
-        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration(coreServicesMap);
-        conf.addConfiguration(coreSeviceWPConf);
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        conf.addConfiguration( coreSeviceWPConf );
 
         //Configuring the Core Services Scheduler
         GridPeerServiceConfiguration coreSeviceSchedulerConf = new CoreServicesSchedulerConfiguration();
-        conf.addConfiguration(coreSeviceSchedulerConf);
+        conf.addConfiguration( coreSeviceSchedulerConf );
 
         //Configuring the MultiplexSocketService
-        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration(new MultiplexSocketServerImpl("127.0.0.1",
-                new MinaAcceptorFactoryService(),
-                l));
-        conf.addConfiguration(socketConf);
+        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
+                                                                                                                          new MinaAcceptorFactoryService(),
+                                                                                                                          l ) );
+        conf.addConfiguration( socketConf );
 
         //Configuring the WhitePages 
         GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
-        conf.addConfiguration(wplConf);
+        conf.addConfiguration( wplConf );
 
         //Exposing Local WhitePages
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration(5012);
-        conf.addConfiguration(wpsc);
+        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration( 5012 );
+        conf.addConfiguration( wpsc );
 
-        
         GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
-        conf.addConfiguration(registerwpincore);
-
+        conf.addConfiguration( registerwpincore );
 
         //Create a Local Scheduler
-        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration("myLocalSched");
-        conf.addConfiguration(schlConf);
+        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
+        conf.addConfiguration( schlConf );
 
         //Expose it to the Grid so it can be accesed by different nodes
         // I need to use the same port to reuse the service multiplexer
-        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration(5012);
-        conf.addConfiguration(schlsc);
+        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration( 5012 );
+        conf.addConfiguration( schlsc );
 
         GridPeerServiceConfiguration registerschedincore = new RegisterSchedulerConfiguration();
-        conf.addConfiguration(registerschedincore);
-        
-        
-        conf.configure(grid);
+        conf.addConfiguration( registerschedincore );
 
+        conf.configure( grid );
 
         //Local White Pages
-        WhitePages wp = grid.get(WhitePages.class);
+        WhitePages wp = grid.get( WhitePages.class );
 
         //Local sched in Local WP
-        GridServiceDescription gsdLocalSched = wp.lookup("scheduler:"+"myLocalSched"+SchedulerService.class.getName());
+        GridServiceDescription gsdLocalSched = wp.lookup( "scheduler:" + "myLocalSched" + SchedulerService.class.getName() );
 
         //Get the CoreWhitePages
-        CoreServicesWhitePages corewp = grid.get(CoreServicesWhitePages.class);
+        CoreServicesWhitePages corewp = grid.get( CoreServicesWhitePages.class );
         //Get the registered Scheduler
-        GridServiceDescription gsdLocalButExposedSched = corewp.lookup(SchedulerService.class);
+        GridServiceDescription gsdLocalButExposedSched = corewp.lookup( SchedulerService.class );
         //Get the registered white pages
-        GridServiceDescription gsdLocalButExposedWp = corewp.lookup(WhitePages.class);
-
+        GridServiceDescription gsdLocalButExposedWp = corewp.lookup( WhitePages.class );
 
         //The Scheduler is local = no addresses and no Data
-        Assert.assertEquals(0, gsdLocalSched.getAddresses().size());
-        Assert.assertNull(gsdLocalSched.getData());
-        
-        Assert.assertNotNull(gsdLocalButExposedSched.getData());
-        
+        Assert.assertEquals( 0,
+                             gsdLocalSched.getAddresses().size() );
+        Assert.assertNull( gsdLocalSched.getData() );
+
+        Assert.assertNotNull( gsdLocalButExposedSched.getData() );
+
         Connector conn = new MinaConnector();
 
-        ConversationManager cm = new ConversationManagerImpl("s1",
-                conn,
-                l);
-        
+        ConversationManager cm = new ConversationManagerImpl( "s1",
+                                                              conn,
+                                                              l );
+
         SchedulerClient sched = null;
-        
-        
-        GridServiceDescription clientSched1 = wp.lookup("scheduler:"+"myLocalSched"+SchedulerService.class.getName());
-        sched = new SchedulerClient(grid, clientSched1, cm);
-        sched.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
-        
-        sched = new SchedulerClient(grid, gsdLocalButExposedSched, cm);
-        sched.scheduleJob(new MockJob(), new MockJobContext("xxx"), new MockTrigger(new Date(1000)));
-        
-        
+
+        GridServiceDescription clientSched1 = wp.lookup( "scheduler:" + "myLocalSched" + SchedulerService.class.getName() );
+        sched = new SchedulerClient( grid,
+                                     clientSched1,
+                                     cm );
+        sched.scheduleJob( new MockJob(),
+                           new MockJobContext( "xxx" ),
+                           new MockTrigger( new Date( 1000 ) ) );
+
+        sched = new SchedulerClient( grid,
+                                     gsdLocalButExposedSched,
+                                     cm );
+        sched.scheduleJob( new MockJob(),
+                           new MockJobContext( "xxx" ),
+                           new MockTrigger( new Date( 1000 ) ) );
+
         //GridServiceDescription clientSched2 = new WhitePagesClient( gsdLocalButExposedWp, cm).lookup(SchedulerService.class.getName());
-        
-        
+
         conn.close();
-        
-        grid.get(MultiplexSocketService.class).close();
+
+        grid.get( MultiplexSocketService.class ).close();
 
     }
 }

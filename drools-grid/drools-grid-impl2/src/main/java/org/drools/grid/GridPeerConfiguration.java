@@ -6,7 +6,6 @@ package org.drools.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class GridPeerConfiguration {
     private List<GridPeerServiceConfiguration> configurations;
 

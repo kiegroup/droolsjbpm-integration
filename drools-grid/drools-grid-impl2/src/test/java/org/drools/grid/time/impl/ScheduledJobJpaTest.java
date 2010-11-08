@@ -16,72 +16,92 @@ import org.drools.time.Trigger;
 
 import junit.framework.TestCase;
 
-
 public class ScheduledJobJpaTest extends TestCase {
-    
-    public void test1()  {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.drools.grid");
-        
+
+    public void test1() {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+
         UuidJobHandle handle = new UuidJobHandle();
-        ScheduledJob sj1 = new ScheduledJob( handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger( new Date(1000 ) ) );
-        ScheduledJob sj2 = new ScheduledJob( handle, new MockJob(), new MockJobContext("xxx"), new MockTrigger( new Date(1000 ) ) );
-        
+        ScheduledJob sj1 = new ScheduledJob( handle,
+                                             new MockJob(),
+                                             new MockJobContext( "xxx" ),
+                                             new MockTrigger( new Date( 1000 ) ) );
+        ScheduledJob sj2 = new ScheduledJob( handle,
+                                             new MockJob(),
+                                             new MockJobContext( "xxx" ),
+                                             new MockTrigger( new Date( 1000 ) ) );
+
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         em.persist( sj1 );
         em.getTransaction().commit();
         em.close();
-        
+
         em = emf.createEntityManager();
-        
-        sj1 = em.find( ScheduledJob.class, sj1.getId() );
-        
-        assertEquals( sj2.getId(), sj1.getId() );
-        assertEquals( sj2.getJob().getClass(), sj1.getJob().getClass() );
-        assertEquals( "xxx", ((MockJobContext) sj1.getJobContext()).getText() );
-        assertEquals( new Date(1000), ((MockTrigger) sj1.getTrigger()).hasNextFireTime() );
-        assertEquals( new Date(1000), ((MockTrigger) sj1.getTrigger()).nextFireTime() );
- 
+
+        sj1 = em.find( ScheduledJob.class,
+                       sj1.getId() );
+
+        assertEquals( sj2.getId(),
+                      sj1.getId() );
+        assertEquals( sj2.getJob().getClass(),
+                      sj1.getJob().getClass() );
+        assertEquals( "xxx",
+                      ((MockJobContext) sj1.getJobContext()).getText() );
+        assertEquals( new Date( 1000 ),
+                      ((MockTrigger) sj1.getTrigger()).hasNextFireTime() );
+        assertEquals( new Date( 1000 ),
+                      ((MockTrigger) sj1.getTrigger()).nextFireTime() );
+
     }
-    
-    public static class MockJob implements Job, Serializable {
+
+    public static class MockJob
+        implements
+        Job,
+        Serializable {
         public void execute(JobContext ctx) {
-        }        
+        }
     }
-    
-    public static class MockJobContext implements JobContext, Serializable {
+
+    public static class MockJobContext
+        implements
+        JobContext,
+        Serializable {
         private String text;
 
         public MockJobContext() {
-            
+
         }
-        
+
         public MockJobContext(String text) {
             this.text = text;
         }
-        
+
         public JobHandle getJobHandle() {
             return null;
         }
 
         public void setJobHandle(JobHandle jobHandle) {
-                       
-        }        
-        
+
+        }
+
         public String getText() {
             return this.text;
         }
-                
+
     }
-    
-    public static class MockTrigger implements Trigger, Serializable {
-        
+
+    public static class MockTrigger
+        implements
+        Trigger,
+        Serializable {
+
         private Date date;
-        
+
         public MockTrigger() {
-            
+
         }
-        
+
         public MockTrigger(Date date) {
             this.date = date;
         }
@@ -93,7 +113,7 @@ public class ScheduledJobJpaTest extends TestCase {
         public Date nextFireTime() {
             return this.date;
         }
-        
+
     }
-    
+
 }

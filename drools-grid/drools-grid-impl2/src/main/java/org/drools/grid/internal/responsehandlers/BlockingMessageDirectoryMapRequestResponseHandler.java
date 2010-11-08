@@ -18,7 +18,8 @@ public class BlockingMessageDirectoryMapRequestResponseHandler extends AbstractB
     private Map<String, String> directoryMap;
     private volatile Message    message;
 
-    public synchronized void messageReceived(Conversation conversation, Message message) {
+    public synchronized void messageReceived(Conversation conversation,
+                                             Message message) {
         this.message = message;
 
         setDone( true );

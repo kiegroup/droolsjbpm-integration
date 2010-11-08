@@ -48,45 +48,49 @@ import org.drools.runtime.ExecutionResults;
  *
  * @author salaboy
  */
-public class KnowledgeBuilderRemoteClient implements KnowledgeBuilder{
+public class KnowledgeBuilderRemoteClient
+    implements
+    KnowledgeBuilder {
 
-    private String instanceId;
-    private ConversationManager cm;
+    private String                 instanceId;
+    private ConversationManager    cm;
     private GridServiceDescription gsd;
-    
-    public KnowledgeBuilderRemoteClient(String localId, GridServiceDescription gsd, ConversationManager cm) {
+
+    public KnowledgeBuilderRemoteClient(String localId,
+                                        GridServiceDescription gsd,
+                                        ConversationManager cm) {
         this.instanceId = localId;
         this.gsd = gsd;
         this.cm = cm;
     }
 
-    
-    
-    public void add(Resource resource, ResourceType type) {
-       add(resource, type, null);
-        
+    public void add(Resource resource,
+                    ResourceType type) {
+        add( resource,
+             type,
+             null );
+
     }
 
-    public void add(Resource resource, ResourceType type, ResourceConfiguration configuration) {
-         
+    public void add(Resource resource,
+                    ResourceType type,
+                    ResourceConfiguration configuration) {
+
         String localId = UUID.randomUUID().toString();
-        
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( resource,
-                                                                                                                  type,
-                                                                                                                  configuration ),
-                                                                                            this.instanceId,
-                                                                                            null,
-                                                                                            null,
-                                                                                            null )}));
-        
-        sendMessage(this.cm,
-                (InetSocketAddress[]) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getServiceInterface().getName(),
-                cmd);
-        
-       
-        
+
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( resource,
+                                                                                                                                                       type,
+                                                                                                                                                       configuration ),
+                                                                                                                       this.instanceId,
+                                                                                                                       null,
+                                                                                                                       null,
+                                                                                                                       null ) } ) );
+
+        sendMessage( this.cm,
+                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getServiceInterface().getName(),
+                     cmd );
 
     }
 
@@ -95,71 +99,67 @@ public class KnowledgeBuilderRemoteClient implements KnowledgeBuilder{
     }
 
     public KnowledgeBase newKnowledgeBase() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public boolean hasErrors() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeBuilderErrors getErrors() {
         String commandId = "kbuilder.getErrors_" + this.gsd.getId();
         String kresultsId = "kresults_" + this.gsd.getId();
         String localId = UUID.randomUUID().toString();
-        
-        
-        
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderGetErrorsCommand( ),
-                                                                                  this.instanceId,
-                                                                                  null,
-                                                                                  null,
-                                                                                  kresultsId ) }));
-        
-        Object result = sendMessage(this.cm,
-                (InetSocketAddress[]) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getServiceInterface().getName(),
-                cmd);
-        
-         return (KnowledgeBuilderErrors) result;
 
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderGetErrorsCommand(),
+                                                                                                                       this.instanceId,
+                                                                                                                       null,
+                                                                                                                       null,
+                                                                                                                       kresultsId ) } ) );
+
+        Object result = sendMessage( this.cm,
+                                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                     this.gsd.getServiceInterface().getName(),
+                                     cmd );
+
+        return (KnowledgeBuilderErrors) result;
 
     }
-    
-     public static Object sendMessage(ConversationManager conversationManager,
-            Serializable addr,
-            String id,
-            Object body) {
+
+    public static Object sendMessage(ConversationManager conversationManager,
+                                     Serializable addr,
+                                     String id,
+                                     Object body) {
 
         InetSocketAddress[] sockets = null;
-        if (addr instanceof InetSocketAddress[]) {
+        if ( addr instanceof InetSocketAddress[] ) {
             sockets = (InetSocketAddress[]) addr;
-        } else if (addr instanceof InetSocketAddress) {
-            sockets = new InetSocketAddress[1];
+        } else if ( addr instanceof InetSocketAddress ) {
+            sockets = new InetSocketAddress[ 1 ];
             sockets[0] = (InetSocketAddress) addr;
         }
 
-
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
-        for (InetSocketAddress socket : sockets) {
+        for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation(socket,
-                        id);
-                conv.sendMessage(body,
-                        handler);
+                Conversation conv = conversationManager.startConversation( socket,
+                                                                           id );
+                conv.sendMessage( body,
+                                  handler );
                 exception = null;
-            } catch (Exception e) {
+            } catch ( Exception e ) {
                 exception = e;
                 conversationManager.endConversation();
             }
-            if (exception == null) {
+            if ( exception == null ) {
                 break;
             }
         }
-        if (exception != null) {
-            throw new RuntimeException("Unable to send message",
-                    exception);
+        if ( exception != null ) {
+            throw new RuntimeException( "Unable to send message",
+                                        exception );
         }
         try {
             return handler.getMessage().getBody();

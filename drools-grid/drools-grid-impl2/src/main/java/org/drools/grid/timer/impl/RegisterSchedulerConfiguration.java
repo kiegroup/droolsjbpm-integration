@@ -30,52 +30,58 @@ import org.drools.time.SchedulerService;
  *
  * @author salaboy
  */
-public class RegisterSchedulerConfiguration implements GridPeerServiceConfiguration {
+public class RegisterSchedulerConfiguration
+    implements
+    GridPeerServiceConfiguration {
 
     public RegisterSchedulerConfiguration() {
     }
 
     public void configureService(Grid grid) {
-        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get(CoreServicesWhitePages.class);
+        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
 
-        GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup(SchedulerService.class);
-        if (gsd == null) {
-            gsd = new GridServiceDescriptionImpl(SchedulerService.class);
+        GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
+        if ( gsd == null ) {
+            gsd = new GridServiceDescriptionImpl( SchedulerService.class );
         }
 
-
-        MultiplexSocketService mss = grid.get(MultiplexSocketService.class);
+        MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
         int port = mss.getPorts().iterator().next();
-        GridServiceDescription service = coreServicesWP.getServices().get(SchedulerService.class.getName());
-        if (service == null) {
-            coreServicesWP.getServices().put(SchedulerService.class.getName(), gsd);
+        GridServiceDescription service = coreServicesWP.getServices().get( SchedulerService.class.getName() );
+        if ( service == null ) {
+            coreServicesWP.getServices().put( SchedulerService.class.getName(),
+                                              gsd );
             service = gsd;
         }
         Address address = null;
-        if (service.getAddresses().get("socket") != null) {
-            address = service.getAddresses().get("socket");
+        if ( service.getAddresses().get( "socket" ) != null ) {
+            address = service.getAddresses().get( "socket" );
         } else {
-            address = service.addAddress("socket");
+            address = service.addAddress( "socket" );
         }
 
         InetSocketAddress[] addresses = (InetSocketAddress[]) address.getObject();
-        if (addresses != null && addresses.length >= 1) {
-            InetSocketAddress[] newAddresses = new InetSocketAddress[addresses.length + 1];
-            if (addresses != null) {
-                System.arraycopy(addresses, 0, newAddresses, 0, addresses.length);
+        if ( addresses != null && addresses.length >= 1 ) {
+            InetSocketAddress[] newAddresses = new InetSocketAddress[ addresses.length + 1 ];
+            if ( addresses != null ) {
+                System.arraycopy( addresses,
+                                  0,
+                                  newAddresses,
+                                  0,
+                                  addresses.length );
             }
 
-            newAddresses[addresses.length] = new InetSocketAddress(mss.getIp(),
-                    port);
-            ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddresses);
-            service.setData(conf);
+            newAddresses[addresses.length] = new InetSocketAddress( mss.getIp(),
+                                                                    port );
+            ServiceConfiguration conf = new SchedulerServiceConfiguration( newAddresses );
+            service.setData( conf );
         } else {
-            InetSocketAddress[] newAddress = new InetSocketAddress[1];
-            newAddress[0] = new InetSocketAddress(mss.getIp(),
-                    port);
-            address.setObject(newAddress);
-            ServiceConfiguration conf = new SchedulerServiceConfiguration(newAddress);
-            service.setData(conf);
+            InetSocketAddress[] newAddress = new InetSocketAddress[ 1 ];
+            newAddress[0] = new InetSocketAddress( mss.getIp(),
+                                                   port );
+            address.setObject( newAddress );
+            ServiceConfiguration conf = new SchedulerServiceConfiguration( newAddress );
+            service.setData( conf );
 
         }
     }

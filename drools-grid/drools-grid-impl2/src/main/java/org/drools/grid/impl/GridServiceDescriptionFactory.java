@@ -27,38 +27,40 @@ import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
  * @author salaboy
  */
 public class GridServiceDescriptionFactory {
-    
-    public static GridServiceDescription newGridServiceDescritpion(String serviceId){
-        GridServiceDescription gsd = new GridServiceDescriptionImpl(serviceId);
+
+    public static GridServiceDescription newGridServiceDescritpion(String serviceId) {
+        GridServiceDescription gsd = new GridServiceDescriptionImpl( serviceId );
         try {
-            
-            String[] clazzName = serviceId.split(":");
-            
-            if(clazzName[0].equals("scheduler")){
-                gsd.setServiceInterface(Class.forName("org.drools.time.SchedulerService"));
-                gsd.setImplementedClass(Class.forName("org.drools.grid.timer.impl.SchedulerImpl"));
+
+            String[] clazzName = serviceId.split( ":" );
+
+            if ( clazzName[0].equals( "scheduler" ) ) {
+                gsd.setServiceInterface( Class.forName( "org.drools.time.SchedulerService" ) );
+                gsd.setImplementedClass( Class.forName( "org.drools.grid.timer.impl.SchedulerImpl" ) );
             }
-             if(clazzName[0].equals("schedulerclient")){
-                gsd.setServiceInterface(Class.forName("org.drools.time.SchedulerService"));
-                gsd.setImplementedClass(Class.forName("org.drools.grid.timer.impl.SchedulerClient"));
+            if ( clazzName[0].equals( "schedulerclient" ) ) {
+                gsd.setServiceInterface( Class.forName( "org.drools.time.SchedulerService" ) );
+                gsd.setImplementedClass( Class.forName( "org.drools.grid.timer.impl.SchedulerClient" ) );
             }
-            
-             if(clazzName[0].equals("executionnode")){
-                gsd.setServiceInterface(Class.forName("org.drools.grid.GridNode"));
-                gsd.setImplementedClass(Class.forName("org.drools.grid.impl.GridNodeImpl"));
+
+            if ( clazzName[0].equals( "executionnode" ) ) {
+                gsd.setServiceInterface( Class.forName( "org.drools.grid.GridNode" ) );
+                gsd.setImplementedClass( Class.forName( "org.drools.grid.impl.GridNodeImpl" ) );
             }
-            
-             if(clazzName[0].equals("executionnodeclient")){
-                gsd.setServiceInterface(Class.forName("org.drools.grid.GridNode"));
-                gsd.setImplementedClass(Class.forName("org.drools.grid.remote.GridNodeRemoteClient"));
+
+            if ( clazzName[0].equals( "executionnodeclient" ) ) {
+                gsd.setServiceInterface( Class.forName( "org.drools.grid.GridNode" ) );
+                gsd.setImplementedClass( Class.forName( "org.drools.grid.remote.GridNodeRemoteClient" ) );
             }
-            if(clazzName[0].equals("test")){
-                 gsd.setServiceInterface(Class.forName("java.lang.String"));
-                gsd.setImplementedClass(Class.forName("java.lang.String"));
+            if ( clazzName[0].equals( "test" ) ) {
+                gsd.setServiceInterface( Class.forName( "java.lang.String" ) );
+                gsd.setImplementedClass( Class.forName( "java.lang.String" ) );
             }
-            
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(GridServiceDescriptionFactory.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch ( ClassNotFoundException ex ) {
+            Logger.getLogger( GridServiceDescriptionFactory.class.getName() ).log( Level.SEVERE,
+                                                                                   null,
+                                                                                   ex );
         }
         return gsd;
     }

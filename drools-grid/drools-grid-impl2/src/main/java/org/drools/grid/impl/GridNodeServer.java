@@ -30,28 +30,31 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.runtime.impl.ExecutionResultImpl;
 
-
 /**
  *
  * @author salaboy
  */
-public class GridNodeServer implements
-    MessageReceiverHandler{
-    private GridNode gnode; 
+public class GridNodeServer
+    implements
+    MessageReceiverHandler {
+    private GridNode gnode;
     private NodeData data;
-    public GridNodeServer(GridNode gnode, NodeData data) {
+
+    public GridNodeServer(GridNode gnode,
+                          NodeData data) {
         this.gnode = gnode;
         this.data = data;
     }
-    
-    public void messageReceived(Conversation conversation, Message msg) {
+
+    public void messageReceived(Conversation conversation,
+                                Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
         this.execs.get( cmd.getName() ).execute( gnode,
                                                  conversation,
                                                  msg,
                                                  cmd );
     }
-    
+
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
                                         {
                                             put( "execute",
@@ -62,22 +65,18 @@ public class GridNodeServer implements
                                                                          CommandImpl cmd) {
                                                          GridNode gnode = (GridNode) object;
                                                          List list = cmd.getArguments();
-                                                          GenericCommand command = (GenericCommand) list.get(0);
+                                                         GenericCommand command = (GenericCommand) list.get( 0 );
 
-                                                        // Setup the evaluation context 
-                                                        ContextImpl localSessionContext = new ContextImpl( "session_" + cmd.getName(),
-                                                                                                           data.getContextManager(),
-                                                                                                           data.getTemp() );
-                                                        ExecutionResultImpl localKresults = new ExecutionResultImpl();
-                                                        localSessionContext.set( "kresults_" + cmd.getName(),
-                                                                                 localKresults );
+                                                         // Setup the evaluation context 
+                                                         ContextImpl localSessionContext = new ContextImpl( "session_" + cmd.getName(),
+                                                                                                            data.getContextManager(),
+                                                                                                            data.getTemp() );
+                                                         ExecutionResultImpl localKresults = new ExecutionResultImpl();
+                                                         localSessionContext.set( "kresults_" + cmd.getName(),
+                                                                                  localKresults );
 
-                                                       
+                                                         Object result = command.execute( localSessionContext );
 
-                                                        Object result = command.execute( localSessionContext );
-                                                         
-                                                         
-                                                         
                                                          con.respond( result );
                                                      }
                                                  } );
@@ -90,6 +89,5 @@ public class GridNodeServer implements
                      Message msg,
                      CommandImpl cmd);
     }
-
 
 }

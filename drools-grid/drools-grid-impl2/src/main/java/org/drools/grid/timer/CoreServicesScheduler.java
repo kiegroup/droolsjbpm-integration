@@ -24,8 +24,7 @@ import org.drools.grid.timer.impl.ScheduledJob;
  * @author salaboy
  */
 
-
 public interface CoreServicesScheduler {
     public void scheduleJob(ScheduledJob job);
-    
+
 }

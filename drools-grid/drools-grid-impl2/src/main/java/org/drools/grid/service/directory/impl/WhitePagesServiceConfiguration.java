@@ -25,10 +25,12 @@ import org.drools.grid.Grid;
  *
  * @author salaboy
  */
-public class WhitePagesServiceConfiguration implements ServiceConfiguration{
-    
+public class WhitePagesServiceConfiguration
+    implements
+    ServiceConfiguration {
+
     private InetSocketAddress[] addresses;
-    
+
     public WhitePagesServiceConfiguration(InetSocketAddress[] addresses) {
         this.addresses = addresses;
     }
@@ -37,8 +39,5 @@ public class WhitePagesServiceConfiguration implements ServiceConfiguration{
         //get addresses from the grid.. or whatever
         return addresses;
     }
- 
-    
-    
-    
+
 }

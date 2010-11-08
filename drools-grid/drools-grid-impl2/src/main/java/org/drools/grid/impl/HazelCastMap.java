@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public class HazelCastMap<K, V> implements DistributedMap<K, V> {
+public class HazelCastMap<K, V>
+    implements
+    DistributedMap<K, V> {
     private Map<K, V> map;
-    
+
     public void clear() {
         map.clear();
     }
@@ -18,10 +20,11 @@ public class HazelCastMap<K, V> implements DistributedMap<K, V> {
     public boolean containsValue(Object value) {
         return map.containsValue( value );
     }
+
     public boolean equals(Object o) {
         return map.equals( o );
     }
-    
+
     public int hashCode() {
         return map.hashCode();
     }
@@ -30,13 +33,11 @@ public class HazelCastMap<K, V> implements DistributedMap<K, V> {
         return map.isEmpty();
     }
 
-
     public int size() {
         return map.size();
     }
 
-
-    public HazelCastMap(Map<K, V>  map) {
+    public HazelCastMap(Map<K, V> map) {
         this.map = map;
     }
 
@@ -54,7 +55,8 @@ public class HazelCastMap<K, V> implements DistributedMap<K, V> {
 
     public V put(K key,
                  V value) {
-        return this.map.put(  key, value );
+        return this.map.put( key,
+                             value );
     }
 
     public void putAll(Map< ? extends K, ? extends V> m) {
@@ -62,7 +64,7 @@ public class HazelCastMap<K, V> implements DistributedMap<K, V> {
     }
 
     public V remove(Object key) {
-        return this.map.remove(  key );
+        return this.map.remove( key );
     }
 
     public Collection<V> values() {

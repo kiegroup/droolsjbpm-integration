@@ -10,13 +10,14 @@ import org.drools.time.JobHandle;
 
 public class UuidJobHandle
     implements
-    JobHandle, Serializable {
+    JobHandle,
+    Serializable {
     private UUID uuid;
 
     public UuidJobHandle() {
         this.uuid = UUID.randomUUID();
     }
-    
+
     public UuidJobHandle(UUID uuid) {
         this.uuid = uuid;
     }
@@ -26,7 +27,7 @@ public class UuidJobHandle
         final int prime = 31;
         int result = 1;
         result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-        if(result < 0){
+        if ( result < 0 ) {
             result *= -1;
         }
         return result;
@@ -43,7 +44,7 @@ public class UuidJobHandle
         } else if ( !uuid.equals( other.uuid ) ) return false;
         return true;
     }
-    
+
     public UUID getUuid() {
         return this.uuid;
     }

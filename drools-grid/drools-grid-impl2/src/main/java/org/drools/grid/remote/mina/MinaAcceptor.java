@@ -19,8 +19,8 @@ import org.drools.grid.io.MessageReceiverHandler;
 public class MinaAcceptor
     implements
     Acceptor {
-    private IoAcceptor acceptor;
-    
+    private IoAcceptor             acceptor;
+
     private MessageReceiverHandler handler;
 
     public MinaAcceptor() {
@@ -42,7 +42,7 @@ public class MinaAcceptor
             acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE,
                                                      10 );
         }
-        
+
         this.handler = handler;
         acceptor.setHandler( new MinaIoHandler( systemEventListener,
                                                 handler ) );
@@ -80,5 +80,5 @@ public class MinaAcceptor
     public MessageReceiverHandler getMessageReceiverHandler() {
         return this.handler;
     }
-    
+
 }

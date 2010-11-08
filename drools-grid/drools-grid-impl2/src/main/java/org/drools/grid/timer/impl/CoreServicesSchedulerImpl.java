@@ -20,23 +20,24 @@ package org.drools.grid.timer.impl;
 import org.drools.grid.timer.CoreServicesScheduler;
 import org.drools.time.SchedulerService;
 
-
 /**
  *
  * @author salaboy
  */
-public class CoreServicesSchedulerImpl implements CoreServicesScheduler {
+public class CoreServicesSchedulerImpl
+    implements
+    CoreServicesScheduler {
 
-    
     private SchedulerService scheduler;
-    
-    
+
     public CoreServicesSchedulerImpl(SchedulerService scheduler) {
         this.scheduler = scheduler;
     }
 
     public void scheduleJob(ScheduledJob job) {
-        this.scheduler.scheduleJob(job.getJob(), job.getJobContext(), job.getTrigger());
+        this.scheduler.scheduleJob( job.getJob(),
+                                    job.getJobContext(),
+                                    job.getTrigger() );
     }
 
 }

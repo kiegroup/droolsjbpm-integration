@@ -29,19 +29,18 @@ public class WhitePagesClient
         this.whitePagesGsd = gsd;
         this.conversationManager = conversationManager;
     }
-    
 
     public static Object sendMessage(ConversationManager conversationManager,
                                      Serializable addr,
                                      String id,
                                      Object body) {
-        
+
         InetSocketAddress[] sockets = null;
-        if(addr instanceof InetSocketAddress[]){
-            sockets = (InetSocketAddress[])addr;
-        }else if (addr instanceof InetSocketAddress){
-            sockets = new InetSocketAddress[1];
-            sockets[0] = (InetSocketAddress)addr;
+        if ( addr instanceof InetSocketAddress[] ) {
+            sockets = (InetSocketAddress[]) addr;
+        } else if ( addr instanceof InetSocketAddress ) {
+            sockets = new InetSocketAddress[ 1 ];
+            sockets[0] = (InetSocketAddress) addr;
         }
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
@@ -75,24 +74,24 @@ public class WhitePagesClient
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.create",
                                            Arrays.asList( new Object[]{ serviceDescriptionId } ) );
-        GridServiceDescription gsd = ( GridServiceDescription ) sendMessage( this.conversationManager,
-                     sockets,
-                     this.whitePagesGsd.getId(),
-                     cmd );
-        return new GridServiceDescriptionClient(gsd,
-                                                this.whitePagesGsd,
-                                                this.conversationManager );
+        GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
+                                                                           sockets,
+                                                                           this.whitePagesGsd.getId(),
+                                                                           cmd );
+        return new GridServiceDescriptionClient( gsd,
+                                                 this.whitePagesGsd,
+                                                 this.conversationManager );
     }
 
     public GridServiceDescription lookup(String serviceDescriptionId) {
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.lookup",
                                            Arrays.asList( new Object[]{ serviceDescriptionId } ) );
-        GridServiceDescription gsd = ( GridServiceDescription ) sendMessage( this.conversationManager,
+        GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
                                                                              sockets,
                                                                              this.whitePagesGsd.getId(),
                                                                              cmd );
-        return (gsd == null ) ? gsd : new GridServiceDescriptionClient(gsd,
+        return (gsd == null) ? gsd : new GridServiceDescriptionClient( gsd,
                                                                        this.whitePagesGsd,
                                                                        this.conversationManager );
     }
@@ -100,18 +99,16 @@ public class WhitePagesClient
     public void remove(String serviceDescriptionId) {
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.remove",
-                                           Arrays.asList( new Object[]{ serviceDescriptionId } ) ); 
+                                           Arrays.asList( new Object[]{ serviceDescriptionId } ) );
         sendMessage( this.conversationManager,
                      sockets,
                      this.whitePagesGsd.getId(),
-                     cmd );        
+                     cmd );
     }
 
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new WhitePagesServer( this );
     }
-
-    
 
     //    public void addAddress(String id,
     //                           Address address) {               

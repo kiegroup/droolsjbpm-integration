@@ -25,6 +25,8 @@ import org.drools.grid.Grid;
  *
  * @author salaboy
  */
-public interface ServiceConfiguration extends Serializable{
+public interface ServiceConfiguration
+    extends
+    Serializable {
     public InetSocketAddress[] getServices(Grid grid);
 }

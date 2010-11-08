@@ -9,12 +9,12 @@ public class MessageImpl
     implements
     Serializable,
     Message {
-    private String   conversationId;
-    private String   senderId;
+    private String conversationId;
+    private String senderId;
     private String recipientId;
-    private int      requestId;
-    private int      responseId;
-    private Object   body;
+    private int    requestId;
+    private int    responseId;
+    private Object body;
 
     public MessageImpl(String conversationId,
                        String senderId,
@@ -43,7 +43,7 @@ public class MessageImpl
     public String getConversationId() {
         return this.conversationId;
     }
-    
+
     public String getSenderId() {
         return senderId;
     }
@@ -58,10 +58,10 @@ public class MessageImpl
     public int getRequestId() {
         return this.requestId;
     }
-    
+
     public int getResponseId() {
         return this.responseId;
-    }    
+    }
 
     /* (non-Javadoc)
      * @see org.drools.grid.io.impl.Message#getPayload()

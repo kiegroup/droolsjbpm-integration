@@ -87,6 +87,4 @@ public class AddressImpl
         return "Address id=" + id + " tranport=" + transport + " object=" + object;
     }
 
-   
-
 }

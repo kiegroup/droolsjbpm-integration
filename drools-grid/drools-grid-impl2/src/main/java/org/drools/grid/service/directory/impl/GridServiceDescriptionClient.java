@@ -25,7 +25,6 @@ public class GridServiceDescriptionClient
 
     private GridServiceDescription detachedLocal;
 
-    
     public GridServiceDescriptionClient(GridServiceDescription detachedLocal,
                                         GridServiceDescription whitePagesGsd,
                                         ConversationManager conversationManager) {
@@ -50,7 +49,8 @@ public class GridServiceDescriptionClient
     public Map<String, Address> getAddresses() {
         Map<String, Address> addresses = new HashMap<String, Address>();
         for ( Address address : this.detachedLocal.getAddresses().values() ) {
-            addresses.put( address.getTransport(), new AddressClient( address,
+            addresses.put( address.getTransport(),
+                           new AddressClient( address,
                                                                       this.whitePagesGsd,
                                                                       this.conversationManager ) );
         }
@@ -84,21 +84,16 @@ public class GridServiceDescriptionClient
                      whitePagesGsd.getId(),
                      cmd );
     }
- 
-
 
     @Override
     public boolean equals(Object obj) {
         //@TODO: improve equals comparision
         final GridServiceDescription other = (GridServiceDescription) obj;
-        if (!this.getId().equals(other.getId() )) {
+        if ( !this.getId().equals( other.getId() ) ) {
             return false;
         }
         return true;
     }
-
-
-    
 
     @Override
     public int hashCode() {
@@ -114,9 +109,9 @@ public class GridServiceDescriptionClient
         CommandImpl cmd = new CommandImpl( "GridServiceDescription.getData",
                                            null );
         Serializable data = (Serializable) sendMessage( this.conversationManager,
-                     sockets,
-                     whitePagesGsd.getId(),
-                     cmd );
+                                                        sockets,
+                                                        whitePagesGsd.getId(),
+                                                        cmd );
         return data;
     }
 
@@ -124,24 +119,19 @@ public class GridServiceDescriptionClient
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "GridServiceDescription.setData",
                                            Arrays.asList( new Object[]{ data } ) );
-         sendMessage( this.conversationManager,
+        sendMessage( this.conversationManager,
                      sockets,
                      whitePagesGsd.getId(),
                      cmd );
-        
+
     }
 
     public Class getServiceInterface() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public void setServiceInterface(Class cls) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
-
-
-    
-    
-    
 
 }
