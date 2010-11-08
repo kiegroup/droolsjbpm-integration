@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <name>Drools :: Grid :: Impl2</name>
-    <artifactId>drools-grid-impl2</artifactId>
+    <name>Drools :: Grid :: Impl</name>
+    <artifactId>drools-grid-impl</artifactId>
 
     <dependencies>
         <dependency>
