@@ -43,11 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-grid-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-grid-local</artifactId>
+      <artifactId>drools-grid-impl</artifactId>
     </dependency>
     <!-- Camel -->
     <dependency>
