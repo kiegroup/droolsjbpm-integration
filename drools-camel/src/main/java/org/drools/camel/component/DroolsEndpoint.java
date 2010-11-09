@@ -43,10 +43,9 @@ import org.apache.camel.dataformat.xstream.JsonDataFormat;
 import org.apache.camel.dataformat.xstream.XStreamDataFormat;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.spi.DataFormat;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.util.StringUtils;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
@@ -58,7 +57,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
 
     public String          ksessionId;
     public CommandExecutor executor;
-    public ExecutionNode   node;
+    public GridNode   node;
 
     public String          dataFormatName;
 
@@ -100,7 +99,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
         return executor;
     }
 
-    public ExecutionNode getExecutionNode() {
+    public GridNode getGridNode() {
         return node;
     }
 
@@ -112,15 +111,15 @@ public class DroolsEndpoint extends DefaultEndpoint {
         if ( !StringUtils.isEmpty( nodeId ) ) {
             // let's look it up
             node = component.getCamelContext().getRegistry().lookup( nodeId,
-                                                                     ExecutionNode.class );
+                                                                     GridNode.class );
             if ( node == null ) {
-                throw new RuntimeCamelException( "Could not find ExecutionNode for uri=\"" + uri + "\" in CamelContext. Check configuration." );
+                throw new RuntimeCamelException( "Could not find GridNode for uri=\"" + uri + "\" in CamelContext. Check configuration." );
             }
 
             // if id is empty this endpoint is not attached to a CommandExecutor and will have to look it up at runtime.
             if ( !StringUtils.isEmpty( ksessionId ) ) {
                 // lookup command executor
-                executor = node.get( DirectoryLookupFactoryService.class ).lookup( ksessionId );
+                executor = node.get( ksessionId, CommandExecutor.class );
                 if ( executor == null ) {
                     throw new RuntimeCamelException( "Failed to instantiate DroolsEndpoint. " + "Lookup of CommandExecutor with uri=\"" + uri + "\" failed. Check configuration." );
                 }
@@ -196,7 +195,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
             throw new RuntimeException( "ExecutionNode for CommandExecutor lookup cannot be null" );
         }
 
-        return node.get( DirectoryLookupFactoryService.class ).lookup( name );
+        return node.get( name, CommandExecutor.class );
     }
 
     public ClassLoader getClassLoader(CommandExecutor exec) {

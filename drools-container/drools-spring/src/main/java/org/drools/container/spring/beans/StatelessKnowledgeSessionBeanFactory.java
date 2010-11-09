@@ -57,5 +57,9 @@ public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessi
     	} else {
     		ksession = getKbase().newStatelessKnowledgeSession( getConf() );
     	}
+    	
+        if ( getNode() != null ) {
+            getNode().set( getName(), this.ksession );
+        }    	
     }
 }

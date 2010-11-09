@@ -27,6 +27,7 @@ import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
@@ -44,7 +45,7 @@ public class KnowledgeBaseProviderRemoteClient
     KnowledgeBaseFactoryService {
 
     private ConversationManager    cm;
-    private GridServiceDescription gsd;
+    private GridServiceDescription<GridNode>  gsd;
 
     public KnowledgeBaseProviderRemoteClient(ConversationManager cm,
                                              GridServiceDescription gsd) {

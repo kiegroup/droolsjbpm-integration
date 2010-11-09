@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
@@ -88,9 +89,9 @@ public class WhitePagesClient
         CommandImpl cmd = new CommandImpl( "WhitePages.lookup",
                                            Arrays.asList( new Object[]{ serviceDescriptionId } ) );
         GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
-                                                                             sockets,
-                                                                             this.whitePagesGsd.getId(),
-                                                                             cmd );
+                                                                           sockets,
+                                                                           this.whitePagesGsd.getId(),
+                                                                           cmd );
         return (gsd == null) ? gsd : new GridServiceDescriptionClient( gsd,
                                                                        this.whitePagesGsd,
                                                                        this.conversationManager );
@@ -110,36 +111,8 @@ public class WhitePagesClient
         return new WhitePagesServer( this );
     }
 
-    //    public void addAddress(String id,
-    //                           Address address) {               
-    //        InetSocketAddress[] sockets = ( InetSocketAddress[] ) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-    //        CommandImpl cmd = new CommandImpl( "addAddress", Arrays.asList( new Object[] { id, address } ) );
-    //        sendMessage( sockets, cmd );
-    //    }
-    //
-    //    public GridServiceDescription lookup(String id) {
-    //        InetSocketAddress[] sockets = ( InetSocketAddress[] ) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-    //        CommandImpl cmd = new CommandImpl( "lookup", Arrays.asList( new Object[] { id } ) );
-    //        return ( GridServiceDescription ) sendMessage( sockets, cmd );
-    //    }
-    //
-    //    public GridServiceDescription create(GridServiceDescription serviceDescription) {
-    //        InetSocketAddress[] sockets = ( InetSocketAddress[] ) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-    //        CommandImpl cmd = new CommandImpl( "register", Arrays.asList( new Object[] { serviceDescription } ) );
-    //        sendMessage( sockets, cmd );        
-    //    }
-    //
-    //    public void removeAddress(String id,
-    //                              Address address) {
-    //        InetSocketAddress[] sockets = ( InetSocketAddress[] ) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-    //        CommandImpl cmd = new CommandImpl( "removeAddress", Arrays.asList( new Object[] { id, address } ) );
-    //        sendMessage( sockets, cmd );
-    //    }
-    //
-    //    public void remove(String id) {
-    //        InetSocketAddress[] sockets = ( InetSocketAddress[] ) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-    //        CommandImpl cmd = new CommandImpl( "unregister", Arrays.asList( new Object[] { id } ) );
-    //        sendMessage( sockets, cmd );      
-    //    }
+    public void registerSocketService(Grid grid, String id, String ip, int port) {
+        WhitePagesImpl.doRegisterSocketService(grid, id, ip, port);
+    }
 
 }

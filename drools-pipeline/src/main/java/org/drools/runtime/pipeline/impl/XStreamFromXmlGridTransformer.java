@@ -25,9 +25,8 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.core.util.StringUtils;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.io.Resource;
@@ -89,8 +88,9 @@ public class XStreamFromXmlGridTransformer extends BaseEmitter
                 throw new IllegalArgumentException("Unable to lookup XStream parser using name '" + name + "'");
             }
             ExecutionNodePipelineContextImpl executionNodeContext = (ExecutionNodePipelineContextImpl) context;
-            ExecutionNode node = executionNodeContext.getExecutionNode();
-            CommandExecutor executor = node.get(DirectoryLookupFactoryService.class).lookup(name);
+            GridNode node = executionNodeContext.getGridNode();
+            
+            CommandExecutor executor = node.get(name, CommandExecutor.class);
             if (executor == null) {
                 throw new IllegalArgumentException("Unable to lookup CommandExecutor using name '" + name + "'");
             }

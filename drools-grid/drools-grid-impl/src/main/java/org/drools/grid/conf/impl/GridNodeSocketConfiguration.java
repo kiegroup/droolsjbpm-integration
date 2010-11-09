@@ -1,16 +1,16 @@
 /**
  * 
  */
-package org.drools.grid.impl;
+package org.drools.grid.conf.impl;
 
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.service.directory.impl.*;
 import org.drools.grid.CoreServicesWhitePages;
 
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
-import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
-import org.drools.grid.MultiplexSocketService;
+import org.drools.grid.SocketService;
 
 public class GridNodeSocketConfiguration
     implements
@@ -36,7 +36,7 @@ public class GridNodeSocketConfiguration
                 gsd = new GridServiceDescriptionImpl( GridNode.class );
             }
 
-            MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
+            SocketService mss = grid.get( SocketService.class );
 
             //            GridServiceDescription service = coreServicesWP.getServices().get( SchedulerService.class.getName() );
             //            if( service == null){
@@ -68,9 +68,9 @@ public class GridNodeSocketConfiguration
             //                 service.setData(conf);
             //            }
 
-            mss.addService( this.port,
-                            GridNode.class.getName(),
-                            ((MessageReceiverHandlerFactoryService) gnode).getMessageReceiverHandler() );
+//            mss.addService( this.port,
+//                            GridNode.class.getName(),
+//                            ((MessageReceiverHandlerFactoryService) gnode).getMessageReceiverHandler() );
         }
     }
 }

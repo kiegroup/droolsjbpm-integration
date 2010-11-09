@@ -3,14 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:drools="http://drools.org/schema/drools-spring"     
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring-1.0.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
 	<drools:resource-change-scanner id="s1" interval="5" />
 	
-	<drools:connection id="connection1" type="local" />
-	
-	<drools:execution-node id="node1" connection="connection1" />
+	<drools:grid-node id="node1" />
 	
 	<drools:ksession id="ksession1" type="stateless" kbase="kbase1"/>
 	

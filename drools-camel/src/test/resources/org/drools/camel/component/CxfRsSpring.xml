@@ -21,16 +21,14 @@
        xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xmlns:drools="http://drools.org/schema/drools-spring"
        xsi:schemaLocation="
-       http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring-1.0.0.xsd
+       http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
     ">
-  
-	<drools:connection id="connection1" type="local" />
 	
-	<drools:execution-node id="node1" connection="connection1" />
+	<drools:grid-node id="node1" />
   
 	<drools:kbase id="kbase1" node="node1">		
 	    <drools:resources>

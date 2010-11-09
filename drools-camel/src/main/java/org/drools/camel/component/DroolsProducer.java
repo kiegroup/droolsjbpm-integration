@@ -47,13 +47,12 @@ import org.apache.camel.dataformat.xstream.XStreamDataFormat;
 import org.apache.camel.impl.DefaultProducer;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.apache.camel.spi.DataFormat;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
 import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
@@ -67,7 +66,7 @@ public class DroolsProducer extends DefaultProducer {
     DroolsEndpoint de;
 
     public DroolsProducer(Endpoint endpoint,
-                          ExecutionNode node) {
+                          GridNode node) {
         super( endpoint );
         de = (DroolsEndpoint) endpoint;
     }
@@ -110,8 +109,8 @@ public class DroolsProducer extends DefaultProducer {
                         lookup = ((BatchExecutionCommandImpl) cmd).getLookup();
                     }
 
-                    if ( de.getExecutionNode() != null && !StringUtils.isEmpty( lookup ) ) {
-                        exec = de.getExecutionNode().get( DirectoryLookupFactoryService.class ).lookup( lookup );
+                    if ( de.getGridNode() != null && !StringUtils.isEmpty( lookup ) ) {
+                        exec = de.getGridNode().get(lookup, CommandExecutor.class);
                         if ( exec == null ) {
                             throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup  +" for uri" + de.getEndpointUri() );
                         }

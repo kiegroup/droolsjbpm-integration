@@ -1,63 +1,8 @@
 package org.drools.camel.component;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.Context;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.camel.ContextTestSupport;
-import org.apache.camel.builder.RouteBuilder;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jettison.badgerfish.BadgerFishDOMDocumentParser;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.drools.ChangeCollector;
-import org.drools.Cheese;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.DirectoryLookupFactoryService;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.common.InternalFactHandle;
-import org.drools.definition.KnowledgePackage;
-import org.drools.grid.ExecutionNode;
-
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
-import org.drools.rule.builder.dialect.java.AbstractJavaRuleBuilder;
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.mvel2.integration.impl.MapVariableResolverFactory;
-import org.mvel2.templates.SimpleTemplateRegistry;
-import org.mvel2.templates.TemplateCompiler;
-import org.mvel2.templates.TemplateRegistry;
-import org.mvel2.templates.TemplateRuntime;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public class JSonBatchExecutionTest  extends BatchTest {//extends ContextTestSupport {
     

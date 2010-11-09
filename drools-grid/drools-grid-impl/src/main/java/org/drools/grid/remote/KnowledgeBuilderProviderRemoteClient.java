@@ -30,6 +30,7 @@ import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.command.SetVariableCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
@@ -45,7 +46,7 @@ public class KnowledgeBuilderProviderRemoteClient
     KnowledgeBuilderFactoryService {
 
     private ConversationManager    cm;
-    private GridServiceDescription gsd;
+    private GridServiceDescription<GridNode>  gsd;
 
     public KnowledgeBuilderProviderRemoteClient(ConversationManager cm,
                                                 GridServiceDescription gsd) {
@@ -76,8 +77,8 @@ public class KnowledgeBuilderProviderRemoteClient
                                                                                                 new NewKnowledgeBuilderCommand( null ) ) } ) );
 
         sendMessage( this.cm,
-                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getServiceInterface().getName(),
+                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getId(),
                      cmd );
 
         return new KnowledgeBuilderRemoteClient( localId,
@@ -106,7 +107,7 @@ public class KnowledgeBuilderProviderRemoteClient
 
     public static Object sendMessage(ConversationManager conversationManager,
                                      Serializable addr,
-                                     String id,
+                                     String recipientId,
                                      Object body) {
 
         InetSocketAddress[] sockets = null;
@@ -122,7 +123,7 @@ public class KnowledgeBuilderProviderRemoteClient
         for ( InetSocketAddress socket : sockets ) {
             try {
                 Conversation conv = conversationManager.startConversation( socket,
-                                                                           id );
+                                                                           recipientId );
                 conv.sendMessage( body,
                                   handler );
                 exception = null;

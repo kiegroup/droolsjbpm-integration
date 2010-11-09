@@ -29,10 +29,13 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
+import org.drools.command.assertion.AssertEquals;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
+import org.drools.grid.conf.impl.GridNodeLocalConfiguration;
+import org.drools.grid.conf.impl.GridNodeSocketConfiguration;
+import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.impl.GridNodeLocalConfiguration;
-import org.drools.grid.impl.GridNodeSocketConfiguration;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.GridNodeRemoteClient;
@@ -41,7 +44,6 @@ import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
-import org.drools.grid.service.directory.impl.RegisterWhitePagesConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
@@ -51,12 +53,16 @@ import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
+import org.drools.time.Scheduler;
+import org.drools.time.SchedulerService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -79,6 +85,7 @@ public class NodeTests {
 
     @Before
     public void setUp() {
+        this.coreServicesMap = new HashMap();
     }
 
     @After
@@ -86,8 +93,7 @@ public class NodeTests {
     }
 
     @Test
-    public void basicLocalNodeTest() {
-
+    public void localNodeTest() {
         Grid grid = new GridImpl( new HashMap<String, Object>() );
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
@@ -95,59 +101,53 @@ public class NodeTests {
         conf.addConfiguration( wpconf );
 
         conf.configure( grid );
-        GridServiceDescription localExecutioNodeGSD = new GridServiceDescriptionImpl( "executionnode:local@local" );
-        localExecutioNodeGSD.addAddress( "local" );
-        //GridNode gnode = grid.createGridNode("executionnode:local@local");
-        GridNode gnode = grid.createGridNode( localExecutioNodeGSD );
+
+        GridNode gnode = grid.createGridNode( "n1" );
 
         KnowledgeBuilder kbuilder = gnode.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
-
-        Assert.assertNotNull( kbuilder );
+        assertNotNull( kbuilder );
 
         KnowledgeBase kbase = gnode.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
-
-        Assert.assertNotNull( kbase );
+        assertNotNull( kbase );
 
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-
-        Assert.assertNotNull( session );
+        assertNotNull( session );
 
         WhitePages wp = grid.get( WhitePages.class );
-        GridServiceDescription gsd = wp.lookup( "executionnode:local@local" );
+        GridServiceDescription gsd = wp.lookup( "n1" );
+        assertNotNull(gsd);
+        assertEquals( 0, gsd.getAddresses().size() );
 
         gnode = grid.getGridNode( gsd.getId() );
-
-        Assert.assertNotNull( gnode );
-
+        assertNotNull( gnode );
+        
+        grid.removeGridNode( gsd.getId() );
+        assertNull( wp.lookup( "n1" ) );        
+        assertNull( grid.getGridNode( gsd.getId() ) );
+        
     }
 
+
     @Test
-    public void basicRemoteNodeTest() {
-
-        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-
+    public void remoteNodeTest() {
         Grid grid1 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid1,
-                        8000 );
+                        8000,
+                        null );
 
         Grid grid2 = new GridImpl( new HashMap<String, Object>() );
-        GridPeerConfiguration conf = new GridPeerConfiguration();
+        configureGrid1( grid2,
+                        -1,
+                        grid1.get( WhitePages.class ) );
 
-        GridPeerServiceConfiguration wpconf = new WhitePagesLocalConfiguration();
-        conf.addConfiguration( wpconf );
+        GridNode n1 = grid1.createGridNode( "n1" );
+        grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
+               
+        GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "n1" );
+        GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
+        GridNode remoteN1 = conn.connect();
 
-        conf.configure( grid2 );
-
-        GridServiceDescription remoteExecutioNodeGSD = new GridServiceDescriptionImpl( "executionnodeclient:mynode@remote[localhost:8080]/socket" );
-        remoteExecutioNodeGSD.setServiceInterface( GridNode.class );
-        remoteExecutioNodeGSD.setImplementedClass( GridNodeRemoteClient.class );
-        Address addr = remoteExecutioNodeGSD.addAddress( "socket" );
-        addr.setObject( new InetSocketAddress[]{ new InetSocketAddress( "localhost",
-                                                                        8000 ) } );
-
-        GridNode gnode = grid2.createGridNode( remoteExecutioNodeGSD );
-
-        KnowledgeBuilder kbuilder = gnode.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+        KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
         Assert.assertNotNull( kbuilder );
 
@@ -170,7 +170,7 @@ public class NodeTests {
             return;
         }
 
-        KnowledgeBase kbase = gnode.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
         Assert.assertNotNull( kbase );
 
@@ -180,12 +180,13 @@ public class NodeTests {
 
         Assert.assertNotNull( session );
 
-        WhitePages wp = grid2.get( WhitePages.class );
-        GridServiceDescription gsd = wp.lookup( "executionnodeclient:mynode@remote[localhost:8080]/socket" );
+        WhitePages wp = grid2.get( WhitePages.class );      
+        
+        GridServiceDescription gsd = wp.lookup( "mynode" );
 
-        gnode = grid2.getGridNode( gsd.getId() );
+        remoteN1 = grid2.getGridNode( gsd.getId() );
 
-        Assert.assertNotNull( gnode );
+        Assert.assertNotNull( remoteN1 );
 
         FactHandle handle = session.insert( new MyObject() );
         Assert.assertNotNull( handle );
@@ -197,7 +198,8 @@ public class NodeTests {
     }
 
     private void configureGrid1(Grid grid,
-                                int port) {
+                                int port,
+                                WhitePages wp) {
 
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
@@ -210,40 +212,26 @@ public class NodeTests {
         GridPeerServiceConfiguration coreSeviceSchedulerConf = new CoreServicesSchedulerConfiguration();
         conf.addConfiguration( coreSeviceSchedulerConf );
 
-        //Configuring the MultiplexSocketService
-        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
-                                                                                                                          new MinaAcceptorFactoryService(),
-                                                                                                                          SystemEventListenerFactory.getSystemEventListener() ) );
-        conf.addConfiguration( socketConf );
-
         //Configuring the WhitePages 
-        GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
-        conf.addConfiguration( wplConf );
+        WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
+        wplConf.setWhitePages( wp );
+        conf.addConfiguration( wplConf );        
 
-        //Exposing Local WhitePages
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration( port );
-        conf.addConfiguration( wpsc );
-        GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
-        conf.addConfiguration( registerwpincore );
-
-        //Create a Local Scheduler
-        GridPeerServiceConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
-        conf.addConfiguration( schlConf );
-
-        //Expose it to the Grid so it can be accesed by different nodes
-        // I need to use the same port to reuse the service multiplexer
-        GridPeerServiceConfiguration schlsc = new SchedulerSocketConfiguration( port );
-        conf.addConfiguration( schlsc );
-
-        GridPeerServiceConfiguration registerschedincore = new RegisterSchedulerConfiguration();
-        conf.addConfiguration( registerschedincore );
-
-        GridPeerServiceConfiguration executionNodeLocal = new GridNodeLocalConfiguration();
-        conf.addConfiguration( executionNodeLocal );
-
-        GridPeerServiceConfiguration executionNodeSocket = new GridNodeSocketConfiguration( port );
-        conf.addConfiguration( executionNodeSocket );
-
+//        //Create a Local Scheduler
+//        SchedulerLocalConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
+//        conf.addConfiguration( schlConf );
+        
+        if ( port >= 0 ) {
+            //Configuring the SocketService
+            MultiplexSocketServiceCongifuration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
+                                                                                                                              new MinaAcceptorFactoryService(),
+                                                                                                                              SystemEventListenerFactory.getSystemEventListener(),
+                                                                                                                              grid) );
+            socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), port );
+//            socketConf.addService( SchedulerService.class.getName(), schlConf.getSchedulerService(), port );
+                        
+            conf.addConfiguration( socketConf );                        
+        }
         conf.configure( grid );
 
     }

@@ -17,8 +17,6 @@ public class GridServiceDescriptionImpl
 
     private String               id;
 
-    private Class                implementedClass;
-
     private Class                serviceInterface;
 
     private Map<String, Address> addresses = new HashMap<String, Address>();
@@ -30,12 +28,11 @@ public class GridServiceDescriptionImpl
     }
 
     public GridServiceDescriptionImpl(Class cls) {
-        this( cls.getCanonicalName() );
-        this.implementedClass = cls;
+        this.serviceInterface = cls;
+        this.id = cls.getName();
     }
 
     public GridServiceDescriptionImpl(String id) {
-
         this.id = id;
     }
 
@@ -53,14 +50,6 @@ public class GridServiceDescriptionImpl
 
     public void setServiceInterface(Class serviceInterface) {
         this.serviceInterface = serviceInterface;
-    }
-
-    public Class getImplementedClass() {
-        return implementedClass;
-    }
-
-    public void setImplementedClass(Class implementedClass) {
-        this.implementedClass = implementedClass;
     }
 
     public synchronized Address addAddress(String protocol) {
@@ -86,7 +75,6 @@ public class GridServiceDescriptionImpl
         int result = 1;
         result = prime * result + ((addresses == null) ? 0 : addresses.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((implementedClass == null) ? 0 : implementedClass.hashCode());
         return result;
     }
 

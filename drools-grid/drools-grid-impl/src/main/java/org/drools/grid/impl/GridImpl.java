@@ -5,16 +5,22 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.SocketFactory;
+
+import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.local.LocalGridConnection;
-import org.drools.grid.remote.RemoteGridConnection;
+import org.drools.grid.SocketService;
+import org.drools.grid.local.LocalGridNodeConnection;
+import org.drools.grid.remote.RemoteGridNodeConnection;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 
 public class GridImpl
     implements
@@ -23,10 +29,19 @@ public class GridImpl
     private Map<String, Object>   localServices;
 
     private Map<String, GridNode> localNodes = new HashMap<String, GridNode>();
+    
+    private String id;
 
     public GridImpl(Map<String, Object> services) {
         this.services = services;
         this.localServices = new ConcurrentHashMap<String, Object>();
+        this.id = UUID.randomUUID().toString();
+        init();
+    }
+    
+    private void init() {
+        ConnectionFactoryService conn = new ConnectionFactoryServiceImpl(this);
+        this.localServices.put( ConnectionFactoryService.class.getName(), conn );
     }
 
     public <T> T get(Class<T> serviceClass) {
@@ -49,6 +64,25 @@ public class GridImpl
                                 service );
     }
 
+    public GridNode createGridNode(String id) {
+        WhitePages wp = get( WhitePages.class );
+        GridServiceDescription gsd = wp.create( id );
+        gsd.setServiceInterface( GridNode.class );        
+        GridNode node = new GridNodeImpl( id );
+        this.localNodes.put( id, node );
+        return node;
+    }
+
+    public void removeGridNode(String id) {
+        WhitePages wp = get( WhitePages.class );
+        wp.remove( id );
+        this.localNodes.remove( id );
+    }
+
+    public GridNode getGridNode(String id) {
+        return this.localNodes.get( id );
+    }
+
     //    public void configureServiceForSocket(int port, Class cls) {
     //        configureServiceForSocket( port, cls.getName() );
     //    }
@@ -61,78 +95,94 @@ public class GridImpl
     //        this.socketServer.addService( port, id, ((MessageReceiverHandlerFactoryService) service).getMessageReceiverHandler() );        
     //    }
 
-    public GridNodeConnection getGridNodeConnection(GridServiceDescription serviceDescription) {
-
-        if ( localNodes.containsKey( serviceDescription.getId() ) ) {
-            // see if the serviceDescription is local, if so use it
-            return new LocalGridConnection( localNodes.get( serviceDescription.getId() ) );
-        } else {
-            // by default use socket
-
-        }
-
-        return null;
-    }
-
-    public GridNodeConnection getGridNodeConnection(Address address) {
-        boolean isLocal = false;
-        if ( "socket".equals( address.getTransport() ) ) {
-            InetSocketAddress isAddress = (InetSocketAddress) address.getObject();
-            try {
-                if ( InetAddress.getLocalHost().equals( isAddress.getAddress() ) ) {
-                    isLocal = true;
-                }
-            } catch ( UnknownHostException e ) {
-                throw new RuntimeException( "Unable to determine local ip address",
-                                            e );
-            }
-        }
-
-        if ( isLocal ) {
-            //new LocalGr
-        } else {
-
-        }
-
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public GridNode createGridNode(String id) {
-        GridServiceDescription gsd = GridServiceDescriptionFactory.newGridServiceDescritpion( id );
-        return createGridNode( gsd );
-
-    }
-
-    public GridNode createGridNode(GridServiceDescription gsd) {
-        GridNodeConnection connection = NodeConnectionFactory.newGridNodeConnection( gsd );
-        GridNode gnode = connection.getGridNode();
-        if ( gnode instanceof GridNodeImpl ) {
-            localNodes.put( gsd.getId(),
-                            gnode );
-        }
-
-        WhitePages pages = get( WhitePages.class );
-        pages.create( gsd.getId() );
-
-        return gnode;
-    }
-
-    public GridNode getGridNode(String id) {
-        if ( isLocalNode( id ) ) {
-            return localNodes.get( id );
-        }
-        WhitePages pages = get( WhitePages.class );
-        GridServiceDescription gsd = pages.lookup( id );
-        return new RemoteGridConnection( gsd ).getGridNode();
-
-    }
-
-    private boolean isLocalNode(String id) {
-        if ( id.contains( "@local" ) ) {
-            return true;
-        }
-        return false;
-    }
+//    public GridNodeConnection getGridNodeConnection(GridServiceDescription serviceDescription) {
+//
+//        if ( localNodes.containsKey( serviceDescription.getId() ) ) {
+//            // see if the serviceDescription is local, if so use it
+//            return new LocalGridNodeConnection( localNodes.get( serviceDescription.getId() ) );
+//        } else {
+//            // by default use socket
+//
+//        }
+//
+//        return null;
+//    }
+//
+//    public GridNodeConnection getGridNodeConnection(Address address) {
+//        boolean isLocal = false;
+//        if ( "socket".equals( address.getTransport() ) ) {
+//            InetSocketAddress isAddress = (InetSocketAddress) address.getObject();
+//            try {
+//                if ( InetAddress.getLocalHost().equals( isAddress.getAddress() ) ) {
+//                    isLocal = true;
+//                }
+//            } catch ( UnknownHostException e ) {
+//                throw new RuntimeException( "Unable to determine local ip address",
+//                                            e );
+//            }
+//        }
+//
+//        if ( isLocal ) {
+//            //new LocalGr
+//        } else {
+//
+//        }
+//
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//    public GridNode createGridNode(String id) {
+//        
+//        WhitePages pages = get( WhitePages.class );
+//        GridServiceDescription gsd = pages.create( id );
+//        gsd.setServiceInterface( GridNode.class );
+//        
+//        SocketService ss = get( SocketService.class );
+//        
+//        gsd.addAddress( "socket" ).setObject( new         ss.getIp() )
+//        
+//        GridServiceDescription gsd = new GridServiceDescriptionImpl( id );
+//        gsd.setServiceInterface( GridNode.class );
+//        GridNode node = new GridNodeImpl( gsd.getId() );
+//        
+//        this.localNodes.put( gsd.getId(), node );
+//        
+//        GridNodeConnection connection = NodeConnectionFactory.newGridNodeConnection( gsd );
+//        
+//        GridNode gnode = connection.getGridNode();
+//        if ( gnode instanceof GridNodeImpl ) {
+//   
+//        }
+//
+//
+//
+//        return gnode;
+//
+//    }
+//    
+//
+//    public void removeGridNode(String id) {
+//        // TODO Auto-generated method stub
+//        
+//    }    
+//
+//    public GridNode createGridNode(GridServiceDescription gsd) {
+//
+//    }
+//
+//    public GridNode getGridNode(String id) {
+////        GridNode node = this.localNodes.get( id );
+////        GridNodeConnection conn;
+////        if ( node != null ) {
+////            conn = new LocalGridNodeConnection( node );
+////        } else {
+////            WhitePages pages = get( WhitePages.class );
+////            GridServiceDescription gsd = pages.lookup( id );
+////            conn = new RemoteGridNodeConnection( gsd );
+////        }
+//        
+//        return conn;
+//    }
 
 }

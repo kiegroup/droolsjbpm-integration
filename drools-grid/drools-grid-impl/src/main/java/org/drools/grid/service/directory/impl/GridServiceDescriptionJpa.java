@@ -12,11 +12,11 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.service.directory.Address;
 
-public class GridServiceDescriptionJpa
+public class GridServiceDescriptionJpa<T>
     implements
     GridServiceDescription,
     Serializable {
-    private GridServiceDescription detached;
+    private GridServiceDescription<T> detached;
 
     private EntityManagerFactory   emf;
 
@@ -67,16 +67,16 @@ public class GridServiceDescriptionJpa
         return this.detached.getId();
     }
 
-    public Class getImplementedClass() {
-        return this.detached.getImplementedClass();
+    public Class getServiceInterface() {
+        return this.detached.getServiceInterface();
     }
 
-    public void setImplementedClass(Class cls) {
+    public void setServiceInterface(Class cls) {
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
         this.detached = em.find( GridServiceDescriptionImpl.class,
                                  this.detached.getId() );
-        this.detached.setImplementedClass( cls );
+        this.detached.setServiceInterface( cls );
         em.getTransaction().commit();
         em.close();
     }
@@ -121,14 +121,6 @@ public class GridServiceDescriptionJpa
         this.detached.setData( data );
         em.getTransaction().commit();
         em.close();
-    }
-
-    public Class getServiceInterface() {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public void setServiceInterface(Class cls) {
-        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

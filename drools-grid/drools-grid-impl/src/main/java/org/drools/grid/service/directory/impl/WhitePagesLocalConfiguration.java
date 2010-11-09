@@ -4,7 +4,7 @@
 package org.drools.grid.service.directory.impl;
 
 import org.drools.grid.Grid;
-import org.drools.grid.GridPeerServiceConfiguration;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
 
@@ -23,10 +23,15 @@ public class WhitePagesLocalConfiguration
     }
 
     public void configureService(Grid grid) {
-        WhitePages wp = (this.whitePages != null) ? this.whitePages : new WhitePagesImpl();
         ((GridImpl) grid).addService( WhitePages.class,
-                                      wp );
-
+                                      getWhitePages() );
+    }
+    
+    public WhitePages getWhitePages() {
+        if ( this.whitePages == null ) {
+            this.whitePages = new WhitePagesImpl();
+        }
+        return this.whitePages;
     }
 
 }

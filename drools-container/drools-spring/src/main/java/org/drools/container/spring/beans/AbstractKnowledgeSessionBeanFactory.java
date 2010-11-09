@@ -20,9 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.KnowledgeBase;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.command.Command;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.process.WorkItemHandler;
@@ -38,14 +37,14 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     BeanNameAware,
     NamedBean {
 
-    private ExecutionNode node;
-    private Map<String, WorkItemHandler> workItems;
+    private GridNode                      node;
+    private Map<String, WorkItemHandler>  workItems;
     private KnowledgeSessionConfiguration conf;
-    private KnowledgeBase kbase;
-    private String        beanName;
-    private String        name;
-    
-    private List<Command<?>> batch;
+    private KnowledgeBase                 kbase;
+    private String                        beanName;
+    private String                        name;
+
+    private List<Command< ? >>            batch;
 
     public AbstractKnowledgeSessionBeanFactory() {
         super();
@@ -89,13 +88,13 @@ public abstract class AbstractKnowledgeSessionBeanFactory
 
     public boolean isSingleton() {
         return true;
-    }        
+    }
 
-    public List<Command<?>> getBatch() {
+    public List<Command< ? >> getBatch() {
         return batch;
     }
 
-    public void setBatch(List<Command<?>> commands) {
+    public void setBatch(List<Command< ? >> commands) {
         this.batch = commands;
     }
 
@@ -107,21 +106,17 @@ public abstract class AbstractKnowledgeSessionBeanFactory
             name = beanName;
         }
         internalAfterPropertiesSet();
-        if ( node != null ) {
-            node.get( DirectoryLookupFactoryService.class ).register( name,
-                                                                      getCommandExecutor() );
-        }
     }
 
     protected abstract CommandExecutor getCommandExecutor();
 
     protected abstract void internalAfterPropertiesSet();
 
-    public ExecutionNode getNode() {
+    public GridNode getNode() {
         return node;
     }
 
-    public void setNode(ExecutionNode node) {
+    public void setNode(GridNode node) {
         this.node = node;
     }
 

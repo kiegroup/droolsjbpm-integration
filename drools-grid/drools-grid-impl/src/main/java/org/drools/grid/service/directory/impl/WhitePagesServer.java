@@ -1,10 +1,13 @@
 package org.drools.grid.service.directory.impl;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.IoWriter;
@@ -13,6 +16,7 @@ import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.timer.impl.ServiceConfiguration;
 
 public class WhitePagesServer
     implements
@@ -96,7 +100,7 @@ public class WhitePagesServer
                                                          con.respond( null );
                                                      }
                                                  } );
-                                            put( "GridServiceDescription.setImplementedClass",
+                                            put( "GridServiceDescription.setServiceInterface",
                                                  new Exec() {
                                                      public void execute(Object object,
                                                                          Conversation con,
@@ -105,7 +109,7 @@ public class WhitePagesServer
                                                          WhitePages whitePages = (WhitePages) object;
                                                          final List list = cmd.getArguments();
                                                          GridServiceDescription gsd = whitePages.lookup( (String) list.get( 0 ) );
-                                                         gsd.setImplementedClass( (Class) list.get( 1 ) );
+                                                         gsd.setServiceInterface( (Class) list.get( 1 ) );
                                                          con.respond( null );
                                                      }
                                                  } );
@@ -117,7 +121,7 @@ public class WhitePagesServer
                                                                          CommandImpl cmd) {
                                                          WhitePages whitePages = (WhitePages) object;
                                                          final List list = cmd.getArguments();
-                                                         GridServiceDescription gsd = whitePages.lookup( (String) list.get( 0 ) );
+                                                         GridServiceDescription<WhitePages> gsd = whitePages.lookup( (String) list.get( 0 ) );
                                                          Address address = gsd.getAddresses().get( (String) list.get( 1 ) );
                                                          address.setObject( list.get( 2 ) );
                                                          con.respond( null );
@@ -131,6 +135,5 @@ public class WhitePagesServer
                      Conversation con,
                      Message msg,
                      CommandImpl cmd);
-    }
-
+    }    
 }

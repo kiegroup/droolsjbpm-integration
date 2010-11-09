@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.drools.grid.CoreServicesWhitePages;
 import org.drools.grid.Grid;
-import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 
 public class CoreServicesWhitePagesConfiguration

@@ -16,14 +16,19 @@
  */
 package org.drools.grid.impl;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
+import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
+import org.drools.grid.SocketService;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.NodeData;
+import org.drools.grid.service.directory.WhitePages;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 
@@ -98,6 +103,24 @@ public class GridNodeImpl
     public MessageReceiverHandler getMessageReceiverHandler() {
         return new GridNodeServer( this,
                                    new NodeData() );
+    }
+
+    public void registerSocketService(Grid grid,
+                                      String id,
+                                      String ip,
+                                      int port) {
+      WhitePages wp = grid.get( WhitePages.class );
+      
+      GridServiceDescription<GridNode> gsd = wp.lookup( id );
+      
+      if ( gsd == null ) {
+          gsd = wp.create( id );
+      }
+      
+      gsd.setServiceInterface( GridNode.class );
+      
+      gsd.addAddress( "socket" ).setObject( new InetSocketAddress( ip,
+                                                                   port ) );
     }
 
 }

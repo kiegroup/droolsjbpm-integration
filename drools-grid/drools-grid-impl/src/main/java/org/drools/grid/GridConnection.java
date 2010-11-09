@@ -1,5 +1,8 @@
 package org.drools.grid;
 
-public interface GridConnection {
+public interface GridConnection<T> {
+    T connect();
 
+    void disconnect();
+  
 }

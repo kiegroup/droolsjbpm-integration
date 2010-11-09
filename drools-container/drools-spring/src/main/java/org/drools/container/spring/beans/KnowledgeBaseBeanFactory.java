@@ -36,11 +36,10 @@ import org.drools.builder.conf.AccumulateFunctionOption;
 import org.drools.builder.conf.EvaluatorOption;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.compiler.PackageBuilderConfiguration;
-import org.drools.grid.ExecutionNode;
-import org.drools.grid.GenericConnection;
 import org.drools.grid.GridConnection;
-import org.drools.grid.local.LocalDirectoryConnector;
-import org.drools.grid.local.LocalNodeConnector;
+import org.drools.grid.GridNode;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.impl.GridNodeImpl;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -55,7 +54,7 @@ public class KnowledgeBaseBeanFactory
     private Map<String, EvaluatorDefinition>         evaluators;
     
     private KnowledgeBase               kbase;
-    private ExecutionNode               node;
+    private GridNode               node;
     private List<DroolsResourceAdapter> resources = Collections.emptyList();
 
     public Object getObject() throws Exception {
@@ -72,10 +71,11 @@ public class KnowledgeBaseBeanFactory
 
     public void afterPropertiesSet() throws Exception {
         if ( this.node == null ) {
-            GenericConnection connection = new GridConnection();
-            connection.addExecutionNode(new LocalNodeConnector());
-            connection.addDirectoryNode(new LocalDirectoryConnector());
-            this.node = connection.getExecutionNode();
+            this.node = new GridNodeImpl();
+//            GenericConnection connection = new GridConnection();
+//            connection.addExecutionNode(new LocalNodeConnector());
+//            connection.addDirectoryNode(new LocalDirectoryConnector());
+//            this.node = connection.getExecutionNode();
 
         }       
         
@@ -164,7 +164,7 @@ public class KnowledgeBaseBeanFactory
         this.kbase = kbase;
     }
 
-    public ExecutionNode getNode() {
+    public GridNode getNode() {
         return node;
     }
 
@@ -176,8 +176,8 @@ public class KnowledgeBaseBeanFactory
         this.resources = resources;
     }
 
-    public void setNode(ExecutionNode executionNode) {
-        this.node = executionNode;
+    public void setNode(GridNode gridNode) {
+        this.node = gridNode;
     } 
 
 }

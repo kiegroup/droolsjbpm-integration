@@ -30,6 +30,7 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
@@ -62,7 +63,7 @@ public class StatefulKnowledgeSessionRemoteClient
     implements
     StatefulKnowledgeSession {
     private String                 instanceId;
-    private GridServiceDescription gsd;
+    private GridServiceDescription<GridNode> gsd;
     private ConversationManager    cm;
 
     public StatefulKnowledgeSessionRemoteClient(String localId,

@@ -15,11 +15,13 @@
  * under the License.
  */
 
-package org.drools.grid.impl;
+package org.drools.grid.conf.impl;
 
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
-import org.drools.grid.GridPeerServiceConfiguration;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.impl.GridNodeImpl;
 
 /**
  *

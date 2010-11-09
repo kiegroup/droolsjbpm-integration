@@ -32,6 +32,7 @@
 package org.drools.camel.component;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import javax.naming.Context;
 
@@ -42,15 +43,15 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
-import org.drools.grid.ExecutionNode;
 import org.drools.grid.GridConnection;
-import org.drools.grid.local.LocalDirectoryConnector;
-import org.drools.grid.local.LocalNodeConnector;
+import org.drools.grid.GridNode;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
@@ -58,13 +59,13 @@ import org.slf4j.LoggerFactory;
 
 public abstract class DroolsCamelTestSupport extends ContextTestSupport {
 	protected static final Logger LOG = LoggerFactory.getLogger(DroolsCamelTestSupport.class);
-	protected ExecutionNode node;	
+	protected GridNode node;	
 
-    public void setNode(ExecutionNode node) {
+    public void setNode(GridNode node) {
 		this.node = node;
 	}
 
-	public ExecutionNode getNode() {
+	public GridNode getNode() {
 		return node;
 	}
 
@@ -87,13 +88,11 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         //create
         Context context = super.createJndiContext();
 
-        GridConnection connection = new GridConnection();
-        connection.addExecutionNode(new LocalNodeConnector());
-        connection.addDirectoryNode(new LocalDirectoryConnector());
-        node = connection.getExecutionNode();
-        node.setId("node");
-        context.bind("node", node);
-
+        GridImpl grid = new GridImpl( new HashMap() );
+        grid.addService( WhitePages.class, new WhitePagesImpl() );
+        node = grid.createGridNode( "node" );
+        context.bind( "node",
+                      node );   
         configureDroolsContext(context);
         return context;
     }
@@ -117,7 +116,7 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         kbase.addKnowledgePackages(pkgs);
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
         
-        node.get(DirectoryLookupFactoryService.class).register(identifier, session);
+        node.set( identifier, session);
         
         return session;
     }

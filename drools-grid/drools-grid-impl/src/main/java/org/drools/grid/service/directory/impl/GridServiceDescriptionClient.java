@@ -23,12 +23,23 @@ public class GridServiceDescriptionClient
 
     private ConversationManager    conversationManager;
 
-    private GridServiceDescription detachedLocal;
+//    private GridServiceDescription detachedLocal;
+    
+    private String               id;
 
-    public GridServiceDescriptionClient(GridServiceDescription detachedLocal,
+    private Class                serviceInterface;
+
+    private Map<String, Address> addresses = new HashMap<String, Address>();
+
+    private Serializable         data;    
+
+    public GridServiceDescriptionClient(GridServiceDescription gsd,
                                         GridServiceDescription whitePagesGsd,
                                         ConversationManager conversationManager) {
-        this.detachedLocal = detachedLocal;
+        this.id = gsd.getId();
+        this.serviceInterface = gsd.getServiceInterface();
+        this.addresses = new HashMap( gsd.getAddresses() );
+        this.data = gsd.getData();
         this.whitePagesGsd = whitePagesGsd;
         this.conversationManager = conversationManager;
     }
@@ -36,11 +47,14 @@ public class GridServiceDescriptionClient
     public Address addAddress(String transport) {
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "GridServiceDescription.addAddress",
-                                           Arrays.asList( new Object[]{ detachedLocal.getId(), transport } ) );
+                                           Arrays.asList( new Object[]{ this.id, transport } ) );
         Address address = (Address) sendMessage( this.conversationManager,
                                                  sockets,
                                                  whitePagesGsd.getId(),
                                                  cmd );
+        
+        this.addresses.put( transport, address );
+        
         return new AddressClient( address,
                                   whitePagesGsd,
                                   this.conversationManager );
@@ -48,41 +62,43 @@ public class GridServiceDescriptionClient
 
     public Map<String, Address> getAddresses() {
         Map<String, Address> addresses = new HashMap<String, Address>();
-        for ( Address address : this.detachedLocal.getAddresses().values() ) {
+        for ( Address address : this.addresses.values() ) {
             addresses.put( address.getTransport(),
                            new AddressClient( address,
-                                                                      this.whitePagesGsd,
-                                                                      this.conversationManager ) );
+                                              this.whitePagesGsd,
+                                              this.conversationManager ) );
         }
         return Collections.unmodifiableMap( addresses );
     }
 
     public String getId() {
-        return this.detachedLocal.getId();
-    }
-
-    public Class getImplementedClass() {
-        return this.detachedLocal.getImplementedClass();
+        return this.id;
     }
 
     public void removeAddress(String transport) {
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "GridServiceDescription.removeAddress",
-                                           Arrays.asList( new Object[]{ detachedLocal.getId(), transport } ) );
+                                           Arrays.asList( new Object[]{ id, transport } ) );
         sendMessage( this.conversationManager,
                      sockets,
                      whitePagesGsd.getId(),
                      cmd );
+        this.addresses.remove( transport );
     }
 
-    public void setImplementedClass(Class cls) {
+    public Class getServiceInterface() {
+        return this.serviceInterface;
+    }
+
+    public void setServiceInterface(Class cls) {
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
-        CommandImpl cmd = new CommandImpl( "GridServiceDescription.setImplementedClass",
-                                           Arrays.asList( new Object[]{ detachedLocal.getId(), cls } ) );
+        CommandImpl cmd = new CommandImpl( "GridServiceDescription.setServiceInterface",
+                                           Arrays.asList( new Object[]{ id, cls } ) );
         sendMessage( this.conversationManager,
                      sockets,
                      whitePagesGsd.getId(),
                      cmd );
+        this.serviceInterface = cls;
     }
 
     @Override
@@ -100,7 +116,7 @@ public class GridServiceDescriptionClient
         int hash = 7;
         hash = 47 * hash + (this.whitePagesGsd != null ? this.whitePagesGsd.hashCode() : 0);
         hash = 47 * hash + (this.conversationManager != null ? this.conversationManager.hashCode() : 0);
-        hash = 47 * hash + (this.detachedLocal != null ? this.detachedLocal.hashCode() : 0);
+        hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
     }
 
@@ -124,14 +140,6 @@ public class GridServiceDescriptionClient
                      whitePagesGsd.getId(),
                      cmd );
 
-    }
-
-    public Class getServiceInterface() {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public void setServiceInterface(Class cls) {
-        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
 }

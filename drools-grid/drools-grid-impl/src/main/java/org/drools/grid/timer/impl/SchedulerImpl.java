@@ -17,9 +17,17 @@
 
 package org.drools.grid.timer.impl;
 
+import java.net.InetSocketAddress;
+
+import org.drools.grid.CoreServicesWhitePages;
 import org.drools.grid.Grid;
+import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
+import org.drools.grid.service.directory.Address;
+import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.CoreServicesWhitePagesImpl;
+import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
@@ -39,24 +47,13 @@ public class SchedulerImpl
     MessageReceiverHandlerFactoryService {
     private TimerService timer = new JDKTimerService();
     private String       id;
-    private Grid         grid;
 
-    public SchedulerImpl(String id,
-                         Grid grid) {
+    public SchedulerImpl(String id) {
         this.id = id;
-        this.grid = grid;
-    }
-
-    public MessageReceiverHandler getMessageReceiverHandler() {
-        return new SchedulerServer( this );
     }
 
     public String getId() {
         return this.id;
-    }
-
-    public Grid getGrid() {
-        return grid;
     }
 
     public JobHandle scheduleJob(Job job,
@@ -69,6 +66,59 @@ public class SchedulerImpl
 
     public boolean removeJob(JobHandle jobHandle) {
         throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public MessageReceiverHandler getMessageReceiverHandler() {
+        return new SchedulerServer( this );
+    }
+
+    public void registerSocketService(Grid grid,
+                                      String id,
+                                      String ip,
+                                      int port) {
+        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
+
+        GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
+        if ( gsd == null ) {
+            gsd = new GridServiceDescriptionImpl( WhitePages.class );
+        }
+
+        GridServiceDescription<WhitePages> service = coreServicesWP.getServices().get( SchedulerService.class.getName() );
+        if ( service == null ) {
+            coreServicesWP.getServices().put( SchedulerService.class.getName(),
+                                              gsd );
+            service = gsd;
+        }
+
+        Address address = null;
+        if ( service.getAddresses().get( "socket" ) != null ) {
+            address = service.getAddresses().get( "socket" );
+        } else {
+            address = service.addAddress( "socket" );
+        }
+        InetSocketAddress[] addresses = (InetSocketAddress[]) address.getObject();
+        if ( addresses != null && addresses.length >= 1 ) {
+            InetSocketAddress[] newAddresses = new InetSocketAddress[ addresses.length + 1 ];
+            if ( addresses != null ) {
+                System.arraycopy( addresses,
+                                  0,
+                                  newAddresses,
+                                  0,
+                                  addresses.length );
+            }
+            newAddresses[addresses.length] = new InetSocketAddress( ip,
+                                                                    port );
+            ServiceConfiguration conf = new SchedulerServiceConfiguration( newAddresses );
+            service.setData( conf );
+        } else {
+            InetSocketAddress[] newAddress = new InetSocketAddress[ 1 ];
+            newAddress[0] = new InetSocketAddress( ip,
+                                                   port );
+            address.setObject( newAddress );
+            ServiceConfiguration conf = new SchedulerServiceConfiguration( newAddress );
+            service.setData( conf );
+        }
+
     }
 
 }

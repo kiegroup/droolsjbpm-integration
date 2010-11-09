@@ -56,7 +56,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     private static final String IMPLEMENTATION_ATTRIBUTE = "implementation";    
 
     private static final String NAME_ATTRIBUTE           = "name";
-    private static final String EXECUTION_NODE_ATTRIBUTE = "node";
+    private static final String GRID_NODE_ATTRIBUTE = "node";
     private static final String TYPE_ATTRIBUTE           = "type";
 
     private static final String KEEP_REFERENCE           = "keep-reference";
@@ -95,7 +95,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         factory.addPropertyReference( "kbase",
                                       kbase );
 
-        String node = element.getAttribute( EXECUTION_NODE_ATTRIBUTE );
+        String node = element.getAttribute( GRID_NODE_ATTRIBUTE );
         if ( node != null && node.length() > 0 ) {
             factory.addPropertyReference( "node",
                                           node );

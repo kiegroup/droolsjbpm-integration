@@ -4,7 +4,7 @@
 package org.drools.grid.service.directory.impl;
 
 import org.drools.grid.Grid;
-import org.drools.grid.GridPeerServiceConfiguration;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 
 public class WhitePagesPeeredConfiguration
     implements

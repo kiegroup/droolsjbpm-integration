@@ -16,14 +16,14 @@
 
 package org.drools.runtime.pipeline.impl;
 
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.ResultHandler;
 
 public class ExecutionNodePipelineImpl extends BaseEmitter implements Pipeline {
-	private ExecutionNode node;
+	private GridNode node;
 
-	public ExecutionNodePipelineImpl(ExecutionNode node) {
+	public ExecutionNodePipelineImpl(GridNode node) {
 		this.node = node;
 	}
 

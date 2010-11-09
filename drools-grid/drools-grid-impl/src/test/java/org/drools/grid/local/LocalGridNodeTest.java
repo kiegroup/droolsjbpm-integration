@@ -9,12 +9,14 @@ import junit.framework.TestCase;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.builder.KnowledgeBuilderFactoryService;
+import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
+import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
-import org.drools.grid.GridPeerConfiguration;
-import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
+import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.grid.service.directory.WhitePages;
@@ -28,28 +30,28 @@ public class LocalGridNodeTest extends TestCase {
     }
 
     public void testConnectWithId() {
-        GridNodeConnection connection = new LocalGridConnection( "test-id" );
-        GridNode gnode = connection.getGridNode();
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
+        GridNode gnode = connection.connect();
         assertNotNull( gnode );
     }
 
     public void testConnectWithGivenGridNode() {
         GridNode gnode = new GridNodeImpl();
-        GridNodeConnection connection = new LocalGridConnection( gnode );
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( gnode );
         assertSame( gnode,
-                    connection.getGridNode() );
+                    connection.connect() );
     }
 
     public void testGetFactoryService() {
-        GridNodeConnection connection = new LocalGridConnection( "test-id" );
-        GridNode gnode = connection.getGridNode();
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
+        GridNode gnode = connection.connect();
         KnowledgeBuilderFactoryService kbfService = gnode.get( KnowledgeBuilderFactoryService.class );
         assertNotNull( kbfService );
     }
 
     public void testSetObject() {
-        GridNodeConnection connection = new LocalGridConnection( "test-id" );
-        GridNode gnode = connection.getGridNode();
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
+        GridNode gnode = connection.connect();
 
         KnowledgeBaseFactoryService kbfService = gnode.get( KnowledgeBaseFactoryService.class );
         KnowledgeBase kbase = kbfService.newKnowledgeBase();
@@ -71,17 +73,16 @@ public class LocalGridNodeTest extends TestCase {
 
         conf.configure( grid );
 
-        GridServiceDescription gsd = new GridServiceDescriptionImpl( "test1@local" );
-        gsd.addAddress( "local" );
-        GridNode gnode = grid.createGridNode( gsd );
+        GridNode gnode = grid.createGridNode( "test1@local" );
 
         WhitePages pages = grid.get( WhitePages.class );
-        GridServiceDescription serviceDescription = pages.lookup( "test1@local" );
+        GridServiceDescription<GridNode> gsd = pages.create( "test1@local" );
+        
+        GridServiceDescription<GridNode> serviceDescription = pages.lookup( "test1@local" );
 
-        GridNodeConnection connection = grid.getGridNodeConnection( serviceDescription );
-        connection.connect();
+        GridConnection connection = grid.get( ConnectionFactoryService.class ).createConnection( gsd );
         assertSame( gnode,
-                    connection.getGridNode() );
+                    connection.connect() );
     }
 
     //    public void testWhitePagesAddRemoveAddresss() {

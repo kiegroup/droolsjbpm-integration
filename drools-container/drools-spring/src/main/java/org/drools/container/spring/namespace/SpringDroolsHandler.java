@@ -43,11 +43,11 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser( "ksession",
                                       new KnowledgeSessionDefinitionParser() );
 
-        registerBeanDefinitionParser( "connection",
-                                      new ConnectionDefinitionParser() );
+        registerBeanDefinitionParser( "grid",
+                                      new GridDefinitionParser() );
 
-        registerBeanDefinitionParser( "execution-node",
-                                      new ExecutionNodeDefinitionParser() );
+        registerBeanDefinitionParser( "grid-node",
+                                      new GridNodeDefinitionParser() );
     }
 
 }

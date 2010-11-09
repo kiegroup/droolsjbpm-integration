@@ -35,6 +35,7 @@ import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.definition.KnowledgePackage;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
@@ -54,7 +55,7 @@ public class KnowledgeBuilderRemoteClient
 
     private String                 instanceId;
     private ConversationManager    cm;
-    private GridServiceDescription gsd;
+    private GridServiceDescription<GridNode>  gsd;
 
     public KnowledgeBuilderRemoteClient(String localId,
                                         GridServiceDescription gsd,
@@ -88,8 +89,8 @@ public class KnowledgeBuilderRemoteClient
                                                                                                                        null ) } ) );
 
         sendMessage( this.cm,
-                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getServiceInterface().getName(),
+                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getId(),
                      cmd );
 
     }
@@ -119,8 +120,8 @@ public class KnowledgeBuilderRemoteClient
                                                                                                                        kresultsId ) } ) );
 
         Object result = sendMessage( this.cm,
-                                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getServiceInterface().getName(),
+                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                     this.gsd.getId(),
                                      cmd );
 
         return (KnowledgeBuilderErrors) result;

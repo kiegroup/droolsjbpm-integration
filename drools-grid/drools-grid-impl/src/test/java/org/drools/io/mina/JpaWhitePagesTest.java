@@ -19,7 +19,7 @@ public class JpaWhitePagesTest extends TestCase {
         wp.create( "s2" );
         wp.create( "s3" );
 
-        GridServiceDescription gs1 = wp.lookup( "s1" );
+        GridServiceDescription<String> gs1 = wp.lookup( "s1" );
 
         gs1.addAddress( "p1" ).setObject( "v1" );
         gs1.addAddress( "p2" ).setObject( "v2" );

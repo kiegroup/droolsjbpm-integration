@@ -52,7 +52,7 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-grid-api</artifactId>
+      <artifactId>drools-grid-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

@@ -16,29 +16,29 @@
 
 package org.drools.runtime.pipeline.impl;
 
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.impl.BasePipelineContext;
 
 public class ExecutionNodePipelineContextImpl extends BasePipelineContext {
 
-    private ExecutionNode node;
+    private GridNode node;
     private CommandExecutor commandExecutor;
 
-    public ExecutionNodePipelineContextImpl(ExecutionNode node,
-                                             ClassLoader classLoader) {
+    public ExecutionNodePipelineContextImpl(GridNode node,
+                                            ClassLoader classLoader) {
         this( node, classLoader, null );
     }
 
-    public ExecutionNodePipelineContextImpl(ExecutionNode node,
-                                             ClassLoader classLoader,
-                                             ResultHandler resultHandler) {
+    public ExecutionNodePipelineContextImpl(GridNode node,
+                                            ClassLoader classLoader,
+                                            ResultHandler resultHandler) {
         super( classLoader, resultHandler );
         this.node = node;
     }
 
-    public ExecutionNode getExecutionNode() {
+    public GridNode getGridNode() {
         return this.node;
     }
 

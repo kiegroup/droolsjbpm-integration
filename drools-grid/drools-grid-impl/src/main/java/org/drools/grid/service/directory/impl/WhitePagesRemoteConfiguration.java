@@ -5,7 +5,7 @@ package org.drools.grid.service.directory.impl;
 
 import org.drools.grid.CoreServicesWhitePages;
 import org.drools.grid.Grid;
-import org.drools.grid.GridPeerServiceConfiguration;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.service.directory.WhitePages;

@@ -33,6 +33,7 @@ import org.drools.definition.rule.Query;
 import org.drools.definition.rule.Rule;
 import org.drools.definition.type.FactType;
 import org.drools.event.knowledgebase.KnowledgeBaseEventListener;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
@@ -54,7 +55,7 @@ public class KnowledgeBaseRemoteClient
 
     private String                 instanceId;
     private ConversationManager    cm;
-    private GridServiceDescription gsd;
+    private GridServiceDescription<GridNode>  gsd;
 
     public KnowledgeBaseRemoteClient(String localId,
                                      GridServiceDescription gsd,

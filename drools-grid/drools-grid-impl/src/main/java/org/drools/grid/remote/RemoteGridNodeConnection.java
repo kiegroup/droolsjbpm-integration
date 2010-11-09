@@ -15,27 +15,31 @@
  * under the License.
  */
 
-package org.drools.grid.impl;
+package org.drools.grid.remote;
 
+import org.drools.grid.GridConnection;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.local.LocalGridConnection;
-import org.drools.grid.remote.RemoteGridConnection;
 
 /**
  *
  * @author salaboy
  */
-public class NodeConnectionFactory {
+public class RemoteGridNodeConnection<T>
+    implements
+    GridConnection<GridNode> {
+    private GridNode gridNode;
 
-    public static GridNodeConnection newGridNodeConnection(GridServiceDescription gsd) {
-        if ( gsd.getAddresses().get( "local" ) != null ) {
-            return new LocalGridConnection( gsd.getId() );
-        }
-        if ( gsd.getAddresses().get( "socket" ) != null ) {
-            return new RemoteGridConnection( gsd );
-        }
-        return null;
+    public RemoteGridNodeConnection(GridServiceDescription gsd) {
+        this.gridNode = new GridNodeRemoteClient( gsd );
     }
 
+    public GridNode connect() {
+        return this.gridNode;
+    }
+
+    public void disconnect() {
+        this.gridNode.dispose();
+    }
 }

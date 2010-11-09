@@ -5,16 +5,12 @@ import java.util.Map;
 
 import org.drools.grid.service.directory.Address;
 
-public interface GridServiceDescription {
+public interface GridServiceDescription<T> {
     public String getId();
 
-    public Class getServiceInterface();
+    public Class<T> getServiceInterface();
 
-    public void setServiceInterface(Class cls);
-
-    public Class getImplementedClass();
-
-    public void setImplementedClass(Class cls);
+    public void setServiceInterface(Class<T> cls);
 
     public Map<String, Address> getAddresses();
 

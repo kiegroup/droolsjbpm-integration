@@ -34,11 +34,10 @@ import org.drools.util.ServiceRegistryImpl;
  *
  * @author salaboy
  */
-public class GridNodeRemoteClient
+public class GridNodeRemoteClient<T>
     implements
     GridNode {
 
-    private String                    id;
     private GridServiceDescription    gsd;
     private final Map<String, Object> localContext    = new ConcurrentHashMap<String, Object>();
     private final ServiceRegistry     serviceRegistry = ServiceRegistryImpl.getInstance();
@@ -75,7 +74,7 @@ public class GridNodeRemoteClient
     public void init(Object context) {
 
         MinaConnector connector = new MinaConnector();
-        ConversationManager cm = new ConversationManagerImpl( id,
+        ConversationManager cm = new ConversationManagerImpl( this.gsd.getId(),
                                                               connector,
                                                               SystemEventListenerFactory.getSystemEventListener() );
         this.localContext.put( KnowledgeBuilderFactoryService.class.getCanonicalName(),

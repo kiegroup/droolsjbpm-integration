@@ -9,10 +9,10 @@ import junit.framework.TestCase;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
-import org.drools.grid.GridPeerConfiguration;
-import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.MultiplexSocketService;
+import org.drools.grid.SocketService;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
+import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.Connector;
@@ -23,7 +23,6 @@ import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.RegisterWhitePagesConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
@@ -44,19 +43,16 @@ public class WhitePagesTest extends TestCase {
         GridPeerServiceConfiguration coreSeviceConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
-        GridPeerServiceConfiguration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
+        MultiplexSocketServiceCongifuration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
                                                                                                                           new MinaAcceptorFactoryService(),
-                                                                                                                          l ) );
+                                                                                                                          l,
+                                                                                                                          grid1) );
         conf.addConfiguration( socketConf );
 
-        GridPeerServiceConfiguration wplConf = new WhitePagesLocalConfiguration();
+        WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
         conf.addConfiguration( wplConf );
 
-        GridPeerServiceConfiguration wpsc = new WhitePagesSocketConfiguration( 5012 );
-        conf.addConfiguration( wpsc );
-
-        GridPeerServiceConfiguration registerwpincore = new RegisterWhitePagesConfiguration();
-        conf.addConfiguration( registerwpincore );
+        socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 5012 );
 
         conf.configure( grid1 );
 
@@ -96,7 +92,7 @@ public class WhitePagesTest extends TestCase {
         assertNotSame( test1Gsd,
                        testGsd_3 );
         conn.close();
-        grid1.get( MultiplexSocketService.class ).close();
+        grid1.get( SocketService.class ).close();
     }
 
     public void testWhitePagesLookupServices() {

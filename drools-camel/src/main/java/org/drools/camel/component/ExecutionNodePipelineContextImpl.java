@@ -16,15 +16,15 @@
 
 package org.drools.camel.component;
 
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 
 public class ExecutionNodePipelineContextImpl {
-    private ExecutionNode node;
+    private GridNode node;
     CommandExecutor       exec;
     private ClassLoader   localClassLoadel;
 
-    public ExecutionNodePipelineContextImpl(ExecutionNode node,
+    public ExecutionNodePipelineContextImpl(GridNode node,
                                             ClassLoader localClassLoader) {
         this.node = node;
         this.localClassLoadel = localClassLoader;
@@ -38,11 +38,11 @@ public class ExecutionNodePipelineContextImpl {
         this.exec = exec;
     }
 
-    public void setExecutionNode(ExecutionNode node) {
+    public void setExecutionNode(GridNode node) {
         this.node = node;
     }
 
-    public ExecutionNode getExecutionNode() {
+    public GridNode getExecutionNode() {
         return this.node;
     }
 

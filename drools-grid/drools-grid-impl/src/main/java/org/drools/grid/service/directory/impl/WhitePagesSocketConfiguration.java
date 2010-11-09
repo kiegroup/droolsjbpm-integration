@@ -8,10 +8,10 @@ import java.net.InetSocketAddress;
 
 import org.drools.grid.CoreServicesWhitePages;
 import org.drools.grid.Grid;
-import org.drools.grid.GridPeerServiceConfiguration;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
-import org.drools.grid.MultiplexSocketService;
+import org.drools.grid.SocketService;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 
@@ -39,7 +39,7 @@ public class WhitePagesSocketConfiguration
                 gsd = new GridServiceDescriptionImpl( WhitePages.class );
             }
 
-            MultiplexSocketService mss = grid.get( MultiplexSocketService.class );
+            SocketService mss = grid.get( SocketService.class );
 
             //            GridServiceDescription service = coreServicesWP.getServices().get( WhitePages.class.getName() );
             //            if( service == null){
@@ -66,9 +66,9 @@ public class WhitePagesSocketConfiguration
             //                                                         this.port);
             //            address.setObject(  newAddresses );
 
-            mss.addService( this.port,
-                            WhitePages.class.getName(),
-                            ((MessageReceiverHandlerFactoryService) wp).getMessageReceiverHandler() );
+            mss.addService( WhitePages.class.getName(),
+                            this.port,
+                            (MessageReceiverHandlerFactoryService) wp );
         }
     }
 }

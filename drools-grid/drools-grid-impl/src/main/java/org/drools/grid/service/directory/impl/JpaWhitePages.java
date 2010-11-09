@@ -4,6 +4,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
@@ -41,7 +42,7 @@ public class JpaWhitePages
     public void remove(String serviceDescriptionId) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        GridServiceDescription gsd = em.find( GridServiceDescriptionImpl.class,
+        GridServiceDescription<WhitePages> gsd = em.find( GridServiceDescriptionImpl.class,
                                               serviceDescriptionId );
         for ( Address address : gsd.getAddresses().values() ) { // because JPA won't cascade delete to orphans
             em.remove( address );
@@ -59,53 +60,7 @@ public class JpaWhitePages
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    //    public GridServiceDescription create(GridServiceDescription serviceDescription) {
-    //        EntityManager em = emf.createEntityManager();
-    //        em.getTransaction().begin();
-    //        em.persist( serviceDescription );
-    //        em.getTransaction().commit();
-    //        em.close();
-    //    }
-    //
-    //    public void remove(String id) {
-    //        EntityManager em = emf.createEntityManager();
-    //        em.getTransaction().begin();
-    //        em.remove( new GridServiceDescriptionImpl( id ) );
-    //        em.getTransaction().commit();
-    //        em.close();
-    //    }
-    //
-    //    public GridServiceDescription lookup(String id) {
-    //        GridServiceDescription gsd = this.emf.createEntityManager().find( GridServiceDescriptionImpl.class, id );
-    //        return gsd;
-    //    }
-    //
-    //    public void addAddress(String id,
-    //                           Address address) {
-    //        EntityManager em = emf.createEntityManager();
-    //        
-    //        GridServiceDescriptionImpl gsd = em.find( GridServiceDescriptionImpl.class, id );
-    //        em.getTransaction().begin();
-    //        gsd.addAddress( address );
-    //        em.getTransaction().commit();
-    //        em.close();
-    //    }
-    //
-    //    public void removeAddress(String id,
-    //                              String protocol) {
-    //        EntityManager em = emf.createEntityManager();
-    //        
-    //        GridServiceDescriptionImpl gsd = em.find( GridServiceDescriptionImpl.class, id );
-    //        em.getTransaction().begin();
-    //        Address address = gsd.getAddresses().get( protocol );
-    //        gsd.removeAddress( protocol );
-    //        em.remove( address ); //because jpa does not automatically remove orphans
-    //        em.getTransaction().commit();
-    //        em.close();
-    //    }
-    //
-    //    public MessageReceiverHandler getMessageReceiverHandler() {
-    //        return new WhitePagesServer( this );
-    //    }
-
+    public void registerSocketService(Grid grid, String id, String ip, int port) {
+        WhitePagesImpl.doRegisterSocketService(grid, id, ip, port);
+    }
 }

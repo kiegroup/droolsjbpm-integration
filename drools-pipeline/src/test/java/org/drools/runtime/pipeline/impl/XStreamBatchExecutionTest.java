@@ -40,7 +40,6 @@ import org.drools.KnowledgeBaseFactory;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.Person;
 import org.drools.TestVariable;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
@@ -49,7 +48,7 @@ import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -76,8 +75,9 @@ import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 import org.drools.grid.GridConnection;
-import org.drools.grid.local.LocalDirectoryConnector;
-import org.drools.grid.local.LocalNodeConnector;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 
 public class XStreamBatchExecutionTest extends TestCase {
 
@@ -1836,14 +1836,13 @@ public class XStreamBatchExecutionTest extends TestCase {
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-        GridConnection connection = new GridConnection();
-        connection.addExecutionNode(new LocalNodeConnector());
-        connection.addDirectoryNode(new LocalDirectoryConnector());
-        ExecutionNode node = connection.getExecutionNode();
+        GridImpl grid = new GridImpl( new HashMap() );
+        grid.addService( WhitePages.class, new WhitePagesImpl() );
+        GridNode node = grid.createGridNode( "local" );
 
         StatefulKnowledgeSession ksession = getExecutionNodeSessionStateful(node, ResourceFactory.newByteArrayResource( str.getBytes() ) );
 
-        node.get(DirectoryLookupFactoryService.class).register("ksession1", ksession);
+        node.set("ksession1", ksession);
 
         XStreamResolverStrategy xstreamStrategy = new XStreamResolverStrategy() {
             public XStream lookup(String name) {
@@ -1902,7 +1901,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         return pipeline;
     }
 
-    private Pipeline getPipelineSessionStateful(ExecutionNode node, XStreamResolverStrategy xstreamResolverStrategy) {
+    private Pipeline getPipelineSessionStateful(GridNode node, XStreamResolverStrategy xstreamResolverStrategy) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
 
         Action assignResult = PipelineFactory.newAssignObjectAsResult();
@@ -2005,7 +2004,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         return session;
     }
 
-    private StatefulKnowledgeSession getExecutionNodeSessionStateful(ExecutionNode node, Resource resource) throws Exception {
+    private StatefulKnowledgeSession getExecutionNodeSessionStateful(GridNode node, Resource resource) throws Exception {
         KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
         kbuilder.add( resource,
                       ResourceType.DRL );

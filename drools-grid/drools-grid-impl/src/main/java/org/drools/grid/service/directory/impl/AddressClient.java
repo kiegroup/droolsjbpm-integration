@@ -49,6 +49,7 @@ public class AddressClient
                      sockets,
                      this.whitePagesGsd.getId(),
                      cmd );
+        this.detachedLocal.setObject( object );
     }
 
 }

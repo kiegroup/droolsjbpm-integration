@@ -28,11 +28,10 @@ import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.SessionConfiguration;
 import org.drools.agent.impl.KnowledgeAgentImpl;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.common.InternalRuleBase;
 import org.drools.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
@@ -59,7 +58,10 @@ public class SpringDroolsTest extends TestCase {
     public void testNoConnection() throws Exception {
             ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
-            ExecutionNode node2 = (ExecutionNode) context.getBean( "node2" );
+            GridNode node1 = (GridNode) context.getBean( "node1" );
+            assertNotNull( node1 );            
+            
+            GridNode node2 = (GridNode) context.getBean( "node2" );
             assertNotNull( node2 );
     }
 
@@ -151,9 +153,9 @@ public class SpringDroolsTest extends TestCase {
     public void testNode() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
-        ExecutionNode node = (ExecutionNode) context.getBean( "node1" );
+        GridNode node = (GridNode) context.getBean( "node1" );
         List<String> list = new ArrayList<String>();
-        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "stateless1" );
+        StatelessKnowledgeSession kstateless = node.get( "stateless1", StatelessKnowledgeSession.class );
         assertNotNull( "can't obtain session named: stateless1",
                        kstateless );
         kstateless.setGlobal( "list",
@@ -165,7 +167,7 @@ public class SpringDroolsTest extends TestCase {
                       list.size() );
 
         list = new ArrayList<String>();
-        StatefulKnowledgeSession kstateful = (StatefulKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "ksession2" );
+        StatefulKnowledgeSession kstateful = node.get( "ksession2", StatefulKnowledgeSession.class );
         kstateful.setGlobal( "list",
                              list );
         kstateful.insert( new Person( "Darth",

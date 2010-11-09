@@ -49,7 +49,7 @@ public class SchedulerClient
     SchedulerService,
     MessageReceiverHandlerFactoryService {
 
-    private GridServiceDescription schedulerGsd;
+    private GridServiceDescription<SchedulerService> schedulerGsd;
 
     private ConversationManager    conversationManager;
 
@@ -168,6 +168,13 @@ public class SchedulerClient
 
     public boolean removeJob(JobHandle jobHandle) {
         throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public void registerSocketService(Grid grid,
+                                      String id,
+                                      String ip,
+                                      int port) {
+        throw new UnsupportedOperationException( );
     }
 
 }

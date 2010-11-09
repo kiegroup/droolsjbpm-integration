@@ -1,10 +1,13 @@
 /**
  * 
  */
-package org.drools.grid;
+package org.drools.grid.conf.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.drools.grid.Grid;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 
 public class GridPeerConfiguration {
     private List<GridPeerServiceConfiguration> configurations;

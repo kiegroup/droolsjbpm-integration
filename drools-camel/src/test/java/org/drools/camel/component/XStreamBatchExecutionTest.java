@@ -42,7 +42,6 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.Person;
 import org.drools.TestVariable;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
@@ -50,7 +49,7 @@ import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
-import org.drools.grid.ExecutionNode;
+import org.drools.grid.GridNode;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -72,24 +71,24 @@ import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 import org.drools.grid.GridConnection;
-import org.drools.grid.local.LocalDirectoryConnector;
-import org.drools.grid.local.LocalNodeConnector;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 
 public class XStreamBatchExecutionTest extends ContextTestSupport {
-    protected ExecutionNode node;
+    protected GridNode node;
     protected CommandExecutor exec;
     
     
     protected Context createJndiContext() throws Exception {
         Context context = super.createJndiContext();
 
-        GridConnection connection = new GridConnection();
-        connection.addExecutionNode(new LocalNodeConnector());
-        connection.addDirectoryNode(new LocalDirectoryConnector());
-        node = connection.getExecutionNode();
-        node.setId("node");
-        context.bind("node", node);
-        node.get(DirectoryLookupFactoryService.class).register("ksession1", this.exec);
+        GridImpl grid = new GridImpl( new HashMap() );
+        grid.addService( WhitePages.class, new WhitePagesImpl() );
+        node = grid.createGridNode( "local" );
+        context.bind( "node",
+                      node );        
+        node.set("ksession1", this.exec);
         return context;
     }    
     

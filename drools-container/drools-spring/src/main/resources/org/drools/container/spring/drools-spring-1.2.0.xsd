@@ -14,9 +14,9 @@
 	<xsd:element name="grid-node">
 		<xsd:complexType>
 			<xsd:attribute name="id" use="required" type="xsd:ID"/>
-			<xsd:attribute name="connection" use="optional" type="xsd:string"/>
+			<xsd:attribute name="grid" use="optional" type="xsd:string"/>
 		</xsd:complexType>
-	</xsd:element>
+	</xsd:element>	
 	
 	<xsd:element name="resource-change-scanner">
 		<xsd:complexType>
@@ -38,6 +38,9 @@
 			<xsd:complexContent>
 				<xsd:extension base="resourceType">
 					<xsd:attribute name="id" use="optional" type="xsd:ID"/>
+                                        <xsd:attribute name="basic-authentication" use="optional" type="enabledDisabledEnum"/>
+                                        <xsd:attribute name="username" use="optional" type="xsd:string"/>
+                                        <xsd:attribute name="password" use="optional" type="xsd:string"/>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -114,7 +117,6 @@
 							        <xsd:attribute name="handler" type="xsd:string"/>
 							    </xsd:complexType>
 	                        </xsd:element>
-	                                                	                        
 						</xsd:all>
 					</xsd:complexType>				
 				</xsd:element>	
@@ -244,7 +246,14 @@
 			<xsd:enumeration value="STREAM" />
 			<xsd:enumeration value="CLOUD" />
 		</xsd:restriction>
-	</xsd:simpleType>	
+	</xsd:simpleType>
+
+        <xsd:simpleType name="enabledDisabledEnum">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="enabled" />
+			<xsd:enumeration value="disabled" />
+		</xsd:restriction>
+	</xsd:simpleType>
 	
 	
 	<xsd:simpleType name="assertBehaviorEnum">
@@ -279,7 +288,7 @@
 		</xsd:choice>
 		<xsd:attribute name="source" use="optional" type="xsd:string"/>
 		<xsd:attribute name="type" use="optional" type="resourceTypeEnum"/>
-	    <xsd:attribute name="ref"  use="optional" type="xsd:string"/>		
+	    <xsd:attribute name="ref"  use="optional" type="xsd:string"/>
 	</xsd:complexType>
 	
 	<xsd:complexType name="resourceRefType">

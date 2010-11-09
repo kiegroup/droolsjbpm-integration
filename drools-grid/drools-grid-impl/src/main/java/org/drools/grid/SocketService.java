@@ -3,14 +3,14 @@ package org.drools.grid;
 import java.util.Set;
 import org.drools.grid.io.MessageReceiverHandler;
 
-public interface MultiplexSocketService {
+public interface SocketService {
 
-    void addService(int port,
-                    String id,
-                    MessageReceiverHandler receiver);
+    void addService(String id,
+                    int port,
+                    Object object);
 
     void removeService(int port,
-                       String id);
+                       String id);    
 
     String getIp();
 

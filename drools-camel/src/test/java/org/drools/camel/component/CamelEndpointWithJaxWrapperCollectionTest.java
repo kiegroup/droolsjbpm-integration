@@ -31,7 +31,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.DirectoryLookupFactoryService;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
@@ -42,6 +41,7 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.concurrent.CommandExecutor;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.pipeline.camel.Person;
@@ -159,7 +159,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 
 		StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-		node.get(DirectoryLookupFactoryService.class).register(identifier, session);
+		node.set(identifier, session);
 		return session;
 	}
 	
@@ -170,7 +170,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
             def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
     
             // create a jaxbContext for the test to use outside of Camel.
-            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( DirectoryLookupFactoryService.class ).lookup( "ksession1" );
+            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1", CommandExecutor.class );
             KnowledgeBase kbase = ksession1.getKnowledgeBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {

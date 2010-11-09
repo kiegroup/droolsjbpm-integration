@@ -19,8 +19,8 @@ public class GridServiceDescriptionJpaTest extends TestCase {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new WhitePagesImpl();
 
-        GridServiceDescription gsd1 = wp.create( WhitePages.class.getName() );
-        gsd1.setImplementedClass( WhitePages.class );
+        GridServiceDescription<WhitePages> gsd1 = wp.create( WhitePages.class.getName() );
+        gsd1.setServiceInterface(  WhitePages.class );
         gsd1.addAddress( "socket" ).setObject( new InetSocketAddress( "127.0.0.1",
                                                                       5011 ) );
         gsd1.addAddress( "p1" ).setObject( "v1" );
@@ -32,7 +32,7 @@ public class GridServiceDescriptionJpaTest extends TestCase {
         em.close();
 
         GridServiceDescriptionImpl gsd2 = new GridServiceDescriptionImpl( "s1" );
-        gsd2.setImplementedClass( WhitePages.class );
+        gsd2.setServiceInterface( WhitePages.class );
         gsd2.addAddress( "socket" ).setObject( new InetSocketAddress( "127.0.0.1",
                                                                       5012 ) );
         gsd2.addAddress( "p2" ).setObject( "v2" );
@@ -44,7 +44,7 @@ public class GridServiceDescriptionJpaTest extends TestCase {
         em.close();
 
         em = emf.createEntityManager();
-        GridServiceDescription gsd1r = em.find( GridServiceDescriptionImpl.class,
+        GridServiceDescription<WhitePages> gsd1r = em.find( GridServiceDescriptionImpl.class,
                                                 WhitePages.class.getName() );
         assertNotNull( gsd1r );
         assertEquals( gsd1,
@@ -55,7 +55,7 @@ public class GridServiceDescriptionJpaTest extends TestCase {
         assertEquals( "v1",
                       gsd1.getAddresses().get( "p1" ).getObject() );
 
-        GridServiceDescription gsd2r = em.find( GridServiceDescriptionImpl.class,
+        GridServiceDescription<WhitePages> gsd2r = em.find( GridServiceDescriptionImpl.class,
                                                 "s1" );
         assertNotNull( gsd2r );
         assertEquals( gsd2,

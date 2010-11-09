@@ -4,10 +4,8 @@ public interface Grid {
     public <T> T get(Class<T> serviceClass);
 
     public GridNode createGridNode(String id);
-
-    public GridNode createGridNode(GridServiceDescription gsd);
+    
+    public void removeGridNode(String id);
 
     public GridNode getGridNode(String id);
-
-    public GridNodeConnection getGridNodeConnection(GridServiceDescription serviceDescription);
 }

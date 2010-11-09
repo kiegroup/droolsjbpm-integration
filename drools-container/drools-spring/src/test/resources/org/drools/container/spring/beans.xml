@@ -3,14 +3,14 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:drools="http://drools.org/schema/drools-spring"       
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring-1.1.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<drools:connection id="connection1" type="local" />
+	<drools:grid id="grid1" />
 	
-	<drools:execution-node id="node1" connection="connection1" />
+	<drools:grid-node id="node1" grid="grid1" />
 	
-	<drools:execution-node id="node2" />
+	<drools:grid-node id="node2" />
 	
 	<drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
 
