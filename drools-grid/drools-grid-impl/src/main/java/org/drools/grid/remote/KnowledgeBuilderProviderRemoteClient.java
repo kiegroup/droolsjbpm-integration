@@ -17,7 +17,6 @@
 package org.drools.grid.remote;
 
 import com.sun.tools.xjc.Options;
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Properties;
@@ -32,8 +31,6 @@ import org.drools.command.SetVariableCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
-import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 
@@ -76,7 +73,7 @@ public class KnowledgeBuilderProviderRemoteClient
                                                                                                 localId,
                                                                                                 new NewKnowledgeBuilderCommand( null ) ) } ) );
 
-        sendMessage( this.cm,
+        ConversationUtil.sendMessage( this.cm,
                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                      this.gsd.getId(),
                      cmd );
@@ -105,44 +102,5 @@ public class KnowledgeBuilderProviderRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public static Object sendMessage(ConversationManager conversationManager,
-                                     Serializable addr,
-                                     String recipientId,
-                                     Object body) {
-
-        InetSocketAddress[] sockets = null;
-        if ( addr instanceof InetSocketAddress[] ) {
-            sockets = (InetSocketAddress[]) addr;
-        } else if ( addr instanceof InetSocketAddress ) {
-            sockets = new InetSocketAddress[ 1 ];
-            sockets[0] = (InetSocketAddress) addr;
-        }
-
-        BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
-        Exception exception = null;
-        for ( InetSocketAddress socket : sockets ) {
-            try {
-                Conversation conv = conversationManager.startConversation( socket,
-                                                                           recipientId );
-                conv.sendMessage( body,
-                                  handler );
-                exception = null;
-            } catch ( Exception e ) {
-                exception = e;
-                conversationManager.endConversation();
-            }
-            if ( exception == null ) {
-                break;
-            }
-        }
-        if ( exception != null ) {
-            throw new RuntimeException( "Unable to send message",
-                                        exception );
-        }
-        try {
-            return handler.getMessage().getBody();
-        } finally {
-            conversationManager.endConversation();
-        }
-    }
+    
 }

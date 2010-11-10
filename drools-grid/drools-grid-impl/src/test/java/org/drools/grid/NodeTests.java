@@ -18,7 +18,6 @@
 package org.drools.grid;
 
 import java.io.Serializable;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import org.drools.KnowledgeBase;
@@ -29,32 +28,19 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
-import org.drools.command.assertion.AssertEquals;
-import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
-import org.drools.grid.conf.impl.GridNodeLocalConfiguration;
-import org.drools.grid.conf.impl.GridNodeSocketConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
-import org.drools.grid.remote.GridNodeRemoteClient;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
-import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
-import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
-import org.drools.grid.timer.impl.RegisterSchedulerConfiguration;
-import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
-import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
-import org.drools.time.Scheduler;
-import org.drools.time.SchedulerService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -152,7 +138,7 @@ public class NodeTests {
         Assert.assertNotNull( kbuilder );
 
         String rule = "package test\n"
-                      + "Rule \"test\""
+                      + "rule \"test\""
                       + "  when"
                       + "  then"
                       + "      System.out.println(\"Rule Fired!\");"
@@ -180,12 +166,93 @@ public class NodeTests {
 
         Assert.assertNotNull( session );
 
-        FactHandle handle = session.insert( new MyObject() );
+        FactHandle handle = session.insert( new MyObject("myObj1") );
         Assert.assertNotNull( handle );
 
         int i = session.fireAllRules();
         Assert.assertEquals( 1,
                              i );
+        
+        remoteN1.dispose(); 
+         grid1.get(SocketService.class).close();
+
+    }
+    
+     @Test
+    public void remoteNodeRetractUpdateGlobalsTest() {
+        Grid grid1 = new GridImpl( new HashMap<String, Object>() );
+        configureGrid1( grid1,
+                        8000,
+                        null );
+
+        Grid grid2 = new GridImpl( new HashMap<String, Object>() );
+        configureGrid1( grid2,
+                        -1,
+                        grid1.get( WhitePages.class ) );
+
+        GridNode n1 = grid1.createGridNode( "n1" );
+        grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
+               
+        GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "n1" );
+        GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
+        GridNode remoteN1 = conn.connect();
+
+        KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+
+        Assert.assertNotNull( kbuilder );
+
+         String rule = "package test\n"
+                 + "import org.drools.grid.NodeTests.MyObject;\n"
+                 + "global MyObject myGlobalObj;\n"
+                 + "rule \"test\""
+                 + "  when"
+                 + "       $o: MyObject()"
+                 + "  then"
+                 + "      System.out.println(\"My Global Object -> \"+myGlobalObj.getName());"
+                 + "      System.out.println(\"Rule Fired! ->\"+$o.getName());"
+                 + " end";
+
+        kbuilder.add( new ByteArrayResource( rule.getBytes() ),
+                      ResourceType.DRL );
+
+        KnowledgeBuilderErrors errors = kbuilder.getErrors();
+        if ( errors != null && errors.size() > 0 ) {
+            for ( KnowledgeBuilderError error : errors ) {
+                System.out.println( "Error: " + error.getMessage() );
+
+            }
+            fail("KnowledgeBase did not build");
+        }
+
+        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+
+        Assert.assertNotNull( kbase );
+
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+
+        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+
+        Assert.assertNotNull( session );
+        session.setGlobal("myGlobalObj", new MyObject("myGlobalObj"));
+
+        FactHandle handle = session.insert( new MyObject("myObj1") );
+        Assert.assertNotNull( handle );
+
+        int fired = session.fireAllRules();
+        Assert.assertEquals( 1,
+                             fired );
+        
+         session.retract(handle);
+         
+         
+         handle = session.insert(new MyObject("myObj2"));
+         
+         session.update(handle, new MyObject("myObj3"));
+         
+         fired = session.fireAllRules();
+         
+         remoteN1.dispose(); 
+         grid1.get(SocketService.class).close();
 
     }
 
@@ -228,11 +295,21 @@ public class NodeTests {
 
     }
 
-    private static class MyObject
+    public static class MyObject
         implements
         Serializable {
-
-        public MyObject() {
+        private String name;
+        public MyObject(String name) {
+            this.name = name;
         }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+        
     }
 }

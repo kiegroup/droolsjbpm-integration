@@ -17,12 +17,9 @@
 
 package org.drools.grid.remote;
 
-import java.io.Serializable;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
@@ -32,18 +29,13 @@ import org.drools.builder.ResourceType;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
-import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.io.Resource;
-import org.drools.runtime.ExecutionResults;
 
 /**
  *
@@ -88,7 +80,7 @@ public class KnowledgeBuilderRemoteClient
                                                                                                                        null,
                                                                                                                        null ) } ) );
 
-        sendMessage( this.cm,
+        ConversationUtil.sendMessage( this.cm,
                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                      this.gsd.getId(),
                      cmd );
@@ -119,7 +111,7 @@ public class KnowledgeBuilderRemoteClient
                                                                                                                        null,
                                                                                                                        kresultsId ) } ) );
 
-        Object result = sendMessage( this.cm,
+        Object result = ConversationUtil.sendMessage( this.cm,
                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                                      this.gsd.getId(),
                                      cmd );
@@ -127,46 +119,5 @@ public class KnowledgeBuilderRemoteClient
         return (KnowledgeBuilderErrors) result;
 
     }
-
-    public static Object sendMessage(ConversationManager conversationManager,
-                                     Serializable addr,
-                                     String id,
-                                     Object body) {
-
-        InetSocketAddress[] sockets = null;
-        if ( addr instanceof InetSocketAddress[] ) {
-            sockets = (InetSocketAddress[]) addr;
-        } else if ( addr instanceof InetSocketAddress ) {
-            sockets = new InetSocketAddress[ 1 ];
-            sockets[0] = (InetSocketAddress) addr;
-        }
-
-        BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
-        Exception exception = null;
-        for ( InetSocketAddress socket : sockets ) {
-            try {
-                Conversation conv = conversationManager.startConversation( socket,
-                                                                           id );
-                conv.sendMessage( body,
-                                  handler );
-                exception = null;
-            } catch ( Exception e ) {
-                exception = e;
-                conversationManager.endConversation();
-            }
-            if ( exception == null ) {
-                break;
-            }
-        }
-        if ( exception != null ) {
-            throw new RuntimeException( "Unable to send message",
-                                        exception );
-        }
-        try {
-            return handler.getMessage().getBody();
-        } finally {
-            conversationManager.endConversation();
-        }
-    }
-
+ 
 }

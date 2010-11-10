@@ -41,7 +41,8 @@ public class GridNodeRemoteClient<T>
     private GridServiceDescription    gsd;
     private final Map<String, Object> localContext    = new ConcurrentHashMap<String, Object>();
     private final ServiceRegistry     serviceRegistry = ServiceRegistryImpl.getInstance();
-
+    private MinaConnector connector = new MinaConnector();
+    
     public GridNodeRemoteClient(GridServiceDescription gsd) {
         this.gsd = gsd;
         init( this.localContext );
@@ -73,7 +74,7 @@ public class GridNodeRemoteClient<T>
 
     public void init(Object context) {
 
-        MinaConnector connector = new MinaConnector();
+        
         ConversationManager cm = new ConversationManagerImpl( this.gsd.getId(),
                                                               connector,
                                                               SystemEventListenerFactory.getSystemEventListener() );
@@ -87,7 +88,7 @@ public class GridNodeRemoteClient<T>
     }
 
     public void dispose() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+         connector.close();
     }
 
 }

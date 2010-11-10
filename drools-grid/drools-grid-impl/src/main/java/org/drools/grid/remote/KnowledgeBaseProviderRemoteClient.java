@@ -78,7 +78,7 @@ public class KnowledgeBaseProviderRemoteClient
                                                                                                 localId,
                                                                                                 new NewKnowledgeBaseCommand( null ) ) } ) );
 
-        sendMessage( this.cm,
+        ConversationUtil.sendMessage( this.cm,
                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                      this.gsd.getId(),
                      cmd );
@@ -106,44 +106,5 @@ public class KnowledgeBaseProviderRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public static Object sendMessage(ConversationManager conversationManager,
-                                     Serializable addr,
-                                     String id,
-                                     Object body) {
-
-        InetSocketAddress[] sockets = null;
-        if ( addr instanceof InetSocketAddress[] ) {
-            sockets = (InetSocketAddress[]) addr;
-        } else if ( addr instanceof InetSocketAddress ) {
-            sockets = new InetSocketAddress[ 1 ];
-            sockets[0] = (InetSocketAddress) addr;
-        }
-
-        BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
-        Exception exception = null;
-        for ( InetSocketAddress socket : sockets ) {
-            try {
-                Conversation conv = conversationManager.startConversation( socket,
-                                                                           id );
-                conv.sendMessage( body,
-                                  handler );
-                exception = null;
-            } catch ( Exception e ) {
-                exception = e;
-                conversationManager.endConversation();
-            }
-            if ( exception == null ) {
-                break;
-            }
-        }
-        if ( exception != null ) {
-            throw new RuntimeException( "Unable to send message",
-                                        exception );
-        }
-        try {
-            return handler.getMessage().getBody();
-        } finally {
-            conversationManager.endConversation();
-        }
-    }
+   
 }
