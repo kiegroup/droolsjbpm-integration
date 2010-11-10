@@ -16,38 +16,59 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.local.LocalGridNodeConnection;
 import org.drools.grid.remote.RemoteGridNodeConnection;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
+import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 
 public class GridImpl
     implements
     Grid {
     private Map<String, Object>   services;
-    private Map<String, Object>   localServices;
 
     private Map<String, GridNode> localNodes = new HashMap<String, GridNode>();
     
+    private Map<String, GridPeerServiceConfiguration> serviceConfigurators = new HashMap();
+    
     private String id;
 
+    public GridImpl() {
+        this(null);
+    }
+    
     public GridImpl(Map<String, Object> services) {
-        this.services = services;
-        this.localServices = new ConcurrentHashMap<String, Object>();
+        if ( services == null ) {
+            this.services = new ConcurrentHashMap<String, Object>();
+        } else {
+            this.services = services;
+        }
+        
         this.id = UUID.randomUUID().toString();
         init();
     }
     
     private void init() {
         ConnectionFactoryService conn = new ConnectionFactoryServiceImpl(this);
-        this.localServices.put( ConnectionFactoryService.class.getName(), conn );
+        this.services.put( ConnectionFactoryService.class.getName(), conn );
+        
+        this.serviceConfigurators.put( WhitePages.class.getName(), new WhitePagesRemoteConfiguration( null ) );
     }
 
+    public Object getX(String str) {
+        return this.services.get( str );
+    }
+    
     public <T> T get(Class<T> serviceClass) {
-        T service = (T) this.localServices.get( serviceClass.getName() );
+        T service = (T) this.services.get( serviceClass.getName() );
+        
         if ( service == null ) {
-            service = (T) services.get( serviceClass.getName() );
+            // If the service does not exist, it'll lazily create it
+            GridPeerServiceConfiguration configurator = this.serviceConfigurators.get( serviceClass.getName() );
+            configurator.configureService( this );
+            service = (T) this.services.get( serviceClass.getName() );
         }
         return service;
     }
@@ -60,7 +81,7 @@ public class GridImpl
 
     public void addService(String id,
                            Object service) {
-        this.localServices.put( id,
+        this.services.put( id,
                                 service );
     }
 
@@ -185,4 +206,5 @@ public class GridImpl
 //        return conn;
 //    }
 
+    
 }

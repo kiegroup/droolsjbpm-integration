@@ -5,7 +5,7 @@ package org.drools.grid.conf.impl;
 
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.service.directory.impl.*;
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -29,7 +29,7 @@ public class GridNodeSocketConfiguration
         GridNode gnode = grid.get( GridNode.class );
 
         if ( port != -1 ) {
-            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
+            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( GridNode.class );
             if ( gsd == null ) {

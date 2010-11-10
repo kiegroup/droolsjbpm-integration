@@ -19,7 +19,7 @@ package org.drools.grid.timer.impl;
 
 import java.net.InetSocketAddress;
 
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
@@ -76,7 +76,7 @@ public class SchedulerImpl
                                       String id,
                                       String ip,
                                       int port) {
-        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
+        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
         if ( gsd == null ) {

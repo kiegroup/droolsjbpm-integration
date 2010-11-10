@@ -34,7 +34,7 @@ import org.drools.time.TimerService;
 import org.drools.time.Trigger;
 
 import junit.framework.TestCase;
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
@@ -42,7 +42,7 @@ import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
+import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
@@ -164,7 +164,7 @@ public class DistributedSchedulerTest extends TestCase {
 //     */
 //    public void testDistributedJobSchedulingRemote() {
 //        //Core services Map Definition
-//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 //
 //        //Grid View 
 //        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
@@ -218,7 +218,7 @@ public class DistributedSchedulerTest extends TestCase {
 //
 //    public void testMultipleSchedulersTest() {
 //        //Core services Map Definition
-//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 //
 //        //Grid View 
 //        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
@@ -234,7 +234,7 @@ public class DistributedSchedulerTest extends TestCase {
 //        configureGrid3( grid3,
 //                        conn );
 //
-//        CoreServicesWhitePages corewp = grid3.get( CoreServicesWhitePages.class );
+//        CoreServicesLookup corewp = grid3.get( CoreServicesLookup.class );
 //
 //        GridServiceDescription gsd = corewp.lookup( SchedulerService.class );
 //
@@ -255,7 +255,7 @@ public class DistributedSchedulerTest extends TestCase {
 //
 //    public void testGetDataFromCoreServices() {
 //
-//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 //
 //        //Grid View 
 //        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
@@ -266,7 +266,7 @@ public class DistributedSchedulerTest extends TestCase {
 //        configureGrid1( grid2,
 //                        5013 );
 //
-//        CoreServicesWhitePages corewp = grid1.get( CoreServicesWhitePages.class );
+//        CoreServicesLookup corewp = grid1.get( CoreServicesLookup.class );
 //
 //        //Get Scheduler Service
 //        GridServiceDescription gsd = corewp.lookup( SchedulerService.class );
@@ -452,7 +452,7 @@ public class DistributedSchedulerTest extends TestCase {
 //        GridPeerConfiguration conf = new GridPeerConfiguration();
 //
 //        //Configuring the Core Services White Pages
-//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesLookupConfiguration( coreServicesMap );
 //        conf.addConfiguration( coreSeviceWPConf );
 //
 //        //Configuring the Core Services Scheduler
@@ -495,7 +495,7 @@ public class DistributedSchedulerTest extends TestCase {
 //                                Connector conn) {
 //        GridPeerConfiguration conf = new GridPeerConfiguration();
 //
-//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesLookupConfiguration( coreServicesMap );
 //        conf.addConfiguration( coreSeviceWPConf );
 //
 //        ConversationManager cm = new ConversationManagerImpl( "s1",
@@ -515,7 +515,7 @@ public class DistributedSchedulerTest extends TestCase {
 //                                Connector conn) {
 //        GridPeerConfiguration conf = new GridPeerConfiguration();
 //
-//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesLookupConfiguration( coreServicesMap );
 //        conf.addConfiguration( coreSeviceWPConf );
 //
 //        ConversationManager cm = new ConversationManagerImpl( "s1",

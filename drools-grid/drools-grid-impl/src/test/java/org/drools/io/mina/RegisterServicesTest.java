@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
@@ -35,7 +35,7 @@ import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
+import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesClient;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
@@ -90,7 +90,7 @@ public class RegisterServicesTest {
 //    @Test
 //    public void testRegisterInCoreServices() {
 //
-//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+//        coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 //
 //        GridImpl grid = new GridImpl( new HashMap<String, Object>() );
 //
@@ -98,7 +98,7 @@ public class RegisterServicesTest {
 //        GridPeerConfiguration conf = new GridPeerConfiguration();
 //
 //        //Configuring the Core Services White Pages
-//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+//        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesLookupConfiguration( coreServicesMap );
 //        conf.addConfiguration( coreSeviceWPConf );
 //
 //        //Configuring the Core Services Scheduler
@@ -141,7 +141,7 @@ public class RegisterServicesTest {
 //        GridServiceDescription gsdLocalSched = wp.lookup( "scheduler:" + "myLocalSched" + SchedulerService.class.getName() );
 //
 //        //Get the CoreWhitePages
-//        CoreServicesWhitePages corewp = grid.get( CoreServicesWhitePages.class );
+//        CoreServicesLookup corewp = grid.get( CoreServicesLookup.class );
 //        //Get the registered Scheduler
 //        GridServiceDescription gsdLocalButExposedSched = corewp.lookup( SchedulerService.class );
 //        //Get the registered white pages

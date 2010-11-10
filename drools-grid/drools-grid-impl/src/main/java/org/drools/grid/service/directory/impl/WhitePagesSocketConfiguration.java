@@ -6,7 +6,7 @@ package org.drools.grid.service.directory.impl;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
@@ -32,7 +32,7 @@ public class WhitePagesSocketConfiguration
         WhitePages wp = grid.get( WhitePages.class );
 
         if ( port != -1 ) {
-            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
+            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( WhitePages.class );
             if ( gsd == null ) {

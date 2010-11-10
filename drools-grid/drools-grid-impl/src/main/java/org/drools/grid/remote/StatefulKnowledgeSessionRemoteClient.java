@@ -92,8 +92,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                        kresultsId ) } ) );
 
         Object result = sendMessage( this.cm,
-                                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getServiceInterface().getName(),
+                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                     this.gsd.getId(),
                                      cmd );
 
         return (Integer) result;
@@ -288,8 +288,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                        kresultsId ) } ) );
 
         Object result = sendMessage( this.cm,
-                                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getServiceInterface().getName(),
+                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                     this.gsd.getId(),
                                      cmd );
 
         return (FactHandle) result;

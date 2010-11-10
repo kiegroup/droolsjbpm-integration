@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
@@ -21,14 +22,18 @@ public class WhitePagesClient
     implements
     WhitePages,
     MessageReceiverHandlerFactoryService {
-    private GridServiceDescription whitePagesGsd;
+    private Grid grid;
 
     private ConversationManager    conversationManager;
 
-    public WhitePagesClient(GridServiceDescription gsd,
+    public WhitePagesClient(Grid grid,
                             ConversationManager conversationManager) {
-        this.whitePagesGsd = gsd;
+        this.grid = grid;
         this.conversationManager = conversationManager;
+    }
+    
+    public GridServiceDescription<WhitePages> getGsd() {
+        return this.grid.get( CoreServicesLookup.class ).lookup( WhitePages.class );
     }
 
     public static Object sendMessage(ConversationManager conversationManager,
@@ -72,38 +77,42 @@ public class WhitePagesClient
     }
 
     public GridServiceDescription create(String serviceDescriptionId) {
-        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        GridServiceDescription<WhitePages> wpGsd = getGsd();
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.create",
                                            Arrays.asList( new Object[]{ serviceDescriptionId } ) );
         GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
                                                                            sockets,
-                                                                           this.whitePagesGsd.getId(),
+                                                                           wpGsd.getId(),
                                                                            cmd );
         return new GridServiceDescriptionClient( gsd,
-                                                 this.whitePagesGsd,
+                                                 wpGsd,
                                                  this.conversationManager );
     }
 
     public GridServiceDescription lookup(String serviceDescriptionId) {
-        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        GridServiceDescription<WhitePages> wpGsd = getGsd();
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.lookup",
                                            Arrays.asList( new Object[]{ serviceDescriptionId } ) );
         GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
                                                                            sockets,
-                                                                           this.whitePagesGsd.getId(),
+                                                                           wpGsd.getId(),
                                                                            cmd );
         return (gsd == null) ? gsd : new GridServiceDescriptionClient( gsd,
-                                                                       this.whitePagesGsd,
+                                                                       wpGsd,
                                                                        this.conversationManager );
     }
 
     public void remove(String serviceDescriptionId) {
-        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) whitePagesGsd.getAddresses().get( "socket" )).getObject();
+        GridServiceDescription<WhitePages> wpGsd = getGsd();
+        
+        InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.remove",
                                            Arrays.asList( new Object[]{ serviceDescriptionId } ) );
         sendMessage( this.conversationManager,
                      sockets,
-                     this.whitePagesGsd.getId(),
+                     wpGsd.getId(),
                      cmd );
     }
 

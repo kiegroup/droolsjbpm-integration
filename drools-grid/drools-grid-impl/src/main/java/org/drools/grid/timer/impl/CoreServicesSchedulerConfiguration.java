@@ -3,7 +3,7 @@
  */
 package org.drools.grid.timer.impl;
 
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
@@ -19,7 +19,7 @@ public class CoreServicesSchedulerConfiguration
     }
 
     public void configureService(Grid grid) {
-        CoreServicesWhitePages wp = grid.get( CoreServicesWhitePages.class );
+        CoreServicesLookup wp = grid.get( CoreServicesLookup.class );
 
         ((GridImpl) grid).addService( CoreServicesScheduler.class,
                                       new CoreServicesSchedulerImpl( new SchedulerImpl( "scheduler:core" ) ) );

@@ -79,8 +79,8 @@ public class KnowledgeBaseProviderRemoteClient
                                                                                                 new NewKnowledgeBaseCommand( null ) ) } ) );
 
         sendMessage( this.cm,
-                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getServiceInterface().getName(),
+                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getId(),
                      cmd );
 
         return new KnowledgeBaseRemoteClient( localId,

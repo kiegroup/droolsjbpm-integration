@@ -6,7 +6,7 @@ package org.drools.grid.timer.impl;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.service.directory.impl.*;
 import java.net.InetSocketAddress;
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
@@ -32,7 +32,7 @@ public class SchedulerSocketConfiguration
         SchedulerService sched = grid.get( SchedulerService.class );
 
         if ( port != -1 ) {
-            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
+            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
             if ( gsd == null ) {

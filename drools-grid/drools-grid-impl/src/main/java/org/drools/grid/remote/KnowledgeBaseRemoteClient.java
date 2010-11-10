@@ -78,8 +78,8 @@ public class KnowledgeBaseRemoteClient
                                                                                                                        kresultsId ) } ) );
 
         sendMessage( this.cm,
-                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getServiceInterface().getName(),
+                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getId(),
                      cmd );
 
     }
@@ -153,8 +153,8 @@ public class KnowledgeBaseRemoteClient
                                                                                                                                                kresultsId ) ) } ) );
 
         sendMessage( this.cm,
-                     (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getServiceInterface().getName(),
+                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                     this.gsd.getId(),
                      cmd );
 
         return new StatefulKnowledgeSessionRemoteClient( localId,

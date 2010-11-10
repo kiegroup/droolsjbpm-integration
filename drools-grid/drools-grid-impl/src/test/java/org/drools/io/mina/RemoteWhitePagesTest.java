@@ -19,7 +19,7 @@ import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.Connector;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.ConversationManagerImpl;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
+import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnector;
@@ -33,7 +33,7 @@ public class RemoteWhitePagesTest extends TestCase {
 
     public void test1() {
 
-        Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
+        Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 
         SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
 
@@ -41,7 +41,7 @@ public class RemoteWhitePagesTest extends TestCase {
 
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
-        GridPeerServiceConfiguration coreSeviceConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        GridPeerServiceConfiguration coreSeviceConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
         MultiplexSocketServiceCongifuration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
@@ -61,8 +61,8 @@ public class RemoteWhitePagesTest extends TestCase {
         GridImpl grid2 = new GridImpl( new ConcurrentHashMap<String, Object>() );
         conf = new GridPeerConfiguration();
 
-        //coreServicesMap = Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesWhitePages.class.getName() );
-        coreSeviceConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        //coreServicesMap = Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
+        coreSeviceConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
         Connector conn = new MinaConnector();

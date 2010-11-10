@@ -42,7 +42,7 @@ import org.drools.grid.remote.GridNodeRemoteClient;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesConfiguration;
+import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
@@ -167,7 +167,7 @@ public class NodeTests {
                 System.out.println( "Error: " + error.getMessage() );
 
             }
-            return;
+            fail("KnowledgeBase did not build");
         }
 
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
@@ -179,14 +179,6 @@ public class NodeTests {
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
 
         Assert.assertNotNull( session );
-
-        WhitePages wp = grid2.get( WhitePages.class );      
-        
-        GridServiceDescription gsd = wp.lookup( "mynode" );
-
-        remoteN1 = grid2.getGridNode( gsd.getId() );
-
-        Assert.assertNotNull( remoteN1 );
 
         FactHandle handle = session.insert( new MyObject() );
         Assert.assertNotNull( handle );
@@ -205,7 +197,7 @@ public class NodeTests {
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
         //Configuring the Core Services White Pages
-        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesWhitePagesConfiguration( coreServicesMap );
+        GridPeerServiceConfiguration coreSeviceWPConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceWPConf );
 
         //Configuring the Core Services Scheduler

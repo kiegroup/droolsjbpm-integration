@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.drools.grid.CoreServicesWhitePages;
+import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
@@ -44,7 +44,7 @@ public class WhitePagesImpl
     }
     
     public static void doRegisterSocketService(Grid grid, String id, String ip, int port) {
-        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesWhitePages.class );
+        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( WhitePages.class );
         if ( gsd == null ) {
