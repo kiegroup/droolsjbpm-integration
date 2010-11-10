@@ -24,10 +24,22 @@ import java.util.Map;
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.command.CommandFactory;
+import org.drools.command.GetSessionClockCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.command.runtime.DisposeCommand;
+import org.drools.command.runtime.GetGlobalsCommand;
+import org.drools.command.runtime.process.AbortProcessInstanceCommand;
+import org.drools.command.runtime.process.GetProcessInstanceCommand;
+import org.drools.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
+import org.drools.command.runtime.rule.FireAllRulesCommand;
+import org.drools.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.command.runtime.rule.GetFactHandleCommand;
+import org.drools.command.runtime.rule.GetFactHandlesCommand;
+import org.drools.command.runtime.rule.GetObjectCommand;
+import org.drools.command.runtime.rule.GetObjectsCommand;
+import org.drools.command.runtime.rule.HaltCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.event.process.ProcessEventListener;
@@ -81,13 +93,30 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void dispose() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new DisposeCommand(),
+                                                                                                                       null,
+                                                                                                                       null,
+                                                                                                                       this.instanceId,
+                                                                                                                       kresultsId ) } ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                     this.gsd.getId(),
+                                     cmd );
     }
 
     public int fireAllRules() {
-        String kresultsId = "kresults_" + this.gsd.getId();
+        return fireAllRules(-1);
+
+       
+    }
+
+    public int fireAllRules(int max) {
+         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( CommandFactory.newFireAllRules(),
+                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( CommandFactory.newFireAllRules(max),
                                                                                                                        null,
                                                                                                                        null,
                                                                                                                        this.instanceId,
@@ -99,24 +128,42 @@ public class StatefulKnowledgeSessionRemoteClient
                                      cmd );
 
         return (Integer) result;
-
-       
-    }
-
-    public int fireAllRules(int max) {
-        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public int fireAllRules(AgendaFilter agendaFilter) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+         String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(agendaFilter),
+                                                                                                                       null,
+                                                                                                                       null,
+                                                                                                                       this.instanceId,
+                                                                                                                       kresultsId ) } ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                     this.gsd.getId(),
+                                     cmd );
+
+        return (Integer) result;
     }
 
     public void fireUntilHalt() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+       fireUntilHalt(null); 
     }
 
     public void fireUntilHalt(AgendaFilter agendaFilter) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new FireUntilHaltCommand( agendaFilter ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
     }
 
     public <T> T execute(Command<T> command) {
@@ -126,8 +173,21 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public <T extends SessionClock> T getSessionClock() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+            String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetSessionClockCommand(),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        return (T) result;
     }
+    
 
     public void setGlobal(String identifier,
                           Object object) {
@@ -166,7 +226,22 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public Globals getGlobals() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetGlobalsCommand(),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )})); 
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        
+        
+        return (Globals)result;
     }
 
     public Calendars getCalendars() {
@@ -208,7 +283,18 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void halt() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+         String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new HaltCommand(),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
     }
 
     public Agenda getAgenda() {
@@ -325,23 +411,62 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public Object getObject(FactHandle factHandle) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetObjectCommand(factHandle ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        return result;
     }
 
     public Collection<Object> getObjects() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        return getObjects(null);
     }
 
     public Collection<Object> getObjects(ObjectFilter filter) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetObjectsCommand( filter ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        return (Collection<Object>)result;
     }
 
     public <T extends FactHandle> Collection<T> getFactHandles() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        return getFactHandles(null);
     }
 
     public <T extends FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+       String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetFactHandlesCommand( filter ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        return (Collection<T>)result; 
     }
 
     public long getFactCount() {
@@ -406,15 +531,57 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public Collection<ProcessInstance> getProcessInstances() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetProcessInstancesCommand(  ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        return (Collection<ProcessInstance>)result;
     }
 
     public ProcessInstance getProcessInstance(long processInstanceId) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetProcessInstanceCommand( processInstanceId ),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        return (ProcessInstance)result;
     }
 
     public void abortProcessInstance(long processInstanceId) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        
+        String kresultsId = "kresults_" + this.gsd.getId();
+        AbortProcessInstanceCommand cmdAbort = new AbortProcessInstanceCommand();
+        cmdAbort.setProcessInstanceId(processInstanceId);
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand(cmdAbort,
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        
     }
 
     public WorkItemManager getWorkItemManager() {

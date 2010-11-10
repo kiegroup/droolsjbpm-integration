@@ -17,7 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,8 +34,6 @@ import org.drools.definition.type.FactType;
 import org.drools.event.knowledgebase.KnowledgeBaseEventListener;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
-import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;

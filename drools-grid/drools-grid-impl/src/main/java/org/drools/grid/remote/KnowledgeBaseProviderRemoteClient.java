@@ -17,7 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Properties;
@@ -29,8 +28,6 @@ import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
-import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.Environment;
@@ -71,12 +68,32 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeBase newKnowledgeBase() {
-        String localId = UUID.randomUUID().toString();
+        return newKnowledgeBase("", null);
+
+    }
+
+    public KnowledgeBase newKnowledgeBase(String kbaseId) {
+       return newKnowledgeBase(kbaseId, null);
+    }
+
+    public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
+        return newKnowledgeBase(null, conf);
+    }
+
+    public KnowledgeBase newKnowledgeBase(String kbaseId,
+                                          KnowledgeBaseConfiguration conf) {
+        String localId = "";
+        if(kbaseId == null || kbaseId.equals("")){
+            localId = UUID.randomUUID().toString();
+        }
+        else{
+            localId = kbaseId;
+        }
 
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new NewKnowledgeBaseCommand( null ) ) } ) );
+                                                                                                new NewKnowledgeBaseCommand( conf ) ) } ) );
 
         ConversationUtil.sendMessage( this.cm,
                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
@@ -86,20 +103,6 @@ public class KnowledgeBaseProviderRemoteClient
         return new KnowledgeBaseRemoteClient( localId,
                                               this.gsd,
                                               this.cm );
-
-    }
-
-    public KnowledgeBase newKnowledgeBase(String kbaseId) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public KnowledgeBase newKnowledgeBase(String kbaseId,
-                                          KnowledgeBaseConfiguration conf) {
-        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public Environment newEnvironment() {

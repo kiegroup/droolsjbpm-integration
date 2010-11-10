@@ -65,13 +65,27 @@ public class KnowledgeBuilderProviderRemoteClient
     }
 
     public KnowledgeBuilder newKnowledgeBuilder() {
+        return newKnowledgeBuilder(null, null);
+       
 
-        String localId = UUID.randomUUID().toString();
+    }
+
+    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {
+        return newKnowledgeBuilder(null, conf);
+    }
+
+    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase) {
+        return newKnowledgeBuilder(kbase, null);
+    }
+
+    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase,
+                                                KnowledgeBuilderConfiguration conf) {
+         String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new NewKnowledgeBuilderCommand( null ) ) } ) );
+                                                                                                new NewKnowledgeBuilderCommand( conf ) ) } ) );
 
         ConversationUtil.sendMessage( this.cm,
                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
@@ -81,20 +95,6 @@ public class KnowledgeBuilderProviderRemoteClient
         return new KnowledgeBuilderRemoteClient( localId,
                                                  this.gsd,
                                                  this.cm );
-
-    }
-
-    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase,
-                                                KnowledgeBuilderConfiguration conf) {
-        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,

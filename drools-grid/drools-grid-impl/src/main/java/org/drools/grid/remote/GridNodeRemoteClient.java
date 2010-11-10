@@ -69,7 +69,7 @@ public class GridNodeRemoteClient<T>
     }
 
     public String getId() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        return gsd.getId();
     }
 
     public void init(Object context) {

@@ -255,7 +255,7 @@ public class NodeTests {
          grid1.get(SocketService.class).close();
 
     }
-
+     
     private void configureGrid1(Grid grid,
                                 int port,
                                 WhitePages wp) {
