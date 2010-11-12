@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.drools.command.Context;
 import org.drools.command.ContextManager;
 import org.drools.command.impl.ContextImpl;
+import org.drools.command.impl.ContextImplWithEviction;
 import org.drools.grid.ContextManagerImpl;
 
 public class NodeData {
@@ -30,9 +31,10 @@ public class NodeData {
                        this );
         // Setup TEMP context, this will hold all short lived instanceId and instances
         // TODO: TEMP context should have a time/utilisation eviction queue added 
-        this.temp = new ContextImpl( TEMP,
+        this.temp = new ContextImplWithEviction( TEMP,
                                      this.contextManager,
-                                     this.root );
+                                     this.root); 
+        
         ((ContextManagerImpl) this.contextManager).addContext( this.temp );
     }
 

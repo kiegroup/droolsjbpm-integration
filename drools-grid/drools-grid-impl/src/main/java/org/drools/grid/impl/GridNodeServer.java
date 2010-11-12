@@ -45,7 +45,7 @@ public class GridNodeServer
         this.gnode = gnode;
         this.data = data;
     }
-
+    
     public void messageReceived(Conversation conversation,
                                 Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
@@ -90,4 +90,7 @@ public class GridNodeServer
                      CommandImpl cmd);
     }
 
+    public NodeData getData() {
+        return data;
+    }  
 }
