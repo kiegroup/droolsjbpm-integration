@@ -6,7 +6,9 @@
                            http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<drools:grid id="grid1" />
+	<drools:grid id="grid1">
+       <drools:whitepages />	
+	</drools:grid>
 	
 	<drools:grid-node id="node1" grid="grid1" />
 	

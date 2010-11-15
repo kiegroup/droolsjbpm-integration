@@ -33,6 +33,7 @@ import org.drools.grid.io.AcceptorFactoryService;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
@@ -95,7 +96,9 @@ public class GridDefinitionParser extends AbstractBeanDefinitionParser {
                             factory.addPropertyReference( "whitePages", ref );
                         } else if ( nestedElm != null  ) {
                             factory.addPropertyValue( "whitePages",  parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );
-                        }                         
+                        } else {
+                            factory.addPropertyValue( "whitePages",  new WhitePagesImpl() );
+                        }
                     }
                 } else if ( "socket-service".equals( e.getLocalName() ) ) {
                     String acceptor = e.getAttribute( "acceptor" );
