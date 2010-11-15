@@ -55,10 +55,8 @@ public class MinaConnector
         if ( this.connector == null ) {
             // Allow users to pass their own configured SocketConnector
             this.connector = new NioSocketConnector();
-            this.connector.getFilterChain().addLast(
-                                                     "codec",
-                                                     new ProtocolCodecFilter(
-                                                                              new ObjectSerializationCodecFactory() ) );
+            this.connector.getFilterChain().addLast( "codec",
+                                                     new ProtocolCodecFilter(new ObjectSerializationCodecFactory() ) );
         }
 
         //        this.handler = new MessageHandler() {

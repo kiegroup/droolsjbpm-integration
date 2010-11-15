@@ -45,9 +45,9 @@ public class KnowledgeBuilderRemoteClient
     implements
     KnowledgeBuilder {
 
-    private String                 instanceId;
-    private ConversationManager    cm;
-    private GridServiceDescription<GridNode>  gsd;
+    private String                           instanceId;
+    private ConversationManager              cm;
+    private GridServiceDescription<GridNode> gsd;
 
     public KnowledgeBuilderRemoteClient(String localId,
                                         GridServiceDescription gsd,
@@ -72,18 +72,18 @@ public class KnowledgeBuilderRemoteClient
         String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( resource,
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( resource,
                                                                                                                                                        type,
                                                                                                                                                        configuration ),
                                                                                                                        this.instanceId,
                                                                                                                        null,
                                                                                                                        null,
-                                                                                                                       null ) } ) );
+                                                                                                                       null )} ) );
 
         ConversationUtil.sendMessage( this.cm,
-                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getId(),
-                     cmd );
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
 
     }
 
@@ -105,19 +105,19 @@ public class KnowledgeBuilderRemoteClient
         String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderGetErrorsCommand(),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderGetErrorsCommand(),
                                                                                                                        this.instanceId,
                                                                                                                        null,
                                                                                                                        null,
-                                                                                                                       kresultsId ) } ) );
+                                                                                                                       kresultsId )} ) );
 
         Object result = ConversationUtil.sendMessage( this.cm,
-                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getId(),
-                                     cmd );
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
 
         return (KnowledgeBuilderErrors) result;
 
     }
- 
+
 }

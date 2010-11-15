@@ -26,7 +26,7 @@ import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.CoreServicesWhitePagesImpl;
+import org.drools.grid.service.directory.impl.CoreServicesLookupImpl;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
@@ -76,7 +76,7 @@ public class SchedulerImpl
                                       String id,
                                       String ip,
                                       int port) {
-        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
+        CoreServicesLookupImpl coreServicesWP = (CoreServicesLookupImpl) grid.get( CoreServicesLookup.class );
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
         if ( gsd == null ) {

@@ -16,6 +16,10 @@ public class MessageImpl
     private int    responseId;
     private Object body;
 
+    public MessageImpl() {
+        
+    }
+    
     public MessageImpl(String conversationId,
                        String senderId,
                        String recipientId,
@@ -29,45 +33,52 @@ public class MessageImpl
         this.body = body;
     }
 
-    //    public MessageImpl(String conversationId,
-    //                       Map<String, Integer> contextVars,
-    //                       Object payload) {
-    //        this.conversationId = conversationId;
-    //        this.responseId = -1;
-    //        this.payload = payload;
-    //    }
-
-    /* (non-Javadoc)
-     * @see org.drools.grid.io.impl.Message#getSessionId()
-     */
     public String getConversationId() {
-        return this.conversationId;
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     public String getSenderId() {
         return senderId;
     }
 
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
     public String getRecipientId() {
         return recipientId;
     }
 
-    /* (non-Javadoc)
-     * @see org.drools.grid.io.impl.Message#getResponseId()
-     */
+    public void setRecipientId(String recipientId) {
+        this.recipientId = recipientId;
+    }
+
     public int getRequestId() {
-        return this.requestId;
+        return requestId;
+    }
+
+    public void setRequestId(int requestId) {
+        this.requestId = requestId;
     }
 
     public int getResponseId() {
-        return this.responseId;
+        return responseId;
     }
 
-    /* (non-Javadoc)
-     * @see org.drools.grid.io.impl.Message#getPayload()
-     */
+    public void setResponseId(int responseId) {
+        this.responseId = responseId;
+    }
+
     public Object getBody() {
-        return this.body;
+        return body;
+    }
+
+    public void setBody(Object body) {
+        this.body = body;
     }
 
     /* (non-Javadoc)

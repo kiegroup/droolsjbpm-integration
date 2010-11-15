@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.SocketFactory;
 
+import org.drools.SystemEventListener;
+import org.drools.SystemEventListenerFactory;
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -17,8 +19,14 @@ import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
+import org.drools.grid.io.AcceptorFactoryService;
+import org.drools.grid.io.ConnectorFactoryService;
+import org.drools.grid.io.ConversationManager;
+import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.local.LocalGridNodeConnection;
 import org.drools.grid.remote.RemoteGridNodeConnection;
+import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
+import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
@@ -51,13 +59,20 @@ public class GridImpl
     }
     
     private void init() {
-        ConnectionFactoryService conn = new ConnectionFactoryServiceImpl(this);
-        this.services.put( ConnectionFactoryService.class.getName(), conn );
+        // TODO hardcoding these for now, should probably be configured
+        SystemEventListener listener = SystemEventListenerFactory.getSystemEventListener();
+        this.services.put( SystemEventListener.class.getName(), listener );
+        this.services.put( AcceptorFactoryService.class.getName(), new MinaAcceptorFactoryService() );
+        this.services.put( ConnectorFactoryService.class.getName(), new MinaConnectorFactoryService() );
+        this.services.put( ConversationManager.class.getName(), new ConversationManagerImpl( this, listener ) );
         
-        this.serviceConfigurators.put( WhitePages.class.getName(), new WhitePagesRemoteConfiguration( null ) );
+        ConnectionFactoryService conn = new ConnectionFactoryServiceImpl(this);
+        this.services.put( ConnectionFactoryService.class.getName(), conn );               
+        
+        this.serviceConfigurators.put( WhitePages.class.getName(), new WhitePagesRemoteConfiguration( ) );
     }
 
-    public Object getX(String str) {
+    public Object get(String str) {
         return this.services.get( str );
     }
     
@@ -67,8 +82,10 @@ public class GridImpl
         if ( service == null ) {
             // If the service does not exist, it'll lazily create it
             GridPeerServiceConfiguration configurator = this.serviceConfigurators.get( serviceClass.getName() );
-            configurator.configureService( this );
-            service = (T) this.services.get( serviceClass.getName() );
+            if ( configurator != null ) {
+                configurator.configureService( this );
+                service = (T) this.services.get( serviceClass.getName() );
+            }
         }
         return service;
     }

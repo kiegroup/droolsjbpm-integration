@@ -29,7 +29,7 @@ public class GridNodeSocketConfiguration
         GridNode gnode = grid.get( GridNode.class );
 
         if ( port != -1 ) {
-            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
+            CoreServicesLookupImpl coreServicesWP = (CoreServicesLookupImpl) grid.get( CoreServicesLookup.class );
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( GridNode.class );
             if ( gsd == null ) {

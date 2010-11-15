@@ -22,6 +22,6 @@ public class CoreServicesLookupConfiguration
 
     public void configureService(Grid grid) {
         ((GridImpl) grid).addService( CoreServicesLookup.class,
-                                      new CoreServicesWhitePagesImpl( this.services ) );
+                                      new CoreServicesLookupImpl( this.services ) );
     }
 }

@@ -22,16 +22,12 @@ public class WhitePagesClient
     implements
     WhitePages,
     MessageReceiverHandlerFactoryService {
-    private Grid grid;
+    private Grid                grid;
 
-    private ConversationManager    conversationManager;
-
-    public WhitePagesClient(Grid grid,
-                            ConversationManager conversationManager) {
+    public WhitePagesClient(Grid grid) {
         this.grid = grid;
-        this.conversationManager = conversationManager;
     }
-    
+
     public GridServiceDescription<WhitePages> getGsd() {
         return this.grid.get( CoreServicesLookup.class ).lookup( WhitePages.class );
     }
@@ -45,21 +41,25 @@ public class WhitePagesClient
         if ( addr instanceof InetSocketAddress[] ) {
             sockets = (InetSocketAddress[]) addr;
         } else if ( addr instanceof InetSocketAddress ) {
-            sockets = new InetSocketAddress[ 1 ];
+            sockets = new InetSocketAddress[1];
             sockets[0] = (InetSocketAddress) addr;
         }
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
+        Conversation conv = null;
         for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation( socket,
-                                                                           id );
+                conv = conversationManager.startConversation( "",
+                                                              socket,
+                                                              id );
                 conv.sendMessage( body,
                                   handler );
                 exception = null;
             } catch ( Exception e ) {
                 exception = e;
-                conversationManager.endConversation();
+                if ( conv != null ) {
+                    conv.endConversation();
+                }
             }
             if ( exception == null ) {
                 break;
@@ -72,7 +72,7 @@ public class WhitePagesClient
         try {
             return handler.getMessage().getBody();
         } finally {
-            conversationManager.endConversation();
+            conv.endConversation();
         }
     }
 
@@ -80,37 +80,40 @@ public class WhitePagesClient
         GridServiceDescription<WhitePages> wpGsd = getGsd();
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.create",
-                                           Arrays.asList( new Object[]{ serviceDescriptionId } ) );
-        GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
+                                           Arrays.asList( new Object[]{serviceDescriptionId} ) );
+        ConversationManager convm = this.grid.get( ConversationManager.class );
+        GridServiceDescription gsd = (GridServiceDescription) sendMessage( convm,
                                                                            sockets,
                                                                            wpGsd.getId(),
                                                                            cmd );
         return new GridServiceDescriptionClient( gsd,
                                                  wpGsd,
-                                                 this.conversationManager );
+                                                 convm );
     }
 
     public GridServiceDescription lookup(String serviceDescriptionId) {
         GridServiceDescription<WhitePages> wpGsd = getGsd();
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.lookup",
-                                           Arrays.asList( new Object[]{ serviceDescriptionId } ) );
-        GridServiceDescription gsd = (GridServiceDescription) sendMessage( this.conversationManager,
+                                           Arrays.asList( new Object[]{serviceDescriptionId} ) );
+        ConversationManager convm = this.grid.get( ConversationManager.class );
+        GridServiceDescription gsd = (GridServiceDescription) sendMessage( convm,
                                                                            sockets,
                                                                            wpGsd.getId(),
                                                                            cmd );
         return (gsd == null) ? gsd : new GridServiceDescriptionClient( gsd,
                                                                        wpGsd,
-                                                                       this.conversationManager );
+                                                                       convm );
     }
 
     public void remove(String serviceDescriptionId) {
         GridServiceDescription<WhitePages> wpGsd = getGsd();
-        
+
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.remove",
-                                           Arrays.asList( new Object[]{ serviceDescriptionId } ) );
-        sendMessage( this.conversationManager,
+                                           Arrays.asList( new Object[]{serviceDescriptionId} ) );
+        ConversationManager convm = this.grid.get( ConversationManager.class );
+        sendMessage( convm,
                      sockets,
                      wpGsd.getId(),
                      cmd );
@@ -120,8 +123,14 @@ public class WhitePagesClient
         return new WhitePagesServer( this );
     }
 
-    public void registerSocketService(Grid grid, String id, String ip, int port) {
-        WhitePagesImpl.doRegisterSocketService(grid, id, ip, port);
+    public void registerSocketService(Grid grid,
+                                      String id,
+                                      String ip,
+                                      int port) {
+        WhitePagesImpl.doRegisterSocketService( grid,
+                                                id,
+                                                ip,
+                                                port );
     }
 
 }

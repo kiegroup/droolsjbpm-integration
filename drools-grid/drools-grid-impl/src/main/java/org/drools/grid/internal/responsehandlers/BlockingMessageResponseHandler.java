@@ -11,7 +11,7 @@ import org.drools.grid.io.MessageReceiverHandler;
 public class BlockingMessageResponseHandler extends AbstractBlockingResponseHandler
     implements
     MessageReceiverHandler {
-    private static final int WAIT_TIME = 60000;
+    private static final int WAIT_TIME = 600000;
 
     private volatile Message message;
 

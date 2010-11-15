@@ -40,7 +40,7 @@ public class MinaAcceptor
                                                new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
             acceptor.getSessionConfig().setReadBufferSize( 2048 );
             acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE,
-                                                     10 );
+                                                     100 );
         }
 
         this.handler = handler;

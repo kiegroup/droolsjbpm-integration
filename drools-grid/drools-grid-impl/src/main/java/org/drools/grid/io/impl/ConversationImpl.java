@@ -5,6 +5,7 @@ package org.drools.grid.io.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.drools.grid.io.Connector;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.IoWriter;
@@ -15,6 +16,7 @@ public class ConversationImpl
     implements
     Conversation {
 
+    private Connector                       conn;
     private IoWriter                        writer;
     private String                          conversationId;
     private String                          senderId;
@@ -25,13 +27,15 @@ public class ConversationImpl
 
     private Message                         receivedMessage;
 
-    public ConversationImpl(String conversationId,
+    public ConversationImpl(Connector conn, 
+                            String conversationId,
                             String senderId,
                             String recipientId,
                             RequestResponseDispatchListener dispathListener,
                             IoWriter writer,
                             ConversationManager conversationManager) {
-        this( conversationId,
+        this( conn,
+              conversationId,
               senderId,
               recipientId,
               dispathListener,
@@ -40,14 +44,15 @@ public class ConversationImpl
               conversationManager );
     }
 
-    public ConversationImpl(String conversationId,
+    public ConversationImpl(Connector conn,
+                            String conversationId,
                             String senderId,
                             String recipientId,
                             RequestResponseDispatchListener dispathListener,
                             Message receivedMessage,
                             IoWriter writer,
                             ConversationManager conversationManager) {
-
+        this.conn = conn;
         this.conversationId = conversationId;
         this.senderId = senderId;
         this.recipientId = recipientId;
@@ -85,6 +90,10 @@ public class ConversationImpl
         this.dispathListener.addMessageReceiverHandler( requestId,
                                                         handler );
         writer.write( msg );
+    }
+
+    public void endConversation() {
+        this.conn.close();
     }
 
 }

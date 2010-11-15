@@ -5,12 +5,12 @@ import java.util.Map;
 import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.GridServiceDescription;
 
-public class CoreServicesWhitePagesImpl
+public class CoreServicesLookupImpl
     implements
     CoreServicesLookup {
     private Map<String, GridServiceDescription> services;
 
-    public CoreServicesWhitePagesImpl(Map<String, GridServiceDescription> services) {
+    public CoreServicesLookupImpl(Map<String, GridServiceDescription> services) {
         this.services = services;
     }
 

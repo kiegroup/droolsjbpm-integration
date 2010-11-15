@@ -26,6 +26,7 @@ import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
+import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
@@ -41,12 +42,12 @@ public class KnowledgeBaseProviderRemoteClient
     implements
     KnowledgeBaseFactoryService {
 
-    private ConversationManager    cm;
-    private GridServiceDescription<GridNode>  gsd;
+    private Grid                             grid;
+    private GridServiceDescription<GridNode> gsd;
 
-    public KnowledgeBaseProviderRemoteClient(ConversationManager cm,
+    public KnowledgeBaseProviderRemoteClient(Grid grid,
                                              GridServiceDescription gsd) {
-        this.cm = cm;
+        this.grid = grid;
         this.gsd = gsd;
     }
 
@@ -68,46 +69,47 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeBase newKnowledgeBase() {
-        return newKnowledgeBase("", null);
+        return newKnowledgeBase( "",
+                                 null );
 
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId) {
-       return newKnowledgeBase(kbaseId, null);
+        return newKnowledgeBase( kbaseId,
+                                 null );
     }
 
     public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
-        return newKnowledgeBase(null, conf);
+        return newKnowledgeBase( null,
+                                 conf );
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId,
                                           KnowledgeBaseConfiguration conf) {
         String localId = "";
-        if(kbaseId == null || kbaseId.equals("")){
+        if ( kbaseId == null || kbaseId.equals( "" ) ) {
             localId = UUID.randomUUID().toString();
-        }
-        else{
+        } else {
             localId = kbaseId;
         }
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
+                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new NewKnowledgeBaseCommand( conf ) ) } ) );
-
-        ConversationUtil.sendMessage( this.cm,
-                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getId(),
-                     cmd );
+                                                                                                new NewKnowledgeBaseCommand( conf ) )} ) );
+        ConversationManager connm = this.grid.get( ConversationManager.class );
+        ConversationUtil.sendMessage( connm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
 
         return new KnowledgeBaseRemoteClient( localId,
                                               this.gsd,
-                                              this.cm );
+                                              connm );
     }
 
     public Environment newEnvironment() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-   
 }

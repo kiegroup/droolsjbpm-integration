@@ -23,6 +23,7 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * 
@@ -32,6 +33,7 @@ import org.w3c.dom.Element;
 public class GridNodeDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String GRID_ATTRIBUTE = "grid";
+    private static final String PORT_ATTRIBUTE = "port";
 
     @Override
     protected AbstractBeanDefinition parseInternal(Element element,
@@ -48,7 +50,20 @@ public class GridNodeDefinitionParser extends AbstractBeanDefinitionParser {
             factory.addPropertyReference( GRID_ATTRIBUTE,
                                           connectionRef );
         }
-
+        
+        for (int i = 0, length = element.getChildNodes().getLength(); i < length; i++) {
+            Node n = element.getChildNodes().item( i );
+            if ( n instanceof Element ) {
+                Element e = ( Element ) n;
+                
+                if ( "socket-service".equals( e.getLocalName() ) ) {
+                    String port = e.getAttribute( PORT_ATTRIBUTE );
+                    if ( StringUtils.hasText( port ) ) {
+                        factory.addPropertyValue( "port", port );
+                    }
+                }
+            }
+        }
         return factory.getBeanDefinition();
     }
 }

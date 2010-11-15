@@ -9,5 +9,7 @@ public interface Conversation {
 
     void sendMessage(Object body,
                      MessageReceiverHandler handler);
+    
+    void endConversation();
 
 }

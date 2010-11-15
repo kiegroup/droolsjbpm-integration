@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
+import org.drools.grid.impl.GridImpl;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Acceptor;
 import org.drools.grid.io.Connector;
@@ -22,6 +23,7 @@ import org.drools.grid.io.impl.MessageHandlerImpl;
 import org.drools.grid.io.impl.MessageImpl;
 import org.drools.grid.remote.mina.MinaAcceptor;
 import org.drools.grid.remote.mina.MinaConnector;
+import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 
 import junit.framework.TestCase;
@@ -49,13 +51,12 @@ public class MinaTest extends TestCase {
                   accHandler,
                   l );
 
-        Connector conn = new MinaConnector();
 
-        ConversationManager cm = new ConversationManagerImpl( "s1",
-                                                              conn,
+        ConversationManager cm = new ConversationManagerImpl( new GridImpl(),
                                                               l );
 
-        Conversation cv = cm.startConversation( new InetSocketAddress( "127.0.0.1",
+        Conversation cv = cm.startConversation( "s1",
+                                                new InetSocketAddress( "127.0.0.1",
                                                                        5012 ),
                                                                        "r1" );
 
@@ -67,7 +68,7 @@ public class MinaTest extends TestCase {
         Message msg = blockHandler.getMessage( 5000 );
         System.out.println( msg.getBody() );
 
-        conn.close();
+        cv.endConversation();
         if ( acc.isOpen() ) {
             acc.close();
         }

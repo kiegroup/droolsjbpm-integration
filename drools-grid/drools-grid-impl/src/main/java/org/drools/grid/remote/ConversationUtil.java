@@ -28,7 +28,23 @@ import org.drools.grid.io.ConversationManager;
  * @author salaboy
  */
 public class ConversationUtil {
+
     public static Object sendMessage(ConversationManager conversationManager,
+                                     Serializable addr,
+                                     String id,
+                                     Object body) {
+        // This method was added to provide a level of backwards compatability
+        // until we have a correct way of setting senderId
+        return sendMessage( conversationManager,
+                            "",
+                            addr,
+                            id,
+                            body );
+
+    }
+
+    public static Object sendMessage(ConversationManager conversationManager,
+                                     String senderId,
                                      Serializable addr,
                                      String id,
                                      Object body) {
@@ -37,22 +53,26 @@ public class ConversationUtil {
         if ( addr instanceof InetSocketAddress[] ) {
             sockets = (InetSocketAddress[]) addr;
         } else if ( addr instanceof InetSocketAddress ) {
-            sockets = new InetSocketAddress[ 1 ];
+            sockets = new InetSocketAddress[1];
             sockets[0] = (InetSocketAddress) addr;
         }
 
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
+        Conversation conv = null;
         for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation( socket,
-                                                                           id );
+                conv = conversationManager.startConversation( senderId,
+                                                              socket,
+                                                              id );
                 conv.sendMessage( body,
                                   handler );
                 exception = null;
             } catch ( Exception e ) {
                 exception = e;
-                conversationManager.endConversation();
+                if ( conv != null ) {
+                    conv.endConversation();
+                }
             }
             if ( exception == null ) {
                 break;
@@ -65,7 +85,7 @@ public class ConversationUtil {
         try {
             return handler.getMessage().getBody();
         } finally {
-            conversationManager.endConversation();
+            conv.endConversation();
         }
     }
 }

@@ -29,6 +29,7 @@ import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.command.SetVariableCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
+import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
@@ -42,12 +43,12 @@ public class KnowledgeBuilderProviderRemoteClient
     implements
     KnowledgeBuilderFactoryService {
 
-    private ConversationManager    cm;
-    private GridServiceDescription<GridNode>  gsd;
+    private Grid                             grid;
+    private GridServiceDescription<GridNode> gsd;
 
-    public KnowledgeBuilderProviderRemoteClient(ConversationManager cm,
+    public KnowledgeBuilderProviderRemoteClient(Grid grid,
                                                 GridServiceDescription gsd) {
-        this.cm = cm;
+        this.grid = grid;
         this.gsd = gsd;
     }
 
@@ -65,36 +66,39 @@ public class KnowledgeBuilderProviderRemoteClient
     }
 
     public KnowledgeBuilder newKnowledgeBuilder() {
-        return newKnowledgeBuilder(null, null);
-       
+        return newKnowledgeBuilder( null,
+                                    null );
 
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {
-        return newKnowledgeBuilder(null, conf);
+        return newKnowledgeBuilder( null,
+                                    conf );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase) {
-        return newKnowledgeBuilder(kbase, null);
+        return newKnowledgeBuilder( kbase,
+                                    null );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase,
                                                 KnowledgeBuilderConfiguration conf) {
-         String localId = UUID.randomUUID().toString();
+        String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
+                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new NewKnowledgeBuilderCommand( conf ) ) } ) );
+                                                                                                new NewKnowledgeBuilderCommand( conf ) )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getId(),
-                     cmd );
+        ConversationManager connm = this.grid.get( ConversationManager.class );
+        ConversationUtil.sendMessage( connm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
 
         return new KnowledgeBuilderRemoteClient( localId,
                                                  this.gsd,
-                                                 this.cm );
+                                                 connm );
     }
 
     public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,
@@ -102,5 +106,4 @@ public class KnowledgeBuilderProviderRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    
 }

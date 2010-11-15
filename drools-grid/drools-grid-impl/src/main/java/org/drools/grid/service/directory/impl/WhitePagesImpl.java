@@ -44,7 +44,7 @@ public class WhitePagesImpl
     }
     
     public static void doRegisterSocketService(Grid grid, String id, String ip, int port) {
-        CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
+        CoreServicesLookupImpl coreServicesWP = (CoreServicesLookupImpl) grid.get( CoreServicesLookup.class );
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( WhitePages.class );
         if ( gsd == null ) {

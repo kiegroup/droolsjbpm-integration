@@ -6,13 +6,57 @@
 	attributeFormDefault="unqualified">
 	
 	<xsd:element name="grid">
-		<xsd:complexType>
-			<xsd:attribute name="id" use="required" type="xsd:ID"/>
-		</xsd:complexType>
+		<xsd:complexType>		
+			<xsd:all minOccurs="0">
+				<xsd:element name="core-services" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+		              <xsd:sequence>
+		                 <xsd:any minOccurs="0" maxOccurs="1" />
+		              </xsd:sequence>	           
+		              <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+					</xsd:complexType>				
+				</xsd:element>	
+				
+				<xsd:element name="whitepages" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+		              <xsd:choice>
+		                 <xsd:element ref="persistence" minOccurs="0" maxOccurs="1"/>
+		                 <xsd:any  minOccurs="0" maxOccurs="1" />
+		              </xsd:choice>
+		              <xsd:attribute name="ref" use="optional" type="xsd:string"/>	 		                        
+					</xsd:complexType>				
+				</xsd:element>		
+				
+			    <xsd:element name="socket-service" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+		              <xsd:sequence>
+		                 <xsd:element name="service" minOccurs="0" maxOccurs="unbounded">
+		                 	<xsd:complexType>
+		                 	   <xsd:attribute name="name" use="required" type="xsd:string"/>	
+		                 	   <xsd:attribute name="port" use="required" type="xsd:string"/>
+		                    </xsd:complexType>
+		                 </xsd:element>
+		              </xsd:sequence>					
+					  <xsd:attribute name="acceptor" use="optional" type="xsd:string"/>
+ 				      <xsd:attribute name="ip" use="required" type="xsd:string"/>		              		              	           
+					</xsd:complexType>				
+				</xsd:element>	
+																					
+			</xsd:all>	
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>			
+		</xsd:complexType>					
 	</xsd:element>
 
 	<xsd:element name="grid-node">
 		<xsd:complexType>
+	   	    <xsd:all>	
+			    <xsd:element name="socket-service" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+ 				         <xsd:attribute name="port" use="required" type="xsd:string"/>		              		              	           
+					</xsd:complexType>				
+				</xsd:element>	
+																					
+			</xsd:all>			
 			<xsd:attribute name="id" use="required" type="xsd:ID"/>
 			<xsd:attribute name="grid" use="optional" type="xsd:string"/>
 		</xsd:complexType>
@@ -337,9 +381,9 @@
 	           <xsd:extension base="persistenceType">
 	              <xsd:all>
 	                 <xsd:element name="variable-persisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
-	                 <xsd:element name="transaction-manager" minOccurs="1" maxOccurs="1">
+	                 <xsd:element name="transaction-manager" minOccurs="0" maxOccurs="1">
 				        <xsd:complexType>
-  					       <xsd:attribute name="ref" use="required" type="xsd:string"/>
+  					       <xsd:attribute name="ref" use="optional" type="xsd:string"/>
 				        </xsd:complexType>
 		             </xsd:element>
 	                 <xsd:element name="entity-manager-factory" minOccurs="1" maxOccurs="1">

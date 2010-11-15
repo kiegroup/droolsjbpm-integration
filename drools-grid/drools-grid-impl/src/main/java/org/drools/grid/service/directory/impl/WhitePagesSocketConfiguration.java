@@ -32,7 +32,7 @@ public class WhitePagesSocketConfiguration
         WhitePages wp = grid.get( WhitePages.class );
 
         if ( port != -1 ) {
-            CoreServicesWhitePagesImpl coreServicesWP = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
+            CoreServicesLookupImpl coreServicesWP = (CoreServicesLookupImpl) grid.get( CoreServicesLookup.class );
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( WhitePages.class );
             if ( gsd == null ) {

@@ -9,6 +9,10 @@ public class CommandImpl
     private String       name;
     private List<Object> arguments;
 
+    public CommandImpl() {
+        
+    }
+    
     public CommandImpl(String name,
                        List<Object> arguments) {
         super();

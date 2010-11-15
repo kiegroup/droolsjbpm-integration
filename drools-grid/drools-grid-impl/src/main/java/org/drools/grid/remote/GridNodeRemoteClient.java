@@ -22,8 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
+import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.io.Connector;
+import org.drools.grid.io.ConnectorFactoryService;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.remote.mina.MinaConnector;
@@ -39,12 +42,15 @@ public class GridNodeRemoteClient<T>
     GridNode {
 
     private GridServiceDescription    gsd;
+    private Grid                      grid;
     private final Map<String, Object> localContext    = new ConcurrentHashMap<String, Object>();
     private final ServiceRegistry     serviceRegistry = ServiceRegistryImpl.getInstance();
-    private MinaConnector connector = new MinaConnector();
-    
-    public GridNodeRemoteClient(GridServiceDescription gsd) {
+    private MinaConnector             connector       = new MinaConnector();
+
+    public GridNodeRemoteClient(Grid grid,
+                                GridServiceDescription gsd) {
         this.gsd = gsd;
+        this.grid = grid;
         init( this.localContext );
     }
 
@@ -74,21 +80,17 @@ public class GridNodeRemoteClient<T>
 
     public void init(Object context) {
 
-        
-        ConversationManager cm = new ConversationManagerImpl( this.gsd.getId(),
-                                                              connector,
-                                                              SystemEventListenerFactory.getSystemEventListener() );
-        this.localContext.put( KnowledgeBuilderFactoryService.class.getCanonicalName(),
-                               new KnowledgeBuilderProviderRemoteClient( cm,
+        this.localContext.put( KnowledgeBuilderFactoryService.class.getName(),
+                               new KnowledgeBuilderProviderRemoteClient( this.grid,
                                                                          gsd ) );
-        this.localContext.put( KnowledgeBaseFactoryService.class.getCanonicalName(),
-                               new KnowledgeBaseProviderRemoteClient( cm,
+        this.localContext.put( KnowledgeBaseFactoryService.class.getName(),
+                               new KnowledgeBaseProviderRemoteClient( this.grid,
                                                                       gsd ) );
 
     }
 
     public void dispose() {
-         connector.close();
+        connector.close();
     }
 
 }

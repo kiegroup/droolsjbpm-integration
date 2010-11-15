@@ -56,11 +56,9 @@ public class SchedulerClient
     private Grid                   grid;
 
     public SchedulerClient(Grid grid,
-                           GridServiceDescription schedulerGsd,
-                           ConversationManager conversationManager) {
+                           GridServiceDescription schedulerGsd) {
         this.grid = grid;
         this.schedulerGsd = schedulerGsd;
-        this.conversationManager = conversationManager;
     }
 
     public static Object sendMessage(ConversationManager conversationManager,
@@ -78,16 +76,18 @@ public class SchedulerClient
 
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
         Exception exception = null;
+        Conversation conv = null;
         for ( InetSocketAddress socket : sockets ) {
             try {
-                Conversation conv = conversationManager.startConversation( socket,
-                                                                           id );
+                conv = conversationManager.startConversation( "", // TODO add ID later
+                                                              socket,
+                                                              id );
                 conv.sendMessage( body,
                                   handler );
                 exception = null;
             } catch ( Exception e ) {
                 exception = e;
-                conversationManager.endConversation();
+                conv.endConversation();
             }
             if ( exception == null ) {
                 break;
@@ -100,7 +100,7 @@ public class SchedulerClient
         try {
             return handler.getMessage().getBody();
         } finally {
-            conversationManager.endConversation();
+            conv.endConversation();
         }
     }
 

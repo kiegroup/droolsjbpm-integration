@@ -43,44 +43,43 @@ public class WorkingMemoryEntryPointRemoteClient
     implements
     WorkingMemoryEntryPoint {
 
-    private String               instanceId;
-    private String               name;
+    private String                 instanceId;
+    private String                 name;
     private GridServiceDescription gsd;
-    private ConversationManager cm;
-    
+    private ConversationManager    cm;
 
-    public WorkingMemoryEntryPointRemoteClient(String instanceId, String name,
+    public WorkingMemoryEntryPointRemoteClient(String instanceId,
+                                               String name,
                                                GridServiceDescription gsd,
                                                ConversationManager cm) {
         this.instanceId = instanceId;
         this.name = name;
         this.gsd = gsd;
         this.cm = cm;
-        
+
     }
 
     public FactHandle insert(Object object) throws FactException {
 
-        
         String kresultsId = "kresults_" + this.gsd.getId();
-        
-        InsertObjectCommand insertCmd = new InsertObjectCommand( object, true );
-        insertCmd.setEntryPoint(name);
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( insertCmd,
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  this.name,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                ((InetSocketAddress[])((Address) this.gsd.getAddresses().get("socket")).getObject()),
-                this.gsd.getServiceInterface().getName(),
-                cmd);
-        return ((FactHandle)result);
-       
-        
+
+        InsertObjectCommand insertCmd = new InsertObjectCommand( object,
+                                                                 true );
+        insertCmd.setEntryPoint( name );
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( insertCmd,
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      this.name,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      ((InetSocketAddress[]) ((Address) this.gsd.getAddresses().get( "socket" )).getObject()),
+                                                      this.gsd.getServiceInterface().getName(),
+                                                      cmd );
+        return ((FactHandle) result);
+
     }
 
     public FactHandle insert(Object object,
@@ -132,6 +131,5 @@ public class WorkingMemoryEntryPointRemoteClient
     public long getFactCount() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
-    
-    
+
 }

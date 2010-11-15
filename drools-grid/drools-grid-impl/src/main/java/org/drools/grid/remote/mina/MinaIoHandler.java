@@ -55,7 +55,8 @@ public class MinaIoHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session,
                                 Object object) throws Exception {
         Message msg = (Message) object;
-        Conversation conversation = new ConversationImpl( msg.getConversationId(),
+        Conversation conversation = new ConversationImpl( null, //TODO this should not be null, but we currently have no concept of a ConversationManager on the Acceptor
+                                                          msg.getConversationId(),
                                                           this.senderId,
                                                           msg.getSenderId(),
                                                           this.dispathListener,

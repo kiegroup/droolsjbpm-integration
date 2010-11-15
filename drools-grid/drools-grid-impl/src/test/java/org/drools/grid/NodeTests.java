@@ -36,6 +36,7 @@ import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.io.impl.ByteArrayResource;
@@ -119,12 +120,12 @@ public class NodeTests {
         Grid grid1 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
-                        null );
+                        new WhitePagesImpl() );
 
         Grid grid2 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid2,
                         -1,
-                        grid1.get( WhitePages.class ) );
+                        null );
 
         GridNode n1 = grid1.createGridNode( "n1" );
         grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
@@ -183,12 +184,12 @@ public class NodeTests {
         Grid grid1 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
-                        null );
+                        new WhitePagesImpl() );
 
         Grid grid2 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid2,
                         -1,
-                        grid1.get( WhitePages.class ) );
+                        null );
 
         GridNode n1 = grid1.createGridNode( "n1" );
         grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
@@ -272,9 +273,12 @@ public class NodeTests {
         conf.addConfiguration( coreSeviceSchedulerConf );
 
         //Configuring the WhitePages 
-        WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
-        wplConf.setWhitePages( wp );
-        conf.addConfiguration( wplConf );        
+        WhitePagesLocalConfiguration wplConf = null;
+        if ( wp != null ) {
+            wplConf = new WhitePagesLocalConfiguration();
+            wplConf.setWhitePages( wp );
+            conf.addConfiguration( wplConf );
+        }
 
 //        //Create a Local Scheduler
 //        SchedulerLocalConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
@@ -283,9 +287,9 @@ public class NodeTests {
         if ( port >= 0 ) {
             //Configuring the SocketService
             MultiplexSocketServiceCongifuration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
-                                                                                                                              new MinaAcceptorFactoryService(),
-                                                                                                                              SystemEventListenerFactory.getSystemEventListener(),
-                                                                                                                              grid) );
+                                                                                                                                     new MinaAcceptorFactoryService(),
+                                                                                                                                     SystemEventListenerFactory.getSystemEventListener(),
+                                                                                                                                     grid) );
             socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), port );
 //            socketConf.addService( SchedulerService.class.getName(), schlConf.getSchedulerService(), port );
                         

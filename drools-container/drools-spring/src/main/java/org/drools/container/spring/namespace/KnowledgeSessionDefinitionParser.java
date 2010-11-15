@@ -199,7 +199,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         if ( StringUtils.hasText( ref ) ) {
                             beanBuilder.addConstructorArgReference( ref );
                         } else if ( nestedElm != null  ) {
-                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
+                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );                         
                         } else {
                             throw new IllegalArgumentException( "insert-object must either specify a 'ref' attribute or have a nested bean" );
                         }
@@ -211,7 +211,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         if ( StringUtils.hasText( ref ) ) {
                             beanBuilder.addConstructorArgReference( ref );
                         } else if ( nestedElm != null  ) {
-                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
+                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );                         
                         } else {
                             throw new IllegalArgumentException( "set-global must either specify a 'ref' attribute or have a nested bean" );
                         }
@@ -246,7 +246,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                                 if ( StringUtils.hasText( ref ) ) {
                                     map.put( identifier,  new RuntimeBeanReference( ref) );
                                 } else if ( nestedElm != null  ) {
-                                    map.put( identifier,  parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );
+                                    map.put( identifier,  parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );
                                 } else {
                                     throw new IllegalArgumentException( "start-process paramaters must either specify a 'ref' attribute or have a nested bean" );
                                 }                                    
@@ -267,7 +267,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                         if ( StringUtils.hasText( ref ) ) {
                             beanBuilder.addConstructorArgReference( ref );
                         } else if ( nestedElm != null  ) {
-                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parseBeanDefinitionElement( nestedElm ) );                         
+                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );                         
                         } else {
                             throw new IllegalArgumentException( "signal-event must either specify a 'ref' attribute or have a nested bean" );
                         }             

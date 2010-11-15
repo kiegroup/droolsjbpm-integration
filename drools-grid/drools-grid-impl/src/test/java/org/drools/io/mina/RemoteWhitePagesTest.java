@@ -65,13 +65,7 @@ public class RemoteWhitePagesTest extends TestCase {
         coreSeviceConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
-        Connector conn = new MinaConnector();
-
-        ConversationManager cm = new ConversationManagerImpl( "s1",
-                                                              conn,
-                                                              l );
-
-        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration( cm );
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration( );
         conf.addConfiguration( wprConf );
 
         conf.configure( grid2 );
@@ -109,9 +103,6 @@ public class RemoteWhitePagesTest extends TestCase {
 
         GridServiceDescription gs2 = wp.lookup( "s2" );
         assertNotNull( gs2 );
-
-        conn.close();
-
         grid1.get( SocketService.class ).close();
 
     }

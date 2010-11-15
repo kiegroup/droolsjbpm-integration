@@ -71,6 +71,9 @@ public class WhitePagesServer
                                                          WhitePages whitePages = (WhitePages) object;
                                                          final List list = cmd.getArguments();
                                                          GridServiceDescription gsd = whitePages.lookup( (String) list.get( 0 ) );
+                                                         if ( gsd != null ) {
+                                                             gsd.setServiceInterface( null ); // FIXME URGENT (mdp) workaround due to mina serialization issues.
+                                                         }
                                                          con.respond( gsd );
                                                      }
                                                  } );

@@ -7,7 +7,9 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.drools.SystemEventListener;
+import org.drools.grid.Grid;
 import org.drools.grid.io.Connector;
+import org.drools.grid.io.ConnectorFactoryService;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.IoWriter;
@@ -16,40 +18,39 @@ import org.drools.grid.io.MessageReceiverHandler;
 public class ConversationManagerImpl
     implements
     ConversationManager {
-
-    private Connector           conn;
-
     private SystemEventListener systemEventListener;
-
-    private String              senderId;
 
     private AtomicLong          conversationIdCounter;
 
-    public ConversationManagerImpl(String senderId,
-                                   Connector conn,
+    private Grid grid;
+    
+    public ConversationManagerImpl(Grid grid,
                                    SystemEventListener systemEventListener) {
-        this.conn = conn;
-        this.senderId = senderId;
         this.conversationIdCounter = new AtomicLong();
         this.systemEventListener = systemEventListener;
+        this.grid = grid;
     }
 
-    public Conversation startConversation(InetSocketAddress address,
+    public Conversation startConversation(String senderId,
+                                          InetSocketAddress address,
                                           String recipientId) {
         RequestResponseDispatchListener dispathListener = new RequestResponseDispatchListener();
-        IoWriter writer = this.conn.open( address,
-                                          dispathListener,
-                                          systemEventListener );
-        return new ConversationImpl( Long.toString( this.conversationIdCounter.incrementAndGet() ),
-                                     this.senderId,
+        ConnectorFactoryService cfs = this.grid.get( ConnectorFactoryService.class );
+        if ( cfs == null ) {
+            throw new RuntimeException( "Unable to resolve ConnectorFactoryService" );
+        }
+        
+        Connector conn = cfs.newConnector();
+        IoWriter writer = conn.open( address,
+                                     dispathListener,
+                                     systemEventListener );
+        return new ConversationImpl( conn,
+                                     Long.toString( this.conversationIdCounter.incrementAndGet() ),
+                                     senderId,
                                      recipientId,
                                      dispathListener,
                                      writer,
                                      this );
-    }
-
-    public void endConversation() {
-        this.conn.close();
     }
 
 }

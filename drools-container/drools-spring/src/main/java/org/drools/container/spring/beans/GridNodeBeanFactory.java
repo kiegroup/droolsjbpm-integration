@@ -21,11 +21,13 @@ import java.util.HashMap;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
+import org.drools.grid.SocketService;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.StringUtils;
 
 /**
  * 
@@ -40,6 +42,8 @@ public class GridNodeBeanFactory
     private String   id;
     private Grid     grid;
     private GridNode node;
+    
+    private String   port;
 
     //
     public Object getObject() throws Exception {
@@ -63,6 +67,10 @@ public class GridNodeBeanFactory
                                                new WhitePagesImpl() );
         }
         this.node = this.grid.createGridNode( id );
+        
+        if ( StringUtils.hasText( this.port ) ) {
+            this.grid.get( SocketService.class ).addService( id, Integer.parseInt( port ), this.node );
+        }
         //        connection.addExecutionNode(new LocalNodeConnector());
         //        connection.addDirectoryNode(new LocalDirectoryConnector());
         //        node = connection.getExecutionNode();
@@ -85,5 +93,15 @@ public class GridNodeBeanFactory
     public void setGrid(Grid grid) {
         this.grid = grid;
     }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+    
+    
 
 }

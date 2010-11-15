@@ -76,9 +76,9 @@ import org.drools.time.SessionClock;
 public class StatefulKnowledgeSessionRemoteClient
     implements
     StatefulKnowledgeSession {
-    private String                 instanceId;
+    private String                           instanceId;
     private GridServiceDescription<GridNode> gsd;
-    private ConversationManager    cm;
+    private ConversationManager              cm;
 
     public StatefulKnowledgeSessionRemoteClient(String localId,
                                                 GridServiceDescription gsd,
@@ -93,155 +93,150 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void dispose() {
+        System.out.println( "remoted!!!!" );
         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new DisposeCommand(),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new DisposeCommand(),
                                                                                                                        null,
                                                                                                                        null,
                                                                                                                        this.instanceId,
-                                                                                                                       kresultsId ) } ) );
+                                                                                                                       kresultsId )} ) );
 
         ConversationUtil.sendMessage( this.cm,
-                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getId(),
-                                     cmd );
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public int fireAllRules() {
-        return fireAllRules(-1);
+        return fireAllRules( -1 );
 
-       
     }
 
     public int fireAllRules(int max) {
-         String kresultsId = "kresults_" + this.gsd.getId();
+        String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( CommandFactory.newFireAllRules(max),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( CommandFactory.newFireAllRules( max ),
                                                                                                                        null,
                                                                                                                        null,
                                                                                                                        this.instanceId,
-                                                                                                                       kresultsId ) } ) );
+                                                                                                                       kresultsId )} ) );
 
         Object result = ConversationUtil.sendMessage( this.cm,
-                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getId(),
-                                     cmd );
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
 
         return (Integer) result;
     }
 
     public int fireAllRules(AgendaFilter agendaFilter) {
-         String kresultsId = "kresults_" + this.gsd.getId();
+        String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(agendaFilter),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand( agendaFilter ),
                                                                                                                        null,
                                                                                                                        null,
                                                                                                                        this.instanceId,
-                                                                                                                       kresultsId ) } ) );
+                                                                                                                       kresultsId )} ) );
 
         Object result = ConversationUtil.sendMessage( this.cm,
-                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getId(),
-                                     cmd );
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
 
         return (Integer) result;
     }
 
     public void fireUntilHalt() {
-       fireUntilHalt(null); 
+        fireUntilHalt( null );
     }
 
     public void fireUntilHalt(AgendaFilter agendaFilter) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new FireUntilHaltCommand( agendaFilter ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new FireUntilHaltCommand( agendaFilter ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public <T> T execute(Command<T> command) {
-        
+
         throw new UnsupportedOperationException( "Not supported yet." );
 
     }
 
     public <T extends SessionClock> T getSessionClock() {
-            String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetSessionClockCommand(),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetSessionClockCommand(),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
         return (T) result;
     }
-    
 
     public void setGlobal(String identifier,
                           Object object) {
-           String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( CommandFactory.newSetGlobal( identifier,
-                                                                                                       object ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( CommandFactory.newSetGlobal( identifier,
+                                                                                                                                                   object ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public Object getGlobal(String identifier) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( CommandFactory.newGetGlobal( identifier ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )})); 
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        
-        
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( CommandFactory.newGetGlobal( identifier ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
         return result;
     }
 
     public Globals getGlobals() {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetGlobalsCommand(),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )})); 
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        
-        
-        return (Globals)result;
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetGlobalsCommand(),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return (Globals) result;
     }
 
     public Calendars getCalendars() {
@@ -283,18 +278,18 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void halt() {
-         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new HaltCommand(),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new HaltCommand(),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public Agenda getAgenda() {
@@ -303,22 +298,20 @@ public class StatefulKnowledgeSessionRemoteClient
 
     public WorkingMemoryEntryPoint getWorkingMemoryEntryPoint(String name) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointRemoteCommand( name ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  name,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress[]) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        
-        
-        return new WorkingMemoryEntryPointRemoteClient( this.instanceId, 
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointRemoteCommand( name ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      name,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
+
+        return new WorkingMemoryEntryPointRemoteClient( this.instanceId,
                                                             name,
                                                             this.gsd,
                                                             this.cm );
@@ -347,126 +340,128 @@ public class StatefulKnowledgeSessionRemoteClient
 
         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( object,
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( object,
                                                                                                                                                 true ),
                                                                                                                        null,
                                                                                                                        null,
                                                                                                                        this.instanceId,
-                                                                                                                       kresultsId ) } ) );
+                                                                                                                       kresultsId )} ) );
 
         Object result = ConversationUtil.sendMessage( this.cm,
-                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                     this.gsd.getId(),
-                                     cmd );
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
 
         return (FactHandle) result;
     }
 
     public void retract(FactHandle handle) {
-         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( CommandFactory.newRetract( handle ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( CommandFactory.newRetract( handle ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public void update(FactHandle handle,
                        Object object) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new UpdateCommand( handle, object ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new UpdateCommand( handle,
+                                                                                                                                         object ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public FactHandle getFactHandle(Object object) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetFactHandleCommand( object, true ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetFactHandleCommand( object,
+                                                                                                                                                true ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
         return (FactHandle) result;
     }
 
     public Object getObject(FactHandle factHandle) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetObjectCommand(factHandle ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetObjectCommand( factHandle ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
         return result;
     }
 
     public Collection<Object> getObjects() {
-        return getObjects(null);
+        return getObjects( null );
     }
 
     public Collection<Object> getObjects(ObjectFilter filter) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetObjectsCommand( filter ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        return (Collection<Object>)result;
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetObjectsCommand( filter ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return (Collection<Object>) result;
     }
 
     public <T extends FactHandle> Collection<T> getFactHandles() {
-        return getFactHandles(null);
+        return getFactHandles( null );
     }
 
     public <T extends FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
-       String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetFactHandlesCommand( filter ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        return (Collection<T>)result; 
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetFactHandlesCommand( filter ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return (Collection<T>) result;
     }
 
     public long getFactCount() {
@@ -474,114 +469,115 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public ProcessInstance startProcess(String processId) {
-        return startProcess(processId, null);
+        return startProcess( processId,
+                             null );
     }
 
     public ProcessInstance startProcess(String processId,
                                         Map<String, Object> parameters) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new StartProcessCommand( processId, parameters ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        
-        
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new StartProcessCommand( processId,
+                                                                                                                                               parameters ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
         return (ProcessInstance) result;
     }
 
     public void signalEvent(String type,
                             Object event) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new SignalEventCommand( type, event ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new SignalEventCommand( type,
+                                                                                                                                              event ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public void signalEvent(String type,
                             Object event,
                             long processInstanceId) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new SignalEventCommand( type, event ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new SignalEventCommand( type,
+                                                                                                                                              event ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
     }
 
     public Collection<ProcessInstance> getProcessInstances() {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetProcessInstancesCommand(  ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        return (Collection<ProcessInstance>)result;
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetProcessInstancesCommand(),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return (Collection<ProcessInstance>) result;
     }
 
     public ProcessInstance getProcessInstance(long processInstanceId) {
         String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetProcessInstanceCommand( processInstanceId ),
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        Object result = ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        return (ProcessInstance)result;
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetProcessInstanceCommand( processInstanceId ),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return (ProcessInstance) result;
     }
 
     public void abortProcessInstance(long processInstanceId) {
-        
+
         String kresultsId = "kresults_" + this.gsd.getId();
         AbortProcessInstanceCommand cmdAbort = new AbortProcessInstanceCommand();
-        cmdAbort.setProcessInstanceId(processInstanceId);
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand(cmdAbort,
-                                                                                  null,
-                                                                                  null,
-                                                                                  this.instanceId,
-                                                                                  kresultsId )}));
-        
-        ConversationUtil.sendMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
-        
-        
+        cmdAbort.setProcessInstanceId( processInstanceId );
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( cmdAbort,
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId )} ) );
+
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
+
     }
 
     public WorkItemManager getWorkItemManager() {
@@ -624,5 +620,4 @@ public class StatefulKnowledgeSessionRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-   
 }

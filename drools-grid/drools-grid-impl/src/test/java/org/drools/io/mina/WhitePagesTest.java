@@ -16,12 +16,14 @@ import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.Connector;
+import org.drools.grid.io.ConnectorFactoryService;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnector;
+import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
@@ -63,13 +65,7 @@ public class WhitePagesTest extends TestCase {
         coreSeviceConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
-        Connector conn = new MinaConnector();
-
-        ConversationManager cm = new ConversationManagerImpl( "s1",
-                                                              conn,
-                                                              l );
-
-        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration( cm );
+        GridPeerServiceConfiguration wprConf = new WhitePagesRemoteConfiguration( );
         conf.addConfiguration( wprConf );
 
         conf.configure( grid2 );
@@ -91,7 +87,7 @@ public class WhitePagesTest extends TestCase {
                       testGsd_3 );
         assertNotSame( test1Gsd,
                        testGsd_3 );
-        conn.close();
+
         grid1.get( SocketService.class ).close();
     }
 

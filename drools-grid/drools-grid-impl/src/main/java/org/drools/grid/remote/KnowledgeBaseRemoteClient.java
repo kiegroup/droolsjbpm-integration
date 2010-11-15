@@ -50,9 +50,9 @@ public class KnowledgeBaseRemoteClient
     implements
     KnowledgeBase {
 
-    private String                 instanceId;
-    private ConversationManager    cm;
-    private GridServiceDescription<GridNode>  gsd;
+    private String                           instanceId;
+    private ConversationManager              cm;
+    private GridServiceDescription<GridNode> gsd;
 
     public KnowledgeBaseRemoteClient(String localId,
                                      GridServiceDescription gsd,
@@ -68,16 +68,16 @@ public class KnowledgeBaseRemoteClient
         String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
                                                                                                                        kuilderInstanceId,
                                                                                                                        this.instanceId,
                                                                                                                        null,
-                                                                                                                       kresultsId ) } ) );
+                                                                                                                       kresultsId )} ) );
 
         ConversationUtil.sendMessage( this.cm,
-                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getId(),
-                     cmd );
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
 
     }
 
@@ -141,18 +141,18 @@ public class KnowledgeBaseRemoteClient
         String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ new SetVariableCommand( "__TEMP__",
+                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
                                                                                                 new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf ),
                                                                                                                                                null,
                                                                                                                                                this.instanceId,
                                                                                                                                                null,
-                                                                                                                                               kresultsId ) ) } ) );
+                                                                                                                                               kresultsId ) )} ) );
 
         ConversationUtil.sendMessage( this.cm,
-                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                     this.gsd.getId(),
-                     cmd );
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
 
         return new StatefulKnowledgeSessionRemoteClient( localId,
                                                          this.gsd,
@@ -189,5 +189,4 @@ public class KnowledgeBaseRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-   
 }

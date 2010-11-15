@@ -18,7 +18,8 @@ public class GridServiceDescriptionJpa<T>
     Serializable {
     private GridServiceDescription<T> detached;
 
-    private EntityManagerFactory   emf;
+    
+    private transient EntityManagerFactory      emf;
 
     public GridServiceDescriptionJpa(GridServiceDescription detached,
                                      EntityManagerFactory emf) {
@@ -32,7 +33,7 @@ public class GridServiceDescriptionJpa<T>
         for ( Address address : this.detached.getAddresses().values() ) {
             addresses.put( address.getTransport(),
                            new AddressJpa( address,
-                                                                   this.emf ) );
+                                           this.emf ) );
         }
         em.close();
         return Collections.unmodifiableMap( addresses );

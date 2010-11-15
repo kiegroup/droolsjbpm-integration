@@ -17,6 +17,7 @@
 
 package org.drools.grid.remote;
 
+import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
@@ -31,8 +32,10 @@ public class RemoteGridNodeConnection<T>
     GridConnection<GridNode> {
     private GridNode gridNode;
 
-    public RemoteGridNodeConnection(GridServiceDescription gsd) {
-        this.gridNode = new GridNodeRemoteClient( gsd );
+    public RemoteGridNodeConnection(Grid grid,
+                                    GridServiceDescription gsd) {
+        this.gridNode = new GridNodeRemoteClient( grid,
+                                                  gsd );
     }
 
     public GridNode connect() {

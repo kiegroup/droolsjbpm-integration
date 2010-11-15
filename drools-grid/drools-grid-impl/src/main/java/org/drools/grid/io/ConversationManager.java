@@ -6,9 +6,7 @@ package org.drools.grid.io;
 import java.net.InetSocketAddress;
 
 public interface ConversationManager {
-    Conversation startConversation(InetSocketAddress address,
+    Conversation startConversation(String senderId,
+                                   InetSocketAddress address,
                                    String recipientId);
-
-    void endConversation();
-
 }

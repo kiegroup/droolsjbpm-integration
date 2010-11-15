@@ -14,21 +14,17 @@ import org.drools.time.SchedulerService;
 public class SchedulerRemoteConfiguration
     implements
     GridPeerServiceConfiguration {
-    private ConversationManager cm;
 
-    public SchedulerRemoteConfiguration(ConversationManager cm) {
-
-        this.cm = cm;
+    public SchedulerRemoteConfiguration() {
     }
 
     public void configureService(Grid grid) {
-        CoreServicesWhitePagesImpl coreServices = (CoreServicesWhitePagesImpl) grid.get( CoreServicesLookup.class );
+        CoreServicesLookupImpl coreServices = (CoreServicesLookupImpl) grid.get( CoreServicesLookup.class );
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServices.lookup( SchedulerService.class );
 
         SchedulerService scheduler = new SchedulerClient( grid,
-                                                          gsd,
-                                                          cm );
+                                                          gsd);
         ((GridImpl) grid).addService( SchedulerService.class,
                                       scheduler );
 

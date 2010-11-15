@@ -33,7 +33,8 @@ public class ConnectionFactoryServiceImpl
         }
 
         if ( conn == null ) {
-            conn = new RemoteGridNodeConnection( gsd );
+            conn = new RemoteGridNodeConnection( this.grid, 
+                                                 gsd );
         }
 
         return conn;
