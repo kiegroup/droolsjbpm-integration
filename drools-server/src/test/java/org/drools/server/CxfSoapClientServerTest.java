@@ -28,34 +28,34 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CxfSoapClientServerTest extends TestCase {
 
-	public void test1() throws Exception {
-	}
-	
-	public void FIXMEtest1() throws Exception {
-		ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:beans-test.xml");
+    public void test1() throws Exception {
+        ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext( "classpath:beans-test.xml" );
 
-		SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
-		SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
-		QName payloadName = new QName("http://soap.jax.drools.org", "execute", "ns1");
+        SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
+        SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
+        QName payloadName = new QName( "http://soap.jax.drools.org",
+                                       "execute",
+                                       "ns1" );
 
-		body.addBodyElement(payloadName);
+        body.addBodyElement( payloadName );
 
-		String cmd = "";
-		cmd += "<batch-execution lookup=\"ksession1\">\n";
-		cmd += "  <insert out-identifier=\"message\">\n";
-		cmd += "      <org.test.Message>\n";
-		cmd += "         <text>Helllo World</text>\n";
-		cmd += "      </org.test.Message>\n";
-		cmd += "   </insert>\n";
-		cmd += "</batch-execution>\n";
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "  <insert out-identifier=\"message\">\n";
+        cmd += "      <org.test.Message>\n";
+        cmd += "         <text>Helllo World</text>\n";
+        cmd += "      </org.test.Message>\n";
+        cmd += "   </insert>\n";
+        cmd += "</batch-execution>\n";
 
-		body.addTextNode(cmd);
+        body.addTextNode( cmd );
 
-		Test test = new Test();
-		String response = test.execute( soapMessage, ( CamelContext ) springContext.getBean( "camel-client-ctx" ) );
+        Test test = new Test();
+        String response = test.execute( soapMessage,
+                                        (CamelContext) springContext.getBean( "camel-client-ctx" ) );
 
-		assertTrue( response.contains( "execution-results" ) );
-		assertTrue( response.contains( "echo" ) ); 
-	}
+        assertTrue( response.contains( "execution-results" ) );
+        assertTrue( response.contains( "echo" ) );
+    }
 
 }

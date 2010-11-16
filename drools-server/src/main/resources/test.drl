@@ -23,7 +23,7 @@ end
 
 rule "echo" dialect "mvel"
 when
-    $m : Message();
+    $m : Message()
 then
     $m.text = "echo:" + $m.text;
 end
