@@ -25,7 +25,9 @@ import org.drools.base.evaluators.EvaluatorDefinition;
 import org.drools.base.evaluators.Operator;
 import org.drools.spi.Evaluator;
 
-public class MockEvaluatorDefinition implements EvaluatorDefinition {
+public class MockEvaluatorDefinition
+    implements
+    EvaluatorDefinition {
 
     public Evaluator getEvaluator(ValueType type,
                                   String operatorId,
@@ -55,7 +57,7 @@ public class MockEvaluatorDefinition implements EvaluatorDefinition {
     }
 
     public String[] getEvaluatorIds() {
-        return new String[] { "id1", "id2" };
+        return new String[]{"id1", "id2"};
     }
 
     public Target getTarget() {
@@ -72,7 +74,7 @@ public class MockEvaluatorDefinition implements EvaluatorDefinition {
 
     public void readExternal(ObjectInput in) throws IOException,
                                             ClassNotFoundException {
-  
+
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {

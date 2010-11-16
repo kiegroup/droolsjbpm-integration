@@ -50,19 +50,23 @@ public class CamelProxyEndpointTest extends DroolsCamelTestSupport {
 
     public void testSessionInsert() throws Exception {
         Person person = new Person();
-        person.setName("Mauricio");
+        person.setName( "Mauricio" );
 
-        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person,"salaboy");
-        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-no-marshal", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert( person,
+                                                                                  "salaboy" );
+        ExecutionResults response = (ExecutionResults) template.requestBody( "direct:test-no-marshal",
+                                                                             cmd );
+        assertTrue( "Expected valid ExecutionResults object",
+                    response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) != null );
     }
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-no-marshal").to("drools://node/ksession1");
+                from( "direct:test-no-marshal" ).to( "drools://node/ksession1" );
             }
         };
     }
@@ -70,15 +74,16 @@ public class CamelProxyEndpointTest extends DroolsCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         Person me = new Person();
-        me.setName("Hadrian");
+        me.setName( "Hadrian" );
 
-        StatefulKnowledgeSession ksession = registerKnowledgeRuntime("ksession1", null);
-        InsertObjectCommand cmd = new InsertObjectCommand(me);
-        cmd.setOutIdentifier("camel-rider");
-        cmd.setReturnObject(false);
-        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[]{cmd} ));
-        
+        StatefulKnowledgeSession ksession = registerKnowledgeRuntime( "ksession1",
+                                                                      null );
+        InsertObjectCommand cmd = new InsertObjectCommand( me );
+        cmd.setOutIdentifier( "camel-rider" );
+        cmd.setReturnObject( false );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
+
         ExecutionResults results = ksession.execute( script );
-        handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
+        handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
     }
 }

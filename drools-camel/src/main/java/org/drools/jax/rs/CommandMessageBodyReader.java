@@ -33,13 +33,15 @@ import org.drools.core.util.StringUtils;
 
 @Consumes("text/plain")
 @Provider
-public class CommandMessageBodyReader implements MessageBodyReader<Object> {
+public class CommandMessageBodyReader
+    implements
+    MessageBodyReader<Object> {
 
     public boolean isReadable(Class type,
                               Type genericType,
                               Annotation[] annotations,
                               MediaType mediaType) {
-        return Command.class.isAssignableFrom(type);
+        return Command.class.isAssignableFrom( type );
     }
 
     public Object readFrom(Class type,

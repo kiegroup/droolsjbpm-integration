@@ -68,19 +68,19 @@ public class DroolsPolicy
     implements
     Policy {
     private static boolean augmented;
-	private DroolsEndpoint dep;
-    
+    private DroolsEndpoint dep;
+
     public void beforeWrap(RouteContext routeContext,
                            ProcessorDefinition processorDefinition) {
         augmentNodes( routeContext,
                       processorDefinition,
                       new HashSet() );
-    }    
+    }
 
     public Processor wrap(RouteContext routeContext,
                           Processor processor) {
         RouteDefinition routeDef = routeContext.getRoute();
-        
+
         ToDefinition toDrools = getDroolsNode( routeDef );
 
         Processor returnedProcessor;
@@ -88,7 +88,7 @@ public class DroolsPolicy
             returnedProcessor = new DroolsProcess( toDrools.getUri(),
                                                    processor );
         } else {
-            returnedProcessor =  processor;//new DroolsClientProcessor( processor );
+            returnedProcessor = processor;//new DroolsClientProcessor( processor );
         }
         return returnedProcessor;
     }
@@ -102,87 +102,98 @@ public class DroolsPolicy
             }
         }
         return toDrools;
-    }    
+    }
 
-    public static void augmentNodes(RouteContext routeContext, ProcessorDefinition nav, Set visited) {
+    public static void augmentNodes(RouteContext routeContext,
+                                    ProcessorDefinition nav,
+                                    Set visited) {
         if ( !nav.getOutputs().isEmpty() ) {
 
             List<ProcessorDefinition> outputs = nav.getOutputs();
-            for ( int i = 0; i <  outputs.size(); i++  ) {
+            for ( int i = 0; i < outputs.size(); i++ ) {
                 ProcessorDefinition child = outputs.get( i );//it.next();
-                if ( child instanceof ToDefinition) {
-                    ToDefinition to = ( ToDefinition ) child;
-                    if (to.getUri().startsWith( "cxfrs" ) && !visited.contains( to ) ) {                        
+                if ( child instanceof ToDefinition ) {
+                    ToDefinition to = (ToDefinition) child;
+                    if ( to.getUri().startsWith( "cxfrs" ) && !visited.contains( to ) ) {
                         BeanDefinition beanDef = new BeanDefinition();
                         beanDef.setBeanType( PreCxfrs.class );
-                        outputs.add( i, beanDef ); // insert before cxfrs
+                        outputs.add( i,
+                                     beanDef ); // insert before cxfrs
                         beanDef = new BeanDefinition();
                         beanDef.setBeanType( PostCxfrs.class );
-                        outputs.add( i+2, beanDef ); // insert after cxfrs
+                        outputs.add( i + 2,
+                                     beanDef ); // insert after cxfrs
                         i = i + 2;// adjust for the two inserts
-                    }
-                    else if (to.getUri().startsWith( "cxf" ) && !visited.contains( to ) ) {                        
+                    } else if ( to.getUri().startsWith( "cxf" ) && !visited.contains( to ) ) {
                         BeanDefinition beanDef = new BeanDefinition();
                         beanDef.setBeanType( PreCxfSoapProcessor.class );
-                        outputs.add( i, beanDef ); // insert before cxf
+                        outputs.add( i,
+                                     beanDef ); // insert before cxf
                         beanDef = new BeanDefinition();
                         beanDef.setBeanType( PostCxfSoapProcessor.class );
-                        outputs.add( i+2, beanDef ); // insert after cxf
+                        outputs.add( i + 2,
+                                     beanDef ); // insert after cxf
                         i = i + 2;// adjust for the two inserts
                         augmented = true;
                     }
                 } else if ( child instanceof MarshalDefinition ) {
                     MarshalDefinition m = (MarshalDefinition) child;
-                    DataFormatDefinition dformatDefinition = m.getDataFormatType();    
-                    dformatDefinition = processDataFormatType( routeContext, m.getRef(), dformatDefinition );
+                    DataFormatDefinition dformatDefinition = m.getDataFormatType();
+                    dformatDefinition = processDataFormatType( routeContext,
+                                                               m.getRef(),
+                                                               dformatDefinition );
                     m.setDataFormatType( dformatDefinition ); // repoint the marshaller, if it was cloned
                 } else if ( child instanceof UnmarshalDefinition ) {
                     UnmarshalDefinition m = (UnmarshalDefinition) child;
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();
-                    dformatDefinition = processDataFormatType( routeContext, m.getRef(), dformatDefinition );
+                    dformatDefinition = processDataFormatType( routeContext,
+                                                               m.getRef(),
+                                                               dformatDefinition );
                     m.setDataFormatType( dformatDefinition ); // repoint the marshaller, if it was cloned                    
                 }
             }
-            
+
             for ( Iterator<ProcessorDefinition> it = nav.getOutputs().iterator(); it.hasNext(); ) {
                 ProcessorDefinition child = it.next();
                 augmentNodes( routeContext,
                               child,
                               visited );
             }
-        }        
+        }
     }
 
-	private static DataFormatDefinition processDataFormatType( RouteContext routeContext, String ref, DataFormatDefinition dformatDefinition) {
-		if ( dformatDefinition == null ) {
-		    if ( "json".equals( ref ) ) {
-		        dformatDefinition = new XStreamDataFormat();
-		        ((XStreamDataFormat)dformatDefinition).setDriver( "json" );                            
-		    } else if ( "xstream".equals( ref ) ) {
-		        dformatDefinition = new XStreamDataFormat();
-		    } else if ( "jaxb".equals( ref ) ) {
-		        dformatDefinition = new JaxbDataFormat();
-		    } else {
-		        dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition(ref);
-		    }
-		}
-		
-		// always clone before changing
-		dformatDefinition = new FastCloner().deepClone( dformatDefinition );                    
-		
-		if ( dformatDefinition instanceof JaxbDataFormat ) {
-		    dformatDefinition = augmentJaxbDataFormatDefinition( (JaxbDataFormat) dformatDefinition );                    
-		} else if ( dformatDefinition instanceof XStreamDataFormat ) { 
-		    XStreamDataFormat xstreamDataFormat = ( XStreamDataFormat )dformatDefinition;
-		    if ( "json".equals( xstreamDataFormat.getDriver() )) {
-		        dformatDefinition =  XStreamJson.newJSonMarshaller( xstreamDataFormat );;    
-		    } else {
-		        dformatDefinition = XStreamXml.newXStreamMarshaller( (XStreamDataFormat) dformatDefinition );    
-		    }
-		    
-		}
-		return dformatDefinition;
-	}
+    private static DataFormatDefinition processDataFormatType(RouteContext routeContext,
+                                                              String ref,
+                                                              DataFormatDefinition dformatDefinition) {
+        if ( dformatDefinition == null ) {
+            if ( "json".equals( ref ) ) {
+                dformatDefinition = new XStreamDataFormat();
+                ((XStreamDataFormat) dformatDefinition).setDriver( "json" );
+            } else if ( "xstream".equals( ref ) ) {
+                dformatDefinition = new XStreamDataFormat();
+            } else if ( "jaxb".equals( ref ) ) {
+                dformatDefinition = new JaxbDataFormat();
+            } else {
+                dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition( ref );
+            }
+        }
+
+        // always clone before changing
+        dformatDefinition = new FastCloner().deepClone( dformatDefinition );
+
+        if ( dformatDefinition instanceof JaxbDataFormat ) {
+            dformatDefinition = augmentJaxbDataFormatDefinition( (JaxbDataFormat) dformatDefinition );
+        } else if ( dformatDefinition instanceof XStreamDataFormat ) {
+            XStreamDataFormat xstreamDataFormat = (XStreamDataFormat) dformatDefinition;
+            if ( "json".equals( xstreamDataFormat.getDriver() ) ) {
+                dformatDefinition = XStreamJson.newJSonMarshaller( xstreamDataFormat );;
+            } else {
+                dformatDefinition = XStreamXml.newXStreamMarshaller( (XStreamDataFormat) dformatDefinition );
+            }
+
+        }
+        return dformatDefinition;
+    }
 
     private ToDefinition getDroolsNode(ProcessorDefinition nav) {
         if ( !nav.getOutputs().isEmpty() ) {
@@ -199,7 +210,7 @@ public class DroolsPolicy
         }
         return null;
     }
-    
+
     /** 
      * Clones the passed JaxbDataFormat and then augments it with with Drools related namespaces
      * 
@@ -214,7 +225,7 @@ public class DroolsPolicy
                                         clsName.lastIndexOf( '.' ) ) );
         }
 
-        StringBuilder sb = new StringBuilder();       
+        StringBuilder sb = new StringBuilder();
         sb.append( jaxbDataFormat.getContextPath() );
         sb.append( ":" );
         for ( String pkgName : set ) {
@@ -225,35 +236,36 @@ public class DroolsPolicy
         jaxbDataFormat.setContextPath( sb.toString() );
         return jaxbDataFormat;
     }
-    
+
     public static class DroolsClientProcessor
-    implements
-    Processor {
-        
+        implements
+        Processor {
+
         private Processor processor;
-        
-        
 
         public DroolsClientProcessor(Processor processor) {
             this.processor = processor;
         }
 
-
-
         public void process(Exchange exchange) throws Exception {
-            exchange.setPattern(ExchangePattern.InOut);
+            exchange.setPattern( ExchangePattern.InOut );
             Message inMessage = exchange.getIn();
-            inMessage.setHeader(CxfConstants.CAMEL_CXF_RS_USING_HTTP_API, Boolean.TRUE);
-            inMessage.setHeader(Exchange.HTTP_METHOD, "POST");
-            inMessage.setHeader(Exchange.HTTP_PATH, "/execute");    
-            inMessage.setHeader(Exchange.ACCEPT_CONTENT_TYPE, "text/plain");
-            inMessage.setHeader(Exchange.CONTENT_TYPE, "text/plain");
-            
+            inMessage.setHeader( CxfConstants.CAMEL_CXF_RS_USING_HTTP_API,
+                                 Boolean.TRUE );
+            inMessage.setHeader( Exchange.HTTP_METHOD,
+                                 "POST" );
+            inMessage.setHeader( Exchange.HTTP_PATH,
+                                 "/execute" );
+            inMessage.setHeader( Exchange.ACCEPT_CONTENT_TYPE,
+                                 "text/plain" );
+            inMessage.setHeader( Exchange.CONTENT_TYPE,
+                                 "text/plain" );
+
             this.processor.process( exchange );
         }
-        
+
     }
-    
+
     public static class DroolsProcess
         implements
         Processor {
@@ -281,21 +293,21 @@ public class DroolsPolicy
             ClassLoader originalClassLoader = null;
             try {
                 originalClassLoader = Thread.currentThread().getContextClassLoader();
-                
+
                 CommandExecutor exec = dep.executor;
                 if ( exec == null ) {
-                    String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP, String.class );
-                    if ( StringUtils.isEmpty( lookup )  ) {
+                    String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP,
+                                                                String.class );
+                    if ( StringUtils.isEmpty( lookup ) ) {
                         lookup = dep.getLookup( exchange.getIn().getBody( String.class ) );
                     }
-                    
-                    if ( StringUtils.isEmpty( lookup )  ) {
-                        throw new RuntimeException( "No Executor defined and no lookup information available for uri " + this.dep.getEndpointUri()  );
+
+                    if ( StringUtils.isEmpty( lookup ) ) {
+                        throw new RuntimeException( "No Executor defined and no lookup information available for uri " + this.dep.getEndpointUri() );
                     }
 
                     exec = dep.getCommandExecutor( lookup );
                 }
-
 
                 if ( exec == null ) {
                     throw new RuntimeException( "CommandExecutor cannot be found for uri " + this.dep.getEndpointUri() );
@@ -316,13 +328,13 @@ public class DroolsPolicy
                                       context );
 
                 boolean soap = false;
-                if (!augmented && exchange.getFromEndpoint() instanceof CxfSpringEndpoint) {
-                	new PreCxfTransportSoapProcessor().process( exchange );
-                	soap = true;
+                if ( !augmented && exchange.getFromEndpoint() instanceof CxfSpringEndpoint ) {
+                    new PreCxfTransportSoapProcessor().process( exchange );
+                    soap = true;
                 }
                 processor.process( exchange );
-                if (soap) {
-                	new PostCxfTransportSoapProcessor().process( exchange );
+                if ( soap ) {
+                    new PostCxfTransportSoapProcessor().process( exchange );
                 }
             } finally {
                 Thread.currentThread().setContextClassLoader( originalClassLoader );
@@ -331,8 +343,9 @@ public class DroolsPolicy
     }
 
     public static final String[] JAXB_ANNOTATED_CMD = {BatchExecutionCommandImpl.class.getName(), SetGlobalCommand.class.getName(), GetGlobalCommand.class.getName(), FireAllRulesCommand.class.getName(), InsertElementsCommand.class.getName(),
-            InsertObjectCommand.class.getName(), ModifyCommand.class.getName(), SetterImpl.class.getName(), QueryCommand.class.getName(), RetractCommand.class.getName(), AbortWorkItemCommand.class.getName(), SignalEventCommand.class.getName(),
-            StartProcessCommand.class.getName(), BatchExecutionCommandImpl.class.getName(), ExecutionResultImpl.class.getName(), DefaultFactHandle.class.getName(), JaxbListWrapper.class.getName(),
-            FlatQueryResults.class.getName(), CompleteWorkItemCommand.class.getName(), GetObjectsCommand.class.getName()};
+                                                    InsertObjectCommand.class.getName(), ModifyCommand.class.getName(), SetterImpl.class.getName(), QueryCommand.class.getName(), RetractCommand.class.getName(), AbortWorkItemCommand.class.getName(),
+            SignalEventCommand.class.getName(),
+                                                    StartProcessCommand.class.getName(), BatchExecutionCommandImpl.class.getName(), ExecutionResultImpl.class.getName(), DefaultFactHandle.class.getName(), JaxbListWrapper.class.getName(),
+                                                    FlatQueryResults.class.getName(), CompleteWorkItemCommand.class.getName(), GetObjectsCommand.class.getName()};
 
 }

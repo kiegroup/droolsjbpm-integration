@@ -20,9 +20,9 @@ import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 
 public class ExecutionNodePipelineContextImpl {
-    private GridNode node;
-    CommandExecutor       exec;
-    private ClassLoader   localClassLoadel;
+    private GridNode    node;
+    CommandExecutor     exec;
+    private ClassLoader localClassLoadel;
 
     public ExecutionNodePipelineContextImpl(GridNode node,
                                             ClassLoader localClassLoader) {

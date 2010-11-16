@@ -52,29 +52,28 @@ public class DroolsResourceAdapter
         }
     }
 
-
-    public void setBasicAuthenticationEnabled(Boolean enabled){
-        if (enabled && !(this.resource instanceof UrlResource)){
-            throw new IllegalArgumentException("Authentication Attributes are only valid for URL Resources");
+    public void setBasicAuthenticationEnabled(Boolean enabled) {
+        if ( enabled && !(this.resource instanceof UrlResource) ) {
+            throw new IllegalArgumentException( "Authentication Attributes are only valid for URL Resources" );
         }
 
-        if (this.resource instanceof UrlResource){
-            ((UrlResource)this.resource).setBasicAuthentication(enabled?"enabled":"disabled");
+        if ( this.resource instanceof UrlResource ) {
+            ((UrlResource) this.resource).setBasicAuthentication( enabled ? "enabled" : "disabled" );
         }
     }
 
-    public void setBasicAuthenticationUsername(String username){
-        if (!(this.resource instanceof UrlResource)){
-            throw new IllegalArgumentException("Authentication Attributes are only valid for URL Resources");
+    public void setBasicAuthenticationUsername(String username) {
+        if ( !(this.resource instanceof UrlResource) ) {
+            throw new IllegalArgumentException( "Authentication Attributes are only valid for URL Resources" );
         }
-        ((UrlResource)this.resource).setUsername(username);
+        ((UrlResource) this.resource).setUsername( username );
     }
 
-    public void setBasicAuthenticationPassword(String password){
-        if (!(this.resource instanceof UrlResource)){
-            throw new IllegalArgumentException("Authentication Attributes are only valid for URL Resources");
+    public void setBasicAuthenticationPassword(String password) {
+        if ( !(this.resource instanceof UrlResource) ) {
+            throw new IllegalArgumentException( "Authentication Attributes are only valid for URL Resources" );
         }
-        ((UrlResource)this.resource).setPassword(password);
+        ((UrlResource) this.resource).setPassword( password );
     }
 
     public DroolsResourceAdapter(String resource,
@@ -132,7 +131,7 @@ public class DroolsResourceAdapter
         if ( resourceType == null ) {
             throw new IllegalArgumentException( "resourceType property is mandatory" );
         }
-        if ( resourceConfiguration != null && !(ResourceType.DTABLE.equals( resourceType ) || ResourceType.XSD.equals( resourceType ))  ) {
+        if ( resourceConfiguration != null && !(ResourceType.DTABLE.equals( resourceType ) || ResourceType.XSD.equals( resourceType )) ) {
             throw new IllegalArgumentException( "Only Decision Tables or XSD resources can have configuration" );
         }
     }

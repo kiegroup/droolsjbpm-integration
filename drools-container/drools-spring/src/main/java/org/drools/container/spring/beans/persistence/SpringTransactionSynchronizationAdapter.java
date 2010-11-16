@@ -23,7 +23,7 @@ public class SpringTransactionSynchronizationAdapter
     implements
     TransactionSynchronization {
     private org.drools.persistence.session.TransactionSynchronization ts;
-    
+
     public SpringTransactionSynchronizationAdapter(org.drools.persistence.session.TransactionSynchronization ts) {
         this.ts = ts;
     }

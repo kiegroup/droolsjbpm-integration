@@ -8,11 +8,11 @@ import org.junit.Ignore;
 
 @Ignore
 public class XStreamBatchTest extends BatchTest {
-    
+
     public XStreamBatchTest() {
         this.dataformat = "xstream";
     }
-    
+
     @Override
     public void setUp() throws Exception {
         XMLUnit.setIgnoreComments( true );
@@ -34,6 +34,6 @@ public class XStreamBatchTest extends BatchTest {
             throw new RuntimeException( "XML Assertion failure",
                                         e );
         }
-    }    
-    
+    }
+
 }

@@ -62,18 +62,17 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
             Map<String, WorkItemHandler> map = ((SessionConfiguration) getConf()).getWorkItemHandlers();
             map.putAll( getWorkItems() );
         }
-        
+
         if ( jpaConfiguration != null ) {
-           
-            
+
             Environment env = KnowledgeBaseFactory.newEnvironment();
             env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                      jpaConfiguration.getEntityManagerFactory() );
             env.set( EnvironmentName.TRANSACTION_MANAGER,
                      jpaConfiguration.getPlatformTransactionManager() );
-             env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES,
-                     new ObjectMarshallingStrategy[]{ new SerializablePlaceholderResolverStrategy(ClassObjectMarshallingStrategyAcceptor.DEFAULT)} );
-            
+            env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES,
+                     new ObjectMarshallingStrategy[]{new SerializablePlaceholderResolverStrategy( ClassObjectMarshallingStrategyAcceptor.DEFAULT )} );
+
             if ( jpaConfiguration.getId() >= 0 ) {
                 ksession = JPAKnowledgeService.loadStatefulKnowledgeSession( jpaConfiguration.getId(),
                                                                              getKbase(),
@@ -85,17 +84,19 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
                                                                             env );
             }
         } else {
-            ksession = getKbase().newStatefulKnowledgeSession( getConf(), null);
+            ksession = getKbase().newStatefulKnowledgeSession( getConf(),
+                                                               null );
         }
-        
-        if ( getBatch() != null && !getBatch().isEmpty()) {
-            for ( Command<?> cmd : getBatch() ) {
+
+        if ( getBatch() != null && !getBatch().isEmpty() ) {
+            for ( Command< ? > cmd : getBatch() ) {
                 ksession.execute( cmd );
             }
         }
-        
+
         if ( getNode() != null ) {
-            getNode().set( getName(), this.ksession );
+            getNode().set( getName(),
+                           this.ksession );
         }
     }
 
@@ -105,8 +106,6 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
         private PlatformTransactionManager tm;
 
         private int                        id = -1;
-        
-        
 
         public EntityManagerFactory getEntityManagerFactory() {
             return this.emf;
@@ -131,7 +130,6 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
         public void setId(int id) {
             this.id = id;
         }
-        
-        
+
     }
 }

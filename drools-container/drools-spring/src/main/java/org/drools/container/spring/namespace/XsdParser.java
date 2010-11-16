@@ -29,28 +29,27 @@ import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
 public class XsdParser {
-    private static final String SYSTEM_ID                = "system-id";
-    private static final String SCHEMA_LANGUAGE          = "schema-language"; 
-    
+    private static final String SYSTEM_ID       = "system-id";
+    private static final String SCHEMA_LANGUAGE = "schema-language";
+
     @SuppressWarnings("unchecked")
-	public static void parse(Element element,
+    public static void parse(Element element,
                              ParserContext parserContext,
                              BeanDefinitionBuilder factory) {
-        
+
         List<Element> childElements = DomUtils.getChildElementsByTagName( element,
                                                                           "jaxb-conf" );
         if ( !childElements.isEmpty() ) {
             Element conf = childElements.get( 0 );
-            
+
             String systemId = conf.getAttribute( SYSTEM_ID );
-            systemId = ( systemId != null && systemId.trim().length() > 0) ? systemId : "xsd";
-            
+            systemId = (systemId != null && systemId.trim().length() > 0) ? systemId : "xsd";
+
             String schemaLanguage = conf.getAttribute( SCHEMA_LANGUAGE );
-            schemaLanguage = ( schemaLanguage != null && schemaLanguage.trim().length() > 0) ? schemaLanguage : "XMLSCHEMA";
-            
+            schemaLanguage = (schemaLanguage != null && schemaLanguage.trim().length() > 0) ? schemaLanguage : "XMLSCHEMA";
+
             Options options = new Options();
             options.setSchemaLanguage( Language.valueOf( schemaLanguage ) );
-            
 
             JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( new Options(),
                                                                                        systemId );
@@ -62,7 +61,7 @@ public class XsdParser {
                                                                                        "xsd" );
 
             factory.addPropertyValue( "resourceConfiguration",
-                                      jaxbConf );                
-        }        
+                                      jaxbConf );
+        }
     }
 }

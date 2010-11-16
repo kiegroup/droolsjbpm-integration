@@ -46,23 +46,22 @@ import org.drools.runtime.help.impl.XStreamJSon.JSonSignalEventConverter;
 import org.drools.runtime.help.impl.XStreamJSon.JSonStartProcessConvert;
 import org.drools.runtime.help.impl.XStreamJSon.RowItemConverter;
 
-
 public class XStreamJson {
-    public static XStreamDataFormat newJSonMarshaller(XStreamDataFormat xstreamDataFormat) {        
+    public static XStreamDataFormat newJSonMarshaller(XStreamDataFormat xstreamDataFormat) {
         xstreamDataFormat.setDriver( "json" );
 
         XStreamHelper.setAliases( xstreamDataFormat );
 
         xstreamDataFormat.getAliases().put( "commands",
-                       CommandsObjectContainer.class.getName() );
+                                            CommandsObjectContainer.class.getName() );
         xstreamDataFormat.getAliases().put( "objects",
-                       ObjectsObjectContainer.class.getName() );
+                                            ObjectsObjectContainer.class.getName() );
         xstreamDataFormat.getAliases().put( "item",
-                       RowItemContainer.class.getName() );
+                                            RowItemContainer.class.getName() );
         xstreamDataFormat.getAliases().put( "parameters",
-                       ParameterContainer.class.getName() );
+                                            ParameterContainer.class.getName() );
         xstreamDataFormat.getAliases().put( "results",
-                       WorkItemResultsContainer.class.getName() );
+                                            WorkItemResultsContainer.class.getName() );
 
         //xstream.setMode( XStream.NO_REFERENCES );
 
@@ -70,10 +69,10 @@ public class XStreamJson {
         if ( converters == null ) {
             converters = new ArrayList<String>();
         }
-        
+
         converters.add( JSonFactHandleConverter.class.getName() );
         converters.add( JSonBatchExecutionResultConverter.class.getName() );
-        converters.add( JSonInsertConverter.class.getName());
+        converters.add( JSonInsertConverter.class.getName() );
         converters.add( JSonFireAllRulesConverter.class.getName() );
         converters.add( JSonBatchExecutionCommandConverter.class.getName() );
         converters.add( CommandsContainerConverter.class.getName() );
@@ -93,7 +92,7 @@ public class XStreamJson {
         converters.add( JSonAbortWorkItemConverter.class.getName() );
 
         xstreamDataFormat.setConverters( converters );
-        
+
         return xstreamDataFormat;
     }
 

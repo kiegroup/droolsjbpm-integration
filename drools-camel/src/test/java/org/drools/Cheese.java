@@ -16,8 +16,6 @@
 
 package org.drools;
 
-
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -28,16 +26,16 @@ public class Cheese
     implements
     Serializable {
 
-    public static final String STILTON = "stilton";
+    public static final String STILTON          = "stilton";
 
     /**
      *
      */
-    private static final long serialVersionUID = 510l;
-    private String            type;
-    private int               price;
-    private int               oldPrice;
-    private Date              usedBy;
+    private static final long  serialVersionUID = 510l;
+    private String             type;
+    private int                price;
+    private int                oldPrice;
+    private Date               usedBy;
 
     public Cheese() {
 
@@ -58,7 +56,7 @@ public class Cheese
 
     public Cheese(final String type,
                   final int price,
-                  final int oldPrice ) {
+                  final int oldPrice) {
         super();
         this.type = type;
         this.price = price;
@@ -121,8 +119,7 @@ public class Cheese
         this.usedBy = usedBy;
     }
 
-
     public int throwException() {
-        throw new RuntimeException("eeeeee");
+        throw new RuntimeException( "eeeeee" );
     }
 }

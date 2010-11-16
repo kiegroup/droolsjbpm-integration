@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
 public class TimerFlowTest {
 
     private static final Logger            log    = LoggerFactory.getLogger( TimerFlowTest.class );
@@ -41,19 +40,19 @@ public class TimerFlowTest {
     }
 
     @Test
-    public void doTest() throws Exception{
+    public void doTest() throws Exception {
 
+        MyDroolsBean myDroolsBean = (MyDroolsBean) ctx.getBean( "myDroolsBean" );
 
-        MyDroolsBean myDroolsBean = (MyDroolsBean) ctx.getBean( "myDroolsBean");
-
-        assertEquals(0,myDroolsBean.TIMER_TRIGGER_COUNT);
+        assertEquals( 0,
+                      myDroolsBean.TIMER_TRIGGER_COUNT );
 
         myDroolsBean.initStartDisposeAndLoadSession();
 
         int n = myDroolsBean.TIMER_TRIGGER_COUNT;
-        assertTrue(n > 0);
+        assertTrue( n > 0 );
 
         myDroolsBean.endTheProcess();
-        assertTrue(myDroolsBean.TIMER_TRIGGER_COUNT > n);
+        assertTrue( myDroolsBean.TIMER_TRIGGER_COUNT > n );
     }
 }

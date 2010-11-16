@@ -43,105 +43,122 @@ import org.w3c.dom.NodeList;
  *
  */
 public class GridDefinitionParser extends AbstractBeanDefinitionParser {
-    
-    private static final String EMF_ATTRIBUTE            = "entity-manager-factory";
+
+    private static final String EMF_ATTRIBUTE = "entity-manager-factory";
 
     protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
 
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( GridBeanFactory.class );
-        
-        String id = element.getAttribute( "id" );        
+
+        String id = element.getAttribute( "id" );
         factory.addPropertyValue( "id",
-                                  id );  
-        
-        for (int i = 0, length = element.getChildNodes().getLength(); i < length; i++) {
+                                  id );
+
+        for ( int i = 0, length = element.getChildNodes().getLength(); i < length; i++ ) {
             Node n = element.getChildNodes().item( i );
             if ( n instanceof Element ) {
-                Element e = ( Element ) n;
-                
+                Element e = (Element) n;
+
                 if ( "core-services".equals( e.getLocalName() ) ) {
                     String ref = e.getAttribute( "ref" );
-                    Element nestedElm = getFirstElement( e.getChildNodes() );                   
+                    Element nestedElm = getFirstElement( e.getChildNodes() );
 
                     if ( StringUtils.hasText( ref ) ) {
-                        factory.addPropertyReference( "coreServices", ref );
-                    } else if ( nestedElm != null  ) {
-                        factory.addPropertyValue( "coreServices",  parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );
+                        factory.addPropertyReference( "coreServices",
+                                                      ref );
+                    } else if ( nestedElm != null ) {
+                        factory.addPropertyValue( "coreServices",
+                                                  parserContext.getDelegate().parsePropertySubElement( nestedElm,
+                                                                                                       null,
+                                                                                                       null ) );
                     } else {
                         throw new IllegalArgumentException( "set-global must either specify a 'ref' attribute or have a nested bean" );
-                    }                     
-                } else if ( "whitepages".equals( e.getLocalName() ) ) {                    
-                    Element persistenceElm = DomUtils.getChildElementByTagName(e, "jpa-persistence");
-                    if ( persistenceElm != null) {      
+                    }
+                } else if ( "whitepages".equals( e.getLocalName() ) ) {
+                    Element persistenceElm = DomUtils.getChildElementByTagName( e,
+                                                                                "jpa-persistence" );
+                    if ( persistenceElm != null ) {
                         BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( JpaWhitePages.class );
-                        
-                        Element emf = DomUtils.getChildElementByTagName(persistenceElm, EMF_ATTRIBUTE);
+
+                        Element emf = DomUtils.getChildElementByTagName( persistenceElm,
+                                                                         EMF_ATTRIBUTE );
                         String ref = emf.getAttribute( "ref" );
-                        
+
                         beanBuilder.addConstructorArgReference( ref );
-                        factory.addPropertyValue( "whitePages", beanBuilder.getBeanDefinition() );
+                        factory.addPropertyValue( "whitePages",
+                                                  beanBuilder.getBeanDefinition() );
                     } else {
                         String ref = e.getAttribute( "ref" );
-                        Element nestedElm = getFirstElement( e.getChildNodes() );                   
+                        Element nestedElm = getFirstElement( e.getChildNodes() );
 
                         if ( StringUtils.hasText( ref ) ) {
-                            factory.addPropertyReference( "whitePages", ref );
-                        } else if ( nestedElm != null  ) {
-                            factory.addPropertyValue( "whitePages",  parserContext.getDelegate().parsePropertySubElement(nestedElm, null, null) );
+                            factory.addPropertyReference( "whitePages",
+                                                          ref );
+                        } else if ( nestedElm != null ) {
+                            factory.addPropertyValue( "whitePages",
+                                                      parserContext.getDelegate().parsePropertySubElement( nestedElm,
+                                                                                                           null,
+                                                                                                           null ) );
                         } else {
-                            factory.addPropertyValue( "whitePages",  new WhitePagesImpl() );
+                            factory.addPropertyValue( "whitePages",
+                                                      new WhitePagesImpl() );
                         }
                     }
                 } else if ( "socket-service".equals( e.getLocalName() ) ) {
                     String acceptor = e.getAttribute( "acceptor" );
                     String ip = e.getAttribute( "ip" );
-                    
+
                     AcceptorFactoryService acc = null;
                     if ( StringUtils.hasText( acceptor ) ) {
-                        if ( "mina".equals( acceptor )) {
+                        if ( "mina".equals( acceptor ) ) {
                             acc = new MinaAcceptorFactoryService();
                         }
-                    } 
+                    }
 
                     if ( acc == null ) {
                         acc = new MinaAcceptorFactoryService();
-                    }                    
-                    
+                    }
+
                     if ( !StringUtils.hasText( ip ) ) {
                         try {
                             ip = InetAddress.getLocalHost().getHostAddress();
                         } catch ( UnknownHostException e1 ) {
-                            throw new RuntimeException( "socket-service did not specify an ip address and one could not be determined", e1 );
+                            throw new RuntimeException( "socket-service did not specify an ip address and one could not be determined",
+                                                        e1 );
                         }
                     }
-                    
+
                     if ( !StringUtils.hasText( ip ) ) {
                         throw new RuntimeException( "socket-service did not specify an ip address and one could not be determined" );
                     }
-                    
+
                     BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( SocketServiceConfiguration.class );
-                    beanBuilder.addPropertyValue( "ip", ip );
-                    beanBuilder.addPropertyValue( "acceptor", acceptor );
-                    
+                    beanBuilder.addPropertyValue( "ip",
+                                                  ip );
+                    beanBuilder.addPropertyValue( "acceptor",
+                                                  acceptor );
+
                     //e.getChildNodes()
                     List<String[]> services = new ArrayList<String[]>();
-                    for (int j = 0, serviceLength = e.getChildNodes().getLength(); j < serviceLength; j++) {
+                    for ( int j = 0, serviceLength = e.getChildNodes().getLength(); j < serviceLength; j++ ) {
                         Node e2 = e.getChildNodes().item( j );
-                        if ( e2 instanceof Element && "service".equals(((Element)e2).getLocalName())) {
-                            Element se = ( Element ) e2;
+                        if ( e2 instanceof Element && "service".equals( ((Element) e2).getLocalName() ) ) {
+                            Element se = (Element) e2;
                             String name = se.getAttribute( "name" );
-                            String port = se.getAttribute( "port" );    
-                            services.add( new String[] { name, port } );
+                            String port = se.getAttribute( "port" );
+                            services.add( new String[]{name, port} );
                         }
                     }
-                    beanBuilder.addPropertyValue( "services", services );
-                    factory.addPropertyValue( "socketServiceConfiguration", beanBuilder.getBeanDefinition() );
+                    beanBuilder.addPropertyValue( "services",
+                                                  services );
+                    factory.addPropertyValue( "socketServiceConfiguration",
+                                              beanBuilder.getBeanDefinition() );
                 }
-                                   
+
             }
-        }            
-        
+        }
+
         return factory.getBeanDefinition();
     }
 
@@ -152,14 +169,14 @@ public class GridDefinitionParser extends AbstractBeanDefinitionParser {
             throw new IllegalArgumentException( "<" + element + "> requires a '" + attributeName + "' attribute" );
         }
     }
-    
-    private Element getFirstElement(NodeList list) {                    
-        for (int j = 0, lengthj = list.getLength(); j < lengthj; j++) {
+
+    private Element getFirstElement(NodeList list) {
+        for ( int j = 0, lengthj = list.getLength(); j < lengthj; j++ ) {
             if ( list.item( j ) instanceof Element ) {
-                return ( Element ) list.item( j );
+                return (Element) list.item( j );
             }
-        }   
+        }
         return null;
-    }    
+    }
 
 }

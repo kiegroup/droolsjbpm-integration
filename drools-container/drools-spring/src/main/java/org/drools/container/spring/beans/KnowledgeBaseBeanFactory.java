@@ -47,13 +47,13 @@ public class KnowledgeBaseBeanFactory
     FactoryBean,
     InitializingBean {
 
-    private KnowledgeBaseConfiguration  conf;
-    private Map<String, AccumulateFunction>         accumulateFunctions;
-    private Map<String, EvaluatorDefinition>         evaluators;
-    
-    private KnowledgeBase               kbase;
-    private GridNode               node;
-    private List<DroolsResourceAdapter> resources = Collections.emptyList();
+    private KnowledgeBaseConfiguration       conf;
+    private Map<String, AccumulateFunction>  accumulateFunctions;
+    private Map<String, EvaluatorDefinition> evaluators;
+
+    private KnowledgeBase                    kbase;
+    private GridNode                         node;
+    private List<DroolsResourceAdapter>      resources = Collections.emptyList();
 
     public Object getObject() throws Exception {
         return kbase;
@@ -70,40 +70,42 @@ public class KnowledgeBaseBeanFactory
     public void afterPropertiesSet() throws Exception {
         if ( this.node == null ) {
             this.node = new GridNodeImpl();
-//            GenericConnection connection = new GridConnection();
-//            connection.addExecutionNode(new LocalNodeConnector());
-//            connection.addDirectoryNode(new LocalDirectoryConnector());
-//            this.node = connection.getExecutionNode();
+            //            GenericConnection connection = new GridConnection();
+            //            connection.addExecutionNode(new LocalNodeConnector());
+            //            connection.addDirectoryNode(new LocalDirectoryConnector());
+            //            this.node = connection.getExecutionNode();
 
-        }       
-        
-        PackageBuilderConfiguration kconf = (PackageBuilderConfiguration)  KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
-        if (this.accumulateFunctions != null && !this.accumulateFunctions.isEmpty()) {            
+        }
+
+        PackageBuilderConfiguration kconf = (PackageBuilderConfiguration) KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+        if ( this.accumulateFunctions != null && !this.accumulateFunctions.isEmpty() ) {
             for ( Entry<String, AccumulateFunction> entry : this.accumulateFunctions.entrySet() ) {
-                kconf.setOption( AccumulateFunctionOption.get( entry.getKey(), entry.getValue()) );
+                kconf.setOption( AccumulateFunctionOption.get( entry.getKey(),
+                                                               entry.getValue() ) );
             }
         }
-        
-        if (this.evaluators != null && !this.evaluators.isEmpty()) {            
+
+        if ( this.evaluators != null && !this.evaluators.isEmpty() ) {
             for ( Entry<String, EvaluatorDefinition> entry : this.evaluators.entrySet() ) {
-                kconf.setOption( EvaluatorOption.get( entry.getKey(), entry.getValue()) );
+                kconf.setOption( EvaluatorOption.get( entry.getKey(),
+                                                      entry.getValue() ) );
             }
-        }        
-         
-        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder(kconf);
-        if ( this.conf != null ) {
-            kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(conf);
-        } else {
-            kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase( );
         }
- 
+
+        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder( kconf );
+        if ( this.conf != null ) {
+            kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase( conf );
+        } else {
+            kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        }
+
         List<JaxbConfigurationImpl> xsds = new ArrayList<JaxbConfigurationImpl>();
-        
-        for ( DroolsResourceAdapter res : resources ) {            
+
+        for ( DroolsResourceAdapter res : resources ) {
             if ( res.getResourceType().equals( ResourceType.XSD ) ) {
-                xsds.add( ( JaxbConfigurationImpl ) res.getResourceConfiguration() );
+                xsds.add( (JaxbConfigurationImpl) res.getResourceConfiguration() );
             }
-            
+
             if ( res.getResourceConfiguration() == null ) {
                 kbuilder.add( res.getDroolsResource(),
                               res.getResourceType() );
@@ -120,15 +122,14 @@ public class KnowledgeBaseBeanFactory
         }
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-        
-        KnowledgeBaseImpl kbaseImpl = ( KnowledgeBaseImpl ) kbase;
+
+        KnowledgeBaseImpl kbaseImpl = (KnowledgeBaseImpl) kbase;
         kbaseImpl.jaxbClasses = new ArrayList<List<String>>();
         for ( JaxbConfigurationImpl conf : xsds ) {
-            kbaseImpl.jaxbClasses.add( conf.getClasses() );            
+            kbaseImpl.jaxbClasses.add( conf.getClasses() );
         }
 
     }
-    
 
     public Map<String, AccumulateFunction> getAccumulateFunctions() {
         return accumulateFunctions;
@@ -176,6 +177,6 @@ public class KnowledgeBaseBeanFactory
 
     public void setNode(GridNode gridNode) {
         this.node = gridNode;
-    } 
+    }
 
 }

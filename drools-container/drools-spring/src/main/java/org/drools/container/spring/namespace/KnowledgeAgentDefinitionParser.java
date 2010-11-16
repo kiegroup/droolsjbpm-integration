@@ -46,42 +46,44 @@ public class KnowledgeAgentDefinitionParser extends AbstractBeanDefinitionParser
 
         String id = element.getAttribute( "id" );
         emptyAttributeCheck( element.getLocalName(),
-                             "id", 
-                             id);
+                             "id",
+                             id );
         factory.addPropertyValue( "id",
                                   id );
-        
+
         String kbase = element.getAttribute( "kbase" );
         if ( StringUtils.hasText( kbase ) ) {
             factory.addPropertyReference( "kbase",
-                                          kbase );     
+                                          kbase );
         }
-        
+
         String newInstance = element.getAttribute( "new-instance" );
         if ( StringUtils.hasText( newInstance ) ) {
             factory.addPropertyValue( "newInstance",
-                                      newInstance );                  
+                                      newInstance );
         }
-        
-        ManagedList resources = KnowledgeBaseDefinitionParser.getResources(element, parserContext, factory);
+
+        ManagedList resources = KnowledgeBaseDefinitionParser.getResources( element,
+                                                                            parserContext,
+                                                                            factory );
 
         if ( resources != null ) {
             factory.addPropertyValue( "resources",
                                       resources );
-        }        
-        
-        // inject the kagent into any stateless sessions
-        for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
-        	BeanDefinition def = parserContext.getRegistry().getBeanDefinition(beanName);
-        	if ( def.getBeanClassName().equals( StatelessKnowledgeSessionBeanFactory.class.getName() ) ) {
-        		 PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
-        		 RuntimeBeanReference tbf = ( RuntimeBeanReference ) pvalue.getValue();        		 
-        		if ( kbase.equals( tbf.getBeanName() ) ) {
-        			def.getPropertyValues().addPropertyValue( "knowledgeAgent", new RuntimeBeanReference( id ) );
-        		}
-        	}       	
         }
 
+        // inject the kagent into any stateless sessions
+        for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
+            BeanDefinition def = parserContext.getRegistry().getBeanDefinition( beanName );
+            if ( def.getBeanClassName().equals( StatelessKnowledgeSessionBeanFactory.class.getName() ) ) {
+                PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
+                RuntimeBeanReference tbf = (RuntimeBeanReference) pvalue.getValue();
+                if ( kbase.equals( tbf.getBeanName() ) ) {
+                    def.getPropertyValues().addPropertyValue( "knowledgeAgent",
+                                                              new RuntimeBeanReference( id ) );
+                }
+            }
+        }
 
         return factory.getBeanDefinition();
     }

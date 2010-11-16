@@ -38,7 +38,7 @@ public class ResourceChangeScannerDefinitionParser extends AbstractBeanDefinitio
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( ResourceChangeScannerBeanFactory.class );
 
         factory.addPropertyValue( INTERVAL,
-        						  element.getAttribute( INTERVAL ) );
+                                  element.getAttribute( INTERVAL ) );
 
         return factory.getBeanDefinition();
     }

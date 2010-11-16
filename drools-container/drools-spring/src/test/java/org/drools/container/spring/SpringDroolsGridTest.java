@@ -54,19 +54,18 @@ public class SpringDroolsGridTest extends TestCase {
 
         wp.create( "s1" );
         wp.create( "s2" );
-        wp.create( "s3" );        
+        wp.create( "s3" );
     }
 
-
     public void testGrid() throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/grid.xml" );           
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/grid.xml" );
 
         Grid grid1 = (Grid) context.getBean( "grid1" );
         assertTrue( grid1.get( WhitePages.class ) instanceof JpaWhitePages );
 
         Grid grid2 = (Grid) context.getBean( "grid2" );
         assertTrue( grid2.get( WhitePages.class ) instanceof WhitePagesClient );
-        
+
         Grid grid3 = (Grid) context.getBean( "grid3" );
         assertTrue( grid3.get( WhitePages.class ) instanceof WhitePagesImpl );
 

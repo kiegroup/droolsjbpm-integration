@@ -119,130 +119,147 @@ public class VariablePersistenceStrategyTest {
 
     @Test
     public void testTransactionsRollback() throws Exception {
-    	final List<?> list = new ArrayList<Object>();
-    	PlatformTransactionManager txManager = (PlatformTransactionManager) ctx.getBean( "txManager" );
-    	
-    	final Environment env = KnowledgeBaseFactory.newEnvironment();
-        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean( "myEmf" ));
-		env.set( EnvironmentName.TRANSACTION_MANAGER, txManager);
-		env.set( EnvironmentName.GLOBALS, new MapGlobalResolver() );
-                env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES, new ObjectMarshallingStrategy[]{new JPAPlaceholderResolverStrategy(env), 
-                                                                    new SerializablePlaceholderResolverStrategy(ClassObjectMarshallingStrategyAcceptor.DEFAULT)} );
-		
-    	final KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
-        final KnowledgeBase kbRollback = ( KnowledgeBase ) ctx.getBean( "kbRollback" );
-    	
-    	TransactionTemplate txTemplate = new TransactionTemplate(txManager);
-    	final StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-				StatefulKnowledgeSession kNewSession = kstore.newStatefulKnowledgeSession(kbRollback, null, env);
-				kNewSession.setGlobal( "list", list );
-				kNewSession.insert( 1 );
-		        kNewSession.insert( 2 );
-				return kNewSession;
-			}
-		});
-    	
-    	final int sessionId = ksession.getId();
+        final List< ? > list = new ArrayList<Object>();
+        PlatformTransactionManager txManager = (PlatformTransactionManager) ctx.getBean( "txManager" );
 
-        txTemplate = new TransactionTemplate(txManager);
-    	txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-		        ksession.insert( 3 );
-		        status.setRollbackOnly();
-				return null;
-			}
-		});
-        
-        txTemplate = new TransactionTemplate(txManager);
-    	txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-				ksession.fireAllRules();
-				return null;
-			}
-		});
+        final Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
+                 ctx.getBean( "myEmf" ) );
+        env.set( EnvironmentName.TRANSACTION_MANAGER,
+                 txManager );
+        env.set( EnvironmentName.GLOBALS,
+                 new MapGlobalResolver() );
+        env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES,
+                 new ObjectMarshallingStrategy[]{new JPAPlaceholderResolverStrategy( env ),
+                                                                    new SerializablePlaceholderResolverStrategy( ClassObjectMarshallingStrategyAcceptor.DEFAULT )} );
 
-    	assertEquals( 2,
+        final KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        final KnowledgeBase kbRollback = (KnowledgeBase) ctx.getBean( "kbRollback" );
+
+        TransactionTemplate txTemplate = new TransactionTemplate( txManager );
+        final StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) txTemplate.execute( new TransactionCallback() {
+
+            public Object doInTransaction(TransactionStatus status) {
+                StatefulKnowledgeSession kNewSession = kstore.newStatefulKnowledgeSession( kbRollback,
+                                                                                           null,
+                                                                                           env );
+                kNewSession.setGlobal( "list",
+                                       list );
+                kNewSession.insert( 1 );
+                kNewSession.insert( 2 );
+                return kNewSession;
+            }
+        } );
+
+        final int sessionId = ksession.getId();
+
+        txTemplate = new TransactionTemplate( txManager );
+        txTemplate.execute( new TransactionCallback() {
+
+            public Object doInTransaction(TransactionStatus status) {
+                ksession.insert( 3 );
+                status.setRollbackOnly();
+                return null;
+            }
+        } );
+
+        txTemplate = new TransactionTemplate( txManager );
+        txTemplate.execute( new TransactionCallback() {
+
+            public Object doInTransaction(TransactionStatus status) {
+                ksession.fireAllRules();
+                return null;
+            }
+        } );
+
+        assertEquals( 2,
                       list.size() );
 
-    	txTemplate = new TransactionTemplate(txManager);
-    	txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-				ksession.insert( 3 );
-		        ksession.insert( 4 );
-				return null;
-			}
-		});
-    	
-    	txTemplate = new TransactionTemplate(txManager);
-    	txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-				ksession.insert( 5 );
-		        ksession.insert( 6 );
-		        status.setRollbackOnly();
-				return null;
-			}
-		});
+        txTemplate = new TransactionTemplate( txManager );
+        txTemplate.execute( new TransactionCallback() {
 
-    	txTemplate = new TransactionTemplate(txManager);
-    	txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-				ksession.fireAllRules();
-				return null;
-			}
-		});
+            public Object doInTransaction(TransactionStatus status) {
+                ksession.insert( 3 );
+                ksession.insert( 4 );
+                return null;
+            }
+        } );
+
+        txTemplate = new TransactionTemplate( txManager );
+        txTemplate.execute( new TransactionCallback() {
+
+            public Object doInTransaction(TransactionStatus status) {
+                ksession.insert( 5 );
+                ksession.insert( 6 );
+                status.setRollbackOnly();
+                return null;
+            }
+        } );
+
+        txTemplate = new TransactionTemplate( txManager );
+        txTemplate.execute( new TransactionCallback() {
+
+            public Object doInTransaction(TransactionStatus status) {
+                ksession.fireAllRules();
+                return null;
+            }
+        } );
 
         assertEquals( 4,
                       list.size() );
-        
-        ksession.dispose();
-        
-        // now load the ksession
-        final StatefulKnowledgeSession ksession2 = JPAKnowledgeService.loadStatefulKnowledgeSession( sessionId, kbRollback, null, env );
-        
-        txTemplate = new TransactionTemplate(txManager);
-    	txTemplate.execute(new TransactionCallback() {
-			
-			public Object doInTransaction(TransactionStatus status) {
-				ksession2.setGlobal( "list", list );
-				ksession2.insert( 7 );
-		        ksession2.insert( 8 );
-				return null;
-			}
-		});
 
-    	txTemplate.execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus status) {
-				ksession2.fireAllRules();
-				return null;
-			}
-		});
+        ksession.dispose();
+
+        // now load the ksession
+        final StatefulKnowledgeSession ksession2 = JPAKnowledgeService.loadStatefulKnowledgeSession( sessionId,
+                                                                                                     kbRollback,
+                                                                                                     null,
+                                                                                                     env );
+
+        txTemplate = new TransactionTemplate( txManager );
+        txTemplate.execute( new TransactionCallback() {
+
+            public Object doInTransaction(TransactionStatus status) {
+                ksession2.setGlobal( "list",
+                                     list );
+                ksession2.insert( 7 );
+                ksession2.insert( 8 );
+                return null;
+            }
+        } );
+
+        txTemplate.execute( new TransactionCallback() {
+            public Object doInTransaction(TransactionStatus status) {
+                ksession2.fireAllRules();
+                return null;
+            }
+        } );
 
         assertEquals( 6,
                       list.size() );
     }
-    
+
     @Test
-    public void testPersistenceVariables() throws NamingException, NotSupportedException, SystemException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+    public void testPersistenceVariables() throws NamingException,
+                                          NotSupportedException,
+                                          SystemException,
+                                          IllegalStateException,
+                                          RollbackException,
+                                          HeuristicMixedException,
+                                          HeuristicRollbackException {
         MyEntity myEntity = new MyEntity( "This is a test Entity with annotation in fields" );
         MyEntityMethods myEntityMethods = new MyEntityMethods( "This is a test Entity with annotations in methods" );
-        MyEntityOnlyFields myEntityOnlyFields = new MyEntityOnlyFields( "This is a test Entity with annotations in fields and without accesors methods" ) ;
+        MyEntityOnlyFields myEntityOnlyFields = new MyEntityOnlyFields( "This is a test Entity with annotations in fields and without accesors methods" );
         MyVariableSerializable myVariableSerializable = new MyVariableSerializable( "This is a test SerializableObject" );
-        EntityManager em = ((EntityManagerFactory)ctx.getBean( "myEmf" )).createEntityManager();
-        
+        EntityManager em = ((EntityManagerFactory) ctx.getBean( "myEmf" )).createEntityManager();
+
         em.getTransaction().begin();
-        em.persist(myEntity);
-        em.persist(myEntityMethods);
-        em.persist(myEntityOnlyFields);
+        em.persist( myEntity );
+        em.persist( myEntityMethods );
+        em.persist( myEntityOnlyFields );
         em.getTransaction().commit();
         em.close();
-        
+
         log.info( "---> get bean jpaSingleSessionCommandService" );
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
@@ -254,14 +271,15 @@ public class VariablePersistenceStrategyTest {
         parameters.put( "x",
                         "SomeString" );
         parameters.put( "y",
-                         myEntity);
+                         myEntity );
         parameters.put( "m",
-                         myEntityMethods);
+                         myEntityMethods );
         parameters.put( "f",
-                        myEntityOnlyFields);
+                        myEntityOnlyFields );
         parameters.put( "z",
-                         myVariableSerializable);
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.startProcess( "com.sample.ruleflow", parameters );
+                         myVariableSerializable );
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.startProcess( "com.sample.ruleflow",
+                                                                                                  parameters );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -272,23 +290,29 @@ public class VariablePersistenceStrategyTest {
 
         EntityManagerFactory emf = (EntityManagerFactory) ctx.getBean( "myEmf" );
 
-//        List< ? > result = emf.createEntityManager().createQuery( "select i from VariableInstanceInfo i" ).getResultList();
-//        assertEquals( 5,
-//                      result.size() );
+        //        List< ? > result = emf.createEntityManager().createQuery( "select i from VariableInstanceInfo i" ).getResultList();
+        //        assertEquals( 5,
+        //                      result.size() );
         log.info( "### Retrieving process instance ###" );
 
         Environment env = KnowledgeBaseFactory.newEnvironment();
-        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, emf);
-        env.set( EnvironmentName.TRANSACTION_MANAGER, ctx.getBean( "txManager" ));  
-        env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES, new ObjectMarshallingStrategy[]{
+        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
+                 emf );
+        env.set( EnvironmentName.TRANSACTION_MANAGER,
+                 ctx.getBean( "txManager" ) );
+        env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES,
+                 new ObjectMarshallingStrategy[]{
                                                                   //  new JPAPlaceholderResolverStrategy(env),
-                                                                    new SerializablePlaceholderResolverStrategy(ClassObjectMarshallingStrategyAcceptor.DEFAULT)
-                                                                });
+                                                                  new SerializablePlaceholderResolverStrategy( ClassObjectMarshallingStrategyAcceptor.DEFAULT )
+                                                                } );
 
-        KnowledgeStoreService kstore = ( KnowledgeStoreService ) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = ( KnowledgeBase ) ctx.getBean( "kbase1" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId, kbase1, null, env );
-        
+        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbase1" );
+        service = kstore.loadStatefulKnowledgeSession( sessionId,
+                                                       kbase1,
+                                                       null,
+                                                       env );
+
         processInstance = (WorkflowProcessInstance) service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
 

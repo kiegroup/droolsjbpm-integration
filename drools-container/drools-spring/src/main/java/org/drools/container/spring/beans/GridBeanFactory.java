@@ -47,16 +47,16 @@ public class GridBeanFactory
     FactoryBean,
     InitializingBean {
 
-    private String           id;
-    private GridImpl         grid;
+    private String                     id;
+    private GridImpl                   grid;
 
-    private Map              coreServices;
+    private Map                        coreServices;
 
-    private WhitePages       whitePages;
+    private WhitePages                 whitePages;
 
-    private JpaConfiguration jpaConfiguration;
-    
-    private SocketServiceConfiguration   socketServiceConfiguration ;
+    private JpaConfiguration           jpaConfiguration;
+
+    private SocketServiceConfiguration socketServiceConfiguration;
 
     //    private String type;
     //    private GenericConnection connection;
@@ -77,55 +77,57 @@ public class GridBeanFactory
     public void afterPropertiesSet() throws Exception {
         this.grid = new GridImpl( new HashMap() );
         MultiplexSocketServiceCongifuration socketConf = null;
-        
+
         if ( this.coreServices == null ) {
             this.coreServices = new HashMap();
         }
 
         GridPeerConfiguration conf = new GridPeerConfiguration();
         GridPeerServiceConfiguration coreSeviceLookupConf = new CoreServicesLookupConfiguration( this.coreServices );
-        conf.addConfiguration( coreSeviceLookupConf );     
-        
+        conf.addConfiguration( coreSeviceLookupConf );
+
         //Configuring the WhitePages 
         if ( this.whitePages != null ) {
             WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
             wplConf.setWhitePages( this.whitePages );
             conf.addConfiguration( wplConf );
         }
-      
-        conf.configure( this.grid  );
-        
+
+        conf.configure( this.grid );
+
         // We do this after the main grid configuration, to make sure all services are instantiated
-        if ( this.socketServiceConfiguration != null ) {            
+        if ( this.socketServiceConfiguration != null ) {
             AcceptorFactoryService acc = null;
             if ( "mina".equals( this.socketServiceConfiguration.getAcceptor() ) ) {
-                acc = new MinaAcceptorFactoryService();        
+                acc = new MinaAcceptorFactoryService();
             }
 
             if ( acc == null ) {
                 // Mina is the default for the moment
                 acc = new MinaAcceptorFactoryService();
             }
-            
+
             socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( this.socketServiceConfiguration.getIp(),
                                                                                                  acc,
                                                                                                  SystemEventListenerFactory.getSystemEventListener(),
-                                                                                                 this.grid) );            
-            
-            for (String[] services : this.socketServiceConfiguration.getServices() ) {
-                Object service = ((GridImpl)this.grid).get( services[0].trim() );
+                                                                                                 this.grid ) );
+
+            for ( String[] services : this.socketServiceConfiguration.getServices() ) {
+                Object service = ((GridImpl) this.grid).get( services[0].trim() );
                 if ( service == null ) {
                     throw new RuntimeException( "Unable to configure socket. Service '" + services[0] + "' could not be found" );
                 }
                 if ( "auto".equals( services[1].trim() ) ) {
-                    
+
                 } else {
-                    socketConf.addService( services[0].trim(), service, Integer.parseInt( services[1].trim() ) );
+                    socketConf.addService( services[0].trim(),
+                                           service,
+                                           Integer.parseInt( services[1].trim() ) );
                 }
             }
-            
+
             socketConf.configureService( this.grid );
-        }           
+        }
     }
 
     public void setId(String id) {
@@ -160,7 +162,6 @@ public class GridBeanFactory
         this.jpaConfiguration = jpaConfiguration;
     }
 
-
     public SocketServiceConfiguration getSocketServiceConfiguration() {
         return socketServiceConfiguration;
     }
@@ -170,36 +171,37 @@ public class GridBeanFactory
     }
 
     public static class SocketServiceConfiguration {
-        private String ip;
-        private String acceptor;
+        private String         ip;
+        private String         acceptor;
         private List<String[]> services;
-        
+
         public String getIp() {
             return ip;
         }
+
         public void setIp(String ip) {
             this.ip = ip;
         }
+
         public String getAcceptor() {
             return acceptor;
         }
+
         public void setAcceptor(String acceptor) {
             this.acceptor = acceptor;
-        }        
-        
+        }
+
         public List<String[]> getServices() {
             if ( this.services == null ) {
                 this.services = new ArrayList<String[]>();
             }
             return services;
-        }        
-        
+        }
+
         public void setServices(List<String[]> services) {
             this.services = services;
         }
-        
-        
-  
+
     }
 
 }

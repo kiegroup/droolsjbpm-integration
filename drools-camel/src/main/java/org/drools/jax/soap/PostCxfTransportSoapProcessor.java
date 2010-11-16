@@ -29,26 +29,32 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.drools.core.util.StringUtils;
 
-public class PostCxfTransportSoapProcessor implements Processor {
+public class PostCxfTransportSoapProcessor
+    implements
+    Processor {
 
-	public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) throws Exception {
 
-		byte[] body2 = (byte[]) exchange.getOut().getBody();
+        byte[] body2 = (byte[]) exchange.getOut().getBody();
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(body2);
+        ByteArrayInputStream bais = new ByteArrayInputStream( body2 );
 
-		SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
-		SOAPBody soapBody = soapMessage.getSOAPPart().getEnvelope().getBody();
-		QName payloadName = new QName("http://soap.jax.drools.org/", "executeResponse", "ns1");
-		QName responseName = new QName("http://soap.jax.drools.org/", "return", "ns1");
-		SOAPBodyElement payload = soapBody.addBodyElement(payloadName);
-		SOAPElement response = payload.addChildElement(responseName);
-		response.addTextNode(StringUtils.toString(bais));
+        SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
+        SOAPBody soapBody = soapMessage.getSOAPPart().getEnvelope().getBody();
+        QName payloadName = new QName( "http://soap.jax.drools.org/",
+                                       "executeResponse",
+                                       "ns1" );
+        QName responseName = new QName( "http://soap.jax.drools.org/",
+                                        "return",
+                                        "ns1" );
+        SOAPBodyElement payload = soapBody.addBodyElement( payloadName );
+        SOAPElement response = payload.addChildElement( responseName );
+        response.addTextNode( StringUtils.toString( bais ) );
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		soapMessage.writeTo(baos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        soapMessage.writeTo( baos );
 
-		exchange.getOut().setBody(new String(baos.toByteArray()));
-	}
+        exchange.getOut().setBody( new String( baos.toByteArray() ) );
+    }
 
 }

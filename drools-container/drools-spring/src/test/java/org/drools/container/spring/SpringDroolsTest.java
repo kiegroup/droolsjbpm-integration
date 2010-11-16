@@ -46,23 +46,22 @@ import org.drools.runtime.process.WorkItemHandler;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest extends TestCase {
-   
-    
+
     protected void setUp() throws Exception {
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
     }
-    
-    public void testNoConnection() throws Exception {
-            ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
-            GridNode node1 = (GridNode) context.getBean( "node1" );
-            assertNotNull( node1 );            
-            
-            GridNode node2 = (GridNode) context.getBean( "node2" );
-            assertNotNull( node2 );
+    public void testNoConnection() throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+
+        GridNode node1 = (GridNode) context.getBean( "node1" );
+        assertNotNull( node1 );
+
+        GridNode node2 = (GridNode) context.getBean( "node2" );
+        assertNotNull( node2 );
     }
 
     public void testNoNodeKSessions() throws Exception {
@@ -114,48 +113,59 @@ public class SpringDroolsTest extends TestCase {
         assertEquals( 2,
                       list.size() );
     }
-    
-    public void testAgents() throws Exception {        
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/kagents-beans.xml" );
-        
-        ResourceChangeScannerImpl scanner = ( ResourceChangeScannerImpl ) ResourceFactory.getResourceChangeScannerService();
-        assertEquals( 5, scanner.getInterval() );
-        
-        KnowledgeBaseImpl kbase1 = ( KnowledgeBaseImpl ) context.getBean( "kbase1" );
-        KnowledgeBaseImpl kbase2 = ( KnowledgeBaseImpl ) context.getBean( "kbase2" );
-        
-        KnowledgeAgentImpl kagent1 = ( KnowledgeAgentImpl ) context.getBean( "kagent1" );
-        assertSame( kagent1.getKnowledgeBase(), kbase1 );
-        assertEquals( 0, kagent1.getResourceDirectories().size() );
-        assertFalse( kagent1.isNewInstance() );
-        
-        KnowledgeAgentImpl kagent2 = ( KnowledgeAgentImpl ) context.getBean( "kagent2" );
-        assertSame( kagent2.getKnowledgeBase(), kbase2 );
-        assertEquals( 1, kagent2.getResourceDirectories().size() );
-        assertFalse( kagent2.isNewInstance() );
-        
-        KnowledgeAgentImpl kagent3 = ( KnowledgeAgentImpl ) context.getBean( "kagent3" );
-        assertTrue( kagent3.isNewInstance() );
-        
-        StatelessKnowledgeSessionImpl ksession1 = (StatelessKnowledgeSessionImpl)  context.getBean( "ksession1" );
-        assertSame( kbase1.getRuleBase(), ksession1.getRuleBase() );
-        assertSame( kagent1, ksession1.getKnowledgeAgent() );
-        
-        StatefulKnowledgeSessionImpl ksession2 = (StatefulKnowledgeSessionImpl)  context.getBean( "ksession2" );
-        assertSame( kbase1.getRuleBase(), ksession2.getRuleBase() );
-        
-        StatelessKnowledgeSessionImpl ksession3 = (StatelessKnowledgeSessionImpl)  context.getBean( "ksession3" );
-        assertSame( kagent2, ksession3.getKnowledgeAgent() );
-        assertSame( kbase2.getRuleBase(), ksession3.getRuleBase() );
 
-    }    
+    public void testAgents() throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/kagents-beans.xml" );
+
+        ResourceChangeScannerImpl scanner = (ResourceChangeScannerImpl) ResourceFactory.getResourceChangeScannerService();
+        assertEquals( 5,
+                      scanner.getInterval() );
+
+        KnowledgeBaseImpl kbase1 = (KnowledgeBaseImpl) context.getBean( "kbase1" );
+        KnowledgeBaseImpl kbase2 = (KnowledgeBaseImpl) context.getBean( "kbase2" );
+
+        KnowledgeAgentImpl kagent1 = (KnowledgeAgentImpl) context.getBean( "kagent1" );
+        assertSame( kagent1.getKnowledgeBase(),
+                    kbase1 );
+        assertEquals( 0,
+                      kagent1.getResourceDirectories().size() );
+        assertFalse( kagent1.isNewInstance() );
+
+        KnowledgeAgentImpl kagent2 = (KnowledgeAgentImpl) context.getBean( "kagent2" );
+        assertSame( kagent2.getKnowledgeBase(),
+                    kbase2 );
+        assertEquals( 1,
+                      kagent2.getResourceDirectories().size() );
+        assertFalse( kagent2.isNewInstance() );
+
+        KnowledgeAgentImpl kagent3 = (KnowledgeAgentImpl) context.getBean( "kagent3" );
+        assertTrue( kagent3.isNewInstance() );
+
+        StatelessKnowledgeSessionImpl ksession1 = (StatelessKnowledgeSessionImpl) context.getBean( "ksession1" );
+        assertSame( kbase1.getRuleBase(),
+                    ksession1.getRuleBase() );
+        assertSame( kagent1,
+                    ksession1.getKnowledgeAgent() );
+
+        StatefulKnowledgeSessionImpl ksession2 = (StatefulKnowledgeSessionImpl) context.getBean( "ksession2" );
+        assertSame( kbase1.getRuleBase(),
+                    ksession2.getRuleBase() );
+
+        StatelessKnowledgeSessionImpl ksession3 = (StatelessKnowledgeSessionImpl) context.getBean( "ksession3" );
+        assertSame( kagent2,
+                    ksession3.getKnowledgeAgent() );
+        assertSame( kbase2.getRuleBase(),
+                    ksession3.getRuleBase() );
+
+    }
 
     public void testNode() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
         GridNode node = (GridNode) context.getBean( "node1" );
         List<String> list = new ArrayList<String>();
-        StatelessKnowledgeSession kstateless = node.get( "stateless1", StatelessKnowledgeSession.class );
+        StatelessKnowledgeSession kstateless = node.get( "stateless1",
+                                                         StatelessKnowledgeSession.class );
         assertNotNull( "can't obtain session named: stateless1",
                        kstateless );
         kstateless.setGlobal( "list",
@@ -167,7 +177,8 @@ public class SpringDroolsTest extends TestCase {
                       list.size() );
 
         list = new ArrayList<String>();
-        StatefulKnowledgeSession kstateful = node.get( "ksession2", StatefulKnowledgeSession.class );
+        StatefulKnowledgeSession kstateful = node.get( "ksession2",
+                                                       StatefulKnowledgeSession.class );
         kstateful.setGlobal( "list",
                              list );
         kstateful.insert( new Person( "Darth",
@@ -180,73 +191,90 @@ public class SpringDroolsTest extends TestCase {
 
     public void testConfiguration() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/session-conf-beans.xml" );
-        KnowledgeBaseImpl kbase1 = ( KnowledgeBaseImpl ) context.getBean( "kbase1" );
-        RuleBaseConfiguration rconf = ((InternalRuleBase)kbase1.getRuleBase()).getConfiguration();
+        KnowledgeBaseImpl kbase1 = (KnowledgeBaseImpl) context.getBean( "kbase1" );
+        RuleBaseConfiguration rconf = ((InternalRuleBase) kbase1.getRuleBase()).getConfiguration();
         assertTrue( rconf.isAdvancedProcessRuleIntegration() );
         assertTrue( rconf.isMultithreadEvaluation() );
-        assertEquals( 5, rconf.getMaxThreads() );
-        assertEquals( EventProcessingOption.STREAM, rconf.getEventProcessingMode() );
-        assertEquals( AssertBehaviour.IDENTITY, rconf.getAssertBehaviour() );
-        assertEquals( "org.drools.container.spring.MockConsequenceExceptionHandler", rconf.getConsequenceExceptionHandler() );
+        assertEquals( 5,
+                      rconf.getMaxThreads() );
+        assertEquals( EventProcessingOption.STREAM,
+                      rconf.getEventProcessingMode() );
+        assertEquals( AssertBehaviour.IDENTITY,
+                      rconf.getAssertBehaviour() );
+        assertEquals( "org.drools.container.spring.MockConsequenceExceptionHandler",
+                      rconf.getConsequenceExceptionHandler() );
 
-        KnowledgeBaseImpl kbase2 = ( KnowledgeBaseImpl ) context.getBean( "kbase2" );
-        rconf = ((InternalRuleBase)kbase2.getRuleBase()).getConfiguration();
+        KnowledgeBaseImpl kbase2 = (KnowledgeBaseImpl) context.getBean( "kbase2" );
+        rconf = ((InternalRuleBase) kbase2.getRuleBase()).getConfiguration();
         assertFalse( rconf.isAdvancedProcessRuleIntegration() );
         assertFalse( rconf.isMultithreadEvaluation() );
-        assertEquals( 3, rconf.getMaxThreads() );
-        assertEquals( EventProcessingOption.CLOUD, rconf.getEventProcessingMode() );
-        assertEquals( AssertBehaviour.EQUALITY, rconf.getAssertBehaviour() );
-        
-        
-        StatefulKnowledgeSessionImpl ksession1 = ( StatefulKnowledgeSessionImpl ) context.getBean( "ksession1" );
+        assertEquals( 3,
+                      rconf.getMaxThreads() );
+        assertEquals( EventProcessingOption.CLOUD,
+                      rconf.getEventProcessingMode() );
+        assertEquals( AssertBehaviour.EQUALITY,
+                      rconf.getAssertBehaviour() );
+
+        StatefulKnowledgeSessionImpl ksession1 = (StatefulKnowledgeSessionImpl) context.getBean( "ksession1" );
         SessionConfiguration sconf = ksession1.session.getSessionConfiguration();
         assertTrue( sconf.isKeepReference() );
-        assertEquals( ClockType.REALTIME_CLOCK , sconf.getClockType() );
+        assertEquals( ClockType.REALTIME_CLOCK,
+                      sconf.getClockType() );
         Map<String, WorkItemHandler> wih = sconf.getWorkItemHandlers();
-        assertEquals( 4, wih.size() );
-        assertTrue( wih.containsKey( "wih1" ));
-        assertTrue( wih.containsKey( "wih2" ));
-        assertTrue( wih.containsKey( "Human Task" ));
-        assertTrue( wih.containsKey( "MyWork" ));        
-        assertNotSame(  wih.get( "wih1" ), wih.get( "wih2" ));
-        assertEquals( HumanTaskHandler.class, wih.get( "wih1" ).getClass() );
-        assertEquals( HumanTaskHandler.class, wih.get( "wih2" ).getClass() );
-  
-        StatefulKnowledgeSessionImpl ksession2 = ( StatefulKnowledgeSessionImpl ) context.getBean( "ksession2" );
+        assertEquals( 4,
+                      wih.size() );
+        assertTrue( wih.containsKey( "wih1" ) );
+        assertTrue( wih.containsKey( "wih2" ) );
+        assertTrue( wih.containsKey( "Human Task" ) );
+        assertTrue( wih.containsKey( "MyWork" ) );
+        assertNotSame( wih.get( "wih1" ),
+                       wih.get( "wih2" ) );
+        assertEquals( HumanTaskHandler.class,
+                      wih.get( "wih1" ).getClass() );
+        assertEquals( HumanTaskHandler.class,
+                      wih.get( "wih2" ).getClass() );
+
+        StatefulKnowledgeSessionImpl ksession2 = (StatefulKnowledgeSessionImpl) context.getBean( "ksession2" );
         sconf = ksession2.session.getSessionConfiguration();
         assertFalse( sconf.isKeepReference() );
-        assertEquals( ClockType.PSEUDO_CLOCK, sconf.getClockType() );        
+        assertEquals( ClockType.PSEUDO_CLOCK,
+                      sconf.getClockType() );
 
-        
     }
 
     public void testResourceAuthenication() throws Exception {
-            ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
-            //Secure Resource
-            DroolsResourceAdapter resourceAdapter = (DroolsResourceAdapter) context.getBean( "secureResource" );
-            assertNotNull( resourceAdapter );
+        //Secure Resource
+        DroolsResourceAdapter resourceAdapter = (DroolsResourceAdapter) context.getBean( "secureResource" );
+        assertNotNull( resourceAdapter );
 
-            Resource resource = resourceAdapter.getDroolsResource();
-            assertTrue(resource instanceof UrlResource);
+        Resource resource = resourceAdapter.getDroolsResource();
+        assertTrue( resource instanceof UrlResource );
 
-            UrlResource ur = (UrlResource)resource;
+        UrlResource ur = (UrlResource) resource;
 
-            assertEquals("enabled",ur.getBasicAuthentication());
-            assertEquals("someUser",ur.getUsername());
-            assertEquals("somePassword",ur.getPassword());
+        assertEquals( "enabled",
+                      ur.getBasicAuthentication() );
+        assertEquals( "someUser",
+                      ur.getUsername() );
+        assertEquals( "somePassword",
+                      ur.getPassword() );
 
-            //Insecure Resource
-            resourceAdapter = (DroolsResourceAdapter) context.getBean( "insecureResource" );
-            assertNotNull( resourceAdapter );
+        //Insecure Resource
+        resourceAdapter = (DroolsResourceAdapter) context.getBean( "insecureResource" );
+        assertNotNull( resourceAdapter );
 
-            resource = resourceAdapter.getDroolsResource();
-            assertTrue(resource instanceof UrlResource);
+        resource = resourceAdapter.getDroolsResource();
+        assertTrue( resource instanceof UrlResource );
 
-            ur = (UrlResource)resource;
+        ur = (UrlResource) resource;
 
-            assertEquals("disabled",ur.getBasicAuthentication());
-            assertEquals("",ur.getUsername());
-            assertEquals("",ur.getPassword());
+        assertEquals( "disabled",
+                      ur.getBasicAuthentication() );
+        assertEquals( "",
+                      ur.getUsername() );
+        assertEquals( "",
+                      ur.getPassword() );
     }
 }

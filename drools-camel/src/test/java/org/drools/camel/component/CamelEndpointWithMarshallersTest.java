@@ -35,17 +35,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.NamingException;
-
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.dataformat.xstream.JsonDataFormat;
-import org.apache.camel.dataformat.xstream.XStreamDataFormat;
 import org.apache.camel.model.DataFormatDefinition;
-import org.apache.camel.spi.DataFormat;
-import org.apache.camel.spring.CamelRouteContextFactoryBean;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.rule.GetObjectsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
@@ -58,10 +51,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.converters.collections.AbstractCollectionConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.mapper.Mapper;
 
 public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     private String handle;
@@ -223,7 +214,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             @Override
-            public void configure() throws Exception {          
+            public void configure() throws Exception {
                 org.apache.camel.model.dataformat.XStreamDataFormat xstreamDataFormat = new org.apache.camel.model.dataformat.XStreamDataFormat();
                 xstreamDataFormat.setConverters( Arrays.asList( new String[]{PersonConverter.class.getName()} ) );
 

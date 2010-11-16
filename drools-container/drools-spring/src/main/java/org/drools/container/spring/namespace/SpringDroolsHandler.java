@@ -26,19 +26,19 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
                                       new ResourceDefinitionParser() );
 
         registerBeanDefinitionParser( "resource-change-scanner",
-                					  new ResourceChangeScannerDefinitionParser() );        
+                                      new ResourceChangeScannerDefinitionParser() );
 
         registerBeanDefinitionParser( "model",
                                       new ResourceDefinitionParser() );
 
         registerBeanDefinitionParser( "kbase",
                                       new KnowledgeBaseDefinitionParser() );
-        
+
         registerBeanDefinitionParser( "kagent",
-                                      new KnowledgeAgentDefinitionParser() );        
-        
+                                      new KnowledgeAgentDefinitionParser() );
+
         registerBeanDefinitionParser( "kstore",
-                                      new KnowledgeStoreDefinitionParser() );        
+                                      new KnowledgeStoreDefinitionParser() );
 
         registerBeanDefinitionParser( "ksession",
                                       new KnowledgeSessionDefinitionParser() );

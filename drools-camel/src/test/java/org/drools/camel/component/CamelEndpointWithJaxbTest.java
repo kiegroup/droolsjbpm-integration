@@ -17,24 +17,16 @@
 package org.drools.camel.component;
 
 import java.io.ByteArrayInputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import javax.naming.NamingException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.OnCompletionDefinition;
-import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
@@ -43,25 +35,14 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
-import org.drools.builder.conf.impl.JaxbConfigurationImpl;
-import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.GetGlobalCommand;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.process.AbortWorkItemCommand;
-import org.drools.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.GetObjectCommand;
-import org.drools.command.runtime.rule.GetObjectsCommand;
 import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.command.runtime.rule.QueryCommand;
-import org.drools.command.runtime.rule.RetractCommand;
-import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
 import org.drools.common.DefaultFactHandle;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
@@ -70,12 +51,9 @@ import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.impl.ExecutionResultImpl;
-import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.runtime.rule.QueryResultsRow;
 import org.drools.runtime.rule.impl.FlatQueryResults;
-import org.drools.xml.jaxb.util.JaxbListWrapper;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
@@ -90,7 +68,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
     private String      handle;
     private JAXBContext jaxbContext;
 
-    public void testSessionInsert() throws Exception {        
+    public void testSessionInsert() throws Exception {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
@@ -180,7 +158,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         expectedXml += "    <facts/>\n";
         expectedXml += "</execution-results>\n";
 
-        assertXMLEqual(expectedXml, outXml);
+        assertXMLEqual( expectedXml,
+                        outXml );
 
         cmd = "<batch-execution lookup='ksession1'>\n";
         cmd += "   <get-object out-identifier='rider' fact-handle='" + handle + "'/>\n";
@@ -383,7 +362,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
                 from( "direct:test-with-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
                 from( "direct:test-no-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node" ).marshal( def );
-            }            
+            }
         };
     }
 
@@ -392,29 +371,29 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
             def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
-    
+
             // create a jaxbContext for the test to use outside of Camel.
-            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1", CommandExecutor.class );
+            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
+                                                                                      CommandExecutor.class );
             KnowledgeBase kbase = ksession1.getKnowledgeBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
                 def = DroolsPolicy.augmentJaxbDataFormatDefinition( def );
-                
-                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = ( org.apache.camel.converter.jaxb.JaxbDataFormat ) def.getDataFormat(  this.context.getRoutes().get( 0 ).getRouteContext() );
-                
-                
+
+                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
+
                 jaxbContext = jaxbDataformat.getContext();
             } catch ( JAXBException e ) {
                 throw new RuntimeException( e );
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
-            }   
+            }
         }
-        
+
         return jaxbContext;
     }
-    
+
     @Override
     protected void configureDroolsContext(javax.naming.Context jndiContext) {
         Person me = new Person();

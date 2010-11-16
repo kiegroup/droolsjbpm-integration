@@ -41,7 +41,6 @@ import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.core.util.StringUtils;
 import org.drools.definition.KnowledgePackage;
-import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
@@ -75,7 +74,7 @@ import org.xml.sax.InputSource;
 
 @RunWith(JUnit4.class)
 public abstract class BatchTest extends ContextTestSupport {
-    protected GridNode   node;
+    protected GridNode        node;
     protected CommandExecutor exec;
     protected String          dataformat;
     protected String          copyToDataFormat;
@@ -88,7 +87,7 @@ public abstract class BatchTest extends ContextTestSupport {
             public void configure() throws Exception {
                 JaxbDataFormat jaxbDf = new JaxbDataFormat();
                 jaxbDf.setContextPath( "org.drools" );
-                
+
                 from( "direct:exec" ).policy( new DroolsPolicy() ).unmarshal( dataformat ).to( "drools://node/ksession1" ).marshal( dataformat );
                 from( "direct:execWithLookup" ).policy( new DroolsPolicy() ).unmarshal( dataformat ).to( "drools://node" ).marshal( dataformat );
                 from( "direct:unmarshal" ).policy( new DroolsPolicy() ).unmarshal( dataformat );
@@ -127,12 +126,13 @@ public abstract class BatchTest extends ContextTestSupport {
         Context context = super.createJndiContext();
 
         GridImpl grid = new GridImpl( new HashMap() );
-        grid.addService( WhitePages.class, new WhitePagesImpl() );
+        grid.addService( WhitePages.class,
+                         new WhitePagesImpl() );
         node = grid.createGridNode( "node" );
         node.set( "ksession1",
                   this.exec );
         context.bind( "node",
-                      node );        
+                      node );
         return context;
     }
 
@@ -147,7 +147,7 @@ public abstract class BatchTest extends ContextTestSupport {
 
     protected final TemplateRegistry tempReg = new SimpleTemplateRegistry();
 
-    protected PrintWriter                      writer;
+    protected PrintWriter            writer;
 
     @Before
     public void before() throws Exception {
@@ -164,14 +164,15 @@ public abstract class BatchTest extends ContextTestSupport {
         XMLUnit.setNormalizeWhitespace( true );
         XMLUnit.setNormalize( true );
 
-        if ( !StringUtils.isEmpty( copyToDataFormat )) {
-            writer = new PrintWriter(new BufferedWriter( new FileWriter( copyToDataFormat + ".mvt", true )));
+        if ( !StringUtils.isEmpty( copyToDataFormat ) ) {
+            writer = new PrintWriter( new BufferedWriter( new FileWriter( copyToDataFormat + ".mvt",
+                                                                          true ) ) );
         }
     }
 
     @After
     public void after() throws Exception {
-        if ( !StringUtils.isEmpty( copyToDataFormat )) {
+        if ( !StringUtils.isEmpty( copyToDataFormat ) ) {
             writer.close();
         }
     }
@@ -185,15 +186,17 @@ public abstract class BatchTest extends ContextTestSupport {
                      var );
         }
 
-        if ( !StringUtils.isEmpty( copyToDataFormat )) {
-                writer.println();
-                writer.println("@declare{\"" + name + "\"}");
+        if ( !StringUtils.isEmpty( copyToDataFormat ) ) {
+            writer.println();
+            writer.println( "@declare{\"" + name + "\"}" );
         }
         String s = (String) TemplateRuntime.execute( tempReg.getNamedTemplate( name ),
                                                      map );
-        if ( !StringUtils.isEmpty( copyToDataFormat )) {
-                writer.print(prettyPrintXml( template.requestBody("direct:to-" + copyToDataFormat, s, String.class) ) );
-                writer.println("@end{}");
+        if ( !StringUtils.isEmpty( copyToDataFormat ) ) {
+            writer.print( prettyPrintXml( template.requestBody( "direct:to-" + copyToDataFormat,
+                                                                s,
+                                                                String.class ) ) );
+            writer.println( "@end{}" );
         }
 
         return roundTripFromXml( s.trim() );
@@ -882,12 +885,11 @@ public abstract class BatchTest extends ContextTestSupport {
 
         String outXml = execContent( "testQuery.in.1" );
 
-        
         // Order is not determinstic, so can't test.
-//         assertXMLEqual( getContent( "testQuery.expected.1" ),
-//                        outXml );
+        //         assertXMLEqual( getContent( "testQuery.expected.1" ),
+        //                        outXml );
         getContent( "testQuery.expected.1" ); // just to force a tostring for comparison
-        
+
         ExecutionResults batchResult = unmarshalOutXml( outXml,
                                                         ExecutionResults.class );
 
@@ -1472,7 +1474,6 @@ public abstract class BatchTest extends ContextTestSupport {
 
     }
 
-
     public void FIXMEtestInsertObjectWithDeclaredFactAndQuery() throws Exception {
         String str = "";
         str += "package org.foo \n";
@@ -1523,13 +1524,14 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "  then \n";
         str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
         str += "end\n";
-        
+
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
         String outXml = execContent( "testExecutionNodeLookup.in.1" );
-        ExecutionResults results = unmarshalOutXml( outXml, ExecutionResults.class );
-        
+        ExecutionResults results = unmarshalOutXml( outXml,
+                                                    ExecutionResults.class );
+
         Cheese stilton = (Cheese) results.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -1539,10 +1541,11 @@ public abstract class BatchTest extends ContextTestSupport {
         assertEquals( 30,
                       stilton.getPrice() );
 
-        assertXMLEqual( getContent( "testExecutionNodeLookup.expected.1", factHandle.toExternalForm() ),
+        assertXMLEqual( getContent( "testExecutionNodeLookup.expected.1",
+                                    factHandle.toExternalForm() ),
                         outXml );
-    }    
-    
+    }
+
     public static class TestWorkItemHandler
         implements
         WorkItemHandler {

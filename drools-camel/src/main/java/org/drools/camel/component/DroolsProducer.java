@@ -31,35 +31,19 @@
 
 package org.drools.camel.component;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.management.RuntimeErrorException;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.RuntimeCamelException;
-import org.apache.camel.dataformat.xstream.JsonDataFormat;
-import org.apache.camel.dataformat.xstream.XStreamDataFormat;
 import org.apache.camel.impl.DefaultProducer;
-import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.apache.camel.spi.DataFormat;
 import org.drools.command.Command;
-import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
-import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.help.BatchExecutionHelper;
 
 public class DroolsProducer extends DefaultProducer {
 
@@ -75,20 +59,20 @@ public class DroolsProducer extends DefaultProducer {
 
         try {
             Command cmd = null;
-//            if ( de.dataFormat != null ) {
-//                String str = exchange.getIn().getBody( String.class );
-//                ByteArrayInputStream bais = new ByteArrayInputStream( str.getBytes() );
-//                cmd = (Command) de.dataFormat.unmarshal( exchange,
-//                                                         bais );
-//            } else {
-//                // no data format set, so we assume it's already concrete
-//                cmd = exchange.getIn().getBody( Command.class );
-//            }
+            //            if ( de.dataFormat != null ) {
+            //                String str = exchange.getIn().getBody( String.class );
+            //                ByteArrayInputStream bais = new ByteArrayInputStream( str.getBytes() );
+            //                cmd = (Command) de.dataFormat.unmarshal( exchange,
+            //                                                         bais );
+            //            } else {
+            //                // no data format set, so we assume it's already concrete
+            //                cmd = exchange.getIn().getBody( Command.class );
+            //            }
 
             cmd = exchange.getIn().getBody( Command.class );
-            
+
             if ( cmd == null ) {
-                throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri()  );
+                throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri() );
             }
 
             if ( !(cmd instanceof BatchExecutionCommandImpl) ) {
@@ -110,31 +94,32 @@ public class DroolsProducer extends DefaultProducer {
                     }
 
                     if ( de.getGridNode() != null && !StringUtils.isEmpty( lookup ) ) {
-                        exec = de.getGridNode().get(lookup, CommandExecutor.class);
+                        exec = de.getGridNode().get( lookup,
+                                                     CommandExecutor.class );
                         if ( exec == null ) {
-                            throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup  +" for uri" + de.getEndpointUri() );
+                            throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
                         }
                     } else {
-                        throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup +" for uri" + de.getEndpointUri());
+                        throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
                     }
                 }
             }
-            
+
             if ( exec == null ) {
                 throw new RuntimeException( "No defined ksession for uri" + de.getEndpointUri() );
-            }            
+            }
 
             ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
 
-//            if ( de.dataFormat != null ) {
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                de.dataFormat.marshal( exchange,
-//                                       results,
-//                                       baos );
-//                exchange.getOut().setBody( baos.toByteArray() );
-//            } else {
-//                exchange.getOut().setBody( results );
-//            }
+            //            if ( de.dataFormat != null ) {
+            //                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            //                de.dataFormat.marshal( exchange,
+            //                                       results,
+            //                                       baos );
+            //                exchange.getOut().setBody( baos.toByteArray() );
+            //            } else {
+            //                exchange.getOut().setBody( results );
+            //            }
             exchange.getOut().setBody( results );
         } finally {
             // we must restore the ClassLoader

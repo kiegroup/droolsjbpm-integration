@@ -52,45 +52,59 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
 
     public void testSessionInsert() throws Exception {
         Person person = new Person();
-        person.setName("Mauricio");
+        person.setName( "Mauricio" );
 
-        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person,"salaboy");
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert( person,
+                                                                                  "salaboy" );
 
-        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-with-session", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+        ExecutionResults response = (ExecutionResults) template.requestBody( "direct:test-with-session",
+                                                                             cmd );
+        assertTrue( "Expected valid ExecutionResults object",
+                    response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) != null );
     }
 
     public void testNoSessionInsert() throws Exception {
         Person person = new Person();
-        person.setName("Mauricio");
+        person.setName( "Mauricio" );
 
-        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person,"salaboy");
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert( person,
+                                                                                  "salaboy" );
 
-        ExecutionResults response = (ExecutionResults) template.requestBodyAndHeader("direct:test-no-session", cmd, 
-            DroolsComponent.DROOLS_LOOKUP, "ksession1");
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+        ExecutionResults response = (ExecutionResults) template.requestBodyAndHeader( "direct:test-no-session",
+                                                                                      cmd,
+                                                                                      DroolsComponent.DROOLS_LOOKUP,
+                                                                                      "ksession1" );
+        assertTrue( "Expected valid ExecutionResults object",
+                    response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) != null );
     }
 
     public void testSessionGetObject() throws Exception {
-        FactHandle factHandle = new DefaultFactHandle(handle);
-        GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject(factHandle);
-        cmd.setOutIdentifier("rider");
+        FactHandle factHandle = new DefaultFactHandle( handle );
+        GetObjectCommand cmd = (GetObjectCommand) CommandFactory.newGetObject( factHandle );
+        cmd.setOutIdentifier( "rider" );
 
-        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-with-session", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected object", response.getValue("rider") != null);
-        assertTrue("FactHandle object not of expected type", response.getValue("rider") instanceof Person);
-        assertEquals("Hadrian", ((Person)response.getValue("rider")).getName());
+        ExecutionResults response = (ExecutionResults) template.requestBody( "direct:test-with-session",
+                                                                             cmd );
+        assertTrue( "Expected valid ExecutionResults object",
+                    response != null );
+        assertTrue( "ExecutionResults missing expected object",
+                    response.getValue( "rider" ) != null );
+        assertTrue( "FactHandle object not of expected type",
+                    response.getValue( "rider" ) instanceof Person );
+        assertEquals( "Hadrian",
+                      ((Person) response.getValue( "rider" )).getName() );
     }
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:test-with-session").to("drools://node/ksession1");
-                from("direct:test-no-session").to("drools://node");
+                from( "direct:test-with-session" ).to( "drools://node/ksession1" );
+                from( "direct:test-no-session" ).to( "drools://node" );
             }
         };
     }
@@ -98,15 +112,16 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         Person me = new Person();
-        me.setName("Hadrian");
+        me.setName( "Hadrian" );
 
-        StatefulKnowledgeSession ksession = registerKnowledgeRuntime("ksession1", null);
-        InsertObjectCommand cmd = new InsertObjectCommand(me);
-        cmd.setOutIdentifier("camel-rider");
-        cmd.setReturnObject(false);
-        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[]{cmd} ));
-        
+        StatefulKnowledgeSession ksession = registerKnowledgeRuntime( "ksession1",
+                                                                      null );
+        InsertObjectCommand cmd = new InsertObjectCommand( me );
+        cmd.setOutIdentifier( "camel-rider" );
+        cmd.setReturnObject( false );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
+
         ExecutionResults results = ksession.execute( script );
-        handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
+        handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
     }
 }

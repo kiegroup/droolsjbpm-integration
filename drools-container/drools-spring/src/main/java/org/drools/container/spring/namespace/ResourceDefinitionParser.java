@@ -32,28 +32,27 @@ import org.w3c.dom.Element;
 
 public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
 
-    private static final String WORKSHEET_NAME_ATTRIBUTE = "worksheet-name";
-    private static final String INPUT_TYPE_ATTRIBUTE     = "input-type";
-    private static final String TYPE_ATTRIBUTE           = "type";
-    private static final String SOURCE_ATTRIBUTE         = "source";
+    private static final String WORKSHEET_NAME_ATTRIBUTE       = "worksheet-name";
+    private static final String INPUT_TYPE_ATTRIBUTE           = "input-type";
+    private static final String TYPE_ATTRIBUTE                 = "type";
+    private static final String SOURCE_ATTRIBUTE               = "source";
     private static final String BASIC_AUTHENTICATION_ATTRIBUTE = "basic-authentication";
-    private static final String USERNAME_ATTRIBUTE         = "username";
-    private static final String PASSWORD_ATTRIBUTE         = "password";
-    private static final String REF                      = "ref";
-
+    private static final String USERNAME_ATTRIBUTE             = "username";
+    private static final String PASSWORD_ATTRIBUTE             = "password";
+    private static final String REF                            = "ref";
 
     @SuppressWarnings("unchecked")
     @Override
     protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( DroolsResourceAdapter.class );
-        
-        if ( StringUtils.hasText( element.getAttribute( REF ) )) {
-            String ref = element.getAttribute( REF);
+
+        if ( StringUtils.hasText( element.getAttribute( REF ) ) ) {
+            String ref = element.getAttribute( REF );
             emptyAttributeCheck( element.getLocalName(),
                                  REF,
                                  ref );
-            return (AbstractBeanDefinition) parserContext.getRegistry().getBeanDefinition( ref );            
+            return (AbstractBeanDefinition) parserContext.getRegistry().getBeanDefinition( ref );
         }
 
         String source = element.getAttribute( SOURCE_ATTRIBUTE );
@@ -70,19 +69,24 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
         factory.addPropertyValue( "resourceType",
                                   resourceType );
 
-        boolean basicAuthenticationEnabled = element.getAttribute( BASIC_AUTHENTICATION_ATTRIBUTE ) != null && element.getAttribute( BASIC_AUTHENTICATION_ATTRIBUTE ).equalsIgnoreCase("enabled");
-        factory.addPropertyValue("basicAuthenticationEnabled", basicAuthenticationEnabled);
+        boolean basicAuthenticationEnabled = element.getAttribute( BASIC_AUTHENTICATION_ATTRIBUTE ) != null && element.getAttribute( BASIC_AUTHENTICATION_ATTRIBUTE ).equalsIgnoreCase( "enabled" );
+        factory.addPropertyValue( "basicAuthenticationEnabled",
+                                  basicAuthenticationEnabled );
 
-        if (basicAuthenticationEnabled){
+        if ( basicAuthenticationEnabled ) {
             String username = element.getAttribute( USERNAME_ATTRIBUTE );
-            factory.addPropertyValue("basicAuthenticationUsername", username);
+            factory.addPropertyValue( "basicAuthenticationUsername",
+                                      username );
 
             String password = element.getAttribute( PASSWORD_ATTRIBUTE );
-            factory.addPropertyValue("basicAuthenticationPassword", password);
+            factory.addPropertyValue( "basicAuthenticationPassword",
+                                      password );
         }
 
         if ( "xsd".equals( resourceType.toLowerCase() ) ) {
-            XsdParser.parse( element, parserContext, factory );
+            XsdParser.parse( element,
+                             parserContext,
+                             factory );
         } else if ( "dtable".equals( resourceType.toLowerCase() ) ) {
             List<Element> childElements = DomUtils.getChildElementsByTagName( element,
                                                                               "decisiontable-conf" );

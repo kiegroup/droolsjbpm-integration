@@ -11,9 +11,12 @@ import org.drools.runtime.rule.impl.DefaultConsequenceExceptionHandler;
 public class MockConsequenceExceptionHandler extends DefaultConsequenceExceptionHandler {
 
     @Override
-    public void handleException(Activation activation, WorkingMemory workingMemory, Exception exception) {
-        super.handleException(activation, workingMemory, exception);
+    public void handleException(Activation activation,
+                                WorkingMemory workingMemory,
+                                Exception exception) {
+        super.handleException( activation,
+                               workingMemory,
+                               exception );
     }
 
-    
 }

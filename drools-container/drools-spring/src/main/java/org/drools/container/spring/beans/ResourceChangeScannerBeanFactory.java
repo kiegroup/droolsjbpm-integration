@@ -32,7 +32,7 @@ public class ResourceChangeScannerBeanFactory
     InitializingBean {
 
     private String id;
-    private int interval;
+    private int    interval;
 
     public Object getObject() throws Exception {
         return ResourceFactory.getResourceChangeScannerService();
@@ -47,7 +47,7 @@ public class ResourceChangeScannerBeanFactory
     }
 
     public void afterPropertiesSet() throws Exception {
-    	ResourceFactory.getResourceChangeScannerService().setInterval( this.interval );
+        ResourceFactory.getResourceChangeScannerService().setInterval( this.interval );
     }
 
     public void setId(String id) {
@@ -58,14 +58,12 @@ public class ResourceChangeScannerBeanFactory
         return id;
     }
 
-	public int getInterval() {
-		return interval;
-	}
+    public int getInterval() {
+        return interval;
+    }
 
-	public void setInterval(int interval) {
-		this.interval = interval;
-	}
-
-
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
 
 }

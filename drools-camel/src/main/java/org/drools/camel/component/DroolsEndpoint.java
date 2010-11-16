@@ -39,8 +39,6 @@ import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
-import org.apache.camel.dataformat.xstream.JsonDataFormat;
-import org.apache.camel.dataformat.xstream.XStreamDataFormat;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.spi.DataFormat;
 import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
@@ -51,13 +49,12 @@ import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.help.BatchExecutionHelper;
 
 public class DroolsEndpoint extends DefaultEndpoint {
 
     public String          ksessionId;
     public CommandExecutor executor;
-    public GridNode   node;
+    public GridNode        node;
 
     public String          dataFormatName;
 
@@ -119,7 +116,8 @@ public class DroolsEndpoint extends DefaultEndpoint {
             // if id is empty this endpoint is not attached to a CommandExecutor and will have to look it up at runtime.
             if ( !StringUtils.isEmpty( ksessionId ) ) {
                 // lookup command executor
-                executor = node.get( ksessionId, CommandExecutor.class );
+                executor = node.get( ksessionId,
+                                     CommandExecutor.class );
                 if ( executor == null ) {
                     throw new RuntimeCamelException( "Failed to instantiate DroolsEndpoint. " + "Lookup of CommandExecutor with uri=\"" + uri + "\" failed. Check configuration." );
                 }
@@ -134,25 +132,25 @@ public class DroolsEndpoint extends DefaultEndpoint {
             // TODO: test this scenario...
         }
 
-//        if ( !StringUtils.isEmpty( getDataFormat() ) ) {
-//            String dataFormatName = getDataFormat();
-//            if ( "drools-xstream".equals( dataFormatName ) ) {
-//                XStreamDataFormat xstreaDataFormat = new XStreamDataFormat();
-//                xstreaDataFormat.setXStream( BatchExecutionHelper.newXStreamMarshaller() );
-//                this.dataFormat = xstreaDataFormat;
-//            } else if ( "drools-json".equals( dataFormatName ) ) {
-//                JsonDataFormat xstreaDataFormat = new JsonDataFormat();
-//                xstreaDataFormat.setXStream( BatchExecutionHelper.newJSonMarshaller() );
-//                this.dataFormat = xstreaDataFormat;
-//            } else if ( "jaxb".equals( dataFormatName ) ) {
-//                // to specify jaxb must be 
-//                //JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
-//                //jaxbDataFormat.setContextPath( contextPath )
-//            } else {
-//                this.dataFormat = getCamelContext().getRegistry().lookup( getDataFormat(),
-//                                                                          DataFormat.class );
-//            }
-//        }
+        //        if ( !StringUtils.isEmpty( getDataFormat() ) ) {
+        //            String dataFormatName = getDataFormat();
+        //            if ( "drools-xstream".equals( dataFormatName ) ) {
+        //                XStreamDataFormat xstreaDataFormat = new XStreamDataFormat();
+        //                xstreaDataFormat.setXStream( BatchExecutionHelper.newXStreamMarshaller() );
+        //                this.dataFormat = xstreaDataFormat;
+        //            } else if ( "drools-json".equals( dataFormatName ) ) {
+        //                JsonDataFormat xstreaDataFormat = new JsonDataFormat();
+        //                xstreaDataFormat.setXStream( BatchExecutionHelper.newJSonMarshaller() );
+        //                this.dataFormat = xstreaDataFormat;
+        //            } else if ( "jaxb".equals( dataFormatName ) ) {
+        //                // to specify jaxb must be 
+        //                //JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
+        //                //jaxbDataFormat.setContextPath( contextPath )
+        //            } else {
+        //                this.dataFormat = getCamelContext().getRegistry().lookup( getDataFormat(),
+        //                                                                          DataFormat.class );
+        //            }
+        //        }
 
     }
 
@@ -195,7 +193,8 @@ public class DroolsEndpoint extends DefaultEndpoint {
             throw new RuntimeException( "ExecutionNode for CommandExecutor lookup cannot be null" );
         }
 
-        return node.get( name, CommandExecutor.class );
+        return node.get( name,
+                         CommandExecutor.class );
     }
 
     public ClassLoader getClassLoader(CommandExecutor exec) {

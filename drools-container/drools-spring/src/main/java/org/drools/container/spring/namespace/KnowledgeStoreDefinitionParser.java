@@ -27,7 +27,7 @@ public class KnowledgeStoreDefinitionParser extends AbstractBeanDefinitionParser
 
     @Override
     protected AbstractBeanDefinition parseInternal(Element element,
-                                                   ParserContext parserContext) {        
+                                                   ParserContext parserContext) {
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( KnowledgeStoreBeanFactory.class );
 
         return factory.getBeanDefinition();

@@ -23,8 +23,8 @@ public class ObjectFactory {
     public Person createPerson() {
         return new Person();
     }
-    
+
     public WrappedList createWrappedList() {
         return new WrappedList();
     }
-}  
+}

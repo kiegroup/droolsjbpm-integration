@@ -41,25 +41,26 @@ public class GridNodeDefinitionParser extends AbstractBeanDefinitionParser {
 
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( GridNodeBeanFactory.class );
 
-        String id = element.getAttribute( "id" );        
+        String id = element.getAttribute( "id" );
         factory.addPropertyValue( "id",
-                                  id );          
-        
+                                  id );
+
         String connectionRef = element.getAttribute( GRID_ATTRIBUTE );
         if ( StringUtils.hasText( connectionRef ) ) {
             factory.addPropertyReference( GRID_ATTRIBUTE,
                                           connectionRef );
         }
-        
-        for (int i = 0, length = element.getChildNodes().getLength(); i < length; i++) {
+
+        for ( int i = 0, length = element.getChildNodes().getLength(); i < length; i++ ) {
             Node n = element.getChildNodes().item( i );
             if ( n instanceof Element ) {
-                Element e = ( Element ) n;
-                
+                Element e = (Element) n;
+
                 if ( "socket-service".equals( e.getLocalName() ) ) {
                     String port = e.getAttribute( PORT_ATTRIBUTE );
                     if ( StringUtils.hasText( port ) ) {
-                        factory.addPropertyValue( "port", port );
+                        factory.addPropertyValue( "port",
+                                                  port );
                     }
                 }
             }

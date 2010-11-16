@@ -31,37 +31,40 @@
 
 package org.drools.camel.component;
 
-import java.net.URI;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultComponent;
-
 
 public class DroolsComponent extends DefaultComponent {
     // Property name *must* follow the Camel conventions (see org.apache.camel.Exchange)
-    public static final String DROOLS_LOOKUP = "DroolsLookup"; 
+    public static final String DROOLS_LOOKUP = "DroolsLookup";
 
     public DroolsComponent() {
     }
 
     public DroolsComponent(CamelContext context) {
-        super(context);
+        super( context );
     }
 
     @Override
-    protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
+    protected Endpoint createEndpoint(String uri,
+                                      String remaining,
+                                      Map<String, Object> parameters) throws Exception {
         Endpoint endpoint;
-        endpoint = new DroolsEndpoint(uri, remaining, this);
-        setProperties(endpoint, parameters);
+        endpoint = new DroolsEndpoint( uri,
+                                       remaining,
+                                       this );
+        setProperties( endpoint,
+                       parameters );
         return endpoint;
-    }    
+    }
 
     @Override
-    protected void validateParameters(String uri, Map<String, Object> parameters, String optionPrefix) {
+    protected void validateParameters(String uri,
+                                      Map<String, Object> parameters,
+                                      String optionPrefix) {
 
     }
 }

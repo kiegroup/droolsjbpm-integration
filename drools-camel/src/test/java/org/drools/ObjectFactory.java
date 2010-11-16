@@ -23,16 +23,16 @@ public class ObjectFactory {
     public ChangeCollector createChangeCollector() {
         return new ChangeCollector();
     }
-    
+
     public Cheese createCheese() {
         return new Cheese();
     }
-    
+
     public Person createPerson() {
         return new Person();
-    }  
-    
+    }
+
     public TestVariable createTestVariable() {
         return new TestVariable();
-    }       
-}  
+    }
+}

@@ -35,7 +35,7 @@ public class DroolsSpringTransactionManager
     implements
     TransactionManager {
 
-    Logger                               logger                                            = LoggerFactory.getLogger( getClass() );
+    Logger                                     logger             = LoggerFactory.getLogger( getClass() );
     private AbstractPlatformTransactionManager ptm;
 
     TransactionDefinition                      td                 = new DefaultTransactionDefinition();
@@ -68,11 +68,11 @@ public class DroolsSpringTransactionManager
     }
 
     public void rollback() {
-	if ( this.localTransaction ) {
-        	this.localTransaction = false;
-        	this.ptm.rollback( currentTransaction );
-		currentTransaction = null;
-	}
+        if ( this.localTransaction ) {
+            this.localTransaction = false;
+            this.ptm.rollback( currentTransaction );
+            currentTransaction = null;
+        }
     }
 
     /**
@@ -84,7 +84,7 @@ public class DroolsSpringTransactionManager
             return TransactionManager.STATUS_NO_TRANSACTION;
         }
 
-        logger.debug("Current TX name (According to TransactionSynchronizationManager) : "+TransactionSynchronizationManager.getCurrentTransactionName());
+        logger.debug( "Current TX name (According to TransactionSynchronizationManager) : " + TransactionSynchronizationManager.getCurrentTransactionName() );
         if ( TransactionSynchronizationManager.isActualTransactionActive() ) {
             TransactionStatus transaction = null;
             try {
@@ -96,7 +96,7 @@ public class DroolsSpringTransactionManager
                 } else {
                     transaction = currentTransaction;
                 }
-                logger.debug("Current TX: "+transaction);
+                logger.debug( "Current TX: " + transaction );
                 // If SynchronizationManager thinks it has an active transaction but
                 // our transaction is a new one
                 // then we must be in the middle of committing

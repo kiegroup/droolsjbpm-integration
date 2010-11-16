@@ -42,26 +42,25 @@ import org.drools.runtime.help.impl.XStreamXML.SignalEventConverter;
 import org.drools.runtime.help.impl.XStreamXML.StartProcessConvert;
 
 public class XStreamXml {
-    
+
     public static XStreamDataFormat newXStreamMarshaller(XStreamDataFormat xstreamDataFormat) {
         XStreamHelper.setAliases( xstreamDataFormat );
-        
+
         //xstream.processAnnotations( BatchExecutionCommand.class );
-        
+
         Map<String, String[]> map = xstreamDataFormat.getImplicitCollections();
         if ( map == null ) {
             map = new HashMap<String, String[]>();
         }
-        map.put( BatchExecutionCommandImpl.class.getName(), 
-                 new String[] { "commands"  } );
+        map.put( BatchExecutionCommandImpl.class.getName(),
+                 new String[]{"commands"} );
         xstreamDataFormat.setImplicitCollections( map );
-        
-                
+
         List<String> converters = xstreamDataFormat.getConverters();
         if ( converters == null ) {
             converters = new ArrayList<String>();
         }
-        
+
         converters.add( InsertConverter.class.getName() );
         converters.add( RetractConverter.class.getName() );
         converters.add( ModifyConverter.class.getName() );
@@ -69,7 +68,7 @@ public class XStreamXml {
         converters.add( InsertElementsConverter.class.getName() );
         converters.add( FireAllRulesConverter.class.getName() );
         converters.add( StartProcessConvert.class.getName() );
-        converters.add( SignalEventConverter.class.getName() );        
+        converters.add( SignalEventConverter.class.getName() );
         converters.add( CompleteWorkItemConverter.class.getName() );
         converters.add( AbortWorkItemConverter.class.getName() );
         converters.add( QueryConverter.class.getName() );
@@ -80,9 +79,8 @@ public class XStreamXml {
         converters.add( QueryResultsConverter.class.getName() );
         converters.add( FactHandleConverter.class.getName() );
         xstreamDataFormat.setConverters( converters );
-        
+
         return xstreamDataFormat;
     }
-     
-}
 
+}

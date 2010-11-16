@@ -21,12 +21,12 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CxfRestTest extends CamelSpringTestSupport {
-    
+
     @Override
-    protected AbstractXmlApplicationContext createApplicationContext() {        
-        return new ClassPathXmlApplicationContext("org/drools/camel/component/CxfRsSpring.xml");
-    }    
-    
+    protected AbstractXmlApplicationContext createApplicationContext() {
+        return new ClassPathXmlApplicationContext( "org/drools/camel/component/CxfRsSpring.xml" );
+    }
+
     public void test1() throws Exception {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
@@ -37,10 +37,10 @@ public class CxfRestTest extends CamelSpringTestSupport {
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
-        
-        
-        Object object = this.context.createProducerTemplate().requestBody("direct://http", cmd);
-        System.out.println( object ); 
+
+        Object object = this.context.createProducerTemplate().requestBody( "direct://http",
+                                                                           cmd );
+        System.out.println( object );
     }
-    
+
 }

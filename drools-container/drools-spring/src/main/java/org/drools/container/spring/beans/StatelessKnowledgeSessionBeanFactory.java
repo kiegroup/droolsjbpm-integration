@@ -26,14 +26,14 @@ import org.drools.runtime.process.WorkItemHandler;
 
 public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {
     private StatelessKnowledgeSession ksession;
-    private KnowledgeAgent kagent;
-    
+    private KnowledgeAgent            kagent;
+
     public void setKnowledgeAgent(KnowledgeAgent kagent) {
-    	this.kagent = kagent;
+        this.kagent = kagent;
     }
-    
+
     public KnowledgeAgent getKnowledgeAgent() {
-    	return this.kagent;
+        return this.kagent;
     }
 
     public Class<StatelessKnowledgeSession> getObjectType() {
@@ -51,15 +51,16 @@ public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessi
             Map<String, WorkItemHandler> map = ((SessionConfiguration) getConf()).getWorkItemHandlers();
             map.putAll( getWorkItems() );
         }
-        
-    	if ( this.kagent != null ) {
-    		ksession = this.kagent.newStatelessKnowledgeSession( getConf() );
-    	} else {
-    		ksession = getKbase().newStatelessKnowledgeSession( getConf() );
-    	}
-    	
+
+        if ( this.kagent != null ) {
+            ksession = this.kagent.newStatelessKnowledgeSession( getConf() );
+        } else {
+            ksession = getKbase().newStatelessKnowledgeSession( getConf() );
+        }
+
         if ( getNode() != null ) {
-            getNode().set( getName(), this.ksession );
-        }    	
+            getNode().set( getName(),
+                           this.ksession );
+        }
     }
 }

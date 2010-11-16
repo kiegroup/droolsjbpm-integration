@@ -61,136 +61,149 @@ import com.sun.tools.xjc.Options;
  */
 public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSupport {
 
-	private String handle;
-	private JAXBContext jaxbContext;
+    private String      handle;
+    private JAXBContext jaxbContext;
 
-	public void testWorkingSetGlobalTestSessionSetAndGetGlobal() throws Exception {
+    public void testWorkingSetGlobalTestSessionSetAndGetGlobal() throws Exception {
 
-		BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
-		cmd.setLookup("ksession1");
-		
-		SetGlobalCommand setGlobal = new SetGlobalCommand("list", new WrappedList());
-		setGlobal.setOut(true);
-		
-		cmd.getCommands().add(setGlobal);
-		cmd.getCommands().add(new InsertObjectCommand(new Person("baunax")));
-		cmd.getCommands().add(new FireAllRulesCommand());
-		cmd.getCommands().add(new GetGlobalCommand("list"));
-		
-		Marshaller marshaller = getJaxbContext().createMarshaller();
-		marshaller.setProperty("jaxb.formatted.output", true);
-		StringWriter xml = new StringWriter();
-		marshaller.marshal(cmd, xml);
+        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
+        cmd.setLookup( "ksession1" );
 
-		System.out.println(xml.toString());
-		
-		byte[] response = (byte[]) template.requestBody("direct:test-with-session", xml.toString());
-		assertNotNull(response);
-		System.out.println("response:\n" + new String(response));
-		Unmarshaller unmarshaller = getJaxbContext().createUnmarshaller();
-		ExecutionResults res = (ExecutionResults) unmarshaller.unmarshal(new ByteArrayInputStream(response));
-		WrappedList resp = (WrappedList) res.getValue("list");
-		assertNotNull(resp);
-		
-		assertEquals(resp.size(), 2);
-		assertEquals("baunax", resp.get(0).getName());
-		assertEquals("Hadrian", resp.get(1).getName());
+        SetGlobalCommand setGlobal = new SetGlobalCommand( "list",
+                                                           new WrappedList() );
+        setGlobal.setOut( true );
 
-	}
-	
-	@Override
-	protected void configureDroolsContext(Context jndiContext) {
-		Person me = new Person();
-		me.setName("Hadrian");
+        cmd.getCommands().add( setGlobal );
+        cmd.getCommands().add( new InsertObjectCommand( new Person( "baunax" ) ) );
+        cmd.getCommands().add( new FireAllRulesCommand() );
+        cmd.getCommands().add( new GetGlobalCommand( "list" ) );
 
-		String rule = "";
-		rule += "package org.drools.pipeline.camel \n";
-		rule += "import org.drools.pipeline.camel.Person\n";
-		rule += "import org.drools.pipeline.camel.WrappedList\n";
-		rule += "global WrappedList list\n";
-		rule += "rule rule1 \n";
-		rule += "  when \n";
-		rule += "    $p : Person() \n";
-		rule += " \n";
-		rule += "  then \n";
-		rule += "    System.out.println(\"executed\"); \n";
-		rule += "    list.add($p); \n";
-		rule += "end\n";
+        Marshaller marshaller = getJaxbContext().createMarshaller();
+        marshaller.setProperty( "jaxb.formatted.output",
+                                true );
+        StringWriter xml = new StringWriter();
+        marshaller.marshal( cmd,
+                            xml );
 
-		StatefulKnowledgeSession ksession = registerKnowledgeRuntime("ksession1", rule);
-		InsertObjectCommand cmd = new InsertObjectCommand(me);
-		cmd.setOutIdentifier("camel-rider");
-		cmd.setReturnObject(false);
-        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand<?>[]{cmd} ));
-        
+        System.out.println( xml.toString() );
+
+        byte[] response = (byte[]) template.requestBody( "direct:test-with-session",
+                                                         xml.toString() );
+        assertNotNull( response );
+        System.out.println( "response:\n" + new String( response ) );
+        Unmarshaller unmarshaller = getJaxbContext().createUnmarshaller();
+        ExecutionResults res = (ExecutionResults) unmarshaller.unmarshal( new ByteArrayInputStream( response ) );
+        WrappedList resp = (WrappedList) res.getValue( "list" );
+        assertNotNull( resp );
+
+        assertEquals( resp.size(),
+                      2 );
+        assertEquals( "baunax",
+                      resp.get( 0 ).getName() );
+        assertEquals( "Hadrian",
+                      resp.get( 1 ).getName() );
+
+    }
+
+    @Override
+    protected void configureDroolsContext(Context jndiContext) {
+        Person me = new Person();
+        me.setName( "Hadrian" );
+
+        String rule = "";
+        rule += "package org.drools.pipeline.camel \n";
+        rule += "import org.drools.pipeline.camel.Person\n";
+        rule += "import org.drools.pipeline.camel.WrappedList\n";
+        rule += "global WrappedList list\n";
+        rule += "rule rule1 \n";
+        rule += "  when \n";
+        rule += "    $p : Person() \n";
+        rule += " \n";
+        rule += "  then \n";
+        rule += "    System.out.println(\"executed\"); \n";
+        rule += "    list.add($p); \n";
+        rule += "end\n";
+
+        StatefulKnowledgeSession ksession = registerKnowledgeRuntime( "ksession1",
+                                                                      rule );
+        InsertObjectCommand cmd = new InsertObjectCommand( me );
+        cmd.setOutIdentifier( "camel-rider" );
+        cmd.setReturnObject( false );
+        BatchExecutionCommandImpl script = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{cmd} ) );
+
         ExecutionResults results = ksession.execute( script );
-		handle = ((FactHandle)results.getFactHandle("camel-rider")).toExternalForm();
-	}
+        handle = ((FactHandle) results.getFactHandle( "camel-rider" )).toExternalForm();
+    }
 
-	@Override
-	protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier, String rule) {
-		KnowledgeBuilder kbuilder = node.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
+    @Override
+    protected StatefulKnowledgeSession registerKnowledgeRuntime(String identifier,
+                                                                String rule) {
+        KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
-		Options xjcOpts = new Options();
-		xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
+        Options xjcOpts = new Options();
+        xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
 
-		try {
-			KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource("person.xsd", getClass()),
-					kbuilder,
-					xjcOpts,
-			"xsd" );
-		} catch (IOException e) {
-			LOG.error("Errors while adding xsd model. ", kbuilder.getErrors());
-		}
+        try {
+            KnowledgeBuilderHelper.addXsdModel( ResourceFactory.newClassPathResource( "person.xsd",
+                                                                                      getClass() ),
+                                                kbuilder,
+                                                xjcOpts,
+                                                "xsd" );
+        } catch ( IOException e ) {
+            LOG.error( "Errors while adding xsd model. ",
+                       kbuilder.getErrors() );
+        }
 
-		assertFalse( kbuilder.hasErrors() );
+        assertFalse( kbuilder.hasErrors() );
 
-		if (rule != null && rule.length() > 0) {
-			kbuilder.add(ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
+        if ( rule != null && rule.length() > 0 ) {
+            kbuilder.add( ResourceFactory.newByteArrayResource( rule.getBytes() ),
+                          ResourceType.DRL );
 
-			if (kbuilder.hasErrors()) {
-				LOG.info("Errors while adding rule. ", kbuilder.getErrors());
-			}
-		}	
+            if ( kbuilder.hasErrors() ) {
+                LOG.info( "Errors while adding rule. ",
+                          kbuilder.getErrors() );
+            }
+        }
 
-		assertFalse(kbuilder.hasErrors());
+        assertFalse( kbuilder.hasErrors() );
 
-		KnowledgeBase kbase = node.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        KnowledgeBase kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
-		StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-		node.set(identifier, session);
-		return session;
-	}
-	
+        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+        node.set( identifier,
+                  session );
+        return session;
+    }
+
     public JAXBContext getJaxbContext() {
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
             def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
-    
+
             // create a jaxbContext for the test to use outside of Camel.
-            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1", CommandExecutor.class );
+            StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
+                                                                                      CommandExecutor.class );
             KnowledgeBase kbase = ksession1.getKnowledgeBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
                 def = DroolsPolicy.augmentJaxbDataFormatDefinition( def );
-                
-                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = ( org.apache.camel.converter.jaxb.JaxbDataFormat ) def.getDataFormat(  this.context.getRoutes().get( 0 ).getRouteContext() );
-                
-                
+
+                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
+
                 jaxbContext = jaxbDataformat.getContext();
             } catch ( JAXBException e ) {
                 throw new RuntimeException( e );
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
-            }   
+            }
         }
-        
+
         return jaxbContext;
-    }   
-    	
+    }
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -199,9 +212,9 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint( true );
                 def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
-                
-                from("direct:test-with-session").policy( new DroolsPolicy() ).
-                    unmarshal(def).to("drools:node/ksession1").marshal(def);
+
+                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).
+                        unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
             }
         };
     }

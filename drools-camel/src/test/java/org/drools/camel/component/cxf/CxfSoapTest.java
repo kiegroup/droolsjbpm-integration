@@ -16,7 +16,6 @@
 
 package org.drools.camel.component.cxf;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
@@ -31,40 +30,43 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CxfSoapTest extends CamelSpringTestSupport {
 
-	@Override
-	protected AbstractXmlApplicationContext createApplicationContext() {        
-		return new ClassPathXmlApplicationContext("org/drools/camel/component/CxfSoapSpring.xml");
-	}
+    @Override
+    protected AbstractXmlApplicationContext createApplicationContext() {
+        return new ClassPathXmlApplicationContext( "org/drools/camel/component/CxfSoapSpring.xml" );
+    }
 
-	public void test1() throws Exception {
+    public void test1() throws Exception {
 
-		SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
-		SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
-		QName payloadName = new QName("http://soap.jax.drools.org", "execute", "ns1");
+        SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
+        SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
+        QName payloadName = new QName( "http://soap.jax.drools.org",
+                                       "execute",
+                                       "ns1" );
 
-		body.addBodyElement(payloadName);
+        body.addBodyElement( payloadName );
 
-		String cmd = "";
-		cmd += "<batch-execution lookup=\"ksession1\">\n";
-		cmd += "  <insert out-identifier=\"salaboy\" disconnected=\"true\">\n";
-		cmd += "      <org.drools.pipeline.camel.Person>\n";
-		cmd += "         <name>salaboy</name>\n";
-		cmd += "         <age>27</age>\n";
-		cmd += "      </org.drools.pipeline.camel.Person>\n";
-		cmd += "   </insert>\n";
-		cmd += "   <fire-all-rules/>\n";
-		cmd += "</batch-execution>\n";
+        String cmd = "";
+        cmd += "<batch-execution lookup=\"ksession1\">\n";
+        cmd += "  <insert out-identifier=\"salaboy\" disconnected=\"true\">\n";
+        cmd += "      <org.drools.pipeline.camel.Person>\n";
+        cmd += "         <name>salaboy</name>\n";
+        cmd += "         <age>27</age>\n";
+        cmd += "      </org.drools.pipeline.camel.Person>\n";
+        cmd += "   </insert>\n";
+        cmd += "   <fire-all-rules/>\n";
+        cmd += "</batch-execution>\n";
 
-		body.addTextNode(cmd);
+        body.addTextNode( cmd );
 
-		Object object = this.context.createProducerTemplate().requestBody("direct://http", soapMessage);
+        Object object = this.context.createProducerTemplate().requestBody( "direct://http",
+                                                                           soapMessage );
 
-		OutputStream out = new ByteArrayOutputStream();
-		out = new ByteArrayOutputStream();
-		soapMessage = (SOAPMessage) object;
-		soapMessage.writeTo(out);
-		String response = out.toString();
-		assertTrue(response.contains("fact-handle identifier=\"salaboy\""));
-	}
+        OutputStream out = new ByteArrayOutputStream();
+        out = new ByteArrayOutputStream();
+        soapMessage = (SOAPMessage) object;
+        soapMessage.writeTo( out );
+        String response = out.toString();
+        assertTrue( response.contains( "fact-handle identifier=\"salaboy\"" ) );
+    }
 
 }

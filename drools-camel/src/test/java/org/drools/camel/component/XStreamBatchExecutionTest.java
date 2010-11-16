@@ -30,7 +30,6 @@ import java.util.Set;
 
 import javax.naming.Context;
 
-
 import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
 import org.custommonkey.xmlunit.Diff;
@@ -50,6 +49,9 @@ import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -70,47 +72,44 @@ import org.drools.runtime.rule.QueryResultsRow;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
-import org.drools.grid.GridConnection;
-import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 
 public class XStreamBatchExecutionTest extends ContextTestSupport {
-    protected GridNode node;
+    protected GridNode        node;
     protected CommandExecutor exec;
-    
-    
+
     protected Context createJndiContext() throws Exception {
         Context context = super.createJndiContext();
 
         GridImpl grid = new GridImpl( new HashMap() );
-        grid.addService( WhitePages.class, new WhitePagesImpl() );
+        grid.addService( WhitePages.class,
+                         new WhitePagesImpl() );
         node = grid.createGridNode( "local" );
         context.bind( "node",
-                      node );        
-        node.set("ksession1", this.exec);
+                      node );
+        node.set( "ksession1",
+                  this.exec );
         return context;
-    }    
-    
+    }
+
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() throws Exception {
-                from("direct:exec").policy( new DroolsPolicy() ).unmarshal( "xstream" ).to("drools://node/ksession1").marshal( "xstream" );
-                from("direct:execWithLookup").policy( new DroolsPolicy() ).unmarshal( "xstream" ).to("drools://node").marshal( "xstream" );
-                from("direct:unmarshal").policy( new DroolsPolicy() ).unmarshal( "xstream" );
-                from("direct:marshal").policy( new DroolsPolicy() ).marshal( "xstream" );                
+                from( "direct:exec" ).policy( new DroolsPolicy() ).unmarshal( "xstream" ).to( "drools://node/ksession1" ).marshal( "xstream" );
+                from( "direct:execWithLookup" ).policy( new DroolsPolicy() ).unmarshal( "xstream" ).to( "drools://node" ).marshal( "xstream" );
+                from( "direct:unmarshal" ).policy( new DroolsPolicy() ).unmarshal( "xstream" );
+                from( "direct:marshal" ).policy( new DroolsPolicy() ).marshal( "xstream" );
             }
         };
-    }    
-    
+    }
+
     public void setExec(CommandExecutor exec) {
         this.exec = exec;
         try {
             super.setUp();
         } catch ( Exception e ) {
-            throw new RuntimeException(e);
-        }        
+            throw new RuntimeException( e );
+        }
     }
 
     @Override
@@ -202,8 +201,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
 
         inXml = "";
         inXml += "<batch-execution>";
@@ -218,7 +221,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-        outXml = template.requestBody("direct:exec", inXml, String.class);
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
 
         assertTrue( outXml.indexOf( "<changes>" ) > -1 );
 
@@ -235,12 +240,13 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-        outXml = template.requestBody("direct:exec", inXml, String.class);
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
 
         assertTrue( outXml.indexOf( "<retracted>" ) > -1 );
 
     }
-      
 
     public void testInsertWithDefaults() throws Exception {
         String str = "";
@@ -269,9 +275,13 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class); 
-            
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
+
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -324,8 +334,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
 
         assertNull( result.getValue( "outStilton" ) );
 
@@ -370,9 +384,13 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
-        
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
+
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -382,8 +400,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "<batch-execution>";
         inXml += "  <get-object out-identifier='outStilton' fact-handle='" + factHandle.toExternalForm() + "' />";
         inXml += "</batch-execution>";
-        outXml = template.requestBody("direct:exec", inXml, String.class);
-        result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
+        result = template.requestBody( "direct:unmarshal",
+                                       outXml,
+                                       ExecutionResults.class );
         stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -416,9 +438,13 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
-        
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
+
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -428,15 +454,21 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "<batch-execution>";
         inXml += "  <retract fact-handle='" + factHandle.toExternalForm() + "' />";
         inXml += "</batch-execution>";
-        template.requestBody("direct:exec", inXml, String.class);
+        template.requestBody( "direct:exec",
+                              inXml,
+                              String.class );
 
         inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <get-object out-identifier='outStilton' fact-handle='" + factHandle.toExternalForm() + "' />";
         inXml += "</batch-execution>";
-        
-        outXml = template.requestBody("direct:exec", inXml, String.class);
-        result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
+        result = template.requestBody( "direct:unmarshal",
+                                       outXml,
+                                       ExecutionResults.class );
         assertNull( result.getValue( "outStilton" ) );
     }
 
@@ -467,8 +499,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );
@@ -495,8 +531,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <modify fact-handle='" + factHandle.toExternalForm() + "'> <set accessor='oldPrice' value='\"42\"' /><set accessor='price' value='50' /></modify>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
-        template.requestBody("direct:exec", inXml, String.class);
-
+        template.requestBody( "direct:exec",
+                              inXml,
+                              String.class );
 
         inXml = "";
         inXml += "<batch-execution>";
@@ -504,8 +541,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "</batch-execution>";
         setExec( ksession );
 
-        outXml = template.requestBody("direct:exec", inXml, String.class);
-        result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
+        result = template.requestBody( "direct:unmarshal",
+                                       outXml,
+                                       ExecutionResults.class );
 
         Cheese cheddar = (Cheese) result.getValue( "outCheddar" );
         assertEquals( 42,
@@ -520,10 +561,14 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <modify fact-handle='" + factHandle.toExternalForm() + "'> <set accessor='type' value='44\"; System.exit(1);' /><set accessor='price' value='50' /></modify>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
-        
-        outXml = template.requestBody("direct:exec", inXml, String.class);
-        result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
-        
+
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
+        result = template.requestBody( "direct:unmarshal",
+                                       outXml,
+                                       ExecutionResults.class );
+
         result = (ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml );
         ModifyCommand.ALLOW_MODIFY_EXPRESSIONS = true;
 
@@ -565,7 +610,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatelessKnowledgeSession ksession = getStatelessKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
@@ -588,7 +635,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         assertXMLEqual( expectedXml,
                         outXml );
 
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
 
         List list = (List) result.getValue( "list" );
         Cheese stilton25 = new Cheese( "stilton",
@@ -633,7 +682,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         System.err.println( outXml );
         String expectedXml = "";
@@ -681,7 +732,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         Collection< ? extends FactHandle> factHandles = ksession.getFactHandles();
 
@@ -784,7 +837,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatelessKnowledgeSession ksession = getStatelessKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
@@ -857,7 +912,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatelessKnowledgeSession ksession = getStatelessKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);        
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
@@ -908,7 +965,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatelessKnowledgeSession ksession = getStatelessKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         String expectedXml = "";
         expectedXml += "<execution-results>";
@@ -999,7 +1058,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         Iterator<QueryResultsRow> it1 = ksession.getQueryResults( "cheeses" ).iterator();
         Iterator<QueryResultsRow> it2 = ksession.getQueryResults( "cheesesWithParams",
@@ -1155,7 +1216,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatelessKnowledgeSession ksession = getStatelessKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         FactHandle factHandle = (FactHandle) ((ExecutionResults) BatchExecutionHelper.newXStreamMarshaller().fromXML( outXml )).getFactHandle( "outBrie" );
 
@@ -1281,7 +1344,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <get-global identifier='list' out-identifier='out-list'/>";
         inXml += "</batch-execution>";
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         assertEquals( 1,
                       list.size() );
@@ -1357,7 +1422,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
@@ -1421,7 +1488,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
@@ -1537,7 +1606,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml = "<complete-work-item id='" + workItem.getId() + "' />";
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         assertEquals( WorkItem.COMPLETED,
                       workItem.getState() );
@@ -1579,7 +1650,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "    </result>";
         inXml += "</complete-work-item>";
 
-        outXml = template.requestBody("direct:exec", inXml, String.class);
+        outXml = template.requestBody( "direct:exec",
+                                       inXml,
+                                       String.class );
 
         assertEquals( WorkItem.COMPLETED,
                       workItem.getState() );
@@ -1693,7 +1766,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "<abort-work-item id='" + workItem.getId() + "' />";
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         assertEquals( WorkItem.ABORTED,
                       workItem.getState() );
@@ -1745,7 +1820,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
 
         ClassLoader cl = ((InternalRuleBase) ((StatefulKnowledgeSessionImpl) ksession).getRuleBase()).getRootClassLoader();
         XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
@@ -1798,10 +1875,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:exec", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        String outXml = template.requestBody( "direct:exec",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
 
-        outXml = template.requestBody("direct:exec", "<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>", String.class);
+        outXml = template.requestBody( "direct:exec",
+                                       "<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>",
+                                       String.class );
 
         //we have not fired the rules yet
         assertFalse( outXml.indexOf( "<price>30</price>" ) > -1 );
@@ -1811,11 +1894,15 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "<batch-execution>";
         inXml += "  <fire-all-rules max='100'/>";
         inXml += "</batch-execution>";
-        template.requestBody("direct:exec", inXml, String.class);
+        template.requestBody( "direct:exec",
+                              inXml,
+                              String.class );
         //ksession.fireAllRules();
 
         //ok lets try that again...
-        outXml = template.requestBody("direct:exec", "<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>", String.class);
+        outXml = template.requestBody( "direct:exec",
+                                       "<batch-execution><query out-identifier='matchingthings' name='results'/></batch-execution>",
+                                       String.class );
         assertTrue( outXml.indexOf( "<price>30</price>" ) > -1 );
     }
 
@@ -1843,12 +1930,15 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
 
-
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
 
-        String outXml = template.requestBody("direct:execWithLookup", inXml, String.class);
-        ExecutionResults result = template.requestBody("direct:unmarshal", outXml, ExecutionResults.class);
+        String outXml = template.requestBody( "direct:execWithLookup",
+                                              inXml,
+                                              String.class );
+        ExecutionResults result = template.requestBody( "direct:unmarshal",
+                                                        outXml,
+                                                        ExecutionResults.class );
         Cheese stilton = (Cheese) result.getValue( "outStilton" );
         assertEquals( 30,
                       stilton.getPrice() );

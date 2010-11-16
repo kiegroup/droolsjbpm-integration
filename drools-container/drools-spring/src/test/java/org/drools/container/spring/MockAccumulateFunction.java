@@ -23,12 +23,14 @@ import java.io.Serializable;
 
 import org.drools.base.accumulators.AccumulateFunction;
 
-public class MockAccumulateFunction implements AccumulateFunction {
+public class MockAccumulateFunction
+    implements
+    AccumulateFunction {
 
     public void accumulate(Serializable context,
                            Object value) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public Serializable createContext() {
@@ -43,13 +45,13 @@ public class MockAccumulateFunction implements AccumulateFunction {
 
     public void init(Serializable context) throws Exception {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void reverse(Serializable context,
                         Object value) throws Exception {
         // TODO Auto-generated method stub
-        
+
     }
 
     public boolean supportsReverse() {
@@ -60,12 +62,12 @@ public class MockAccumulateFunction implements AccumulateFunction {
     public void readExternal(ObjectInput in) throws IOException,
                                             ClassNotFoundException {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

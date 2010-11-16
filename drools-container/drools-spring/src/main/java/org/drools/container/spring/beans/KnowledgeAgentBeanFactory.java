@@ -71,23 +71,23 @@ public class KnowledgeAgentBeanFactory
         this.kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.id,
                                                                this.kbase,
                                                                kagentConf );
-        
+
         if ( resources != null && !resources.isEmpty() ) {
             Collection<Resource> rs = new ArrayList<Resource>();
             for ( DroolsResourceAdapter res : resources ) {
                 InternalResource resource = (InternalResource) res.getDroolsResource();
-    
+
                 resource.setResourceType( res.getResourceType() );
-    
+
                 if ( res.getResourceConfiguration() != null ) {
                     resource.setConfiguration( res.getResourceConfiguration() );
                 }
-    
+
                 rs.add( resource );
             }
             ChangeSetImpl changeSet = new ChangeSetImpl();
             changeSet.setResourcesAdded( rs );
-    
+
             kagent.applyChangeSet( changeSet );
         }
     }
