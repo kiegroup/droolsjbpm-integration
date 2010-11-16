@@ -22,10 +22,10 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.persistence.session.JpaManager;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
-import org.springframework.orm.jpa.EntityManagerHolder;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.orm.jpa.EntityManagerHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  *

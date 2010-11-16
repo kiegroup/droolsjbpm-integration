@@ -24,8 +24,6 @@ import java.util.Map;
 import org.drools.SystemEventListenerFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
 import org.drools.grid.Grid;
-import org.drools.grid.GridConnection;
-import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
@@ -35,12 +33,9 @@ import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
-import org.mvel2.optimizers.impl.refl.nodes.ArrayLength;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.StringUtils;
 
 /**
  * 

@@ -16,10 +16,7 @@
 
 package org.drools.container.spring;
 
-import static org.junit.Assert.fail;
-
 import java.io.Serializable;
-import java.util.HashMap;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -33,15 +30,12 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
-import org.drools.container.spring.beans.persistence.JPASingleSessionCommandServiceFactoryTest;
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
-import org.drools.grid.NodeTests.MyObject;
-import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesClient;
@@ -49,13 +43,7 @@ import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsGridTest extends TestCase {

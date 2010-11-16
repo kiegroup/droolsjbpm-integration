@@ -31,7 +31,6 @@ import java.util.Properties;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.compiler.PackageBuilder;
-import org.drools.compiler.ProcessBuilder;
 import org.drools.compiler.ProcessBuilderImpl;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.persistence.jpa.KnowledgeStoreService;

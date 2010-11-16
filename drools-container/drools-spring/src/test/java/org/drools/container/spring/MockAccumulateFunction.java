@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+
 import org.drools.base.accumulators.AccumulateFunction;
 
 public class MockAccumulateFunction implements AccumulateFunction {

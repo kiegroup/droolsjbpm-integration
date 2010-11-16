@@ -17,20 +17,13 @@
 package org.drools.container.spring.namespace;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.SystemEventListenerFactory;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.container.spring.beans.GridBeanFactory;
 import org.drools.container.spring.beans.GridBeanFactory.SocketServiceConfiguration;
-import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
-import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.AcceptorFactoryService;
-import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesImpl;

@@ -19,7 +19,6 @@ package org.drools.container.spring.beans;
 import java.util.HashMap;
 
 import org.drools.grid.Grid;
-import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.SocketService;
 import org.drools.grid.impl.GridImpl;

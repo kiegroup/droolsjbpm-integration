@@ -23,8 +23,6 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.SessionConfiguration;
 import org.drools.command.Command;
-import org.drools.command.runtime.GetIdCommand;
-import org.drools.core.util.StringUtils;
 import org.drools.marshalling.ObjectMarshallingStrategy;
 import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
