@@ -93,7 +93,6 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public void dispose() {
-        System.out.println( "remoted!!!!" );
         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new DisposeCommand(),
