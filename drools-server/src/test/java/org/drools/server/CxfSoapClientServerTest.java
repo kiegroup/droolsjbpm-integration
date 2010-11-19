@@ -27,7 +27,7 @@ import org.apache.camel.CamelContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CxfSoapClientServerTest extends TestCase {
-
+    
     public void test1() throws Exception {
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext( "classpath:beans-test.xml" );
 
@@ -55,7 +55,8 @@ public class CxfSoapClientServerTest extends TestCase {
                                         (CamelContext) springContext.getBean( "camel-client-ctx" ) );
 
         assertTrue( response.contains( "execution-results" ) );
-        assertTrue( response.contains( "echo" ) );
+        assertTrue( response.contains( "echo" ) );  
+        springContext.stop();
     }
 
 }

@@ -281,7 +281,12 @@ public class DroolsPolicy
         }
 
         public void process(Exchange exchange) throws Exception {
+            //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
+            //I need to copy the body of the exachange because for some reason
+            // the getContext().getEndpoint() erase the content/or loose the reference
+            String body = exchange.getIn().getBody( String.class );
             if ( dep == null ) {
+                
                 this.dep = exchange.getContext().getEndpoint( this.droolsUri,
                                                               DroolsEndpoint.class );
             }
@@ -299,20 +304,20 @@ public class DroolsPolicy
                     String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP,
                                                                 String.class );
                     if ( StringUtils.isEmpty( lookup ) ) {
-                        lookup = dep.getLookup( exchange.getIn().getBody( String.class ) );
+                        //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
+                        lookup = dep.getLookup( body );
+                        //lookup = dep.getLookup( exchange.getIn().getBody( String.class ) );
                     }
 
                     if ( StringUtils.isEmpty( lookup ) ) {
                         throw new RuntimeException( "No Executor defined and no lookup information available for uri " + this.dep.getEndpointUri() );
                     }
-
                     exec = dep.getCommandExecutor( lookup );
                 }
 
                 if ( exec == null ) {
                     throw new RuntimeException( "CommandExecutor cannot be found for uri " + this.dep.getEndpointUri() );
                 }
-
                 ClassLoader localClassLoader = dep.getClassLoader( exec );
                 if ( localClassLoader == null ) {
                     throw new RuntimeException( "CommandExecutor Classloader cannot be null for uri " + this.dep.getEndpointUri() );
@@ -326,13 +331,17 @@ public class DroolsPolicy
 
                 exchange.setProperty( "drools-context",
                                       context );
+                //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
+                // I need to re set the Body because the exchange loose the content at
+                // the begining of the method
+                 exchange.getIn().setBody(body);
 
                 boolean soap = false;
                 if ( !augmented && exchange.getFromEndpoint() instanceof CxfSpringEndpoint ) {
                     new PreCxfTransportSoapProcessor().process( exchange );
                     soap = true;
                 }
-                processor.process( exchange );
+                    processor.process( exchange );
                 if ( soap ) {
                     new PostCxfTransportSoapProcessor().process( exchange );
                 }

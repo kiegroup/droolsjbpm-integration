@@ -72,10 +72,15 @@ import org.drools.runtime.rule.QueryResultsRow;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
+import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.impl.StatelessKnowledgeSessionImpl;
+import org.drools.reteoo.ReteooRuleBase;
 
 public class XStreamBatchExecutionTest extends ContextTestSupport {
     protected GridNode        node;
     protected CommandExecutor exec;
+    protected CommandExecutor exec2;
 
     protected Context createJndiContext() throws Exception {
         Context context = super.createJndiContext();
@@ -84,10 +89,14 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         grid.addService( WhitePages.class,
                          new WhitePagesImpl() );
         node = grid.createGridNode( "local" );
-        context.bind( "node",
-                      node );
+        
         node.set( "ksession1",
                   this.exec );
+        
+       
+        
+        context.bind( "node",
+                      node );
         return context;
     }
 
@@ -105,6 +114,14 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
     public void setExec(CommandExecutor exec) {
         this.exec = exec;
+        try {
+            super.setUp();
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
+        }
+    }
+    public void setExec2(CommandExecutor exec) {
+        this.exec2 = exec;
         try {
             super.setUp();
         } catch ( Exception e ) {
@@ -1908,62 +1925,148 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
     public void testExecutionNodeLookup() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.drools \n"
+                + "declare Cheese1\n"
+                + "   type : String\n"
+                + "   price : int\n"
+                + "   oldPrice : int\n"
+                + "end \n";
+        
         str += "rule rule1 \n";
         str += "  when \n";
-        str += "    $c : Cheese() \n";
+        str += "    $c : Cheese1() \n";
         str += " \n";
         str += "  then \n";
         str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
         str += "end\n";
-
+        //System.out.println("STR = "+str);
+        String str2 = "";
+        str2 += "package org.drools \n"
+                + "declare Cheese2\n"
+                + "   type : String\n"
+                + "   price : int\n"
+                + "   oldPrice : int\n"
+                + "end \n";
+        str2 += "rule rule2 \n";
+        str2 += "  when \n";
+        str2 += "    $c : Cheese2() \n";
+        str2 += " \n";
+        str2 += "  then \n";
+        str2 += "    $c.setPrice( $c.getPrice() + 10 ); \n";
+        str2 += "end\n";
+        //System.out.println("STR2 = "+str2);
         String inXml = "";
         inXml += "<batch-execution lookup=\"ksession1\" >";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.drools.Cheese1>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.drools.Cheese1>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
+        
+        String inXml2 = "";
+        inXml2 += "<batch-execution lookup=\"ksession2\" >";
+        inXml2 += "  <insert out-identifier='outStilton'>";
+        inXml2 += "    <org.drools.Cheese2>";
+        inXml2 += "      <type>stilton</type>";
+        inXml2 += "      <price>25</price>";
+        inXml2 += "      <oldPrice>0</oldPrice>";
+        inXml2 += "    </org.drools.Cheese2>";
+        inXml2 += "  </insert>";
+        inXml2 += "  <fire-all-rules />";
+        inXml2 += "</batch-execution>";
 
         StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         setExec( ksession );
+        
+        StatefulKnowledgeSession ksession2 = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str2.getBytes() ) );
+        
+        setExec2( ksession2 );
 
+         node.set( "ksession2",
+                  this.exec2 );
+        
         String outXml = template.requestBody( "direct:execWithLookup",
                                               inXml,
                                               String.class );
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        
+        Thread.currentThread().setContextClassLoader( getClassLoader(ksession) );
         ExecutionResults result = template.requestBody( "direct:unmarshal",
                                                         outXml,
                                                         ExecutionResults.class );
-        Cheese stilton = (Cheese) result.getValue( "outStilton" );
-        assertEquals( 30,
-                      stilton.getPrice() );
+        org.drools.definition.type.FactType fT = ksession.getKnowledgeBase().getFactType("org.drools","Cheese1");
+        
+        int price = (Integer)fT.get(result.getValue( "outStilton" ), "price");
+        assertEquals( 30, 
+                      price );
 
         FactHandle factHandle = (FactHandle) result.getFactHandle( "outStilton" );
-        stilton = (Cheese) ksession.getObject( factHandle );
-        assertEquals( 30,
-                      stilton.getPrice() );
-
+//        stilton = (Cheese) ksession.getObject( factHandle );
+//        assertEquals( 30,
+//                      stilton.getPrice() );
+        
+        String outXml2 = template.requestBody( "direct:execWithLookup",
+                                              inXml2,
+                                              String.class );
+        
+        
+        Thread.currentThread().setContextClassLoader( getClassLoader(ksession2) );
+        ExecutionResults result2 = template.requestBody( "direct:unmarshal",
+                                                        outXml2,
+                                                        ExecutionResults.class );
+        
+        org.drools.definition.type.FactType fT2 = ksession2.getKnowledgeBase().getFactType("org.drools","Cheese2");
+        
+        int price2 = (Integer)fT2.get(result2.getValue( "outStilton" ), "price");
+        assertEquals( 35, price2 );
+        
+//        Cheese2 stilton2 = (Cheese2) result2.getValue( "outStilton" );
+//        assertEquals( 35,
+//                      stilton2.getPrice() );
+//
+          factHandle = (FactHandle) result2.getFactHandle( "outStilton" );
+//        stilton2 = (Cheese2) ksession2.getObject( factHandle );
+//        assertEquals( 35,
+//                      stilton2.getPrice() );
+        
+        
+        Thread.currentThread().setContextClassLoader( originalClassLoader );
+        
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "    <org.drools.Cheese1>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "    </org.drools.Cheese1>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
+        
+        String expectedXml2 = "";
+        expectedXml2 += "<execution-results>\n";
+        expectedXml2 += "  <result identifier=\"outStilton\">\n";
+        expectedXml2 += "    <org.drools.Cheese2>\n";
+        expectedXml2 += "      <type>stilton</type>\n";
+        expectedXml2 += "      <oldPrice>0</oldPrice>\n";
+        expectedXml2 += "      <price>35</price>\n";
+        expectedXml2 += "    </org.drools.Cheese2>\n";
+        expectedXml2 += "  </result>\n";
+        expectedXml2 += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result2.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
+        expectedXml2 += "</execution-results>\n";
 
         assertXMLEqual( expectedXml,
                         outXml );
+        
+        assertXMLEqual( expectedXml2,
+                        outXml2 );
     }
-
+    
     private StatelessKnowledgeSession getStatelessKnowledgeSession(Resource resource) throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( resource,
@@ -2002,6 +2105,40 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
 
         return session;
+    }
+    
+    private StatefulKnowledgeSession getStatefulKnowledgeSession2(Resource resource) throws Exception {
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        kbuilder.add( resource,
+                      ResourceType.DRL );
+
+        if ( kbuilder.hasErrors() ) {
+            System.out.println( kbuilder.getErrors() );
+        }
+
+        assertFalse( kbuilder.hasErrors() );
+        Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
+
+        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+
+        kbase.addKnowledgePackages( pkgs );
+        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+
+        return session;
+    }
+    
+    public ClassLoader getClassLoader(CommandExecutor exec) {
+        ClassLoader cl = null;
+
+        if ( exec instanceof StatefulKnowledgeSessionImpl ) {
+            cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
+        } else if ( exec instanceof StatelessKnowledgeSessionImpl ) {
+            cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
+        } else if ( exec instanceof CommandBasedStatefulKnowledgeSession ) {
+            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
+        }
+
+        return cl;
     }
 
 }

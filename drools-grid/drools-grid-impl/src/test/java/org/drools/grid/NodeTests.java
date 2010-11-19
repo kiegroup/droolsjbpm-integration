@@ -17,7 +17,7 @@
 
 package org.drools.grid;
 
-import java.io.Serializable;
+import java.io.Serializable; 
 import java.util.HashMap;
 import java.util.Map;
 import org.drools.KnowledgeBase;
@@ -314,6 +314,29 @@ public class NodeTests {
         public void setName(String name) {
             this.name = name;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final MyObject other = (MyObject) obj;
+            if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+            return hash;
+        }
+        
         
     }
 }

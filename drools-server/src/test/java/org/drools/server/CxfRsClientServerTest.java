@@ -40,6 +40,7 @@ public class CxfRsClientServerTest extends TestCase {
 
         assertTrue( response.contains( "execution-results" ) );
         assertTrue( response.contains( "echo" ) );
+        springContext.stop();
     }
 
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+  <persistence-unit name="org.drools.grid">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>org.drools.grid.service.directory.impl.GridServiceDescriptionImpl</class>
+    <class>org.drools.grid.service.directory.impl.AddressImpl</class>
+    <class>java.lang.String</class>
+    <class>org.drools.grid.timer.impl.ScheduledJob</class>
+    <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+      <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
+      <property name="hibernate.connection.url" value="jdbc:h2:mem:mydb"/>
+      <!--property name="hibernate.connection.url" value="jdbc:h2:file:/h2/test;AUTO_SERVER=TRUE" /-->
+      <!--  property name="hibernate.connection.url" value="jdbc:h2:file:\dev\drools\trunk7\drools-process\drools-process-task\mydb"/ -->
+      <!--			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>-->
+      <!--	        <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>	  	        -->
+      <!--	        <property name="hibernate.connection.url" value="jdbc:postgresql://localhost/postgres"/>-->
+      <property name="hibernate.connection.username" value="sa"/>
+      <property name="hibernate.connection.password" value="sasa"/>
+      <property name="hibernate.connection.autocommit" value="false"/>
+      <property name="hibernate.max_fetch_depth" value="3"/>
+      <property name="hibernate.hbm2ddl.auto" value="create"/>
+      <property name="hibernate.show_sql" value="true"/>
+    </properties>
+  </persistence-unit>
+</persistence>

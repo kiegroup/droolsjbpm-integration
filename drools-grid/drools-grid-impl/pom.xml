@@ -104,6 +104,12 @@
       <artifactId>btm</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-bpmn2</artifactId>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 

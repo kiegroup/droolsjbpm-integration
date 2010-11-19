@@ -16,15 +16,17 @@
 
 package  org.drools.springframework
 
-declare Person2
+
+declare Person3
     name : String
 end
 
+
 global java.util.List list;
 
-rule "rule 1"
+rule "rule 3"
 when
-    $p : Person2();
+    $p : Person3();
 then
     list.add( $p );
 end

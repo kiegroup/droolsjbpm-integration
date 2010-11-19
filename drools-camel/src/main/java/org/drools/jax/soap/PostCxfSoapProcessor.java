@@ -38,6 +38,9 @@ public class PostCxfSoapProcessor
 
     public void process(Exchange exchange) throws Exception {
         InputStream is = (InputStream) exchange.getIn().getBody();
+        //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
+        //I need to copy the results here because I loose them at the end of the method
+        String results = StringUtils.toString( is );
         if ( is != null ) {
             SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
             SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
@@ -49,7 +52,9 @@ public class PostCxfSoapProcessor
                                             "ns1" );
             SOAPBodyElement payload = body.addBodyElement( payloadName );
             SOAPElement response = payload.addChildElement( responseName );
-            response.addTextNode( StringUtils.toString( is ) );
+            //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
+            // response.addTextNode( StringUtils.toString( is ) );
+            response.addTextNode( results );
             exchange.getOut().setBody( soapMessage );
         }
     }

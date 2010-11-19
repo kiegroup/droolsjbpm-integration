@@ -44,6 +44,7 @@ import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
+import org.drools.runtime.impl.ExecutionResultImpl;
 
 public class DroolsProducer extends DefaultProducer {
 
@@ -57,20 +58,9 @@ public class DroolsProducer extends DefaultProducer {
 
     public void process(Exchange exchange) throws Exception {
 
-        try {
-            Command cmd = null;
-            //            if ( de.dataFormat != null ) {
-            //                String str = exchange.getIn().getBody( String.class );
-            //                ByteArrayInputStream bais = new ByteArrayInputStream( str.getBytes() );
-            //                cmd = (Command) de.dataFormat.unmarshal( exchange,
-            //                                                         bais );
-            //            } else {
-            //                // no data format set, so we assume it's already concrete
-            //                cmd = exchange.getIn().getBody( Command.class );
-            //            }
-
-            cmd = exchange.getIn().getBody( Command.class );
-
+            Command cmd = exchange.getIn().getBody( Command.class );
+            
+            
             if ( cmd == null ) {
                 throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri() );
             }
@@ -108,22 +98,8 @@ public class DroolsProducer extends DefaultProducer {
             if ( exec == null ) {
                 throw new RuntimeException( "No defined ksession for uri" + de.getEndpointUri() );
             }
-
+            
             ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
-
-            //            if ( de.dataFormat != null ) {
-            //                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            //                de.dataFormat.marshal( exchange,
-            //                                       results,
-            //                                       baos );
-            //                exchange.getOut().setBody( baos.toByteArray() );
-            //            } else {
-            //                exchange.getOut().setBody( results );
-            //            }
-            exchange.getOut().setBody( results );
-        } finally {
-            // we must restore the ClassLoader
-            //            Thread.currentThread().setContextClassLoader( originalClassLoader );
-        }
+            exchange.getOut().setBody( results );     
     }
 }

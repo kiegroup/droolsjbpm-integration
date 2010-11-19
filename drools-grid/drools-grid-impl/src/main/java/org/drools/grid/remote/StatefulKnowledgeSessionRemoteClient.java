@@ -27,6 +27,7 @@ import org.drools.command.CommandFactory;
 import org.drools.command.GetSessionClockCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.DisposeCommand;
+import org.drools.command.runtime.GetFactCountCommand;
 import org.drools.command.runtime.GetGlobalsCommand;
 import org.drools.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.command.runtime.process.GetProcessInstanceCommand;
@@ -49,6 +50,7 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.remote.command.GetWorkItemManagerCommand;
 import org.drools.grid.remote.command.GetWorkingMemoryEntryPointRemoteCommand;
 import org.drools.runtime.Calendars;
 import org.drools.runtime.Channel;
@@ -464,7 +466,20 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public long getFactCount() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+         String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetFactCountCommand(),
+                                                                                  null,
+                                                                                  null,
+                                                                                  this.instanceId,
+                                                                                  kresultsId )}));
+        
+        Object result = ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
+        
+        return (Long)result;
     }
 
     public ProcessInstance startProcess(String processId) {
@@ -580,7 +595,29 @@ public class StatefulKnowledgeSessionRemoteClient
     }
 
     public WorkItemManager getWorkItemManager() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        
+        //This is not needed right??? or should I send the message to see if something is wrong..??
+        
+//         String kresultsId = "kresults_" + this.gsd.getId();
+//        
+//        CommandImpl cmd = new CommandImpl("execute",
+//                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand(new GetWorkItemManagerCommand(),
+//                                                                                  null,
+//                                                                                  null,
+//                                                                                  this.instanceId,
+//                                                                                  kresultsId )}));
+//        
+//         ConversationUtil.sendMessage(this.cm,
+//                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+//                this.gsd.getId(),
+//                cmd);
+        
+         
+           
+            
+         return new WorkItemManagerRemoteClient(this.instanceId, this.gsd, this.cm);
+        
+
     }
 
     public void addEventListener(WorkingMemoryEventListener listener) {
@@ -619,4 +656,9 @@ public class StatefulKnowledgeSessionRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
+    public String getInstanceId() {
+        return instanceId;
+    }
+    
+    
 }

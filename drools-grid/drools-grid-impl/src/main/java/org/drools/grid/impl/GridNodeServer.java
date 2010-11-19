@@ -63,7 +63,7 @@ public class GridNodeServer
                                                                          Conversation con,
                                                                          Message msg,
                                                                          CommandImpl cmd) {
-                                                         GridNode gnode = (GridNode) object;
+                                                         
                                                          List list = cmd.getArguments();
                                                          GenericCommand command = (GenericCommand) list.get( 0 );
 
@@ -78,6 +78,21 @@ public class GridNodeServer
                                                          Object result = command.execute( localSessionContext );
 
                                                          con.respond( result );
+                                                     }
+                                                 } );
+                                                 put( "registerKsession",
+                                                 new Exec() {
+                                                     public void execute(Object object,
+                                                                         Conversation con,
+                                                                         Message msg,
+                                                                         CommandImpl cmd) {
+                                                         GridNode gnode = (GridNode) object;
+                                                         List list = cmd.getArguments();
+                                                         String instanceId = (String)list.get(1);
+                                                         // Set the already created session into the node localcontext
+                                                         gnode.set((String) list.get(0), data.getTemp().get(instanceId));
+                                                         // Respond nothing
+                                                         con.respond( null );
                                                      }
                                                  } );
                                         }

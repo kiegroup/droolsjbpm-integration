@@ -17,19 +17,20 @@
 
 package org.drools.grid.remote;
 
+import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.SystemEventListenerFactory;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.io.Connector;
-import org.drools.grid.io.ConnectorFactoryService;
 import org.drools.grid.io.ConversationManager;
-import org.drools.grid.io.impl.ConversationManagerImpl;
+import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.mina.MinaConnector;
+import org.drools.grid.service.directory.Address;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 
@@ -71,7 +72,25 @@ public class GridNodeRemoteClient<T>
 
     public void set(String identifier,
                     Object object) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+       //We need a way to do it more generic, so we can set whatever we want.
+        
+       if(object instanceof StatefulKnowledgeSessionRemoteClient){ 
+            String localId = UUID.randomUUID().toString();
+
+            CommandImpl cmd = new CommandImpl( "registerKsession",
+                                               Arrays.asList( new Object[]{identifier, ((StatefulKnowledgeSessionRemoteClient)object).getInstanceId()} ) );
+
+            ConversationManager connm = this.grid.get( ConversationManager.class );
+            ConversationUtil.sendMessage( connm,
+                                          (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                                          this.gsd.getId(),
+                                          cmd );
+       } else{
+            
+           throw new UnsupportedOperationException( "Not supported yet." );
+       }
+
+        
     }
 
     public String getId() {
