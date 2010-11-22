@@ -52,15 +52,54 @@ import org.drools.runtime.CommandExecutor;
 
 public class DroolsEndpoint extends DefaultEndpoint {
 
-    public String          ksessionId;
-    public CommandExecutor executor;
-    public GridNode        node;
+    /**
+     * An ENUM to define which action should be executed by the 
+     * producer into this end point
+     */
+    public static enum Action {
+        EXECUTE("execute"),
+        INSERT_BODY("insertBody"),
+        INSERT_MESSAGE("insertMessage"),
+        INSERT_EXCHANGE("insertExchange");
 
-    public String          dataFormatName;
+        private final String id;
 
-    public DataFormat      dataFormat;
+        Action(String id) {
+            this.id = id;
+        }
 
-    public static Pattern  p = Pattern.compile( "[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']" );
+        public String getId() {
+            return this.id;
+        }
+
+        public static Action resolveAction(String id) {
+            if ( EXECUTE.getId().equalsIgnoreCase( id ) ) {
+                return EXECUTE;
+            } else if ( INSERT_BODY.getId().equalsIgnoreCase( id ) ) {
+                return INSERT_BODY;
+            } else if ( INSERT_MESSAGE.getId().equalsIgnoreCase( id ) ) {
+                return INSERT_MESSAGE;
+            } else if ( INSERT_EXCHANGE.getId().equalsIgnoreCase( id ) ) {
+                return INSERT_EXCHANGE;
+            } else {
+                throw new IllegalArgumentException( "Invalid action configuring EndPoint = " + id );
+            }
+        }
+    }
+
+    public static final Pattern p          = Pattern.compile( "[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']" );
+
+    public String               ksessionId;
+    public CommandExecutor      executor;
+    public GridNode             node;
+
+    public String               dataFormatName;
+
+    public DataFormat           dataFormat;
+
+    public Action               action     = Action.EXECUTE;
+    public String               entryPoint = null;
+    public String               channel    = null;
 
     public DroolsEndpoint(String endpointUri,
                           String remaining,
@@ -76,8 +115,13 @@ public class DroolsEndpoint extends DefaultEndpoint {
     }
 
     public Producer createProducer() throws Exception {
-        return new DroolsProducer( this,
-                                   node );
+        if ( Action.EXECUTE.equals( action ) ) {
+            return new DroolsExecuteProducer( this,
+                                              node );
+        } else {
+            return new DroolsInsertProducer( this,
+                                             node );
+        }
     }
 
     public boolean isSingleton() {
@@ -210,4 +254,33 @@ public class DroolsEndpoint extends DefaultEndpoint {
 
         return cl;
     }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public void setAction(String action) {
+        this.action = Action.resolveAction( action );
+    }
+
+    public String getEntryPoint() {
+        return entryPoint;
+    }
+
+    public void setEntryPoint(String entryPoint) {
+        this.entryPoint = entryPoint;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
 }

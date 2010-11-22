@@ -44,62 +44,60 @@ import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.impl.ExecutionResultImpl;
 
-public class DroolsProducer extends DefaultProducer {
+public class DroolsExecuteProducer extends DefaultProducer {
 
     DroolsEndpoint de;
 
-    public DroolsProducer(Endpoint endpoint,
-                          GridNode node) {
+    public DroolsExecuteProducer(Endpoint endpoint,
+                                 GridNode node) {
         super( endpoint );
         de = (DroolsEndpoint) endpoint;
     }
 
     public void process(Exchange exchange) throws Exception {
 
-            Command cmd = exchange.getIn().getBody( Command.class );
-            
-            
-            if ( cmd == null ) {
-                throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri() );
-            }
+        Command cmd = exchange.getIn().getBody( Command.class );
 
-            if ( !(cmd instanceof BatchExecutionCommandImpl) ) {
-                cmd = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand) cmd} ) );
-            }
+        if ( cmd == null ) {
+            throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri() );
+        }
 
-            CommandExecutor exec;
-            ExecutionNodePipelineContextImpl droolsContext = exchange.getProperty( "drools-context",
+        if ( !(cmd instanceof BatchExecutionCommandImpl) ) {
+            cmd = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand) cmd} ) );
+        }
+
+        CommandExecutor exec;
+        ExecutionNodePipelineContextImpl droolsContext = exchange.getProperty( "drools-context",
                                                                                    ExecutionNodePipelineContextImpl.class );
-            if ( droolsContext != null ) {
-                exec = droolsContext.getCommandExecutor();
-            } else {
-                exec = de.getExecutor();
-                if ( exec == null ) {
-                    String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP,
+        if ( droolsContext != null ) {
+            exec = droolsContext.getCommandExecutor();
+        } else {
+            exec = de.getExecutor();
+            if ( exec == null ) {
+                String lookup = exchange.getIn().getHeader( DroolsComponent.DROOLS_LOOKUP,
                                                                 String.class );
-                    if ( StringUtils.isEmpty( lookup ) && (cmd instanceof BatchExecutionCommandImpl) ) {
-                        lookup = ((BatchExecutionCommandImpl) cmd).getLookup();
-                    }
+                if ( StringUtils.isEmpty( lookup ) && (cmd instanceof BatchExecutionCommandImpl) ) {
+                    lookup = ((BatchExecutionCommandImpl) cmd).getLookup();
+                }
 
-                    if ( de.getGridNode() != null && !StringUtils.isEmpty( lookup ) ) {
-                        exec = de.getGridNode().get( lookup,
+                if ( de.getGridNode() != null && !StringUtils.isEmpty( lookup ) ) {
+                    exec = de.getGridNode().get( lookup,
                                                      CommandExecutor.class );
-                        if ( exec == null ) {
-                            throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
-                        }
-                    } else {
-                        throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
+                    if ( exec == null ) {
+                        throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
                     }
+                } else {
+                    throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
                 }
             }
+        }
 
-            if ( exec == null ) {
-                throw new RuntimeException( "No defined ksession for uri" + de.getEndpointUri() );
-            }
-            
-            ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
-            exchange.getOut().setBody( results );     
+        if ( exec == null ) {
+            throw new RuntimeException( "No defined ksession for uri" + de.getEndpointUri() );
+        }
+
+        ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
+        exchange.getOut().setBody( results );
     }
 }
