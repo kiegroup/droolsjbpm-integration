@@ -16,6 +16,7 @@
 
 package org.drools.camel.component;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -334,7 +335,7 @@ public class DroolsPolicy
                 //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
                 // I need to re set the Body because the exchange loose the content at
                 // the begining of the method
-                 exchange.getIn().setBody(body);
+                 exchange.getIn().setBody(new ByteArrayInputStream(body.getBytes("UTF-8")));
 
                 boolean soap = false;
                 if ( !augmented && exchange.getFromEndpoint() instanceof CxfSpringEndpoint ) {
