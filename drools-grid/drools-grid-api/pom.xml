@@ -2,40 +2,40 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>drools-grid</artifactId>
-        <groupId>org.drools</groupId>
-        <version>5.2.0-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <packaging>jar</packaging>
-    <name>Drools :: Grid :: API</name>
-    <artifactId>drools-grid-api</artifactId>
+  <parent>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-grid</artifactId>
+    <version>5.2.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>jar</packaging>
+  <name>Drools :: Grid :: API</name>
+  <artifactId>drools-grid-api</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.6</version>
-            <scope>test</scope>
-        </dependency>
-         <!-- Drools Runtime -->
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-core</artifactId>
-            <type>jar</type>
-        </dependency>
-         <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-compiler</artifactId>
-            <type>jar</type>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.6</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Drools Runtime -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+      <type>jar</type>
+    </dependency>
 
-    </dependencies>
+  </dependencies>
 
 
 </project>

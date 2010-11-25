@@ -1,59 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>drools-grid</artifactId>
-        <groupId>org.drools</groupId>
-        <version>5.2.0-SNAPSHOT</version>
-    </parent>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>org.drools</groupId>
-    <artifactId>drools-grid-remote-dir-mina</artifactId>
- 
-    <name>Drools :: Grid :: Remote Directory :: Mina</name>
-  
-    <dependencies>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-api</artifactId>
-            
-        </dependency>
+    <artifactId>drools-grid</artifactId>
+    <version>5.2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.drools</groupId>
+  <artifactId>drools-grid-remote-dir-mina</artifactId>
 
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-remote-api</artifactId>
-            
-        </dependency>
+  <name>Drools :: Grid :: Remote Directory :: Mina</name>
 
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-local</artifactId>
-            
-            <type>jar</type>
-        </dependency>
-        <!-- Apache Mina for default Service Remote Implementation -->
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>2.0.0-M6</version>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-remote-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-local</artifactId>
+    </dependency>
+    <!-- Apache Mina for default Service Remote Implementation -->
+    <dependency>
+      <groupId>org.apache.mina</groupId>
+      <artifactId>mina-core</artifactId>
+      <version>2.0.0-M6</version>
+    </dependency>
 
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-grid-remote-mina</artifactId>
-            
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.6</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-remote-mina</artifactId>
+    </dependency>
+  </dependencies>
 
-      <!--build>
+  <!--build>
     <plugins>
       
       <plugin>

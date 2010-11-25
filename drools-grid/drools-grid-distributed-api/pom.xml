@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>drools-grid</artifactId>
     <groupId>org.drools</groupId>
+    <artifactId>drools-grid</artifactId>
     <version>5.2.0-SNAPSHOT</version>
   </parent>
   
