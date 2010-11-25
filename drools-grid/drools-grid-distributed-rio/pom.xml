@@ -5,7 +5,7 @@
     <parent>
         <artifactId>drools-grid</artifactId>
         <groupId>org.drools</groupId>
-        <version>5.2.0.SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>drools-grid-distributed-rio</artifactId>
   
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-grid-distributed-dir-rio</artifactId>
-            <version>5.2.0.SNAPSHOT</version>
+            <version>5.2.0-SNAPSHOT</version>
         </dependency>
 
      <!-- RIO Runtime -->
