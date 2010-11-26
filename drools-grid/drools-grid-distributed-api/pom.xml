@@ -16,18 +16,17 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-api</artifactId>
-      <version>5.2.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-api</artifactId>
-      <version>5.2.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-remote-api</artifactId>
-      <version>5.2.0-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>jar</type>
     </dependency>
      <!-- REMOVE -->
