@@ -43,9 +43,9 @@ import org.drools.concurrent.CommandExecutor;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.reteoo.ReteooRuleBase;
-import org.drools.rule.DroolsCompositeClassLoader;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.util.CompositeClassLoader;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
@@ -59,7 +59,7 @@ import com.sun.tools.xjc.Options;
 public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
     private JAXBContext                jaxbContext;
-    private DroolsCompositeClassLoader classLoader;
+    private CompositeClassLoader    classLoader;
 
     public void testSessionInsert() throws Exception {
         Class< ? > personClass = classLoader.loadClass( "org.drools.model.Person" );
