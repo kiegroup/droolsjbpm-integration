@@ -12,7 +12,9 @@
   <packaging>pom</packaging>
   <name>Drools :: Container</name>
 
+
   <modules>
+    <module>drools-seam</module>
     <module>drools-spring</module>
   </modules>
 
