@@ -18,8 +18,8 @@
       <url>https://repository.apache.org/content/repositories/snapshots/</url>
     </repository>
   </repositories>
-  <dependencies>
 
+  <dependencies>
     <!-- Drools -->
     <dependency>
       <groupId>org.drools</groupId>
