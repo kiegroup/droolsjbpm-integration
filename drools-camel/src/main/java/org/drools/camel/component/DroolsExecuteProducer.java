@@ -57,14 +57,14 @@ public class DroolsExecuteProducer extends DefaultProducer {
 
     public void process(Exchange exchange) throws Exception {
 
-        Command cmd = exchange.getIn().getBody( Command.class );
+        Command<?> cmd = exchange.getIn().getBody( Command.class );
 
         if ( cmd == null ) {
             throw new RuntimeCamelException( "Body of in message not of the expected type 'org.drools.command.Command' for uri" + de.getEndpointUri() );
         }
 
         if ( !(cmd instanceof BatchExecutionCommandImpl) ) {
-            cmd = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand) cmd} ) );
+            cmd = new BatchExecutionCommandImpl( Arrays.asList( new GenericCommand< ? >[]{(GenericCommand<?>) cmd} ) );
         }
 
         CommandExecutor exec;

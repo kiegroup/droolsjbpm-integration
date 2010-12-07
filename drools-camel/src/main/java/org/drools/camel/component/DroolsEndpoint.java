@@ -36,10 +36,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.camel.Consumer;
+import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.impl.DefaultMessage;
 import org.apache.camel.spi.DataFormat;
 import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.util.StringUtils;
@@ -111,7 +114,8 @@ public class DroolsEndpoint extends DefaultEndpoint {
     }
 
     public Consumer createConsumer(Processor processor) throws Exception {
-        throw new RuntimeCamelException( "Drools consumers not supported." );
+        return new DroolsConsumer( this, 
+                                   processor );
     }
 
     public Producer createProducer() throws Exception {
@@ -282,5 +286,15 @@ public class DroolsEndpoint extends DefaultEndpoint {
     public void setChannel(String channel) {
         this.channel = channel;
     }
-
+    
+    public Exchange createExchange( Object pojo ) {
+        DefaultMessage msg = new DefaultMessage();
+        msg.setBody( pojo );
+        DefaultExchange exchange = new DefaultExchange(this, getExchangePattern());
+        // DO WE NEED TO SET THE BINDING PROPERTY?
+        //exchange.setProperty(Exchange.BINDING, getBinding());
+        exchange.setIn( msg );
+        return exchange;
+    }    
+    
 }

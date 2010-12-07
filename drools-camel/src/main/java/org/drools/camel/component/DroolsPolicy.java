@@ -69,13 +69,12 @@ public class DroolsPolicy
     implements
     Policy {
     private static boolean augmented;
-    private DroolsEndpoint dep;
 
     public void beforeWrap(RouteContext routeContext,
-                           ProcessorDefinition processorDefinition) {
+                           ProcessorDefinition<?> processorDefinition) {
         augmentNodes( routeContext,
                       processorDefinition,
-                      new HashSet() );
+                      new HashSet<Object>() );
     }
 
     public Processor wrap(RouteContext routeContext,
@@ -96,7 +95,7 @@ public class DroolsPolicy
 
     private ToDefinition getDroolsNode(RouteDefinition routeDef) {
         ToDefinition toDrools = null;
-        for ( ProcessorDefinition child : routeDef.getOutputs() ) {
+        for ( ProcessorDefinition<?> child : routeDef.getOutputs() ) {
             toDrools = getDroolsNode( child );
             if ( toDrools != null ) {
                 break;
@@ -106,7 +105,7 @@ public class DroolsPolicy
     }
 
     public static void augmentNodes(RouteContext routeContext,
-                                    ProcessorDefinition nav,
+                                    ProcessorDefinition<?> nav,
                                     Set visited) {
         if ( !nav.getOutputs().isEmpty() ) {
 
