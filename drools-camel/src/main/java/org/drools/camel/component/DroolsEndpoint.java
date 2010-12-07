@@ -291,8 +291,6 @@ public class DroolsEndpoint extends DefaultEndpoint {
         DefaultMessage msg = new DefaultMessage();
         msg.setBody( pojo );
         DefaultExchange exchange = new DefaultExchange(this, getExchangePattern());
-        // DO WE NEED TO SET THE BINDING PROPERTY?
-        //exchange.setProperty(Exchange.BINDING, getBinding());
         exchange.setIn( msg );
         return exchange;
     }    
