@@ -52,11 +52,11 @@ public class DroolsConsumer extends DefaultConsumer {
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        DroolsCamelChannel channel = new DroolsCamelChannel();
+        KSessionChannel channel = new KSessionChannel();
         krt.registerChannel( channelId, channel );
     }
 
-    class DroolsCamelChannel implements Channel {
+    class KSessionChannel implements Channel {
         public void send(Object pojo) {
             Exchange exchange = de.createExchange( pojo );
             try {
