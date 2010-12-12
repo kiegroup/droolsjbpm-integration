@@ -39,8 +39,8 @@
       <artifactId>drools-persistence-jpa</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workitems</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-workitems</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

@@ -48,8 +48,6 @@ import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.process.core.context.variable.VariableScope;
-import org.drools.process.instance.context.variable.VariableScopeInstance;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -60,6 +58,8 @@ import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
 import org.drools.runtime.process.WorkflowProcessInstance;
 import org.drools.runtime.rule.FactHandle;
+import org.jbpm.process.core.context.variable.VariableScope;
+import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1107,7 +1107,7 @@ public abstract class BatchTest extends ContextTestSupport {
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
         assertEquals( "MyValue",
-                      ((VariableScopeInstance) ((org.drools.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
+                      ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
     @Test
@@ -1166,7 +1166,7 @@ public abstract class BatchTest extends ContextTestSupport {
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
         assertEquals( "MyValue",
-                      ((VariableScopeInstance) ((org.drools.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
+                      ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
     @Test

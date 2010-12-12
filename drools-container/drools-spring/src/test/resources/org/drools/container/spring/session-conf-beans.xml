@@ -7,9 +7,9 @@
                            http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
    
-   <bean id="rwih1" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />
+   <bean id="rwih1" class="org.jbpm.process.instance.impl.humantask.HumanTaskHandler" />
    
-   <bean id="rwih2" class="org.drools.process.instance.impl.humantask.HumanTaskHandler" />
+   <bean id="rwih2" class="org.jbpm.process.instance.impl.humantask.HumanTaskHandler" />
    
    <bean id="raf1" class="org.drools.container.spring.MockAccumulateFunction" />
    <bean id="raf2" class="org.drools.container.spring.MockAccumulateFunction" />    

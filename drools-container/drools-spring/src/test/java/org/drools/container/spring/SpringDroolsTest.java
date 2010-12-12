@@ -25,8 +25,8 @@ import junit.framework.TestCase;
 import org.drools.ClockType;
 import org.drools.Person;
 import org.drools.RuleBaseConfiguration;
-import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.SessionConfiguration;
+import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.agent.impl.KnowledgeAgentImpl;
 import org.drools.common.InternalRuleBase;
 import org.drools.conf.EventProcessingOption;
@@ -39,10 +39,10 @@ import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.io.impl.ResourceChangeScannerImpl;
 import org.drools.io.impl.UrlResource;
-import org.drools.process.instance.impl.humantask.HumanTaskHandler;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.process.WorkItemHandler;
+import org.jbpm.process.instance.impl.humantask.HumanTaskHandler;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest extends TestCase {

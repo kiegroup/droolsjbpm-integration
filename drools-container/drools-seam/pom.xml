@@ -41,8 +41,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workitems</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-workitems</artifactId>
     </dependency>
 
     <dependency>
@@ -51,18 +51,18 @@
     </dependency>
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-flow-compiler</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow-builder</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-flow-core</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-flow-persistence-jpa</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-persistence-jpa</artifactId>
     </dependency>
 
   </dependencies>

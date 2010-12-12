@@ -49,11 +49,12 @@ import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
+import org.drools.grid.impl.GridImpl;
+import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.process.core.context.variable.VariableScope;
-import org.drools.process.instance.context.variable.VariableScopeInstance;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
@@ -71,13 +72,11 @@ import org.drools.runtime.process.WorkItemManager;
 import org.drools.runtime.process.WorkflowProcessInstance;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.runtime.rule.QueryResultsRow;
+import org.jbpm.process.core.context.variable.VariableScope;
+import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
-import org.drools.grid.GridConnection;
-import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 
 public class XStreamBatchExecutionTest extends TestCase {
 
@@ -1353,7 +1352,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
         assertEquals( "MyValue",
-                      ((VariableScopeInstance) ((org.drools.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
+                      ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
     public void testProcessRuntimeSignalEvent() throws Exception {
@@ -1416,7 +1415,7 @@ public class XStreamBatchExecutionTest extends TestCase {
         assertEquals( ProcessInstance.STATE_COMPLETED,
                       processInstance.getState() );
         assertEquals( "MyValue",
-                      ((VariableScopeInstance) ((org.drools.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
+                      ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
     public void testCompleteWorkItem() {

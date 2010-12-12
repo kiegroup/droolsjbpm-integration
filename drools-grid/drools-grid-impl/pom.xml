@@ -106,8 +106,8 @@
     </dependency>
     
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-bpmn2</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-bpmn2</artifactId>
       <scope>test</scope>
     </dependency>
 

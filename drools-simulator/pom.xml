@@ -28,8 +28,8 @@
       <artifactId>drools-compiler</artifactId>
     </dependency>   
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-flow-compiler</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow-builder</artifactId>
     </dependency>   
     <dependency>
        <groupId>junit</groupId>
