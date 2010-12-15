@@ -290,7 +290,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
 
-        StartProcessCommand start = new StartProcessCommand( "org.drools.actions" );
+        StartProcessCommand start = new StartProcessCommand( "org.drools.actions" , "process-instance-id" );
         start.putParameter( "person",
                             new Person( "lucaz",
                                         25 ) );
@@ -316,8 +316,9 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
                                                         xmlReq.toString() );
         assertNotNull( xmlResp );
         System.out.println( new String( xmlResp ) );
-        Object resp = getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
+        ExecutionResults resp = (ExecutionResults) getJaxbContext().createUnmarshaller().unmarshal( new ByteArrayInputStream( xmlResp ) );
         assertNotNull( resp );
+        assertNotNull( resp.getValue( "process-instance-id" ) );
     }
 
     public void testProcessInstanceSignalEvent() throws Exception {
