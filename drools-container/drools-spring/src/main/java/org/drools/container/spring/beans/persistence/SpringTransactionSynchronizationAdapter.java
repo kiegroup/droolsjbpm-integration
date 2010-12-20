@@ -16,7 +16,7 @@
 
 package org.drools.container.spring.beans.persistence;
 
-import org.drools.persistence.session.TransactionManager;
+import org.drools.persistence.TransactionManager;
 import org.springframework.transaction.support.TransactionSynchronization;
 
 public class SpringTransactionSynchronizationAdapter
