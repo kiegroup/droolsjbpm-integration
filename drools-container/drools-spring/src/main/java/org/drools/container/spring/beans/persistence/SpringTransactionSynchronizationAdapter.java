@@ -22,9 +22,9 @@ import org.springframework.transaction.support.TransactionSynchronization;
 public class SpringTransactionSynchronizationAdapter
     implements
     TransactionSynchronization {
-    private org.drools.persistence.session.TransactionSynchronization ts;
+    private org.drools.persistence.TransactionSynchronization ts;
 
-    public SpringTransactionSynchronizationAdapter(org.drools.persistence.session.TransactionSynchronization ts) {
+    public SpringTransactionSynchronizationAdapter(org.drools.persistence.TransactionSynchronization ts) {
         this.ts = ts;
     }
 

@@ -17,7 +17,7 @@
 package org.drools.container.spring.beans.persistence;
 
 import org.drools.persistence.TransactionManager;
-import org.drools.persistence.session.TransactionSynchronization;
+import org.drools.persistence.TransactionSynchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionDefinition;
