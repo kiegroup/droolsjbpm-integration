@@ -19,7 +19,9 @@ package org.drools.container.spring.beans.persistence;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.drools.persistence.session.JpaManager;
+import org.drools.persistence.PersistenceContext;
+import org.drools.persistence.PersistenceContextManager;
+import org.drools.persistence.jpa.JpaPersistenceContext;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.slf4j.Logger;
@@ -34,7 +36,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class DroolsSpringJpaManager
     implements
-    JpaManager {
+    PersistenceContextManager {
 
     Logger                       logger = LoggerFactory.getLogger( getClass() );
 
@@ -50,11 +52,11 @@ public class DroolsSpringJpaManager
         this.env = env;
         this.emf = (EntityManagerFactory) env.get( EnvironmentName.ENTITY_MANAGER_FACTORY );
 
-        getApplicationScopedEntityManager(); // we create this on initialisation so that we own the EMF reference
+        getApplicationScopedPersistenceContext(); // we create this on initialisation so that we own the EMF reference
                                              // otherwise Spring will close it after the transaction finishes
     }
 
-    public EntityManager getApplicationScopedEntityManager() {
+    public PersistenceContext getApplicationScopedPersistenceContext() {
         if ( this.appScopedEntityManager == null ) {
             // Use the App scoped EntityManager if the user has provided it, and it is open.
             this.appScopedEntityManager = (EntityManager) this.env.get( EnvironmentName.APP_SCOPED_ENTITY_MANAGER );
@@ -81,15 +83,15 @@ public class DroolsSpringJpaManager
         if ( TransactionSynchronizationManager.isActualTransactionActive() ) {
             this.appScopedEntityManager.joinTransaction();
         }
-        return this.appScopedEntityManager;
+        return new JpaPersistenceContext( this.appScopedEntityManager );
     }
 
-    public EntityManager getCommandScopedEntityManager() {
-        return (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER );
+    public PersistenceContext getCommandScopedPersistenceContext() {
+        return  new JpaPersistenceContext( (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER ) );
     }
 
     public void beginCommandScopedEntityManager() {
-        if ( this.getCommandScopedEntityManager() == null || !this.getCommandScopedEntityManager().isOpen() ) {
+        if ( this.getCommandScopedPersistenceContext() == null || !this.getCommandScopedPersistenceContext().isOpen() ) {
             EntityManagerHolder emHolder = (EntityManagerHolder) TransactionSynchronizationManager.getResource( "cmdEM" );
             EntityManager em = null;
             if ( emHolder == null ) {
@@ -104,7 +106,7 @@ public class DroolsSpringJpaManager
                           em );
         }
 
-        this.getCommandScopedEntityManager().joinTransaction();
+        this.getCommandScopedPersistenceContext().joinTransaction();
         this.appScopedEntityManager.joinTransaction();
 
     }
@@ -112,8 +114,8 @@ public class DroolsSpringJpaManager
     public void endCommandScopedEntityManager() {
         if ( TransactionSynchronizationManager.hasResource( "cmdEM" ) ) {
             TransactionSynchronizationManager.unbindResource( "cmdEM" );
-            if ( getCommandScopedEntityManager() != null ) {
-                getCommandScopedEntityManager().close();
+            if ( getCommandScopedPersistenceContext() != null ) {
+                getCommandScopedPersistenceContext().close();
             }
 
         }
