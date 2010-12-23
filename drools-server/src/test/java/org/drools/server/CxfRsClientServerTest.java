@@ -16,12 +16,14 @@
 
 package org.drools.server;
 
-import junit.framework.TestCase;
-
 import org.apache.camel.CamelContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class CxfRsClientServerTest extends TestCase {
+import static org.junit.Assert.*;
+
+public class CxfRsClientServerTest {
+
+    @org.junit.Test
     public void test1() throws Exception {
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext( "classpath:beans-test.xml" );
 

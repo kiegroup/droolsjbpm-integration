@@ -27,8 +27,6 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import junit.framework.TestCase;
-
 import org.apache.camel.CamelContext;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
@@ -47,14 +45,15 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class CxfSoapClientServerGridTest extends TestCase {
+import static org.junit.Assert.*;
 
-	public void testDummy() {
-	}
-	
-    public void FIXMEtest1() throws Exception {
+public class CxfSoapClientServerGridTest {
+
+    @org.junit.Test @Ignore
+    public void test1() throws Exception {
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext( "classpath:beans-test-grid.xml" );
 
         SOAPMessage soapMessage = createMessageForKsession("ksession3");
