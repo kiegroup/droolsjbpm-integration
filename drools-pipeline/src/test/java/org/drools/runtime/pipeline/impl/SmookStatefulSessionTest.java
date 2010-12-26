@@ -26,6 +26,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -49,12 +50,9 @@ import org.milyn.Smooks;
 import org.milyn.io.StreamUtils;
 
 public class SmookStatefulSessionTest {
-	
-    @Test
-    public void testDummy() {
-	}
 
-    public void FIXMEtestDirectRoot() throws Exception {
+    @Test @Ignore
+    public void testDirectRoot() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
         kbuilder.add( ResourceFactory.newClassPathResource( "test_SmooksDirectRoot.drl",
@@ -102,7 +100,8 @@ public class SmookStatefulSessionTest {
                       list.get( 0 ).getClass().getName() );
     }
 
-    public void FIXMEtestNestedIterable() throws Exception {
+    @Test @Ignore
+    public void testNestedIterable() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
         kbuilder.add( ResourceFactory.newClassPathResource( "test_SmooksNestedIterable.drl",

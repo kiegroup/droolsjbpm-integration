@@ -25,6 +25,7 @@ import javax.naming.Context;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -76,7 +77,8 @@ public class SimpleJmsMessengerTest {
 //        this.broker.stop();
 //    }    
 
-    public void FIXMEtestJms() throws Exception {
+    @Test @Ignore
+    public void testJms() throws Exception {
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 

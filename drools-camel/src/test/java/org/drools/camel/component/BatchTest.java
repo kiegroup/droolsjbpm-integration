@@ -62,6 +62,7 @@ import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -1435,7 +1436,8 @@ public abstract class BatchTest extends ContextTestSupport {
                       workItem.getState() );
     }
 
-    public void FIXMEtestInsertObjectWithDeclaredFact() throws Exception {
+    @Test @Ignore
+    public void testInsertObjectWithDeclaredFact() throws Exception {
         String str = "";
         str += "package org.foo \n";
         str += "declare Whee \n\ttype: String\n\tprice: Integer\n\toldPrice: Integer\nend\n";
@@ -1474,7 +1476,8 @@ public abstract class BatchTest extends ContextTestSupport {
 
     }
 
-    public void FIXMEtestInsertObjectWithDeclaredFactAndQuery() throws Exception {
+    @Test @Ignore
+    public void testInsertObjectWithDeclaredFactAndQuery() throws Exception {
         String str = "";
         str += "package org.foo \n";
         str += "declare Whee \n\ttype: String\n\tprice: Integer\n\toldPrice: Integer\nend\n";

@@ -29,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -95,7 +96,8 @@ public class JaxbSimpleJmsMessengerTest {
 //        this.broker.stop();
 //    }
 
-    public void FIXMEtestJmsWithJaxb() throws Exception {
+    @Test @Ignore
+    public void testJmsWithJaxb() throws Exception {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
