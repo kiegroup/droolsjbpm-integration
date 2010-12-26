@@ -16,9 +16,15 @@
 
 package org.drools.camel.component.cxf;
 
-import org.apache.camel.test.CamelSpringTestSupport;
+import org.apache.camel.test.junit4.CamelSpringTestSupport;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class CxfRestTest extends CamelSpringTestSupport {
 
@@ -27,6 +33,7 @@ public class CxfRestTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext( "org/drools/camel/component/CxfRsSpring.xml" );
     }
 
+    @Test
     public void test1() throws Exception {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";

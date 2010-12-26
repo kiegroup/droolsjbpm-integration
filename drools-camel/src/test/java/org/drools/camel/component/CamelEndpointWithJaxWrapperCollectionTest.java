@@ -54,6 +54,12 @@ import org.drools.runtime.rule.FactHandle;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 /**
  * 
  * @author Lucas Amador
@@ -64,6 +70,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
     private String      handle;
     private JAXBContext jaxbContext;
 
+    @Test
     public void testWorkingSetGlobalTestSessionSetAndGetGlobal() throws Exception {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();

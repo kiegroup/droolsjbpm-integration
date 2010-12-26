@@ -27,7 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
@@ -77,9 +80,10 @@ import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 
-public class JSonBatchExecutionTest extends TestCase { 
+public class JSonBatchExecutionTest {
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         XMLUnit.setIgnoreComments( true );
         XMLUnit.setIgnoreWhitespace( true );
         XMLUnit.setIgnoreAttributeOrder( true );
@@ -101,6 +105,7 @@ public class JSonBatchExecutionTest extends TestCase {
         }
     }
 
+    @Test
     public void testListenForChanges() throws Exception {
 
         String str = "";
@@ -207,6 +212,7 @@ public class JSonBatchExecutionTest extends TestCase {
 
     }
 
+    @Test
     public void testInsertWithDefaults() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -265,6 +271,7 @@ public class JSonBatchExecutionTest extends TestCase {
 //        JSONAssert.assertEquals( expectedXml, outXml );
     }
 
+    @Test
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -309,6 +316,7 @@ public class JSonBatchExecutionTest extends TestCase {
 //                        outXml );
     }
 
+    @Test
     public void testGetObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -364,6 +372,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       stilton.getPrice() );
     }
 
+    @Test
     public void testRetractObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -421,6 +430,7 @@ public class JSonBatchExecutionTest extends TestCase {
         assertNull( result.getValue( "outStilton" ) );
     }
 
+    @Test
     public void testModifyObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -519,6 +529,7 @@ public class JSonBatchExecutionTest extends TestCase {
 
     }
 
+    @Test
     public void testInsertElements() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -589,6 +600,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       new HashSet( list ) );
     }
 
+    @Test
     public void testFactHandleReturn() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -642,6 +654,7 @@ public class JSonBatchExecutionTest extends TestCase {
 
     }
 
+    @Test
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -740,6 +753,7 @@ public class JSonBatchExecutionTest extends TestCase {
 //                        outXml );
     }
 
+    @Test
     public void testSetGlobal() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -821,6 +835,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       list3.get( 0 ) );
     }
 
+    @Test
     public void testGetGlobal() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -874,6 +889,7 @@ public class JSonBatchExecutionTest extends TestCase {
 //                        outXml );
     }
 
+    @Test
     public void testGetObjects() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -940,6 +956,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       new HashSet( list ) );
     }
 
+    @Test
     public void testQuery() throws Exception {
         String str = "";
         str += "package org.drools.test  \n";
@@ -1083,6 +1100,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       newSet );
     }
 
+    @Test
     public void testManualFireAllRules() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -1172,6 +1190,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       result.getValue( "outBrie" ) );
     }
 
+    @Test
     public void testProcess() throws SAXException,
                              IOException {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -1268,6 +1287,7 @@ public class JSonBatchExecutionTest extends TestCase {
 //                        outXml );
     }
 
+    @Test
     public void testProcessInstanceSignalEvent() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         String str = "";
@@ -1333,6 +1353,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
+    @Test
     public void testProcessRuntimeSignalEvent() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         String str = "";
@@ -1398,6 +1419,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
+    @Test
     public void testCompleteWorkItem() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -1558,6 +1580,7 @@ public class JSonBatchExecutionTest extends TestCase {
                       processInstance.getVariable( "Number" ) );
     }
 
+    @Test
     public void testAbortWorkItem() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -1684,6 +1707,7 @@ public class JSonBatchExecutionTest extends TestCase {
         }
     }
 
+    @Test
     public void testInsertObjectWithDeclaredFact() throws Exception {
         String str = "";
         str += "package org.foo \n";
@@ -1735,6 +1759,7 @@ public class JSonBatchExecutionTest extends TestCase {
 
     }
 
+    @Test
     public void testInsertObjectStateful() throws Exception {
         String str = "";
         str += "package org.foo \n";
@@ -1783,6 +1808,7 @@ public class JSonBatchExecutionTest extends TestCase {
         assertTrue( outXml.indexOf( "\"price\":30" ) >= 0 );
     }
 
+    @Test
     public void testVsmPipeline() throws Exception {
         String str = "";
         str += "package org.drools \n";

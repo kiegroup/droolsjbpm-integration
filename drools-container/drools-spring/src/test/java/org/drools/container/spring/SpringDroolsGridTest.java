@@ -21,7 +21,10 @@ import java.io.Serializable;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
@@ -46,8 +49,9 @@ import org.drools.runtime.rule.FactHandle;
 import org.junit.Assert;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class SpringDroolsGridTest extends TestCase {
+public class SpringDroolsGridTest {
 
+    @Test
     public void test1() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new JpaWhitePages( emf );
@@ -57,6 +61,7 @@ public class SpringDroolsGridTest extends TestCase {
         wp.create( "s3" );
     }
 
+    @Test
     public void testGrid() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/grid.xml" );
 
@@ -75,7 +80,7 @@ public class SpringDroolsGridTest extends TestCase {
 
         KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
-        Assert.assertNotNull( kbuilder );
+        assertNotNull( kbuilder );
 
         String rule = "package test\n"
                       + "import org.drools.container.spring.SpringDroolsGridTest.MyObject;\n"
@@ -102,21 +107,21 @@ public class SpringDroolsGridTest extends TestCase {
 
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
-        Assert.assertNotNull( kbase );
+        assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
 
-        Assert.assertNotNull( session );
+        assertNotNull( session );
         session.setGlobal( "myGlobalObj",
                            new MyObject( "myGlobalObj" ) );
 
         FactHandle handle = session.insert( new MyObject( "myObj1" ) );
-        Assert.assertNotNull( handle );
+        assertNotNull( handle );
 
         int fired = session.fireAllRules();
-        Assert.assertEquals( 1,
+        assertEquals( 1,
                                  fired );
 
         session.retract( handle );

@@ -45,9 +45,16 @@ import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class CamelProxyEndpointTest extends DroolsCamelTestSupport {
     private String handle;
 
+    @Test
     public void testSessionInsert() throws Exception {
         Person person = new Person();
         person.setName( "Mauricio" );

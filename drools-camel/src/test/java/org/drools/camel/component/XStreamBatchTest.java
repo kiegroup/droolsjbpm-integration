@@ -6,6 +6,12 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Ignore;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 @Ignore
 public class XStreamBatchTest extends BatchTest {
 
@@ -13,7 +19,7 @@ public class XStreamBatchTest extends BatchTest {
         this.dataformat = "xstream";
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         XMLUnit.setIgnoreComments( true );
         XMLUnit.setIgnoreWhitespace( true );

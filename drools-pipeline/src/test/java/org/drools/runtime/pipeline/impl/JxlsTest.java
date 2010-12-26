@@ -40,13 +40,17 @@ import org.mvel2.MVEL;
 import org.mvel2.ParserConfiguration;
 import org.mvel2.ParserContext;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import net.sf.jxls.reader.ReaderBuilder;
 import net.sf.jxls.reader.XLSDataReadException;
 import net.sf.jxls.reader.XLSReadStatus;
 import net.sf.jxls.reader.XLSReader;
 
-public class JxlsTest extends TestCase {
+public class JxlsTest {
+    @Test
     public void test1() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         // kbuilder.add( ResourceFactory.newClassPathResource( "test_JXLS.drl", getClass() ), ResourceType.DRL );

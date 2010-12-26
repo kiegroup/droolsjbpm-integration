@@ -16,13 +16,17 @@
 
 package org.drools.runtime.pipeline.impl;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Callable;
 import org.drools.runtime.pipeline.PipelineFactory;
 
-public class CallableTest extends TestCase {
+public class CallableTest {
+    @Test
     public void testCallable() {
         MockClass mock = new MockClass();
         Callable callable = new CallableImpl();

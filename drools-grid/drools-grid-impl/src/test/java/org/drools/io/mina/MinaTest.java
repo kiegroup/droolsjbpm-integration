@@ -26,10 +26,14 @@ import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class MinaTest extends TestCase {
+public class MinaTest {
 
+    @Test
     public void test1() throws Exception {
         SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
 

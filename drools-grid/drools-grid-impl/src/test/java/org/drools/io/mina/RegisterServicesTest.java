@@ -52,6 +52,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -65,24 +66,8 @@ public class RegisterServicesTest {
 
     public RegisterServicesTest() {
     }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
     
-    @Test
+    @Test @Ignore
     public void test1() {
         
     }
@@ -148,11 +133,11 @@ public class RegisterServicesTest {
 //        GridServiceDescription gsdLocalButExposedWp = corewp.lookup( WhitePages.class );
 //
 //        //The Scheduler is local = no addresses and no Data
-//        Assert.assertEquals( 0,
+//        assertEquals( 0,
 //                             gsdLocalSched.getAddresses().size() );
-//        Assert.assertNull( gsdLocalSched.getData() );
+//        assertNull( gsdLocalSched.getData() );
 //
-//        Assert.assertNotNull( gsdLocalButExposedSched.getData() );
+//        assertNotNull( gsdLocalButExposedSched.getData() );
 //
 //        Connector conn = new MinaConnector();
 //

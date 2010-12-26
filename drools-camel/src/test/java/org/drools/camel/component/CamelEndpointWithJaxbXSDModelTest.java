@@ -50,6 +50,12 @@ import org.drools.util.CompositeClassLoader;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 /**
  * 
  * @author Lucas Amador
@@ -61,6 +67,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
     private JAXBContext                jaxbContext;
     private CompositeClassLoader    classLoader;
 
+    @Test
     public void testSessionInsert() throws Exception {
         Class< ? > personClass = classLoader.loadClass( "org.drools.model.Person" );
         assertNotNull( personClass.getPackage() );

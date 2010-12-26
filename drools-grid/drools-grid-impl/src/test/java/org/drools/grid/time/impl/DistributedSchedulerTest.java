@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import junit.framework.Assert;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
@@ -33,7 +32,10 @@ import org.drools.time.JobHandle;
 import org.drools.time.TimerService;
 import org.drools.time.Trigger;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
@@ -57,22 +59,19 @@ import org.drools.grid.timer.impl.SchedulerServiceConfiguration;
 import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
 import org.drools.time.SchedulerService;
 
-public class DistributedSchedulerTest extends TestCase {
+public class DistributedSchedulerTest {
 
     private Acceptor                            acc = new MinaAcceptor();
     private SystemEventListener                 l   = SystemEventListenerFactory.getSystemEventListener();
     private Map<String, GridServiceDescription> coreServicesMap;
 
-    @Override
-    public void setUp() {
-
-    }
-
-    @Override
+    @After
     public void tearDown() {
         MockJob.counter = 0;
     }
-    
+
+
+    @Test
     public void test1() {
         
     }
@@ -238,13 +237,13 @@ public class DistributedSchedulerTest extends TestCase {
 //
 //        GridServiceDescription gsd = corewp.lookup( SchedulerService.class );
 //
-//        Assert.assertEquals( 1,
+//        assertEquals( 1,
 //                             ((InetSocketAddress[]) gsd.getAddresses().values().iterator().next().getObject()).length );
 //
-//        Assert.assertEquals( 2,
+//        assertEquals( 2,
 //                             ((InetSocketAddress[]) ((SchedulerServiceConfiguration) gsd.getData()).getServices( grid3 )).length );
 //
-//        Assert.assertEquals( 0,
+//        assertEquals( 0,
 //                             MockJob.counter );
 //
 //        conn.close();
@@ -271,10 +270,10 @@ public class DistributedSchedulerTest extends TestCase {
 //        //Get Scheduler Service
 //        GridServiceDescription gsd = corewp.lookup( SchedulerService.class );
 //
-//        Assert.assertEquals( 1,
+//        assertEquals( 1,
 //                             ((InetSocketAddress[]) gsd.getAddresses().values().iterator().next().getObject()).length );
 //
-//        Assert.assertEquals( 2,
+//        assertEquals( 2,
 //                             ((InetSocketAddress[]) ((SchedulerServiceConfiguration) gsd.getData()).getServices( grid1 )).length );
 //
 //        Connector conn = new MinaConnector();

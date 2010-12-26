@@ -3,9 +3,11 @@ package org.drools.io.mina;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import junit.framework.Assert;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
@@ -31,8 +33,9 @@ import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.time.SchedulerService;
 
-public class WhitePagesTest extends TestCase {
+public class WhitePagesTest {
 
+    @Test
     public void test1() throws Exception {
         Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 
@@ -91,6 +94,7 @@ public class WhitePagesTest extends TestCase {
         grid1.get( SocketService.class ).close();
     }
 
+    @Test
     public void testWhitePagesLookupServices() {
         Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );
 
@@ -117,10 +121,10 @@ public class WhitePagesTest extends TestCase {
         conf.configure( grid1 );
 
         WhitePages wplocal = grid1.get( WhitePages.class );
-        Assert.assertNotNull( wplocal );
+        assertNotNull( wplocal );
         GridServiceDescription schedulersgsd = wplocal.lookup( "scheduler:" + "myLocalSched1" + SchedulerService.class.getName() );
 
-        Assert.assertNotNull( schedulersgsd );
+        assertNotNull( schedulersgsd );
 
     }
 

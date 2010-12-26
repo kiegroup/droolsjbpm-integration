@@ -28,9 +28,13 @@ import org.drools.runtime.pipeline.Splitter;
 import org.mvel2.MVEL;
 import org.mvel2.optimizers.OptimizerFactory;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class IterateSplitterTest extends TestCase {
+public class IterateSplitterTest {
+    @Test
     public void testSplitter() {
         MockClass mock = new MockClass();
         List<Integer> list = new ArrayList<Integer>();

@@ -24,7 +24,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -50,7 +53,7 @@ import org.drools.runtime.rule.FactHandle;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
-public class JaxbTest extends TestCase {
+public class JaxbTest {
 
     //    public void testModelLoad() throws Exception {
     //        Options xjcOpts = new Options();
@@ -77,6 +80,7 @@ public class JaxbTest extends TestCase {
     //                      elm.getValue().getClass().getName() );        
     //    }
 
+    @Test
     public void testDirectRoot() throws Exception {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
@@ -143,6 +147,7 @@ public class JaxbTest extends TestCase {
                       list1.get( 0 ).getClass().getName() );
     }
 
+    @Test
     public void testNestedIterable() throws Exception {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );

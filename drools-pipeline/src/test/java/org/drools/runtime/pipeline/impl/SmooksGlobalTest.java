@@ -41,11 +41,15 @@ import org.milyn.Smooks;
 
 import com.thoughtworks.xstream.XStream;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class SmooksGlobalTest extends TestCase {
+public class SmooksGlobalTest {
     
-	public void testDummy() {
+    @Test
+    public void testDummy() {
 	}
 	
     public void FIXMEtestGlobal() throws Exception {

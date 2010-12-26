@@ -19,7 +19,10 @@ package org.drools.runtime.pipeline.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -38,8 +41,9 @@ import org.drools.runtime.pipeline.Transformer;
 
 import com.thoughtworks.xstream.XStream;
 
-public class XStreamStatelessSessionTest extends TestCase {
+public class XStreamStatelessSessionTest {
 
+    @Test
     public void testXstreamDirectRoot() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -86,6 +90,7 @@ public class XStreamStatelessSessionTest extends TestCase {
                       list.get( 0 ).getClass().getName() );
     }
 
+    @Test
     public void testXstreamNestedIterable() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 

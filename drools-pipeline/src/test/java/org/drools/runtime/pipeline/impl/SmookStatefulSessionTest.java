@@ -24,7 +24,10 @@ import java.util.Map;
 
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -45,9 +48,10 @@ import org.drools.runtime.rule.FactHandle;
 import org.milyn.Smooks;
 import org.milyn.io.StreamUtils;
 
-public class SmookStatefulSessionTest extends TestCase {
+public class SmookStatefulSessionTest {
 	
-	public void testDummy() {
+    @Test
+    public void testDummy() {
 	}
 
     public void FIXMEtestDirectRoot() throws Exception {

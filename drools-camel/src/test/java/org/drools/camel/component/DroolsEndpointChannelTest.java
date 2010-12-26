@@ -38,9 +38,16 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.drools.pipeline.camel.Person;
 import org.drools.runtime.StatefulKnowledgeSession;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class DroolsEndpointChannelTest extends DroolsCamelTestSupport {
     private StatefulKnowledgeSession ksession;
 
+    @Test
     public void testChannelSupport() throws Exception {
         Person bob1 = new Person( "bob" );
         Person bob2 = new Person( "bob" );

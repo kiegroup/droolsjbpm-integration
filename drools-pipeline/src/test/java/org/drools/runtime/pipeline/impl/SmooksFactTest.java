@@ -39,11 +39,15 @@ import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.rule.FactHandle;
 import org.milyn.Smooks;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class SmooksFactTest extends TestCase {
+public class SmooksFactTest {
    
-	public void testDummy() {
+    @Test
+    public void testDummy() {
 	}
 	
     public void FIXMEtestFact() throws Exception {

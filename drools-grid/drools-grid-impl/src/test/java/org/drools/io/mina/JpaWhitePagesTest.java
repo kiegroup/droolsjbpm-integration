@@ -3,14 +3,18 @@ package org.drools.io.mina;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 
-public class JpaWhitePagesTest extends TestCase {
+public class JpaWhitePagesTest {
 
+    @Test
     public void test1() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new JpaWhitePages( emf );

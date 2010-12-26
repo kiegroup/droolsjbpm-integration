@@ -6,7 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Persistence;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
@@ -29,8 +32,9 @@ import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 
-public class RemoteWhitePagesTest extends TestCase {
+public class RemoteWhitePagesTest {
 
+    @Test
     public void test1() {
 
         Map<String, GridServiceDescription> coreServicesMap = new HashMap<String, GridServiceDescription>();//Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );

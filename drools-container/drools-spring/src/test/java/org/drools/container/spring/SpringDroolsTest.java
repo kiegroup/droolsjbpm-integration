@@ -20,7 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.ClockType;
 import org.drools.Person;
@@ -45,15 +48,9 @@ import org.drools.runtime.process.WorkItemHandler;
 import org.jbpm.process.instance.impl.humantask.HumanTaskHandler;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class SpringDroolsTest extends TestCase {
+public class SpringDroolsTest {
 
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
+    @Test
     public void testNoConnection() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
@@ -64,6 +61,7 @@ public class SpringDroolsTest extends TestCase {
         assertNotNull( node2 );
     }
 
+    @Test
     public void testNoNodeKSessions() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/no-node-beans.xml" );
 
@@ -89,6 +87,7 @@ public class SpringDroolsTest extends TestCase {
                       list.size() );
     }
 
+    @Test
     public void testSimpleKSessions() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
@@ -114,6 +113,7 @@ public class SpringDroolsTest extends TestCase {
                       list.size() );
     }
 
+    @Test
     public void testAgents() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/kagents-beans.xml" );
 
@@ -159,6 +159,7 @@ public class SpringDroolsTest extends TestCase {
 
     }
 
+    @Test
     public void testNode() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
@@ -189,6 +190,7 @@ public class SpringDroolsTest extends TestCase {
                       list.size() );
     }
 
+    @Test
     public void testConfiguration() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/session-conf-beans.xml" );
         KnowledgeBaseImpl kbase1 = (KnowledgeBaseImpl) context.getBean( "kbase1" );
@@ -242,6 +244,7 @@ public class SpringDroolsTest extends TestCase {
 
     }
 
+    @Test
     public void testResourceAuthenication() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 

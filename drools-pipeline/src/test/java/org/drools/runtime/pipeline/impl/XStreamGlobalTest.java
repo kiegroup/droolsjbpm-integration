@@ -16,7 +16,10 @@
 
 package org.drools.runtime.pipeline.impl;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
@@ -38,9 +41,10 @@ import org.drools.runtime.pipeline.impl.XStreamStatefulSessionTest.ResultHandler
 
 import com.thoughtworks.xstream.XStream;
 
-public class XStreamGlobalTest extends TestCase {
+public class XStreamGlobalTest {
     
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         XMLUnit.setIgnoreComments( true );
         XMLUnit.setIgnoreWhitespace( true );
         XMLUnit.setIgnoreAttributeOrder( true );
@@ -63,6 +67,7 @@ public class XStreamGlobalTest extends TestCase {
     }
     
     
+    @Test
     public void testGlobal() throws Exception {
         String xml = "";
         xml += "<list>\n";

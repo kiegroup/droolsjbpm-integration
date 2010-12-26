@@ -46,8 +46,9 @@ import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -133,7 +134,7 @@ public abstract class BaseRemoteTest {
     protected StatefulKnowledgeSession createSession(){
         KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
-        Assert.assertNotNull( kbuilder );
+        assertNotNull( kbuilder );
 
          String rule = "package test\n"
                  + "import org.drools.grid.NodeTests.MyObject;\n"
@@ -155,12 +156,12 @@ public abstract class BaseRemoteTest {
                 System.out.println( "Error: " + error.getMessage() );
 
             }
-            Assert.fail("KnowledgeBase did not build");
+            fail("KnowledgeBase did not build");
         }
 
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
-        Assert.assertNotNull( kbase );
+        assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
@@ -173,7 +174,7 @@ public abstract class BaseRemoteTest {
     protected StatefulKnowledgeSession createProcessSession(){
         KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
-        Assert.assertNotNull( kbuilder );
+        assertNotNull( kbuilder );
 
         String process = "<definitions id=\"Definition\" "
                 + "targetNamespace=\"http://www.example.org/MinimalExample\" "
@@ -206,12 +207,12 @@ public abstract class BaseRemoteTest {
                 System.out.println( "Error: " + error.getMessage() );
 
             }
-            Assert.fail("KnowledgeBase did not build");
+            fail("KnowledgeBase did not build");
         }
 
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
-        Assert.assertNotNull( kbase );
+        assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 

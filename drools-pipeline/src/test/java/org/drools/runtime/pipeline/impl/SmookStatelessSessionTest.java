@@ -25,7 +25,10 @@ import java.util.Map;
 
 import javax.xml.transform.stream.StreamSource;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -50,8 +53,9 @@ import org.drools.runtime.rule.FactHandle;
 import org.milyn.Smooks;
 import org.milyn.io.StreamUtils;
 
-public class SmookStatelessSessionTest extends TestCase {
+public class SmookStatelessSessionTest {
 
+    @Test
     public void testSmooksDirectRoot() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -101,6 +105,7 @@ public class SmookStatelessSessionTest extends TestCase {
                       list.get( 0 ).getClass().getName() );
     }
 
+    @Test
     public void testSmooksNestedIterable() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 

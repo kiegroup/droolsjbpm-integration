@@ -4,7 +4,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
@@ -23,18 +26,16 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 
-public class LocalGridNodeTest extends TestCase {
+public class LocalGridNodeTest {
 
-    public void test() {
-
-    }
-
+    @Test
     public void testConnectWithId() {
         GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
         GridNode gnode = connection.connect();
         assertNotNull( gnode );
     }
 
+    @Test
     public void testConnectWithGivenGridNode() {
         GridNode gnode = new GridNodeImpl();
         GridConnection<GridNode> connection = new LocalGridNodeConnection( gnode );
@@ -42,6 +43,7 @@ public class LocalGridNodeTest extends TestCase {
                     connection.connect() );
     }
 
+    @Test
     public void testGetFactoryService() {
         GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
         GridNode gnode = connection.connect();
@@ -49,6 +51,7 @@ public class LocalGridNodeTest extends TestCase {
         assertNotNull( kbfService );
     }
 
+    @Test
     public void testSetObject() {
         GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
         GridNode gnode = connection.connect();
@@ -62,6 +65,7 @@ public class LocalGridNodeTest extends TestCase {
                                KnowledgeBase.class ) );
     }
 
+    @Test
     public void testNodeCreationAndWhitePagesRegistration() {
         Grid grid = new GridImpl( new HashMap<String, Object>() );
 

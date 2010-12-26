@@ -14,10 +14,14 @@ import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
 import org.drools.time.Trigger;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class ScheduledJobJpaTest extends TestCase {
+public class ScheduledJobJpaTest {
 
+    @Test
     public void test1() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
 

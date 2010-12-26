@@ -23,7 +23,10 @@ import java.util.Properties;
 
 import javax.naming.Context;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.apache.activemq.broker.BrokerService;
 import org.drools.KnowledgeBase;
@@ -33,7 +36,7 @@ import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
 import org.drools.runtime.rule.FactHandle;
 
-public class SimpleJmsMessengerTest extends TestCase {
+public class SimpleJmsMessengerTest {
 
     private SimpleProducer simpleProducer;
     private BrokerService  broker;
@@ -42,10 +45,11 @@ public class SimpleJmsMessengerTest extends TestCase {
 
     private Properties     props;
     
+    @Test
     public void testDummy() {
     }
 
-//    protected void setUp() {
+//    public void setUp() {
 //        try {
 //            this.broker = new BrokerService();
 //            // configure the broker
@@ -67,7 +71,7 @@ public class SimpleJmsMessengerTest extends TestCase {
 //        }
 //    }
 //    
-//    protected void tearDown() throws Exception {
+//    public void tearDown() throws Exception {
 //        this.simpleProducer.stop();
 //        this.broker.stop();
 //    }    

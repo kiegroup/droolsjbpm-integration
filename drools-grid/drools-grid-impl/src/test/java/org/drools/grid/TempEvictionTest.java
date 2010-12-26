@@ -27,12 +27,13 @@ import org.drools.command.impl.ContextImplWithEviction;
 import org.drools.grid.impl.EvictionJob;
 import org.drools.time.Trigger;
 import org.drools.time.impl.JDKTimerService;
-import org.junit.Assert;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -45,23 +46,9 @@ public class TempEvictionTest {
     public TempEvictionTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
     public void setUp() {
-
-
         coreServicesMap = new HashMap<String, GridServiceDescription>();
-    }
-
-    @After
-    public void tearDown() {
     }
 
 
@@ -91,7 +78,7 @@ public class TempEvictionTest {
         //Wait for eviction
         Thread.sleep(4000);
 
-        Assert.assertNull((String) contextTemp.get("myvalue"));
+        assertNull((String) contextTemp.get("myvalue"));
 
 
     }
@@ -147,7 +134,7 @@ public class TempEvictionTest {
 //
 //        KnowledgeBuilder kbuilder = remoteN1.get(KnowledgeBuilderFactoryService.class).newKnowledgeBuilder();
 //
-//        Assert.assertNotNull(kbuilder);
+//        assertNotNull(kbuilder);
 //
 //        String rule = "package test\n"
 //                + "rule \"test\""
@@ -170,25 +157,25 @@ public class TempEvictionTest {
 //
 //        KnowledgeBase kbase = remoteN1.get(KnowledgeBaseFactoryService.class).newKnowledgeBase();
 //
-//        Assert.assertNotNull(kbase);
+//        assertNotNull(kbase);
 //
 //        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 //
 //        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
 //
-//        Assert.assertNotNull(session);
+//        assertNotNull(session);
 //
 //       
 //        
 //        Thread.sleep(10000);
 //        
 //        StatefulKnowledgeSession session2 = kbase.newStatefulKnowledgeSession();
-//        Assert.assertNotNull(session2);
+//        assertNotNull(session2);
 //        
 //        Thread.sleep(10000);
 //        session2.insert(new NodeTests.MyObject("something"));
 //        int i = session2.fireAllRules();
-//        Assert.assertEquals(1, i);
+//        assertEquals(1, i);
 //        
 //        Thread.sleep(30000);
 //        

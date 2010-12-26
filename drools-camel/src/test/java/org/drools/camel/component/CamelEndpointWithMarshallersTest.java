@@ -54,12 +54,20 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     private String handle;
 
+    @Test
     public void testSimple() {
     }
 
+    @Test
     public void testSessionInsert() throws Exception {
 
         String cmd = "";
@@ -95,6 +103,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
 
     }
 
+    @Test
     public void testJSonSessionInsert() throws Exception {
 
         String inXml = "";
@@ -113,6 +122,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
                       person.getName() );
     }
 
+    @Test
     public void testNoSessionInsert() throws Exception {
 
         String cmd = "";
@@ -147,6 +157,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
                         outXml );
     }
 
+    @Test
     public void testNoSessionInsertCustomXstream() throws Exception {
 
         String cmd = "";
@@ -182,6 +193,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
                         outXml );
     }
 
+    @Test
     public void testSessionGetObject() throws Exception {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";

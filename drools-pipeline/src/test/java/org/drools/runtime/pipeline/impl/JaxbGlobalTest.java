@@ -47,9 +47,13 @@ import org.drools.core.util.StringUtils;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class JaxbGlobalTest extends TestCase {
+public class JaxbGlobalTest {
+    @Test
     public void testGlobal() throws Exception {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );

@@ -44,7 +44,6 @@ import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -74,7 +73,7 @@ public class CxfSoapClientServerGridTest {
 
         KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
-        Assert.assertNotNull( kbuilder );
+        assertNotNull( kbuilder );
         
         String rule = "package  org.grid.test\n"
                 + "declare Message2\n"
@@ -102,13 +101,13 @@ public class CxfSoapClientServerGridTest {
 
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
-        Assert.assertNotNull( kbase );
+        assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
 
-        Assert.assertNotNull( session );
+        assertNotNull( session );
         
         
         remoteN1.set("ksession2", session);

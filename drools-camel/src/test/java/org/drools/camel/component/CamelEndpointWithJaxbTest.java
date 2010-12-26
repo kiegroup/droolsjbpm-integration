@@ -58,6 +58,12 @@ import org.drools.runtime.rule.impl.FlatQueryResults;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 /**
  * 
  * @author Lucas Amador
@@ -68,6 +74,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
     private String      handle;
     private JAXBContext jaxbContext;
 
+    @Test
     public void testSessionInsert() throws Exception {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
@@ -111,6 +118,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         assertNotNull( resp.getFactHandle( "person3" ) );
     }
 
+    @Test
     public void testSessionGetObject() throws Exception {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
@@ -139,6 +147,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         assertNotNull( resp.getValue( "hadrian" ) );
     }
 
+    @Test
     public void testSessionModify() throws Exception {
         String cmd = "";
         cmd += "<batch-execution lookup='ksession1'>\n";
@@ -179,6 +188,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     }
 
+    @Test
     public void testSessionRetractObject() throws Exception {
 
         String cmd = "";
@@ -195,6 +205,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     }
 
+    @Test
     public void testInsertElements() throws Exception {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
@@ -237,6 +248,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     }
 
+    @Test
     public void testQuery() throws Exception {
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
@@ -285,6 +297,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
                       person.getName() );
     }
 
+    @Test
     public void testProcess() throws Exception {
 
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
@@ -321,6 +334,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         assertNotNull( resp.getValue( "process-instance-id" ) );
     }
 
+    @Test
     public void testProcessInstanceSignalEvent() throws Exception {
 
         String processId = "org.drools.event";

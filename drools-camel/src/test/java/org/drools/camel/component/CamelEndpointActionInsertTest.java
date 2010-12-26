@@ -49,11 +49,18 @@ import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
     private StatefulKnowledgeSession ksession;
     private AgendaEventListener ael;
     private WorkingMemoryEventListener wmel;
 
+    @Test
     public void testSessionInsert() throws Exception {
         Person person = new Person();
         person.setName( "Bob" );
@@ -70,6 +77,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         assertThat( ace.getValue().getActivation().getRule().getName(), is("rule1") );
     }
 
+    @Test
     public void testSessionInsertEntryPoint() throws Exception {
         Person person = new Person();
         person.setName( "Bob" );
@@ -86,6 +94,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         assertThat( ace.getValue().getActivation().getRule().getName(), is("rule2") );
     }
 
+    @Test
     public void testSessionInsertMessage() throws Exception {
         Person person = new Person();
         person.setName( "Bob" );
@@ -102,6 +111,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         assertThat( ace.getValue().getActivation().getRule().getName(), is("rule3") );
     }
 
+    @Test
     public void testSessionInsertExchange() throws Exception {
         Person person = new Person();
         person.setName( "Bob" );

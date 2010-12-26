@@ -37,9 +37,13 @@ import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class StatefulKnowledgeSessionPipelineTest extends TestCase {
+public class StatefulKnowledgeSessionPipelineTest {
+    @Test
     public void testInsertObject() {
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
@@ -61,6 +65,7 @@ public class StatefulKnowledgeSessionPipelineTest extends TestCase {
         assertEquals( 1, resultHanadle.getHandles().size() );              
     }
     
+    @Test
     public void testInsertObject2() {
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
@@ -80,6 +85,7 @@ public class StatefulKnowledgeSessionPipelineTest extends TestCase {
         assertEquals( 1, resultHanadle.getHandles().size() );              
     }
     
+    @Test
     public void testStartProcess() {
         // This also tests setGlobal
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -149,6 +155,7 @@ public class StatefulKnowledgeSessionPipelineTest extends TestCase {
         assertEquals("SomeText", list.get(0));             
     }    
     
+    @Test
     public void testSignalEvent() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         Reader source = new StringReader(

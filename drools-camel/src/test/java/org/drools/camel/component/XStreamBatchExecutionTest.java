@@ -77,6 +77,12 @@ import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class XStreamBatchExecutionTest extends ContextTestSupport {
     protected GridNode        node;
     protected CommandExecutor exec;
@@ -129,7 +135,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         }
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         XMLUnit.setIgnoreComments( true );
         XMLUnit.setIgnoreWhitespace( true );
@@ -152,6 +158,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         }
     }
 
+    @Test
     public void testListenForChanges() throws Exception {
 
         String str = "";
@@ -265,6 +272,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
     }
 
+    @Test
     public void testInsertWithDefaults() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -324,6 +332,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                         outXml );
     }
 
+    @Test
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -374,6 +383,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                         outXml );
     }
 
+    @Test
     public void testGetObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -428,6 +438,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       stilton.getPrice() );
     }
 
+    @Test
     public void testRetractObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -489,6 +500,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         assertNull( result.getValue( "outStilton" ) );
     }
 
+    @Test
     public void testModifyObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -591,6 +603,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
     }
 
+    @Test
     public void testInsertElements() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -670,6 +683,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       new HashSet( list ) );
     }
 
+    @Test
     public void testFactHandleReturn() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -712,6 +726,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
     }
 
+    @Test
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -813,6 +828,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       new HashSet( list ) );
     }
 
+    @Test
     public void testSetGlobal() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -898,6 +914,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       list3.get( 0 ) );
     }
 
+    @Test
     public void testGetGlobal() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -950,6 +967,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                         outXml );
     }
 
+    @Test
     public void testGetObjects() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -1022,6 +1040,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       new HashSet( list ) );
     }
 
+    @Test
     public void testQuery() throws Exception {
         String str = "";
         str += "package org.drools.test  \n";
@@ -1189,6 +1208,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       newSet );
     }
 
+    @Test
     public void testManualFireAllRules() throws Exception {
         String str = "";
         str += "package org.drools \n";
@@ -1291,6 +1311,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       result.getValue( "outBrie" ) );
     }
 
+    @Test
     public void testProcess() throws SAXException,
                              IOException {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -1383,6 +1404,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                         outXml );
     }
 
+    @Test
     public void testProcessInstanceSignalEvent() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         String str = "";
@@ -1449,6 +1471,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
+    @Test
     public void testProcessRuntimeSignalEvent() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         String str = "";
@@ -1515,6 +1538,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       ((VariableScopeInstance) ((org.jbpm.process.instance.ProcessInstance) processInstance).getContextInstance( VariableScope.VARIABLE_SCOPE )).getVariable( "MyVar" ) );
     }
 
+    @Test
     public void testCompleteWorkItem() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -1682,6 +1706,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                       processInstance.getVariable( "Number" ) );
     }
 
+    @Test
     public void testAbortWorkItem() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
@@ -1810,6 +1835,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         }
     }
 
+    @Test
     public void testInsertObjectWithDeclaredFact() throws Exception {
         String str = "";
         str += "package org.foo \n";
@@ -1863,6 +1889,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
     }
 
+    @Test
     public void testInsertObjectStateful() throws Exception {
         String str = "";
         str += "package org.foo \n";
@@ -1923,6 +1950,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         assertTrue( outXml.indexOf( "<price>30</price>" ) > -1 );
     }
 
+    @Test
     public void testExecutionNodeLookup() throws Exception {
         String str = "";
         str += "package org.drools \n"

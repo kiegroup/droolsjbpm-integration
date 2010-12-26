@@ -12,9 +12,13 @@ import org.drools.grid.service.directory.impl.AddressImpl;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesImpl;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class GridServiceDescriptionJpaTest extends TestCase {
+public class GridServiceDescriptionJpaTest {
+    @Test
     public void test1() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new WhitePagesImpl();

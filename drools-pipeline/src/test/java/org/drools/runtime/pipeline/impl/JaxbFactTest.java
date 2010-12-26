@@ -23,7 +23,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -46,7 +49,8 @@ import org.drools.core.util.StringUtils;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
-public class JaxbFactTest extends TestCase {
+public class JaxbFactTest {
+    @Test
     public void testFact() throws Exception {
         Options xjcOpts = new Options();
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );

@@ -27,7 +27,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
@@ -37,7 +40,8 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.pipeline.camel.Person;
 import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 
-public class JaxbTest extends TestCase {
+public class JaxbTest {
+    @Test
     public void test1() throws Exception {
         List<String> classesName = new ArrayList();
         //        classesName.add("org.drools.model.AddressType");

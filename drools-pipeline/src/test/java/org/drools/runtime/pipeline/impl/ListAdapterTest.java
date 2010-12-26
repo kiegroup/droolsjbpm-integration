@@ -25,9 +25,13 @@ import org.drools.runtime.pipeline.Expression;
 import org.drools.runtime.pipeline.ListAdapter;
 import org.drools.runtime.pipeline.PipelineFactory;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class ListAdapterTest extends TestCase {
+public class ListAdapterTest {
+    @Test
     public void testListAdapter() {
         MockClass mock = new MockClass();
         List list = new ArrayList();
