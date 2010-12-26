@@ -64,11 +64,8 @@ public class JaxbSimpleJmsMessengerTest {
     private String         url             = "vm://localhost:61616";
 
     private Properties     props;
-    
-    @Test
-    public void testDummy() {
-    }
 
+//    @Before
 //    public void setUp() {
 //        try {
 //            this.broker = new BrokerService();

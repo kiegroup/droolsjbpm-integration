@@ -45,10 +45,6 @@ public class SimpleJmsMessengerTest {
     private String         url             = "vm://localhost:61616";
 
     private Properties     props;
-    
-    @Test
-    public void testDummy() {
-    }
 
 //    public void setUp() {
 //        try {

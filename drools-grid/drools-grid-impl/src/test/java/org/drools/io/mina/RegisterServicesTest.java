@@ -68,7 +68,7 @@ public class RegisterServicesTest {
     }
     
     @Test @Ignore
-    public void test1() {
+    public void testDummy() {
         
     }
 

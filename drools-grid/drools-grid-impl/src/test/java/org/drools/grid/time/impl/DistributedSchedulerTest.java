@@ -34,6 +34,7 @@ import org.drools.time.Trigger;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.drools.grid.CoreServicesLookup;
@@ -71,8 +72,8 @@ public class DistributedSchedulerTest {
     }
 
 
-    @Test
-    public void test1() {
+    @Test @Ignore
+    public void testDummy() {
         
     }
 
