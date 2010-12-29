@@ -30,10 +30,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
-    </dependency>   
-    <dependency>
+    </dependency>
+    <dependency><!-- Overwrites (or duplicates) the parent junit dependency because it is needed at compile time -->
        <groupId>junit</groupId>
        <artifactId>junit</artifactId>
+       <scope>compile</scope>
     </dependency>
     <dependency>  
     <groupId>org.yaml</groupId>

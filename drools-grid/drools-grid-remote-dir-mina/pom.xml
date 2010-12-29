@@ -34,13 +34,6 @@
       <version>2.0.0-M6</version>
     </dependency>
 
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.6</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-remote-mina</artifactId>
