@@ -91,7 +91,8 @@ public class DroolsSpringJpaManager
     }
 
     public void beginCommandScopedEntityManager() {
-        if ( this.getCommandScopedPersistenceContext() == null || !this.getCommandScopedPersistenceContext().isOpen() ) {
+        EntityManager cmdScopedEntityManager = (EntityManager) env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER );
+        if ( cmdScopedEntityManager == null || !cmdScopedEntityManager.isOpen() ) {
             EntityManagerHolder emHolder = (EntityManagerHolder) TransactionSynchronizationManager.getResource( "cmdEM" );
             EntityManager em = null;
             if ( emHolder == null ) {
@@ -131,6 +132,7 @@ public class DroolsSpringJpaManager
                 this.internalAppScopedEntityManager = false;
                 this.env.set( EnvironmentName.APP_SCOPED_ENTITY_MANAGER,
                               null );
+                this.appScopedEntityManager = null;
             }
             this.endCommandScopedEntityManager();
         }
