@@ -12,88 +12,88 @@
   <packaging>jar</packaging>
   <name>Drools :: Pipeline</name>
 
-  
-   <dependencies>
-      <dependency>
-        <groupId>org.drools</groupId>
-        <artifactId>drools-api</artifactId>
-      </dependency>
 
-      <dependency>
-         <groupId>org.drools</groupId>
-         <artifactId>drools-core</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.drools</groupId>
-         <artifactId>drools-compiler</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.jbpm</groupId>
-         <artifactId>jbpm-flow-builder</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>org.drools</groupId>
-        <artifactId>drools-grid-impl</artifactId>
-      </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-api</artifactId>
+    </dependency>
 
-      <dependency>
-         <groupId>com.thoughtworks.xstream</groupId>
-         <artifactId>xstream</artifactId>
-      </dependency>     
-      <dependency>
-         <groupId>xmlunit</groupId>
-         <artifactId>xmlunit</artifactId>
-         <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow-builder</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-grid-impl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <scope>test</scope>
+    </dependency>
 
 
-      <dependency>
-         <groupId>org.codehaus.jettison</groupId>
-         <artifactId>jettison</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+    </dependency>
 
-      <dependency>
-         <groupId>net.sf.jxls</groupId>
-         <artifactId>jxls-reader</artifactId>
-      </dependency>  
+    <dependency>
+      <groupId>net.sf.jxls</groupId>
+      <artifactId>jxls-reader</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
     </dependency>
-  <dependency>
-    <groupId>com.sun.xml.bind</groupId>
-    <artifactId>jaxb-xjc</artifactId>
-  </dependency>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-xjc</artifactId>
+    </dependency>
 
-      <dependency>
-        <groupId>xalan</groupId>
-    <artifactId>xalan</artifactId>
-  </dependency>
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+    </dependency>
 
-  <dependency>
-    <groupId>commons-net</groupId>
-    <artifactId>commons-net</artifactId>
-  </dependency>
-      <dependency>
-         <groupId>org.apache.activemq</groupId>
-         <artifactId>activemq-core</artifactId>
-         <exclusions>
-           <exclusion>
-             <groupId>commons-net</groupId>
-        <artifactId>commons-net</artifactId>
-           </exclusion>
-         </exclusions>
-      </dependency>
-      <dependency>
-         <groupId>simple-jndi</groupId>
-         <artifactId>simple-jndi</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-net</groupId>
+          <artifactId>commons-net</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>simple-jndi</groupId>
+      <artifactId>simple-jndi</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.milyn</groupId>
-          <artifactId>milyn-smooks-javabean</artifactId>
-        </dependency>     
+    <dependency>
+      <groupId>org.milyn</groupId>
+      <artifactId>milyn-smooks-javabean</artifactId>
+    </dependency>
   </dependencies>
-   
+
 </project>

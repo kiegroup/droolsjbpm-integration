@@ -11,14 +11,6 @@
   <artifactId>drools-camel</artifactId>
   <name>Drools :: Camel</name>
 
-  <repositories>
-    <repository>
-      <id>camel</id>
-      <name>camel</name>
-      <url>https://repository.apache.org/content/repositories/snapshots/</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <!-- Drools -->
     <dependency>
@@ -170,7 +162,6 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <scope>test</scope>
     </dependency>
-
 
     <!-- web app deps -->
     <dependency>
