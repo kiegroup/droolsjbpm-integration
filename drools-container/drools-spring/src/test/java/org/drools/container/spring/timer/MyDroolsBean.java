@@ -16,7 +16,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 public class MyDroolsBean {
 
     public static int             TIMER_TRIGGER_COUNT;
-    private static long           sessionId;
+    private static int           sessionId;
     private EntityManagerFactory  emf;
     private KnowledgeBase         kbase;
     private KnowledgeStoreService kstore;

@@ -90,7 +90,7 @@ public class StatefulKnowledgeSessionRemoteClient
         this.cm = cm;
     }
 
-    public long getId() {
+    public int getId() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

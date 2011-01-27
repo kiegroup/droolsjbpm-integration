@@ -155,7 +155,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
         log.info( "---> create new SingleSessionCommandService" );
 
-        long sessionId = service.getId();
+        int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
         ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
@@ -244,7 +244,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        long sessionId = service.getId();
+        int sessionId = service.getId();
         ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
@@ -424,7 +424,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        long sessionId = service.getId();
+        int sessionId = service.getId();
 
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess( "org.drools.test.ProcessSubProcess" );
         log.info( "Started process instance {}",
@@ -576,7 +576,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         log.info( "---> get bean jpaSingleSessionCommandService" );
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        long sessionId = service.getId();
+        int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
         ProcessInstance processInstance = service.startProcess( "org.drools.test.ProcessTimer" );
@@ -672,7 +672,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     public void testPersistenceTimer2() throws Exception {
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
-        long sessionId = service.getId();
+        int sessionId = service.getId();
 
         ProcessInstance processInstance = service.startProcess( "org.drools.test.ProcessTimer2" );
         log.info( "Started process instance {}",
