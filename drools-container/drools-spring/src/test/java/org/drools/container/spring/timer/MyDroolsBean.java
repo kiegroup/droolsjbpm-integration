@@ -10,6 +10,7 @@ import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
@@ -18,12 +19,12 @@ public class MyDroolsBean {
     private static int timerTriggerCount;
     private static int sessionId;
 
+    private Logger logger          = LoggerFactory.getLogger( getClass() );
+
     private EntityManagerFactory  emf;
     private KnowledgeBase         kbase;
     private KnowledgeStoreService kstore;
     private JpaTransactionManager txm;
-
-    org.slf4j.Logger              logger          = LoggerFactory.getLogger( getClass() );
 
     private TestWorkItemHandler   workItemHandler = new TestWorkItemHandler();
 
@@ -46,10 +47,8 @@ public class MyDroolsBean {
             Thread.sleep( 4000 );
             ksession.dispose();
         } catch ( Exception ex ) {
-            logger.error( "Exception",
-                          ex );
+            throw new IllegalStateException("The endTheProcess method has been interrupted", ex);
         }
-
     }
 
     /**
@@ -90,8 +89,7 @@ public class MyDroolsBean {
             ksession.dispose();
 
         } catch ( InterruptedException ex ) {
-            logger.error( "Exception",
-                          ex );
+            throw new IllegalStateException("The endTheProcess method has been interrupted", ex);
         }
     }
 
