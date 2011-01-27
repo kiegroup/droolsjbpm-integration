@@ -318,7 +318,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         // find any kagent's for the current kbase and assign
         for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
             BeanDefinition def = parserContext.getRegistry().getBeanDefinition( beanName );
-            if ( def.getBeanClassName().equals( KnowledgeAgentBeanFactory.class.getName() ) ) {
+            if ( KnowledgeAgentBeanFactory.class.getName().equals( def.getBeanClassName() ) ) {
                 PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
                 RuntimeBeanReference tbf = (RuntimeBeanReference) pvalue.getValue();
                 if ( kbase.equals( tbf.getBeanName() ) ) {

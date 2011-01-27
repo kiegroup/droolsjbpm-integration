@@ -25,7 +25,7 @@
       <timers>
         <timer id="1" delay="1000" period="2000" >
         <action type="expression" dialect="java" >System.out.println("**** Timer Triggered ****");
-MyDroolsBean.TIMER_TRIGGER_COUNT++;</action>
+MyDroolsBean.incrementTimerTriggerCount();</action>
         </timer>
       </timers>
     </workItem>

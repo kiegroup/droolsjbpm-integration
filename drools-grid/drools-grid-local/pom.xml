@@ -47,10 +47,9 @@
     <!-- Test deps -->
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-flow-persistence-jpa</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-persistence-jpa</artifactId>
       <scope>test</scope>
-      <type>jar</type>
     </dependency>
 
     <dependency>
@@ -67,12 +66,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.codehaus.btm</groupId>
-      <artifactId>btm</artifactId>
-      <version>1.3.3</version>
-      <scope>test</scope>
-    </dependency>
     <!-- Persistence Provider: Hibernate -->
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -111,7 +104,6 @@
     </dependency>
 
     <!-- logging -->
-
 
   </dependencies>
 </project>

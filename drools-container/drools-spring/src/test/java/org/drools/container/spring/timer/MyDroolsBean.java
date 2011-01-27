@@ -10,19 +10,21 @@ import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
 public class MyDroolsBean {
 
-    public static int             TIMER_TRIGGER_COUNT;
-    private static int           sessionId;
+    private static int timerTriggerCount;
+    private static int sessionId;
+
+    private Logger logger          = LoggerFactory.getLogger( getClass() );
+
     private EntityManagerFactory  emf;
     private KnowledgeBase         kbase;
     private KnowledgeStoreService kstore;
     private JpaTransactionManager txm;
-
-    org.slf4j.Logger              logger          = LoggerFactory.getLogger( getClass() );
 
     private TestWorkItemHandler   workItemHandler = new TestWorkItemHandler();
 
@@ -45,10 +47,25 @@ public class MyDroolsBean {
             Thread.sleep( 4000 );
             ksession.dispose();
         } catch ( Exception ex ) {
-            logger.error( "Exception",
-                          ex );
+            throw new IllegalStateException("The endTheProcess method has been interrupted", ex);
         }
+    }
 
+    /**
+     * Thread safe increment.
+     */
+    public static synchronized void incrementTimerTriggerCount() {
+        timerTriggerCount++;
+    }
+
+    /**
+     * Thread safe getter.
+     * Note that if this method is not synchronized, there is no visibility guarantee,
+     * so the returned value might be a stale cache.
+     * @return >= 0
+     */
+    public static synchronized int getTimerTriggerCount() {
+        return timerTriggerCount;
     }
 
     public void endTheProcess() {
@@ -72,8 +89,7 @@ public class MyDroolsBean {
             ksession.dispose();
 
         } catch ( InterruptedException ex ) {
-            logger.error( "Exception",
-                          ex );
+            throw new IllegalStateException("The endTheProcess method has been interrupted", ex);
         }
     }
 

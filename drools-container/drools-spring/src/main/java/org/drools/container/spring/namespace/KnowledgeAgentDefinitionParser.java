@@ -75,7 +75,7 @@ public class KnowledgeAgentDefinitionParser extends AbstractBeanDefinitionParser
         // inject the kagent into any stateless sessions
         for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
             BeanDefinition def = parserContext.getRegistry().getBeanDefinition( beanName );
-            if ( def.getBeanClassName().equals( StatelessKnowledgeSessionBeanFactory.class.getName() ) ) {
+            if ( StatelessKnowledgeSessionBeanFactory.class.getName().equals( def.getBeanClassName() ) ) {
                 PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
                 RuntimeBeanReference tbf = (RuntimeBeanReference) pvalue.getValue();
                 if ( kbase.equals( tbf.getBeanName() ) ) {
