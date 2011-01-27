@@ -15,8 +15,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 
 public class MyDroolsBean {
 
-    public static int timerTriggerCount;
-    private static int            sessionId;
+    private static int timerTriggerCount;
+    private static int sessionId;
+
     private EntityManagerFactory  emf;
     private KnowledgeBase         kbase;
     private KnowledgeStoreService kstore;
@@ -49,6 +50,23 @@ public class MyDroolsBean {
                           ex );
         }
 
+    }
+
+    /**
+     * Thread safe increment.
+     */
+    public static synchronized void incrementTimerTriggerCount() {
+        timerTriggerCount++;
+    }
+
+    /**
+     * Thread safe getter.
+     * Note that if this method is not synchronized, there is no visibility guarantee,
+     * so the returned value might be a stale cache.
+     * @return >= 0
+     */
+    public static synchronized int getTimerTriggerCount() {
+        return timerTriggerCount;
     }
 
     public void endTheProcess() {
