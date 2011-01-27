@@ -45,14 +45,14 @@ public class TimerFlowTest {
         MyDroolsBean myDroolsBean = (MyDroolsBean) ctx.getBean( "myDroolsBean" );
 
         assertEquals( 0,
-                      myDroolsBean.TIMER_TRIGGER_COUNT );
+                      myDroolsBean.timerTriggerCount);
 
         myDroolsBean.initStartDisposeAndLoadSession();
 
-        int n = myDroolsBean.TIMER_TRIGGER_COUNT;
+        int n = myDroolsBean.timerTriggerCount;
         assertTrue( n > 0 );
 
         myDroolsBean.endTheProcess();
-        assertTrue( myDroolsBean.TIMER_TRIGGER_COUNT > n );
+        assertTrue( myDroolsBean.timerTriggerCount > n );
     }
 }
