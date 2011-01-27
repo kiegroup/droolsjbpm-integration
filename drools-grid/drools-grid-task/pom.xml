@@ -37,8 +37,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-process-task</artifactId>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task</artifactId>
     </dependency>
 
     <dependency>
