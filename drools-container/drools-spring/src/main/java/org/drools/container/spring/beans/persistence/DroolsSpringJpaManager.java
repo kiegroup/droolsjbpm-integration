@@ -20,10 +20,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.persistence.PersistenceContext;
-import org.drools.persistence.PersistenceContextManager;
 import org.drools.persistence.jpa.JpaPersistenceContext;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
+import org.jbpm.persistence.JpaProcessPersistenceContext;
+import org.jbpm.persistence.ProcessPersistenceContext;
+import org.jbpm.persistence.ProcessPersistenceContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.EntityManagerHolder;
@@ -36,7 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class DroolsSpringJpaManager
     implements
-    PersistenceContextManager {
+    ProcessPersistenceContextManager {
 
     Logger                       logger = LoggerFactory.getLogger( getClass() );
 
@@ -137,5 +139,9 @@ public class DroolsSpringJpaManager
             this.endCommandScopedEntityManager();
         }
     }
+
+	public ProcessPersistenceContext getProcessPersistenceContext() {
+		return new JpaProcessPersistenceContext( appScopedEntityManager );
+	}
 
 }
