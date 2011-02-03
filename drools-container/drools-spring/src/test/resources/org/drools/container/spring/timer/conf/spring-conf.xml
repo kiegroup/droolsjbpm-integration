@@ -39,7 +39,7 @@
 
 	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="org.h2.Driver" />
-		<property name="url" value="jdbc:h2:workflow" />
+		<property name="url" value="jdbc:h2:mem:drools-spring-workflow" />
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
