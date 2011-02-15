@@ -12,7 +12,6 @@ import org.drools.grid.internal.MessageResponseHandler;
  * <p/>
  * Please note that the <field>error</field> is actually the Exception that occured on the server while
  * processing the request.
- *
  */
 public abstract class AbstractBaseResponseHandler
     implements

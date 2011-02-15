@@ -47,8 +47,6 @@ import org.drools.runtime.rule.WorkingMemoryEntryPoint;
  * It can be configured to insert the message body only, or the
  * whole message (that includes headers) or even the whole Exchange 
  * object.
- * 
- *
  */
 public class DroolsInsertProducer extends DefaultProducer {
 

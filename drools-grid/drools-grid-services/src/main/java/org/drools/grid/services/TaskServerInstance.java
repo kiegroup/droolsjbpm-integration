@@ -15,7 +15,6 @@ import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
  * execute and manage Human Tasks associated with business processes.
  * As ExecutionEnvironment and DirectoryInstance this class can encapsulate one
  * or a set of HumanTaskNodes based on the underlaying implementation.
- *
  */
 public class TaskServerInstance {
 

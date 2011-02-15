@@ -39,9 +39,6 @@ import org.drools.grid.services.strategies.TaskServerInstanceSelectionStrategy;
  * It's important to understand that the GridTopologyConfiguration will represent a static description/configuration of a
  * runtime environment. Based on this static description/configuration the GridTopology object will represent a
  * live status of this runtime environment.
- *
- *
- *
  */
 public class GridTopology {
 
@@ -139,7 +136,6 @@ public class GridTopology {
      *     2.3) Disconnect the connector
      *  3) Remove the executionEnvironment from the executionEnvironmentMap
      *  4) Unregister the ExecutionEnvironment from the running Directory Instances
-     *
      */
     public void unregisterExecutionEnvironment(String name) {
         

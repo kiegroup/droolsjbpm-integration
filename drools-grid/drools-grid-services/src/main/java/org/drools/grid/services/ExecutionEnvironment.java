@@ -35,7 +35,6 @@ import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
  * Depending on the underlaying implementation the executionEnvironment will be able to
  * create a connection to the remote/distributed ExecutionNode that we can use to
  * create and execute knowledge.
- *
  */
 public class ExecutionEnvironment {
 
