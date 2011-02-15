@@ -39,7 +39,7 @@
   <modules>
     <module>drools-container</module>
     <module>drools-camel</module>
-    <module>drools-server</module>
+    <module>drools-camel-server</module>
     <module>drools-pipeline</module>
     <module>drools-grid</module>
     <module>drools-simulator</module>

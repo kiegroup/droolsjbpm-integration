@@ -9,7 +9,7 @@
   </parent>
 
   <groupId>org.drools</groupId><!-- TODO rename groupId, artifactId, name and description -->
-  <artifactId>drools-server</artifactId>
+  <artifactId>drools-camel-server</artifactId>
   <packaging>war</packaging>
   
   <name>Drools :: Server</name>
