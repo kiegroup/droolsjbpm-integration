@@ -17,10 +17,10 @@
 package org.drools.test;
 
 global java.util.List list;
-	
+
 rule "test rollback"
 when
-	$i : Integer(intValue > 0);
+    $i : Integer(intValue > 0);
 then
-	list.add( $i );
+    list.add( $i );
 end
