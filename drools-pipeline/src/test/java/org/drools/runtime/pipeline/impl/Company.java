@@ -21,7 +21,6 @@ import java.util.List;
 
 /**
  * Sample Department bean to demostrate main excel export features
- * author: Leonid Vysochyn
  */
 public class Company {
     private String name;
