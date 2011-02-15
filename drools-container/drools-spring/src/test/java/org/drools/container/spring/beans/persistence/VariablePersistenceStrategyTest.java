@@ -343,15 +343,15 @@ public class VariablePersistenceStrategyTest {
         //        result = emf.createEntityManager().createQuery("select i from VariableInstanceInfo i").getResultList();
         //        assertEquals(8, result.size());
         //        for (Object o: result) {
-        //        	assertTrue(VariableInstanceInfo.class.isAssignableFrom(o.getClass()));
-        //        	log.info(o);
+        //            assertTrue(VariableInstanceInfo.class.isAssignableFrom(o.getClass()));
+        //            log.info(o);
         //        }
         //        
         //        log.info("### Retrieving process instance ###");
         //        ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(id, kbase, null, env);
-        //		processInstance = (WorkflowProcessInstance)
-        //			ksession.getProcessInstance(processInstance.getId());
-        //		assertNotNull(processInstance);
+        //        processInstance = (WorkflowProcessInstance)
+        //            ksession.getProcessInstance(processInstance.getId());
+        //        assertNotNull(processInstance);
         //        assertEquals("SomeString", processInstance.getVariable("x"));
         //        assertEquals("This is a test Entity with annotation in fields", ((MyEntity) processInstance.getVariable("y")).getTest());
         //        assertEquals("This is a test Entity with annotations in methods", ((MyEntityMethods) processInstance.getVariable("m")).getTest());
@@ -361,7 +361,7 @@ public class VariablePersistenceStrategyTest {
         //        assertEquals("This is a new test Entity", ((MyEntity) processInstance.getVariable("b")).getTest());
         //        assertEquals("This is a new test SerializableObject", ((MyVariableSerializable) processInstance.getVariable("c")).getText());
         //        log.info("### Completing second work item ###");
-        //		ksession.getWorkItemManager().completeWorkItem(workItem.getId(), null);
+        //        ksession.getWorkItemManager().completeWorkItem(workItem.getId(), null);
         //
         //        workItem = handler.getWorkItem();
         //        assertNotNull(workItem);
@@ -372,7 +372,7 @@ public class VariablePersistenceStrategyTest {
         //        log.info("### Retrieving process instance ###");
         //        ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(id, kbase, null, env);
         //        processInstance = (WorkflowProcessInstance)
-        //        	ksession.getProcessInstance(processInstance.getId());
+        //            ksession.getProcessInstance(processInstance.getId());
         //        assertNotNull(processInstance);
         //        assertEquals("SomeString", processInstance.getVariable("x"));
         //        assertEquals("This is a test Entity with annotation in fields", ((MyEntity) processInstance.getVariable("y")).getTest());
@@ -395,7 +395,7 @@ public class VariablePersistenceStrategyTest {
         //
         //        ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(id, kbase, null, env);
         //        processInstance = (WorkflowProcessInstance)
-        //			ksession.getProcessInstance(processInstance.getId());
+        //            ksession.getProcessInstance(processInstance.getId());
         //        assertNull(processInstance);
     }
 
@@ -403,7 +403,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
     //        kbuilder.add( new ClassPathResource( "VariablePersistenceStrategyProcessTypeChange.rf" ), ResourceType.DRF );
     //        for (KnowledgeBuilderError error: kbuilder.getErrors()) {
-    //        	log.info(error);
+    //            log.info(error);
     //        }
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
@@ -454,7 +454,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
     //        kbuilder.add( new ClassPathResource( "VariablePersistenceStrategySubProcess.rf" ), ResourceType.DRF );
     //        for (KnowledgeBuilderError error: kbuilder.getErrors()) {
-    //        	log.info("{}", error);
+    //            log.info("{}", error);
     //        }
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );

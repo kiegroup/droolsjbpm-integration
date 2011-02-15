@@ -76,8 +76,8 @@ public class ProcessInstanceRemoteClient
         return this.eventTypes;
     }
 
-	public Process getProcess() {
-		return process;
-	}
+    public Process getProcess() {
+        return process;
+    }
 
 }

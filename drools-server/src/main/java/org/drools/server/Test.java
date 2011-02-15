@@ -28,51 +28,51 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Test {
 
-	public static void main(String[] args) {
-		String msg = "Hello World";
+    public static void main(String[] args) {
+        String msg = "Hello World";
 
-		System.out.println( "Sending Message:\n"  + msg);        
+        System.out.println( "Sending Message:\n"  + msg);
 
-		Test test = new Test();
-		String response = test.send( msg );
+        Test test = new Test();
+        String response = test.send( msg );
 
-		System.out.println( );
-		System.out.println( );
+        System.out.println( );
+        System.out.println( );
 
-		System.out.println( "Received Response:\n" + response);      
-	}
+        System.out.println( "Received Response:\n" + response);
+    }
 
-	public String send(String msg) {
-		ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:camel-client.xml");
-		String batch = "";
-		batch += "<batch-execution lookup=\"ksession1\">\n";
-		batch += "  <insert out-identifier=\"message\">\n";
-		batch += "      <org.test.Message>\n";
-		batch += "         <text>" + msg + "</text>\n";
-		batch += "      </org.test.Message>\n";
-		batch += "   </insert>\n";
-		batch += "</batch-execution>\n";                
+    public String send(String msg) {
+        ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:camel-client.xml");
+        String batch = "";
+        batch += "<batch-execution lookup=\"ksession1\">\n";
+        batch += "  <insert out-identifier=\"message\">\n";
+        batch += "      <org.test.Message>\n";
+        batch += "         <text>" + msg + "</text>\n";
+        batch += "      </org.test.Message>\n";
+        batch += "   </insert>\n";
+        batch += "</batch-execution>\n";
 
 
-		Test test = new Test();
-		String response = test.execute( batch, 
-				( CamelContext ) springContext.getBean( "camel" ) );
+        Test test = new Test();
+        String response = test.execute( batch,
+                ( CamelContext ) springContext.getBean( "camel" ) );
 
-		return response;
-	}
+        return response;
+    }
 
-	public String execute(String msg, CamelContext camelContext) {                
+    public String execute(String msg, CamelContext camelContext) {
 
-		String response = camelContext.createProducerTemplate().requestBody( "direct://kservice/rest", msg, String.class );
+        String response = camelContext.createProducerTemplate().requestBody( "direct://kservice/rest", msg, String.class );
 
-		return response;
-	}
+        return response;
+    }
 
-	public String execute(SOAPMessage soapMessage, CamelContext camelContext) throws SOAPException, IOException {
-		Object object = camelContext.createProducerTemplate().requestBody( "direct://kservice/soap", soapMessage);
-		OutputStream out = new ByteArrayOutputStream();
-		SOAPMessage soapResponse = (SOAPMessage) object;
-		soapResponse.writeTo(out);
-		return out.toString();
-	}
+    public String execute(SOAPMessage soapMessage, CamelContext camelContext) throws SOAPException, IOException {
+        Object object = camelContext.createProducerTemplate().requestBody( "direct://kservice/soap", soapMessage);
+        OutputStream out = new ByteArrayOutputStream();
+        SOAPMessage soapResponse = (SOAPMessage) object;
+        soapResponse.writeTo(out);
+        return out.toString();
+    }
 }

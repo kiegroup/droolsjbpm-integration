@@ -550,6 +550,6 @@ public class StatefulKnowledgeSessionRemoteClient
     }
     
     public KnowledgeSessionConfiguration getSessionConfiguration() {
-    	throw new UnsupportedOperationException( "Not supported yet." );
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 }

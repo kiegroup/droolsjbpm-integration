@@ -140,8 +140,8 @@ public class DroolsSpringJpaManager
         }
     }
 
-	public ProcessPersistenceContext getProcessPersistenceContext() {
-		return new JpaProcessPersistenceContext( appScopedEntityManager );
-	}
+    public ProcessPersistenceContext getProcessPersistenceContext() {
+        return new JpaProcessPersistenceContext( appScopedEntityManager );
+    }
 
 }

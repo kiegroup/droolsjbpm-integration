@@ -40,13 +40,13 @@ public class XStreamFromXmlTransformer extends BaseEmitter
         this.xstream.setClassLoader( context.getClassLoader() );
         Object result = null;
         try {
-        	if ( object instanceof String ) {
-        	    result = this.xstream.fromXML( ( String ) object );
-        	} else  if ( object instanceof Reader ) {
-        		result = this.xstream.fromXML( ( Reader ) object );
-        	} else if ( object instanceof InputStream ) {
-        		result = this.xstream.fromXML( ( InputStream ) object );
-        	} else if ( object instanceof Resource ) {
+            if ( object instanceof String ) {
+                result = this.xstream.fromXML( ( String ) object );
+            } else  if ( object instanceof Reader ) {
+                result = this.xstream.fromXML( ( Reader ) object );
+            } else if ( object instanceof InputStream ) {
+                result = this.xstream.fromXML( ( InputStream ) object );
+            } else if ( object instanceof Resource ) {
                 result = this.xstream.fromXML( (( Resource ) object).getReader() );
             } else {
                 throw new IllegalArgumentException( "signal object must be instance of InputStream or Resource" );

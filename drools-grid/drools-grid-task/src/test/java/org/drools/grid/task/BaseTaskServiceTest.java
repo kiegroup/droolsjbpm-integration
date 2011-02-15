@@ -1050,8 +1050,8 @@ public abstract class BaseTaskServiceTest {
                                             org.drools.runtime.process.WorkItemHandler handler) {
         }
 
-		public void clear() {
-		}
+        public void clear() {
+        }
 
     }
 

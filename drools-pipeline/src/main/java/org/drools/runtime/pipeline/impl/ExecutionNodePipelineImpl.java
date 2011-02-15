@@ -21,14 +21,14 @@ import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.ResultHandler;
 
 public class ExecutionNodePipelineImpl extends BaseEmitter implements Pipeline {
-	private GridNode node;
+    private GridNode node;
 
-	public ExecutionNodePipelineImpl(GridNode node) {
-		this.node = node;
-	}
+    public ExecutionNodePipelineImpl(GridNode node) {
+        this.node = node;
+    }
 
-	public synchronized void insert(Object object, ResultHandler resultHandler) {
-		emit(object, new ExecutionNodePipelineContextImpl(this.node, null, resultHandler));
-	}
+    public synchronized void insert(Object object, ResultHandler resultHandler) {
+        emit(object, new ExecutionNodePipelineContextImpl(this.node, null, resultHandler));
+    }
 
 }
