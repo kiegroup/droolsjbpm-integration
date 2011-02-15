@@ -4,17 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.drools</groupId>
-    <artifactId>drools</artifactId>
+    <artifactId>drools-container</artifactId>
     <version>5.2.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>drools-spring</artifactId>
   <packaging>jar</packaging>
+
   <name>Drools :: Spring</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-api</artifactId>

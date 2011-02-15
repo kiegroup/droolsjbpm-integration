@@ -10,6 +10,7 @@
 
   <artifactId>drools-seam3</artifactId>
   <packaging>jar</packaging>
+
   <name>Drools :: Seam3</name>
 
   <dependencies>

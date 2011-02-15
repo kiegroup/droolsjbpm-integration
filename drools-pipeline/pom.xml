@@ -3,15 +3,16 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.drools</groupId>
-    <artifactId>drools</artifactId>
+    <groupId>org.droolsjbpm</groupId>
+    <artifactId>droolsjbpm-integration</artifactId>
     <version>5.2.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.drools</groupId><!-- TODO rename groupId, artifactId, name and description -->
   <artifactId>drools-pipeline</artifactId>
   <packaging>jar</packaging>
-  <name>Drools :: Pipeline</name>
 
+  <name>Drools :: Pipeline</name>
 
   <dependencies>
     <dependency>
