@@ -35,10 +35,6 @@ import org.drools.grid.strategies.StaticIncrementalNodeSelectionStrategy;
 import org.drools.runtime.ExecutionResults;
 import org.junit.Assert;
 import org.junit.Test;
-/**
- *
- * @author salaboy
- */
 
 public abstract class ExecutionNodeBaseTest {
 

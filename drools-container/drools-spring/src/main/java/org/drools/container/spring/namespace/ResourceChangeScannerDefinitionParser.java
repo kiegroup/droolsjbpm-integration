@@ -23,11 +23,6 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class ResourceChangeScannerDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String INTERVAL = "interval";

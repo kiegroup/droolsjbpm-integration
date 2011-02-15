@@ -19,10 +19,6 @@ package org.drools.grid;
 import org.drools.grid.internal.GenericIoWriter;
 import org.drools.grid.internal.Message;
 
-/**
- *
- * @author salaboy
- */
 public interface GenericHumanTaskConnector
     extends
     GenericIoWriter {

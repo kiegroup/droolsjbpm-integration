@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.local;
 
 import java.util.Properties;

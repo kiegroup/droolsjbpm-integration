@@ -31,11 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-/**
- *
- * @author Mark Proctor
- * @author Esteban Aliverti
- */
 public class DroolsSpringJpaManager
     implements
     ProcessPersistenceContextManager {

@@ -16,10 +16,6 @@
  */
 package org.drools.grid;
 
-/**
- *
- * @author salaboy
- */
 public interface GridNodeConnection {
 
     public void connect();

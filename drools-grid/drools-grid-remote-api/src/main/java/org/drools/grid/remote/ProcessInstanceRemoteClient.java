@@ -22,10 +22,6 @@ import java.io.Serializable;
 import org.drools.definition.process.Process;
 import org.drools.runtime.process.ProcessInstance;
 
-/**
- *
- * @author salaboy
- */
 public class ProcessInstanceRemoteClient
     implements
     ProcessInstance,

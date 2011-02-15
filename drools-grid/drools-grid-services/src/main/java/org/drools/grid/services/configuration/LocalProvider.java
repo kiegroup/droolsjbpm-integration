@@ -19,10 +19,6 @@ package org.drools.grid.services.configuration;
 import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
 
-/**
- *
- * @author salaboy
- */
 public class LocalProvider
     implements
     GenericProvider {

@@ -37,11 +37,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class GridDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String EMF_ATTRIBUTE = "entity-manager-factory";

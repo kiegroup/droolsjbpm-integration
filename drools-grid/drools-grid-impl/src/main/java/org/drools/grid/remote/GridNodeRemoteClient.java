@@ -34,10 +34,6 @@ import org.drools.grid.service.directory.Address;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 
-/**
- *
- * @author salaboy
- */
 public class GridNodeRemoteClient<T>
     implements
     GridNode {

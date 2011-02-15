@@ -31,11 +31,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class KnowledgeAgentDefinitionParser extends AbstractBeanDefinitionParser {
 
     @Override

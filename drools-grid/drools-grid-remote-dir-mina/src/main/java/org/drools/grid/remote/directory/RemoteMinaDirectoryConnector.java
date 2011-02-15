@@ -45,10 +45,6 @@ import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
 import org.drools.grid.remote.mina.MinaIoHandler;
 
-/**
- *
- * @author salaboy
- */
 public class RemoteMinaDirectoryConnector
     implements
     GenericNodeConnector {

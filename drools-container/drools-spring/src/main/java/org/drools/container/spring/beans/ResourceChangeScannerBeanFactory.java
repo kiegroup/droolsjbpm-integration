@@ -21,11 +21,6 @@ import org.drools.io.ResourceFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class ResourceChangeScannerBeanFactory
     implements
     FactoryBean,

@@ -27,10 +27,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- *
- * @author salaboy
- */
 //    @RunWith(RioTestRunner.class)
 public class ITGridExecutionTest {
 

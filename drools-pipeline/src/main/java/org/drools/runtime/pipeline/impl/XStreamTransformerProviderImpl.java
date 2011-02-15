@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/**
- * 
- */
 package org.drools.runtime.pipeline.impl;
 
 import org.drools.runtime.pipeline.Transformer;

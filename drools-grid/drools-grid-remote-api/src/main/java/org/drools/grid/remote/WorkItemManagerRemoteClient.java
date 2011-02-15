@@ -11,11 +11,6 @@ import org.drools.grid.internal.MessageSession;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
 
-/**
- *
- * @author Lucas Amador
- * @author salaboy
- */
 public class WorkItemManagerRemoteClient
     implements
     WorkItemManager,

@@ -37,10 +37,6 @@ import org.drools.time.TimerService;
 import org.drools.time.Trigger;
 import org.drools.time.impl.JDKTimerService;
 
-/**
- *
- * @author salaboy
- */
 public class SchedulerImpl
     implements
     SchedulerService,

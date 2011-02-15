@@ -27,10 +27,6 @@ import java.util.Map;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.services.TaskServerInstance;
 
-/**
- *
- * @author salaboy
- */
 public class TaskServerInstanceByPrioritySelectionStrategy
     implements
     TaskServerInstanceSelectionStrategy {

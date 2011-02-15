@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 import org.drools.grid.GenericNodeConnector;
 
-/**
- * @author salaboy
- */
 
 public interface GenericProvider<T>
     extends

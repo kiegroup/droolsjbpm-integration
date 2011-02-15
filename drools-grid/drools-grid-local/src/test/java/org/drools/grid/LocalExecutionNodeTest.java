@@ -44,10 +44,6 @@ import org.junit.Test;
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
-/**
- *
- * @author salaboy
- */
 public class LocalExecutionNodeTest extends ExecutionNodeBase {
 
     private static EntityManagerFactory entityManagerFactory;

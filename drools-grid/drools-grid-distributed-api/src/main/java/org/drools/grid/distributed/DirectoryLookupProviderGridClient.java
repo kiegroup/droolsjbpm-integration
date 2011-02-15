@@ -36,10 +36,6 @@ import org.drools.grid.internal.commands.RegisterCommand;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.StatefulKnowledgeSession;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryLookupProviderGridClient
     implements
     DirectoryLookupFactoryService {

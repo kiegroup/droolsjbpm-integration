@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.io;
 
 public interface SocketConfiguration {

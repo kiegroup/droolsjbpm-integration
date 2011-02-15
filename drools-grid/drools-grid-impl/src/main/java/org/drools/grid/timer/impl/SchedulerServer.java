@@ -26,10 +26,6 @@ import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.time.SchedulerService;
 
-/**
- *
- * @author salaboy
- */
 public class SchedulerServer
     implements
     MessageReceiverHandler {

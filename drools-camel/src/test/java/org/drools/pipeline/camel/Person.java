@@ -23,10 +23,6 @@ package org.drools.pipeline.camel;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * 
- * @author salaboy
- */
 @XmlRootElement
 public class Person {
     private String  name;

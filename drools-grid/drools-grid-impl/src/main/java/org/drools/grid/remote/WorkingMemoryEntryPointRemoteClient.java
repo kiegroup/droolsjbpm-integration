@@ -35,10 +35,6 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.service.directory.Address;
 import org.drools.runtime.ObjectFilter;
 
-/**
- *
- * @author salaboy
- */
 public class WorkingMemoryEntryPointRemoteClient
     implements
     WorkingMemoryEntryPoint {

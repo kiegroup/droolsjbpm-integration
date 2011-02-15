@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.drools.grid.internal.responsehandlers;
 
 public abstract class AbstractBlockingResponseHandler extends AbstractBaseResponseHandler {

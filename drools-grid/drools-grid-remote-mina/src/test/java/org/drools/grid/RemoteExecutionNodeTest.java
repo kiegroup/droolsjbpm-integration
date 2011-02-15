@@ -33,10 +33,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
-/**
- *
- * @author salaboy
- */
 public class RemoteExecutionNodeTest extends ExecutionNodeBase {
     private MinaAcceptor      server;
     private GenericConnection connection;

@@ -24,9 +24,6 @@ import org.drools.event.rule.ObjectRetractedEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Michael Neale
- */
 public class ChangeCollector implements WorkingMemoryEventListener {
 
     private List<String> retracted;

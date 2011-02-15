@@ -42,10 +42,6 @@ import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 
-/**
- *
- * @author salaboy
- */
 public class KnowledgeBaseRemoteClient
     implements
     KnowledgeBase {

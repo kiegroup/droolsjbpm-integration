@@ -17,10 +17,6 @@
 
 package org.drools.grid;
 
-/**
- *
- * @author salaboy
- */
 public enum ConnectorType {
     LOCAL, REMOTE, DISTRIBUTED
 }

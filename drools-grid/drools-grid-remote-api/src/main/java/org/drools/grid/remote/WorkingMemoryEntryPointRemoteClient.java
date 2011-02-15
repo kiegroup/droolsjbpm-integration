@@ -31,10 +31,6 @@ import org.drools.grid.internal.MessageSession;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.ObjectFilter;
 
-/**
- *
- * @author salaboy
- */
 public class WorkingMemoryEntryPointRemoteClient
     implements
     WorkingMemoryEntryPoint {

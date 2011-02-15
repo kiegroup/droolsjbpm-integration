@@ -35,10 +35,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- *
- * @author salaboy
- */
 public class TempEvictionTest {
 
     private Map<String, GridServiceDescription> coreServicesMap;

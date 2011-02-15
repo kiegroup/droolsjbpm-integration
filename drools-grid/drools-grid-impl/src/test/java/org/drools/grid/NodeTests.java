@@ -51,10 +51,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- *
- * @author salaboy
- */
 public class NodeTests {
 
     private Map<String, GridServiceDescription> coreServicesMap;

@@ -26,10 +26,6 @@ import org.drools.grid.SocketService;
 import org.drools.grid.service.directory.Address;
 import org.drools.time.SchedulerService;
 
-/**
- *
- * @author salaboy
- */
 public class RegisterSchedulerConfiguration
     implements
     GridPeerServiceConfiguration {

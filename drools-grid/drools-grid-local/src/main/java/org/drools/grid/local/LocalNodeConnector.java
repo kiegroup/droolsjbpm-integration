@@ -28,10 +28,6 @@ import org.drools.grid.NodeConnectionType;
 import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageResponseHandler;
 
-/**
- *
- * @author salaboy
- */
 public class LocalNodeConnector
     implements
     GenericNodeConnector {

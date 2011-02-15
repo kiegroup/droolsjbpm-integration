@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.impl;
 
 import java.util.Map;

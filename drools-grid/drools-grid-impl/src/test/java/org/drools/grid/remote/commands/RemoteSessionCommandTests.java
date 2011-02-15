@@ -27,10 +27,6 @@ import org.drools.runtime.rule.FactHandle;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author salaboy
- */
 public class RemoteSessionCommandTests extends BaseRemoteTest{
 
     public RemoteSessionCommandTests() {

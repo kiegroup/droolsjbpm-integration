@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.conf.impl;
 
 import org.drools.grid.conf.GridPeerServiceConfiguration;

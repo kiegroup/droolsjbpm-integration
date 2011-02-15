@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/**
- * 
- */
 package org.drools.jax.soap;
 
 import javax.xml.soap.SOAPMessage;

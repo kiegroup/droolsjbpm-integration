@@ -26,10 +26,6 @@ import java.util.Map;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.services.ExecutionEnvironment;
 
-/**
- *
- * @author salaboy
- */
 public class ExecutionEnvByPrioritySelectionStrategy
     implements
     ExecutionEnvironmentSelectionStrategy {

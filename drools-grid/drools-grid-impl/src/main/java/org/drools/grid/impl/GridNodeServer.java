@@ -30,10 +30,6 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.runtime.impl.ExecutionResultImpl;
 
-/**
- *
- * @author salaboy
- */
 public class GridNodeServer
     implements
     MessageReceiverHandler {

@@ -18,10 +18,6 @@ package org.drools.grid;
 
 import java.rmi.RemoteException;
 
-/**
- *
- * @author salaboy
- */
 public interface GenericDirectoryConnector {
 
     public String getId() throws ConnectorException,

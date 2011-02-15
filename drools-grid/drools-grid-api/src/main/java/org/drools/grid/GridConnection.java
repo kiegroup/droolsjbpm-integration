@@ -25,10 +25,6 @@ import java.util.logging.Logger;
 import org.drools.grid.strategies.NodeSelectionStrategy;
 import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
 
-/**
- *
- * @author salaboy
- */
 public class GridConnection
     implements
     GenericConnection {

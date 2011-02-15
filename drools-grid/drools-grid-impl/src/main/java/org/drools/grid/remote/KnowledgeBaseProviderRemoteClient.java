@@ -34,10 +34,6 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 
-/**
- *
- * @author salaboy
- */
 public class KnowledgeBaseProviderRemoteClient
     implements
     KnowledgeBaseFactoryService {

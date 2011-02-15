@@ -10,7 +10,6 @@ import org.drools.grid.strategies.NodeSelectionStrategy;
 import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
 
 /**
- * @author salaboy
  *
  * The DirectoryInstance class represent a remote/distributed Directory Service.
  * Depending on the underlaying implementation each DirectoryInstance can encapsulate

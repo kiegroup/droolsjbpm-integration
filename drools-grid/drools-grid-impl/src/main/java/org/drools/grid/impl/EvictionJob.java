@@ -24,10 +24,6 @@ import org.drools.command.impl.ContextImplWithEviction;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 
-/**
- *
- * @author salaboy
- */
 public class EvictionJob implements Job {
     private static Logger log = Logger.getLogger( EvictionJob.class.getName() );
     private ContextImplWithEviction contextImpl;

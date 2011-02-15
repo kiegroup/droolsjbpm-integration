@@ -16,10 +16,6 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
 
-/**
- *
- * @author salaboy
- */
 public class WorkItemManagerRemoteClient
     implements
     WorkItemManager,

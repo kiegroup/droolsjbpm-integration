@@ -37,10 +37,6 @@ import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.io.Resource;
 
-/**
- *
- * @author salaboy
- */
 public class KnowledgeBuilderRemoteClient
     implements
     KnowledgeBuilder {

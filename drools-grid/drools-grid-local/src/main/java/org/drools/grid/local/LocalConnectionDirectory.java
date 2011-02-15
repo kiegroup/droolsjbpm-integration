@@ -28,10 +28,6 @@ import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.NodeConnectionType;
 
-/**
- *
- * @author salaboy 
- */
 public class LocalConnectionDirectory
     implements
     NodeConnectionType {

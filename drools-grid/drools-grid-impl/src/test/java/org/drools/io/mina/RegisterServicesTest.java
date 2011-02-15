@@ -55,10 +55,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-/**
- *
- * @author salaboy
- */
 public class RegisterServicesTest {
 
     private SystemEventListener                 l = SystemEventListenerFactory.getSystemEventListener();

@@ -20,10 +20,6 @@ package org.drools.grid.time.impl;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 
-/**
- *
- * @author salaboy
- */
 public class MockJob
     implements
     Job {

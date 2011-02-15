@@ -24,10 +24,6 @@ import java.util.logging.Logger;
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
 
-/**
- *
- * @author salaboy
- */
 public class GenericConnectorFactory {
 
     private static final String SEPARATOR                                 = ":";

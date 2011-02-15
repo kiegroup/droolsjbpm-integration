@@ -19,10 +19,6 @@ package org.drools.grid;
 
 import java.rmi.RemoteException;
 
-/**
- *
- * @author salaboy
- */
 public interface NodeService {
     public enum ServiceType {
         LOCAL, REMOTE, DISTRIBUTED

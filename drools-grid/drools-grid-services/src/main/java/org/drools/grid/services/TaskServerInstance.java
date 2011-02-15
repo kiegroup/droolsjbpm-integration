@@ -10,7 +10,6 @@ import org.drools.grid.strategies.NodeSelectionStrategy;
 import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
 
 /**
- * @author salaboy
  *
  * This class represent a remote/distributed Task Server service that will let us
  * execute and manage Human Tasks associated with business processes.

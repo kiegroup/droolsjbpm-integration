@@ -27,10 +27,6 @@ import java.util.Map;
 import org.drools.grid.ConnectorType;
 import org.drools.grid.services.DirectoryInstance;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryInstanceByPrioritySelectionStrategy
     implements
     DirectoryInstanceSelectionStrategy {

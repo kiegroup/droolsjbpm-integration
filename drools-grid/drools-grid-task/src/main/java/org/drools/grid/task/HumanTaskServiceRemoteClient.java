@@ -48,11 +48,6 @@ import org.drools.task.service.ContentData;
 import org.drools.task.service.FaultData;
 import org.drools.task.service.Operation;
 
-/**
- * @author salaboy
- * @author Lucas Amador
- *
- */
 public class HumanTaskServiceRemoteClient
     implements
     HumanTaskService {

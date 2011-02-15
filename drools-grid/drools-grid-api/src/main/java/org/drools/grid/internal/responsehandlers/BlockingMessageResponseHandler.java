@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.drools.grid.internal.responsehandlers;
 
 import org.drools.grid.internal.Message;

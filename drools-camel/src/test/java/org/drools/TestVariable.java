@@ -18,9 +18,6 @@ package org.drools;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * 
- */
 
 @XmlRootElement
 public class TestVariable {

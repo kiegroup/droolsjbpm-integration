@@ -29,10 +29,6 @@ import org.drools.grid.internal.Message;
 import org.drools.grid.internal.MessageSession;
 import org.drools.runtime.ObjectFilter;
 
-/**
- *
- * @author salaboy
- */
 public class WorkingMemoryEntryPointGridClient
     implements
     WorkingMemoryEntryPoint {

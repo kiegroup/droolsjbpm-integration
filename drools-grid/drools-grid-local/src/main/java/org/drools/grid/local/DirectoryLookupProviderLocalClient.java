@@ -29,10 +29,6 @@ import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.runtime.CommandExecutor;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryLookupProviderLocalClient
     implements
     DirectoryLookupFactoryService {

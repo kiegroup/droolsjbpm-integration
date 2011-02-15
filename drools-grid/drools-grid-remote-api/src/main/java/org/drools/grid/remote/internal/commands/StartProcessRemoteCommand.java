@@ -30,10 +30,6 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.process.ProcessInstance;
 
-/**
- *
- * @author salaboy
- */
 public class StartProcessRemoteCommand
     implements
     GenericCommand<ExecutionResults> {

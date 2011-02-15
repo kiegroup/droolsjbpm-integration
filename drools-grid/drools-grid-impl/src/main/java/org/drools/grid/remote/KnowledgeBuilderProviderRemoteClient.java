@@ -35,10 +35,6 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 
-/**
- *
- * @author salaboy
- */
 public class KnowledgeBuilderProviderRemoteClient
     implements
     KnowledgeBuilderFactoryService {

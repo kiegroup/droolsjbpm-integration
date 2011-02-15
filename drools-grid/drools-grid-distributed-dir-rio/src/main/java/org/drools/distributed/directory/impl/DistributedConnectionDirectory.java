@@ -30,10 +30,6 @@ import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.NodeConnectionType;
 
-/**
- *
- * @author salaboy 
- */
 public class DistributedConnectionDirectory implements NodeConnectionType, Serializable {
 
     private final Map<Class<?>, Object> services = new ConcurrentHashMap<Class<?>, Object>();

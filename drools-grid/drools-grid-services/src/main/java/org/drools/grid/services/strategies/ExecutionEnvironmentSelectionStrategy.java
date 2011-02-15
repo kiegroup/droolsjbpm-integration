@@ -21,10 +21,6 @@ import java.util.Map;
 
 import org.drools.grid.services.ExecutionEnvironment;
 
-/**
- *
- * @author salaboy
- */
 public interface ExecutionEnvironmentSelectionStrategy {
     public ExecutionEnvironment getBestExecutionEnvironment(Map<String, ExecutionEnvironment> executionEnvironments);
 }

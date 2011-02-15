@@ -26,10 +26,6 @@ import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.strategies.NodeSelectionStrategy;
 
-/**
- *
- * @author salaboy
- */
 public class GetMinimalKsessionNodes implements NodeSelectionStrategy {
 
 

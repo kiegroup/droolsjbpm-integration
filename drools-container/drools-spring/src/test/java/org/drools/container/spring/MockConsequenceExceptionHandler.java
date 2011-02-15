@@ -4,10 +4,6 @@ import org.drools.runtime.rule.Activation;
 import org.drools.runtime.rule.WorkingMemory;
 import org.drools.runtime.rule.impl.DefaultConsequenceExceptionHandler;
 
-/**
- *
- * @author esteban
- */
 public class MockConsequenceExceptionHandler extends DefaultConsequenceExceptionHandler {
 
     @Override

@@ -64,11 +64,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     private String      handle;

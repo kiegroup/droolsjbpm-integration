@@ -17,10 +17,6 @@
 
 package org.drools.grid.remote.internal.commands;
 
-/**
- *
- * @author salaboy
- */
 
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;

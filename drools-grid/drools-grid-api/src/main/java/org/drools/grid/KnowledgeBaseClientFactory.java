@@ -19,10 +19,6 @@ package org.drools.grid;
 
 import org.drools.KnowledgeBase;
 
-/**
- *
- * @author salaboy
- */
 public class KnowledgeBaseClientFactory {
     public static KnowledgeBase newKnowledgeBaseClient(String connectorString) {
         KnowledgeBase client =  null;

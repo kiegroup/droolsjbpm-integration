@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
- * @author kostantinos.kougios
  *
  * 21 May 2009
  */
@@ -51,8 +50,7 @@ import java.util.regex.Pattern;
  * 
  * This class is thread safe. One instance can be used by multiple threads on the same time.
  * 
- * @author kostantinos.kougios
- * 
+ *
  *         18 Sep 2008
  */
 public class FastCloner {

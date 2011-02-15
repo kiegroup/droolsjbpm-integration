@@ -17,10 +17,6 @@
 
 package org.drools.grid;
 
-/**
- *
- * @author salaboy
- */
 public interface HumanTaskNodeService
     extends
     NodeService {

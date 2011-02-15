@@ -20,10 +20,6 @@ package org.drools.grid.timer.impl;
 import org.drools.grid.timer.CoreServicesScheduler;
 import org.drools.time.SchedulerService;
 
-/**
- *
- * @author salaboy
- */
 public class CoreServicesSchedulerImpl
     implements
     CoreServicesScheduler {

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.service.directory.impl;
 
 import java.io.Serializable;

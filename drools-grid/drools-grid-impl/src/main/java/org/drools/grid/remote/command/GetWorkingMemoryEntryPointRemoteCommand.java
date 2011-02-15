@@ -19,7 +19,6 @@ package org.drools.grid.remote.command;
 
 /**
  *
- * @author salaboy
  * this class should not exist!
  */
 

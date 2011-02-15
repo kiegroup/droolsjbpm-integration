@@ -5,10 +5,6 @@
 
 package org.drools.grid.distributed.util;
 
-/**
- *
- * @author salaboy
- */
 public class IDEntry extends net.jini.entry.AbstractEntry{
     public String id;
 

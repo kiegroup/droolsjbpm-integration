@@ -18,10 +18,6 @@ package org.drools.grid.task;
 import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.HumanTaskNodeService;
 
-/**
- *
- * @author salaboy
- */
 public class HumanTaskServiceProviderRemoteClient
     implements
     HumanTaskFactoryService {

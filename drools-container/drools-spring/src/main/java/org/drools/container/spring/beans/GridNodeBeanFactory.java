@@ -28,11 +28,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class GridNodeBeanFactory
     implements
     FactoryBean,

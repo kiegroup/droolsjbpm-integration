@@ -23,10 +23,6 @@ import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 
-/**
- *
- * @author salaboy
- */
 public class ConversationUtil {
 
     public static Object sendMessage(ConversationManager conversationManager,

@@ -63,11 +63,6 @@ import org.drools.task.service.Command;
 import org.drools.task.service.ContentData;
 import org.drools.task.service.responsehandlers.AbstractBaseResponseHandler;
 
-/**
- * @author salaboy
- * @author Lucas Amador
- *
- */
 public class CommandBasedServicesWSHumanTaskHandler
     implements
     WorkItemHandler {

@@ -40,10 +40,6 @@ import org.drools.time.SchedulerService;
 import org.drools.time.Trigger;
 import org.drools.time.impl.MultiJobHandle;
 
-/**
- *
- * @author salaboy
- */
 public class SchedulerClient
     implements
     SchedulerService,

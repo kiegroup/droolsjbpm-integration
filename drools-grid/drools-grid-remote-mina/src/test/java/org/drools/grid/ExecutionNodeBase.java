@@ -28,10 +28,6 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- * @author salaboy
- */
 
 public abstract class ExecutionNodeBase {
 

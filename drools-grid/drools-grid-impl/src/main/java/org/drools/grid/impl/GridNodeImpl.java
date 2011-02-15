@@ -32,10 +32,6 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 
-/**
- *
- * @author salaboy
- */
 public class GridNodeImpl
     implements
     GridNode,

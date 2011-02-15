@@ -19,10 +19,6 @@ package org.drools.grid.io.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- *
- * @author salaboy
- */
 public class MessageSession {
 
     public AtomicInteger counter;

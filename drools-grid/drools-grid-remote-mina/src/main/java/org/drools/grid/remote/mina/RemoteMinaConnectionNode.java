@@ -32,10 +32,6 @@ import org.drools.grid.remote.DirectoryLookupProviderRemoteClient;
 import org.drools.grid.remote.KnowledgeBaseProviderRemoteClient;
 import org.drools.grid.remote.KnowledgeBuilderProviderRemoteClient;
 
-/**
- *
- * @author salaboy 
- */
 public class RemoteMinaConnectionNode
     implements
     NodeConnectionType {

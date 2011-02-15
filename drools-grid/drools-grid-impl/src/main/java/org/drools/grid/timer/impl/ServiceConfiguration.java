@@ -21,10 +21,6 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import org.drools.grid.Grid;
 
-/**
- *
- * @author salaboy
- */
 public interface ServiceConfiguration
     extends
     Serializable {

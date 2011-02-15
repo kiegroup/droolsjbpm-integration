@@ -5,11 +5,6 @@ import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.runtime.process.WorkItemManager;
 
-/**
- * 
- * @author salaboy
- *
- */
 public class GetWorkItemManagerCommand
     implements
     GenericCommand<WorkItemManager> {

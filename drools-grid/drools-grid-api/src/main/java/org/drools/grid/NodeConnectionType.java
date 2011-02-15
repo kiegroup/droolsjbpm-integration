@@ -19,10 +19,6 @@ package org.drools.grid;
 
 import java.util.Set;
 
-/**
- *
- * @author salaboy
- */
 public interface NodeConnectionType {
     public void setConnector(GenericNodeConnector connector);
 

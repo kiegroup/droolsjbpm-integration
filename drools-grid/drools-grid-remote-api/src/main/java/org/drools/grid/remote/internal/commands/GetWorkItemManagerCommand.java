@@ -7,11 +7,6 @@ import org.drools.grid.remote.WorkItemManagerRemoteClient;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.process.WorkItemManager;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class GetWorkItemManagerCommand
     implements
     GenericCommand<WorkItemManager> {

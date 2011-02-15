@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.io;
 
 import java.net.InetSocketAddress;

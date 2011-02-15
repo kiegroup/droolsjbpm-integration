@@ -21,10 +21,6 @@ import java.util.List;
 
 import org.drools.grid.GenericHumanTaskConnector;
 
-/**
- *
- * @author salaboy
- */
 public interface HumanTaskSelectionStrategy {
     public GenericHumanTaskConnector getBestHumanTask(List<GenericHumanTaskConnector> connectors);
 }

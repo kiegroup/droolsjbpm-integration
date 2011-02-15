@@ -48,7 +48,6 @@ import org.drools.runtime.rule.WorkingMemoryEntryPoint;
  * whole message (that includes headers) or even the whole Exchange 
  * object.
  * 
- * @author etirelli
  *
  */
 public class DroolsInsertProducer extends DefaultProducer {

@@ -21,7 +21,6 @@ import java.util.List;
 
 /**
  * Sample Employee bean to demostrate simple export features
- * @author Leonid Vysochyn
  */
 public class Employee {
     private String name;

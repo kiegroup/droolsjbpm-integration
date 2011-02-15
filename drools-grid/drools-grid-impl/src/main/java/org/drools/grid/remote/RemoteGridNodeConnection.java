@@ -23,10 +23,6 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 
-/**
- *
- * @author salaboy
- */
 public class RemoteGridNodeConnection<T>
     implements
     GridConnection<GridNode> {

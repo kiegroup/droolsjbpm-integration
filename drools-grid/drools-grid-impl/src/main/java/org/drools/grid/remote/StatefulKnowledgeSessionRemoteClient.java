@@ -71,10 +71,6 @@ import org.drools.runtime.rule.ViewChangedEventListener;
 import org.drools.runtime.rule.WorkingMemoryEntryPoint;
 import org.drools.time.SessionClock;
 
-/**
- *
- * @author salaboy
- */
 public class StatefulKnowledgeSessionRemoteClient
     implements
     StatefulKnowledgeSession {

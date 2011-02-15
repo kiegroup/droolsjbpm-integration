@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.remote;
 
 import java.util.Properties;

@@ -27,10 +27,6 @@ import org.drools.grid.GenericConnection;
 import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryNodeServiceGridClient implements DirectoryNodeService {
     
     private GenericNodeConnector connector;

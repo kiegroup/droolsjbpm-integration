@@ -20,10 +20,6 @@ import java.util.List;
 
 import org.drools.grid.strategies.NodeSelectionStrategy;
 
-/**
- *
- * @author salaboy
- */
 public interface GenericConnection {
 
     //Add Connectors to get new Connections

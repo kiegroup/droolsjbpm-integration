@@ -23,9 +23,6 @@ import java.math.BigInteger;
 public class Person
     implements
     Serializable {
-    /**
-     *
-     */
     private static final long serialVersionUID = 510l;
     private String            name;
     private String            likes;

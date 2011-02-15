@@ -21,10 +21,6 @@ import java.util.Map;
 
 import org.drools.grid.services.ExecutionEnvironment;
 
-/**
- *
- * @author salaboy
- */
 public class RandomEnvironmentSelectionStrategy
     implements
     ExecutionEnvironmentSelectionStrategy {

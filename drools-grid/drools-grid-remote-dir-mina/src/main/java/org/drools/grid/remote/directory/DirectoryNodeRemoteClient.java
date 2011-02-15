@@ -37,10 +37,6 @@ import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.remote.KnowledgeBaseRemoteClient;
 import org.drools.grid.remote.mina.MinaIoHandler;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryNodeRemoteClient
     implements
     DirectoryNodeService {

@@ -29,10 +29,6 @@ import net.jini.lookup.ServiceDiscoveryManager;
 import org.drools.grid.DirectoryNodeService;
 import org.drools.grid.ExecutionNodeService;
 
-/**
- *
- * @author salaboy
- */
 public class RioResourceLocator {
     public static ExecutionNodeService locateExecutionNodeById(String id) throws IOException, InterruptedException{
         IDEntry[] ids = new IDEntry[]{new IDEntry(id)};

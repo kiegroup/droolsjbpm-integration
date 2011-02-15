@@ -26,7 +26,6 @@ import org.drools.runtime.KnowledgeRuntime;
  * A consumer that consumes objects sent into channels of a drools
  * session
  * 
- * @author etirelli
  *
  */
 public class DroolsConsumer extends DefaultConsumer {

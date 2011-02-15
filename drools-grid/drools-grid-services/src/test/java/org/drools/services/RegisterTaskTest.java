@@ -80,10 +80,6 @@ import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExpressionCompiler;
 
-/**
- *
- * @author salaboy
- */
 public class RegisterTaskTest {
 
     private GridTopology                             grid;

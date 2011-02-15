@@ -18,10 +18,6 @@ package org.drools.container.spring.beans.persistence;
 
 import java.io.Serializable;
 
-/**
- *
- * @author salaboy
- */
 public class MyVariableSerializable
     implements
     Serializable {

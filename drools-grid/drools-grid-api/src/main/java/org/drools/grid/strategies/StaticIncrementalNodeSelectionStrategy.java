@@ -20,10 +20,6 @@ import java.util.List;
 
 import org.drools.grid.GenericNodeConnector;
 
-/**
- *
- * @author salaboy
- */
 public class StaticIncrementalNodeSelectionStrategy
     implements
     NodeSelectionStrategy {

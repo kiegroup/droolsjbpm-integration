@@ -56,12 +56,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * 
- * @author Lucas Amador
- * @author Pablo Nussembaum
- *
- */
 public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
     private JAXBContext                jaxbContext;

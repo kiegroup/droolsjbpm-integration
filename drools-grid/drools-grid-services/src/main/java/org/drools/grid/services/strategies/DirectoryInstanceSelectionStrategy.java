@@ -21,10 +21,6 @@ import java.util.Map;
 
 import org.drools.grid.services.DirectoryInstance;
 
-/**
- *
- * @author salaboy
- */
 public interface DirectoryInstanceSelectionStrategy {
     public DirectoryInstance getBestDirectoryInstance(Map<String, DirectoryInstance> directoryInstance);
 }

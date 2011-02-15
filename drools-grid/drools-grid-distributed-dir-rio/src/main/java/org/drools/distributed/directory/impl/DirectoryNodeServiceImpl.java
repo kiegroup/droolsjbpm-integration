@@ -18,10 +18,6 @@ import org.drools.grid.GenericNodeConnector;
 import org.drools.grid.distributed.KnowledgeBaseGridClient;
 import org.drools.grid.internal.MessageSession;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryNodeServiceImpl implements DirectoryNodeService {
 
     private String id;

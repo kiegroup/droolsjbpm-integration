@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.timer.impl;
 
 import org.drools.grid.Grid;

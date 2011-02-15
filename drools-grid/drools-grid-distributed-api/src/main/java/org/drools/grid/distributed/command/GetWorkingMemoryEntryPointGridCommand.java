@@ -17,10 +17,6 @@
 
 package org.drools.grid.distributed.command;
 
-/**
- *
- * @author salaboy
- */
 
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;

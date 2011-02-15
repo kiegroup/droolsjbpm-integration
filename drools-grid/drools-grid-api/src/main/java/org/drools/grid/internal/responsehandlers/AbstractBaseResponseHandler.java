@@ -13,7 +13,6 @@ import org.drools.grid.internal.MessageResponseHandler;
  * Please note that the <field>error</field> is actually the Exception that occured on the server while
  * processing the request.
  *
- * @author <a href="mailto:stampy88@yahoo.com">dave sinclair</a>
  */
 public abstract class AbstractBaseResponseHandler
     implements

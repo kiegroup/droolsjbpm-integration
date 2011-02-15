@@ -22,10 +22,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-/**
- *
- * @author salaboy
- */
 public class ScheduledJobConfiguration
     implements
     Externalizable {

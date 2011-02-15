@@ -59,10 +59,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- *
- * @author salaboy
- */
 public class RegisterMinaDirectoryTest {
 
     private GridTopology grid;

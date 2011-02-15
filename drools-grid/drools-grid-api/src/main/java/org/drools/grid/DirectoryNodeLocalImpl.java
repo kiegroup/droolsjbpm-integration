@@ -22,10 +22,6 @@ import java.util.Map;
 
 import org.drools.KnowledgeBase;
 
-/**
- *
- * @author salaboy
- */
 public class DirectoryNodeLocalImpl
     implements
     DirectoryNodeService {

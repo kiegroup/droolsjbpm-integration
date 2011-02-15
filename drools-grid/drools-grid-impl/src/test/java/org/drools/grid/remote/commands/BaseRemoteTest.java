@@ -50,10 +50,6 @@ import org.junit.Before;
 
 import static org.junit.Assert.*;
 
-/**
- *
- * @author salaboy
- */
 public abstract class BaseRemoteTest {
     
     private Map<String, GridServiceDescription> coreServicesMap;

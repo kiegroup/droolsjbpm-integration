@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.remote.mina;
 
 import java.util.concurrent.atomic.AtomicInteger;

@@ -21,10 +21,6 @@ import java.util.Map;
 
 import org.drools.grid.services.TaskServerInstance;
 
-/**
- *
- * @author salaboy
- */
 public interface TaskServerInstanceSelectionStrategy {
     public TaskServerInstance getBestTaskServerInstance(Map<String, TaskServerInstance> taskServerInstances);
 }

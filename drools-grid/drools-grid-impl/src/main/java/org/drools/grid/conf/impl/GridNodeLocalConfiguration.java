@@ -23,10 +23,6 @@ import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.GridNodeImpl;
 
-/**
- *
- * @author salaboy
- */
 public class GridNodeLocalConfiguration
     implements
     GridPeerServiceConfiguration {

@@ -28,7 +28,6 @@ import org.drools.grid.strategies.ReturnAlwaysTheFirstSelectionStrategy;
 
 /**
  *
- * @author salaboy
  *
  * This class represents a remote/distributed execution environment where we can
  * create and execute our knowledge (remote/distributed knowledge sessions). The concept of

@@ -37,11 +37,6 @@ import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class GridBeanFactory
     implements
     FactoryBean,

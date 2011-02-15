@@ -21,10 +21,6 @@ import java.util.List;
 
 import org.drools.grid.GenericNodeConnector;
 
-/**
- *
- * @author salaboy
- */
 public interface DirectorySelectionStrategy {
     public GenericNodeConnector getBestDirectory(List<GenericNodeConnector> connectors);
 }

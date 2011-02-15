@@ -26,11 +26,6 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-/**
- *
- * @author Mark Proctor
- * @author Esteban Aliverti
- */
 public class DroolsSpringTransactionManager
     implements
     TransactionManager {
@@ -77,7 +72,6 @@ public class DroolsSpringTransactionManager
 
     /**
      * Borrowed from Seam
-     * @author Michael Youngstrom
      */
     public int getStatus() {
         if ( ptm == null ) {

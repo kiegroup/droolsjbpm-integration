@@ -24,10 +24,6 @@ import org.drools.grid.ExecutionNodeService;
 import org.drools.grid.GenericConnectorFactory;
 import org.drools.grid.GenericNodeConnector;
 
-/**
- *
- * @author salaboy
- */
 public class RioProvider
     implements
     GenericProvider {

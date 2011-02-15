@@ -10,10 +10,6 @@ import java.util.Map;
 
 import org.drools.KnowledgeBase;
 
-/**
- *
- * @author salaboy
- */
 
 public interface DirectoryNodeService
     extends

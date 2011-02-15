@@ -31,11 +31,6 @@ import org.drools.io.internal.InternalResource;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class KnowledgeAgentBeanFactory
     implements
     FactoryBean,

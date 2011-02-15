@@ -22,7 +22,6 @@ import org.drools.grid.services.strategies.TaskServerInstanceByPrioritySelection
 import org.drools.grid.services.strategies.TaskServerInstanceSelectionStrategy;
 
 /**
- * @author salaboy 
  *
  * This class will represent a Grid Topology where we can execute and manager our
  * knowledge sessions.

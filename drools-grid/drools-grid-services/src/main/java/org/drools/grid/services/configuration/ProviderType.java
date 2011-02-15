@@ -17,10 +17,6 @@
 
 package org.drools.grid.services.configuration;
 
-/**
- *
- * @author salaboy
- */
 public enum ProviderType {
     Local, RemoteMina, RemoteHornetQ, DistributedRio
 };

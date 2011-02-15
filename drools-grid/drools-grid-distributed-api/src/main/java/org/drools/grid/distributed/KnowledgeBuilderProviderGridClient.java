@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.drools.grid.distributed;
 
 import java.util.Properties;

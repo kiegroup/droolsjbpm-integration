@@ -35,10 +35,6 @@ import org.drools.grid.distributed.util.IDEntry;
 import org.rioproject.core.jsb.ServiceBeanContext;
 import org.rioproject.watch.CounterWatch;
 
-/**
- *
- * @author salaboy
- */
  public class ExecutionNodeServiceImpl implements ExecutionNodeService {
 
     private GenericMessageHandler handler;

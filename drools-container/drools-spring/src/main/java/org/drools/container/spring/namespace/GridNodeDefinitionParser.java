@@ -25,11 +25,6 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-/**
- * 
- * @author Lucas Amador
- *
- */
 public class GridNodeDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String GRID_ATTRIBUTE = "grid";

@@ -17,10 +17,6 @@
 
 package org.drools.grid;
 
-/**
- *
- * @author salaboy
- */
 public class NodeFactory {
     public static ExecutionNode newExecutionNode(NodeConnectionType type) {
         type.init();
