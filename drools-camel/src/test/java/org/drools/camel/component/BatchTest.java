@@ -70,6 +70,7 @@ import org.mvel2.templates.SimpleTemplateRegistry;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRegistry;
 import org.mvel2.templates.TemplateRuntime;
+import org.mvel2.templates.res.Node;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -154,7 +155,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void before() throws Exception {
         tempReg.addNamedTemplate( "tempReg",
                                   TemplateCompiler.compileTemplate( getClass().getResourceAsStream( dataformat + ".mvt" ),
-                                                                    null ) );
+                                                                    (Map<String, Class<? extends Node>>) null ) );
         TemplateRuntime.execute( tempReg.getNamedTemplate( "tempReg" ),
                                  null,
                                  tempReg );
