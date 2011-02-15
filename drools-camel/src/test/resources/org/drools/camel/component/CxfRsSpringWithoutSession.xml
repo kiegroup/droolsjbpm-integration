@@ -27,35 +27,35 @@
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
     ">
-	
-	<drools:grid-node id="node1" />
+
+  <drools:grid-node id="node1" />
   
-	<drools:kbase id="kbase1" node="node1">		
-	    <drools:resources>
-		    <drools:resource type="DRL" source="classpath:org/drools/camel/component/testSpring.drl"/>
-		</drools:resources>					
-	</drools:kbase>
-	
-	
-	<drools:ksession id="ksession1" type="stateful" name="ksession1" kbase="kbase1" node="node1">
-	    <drools:script>	    		    	
-	    	<drools:set-global identifier="list" >
-	    	   <bean class="java.util.ArrayList" />
-	    	</drools:set-global>		  
+  <drools:kbase id="kbase1" node="node1">
+      <drools:resources>
+        <drools:resource type="DRL" source="classpath:org/drools/camel/component/testSpring.drl"/>
+    </drools:resources>
+  </drools:kbase>
+
+  
+  <drools:ksession id="ksession1" type="stateful" name="ksession1" kbase="kbase1" node="node1">
+      <drools:script>
+        <drools:set-global identifier="list" >
+           <bean class="java.util.ArrayList" />
+        </drools:set-global>
         </drools:script>
         </drools:ksession>  
         <drools:ksession id="ksession2" type="stateful" name="ksession2" kbase="kbase1" node="node1">
-	    <drools:script>	    		    	
-	    	<drools:set-global identifier="list" >
-	    	   <bean class="java.util.ArrayList" />
-	    	</drools:set-global>		  
+      <drools:script>
+        <drools:set-global identifier="list" >
+           <bean class="java.util.ArrayList" />
+        </drools:set-global>
         </drools:script>
         
     </drools:ksession>   
          
   <!-- Defined the server endpoint to create the cxf-rs consumer --> 
   <cxf:rsServer id="rsServer" 
-  				address="http://localhost:9002/rest"
+          address="http://localhost:9002/rest"
                 serviceClass="org.drools.jax.rs.CommandExecutorImpl">
        <cxf:providers>
            <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
@@ -69,16 +69,16 @@
     <route>
        <from uri="cxfrs://bean://rsServer"/>
        <policy ref="droolsPolicy">
-	       <unmarshal ref="xstream" />       
-	       <to uri="drools:node1" />
-	       <marshal ref="xstream" />
+         <unmarshal ref="xstream" />
+         <to uri="drools:node1" />
+         <marshal ref="xstream" />
        </policy>
     </route>
     
     <route id="x1">
        <from uri="direct://http"/>
        <policy ref="droolsPolicy">
-	       <to uri="cxfrs://http://localhost:9002/rest"/> 
+         <to uri="cxfrs://http://localhost:9002/rest"/>
        </policy> 
     </route> 
         

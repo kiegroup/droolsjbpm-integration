@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" 
-		xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="
-				http://java.sun.com/xml/ns/persistence			http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd
-				http://java.sun.com/xml/ns/persistence/orm		http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+    xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://java.sun.com/xml/ns/persistence      http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd
+        http://java.sun.com/xml/ns/persistence/orm    http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
 
-	<persistence-unit name="org.drools.persistence.jpa.local" transaction-type="RESOURCE_LOCAL">
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<!--
-		<jta-data-source>jdbc/testDS1</jta-data-source>
-		-->
-		<class>org.drools.persistence.info.SessionInfo</class>
-		<class>org.jbpm.persistence.processinstance.ProcessInstanceInfo</class>
+  <persistence-unit name="org.drools.persistence.jpa.local" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <!--
+    <jta-data-source>jdbc/testDS1</jta-data-source>
+    -->
+    <class>org.drools.persistence.info.SessionInfo</class>
+    <class>org.jbpm.persistence.processinstance.ProcessInstanceInfo</class>
         <class>org.drools.persistence.info.WorkItemInfo</class>
-		
-		<!-- my persistent variables -->
-		<class>org.drools.container.spring.beans.persistence.MyEntity</class>
-		<class>org.drools.container.spring.beans.persistence.MyEntityMethods</class>
-		<class>org.drools.container.spring.beans.persistence.MyEntityOnlyFields</class>
-		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
-			<!--property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/-->
-			<!--property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/-->
 
-			<property name="hibernate.max_fetch_depth" value="3" />
-			<property name="hibernate.hbm2ddl.auto" value="create" />
-			<property name="hibernate.show_sql" value="false" />
-			
-			<!--
-			<property name="hibernate.connection.autocommit" value="false" />
-			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
-			-->
-		</properties>
-	</persistence-unit>
+    <!-- my persistent variables -->
+    <class>org.drools.container.spring.beans.persistence.MyEntity</class>
+    <class>org.drools.container.spring.beans.persistence.MyEntityMethods</class>
+    <class>org.drools.container.spring.beans.persistence.MyEntityOnlyFields</class>
+    <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+      <!--property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/-->
+      <!--property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/-->
+
+      <property name="hibernate.max_fetch_depth" value="3" />
+      <property name="hibernate.hbm2ddl.auto" value="create" />
+      <property name="hibernate.show_sql" value="false" />
+
+      <!--
+      <property name="hibernate.connection.autocommit" value="false" />
+      <property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
+      -->
+    </properties>
+  </persistence-unit>
 </persistence>

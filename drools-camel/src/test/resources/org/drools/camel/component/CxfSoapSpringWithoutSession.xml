@@ -30,40 +30,40 @@
     ">
   <drools:grid-node id="node1" />
 
-  <drools:kbase id="kbase1" node="node1">		
+  <drools:kbase id="kbase1" node="node1">
     <drools:resources>
       <drools:resource type="DRL" source="classpath:org/drools/camel/component/testSpring.drl"/>
-    </drools:resources>					
+    </drools:resources>
   </drools:kbase>
   
-  <drools:kbase id="kbase2" node="node1">		
+  <drools:kbase id="kbase2" node="node1">
     <drools:resources>
       <drools:resource type="DRL" source="classpath:org/drools/camel/component/testSpring2.drl"/>
-    </drools:resources>					
+    </drools:resources>
   </drools:kbase>
 
   <drools:ksession id="ksession1" type="stateful" name="ksession1" kbase="kbase1" node="node1">
-    <drools:script>	    		    	
-	  <drools:set-global identifier="list" >
-	    <bean class="java.util.ArrayList" />
-	  </drools:set-global>		  
+    <drools:script>
+    <drools:set-global identifier="list" >
+      <bean class="java.util.ArrayList" />
+    </drools:set-global>
     </drools:script>
   </drools:ksession>
   
   <drools:ksession id="ksession2" type="stateful" name="ksession2" kbase="kbase2" node="node1">
-    <drools:script>	    		    	
-	  <drools:set-global identifier="list" >
-	    <bean class="java.util.ArrayList" />
-	  </drools:set-global>		  
+    <drools:script>
+    <drools:set-global identifier="list" >
+      <bean class="java.util.ArrayList" />
+    </drools:set-global>
     </drools:script>
   </drools:ksession>
 
   <cxf:cxfEndpoint id="soapServer"
-   					address="http://localhost:9002/soap"
-   					serviceName="ns:CommandExecutor"
-   					endpointName="ns:CommandExecutorPort" 
-					wsdlURL="src/test/resources/org/drools/camel/component/soap.wsdl"
-					xmlns:ns="http://soap.jax.drools.org/" >
+             address="http://localhost:9002/soap"
+             serviceName="ns:CommandExecutor"
+             endpointName="ns:CommandExecutorPort"
+          wsdlURL="src/test/resources/org/drools/camel/component/soap.wsdl"
+          xmlns:ns="http://soap.jax.drools.org/" >
     <cxf:properties>
       <entry key="dataFormat" value="MESSAGE"/>
       <entry key="defaultOperationName" value="execute"/>

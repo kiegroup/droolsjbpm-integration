@@ -35,14 +35,14 @@
     <route>
        <from uri="direct://kservice/rest"/>
        <policy ref="droolsPolicy"> 
-	       <to uri="cxfrs://http://localhost:9002/rest"/>
+         <to uri="cxfrs://http://localhost:9002/rest"/>
        </policy>
     </route>
 
     <route>
        <from uri="direct://kservice/soap"/>
        <policy ref="droolsPolicy"> 
-	       <to uri="cxf://bean://soapServer"/>
+         <to uri="cxf://bean://soapServer"/>
        </policy>
     </route>     
 

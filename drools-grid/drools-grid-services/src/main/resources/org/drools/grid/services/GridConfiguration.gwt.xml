@@ -1,4 +1,4 @@
 <module>
-	<set-property name="gwt.suppressNonStaticFinalFieldWarnings" value="true" />
-	<source path="configuration" />
+  <set-property name="gwt.suppressNonStaticFinalFieldWarnings" value="true" />
+  <source path="configuration" />
 </module>

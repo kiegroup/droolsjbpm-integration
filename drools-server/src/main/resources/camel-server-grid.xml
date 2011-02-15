@@ -26,10 +26,10 @@
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
     ">
     
-	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/> 
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
-	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml"/>
+  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
   <!--
       !   If you are running on JBoss you will need to copy a camel-jboss.jar into the lib and set this classloader configuration 
@@ -51,11 +51,11 @@
   </cxf:rsServer>  
   
   <cxf:cxfEndpoint id="soapServer"
-  					address="/soap"
-   					serviceName="ns:CommandExecutor"
-   					endpointName="ns:CommandExecutorPort" 
-					wsdlURL="soap.wsdl"
-					xmlns:ns="http://soap.jax.drools.org/" >
+            address="/soap"
+             serviceName="ns:CommandExecutor"
+             endpointName="ns:CommandExecutorPort"
+          wsdlURL="soap.wsdl"
+          xmlns:ns="http://soap.jax.drools.org/" >
     <cxf:properties>
       <entry key="dataFormat" value="MESSAGE"/>
       <entry key="defaultOperationName" value="execute"/>
@@ -75,9 +75,9 @@
     <route>
        <from uri="cxfrs://bean://rsServer"/>
        <policy ref="droolsPolicy">
-	       <unmarshal ref="xstream" />       
-	       <to uri="drools:node1" />
-	       <marshal ref="xstream" />
+         <unmarshal ref="xstream" />
+         <to uri="drools:node1" />
+         <marshal ref="xstream" />
        </policy>
     </route>    
 

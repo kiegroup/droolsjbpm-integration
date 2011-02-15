@@ -514,7 +514,7 @@ where
           </query>
           <!-- hint name="org.hibernate.timeout" value="200"/ -->
       </named-query>
-	  <named-query name="UnescalatedDeadlines">
+    <named-query name="UnescalatedDeadlines">
           <query>
 select
      new org.drools.task.query.DeadlineSummary(

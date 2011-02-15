@@ -17,72 +17,72 @@
    <bean id="red1" class="org.drools.container.spring.MockEvaluatorDefinition" />
    <bean id="red2" class="org.drools.container.spring.MockEvaluatorDefinition" />
 
-	<drools:kbase id="kbase1">
-	   <drools:resources>
-	      <drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
-	   </drools:resources>
-	   
-	   <drools:configuration>
-	      <drools:advanced-process-rule-integration enabled="true" />
-	      
-	      <drools:multithread enabled="true" max-threads="5" />
-	      
-	      <drools:mbeans enabled="true" />
-	      
-	      <drools:event-processing-mode mode="STREAM" />
-	      
-	      <drools:accumulate-functions>
-	         <drools:accumulate-function name="af1" ref="raf1" />
-	         <drools:accumulate-function name="af2" ref="raf2" />
-	      </drools:accumulate-functions>
-	      
-	      <drools:evaluators>
-	         <drools:evaluator name="ed1" ref="red1" />
-	         <drools:evaluator name="ed2" ref="red2" />
-	      </drools:evaluators>
-	      
-	      <drools:assert-behavior mode="IDENTITY" />
+  <drools:kbase id="kbase1">
+     <drools:resources>
+        <drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+     </drools:resources>
+
+     <drools:configuration>
+        <drools:advanced-process-rule-integration enabled="true" />
+
+        <drools:multithread enabled="true" max-threads="5" />
+
+        <drools:mbeans enabled="true" />
+
+        <drools:event-processing-mode mode="STREAM" />
+
+        <drools:accumulate-functions>
+           <drools:accumulate-function name="af1" ref="raf1" />
+           <drools:accumulate-function name="af2" ref="raf2" />
+        </drools:accumulate-functions>
+
+        <drools:evaluators>
+           <drools:evaluator name="ed1" ref="red1" />
+           <drools:evaluator name="ed2" ref="red2" />
+        </drools:evaluators>
+
+        <drools:assert-behavior mode="IDENTITY" />
 
               <drools:consequenceExceptionHandler handler="org.drools.container.spring.MockConsequenceExceptionHandler" />
-	      
-	   </drools:configuration>
-	</drools:kbase>
-	
-	<drools:kbase id="kbase2">
-	   <drools:resources>
-	      <drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
-	   </drools:resources>
-	   
-	   <drools:configuration>
-	      <drools:advanced-process-rule-integration enabled="false" />
-	      
-	      <drools:multithread enabled="false" />
-	      
-	      <drools:mbeans enabled="false" />
-	      
-	      <drools:event-processing-mode mode="CLOUD" />
-	      
-	      <drools:assert-behavior mode="EQUALITY" />	      
-	   </drools:configuration>
-	</drools:kbase>	
-	
-	
-	<drools:ksession id="ksession1" type="stateful"  kbase="kbase1" >
-	   <drools:configuration>
-		    <drools:work-item-handlers>
-		        <drools:work-item-handler name="wih1" ref="rwih1" />
-		        <drools:work-item-handler name="wih2" ref="rwih2" />
-		    </drools:work-item-handlers>
-		    <drools:keep-reference enabled="true" />	
-		    <drools:clock-type type="REALTIME"  /> 
-	   </drools:configuration>		    
-	</drools:ksession>
-	
-	<drools:ksession id="ksession2" type="stateful"  kbase="kbase1" >
-	   <drools:configuration>
-		    <drools:keep-reference enabled="false" />	
-		    <drools:clock-type type="PSEUDO"  /> 
-	   </drools:configuration>		    
-	</drools:ksession>	
-	
+
+     </drools:configuration>
+  </drools:kbase>
+
+  <drools:kbase id="kbase2">
+     <drools:resources>
+        <drools:resource type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+     </drools:resources>
+
+     <drools:configuration>
+        <drools:advanced-process-rule-integration enabled="false" />
+
+        <drools:multithread enabled="false" />
+
+        <drools:mbeans enabled="false" />
+
+        <drools:event-processing-mode mode="CLOUD" />
+
+        <drools:assert-behavior mode="EQUALITY" />
+     </drools:configuration>
+  </drools:kbase>
+
+
+  <drools:ksession id="ksession1" type="stateful"  kbase="kbase1" >
+     <drools:configuration>
+        <drools:work-item-handlers>
+            <drools:work-item-handler name="wih1" ref="rwih1" />
+            <drools:work-item-handler name="wih2" ref="rwih2" />
+        </drools:work-item-handlers>
+        <drools:keep-reference enabled="true" />
+        <drools:clock-type type="REALTIME"  />
+     </drools:configuration>
+  </drools:ksession>
+
+  <drools:ksession id="ksession2" type="stateful"  kbase="kbase1" >
+     <drools:configuration>
+        <drools:keep-reference enabled="false" />
+        <drools:clock-type type="PSEUDO"  />
+     </drools:configuration>
+  </drools:ksession>
+
 </beans>

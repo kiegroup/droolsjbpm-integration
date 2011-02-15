@@ -6,36 +6,36 @@
                            http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<drools:grid id="grid1">
-       <drools:whitepages />	
-	</drools:grid>
-	
-	<drools:grid-node id="node1" grid="grid1" />
-	
-	<drools:grid-node id="node2" />
-	
-	<drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+  <drools:grid id="grid1">
+       <drools:whitepages />
+  </drools:grid>
+
+  <drools:grid-node id="node1" grid="grid1" />
+
+  <drools:grid-node id="node2" />
+
+  <drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
 
    <drools:resource id="secureResource" basic-authentication="enabled" username="someUser" password="somePassword" type="DRL" source="http://someHost:1234/someDRLResource.drl"/>
    <drools:resource id="insecureResource" type="DRL" source="http://someHost:1234/someOtherDRLResource.drl"/>
-	
-	<drools:kbase id="kbase1" node="node1">
-	    <drools:resources>
-			<drools:resource source="classpath:org/drools/container/spring/IntegrationExampleTest.xls" type="DTABLE">
-				<drools:decisiontable-conf input-type="XLS" worksheet-name="Tables_2" />
-			</drools:resource>
-			
-			<drools:resource ref="resource1"/>
-			
-			<drools:resource source="classpath:org/drools/container/spring/model.xsd" type="XSD">
-			   <drools:jaxb-conf system-id="xsd" />
-			</drools:resource>
-		</drools:resources>						
-	</drools:kbase>
-	
-	
-	<drools:ksession id="ksession1" type="stateless" name="stateless1" kbase="kbase1" node="node1"/>
-	
-	<drools:ksession id="ksession2" type="stateful" kbase="kbase1" node="node1"/>
+
+  <drools:kbase id="kbase1" node="node1">
+      <drools:resources>
+      <drools:resource source="classpath:org/drools/container/spring/IntegrationExampleTest.xls" type="DTABLE">
+        <drools:decisiontable-conf input-type="XLS" worksheet-name="Tables_2" />
+      </drools:resource>
+
+      <drools:resource ref="resource1"/>
+
+      <drools:resource source="classpath:org/drools/container/spring/model.xsd" type="XSD">
+         <drools:jaxb-conf system-id="xsd" />
+      </drools:resource>
+    </drools:resources>
+  </drools:kbase>
+
+
+  <drools:ksession id="ksession1" type="stateless" name="stateless1" kbase="kbase1" node="node1"/>
+
+  <drools:ksession id="ksession2" type="stateful" kbase="kbase1" node="node1"/>
 
 </beans>

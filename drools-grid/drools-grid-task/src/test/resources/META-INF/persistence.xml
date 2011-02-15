@@ -28,9 +28,9 @@
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
       <!--  property name="hibernate.connection.url" value="jdbc:h2:file:\dev\drools\trunk7\jbpm-process\jbpm-human-task\mydb"/ -->
-      <!--			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>-->
-      <!--	        <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>	  	        -->
-      <!--	        <property name="hibernate.connection.url" value="jdbc:postgresql://localhost/postgres"/>-->
+      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>-->
+      <!--          <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>              -->
+      <!--          <property name="hibernate.connection.url" value="jdbc:postgresql://localhost/postgres"/>-->
 
       <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
       <property name="hibernate.connection.url" value="jdbc:h2:mem:mydb" />

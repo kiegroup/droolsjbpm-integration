@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:drools="http://drools.org/schema/drools-spring"
-	xmlns:jee="http://www.springframework.org/schema/jee"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
-		http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:drools="http://drools.org/schema/drools-spring"
+  xmlns:jee="http://www.springframework.org/schema/jee"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
+    http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<bean name="myDroolsBean" class="org.drools.container.spring.timer.MyDroolsBean">
-		<property name="emf" ref="entityManagerFactory" />
-		<property name="kbase" ref="knowledgeBase" />
-		<property name="kstore" ref="knowledgeStore" />
-		<property name="txm" ref="transactionManager" />
-	</bean>
+  <bean name="myDroolsBean" class="org.drools.container.spring.timer.MyDroolsBean">
+    <property name="emf" ref="entityManagerFactory" />
+    <property name="kbase" ref="knowledgeBase" />
+    <property name="kstore" ref="knowledgeStore" />
+    <property name="txm" ref="transactionManager" />
+  </bean>
 
-	<context:annotation-config/>
+  <context:annotation-config/>
 
-	<drools:kstore id="knowledgeStore"/>
+  <drools:kstore id="knowledgeStore"/>
 
-	<drools:kbase id="knowledgeBase">
-		<drools:resources>
-			<drools:resource type="DRF"
-				             source="classpath:org/drools/container/spring/timer/flow/timer-flow.rf" />
-		</drools:resources>
-	</drools:kbase>
+  <drools:kbase id="knowledgeBase">
+    <drools:resources>
+      <drools:resource type="DRF"
+                     source="classpath:org/drools/container/spring/timer/flow/timer-flow.rf" />
+    </drools:resources>
+  </drools:kbase>
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory" />
-	</bean>
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+  </bean>
 
-	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="org.h2.Driver" />
-		<property name="url" value="jdbc:h2:mem:drools-spring-workflow" />
-		<property name="username" value="sa" />
-		<property name="password" value="" />
-	</bean>
+  <bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="org.h2.Driver" />
+    <property name="url" value="jdbc:h2:mem:drools-spring-workflow" />
+    <property name="username" value="sa" />
+    <property name="password" value="" />
+  </bean>
 
-	<bean id="entityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
-		<property name="dataSource" ref="datasource" />
-		<!--property name="jpaProperties">
-			<props>
+  <bean id="entityManagerFactory"
+    class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
+    <property name="dataSource" ref="datasource" />
+    <!--property name="jpaProperties">
+      <props>
                             <prop key="hibernate.connection.autocommit">false</prop>
                             <prop key="hibernate.max_fetch_depth">3</prop>
                             <prop key="hibernate.show_sql">false</prop>
                             <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
                             <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-			</props>
-		</property-->
-	</bean>
+      </props>
+    </property-->
+  </bean>
 
 
-	<!--aop:config>
+  <!--aop:config>
         <aop:pointcut id="timerFlowManagerMethods"
                       expression="execution(* org.drools.container.spring.timer.MyDroolsBean.*(..))"/>
 

@@ -23,8 +23,8 @@
         <param name="beanId">children</param>
         <param name="beanClass">java.util.ArrayList</param>
         <param name="bindings">
-			<binding selector="${orderItem}" />
-		</param>
+      <binding selector="${orderItem}" />
+    </param>
     </resource-config>
 
     <!--
