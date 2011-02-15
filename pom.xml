@@ -13,7 +13,7 @@
   <artifactId>droolsjbpm-integration</artifactId>
   <packaging>pom</packaging>
 
-  <name>Drools and jBPM Integration multiproject</name>
+  <name>Drools and jBPM integration multiproject</name>
   <description>
     Drools and jBPM integration with seam, spring, camel, ...
   </description>

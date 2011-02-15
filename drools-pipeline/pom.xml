@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -10,9 +11,9 @@
 
   <groupId>org.drools</groupId><!-- TODO rename groupId, artifactId, name and description -->
   <artifactId>drools-pipeline</artifactId>
-  <packaging>jar</packaging>
 
-  <name>Drools :: Pipeline</name>
+  <name>Drools pipeline</name>
+  <description>Deprecated alternative to drools-camel.</description>
 
   <dependencies>
     <dependency>
@@ -46,7 +47,6 @@
       <artifactId>xmlunit</artifactId>
       <scope>test</scope>
     </dependency>
-
 
     <dependency>
       <groupId>org.codehaus.jettison</groupId>

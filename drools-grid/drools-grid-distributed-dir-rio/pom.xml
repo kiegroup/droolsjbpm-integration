@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.drools</groupId>
@@ -9,8 +10,10 @@
   </parent>
 
   <artifactId>drools-grid-distributed-dir-rio</artifactId>
-  <name>Drools :: Grid :: Distributed Directory :: Rio</name>
-  <packaging>oar</packaging>
+  <packaging>oar</packaging><!-- TODO Does packaging oar really exist? -->
+
+  <name>Drools grid distributed directory Rio</name>
+  <description>TODO</description>
 
   <dependencies>
 
@@ -18,19 +21,16 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-api</artifactId>
-
     </dependency>
 
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
-
     </dependency>
 
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
-
     </dependency>
 
     <dependency>

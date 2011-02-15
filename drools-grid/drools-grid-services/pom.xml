@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>drools-grid</artifactId>
     <version>5.2.0-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <name>Drools :: Grid :: Services</name>
+
   <artifactId>drools-grid-services</artifactId>
+  
+  <name>Drools grid services</name>
+  <description>TODO</description>
 
   <dependencies>
-
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-api</artifactId>
@@ -33,12 +35,10 @@
       <artifactId>drools-grid-remote-api</artifactId>
     </dependency>
 
-
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-task</artifactId>
     </dependency>
-
 
     <dependency>
       <groupId>org.drools</groupId>

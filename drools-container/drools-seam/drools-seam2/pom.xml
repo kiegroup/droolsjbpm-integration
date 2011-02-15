@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -9,12 +10,11 @@
   </parent>
 
   <artifactId>drools-seam2</artifactId>
-  <packaging>jar</packaging>
 
-  <name>Drools :: Seam2</name>
+  <name>Drools Seam 2</name>
+  <description>Drools and jBPM integration for Seam 2.</description>
 
   <dependencies>
-
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-api</artifactId>
@@ -64,7 +64,6 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-persistence-jpa</artifactId>
     </dependency>
-
   </dependencies>
 
 </project>

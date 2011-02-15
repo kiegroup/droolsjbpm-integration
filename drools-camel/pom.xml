@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.droolsjbpm</groupId>
@@ -10,7 +11,9 @@
 
   <groupId>org.drools</groupId><!-- TODO rename groupId, artifactId, name and description -->
   <artifactId>drools-camel</artifactId>
-  <name>Drools :: Camel</name>
+
+  <name>Drools Camel integration</name>
+  <description>Drools integration for Camel that provides an integration framework  based on known Enterprise Integration Pattern.</description>
 
   <dependencies>
     <!-- Drools -->
