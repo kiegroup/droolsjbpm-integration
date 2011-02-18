@@ -29,5 +29,5 @@ public class JaxbTransformerProviderImpl implements JaxbTransformerProvider {
     
     public Transformer newJaxbToXmlTransformer(Marshaller marshaller) {
         return new JaxbToXmlTransformer( marshaller );
-    }    
+    }
 }

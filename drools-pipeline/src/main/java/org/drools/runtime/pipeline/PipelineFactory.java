@@ -87,7 +87,7 @@ import com.thoughtworks.xstream.XStream;
  *     public Object getResult() {
  *         return this.result;
  *     }
- * }   
+ * }
  * </pre>
  * 
  * <p>
@@ -222,7 +222,7 @@ public class PipelineFactory {
     
     public static KnowledgeRuntimeCommand newCommandExecutor() {
         return getCorePipelineProvider().newCommandExecutor();
-    }    
+    }
 
     
     public static KnowledgeRuntimeCommand newInsertElementsCommand() {
@@ -231,7 +231,7 @@ public class PipelineFactory {
 
     public static KnowledgeRuntimeCommand newInsertObjectCommand() {
         return getCorePipelineProvider().newInsertObjectCommand();
-    }    
+    }
     
     /**
      * Insert the payload into the StatefulKnowledgeSesssion referenced in the context. This stage

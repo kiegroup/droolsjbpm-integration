@@ -153,7 +153,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         
         assertEquals(1, list.size());
         assertEquals("SomeText", list.get(0));
-    }    
+    }
     
     @Test
     public void testSignalEvent() throws Exception {
@@ -236,7 +236,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         assertEquals(1, list.size());
         assertEquals("MyValue", list.get(0));
         
-    }        
+    }
     
     public static class ResultHandlerImpl implements ResultHandler {
         Map handles;

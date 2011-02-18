@@ -46,7 +46,7 @@ public class StepImpl
         commands = new ArrayList<Command>();
         ((List<Command>)this.commands).add( command );
         this.distance = distance;
-    }    
+    }
 
     public Collection<Command> getCommands() {
         return commands;

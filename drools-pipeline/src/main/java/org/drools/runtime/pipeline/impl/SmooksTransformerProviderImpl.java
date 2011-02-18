@@ -30,5 +30,5 @@ public class SmooksTransformerProviderImpl implements SmooksTransformerProvider 
     
     public Transformer newSmooksToSourceTransformer(Smooks smooks) {
         return new SmooksToSourceTransformer( smooks );
-    }    
+    }
 }

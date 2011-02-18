@@ -58,7 +58,7 @@ public class Company {
 
     public void setChief(Employee chief) {
         this.chief = chief;
-    }    
+    }
 
     public List getEmployee() {
         return employee;
@@ -70,5 +70,5 @@ public class Company {
     
     public String toString() {
         return "[Company name : " + this.name + " chief : " + this.chief + " staff : " + this.employee + "]";
-    }    
+    }
 }

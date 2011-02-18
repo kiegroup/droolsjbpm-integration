@@ -55,7 +55,7 @@ public class MvelExpressionTest {
         assertEquals( 4,list.get( 4 ).intValue() );
     }
     
-    public static class MockClass {        
+    public static class MockClass {
         private List values;
 
         public List getValues() {
@@ -64,6 +64,6 @@ public class MvelExpressionTest {
 
         public void setValues(List values) {
             this.values = values;
-        }                              
+        }
     }
 }

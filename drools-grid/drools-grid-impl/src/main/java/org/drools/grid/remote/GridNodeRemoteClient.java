@@ -70,7 +70,7 @@ public class GridNodeRemoteClient<T>
                     Object object) {
        //We need a way to do it more generic, so we can set whatever we want.
         
-       if(object instanceof StatefulKnowledgeSessionRemoteClient){ 
+       if(object instanceof StatefulKnowledgeSessionRemoteClient){
             String localId = UUID.randomUUID().toString();
 
             CommandImpl cmd = new CommandImpl( "registerKsession",

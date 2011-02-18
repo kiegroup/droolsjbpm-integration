@@ -28,5 +28,5 @@ public class XStreamTransformerProviderImpl implements XStreamTransformerProvide
     
     public Transformer newXStreamToXmlTransformer(XStream xstream) {
         return new XStreamToXmlTransformer( xstream );
-    }        
+    }
 }

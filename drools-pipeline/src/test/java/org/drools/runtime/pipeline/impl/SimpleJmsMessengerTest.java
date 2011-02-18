@@ -71,7 +71,7 @@ public class SimpleJmsMessengerTest {
 //    public void tearDown() throws Exception {
 //        this.simpleProducer.stop();
 //        this.broker.stop();
-//    }    
+//    }
 
     @Test @Ignore
     public void testJms() throws Exception {

@@ -293,6 +293,6 @@ public class DroolsEndpoint extends DefaultEndpoint {
         DefaultExchange exchange = new DefaultExchange(this, getExchangePattern());
         exchange.setIn( msg );
         return exchange;
-    }    
+    }
     
 }

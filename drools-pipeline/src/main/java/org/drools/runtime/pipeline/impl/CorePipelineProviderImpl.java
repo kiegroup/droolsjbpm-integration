@@ -71,7 +71,7 @@ public class CorePipelineProviderImpl
     
     public KnowledgeRuntimeCommand newStatefulKnowledgeSessionGetObject() {
         return new StatefulKnowledgeSessionGetObjectStage(  );
-    }    
+    }
 
     public KnowledgeRuntimeCommand newStatefulKnowledgeSessionSignalEvent(String eventType) {
         return new StatefulKnowledgeSessionSignalEventStage( eventType );

@@ -49,7 +49,7 @@ public class ListAdapterTest {
         assertTrue( mock.isSet() );
     }
     
-    public static class MockClass {        
+    public static class MockClass {
         private boolean set;
 
         public boolean isSet() {

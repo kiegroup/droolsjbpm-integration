@@ -111,7 +111,7 @@ public class Simulator
         while ( (step = executeNextStep()) != null ) {
 
         }
-    }    
+    }
 
     public Step executeNextStep() {
         if ( this.queue.isEmpty() ) {
@@ -180,7 +180,7 @@ public class Simulator
         public Object execute(GenericCommand command, Context context) {
             return command.execute( context );
         }
-    }    
+    }
 
 
 //    public static interface CommandExecutorService<T> {

@@ -55,13 +55,13 @@ public class SmooksFromSourceTransformer extends BaseEmitter
             Source source = null;
             if ( object instanceof Source ) {
                 source = ( Source ) object;
-            } else if ( object instanceof InputStream ) {                
+            } else if ( object instanceof InputStream ) {
                 source =  new StreamSource( ( InputStream ) object );
-            } else if ( object instanceof Reader ) {                
+            } else if ( object instanceof Reader ) {
                 source =  new StreamSource( ( Reader ) object );
-            } else if ( object instanceof Resource ) {                
+            } else if ( object instanceof Resource ) {
                 source =  new StreamSource( ( ( Resource ) object).getReader() );
-            } else if ( object instanceof String ) {                 
+            } else if ( object instanceof String ) {
                 source =  new StringSource( (String) object);
             } else {
                 throw new IllegalArgumentException( "signal object must be instance of Source, InputStream, Reader, Resource or String" );

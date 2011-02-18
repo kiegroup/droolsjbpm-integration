@@ -43,5 +43,5 @@ public class ListCollectJoin extends BaseEmitter implements Join {
     
     public void completed(PipelineContext context) {
         emit( lists.remove( context ), context);
-    }    
+    }
 }

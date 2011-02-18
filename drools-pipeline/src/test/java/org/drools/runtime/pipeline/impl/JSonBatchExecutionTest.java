@@ -1942,7 +1942,7 @@ public class JSonBatchExecutionTest {
         pipeline.setReceiver( inTransformer );
 
         return pipeline;
-    }    
+    }
 
     public static class ResultHandlerImpl
         implements

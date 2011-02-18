@@ -138,5 +138,5 @@ public class WhitePagesServer
                      Conversation con,
                      Message msg,
                      CommandImpl cmd);
-    }    
+    }
 }

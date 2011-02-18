@@ -23,7 +23,7 @@ import org.drools.command.Context;
 import org.drools.simulation.Path;
 import org.drools.simulation.Simulation;
 
-public class SimulationImpl implements Simulation {    
+public class SimulationImpl implements Simulation {
     private Map<String, Path> paths;
     
     public SimulationImpl() {

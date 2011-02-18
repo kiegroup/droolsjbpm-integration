@@ -34,7 +34,7 @@ public class StatefulKnowledgeSessionGetObjectStage extends BaseEmitter
     }
 
     public void receive(Object object,
-                        PipelineContext context) {        
+                        PipelineContext context) {
         StatefulKnowledgeSessionPipelineContext kContext = (StatefulKnowledgeSessionPipelineContext) context;
         StatefulKnowledgeSession ksession = kContext.getStatefulKnowledgeSession();
         Object result = ksession.getObject( (FactHandle) object );

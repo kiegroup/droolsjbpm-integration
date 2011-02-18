@@ -103,5 +103,5 @@ public class GridNodeServer
 
     public NodeData getData() {
         return data;
-    }  
+    }
 }

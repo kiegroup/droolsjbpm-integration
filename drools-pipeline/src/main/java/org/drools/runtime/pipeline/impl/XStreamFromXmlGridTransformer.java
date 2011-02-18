@@ -52,7 +52,7 @@ public class XStreamFromXmlGridTransformer extends BaseEmitter
     }
 
     public void receive(Object object,
-                        PipelineContext context) {            
+                        PipelineContext context) {
         this.payload = processPayload(object, context);
         emit( this.payload,
               context );
@@ -72,7 +72,7 @@ public class XStreamFromXmlGridTransformer extends BaseEmitter
                 str = StringUtils.toString( ((Resource) object).getReader());
             } else {
                 throw new IllegalArgumentException( "signal object must be instance of String, Reader, InputStream or Resource, was: " + object );
-            }                  
+            }
             
             Matcher m = p.matcher( str );
             String name = null;

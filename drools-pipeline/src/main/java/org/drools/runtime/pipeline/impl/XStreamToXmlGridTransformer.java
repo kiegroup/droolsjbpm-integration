@@ -26,7 +26,7 @@ public class XStreamToXmlGridTransformer extends BaseEmitter
     Transformer {
     Object result = null;
     public void receive(Object object,
-                        PipelineContext context) { 
+                        PipelineContext context) {
         this.result = transform(context, object);
         
         emit( result,

@@ -203,7 +203,7 @@ public class GridImpl
 //    public void removeGridNode(String id) {
 //        // TODO Auto-generated method stub
 //        
-//    }    
+//    }
 //
 //    public GridNode createGridNode(GridServiceDescription gsd) {
 //

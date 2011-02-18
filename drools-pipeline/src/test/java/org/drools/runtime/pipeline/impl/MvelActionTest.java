@@ -51,7 +51,7 @@ public class MvelActionTest {
         assertEquals( 4, mock.getValues().get( 4 ).intValue() );
     }
     
-    public static class MockClass {        
+    public static class MockClass {
         private List<Integer> values;
 
         public List<Integer> getValues() {
@@ -60,6 +60,6 @@ public class MvelActionTest {
 
         public void setValues(List<Integer> values) {
             this.values = values;
-        }                              
+        }
     }
 }

@@ -34,7 +34,7 @@ public class RemoteProcessCommandTests extends BaseRemoteTest{
     
 
      @Test
-     public void startProcessTest() {   
+     public void startProcessTest() {
         StatefulKnowledgeSession ksession = createProcessSession();
         
         ProcessInstance processInstance = ksession.startProcess("Minimal");

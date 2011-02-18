@@ -87,5 +87,5 @@ public class WhitePagesImpl
             ServiceConfiguration conf = new WhitePagesServiceConfiguration( newAddress );
             service.setData( conf );
         }
-    }    
+    }
 }
