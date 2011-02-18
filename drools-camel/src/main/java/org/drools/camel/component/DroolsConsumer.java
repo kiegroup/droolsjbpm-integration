@@ -28,7 +28,7 @@ import org.drools.runtime.KnowledgeRuntime;
  */
 public class DroolsConsumer extends DefaultConsumer {
 
-    private DroolsEndpoint de; 
+    private DroolsEndpoint de;
     private KnowledgeRuntime krt;
     private String channelId;
 

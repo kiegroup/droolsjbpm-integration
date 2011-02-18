@@ -33,7 +33,7 @@ public class NodeData {
         // TODO: TEMP context should have a time/utilisation eviction queue added 
         this.temp = new ContextImplWithEviction( TEMP,
                                      this.contextManager,
-                                     this.root); 
+                                     this.root);
         
         ((ContextManagerImpl) this.contextManager).addContext( this.temp );
     }

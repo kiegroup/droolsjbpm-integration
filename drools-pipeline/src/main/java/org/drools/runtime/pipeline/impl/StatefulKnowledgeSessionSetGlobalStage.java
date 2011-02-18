@@ -46,7 +46,7 @@ public class StatefulKnowledgeSessionSetGlobalStage extends BaseEmitter
             if ( !(object instanceof Map) ) {
                 throw new IllegalArgumentException( "SetGlobalStage must either declare a key or be an instanceof a Map");
             } else {
-                Map<String, Object> vars = ( Map<String, Object> ) object;        
+                Map<String, Object> vars = ( Map<String, Object> ) object;
                 for ( Entry<String, Object> entry : vars.entrySet()) {
                     ksession.setGlobal( entry.getKey(), entry.getValue() );
                 }
@@ -57,7 +57,7 @@ public class StatefulKnowledgeSessionSetGlobalStage extends BaseEmitter
 
         
         emit( object,
-              kContext );        
+              kContext );
     }
 
 }

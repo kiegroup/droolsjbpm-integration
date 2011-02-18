@@ -64,7 +64,7 @@ public abstract class BaseRemoteTest {
 
     @After
     public void tearDown() {
-        remoteN1.dispose(); 
+        remoteN1.dispose();
         grid1.get(SocketService.class).close();
     }
     
@@ -106,7 +106,7 @@ public abstract class BaseRemoteTest {
         //Configuring the WhitePages 
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
         wplConf.setWhitePages( wp );
-        conf.addConfiguration( wplConf );        
+        conf.addConfiguration( wplConf );
 
 //        //Create a Local Scheduler
 //        SchedulerLocalConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
@@ -121,7 +121,7 @@ public abstract class BaseRemoteTest {
             socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), port );
 //            socketConf.addService( SchedulerService.class.getName(), schlConf.getSchedulerService(), port );
                         
-            conf.addConfiguration( socketConf );                        
+            conf.addConfiguration( socketConf );
         }
         conf.configure( grid );
 

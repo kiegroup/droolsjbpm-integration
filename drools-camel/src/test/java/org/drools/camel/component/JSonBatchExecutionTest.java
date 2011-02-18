@@ -49,8 +49,8 @@ public class JSonBatchExecutionTest extends BatchTest {//extends ContextTestSupp
     //        inXml += "{\"batch-execution\":{\"lookup\":\"ksession1\", \"commands\":[";
     //        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
     //        inXml += ", {\"fire-all-rules\":\"\"}";
-    //        inXml += "]}}";        
-    //        inXml = roundTripFromXml( inXml );        
+    //        inXml += "]}}";
+    //        inXml = roundTripFromXml( inXml );
     //        
     //        LocalConnection connection = new LocalConnection();
     //        ExecutionNode node = connection.getExecutionNode(null);

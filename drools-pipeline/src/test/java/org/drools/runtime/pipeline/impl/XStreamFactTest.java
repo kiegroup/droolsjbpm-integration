@@ -75,9 +75,9 @@ public class XStreamFactTest {
         String xml = "";
         xml += "<list>\n";
         xml += "  <example.OrderItem>\n";
-        xml += "    <price>8.9</price>\n";        
+        xml += "    <price>8.9</price>\n";
         xml += "    <productId>111</productId>\n";
-        xml += "    <quantity>2</quantity>\n";        
+        xml += "    <quantity>2</quantity>\n";
         xml += "  </example.OrderItem>\n";
         xml += "</list>\n";
 
@@ -124,14 +124,14 @@ public class XStreamFactTest {
         transformer = PipelineFactory.newXStreamToXmlTransformer( xstream );
         transformer.setReceiver( assignAsResult );
         
-        KnowledgeRuntimeCommand getObject = PipelineFactory.newStatefulKnowledgeSessionGetObject();      
+        KnowledgeRuntimeCommand getObject = PipelineFactory.newStatefulKnowledgeSessionGetObject();
         getObject.setReceiver( transformer );
 
         pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( getObject );
         
         resultHandler = new ResultHandlerImpl();
-        pipeline.insert( factHandle, resultHandler );  
+        pipeline.insert( factHandle, resultHandler );
         
         assertXMLEqual( xml, (String) resultHandler.getObject() );
     }

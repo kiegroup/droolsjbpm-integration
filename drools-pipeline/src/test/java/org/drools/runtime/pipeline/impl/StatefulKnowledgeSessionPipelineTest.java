@@ -62,7 +62,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         ResultHandlerImpl resultHanadle = new ResultHandlerImpl();
         pipeline.insert( "Hello", resultHanadle );
         
-        assertEquals( 1, resultHanadle.getHandles().size() );              
+        assertEquals( 1, resultHanadle.getHandles().size() );
     }
     
     @Test
@@ -82,7 +82,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         ResultHandlerImpl resultHanadle = new ResultHandlerImpl();
         pipeline.insert( "Hello", resultHanadle );
         
-        assertEquals( 1, resultHanadle.getHandles().size() );              
+        assertEquals( 1, resultHanadle.getHandles().size() );
     }
     
     @Test
@@ -138,21 +138,21 @@ public class StatefulKnowledgeSessionPipelineTest {
         Map globals = new HashMap();
         globals.put("list", list);
         
-        StatefulKnowledgeSessionSetGlobalStage setGlobal = new StatefulKnowledgeSessionSetGlobalStage();        
+        StatefulKnowledgeSessionSetGlobalStage setGlobal = new StatefulKnowledgeSessionSetGlobalStage();
         StatefulKnowledgeSessionPipelineImpl pipeline = new StatefulKnowledgeSessionPipelineImpl(ksession);
-        pipeline.setReceiver( setGlobal );            
+        pipeline.setReceiver( setGlobal );
         pipeline.insert( globals, null );
         
         Map vars = new HashMap();
-        vars.put( "variable", "SomeText" );        
+        vars.put( "variable", "SomeText" );
         
-        StatefulKnowledgeSessionStartProcessStage startProcess = new StatefulKnowledgeSessionStartProcessStage("org.drools.actions");        
+        StatefulKnowledgeSessionStartProcessStage startProcess = new StatefulKnowledgeSessionStartProcessStage("org.drools.actions");
         pipeline = new StatefulKnowledgeSessionPipelineImpl(ksession);
-        pipeline.setReceiver( startProcess );        
-        pipeline.insert( vars, null );  
+        pipeline.setReceiver( startProcess );
+        pipeline.insert( vars, null );
         
         assertEquals(1, list.size());
-        assertEquals("SomeText", list.get(0));             
+        assertEquals("SomeText", list.get(0));
     }    
     
     @Test
@@ -212,36 +212,36 @@ public class StatefulKnowledgeSessionPipelineTest {
         }
         
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );        
+        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
         
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
         List<String> list = new ArrayList<String>();
         Map globals = new HashMap();
         globals.put("list", list);
         
-        StatefulKnowledgeSessionSetGlobalStage setGlobal = new StatefulKnowledgeSessionSetGlobalStage();        
+        StatefulKnowledgeSessionSetGlobalStage setGlobal = new StatefulKnowledgeSessionSetGlobalStage();
         StatefulKnowledgeSessionPipelineImpl pipeline = new StatefulKnowledgeSessionPipelineImpl(ksession);
-        pipeline.setReceiver( setGlobal );            
-        pipeline.insert( globals, null );        
+        pipeline.setReceiver( setGlobal );
+        pipeline.insert( globals, null );
         
         org.drools.runtime.process.ProcessInstance instance = ksession.startProcess("org.drools.event");
         
         StatefulKnowledgeSessionSignalEventStage signalEvent = new StatefulKnowledgeSessionSignalEventStage( "MyEvent",
-                                                                                                              instance.getId());        
+                                                                                                              instance.getId());
         pipeline = new StatefulKnowledgeSessionPipelineImpl(ksession);
-        pipeline.setReceiver( signalEvent );        
+        pipeline.setReceiver( signalEvent );
         
         pipeline.insert( "MyValue", null );
         
         assertEquals(1, list.size());
-        assertEquals("MyValue", list.get(0));  
+        assertEquals("MyValue", list.get(0));
         
     }        
     
     public static class ResultHandlerImpl implements ResultHandler {
         Map handles;
         public void handleResult(Object object) {
-           this.handles = ( Map ) object;             
+           this.handles = ( Map ) object;
         }
         public Map getHandles() {
             return this.handles;

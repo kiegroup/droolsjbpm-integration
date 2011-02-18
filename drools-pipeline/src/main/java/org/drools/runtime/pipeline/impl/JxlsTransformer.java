@@ -78,7 +78,7 @@ public class JxlsTransformer extends BaseEmitter
                                              beans );
             } else if ( object instanceof Resource ) {
                 readStatus = xlsReader.read( ((Resource) object).getInputStream(),
-                                             beans );                
+                                             beans );
             } else {
                 throw new IllegalArgumentException( "signal object must be instance of InputStream or Resource" );
             }

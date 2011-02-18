@@ -37,7 +37,7 @@ public class StatefulKnowledgeSessionGetObjectStage extends BaseEmitter
                         PipelineContext context) {        
         StatefulKnowledgeSessionPipelineContext kContext = (StatefulKnowledgeSessionPipelineContext) context;
         StatefulKnowledgeSession ksession = kContext.getStatefulKnowledgeSession();
-        Object result = ksession.getObject( (FactHandle) object );        
+        Object result = ksession.getObject( (FactHandle) object );
         
         context.setResult( result );
         

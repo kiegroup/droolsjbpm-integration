@@ -69,7 +69,7 @@ public class SmooksFromSourceTransformer extends BaseEmitter
             
             this.smooks.filter( source,
                                 javaResult,
-                                executionContext );            
+                                executionContext );
             
             result = javaResult.getBean( this.configuration.getRootId() );
         } catch ( Exception e ) {

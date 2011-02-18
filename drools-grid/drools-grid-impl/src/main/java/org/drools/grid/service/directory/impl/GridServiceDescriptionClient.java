@@ -31,7 +31,7 @@ public class GridServiceDescriptionClient
 
     private Map<String, Address> addresses = new HashMap<String, Address>();
 
-    private Serializable         data;    
+    private Serializable         data;
 
     public GridServiceDescriptionClient(GridServiceDescription gsd,
                                         GridServiceDescription whitePagesGsd,

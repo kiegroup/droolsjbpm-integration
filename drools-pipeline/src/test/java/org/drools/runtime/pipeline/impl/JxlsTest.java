@@ -55,7 +55,7 @@ public class JxlsTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         // kbuilder.add( ResourceFactory.newClassPathResource( "test_JXLS.drl", getClass() ), ResourceType.DRL );
         
-        ClassLoader cl = ((KnowledgeBuilderImpl)kbuilder).pkgBuilder.getRootClassLoader(); 
+        ClassLoader cl = ((KnowledgeBuilderImpl)kbuilder).pkgBuilder.getRootClassLoader();
         Thread.currentThread().setContextClassLoader( cl );
 
         InputStream inputXLS = new BufferedInputStream(getClass().getResourceAsStream( "departmentData.xls"));
@@ -66,7 +66,7 @@ public class JxlsTest {
         Callable callable = new CallableImpl();
 
         callable.setReceiver( transformer );
-        transformer.setReceiver( callable );        
+        transformer.setReceiver( callable );
         BasePipelineContext context = new BasePipelineContext( Thread.currentThread().getContextClassLoader() );
         
         Map<String, Object> beans = ( Map<String, Object> ) callable.call( inputXLS, context );
@@ -82,12 +82,12 @@ public class JxlsTest {
         assertEquals( 3, departments.size() );
         
         Department department = departments.get( 0 );
-        assertEquals( "IT", department.getName() );        
+        assertEquals( "IT", department.getName() );
         assertEquals( 5, department.getStaff().size() );
         
         department = departments.get( 2 );
-        assertEquals( "BA", department.getName() );        
-        assertEquals( 4, department.getStaff().size() );        
+        assertEquals( "BA", department.getName() );
+        assertEquals( 4, department.getStaff().size() );
     }
     
 }

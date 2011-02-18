@@ -28,7 +28,7 @@ import com.thoughtworks.xstream.XStream;
 public class XStreamFromXmlTransformer extends BaseEmitter
     implements  
     Transformer {
-    private XStream                    xstream;   
+    private XStream                    xstream;
 
     public XStreamFromXmlTransformer(XStream xstream) {
         this.xstream = xstream;

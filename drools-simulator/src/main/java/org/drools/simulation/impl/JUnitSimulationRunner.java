@@ -95,7 +95,7 @@ public class JUnitSimulationRunner extends Runner {
         //        this.descr2 = Description.createTestDescription( cls, "test2" );
         //        
         //        this.descr.addChild( descr1 );
-        //        this.descr.addChild( descr2 );                       
+        //        this.descr.addChild( descr2 );
 
     }
 

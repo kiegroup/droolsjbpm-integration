@@ -43,7 +43,7 @@ public class MvelExpressionTest {
         callable.setReceiver( action );
         Expression expr = PipelineFactory.newMvelExpression( "this.values" );
         action.setReceiver( expr );
-        expr.setReceiver( callable );          
+        expr.setReceiver( callable );
         
         assertNull( mock.getValues() );
         List<Integer> list = ( List<Integer> ) callable.call( mock, new BasePipelineContext( Thread.currentThread().getContextClassLoader() ) );

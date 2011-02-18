@@ -85,7 +85,7 @@ public class SmooksFactTest {
                          resultHandler );
         
         FactHandle factHandle = ( FactHandle ) ((Map)resultHandler.getObject()).keySet().iterator().next();
-        assertNotNull( factHandle );         
+        assertNotNull( factHandle );
 
         // now round trip that fact
         Action executeResult = PipelineFactory.newExecuteResultHandler();
@@ -96,7 +96,7 @@ public class SmooksFactTest {
         transformer = PipelineFactory.newSmooksToSourceTransformer( smooks );
         transformer.setReceiver( assignAsResult );
         
-        KnowledgeRuntimeCommand getObject = PipelineFactory.newStatefulKnowledgeSessionGetObject();      
+        KnowledgeRuntimeCommand getObject = PipelineFactory.newStatefulKnowledgeSessionGetObject();
         getObject.setReceiver( transformer );
 
         pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );

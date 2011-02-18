@@ -72,9 +72,9 @@ public class XStreamGlobalTest {
         String xml = "";
         xml += "<list>\n";
         xml += "  <example.OrderItem>\n";
-        xml += "    <price>8.9</price>\n";        
+        xml += "    <price>8.9</price>\n";
         xml += "    <productId>111</productId>\n";
-        xml += "    <quantity>2</quantity>\n";        
+        xml += "    <quantity>2</quantity>\n";
         xml += "  </example.OrderItem>\n";
         xml += "</list>";
 
@@ -116,14 +116,14 @@ public class XStreamGlobalTest {
         transformer = PipelineFactory.newXStreamToXmlTransformer( xstream );
         transformer.setReceiver( assignAsResult );
         
-        KnowledgeRuntimeCommand getGlobalStage = PipelineFactory.newStatefulKnowledgeSessionGetGlobal( );        
+        KnowledgeRuntimeCommand getGlobalStage = PipelineFactory.newStatefulKnowledgeSessionGetGlobal( );
         getGlobalStage.setReceiver( transformer );
 
         pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( getGlobalStage );
         
         resultHandler = new ResultHandlerImpl();
-        pipeline.insert( "list", resultHandler );  
+        pipeline.insert( "list", resultHandler );
         
         assertXMLEqual( xml, (String) resultHandler.getObject() );
     }

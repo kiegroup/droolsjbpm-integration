@@ -67,7 +67,7 @@ public class GridImpl
         this.services.put( ConversationManager.class.getName(), new ConversationManagerImpl( this, listener ) );
         
         ConnectionFactoryService conn = new ConnectionFactoryServiceImpl(this);
-        this.services.put( ConnectionFactoryService.class.getName(), conn );               
+        this.services.put( ConnectionFactoryService.class.getName(), conn );
         
         this.serviceConfigurators.put( WhitePages.class.getName(), new WhitePagesRemoteConfiguration( ) );
     }
@@ -105,7 +105,7 @@ public class GridImpl
     public GridNode createGridNode(String id) {
         WhitePages wp = get( WhitePages.class );
         GridServiceDescription gsd = wp.create( id );
-        gsd.setServiceInterface( GridNode.class );        
+        gsd.setServiceInterface( GridNode.class );
         GridNode node = new GridNodeImpl( id );
         this.localNodes.put( id, node );
         return node;
@@ -130,7 +130,7 @@ public class GridImpl
     //        if ( service == null ) {
     //            throw new IllegalArgumentException( "Service '" + id + "' could not be found" );
     //        }
-    //        this.socketServer.addService( port, id, ((MessageReceiverHandlerFactoryService) service).getMessageReceiverHandler() );        
+    //        this.socketServer.addService( port, id, ((MessageReceiverHandlerFactoryService) service).getMessageReceiverHandler() );
     //    }
 
 //    public GridNodeConnection getGridNodeConnection(GridServiceDescription serviceDescription) {

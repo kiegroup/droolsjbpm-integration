@@ -56,7 +56,7 @@ public class CxfSoapClientServerTest {
                                         (CamelContext) springContext.getBean( "camel-client-ctx" ) );
 
         assertTrue( response.contains( "execution-results" ) );
-        assertTrue( response.contains( "echo" ) );  
+        assertTrue( response.contains( "echo" ) );
         springContext.stop();
     }
 

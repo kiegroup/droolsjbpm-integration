@@ -77,7 +77,7 @@ public class JaxbTest {
     //        JAXBElement elm = ( JAXBElement ) unmarshaller.unmarshal( getClass().getResourceAsStream( "data.xml" ) );
     //       
     //        assertEquals( "com.oracle.sample3.USAddress",
-    //                      elm.getValue().getClass().getName() );        
+    //                      elm.getValue().getClass().getName() );
     //    }
 
     @Test
@@ -86,7 +86,7 @@ public class JaxbTest {
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         
-        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );               
+        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );
         
         kbuilder.add( ResourceFactory.newClassPathResource( "order.xsd",
                                                           getClass() ), ResourceType.XSD,
@@ -112,7 +112,7 @@ public class JaxbTest {
         insertStage.setReceiver( executeResultHandler );
         
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
-                                                                     kbase ); 
+                                                                     kbase );
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         
 //        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -153,7 +153,7 @@ public class JaxbTest {
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );               
+        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );
         
         kbuilder.add( ResourceFactory.newClassPathResource( "order.xsd",
                                                           getClass() ), ResourceType.XSD,
@@ -188,7 +188,7 @@ public class JaxbTest {
         expression.setReceiver( splitter );
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
-                                                                     kbase ); 
+                                                                     kbase );
         
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );

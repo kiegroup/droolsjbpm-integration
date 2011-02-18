@@ -113,7 +113,7 @@ public class DirectoryNodeServiceGridClient implements DirectoryNodeService {
         DirectoryNodeService client = ((DistributedRioDirectoryConnector) connector).getDirectoryNodeService();
         Map<String, String>  result = client.getKBasesMap();
         connector.disconnect();
-        return result; 
+        return result;
     }
 
     public void dispose() throws ConnectorException, RemoteException {

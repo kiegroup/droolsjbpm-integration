@@ -36,9 +36,9 @@ public class ListAdapterTest {
         MockClass mock = new MockClass();
         List list = new ArrayList();
         
-        Action action = PipelineFactory.newMvelAction( "this.set = true" );   
+        Action action = PipelineFactory.newMvelAction( "this.set = true" );
         
-        ListAdapter listAdapter = new ListAdapterImpl( list, true );        
+        ListAdapter listAdapter = new ListAdapterImpl( list, true );
         action.setReceiver( listAdapter );
         
         assertFalse( mock.isSet() );

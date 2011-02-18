@@ -33,7 +33,7 @@ public class SchedulerLocalConfiguration
     
     public SchedulerService getSchedulerService() {
         if ( this.scheduler == null ) {
-            this.scheduler = new SchedulerImpl( this.id ); 
+            this.scheduler = new SchedulerImpl( this.id );
         }
         
         return this.scheduler;

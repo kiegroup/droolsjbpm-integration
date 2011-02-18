@@ -61,7 +61,7 @@ public class CxfSoapClientServerGridTest {
         String response = test.execute( soapMessage,
                                         (CamelContext) springContext.getBean( "camel-client-ctx" ) );
         
-        //System.out.println("Response 1 = "+ response ); 
+        //System.out.println("Response 1 = "+ response );
         assertTrue( response.contains( "execution-results" ) );
         assertTrue( response.contains( "echo" ) );
         

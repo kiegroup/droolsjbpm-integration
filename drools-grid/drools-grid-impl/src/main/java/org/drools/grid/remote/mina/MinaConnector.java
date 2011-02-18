@@ -71,7 +71,7 @@ public class MinaConnector
         //                                           MessageResponseHandler responseHandler) {
         //                map.put( id, responseHandler );
         //            }
-        //        };        
+        //        };
 
         this.connector.setHandler( new MinaIoHandler( systemEventListener,
                                                       handler ) );

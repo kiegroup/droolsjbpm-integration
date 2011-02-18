@@ -140,7 +140,7 @@ public class JmsMessenger extends BaseService
             while ( this.run ) {
                 Message msg = null;
                 try {
-                    msg = this.consumer.receive();     
+                    msg = this.consumer.receive();
                     if (  msg != null ) {
                         if ( this.resultHandlerFactory != null ) {
                             pipeline.insert( msg,

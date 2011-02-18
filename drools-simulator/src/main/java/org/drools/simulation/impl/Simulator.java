@@ -129,7 +129,7 @@ public class Simulator
           long newTime = this.startTime + step.getTemporalDistance();
           long currentTime = clock.getCurrentTime();
           clock.advanceTime( (currentTime + (newTime - currentTime)),
-                             TimeUnit.MICROSECONDS );            
+                             TimeUnit.MICROSECONDS );
         }
         
         for ( Command cmd : step.getCommands() ) {
@@ -190,7 +190,7 @@ public class Simulator
 //    public static class SimulatorCommandExecutorService<T> implements CommandExecutorService {
 //        Map map = new HashMap() {
 //            {
-//               put( KnowledgeBuilderAddCommand.class, null); 
+//               put( KnowledgeBuilderAddCommand.class, null);
 //            }
 //        };
 //        

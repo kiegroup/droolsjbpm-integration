@@ -74,7 +74,7 @@ import com.thoughtworks.xstream.XStream;
  * </p>
  * <pre>
  * ResultHandler resultHandler = new ResultHandlerImpl();
- * pipeline.insert( factHandle, resultHandler );  
+ * pipeline.insert( factHandle, resultHandler );
  * System.out.println( resultHandler );
  * ...
  * public class ResultHandlerImpl implements ResultHandler {

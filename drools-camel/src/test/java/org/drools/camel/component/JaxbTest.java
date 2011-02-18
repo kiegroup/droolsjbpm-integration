@@ -70,7 +70,7 @@ public class JaxbTest {
 
         System.out.println( "context path: " + sb.toString() );
         //        jaxbDataFormat.setContextPath( sb.toString() );
-        //        jaxbDataFormat.setPrettyPrint( true ); 
+        //        jaxbDataFormat.setPrettyPrint( true );
         JAXBContext jaxbContext = JAXBContext.newInstance( sb.toString() );
 
         List<GenericCommand< ? >> cmds = new ArrayList<GenericCommand< ? >>();

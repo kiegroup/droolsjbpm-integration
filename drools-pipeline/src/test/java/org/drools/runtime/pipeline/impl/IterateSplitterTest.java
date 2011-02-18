@@ -39,14 +39,14 @@ public class IterateSplitterTest {
         MockClass mock = new MockClass();
         List<Integer> list = new ArrayList<Integer>();
         
-        Action action = PipelineFactory.newMvelAction( "this.setValues( [0, 1, 2, 3, 4] ) " );  
+        Action action = PipelineFactory.newMvelAction( "this.setValues( [0, 1, 2, 3, 4] ) " );
         Expression expr = PipelineFactory.newMvelExpression( "this.values" );
         action.setReceiver( expr );
                 
         Splitter splitter = PipelineFactory.newIterateSplitter();
         expr.setReceiver( splitter );
         
-        ListAdapter listAdapter = new ListAdapterImpl( list, true );        
+        ListAdapter listAdapter = new ListAdapterImpl( list, true );
         splitter.setReceiver( listAdapter );
         
         assertNull( mock.getValues() );

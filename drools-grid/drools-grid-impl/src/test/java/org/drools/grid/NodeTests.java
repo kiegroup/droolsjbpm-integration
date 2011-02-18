@@ -17,7 +17,7 @@
 
 package org.drools.grid;
 
-import java.io.Serializable; 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import org.drools.KnowledgeBase;
@@ -105,7 +105,7 @@ public class NodeTests {
         assertNotNull( gnode );
         
         grid.removeGridNode( gsd.getId() );
-        assertNull( wp.lookup( "n1" ) );        
+        assertNull( wp.lookup( "n1" ) );
         assertNull( grid.getGridNode( gsd.getId() ) );
         
     }
@@ -170,7 +170,7 @@ public class NodeTests {
         Assert.assertEquals( 1,
                              i );
         
-        remoteN1.dispose(); 
+        remoteN1.dispose();
          grid1.get(SocketService.class).close();
 
     }
@@ -248,7 +248,7 @@ public class NodeTests {
          
          fired = session.fireAllRules();
          
-         remoteN1.dispose(); 
+         remoteN1.dispose();
          grid1.get(SocketService.class).close();
 
     }
@@ -289,7 +289,7 @@ public class NodeTests {
             socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), port );
 //            socketConf.addService( SchedulerService.class.getName(), schlConf.getSchedulerService(), port );
                         
-            conf.addConfiguration( socketConf );                        
+            conf.addConfiguration( socketConf );
         }
         conf.configure( grid );
 

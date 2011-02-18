@@ -56,7 +56,7 @@ public class JaxbFactTest {
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );               
+        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );
         
         kbuilder.add( ResourceFactory.newClassPathResource( "order.xsd",
                                                           getClass() ), ResourceType.XSD,
@@ -83,7 +83,7 @@ public class JaxbFactTest {
         insertStage.setReceiver( executeResultHandler );
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
-                                                                     kbase ); 
+                                                                     kbase );
         
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );

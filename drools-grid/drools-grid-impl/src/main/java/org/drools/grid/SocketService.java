@@ -10,7 +10,7 @@ public interface SocketService {
                     Object object);
 
     void removeService(int port,
-                       String id);    
+                       String id);
 
     String getIp();
 

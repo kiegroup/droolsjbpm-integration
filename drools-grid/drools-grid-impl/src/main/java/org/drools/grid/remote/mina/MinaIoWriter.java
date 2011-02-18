@@ -67,7 +67,7 @@ public class MinaIoWriter
         //        if ( responseHandler != null ) {
         //            requestId = this.requestIdCounter.getAndIncrement();
         //            addResponseHandler( requestId,
-        //                                responseHandler );            
+        //                                responseHandler );
         //        }
         //        Message msg = new MessageImpl( this.conversationId,
         //                                       this.id,

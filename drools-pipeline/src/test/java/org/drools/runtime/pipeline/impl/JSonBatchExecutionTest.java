@@ -161,8 +161,8 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );    
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
                 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
@@ -172,10 +172,10 @@ public class JSonBatchExecutionTest {
         inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "   {\"insert\":{\"object\":{\"org.drools.Person\":{\"name\":\"mic\"} }, \"out-identifier\":\"person\" } }";
-        inXml += ",  {\"insert\":{\"object\":{\"org.drools.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";        
+        inXml += ",  {\"insert\":{\"object\":{\"org.drools.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";
         inXml += ",  {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );    
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
                         
         
         resultHandler = new ResultHandlerImpl();
@@ -185,7 +185,7 @@ public class JSonBatchExecutionTest {
         outXml = roundTripFromXml( outXml );
         
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
-        result = ( ExecutionResults ) roundTripFromObject( result );        
+        result = ( ExecutionResults ) roundTripFromObject( result );
         ChangeCollector collector = ( ChangeCollector ) result.getValue( "changes" );
         Cheese c = ( Cheese ) collector.getChanges().get( 0 );
         assertEquals( 42, c.getPrice() );
@@ -193,9 +193,9 @@ public class JSonBatchExecutionTest {
         inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "   {\"insert\":{\"object\":{\"org.drools.Person\":{\"name\":\"mark\"} }, \"out-identifier\":\"person\" } }";
-        inXml += ",  {\"insert\":{\"object\":{\"org.drools.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";        
+        inXml += ",  {\"insert\":{\"object\":{\"org.drools.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";
         inXml += ",  {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";  
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         
         resultHandler = new ResultHandlerImpl();
@@ -206,9 +206,9 @@ public class JSonBatchExecutionTest {
         outXml = roundTripFromXml( outXml );
         
         result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
-        result = ( ExecutionResults ) roundTripFromObject( result );        
+        result = ( ExecutionResults ) roundTripFromObject( result );
         collector = ( ChangeCollector ) result.getValue( "changes" );
-        assertEquals( "stilton", collector.getRetracted().get( 0 ) );        
+        assertEquals( "stilton", collector.getRetracted().get( 0 ) );
 
     }
 
@@ -229,8 +229,8 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );    
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
         
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -238,7 +238,7 @@ public class JSonBatchExecutionTest {
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
         String outXml = (String) resultHandler.getObject();
-        outXml = roundTripFromXml( outXml );        
+        outXml = roundTripFromXml( outXml );
 
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
         result = ( ExecutionResults ) roundTripFromObject( result );
@@ -250,7 +250,7 @@ public class JSonBatchExecutionTest {
         FactHandle factHandle = (FactHandle) result.getFactHandle( "outStilton" );
         stilton = (Cheese) ksession.getObject( factHandle );
         assertEquals( 30,
-                      stilton.getPrice() );        
+                      stilton.getPrice() );
 
 //        String expectedXml = "";
 //        expectedXml = "{\"execution-results\":{\"results\":{\"outStilton\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"oldPrice\":0,\"price\":30}}},\"fact-handles\":{\"outStilton\":\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\"}}}";
@@ -288,15 +288,15 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"return-object\":false, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml ); 
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
         String outXml = (String) resultHandler.getObject();
-        outXml = roundTripFromXml( outXml ); 
+        outXml = roundTripFromXml( outXml );
 
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
         result = ( ExecutionResults ) roundTripFromObject ( result );
@@ -333,7 +333,7 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":{\"max\":10}}";
-        inXml += "]}}";        
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         
 
@@ -341,7 +341,7 @@ public class JSonBatchExecutionTest {
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
-        String outXml = (String) resultHandler.getObject();        
+        String outXml = (String) resultHandler.getObject();
         outXml = roundTripFromXml( outXml );
 
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
@@ -357,8 +357,8 @@ public class JSonBatchExecutionTest {
         inXml += "  {\"get-object\":{ ";
         inXml += "      \"out-identifier\":'outStilton',";
         inXml += "      \"fact-handle\":'" + factHandle.toExternalForm() + "'}}";
-        inXml += "]}}";   
-        inXml = roundTripFromXml( inXml );        
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
       
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
@@ -389,7 +389,7 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":{\"max\":10}}";
-        inXml += "]}}";        
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -410,7 +410,7 @@ public class JSonBatchExecutionTest {
         inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "  { \"retract\":{\"fact-handle\":'" + factHandle.toExternalForm() + "'}}";
-        inXml += "]}}";   
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
@@ -420,7 +420,7 @@ public class JSonBatchExecutionTest {
         inXml += "  {\"get-object\":{ ";
         inXml += "      \"out-identifier\":'outStilton',";
         inXml += "      \"fact-handle\":'" + factHandle.toExternalForm() + "'}}";
-        inXml += "]}}";   
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
@@ -447,7 +447,7 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -484,10 +484,10 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "  {\"modify\":{\"fact-handle\":'" + factHandle.toExternalForm() + "'";
         inXml += ",                \"setters\":[{\"accessor\":\"oldPrice\",\"set\":42}, {\"accessor\":\"price\",\"set\":50}]";
-        inXml += "} }";        
+        inXml += "} }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";   
-        inXml = roundTripFromXml( inXml );        
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
         
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
@@ -496,7 +496,7 @@ public class JSonBatchExecutionTest {
         inXml += "  {\"get-object\":{ ";
         inXml += "      \"out-identifier\":'outCheddar',";
         inXml += "      \"fact-handle\":'" + factHandle.toExternalForm() + "'}}";
-        inXml += "]}}";   
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         
         getPipelineStateful( ksession ).insert( inXml,
@@ -512,15 +512,15 @@ public class JSonBatchExecutionTest {
                       cheddar.getPrice() );
 
         //now test for code injection:
-        ModifyCommand.ALLOW_MODIFY_EXPRESSIONS = false;        
+        ModifyCommand.ALLOW_MODIFY_EXPRESSIONS = false;
         inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "  {\"modify\":{\"fact-handle\":'" + factHandle.toExternalForm() + "'";
         inXml += ",                \"setters\":[{\"accessor\":\"type\",\"set\":\"44; System.exit(1);\"}, {\"accessor\":\"price\",\"set\":50}]";
-        inXml += "} }";        
+        inXml += "} }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";   
-        inXml = roundTripFromXml( inXml );           
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
         outXml = (String) resultHandler.getObject();
@@ -549,18 +549,18 @@ public class JSonBatchExecutionTest {
         inXml += "   {\"set-global\":{\"identifier\":\"list1\",\"out\"=true";
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
-        inXml += ",  {\"insert-elements\":{\"objects\":[";        
+        inXml += ",  {\"insert-elements\":{\"objects\":[";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";        
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
-        inXml += "]}}";                 
-        inXml = roundTripFromXml( inXml );         
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
         getPipeline( ksession ).insert( inXml,
                                         resultHandler );
-        String outXml = (String) resultHandler.getObject();                
+        String outXml = (String) resultHandler.getObject();
         outXml = roundTripFromXml( outXml );
         
 //        String expectedXml = "";
@@ -616,9 +616,9 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "  {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\":\"out-list\"}}";               
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );          
+        inXml += "  {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\":\"out-list\"}}";
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         FactHandle fh = ksession.insert( new Person( "mic",
@@ -674,13 +674,13 @@ public class JSonBatchExecutionTest {
         inXml += "   {\"set-global\":{\"identifier\":\"list1\",\"out\"=true";
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
-        inXml += ",  {\"insert-elements\":{\"out-identifier\":\"myfacts\",\"return-objects\":true,\"objects\":[";        
+        inXml += ",  {\"insert-elements\":{\"out-identifier\":\"myfacts\",\"return-objects\":true,\"objects\":[";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";        
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
-        inXml += ", {\"fire-all-rules\":\"\"}";        
-        inXml += "]}}";                 
-        inXml = roundTripFromXml( inXml );        
+        inXml += ", {\"fire-all-rules\":\"\"}";
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
@@ -695,19 +695,19 @@ public class JSonBatchExecutionTest {
         List list1 = ( List ) result.getValue( "list1" );
         assertEquals( 2, list1.size() );
         assertTrue( list1.contains( new Cheese("stilton", 35) ) );
-        assertTrue( list1.contains( new Cheese("stilton", 30) ) );          
+        assertTrue( list1.contains( new Cheese("stilton", 30) ) );
         
         List myFacts = ( List ) result.getValue( "myfacts" );
         assertEquals( 2, list1.size() );
         assertTrue( myFacts.contains( new Cheese("stilton", 35) ) );
-        assertTrue( myFacts.contains( new Cheese("stilton", 30) ) );        
+        assertTrue( myFacts.contains( new Cheese("stilton", 30) ) );
         
         List factHandles = ( List ) result.getFactHandle( "myfacts" );
         List list = new ArrayList();
         list.add( ksession.getObject( ((InternalFactHandle)factHandles.get( 0 )) ) );
         list.add( ksession.getObject( ((InternalFactHandle)factHandles.get( 1 )) ) );
         assertTrue( list.contains( new Cheese("stilton", 35) ) );
-        assertTrue( list.contains( new Cheese("stilton", 30) ) );          
+        assertTrue( list.contains( new Cheese("stilton", 30) ) );
 
 
 //        String expectedXml = "";
@@ -776,16 +776,16 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += " {\"set-global\":{\"identifier\":\"list1\"";
         inXml += "                  ,\"object\":{\"list\":{\"object\":[]}}";
-        inXml += "} } ";   
+        inXml += "} } ";
         inXml += ", {\"set-global\":{\"identifier\":\"list2\",\"out\"=true";
         inXml += "                  ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "} } ";
         inXml += ", {\"set-global\":{\"identifier\":\"list3\",\"out-identifier\"=\"outList3\"";
         inXml += "                  ,\"object\":{\"list\":{\"object\":[]}}";
-        inXml += "} } ";        
+        inXml += "} } ";
         inXml += ", {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":5}}, \"out-identifier\":\"outStilton\" } }";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml ); 
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
@@ -855,9 +855,9 @@ public class JSonBatchExecutionTest {
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
         inXml += ",  {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
-        inXml += ",  {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\"=\"out-list\"}}";               
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );         
+        inXml += ",  {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\"=\"out-list\"}}";
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
@@ -904,12 +904,12 @@ public class JSonBatchExecutionTest {
 
         String inXml ="";
         inXml =  "{\"batch-execution\":{\"commands\":[";
-        inXml += "  {\"insert-elements\":{\"objects\":[";        
+        inXml += "  {\"insert-elements\":{\"objects\":[";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";        
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
-        inXml += ",  {\"get-objects\":{\"out-identifier\":\"list1\"}}";        
-        inXml += "]}}";     
+        inXml += ",  {\"get-objects\":{\"out-identifier\":\"list1\"}}";
+        inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -941,7 +941,7 @@ public class JSonBatchExecutionTest {
 //                        outXml );
 //
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
-        result = ( ExecutionResults ) roundTripFromObject( result ); 
+        result = ( ExecutionResults ) roundTripFromObject( result );
         List list = (List) result.getValue( "list1" );
         Cheese stilton25 = new Cheese( "stilton",
                                        30 );
@@ -972,21 +972,21 @@ public class JSonBatchExecutionTest {
 
         String inXml ="";
         inXml =  "{\"batch-execution\":{\"commands\":[";
-        inXml += "  {\"insert-elements\":{\"objects\":[";        
+        inXml += "  {\"insert-elements\":{\"objects\":[";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":2}}, ";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"cheddar\",\"price\":1}}, ";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"cheddar\",\"price\":2}}, ";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":1}}  ";        
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":1}}  ";
         inXml += "   ]}}";
-        inXml += ",  {\"query\":{\"out-identifier\":\"cheeses\",\"name\":\"cheeses\"}}";        
-        inXml += "]}}";     
-        inXml = roundTripFromXml( inXml );        
+        inXml += ",  {\"query\":{\"out-identifier\":\"cheeses\",\"name\":\"cheeses\"}}";
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
         
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
-        String outXml = (String) resultHandler.getObject();        
+        String outXml = (String) resultHandler.getObject();
         outXml = roundTripFromXml( outXml );
 
 //        Iterator<QueryResultsRow> it1 = ksession.getQueryResults( "cheeses" ).iterator();
@@ -1120,14 +1120,14 @@ public class JSonBatchExecutionTest {
         inXml += "   {\"set-global\":{\"identifier\":\"list1\",\"out\"=true";
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
-        inXml += ",  {\"insert-elements\":{\"objects\":[";        
+        inXml += ",  {\"insert-elements\":{\"objects\":[";
         inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";        
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
-        inXml += ", {\"fire-all-rules\":\"\"}";  
-        inXml += ", {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"brie\",\"price\":10,\"oldPrice\":0}}, \"out-identifier\":\"outBrie\" } }";        
-        inXml += "]}}";                 
-        inXml = roundTripFromXml( inXml );         
+        inXml += ", {\"fire-all-rules\":\"\"}";
+        inXml += ", {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"brie\",\"price\":10,\"oldPrice\":0}}, \"out-identifier\":\"outBrie\" } }";
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
         
         StatelessKnowledgeSession ksession = getSession2( ResourceFactory.newByteArrayResource( str.getBytes() ) );
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
@@ -1256,14 +1256,14 @@ public class JSonBatchExecutionTest {
         inXml += "        {\"identifier\":\"person\",";
         inXml += "         \"object\":{\"@class\":\"org.drools.TestVariable\",";
         inXml += "                     \"name\":\"John Doe\"}}]}},";
-        inXml += "    {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\":\"out-list\"}}]}}";       
+        inXml += "    {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\":\"out-list\"}}]}}";
         inXml = roundTripFromXml( inXml );
         
         ResultHandlerImpl resultHandler = new ResultHandlerImpl();
         getPipeline( ksession ).insert( inXml,
                                         resultHandler );
         String outXml = (String) resultHandler.getObject();
-        outXml = roundTripFromXml( outXml ); 
+        outXml = roundTripFromXml( outXml );
         
         ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
         result = (ExecutionResults) roundTripFromObject( result );
@@ -1341,8 +1341,8 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"signal-event\":{\"process-instance-id\":" + processInstance.getId() +",\"event-type\":\"MyEvent\"";
         inXml += "                   ,\"object\":{\"string\":[\"MyValue\"]} } }";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );         
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         getPipelineStateful( ksession ).insert( inXml,
                                                 new ResultHandlerImpl() );
@@ -1407,8 +1407,8 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "   {\"signal-event\":{\"event-type\":\"MyEvent\"";
         inXml += "                    ,\"object\":{\"string\":[\"MyValue\"]} } }";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );             
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
 
         getPipelineStateful( ksession ).insert( inXml,
                                                 new ResultHandlerImpl() );
@@ -1487,7 +1487,7 @@ public class JSonBatchExecutionTest {
         str += "    <connection from=\"2\" to=\"3\" />\n";
         str += "  </connections>\n";
         str += "\n";
-        str += "</process>";        
+        str += "</process>";
         
         Reader source = new StringReader( str );
         kbuilder.add( ResourceFactory.newReaderResource( source ),
@@ -1525,7 +1525,7 @@ public class JSonBatchExecutionTest {
                       workItem.getState() );
 
         String inXml = "";
-        inXml = "{\"complete-work-item\":{\"id\":" + workItem.getId() + "}}";                
+        inXml = "{\"complete-work-item\":{\"id\":" + workItem.getId() + "}}";
         inXml = roundTripFromXml( inXml );
         getPipelineStateful( ksession ).insert( inXml,
                                                 new ResultHandlerImpl() );
@@ -1724,7 +1724,7 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.foo.Whee\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
+        inXml += "]}}";
         //inXml = roundTripFromXml( inXml );   // can't round trip, as dosn't have the correct class loader       
         
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -1736,10 +1736,10 @@ public class JSonBatchExecutionTest {
         ClassLoader cl = ((InternalRuleBase) ((StatefulKnowledgeSessionImpl) ksession).getRuleBase()).getRootClassLoader();
         XStream xstream = BatchExecutionHelper.newJSonMarshaller();
         xstream.setClassLoader( cl );
-        FactHandle factHandle = (FactHandle) ((ExecutionResults) xstream.fromXML( outXml )).getFactHandle( "outStilton" );        
+        FactHandle factHandle = (FactHandle) ((ExecutionResults) xstream.fromXML( outXml )).getFactHandle( "outStilton" );
         assertNotNull( factHandle );
         
-        Object object = ((ExecutionResults) xstream.fromXML( outXml )).getValue( "outStilton" );        
+        Object object = ((ExecutionResults) xstream.fromXML( outXml )).getValue( "outStilton" );
         assertEquals( "org.foo.Whee", object.getClass().getName() );
 
 //        String expectedXml = "";
@@ -1778,7 +1778,7 @@ public class JSonBatchExecutionTest {
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.foo.Whee\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}} } }";
-        inXml += "]}}";        
+        inXml += "]}}";
         //inXml = roundTripFromXml( inXml );   // can't round trip, as dosn't have the correct class loader           
 
         StatefulKnowledgeSession ksession = getSessionStateful( ResourceFactory.newByteArrayResource( str.getBytes() ) );
@@ -1787,7 +1787,7 @@ public class JSonBatchExecutionTest {
                                                 resultHandler );
         inXml = "{\"batch-execution\":{\"commands\":[";
         inXml += "   {\"query\":{\"out-identifier\":\"matchingthings\",\"name\":\"results\"}}";
-        inXml += "]}}";         
+        inXml += "]}}";
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
         String outXml = (String) resultHandler.getObject();
@@ -1801,7 +1801,7 @@ public class JSonBatchExecutionTest {
         //ok lets try that again...
         inXml = "{\"batch-execution\":{\"commands\":[";
         inXml += "   {\"query\":{\"out-identifier\":\"matchingthings\",\"name\":\"results\"}}";
-        inXml += "]}}";          
+        inXml += "]}}";
         getPipelineStateful( ksession ).insert( inXml,
                                                 resultHandler );
         outXml = (String) resultHandler.getObject();
@@ -1825,8 +1825,8 @@ public class JSonBatchExecutionTest {
         inXml += "{\"batch-execution\":{\"lookup\":\"ksession1\", \"commands\":[";
         inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";        
-        inXml = roundTripFromXml( inXml );        
+        inXml += "]}}";
+        inXml = roundTripFromXml( inXml );
         
         GridImpl grid = new GridImpl( new HashMap() );
         grid.addService( WhitePages.class, new WhitePagesImpl() );
@@ -2022,14 +2022,14 @@ public class JSonBatchExecutionTest {
        Object object =  BatchExecutionHelper.newJSonMarshaller().fromXML( inXml );
         inXml = BatchExecutionHelper.newJSonMarshaller().toXML( object );
         object =  BatchExecutionHelper.newJSonMarshaller().fromXML( inXml );
-        return BatchExecutionHelper.newJSonMarshaller().toXML( object );        
+        return BatchExecutionHelper.newJSonMarshaller().toXML( object );
     }
     
     public Object roundTripFromObject(Object object) {
         String xml = BatchExecutionHelper.newJSonMarshaller().toXML( object );
         object =  BatchExecutionHelper.newJSonMarshaller().fromXML( xml );
         xml = BatchExecutionHelper.newJSonMarshaller().toXML( object );
-        return BatchExecutionHelper.newJSonMarshaller().fromXML( xml );          
+        return BatchExecutionHelper.newJSonMarshaller().fromXML( xml );
         
     }
 

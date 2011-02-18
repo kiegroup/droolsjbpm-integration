@@ -40,7 +40,7 @@ import org.rioproject.watch.CounterWatch;
     private GenericMessageHandler handler;
     private String id;
    
-    private CounterWatch ksessionCounter; 
+    private CounterWatch ksessionCounter;
     private Long instanceID;
 
     public ExecutionNodeServiceImpl() {

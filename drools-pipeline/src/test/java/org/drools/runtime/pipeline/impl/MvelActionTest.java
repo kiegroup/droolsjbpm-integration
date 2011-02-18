@@ -39,7 +39,7 @@ public class MvelActionTest {
         MockClass mock = new MockClass();
         List<Integer> list = new ArrayList<Integer>();
         
-        Action action = PipelineFactory.newMvelAction( "this.setValues( [0, 1, 2, 3, 4] ) " );  
+        Action action = PipelineFactory.newMvelAction( "this.setValues( [0, 1, 2, 3, 4] ) " );
 
         assertNull( mock.getValues() );
         action.receive( mock, new BasePipelineContext( Thread.currentThread().getContextClassLoader() ) );

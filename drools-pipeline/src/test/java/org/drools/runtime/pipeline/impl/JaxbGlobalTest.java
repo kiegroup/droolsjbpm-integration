@@ -59,7 +59,7 @@ public class JaxbGlobalTest {
         xjcOpts.setSchemaLanguage( Language.XMLSCHEMA );
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );               
+        JaxbConfiguration jaxbConf = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts, "xsd" );
         
         kbuilder.add( ResourceFactory.newClassPathResource( "order.xsd",
                                                             getClass() ), ResourceType.XSD,
@@ -83,7 +83,7 @@ public class JaxbGlobalTest {
         KnowledgeRuntimeCommand setGlobalStage = PipelineFactory.newStatefulKnowledgeSessionSetGlobal( "order" );
 
         JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( jaxbConf.getClasses().toArray( new String[jaxbConf.getClasses().size()] ),
-                                                                     kbase );  
+                                                                     kbase );
         
         Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
@@ -109,14 +109,14 @@ public class JaxbGlobalTest {
         transformer = PipelineFactory.newJaxbToXmlTransformer( marshaller );
         transformer.setReceiver( assignAsResult );
         
-        KnowledgeRuntimeCommand getGlobalStage = PipelineFactory.newStatefulKnowledgeSessionGetGlobal( );        
+        KnowledgeRuntimeCommand getGlobalStage = PipelineFactory.newStatefulKnowledgeSessionGetGlobal( );
         getGlobalStage.setReceiver( transformer );
 
         pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
         pipeline.setReceiver( getGlobalStage );
         
         resultHandler = new ResultHandlerImpl();
-        pipeline.insert( "order", resultHandler );  
+        pipeline.insert( "order", resultHandler );
         
         assertEqualsIgnoreWhitespace( xml, (String) resultHandler.getObject() );
     }

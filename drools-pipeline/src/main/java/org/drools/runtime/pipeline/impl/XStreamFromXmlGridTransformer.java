@@ -63,7 +63,7 @@ public class XStreamFromXmlGridTransformer extends BaseEmitter
         try {
             String str ;
             if ( object instanceof String ) {
-                str = (String) object; 
+                str = (String) object;
             } else if ( object instanceof Reader ) {
                 str = StringUtils.toString( ((Reader)object) );
             } else if ( object instanceof InputStream ) {
