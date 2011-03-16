@@ -36,6 +36,12 @@
     </repository>
   </repositories>
 
+  <scm>
+    <connection>scm:git:git@github.com:droolsjbpm/droolsjbpm-integration.git</connection>
+    <developerConnection>scm:git:git@github.com:droolsjbpm/droolsjbpm-integration.git</developerConnection>
+    <url>https://github.com/droolsjbpm/droolsjbpm-integration</url>
+  </scm>
+
   <modules>
     <module>drools-container</module>
     <module>drools-camel</module>
