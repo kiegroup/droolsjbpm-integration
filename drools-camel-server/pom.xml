@@ -24,7 +24,7 @@
     <!-- Drools -->
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-api</artifactId>
+      <artifactId>knowledge-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
