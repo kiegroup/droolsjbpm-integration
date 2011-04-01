@@ -9,11 +9,10 @@
     <version>5.2.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.drools</groupId><!-- TODO rename groupId, artifactId, name and description -->
   <artifactId>drools-pipeline</artifactId>
 
   <name>Drools pipeline</name>
-  <description>Deprecated alternative to drools-camel.</description>
+  <description>Legacy alternative to drools-camel.</description>
 
   <dependencies>
     <dependency>

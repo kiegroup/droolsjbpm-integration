@@ -9,12 +9,11 @@
     <version>5.2.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.drools</groupId><!-- TODO rename groupId, artifactId, name and description -->
   <artifactId>drools-grid</artifactId>
   <packaging>pom</packaging>
 
   <name>Drools grid</name>
-  <description>TODO</description>
+  <description>TODO Cloud and multi agent things?</description>
 
   <dependencies>
     <dependency>
