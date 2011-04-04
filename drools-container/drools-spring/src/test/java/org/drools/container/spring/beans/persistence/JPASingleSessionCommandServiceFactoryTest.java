@@ -82,19 +82,6 @@ public class JPASingleSessionCommandServiceFactoryTest {
                                true );
         h2Server = Server.createTcpServer( new String[0] );
         h2Server.start();
-    }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        log.info( "stopping database" );
-        h2Server.stop();
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
-    }
-
-    @BeforeClass
-    public static void generatePackages() {
         try {
             log.info( "creating: {}",
                       TMPDIR + "/processWorkItems.pkg" );
@@ -120,6 +107,15 @@ public class JPASingleSessionCommandServiceFactoryTest {
                        e );
             throw new RuntimeException( e );
         }
+    }
+
+    @AfterClass
+    public static void stopH2Database() throws Exception {
+        log.info( "stopping database" );
+        h2Server.stop();
+        DeleteDbFiles.execute( "",
+                               "DroolsFlow",
+                               true );
     }
 
     @Before
