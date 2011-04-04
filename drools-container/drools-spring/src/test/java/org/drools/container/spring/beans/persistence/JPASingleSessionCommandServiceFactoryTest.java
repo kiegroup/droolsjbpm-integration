@@ -86,7 +86,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
     @AfterClass
     public static void stopH2Database() throws Exception {
-        log.info( "stoping database" );
+        log.info( "stopping database" );
         h2Server.stop();
         DeleteDbFiles.execute( "",
                                "DroolsFlow",
