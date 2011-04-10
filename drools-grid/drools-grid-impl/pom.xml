@@ -11,7 +11,7 @@
 
   <artifactId>drools-grid-impl</artifactId>
   
-  <name>Drools grid implementation</name>
+  <name>Drools :: Drools Grid Impl</name>
   <description>TODO</description>
 
   <dependencies>
