@@ -16,7 +16,7 @@
   <description>Multiproject that contains modules with Drools and jBPM integration for CDI and DI containers such as seam, spring, ...</description>
 
   <modules>
-    <module>drools-seam</module>
+    <!--<module>drools-seam</module>-->
     <module>drools-spring</module>
   </modules>
 
