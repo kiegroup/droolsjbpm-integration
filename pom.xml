@@ -62,6 +62,7 @@
       </activation>
       <modules>
         <module>droolsjbpm-integration-docs</module>
+        <module>droolsjbpm-integration-distribution</module>
       </modules>
     </profile>
   </profiles>
