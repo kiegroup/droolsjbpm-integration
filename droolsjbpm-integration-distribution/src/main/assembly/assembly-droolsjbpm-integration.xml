@@ -90,7 +90,7 @@
     <!-- Reference manual -->
     <dependencySet>
       <includes>
-        <include>org.drools:drools-integration-docs:jdocbook</include>
+        <include>org.drools:droolsjbpm-integration-docs:jdocbook</include>
       </includes>
       <outputDirectory>reference_manual</outputDirectory>
       <unpack>true</unpack>
