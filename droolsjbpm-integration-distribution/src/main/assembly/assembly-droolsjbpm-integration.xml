@@ -42,26 +42,26 @@
       <outputDirectory/>
     </fileSet>
     <!-- Examples -->
-    <!--<fileSet>&lt;!&ndash; Note: going outside the module dir is bad, but it is not fetching generated files &ndash;&gt;-->
-      <!--<directory>../droolsjbpm-integration-examples</directory>-->
-      <!--<outputDirectory>examples/sources</outputDirectory>-->
-      <!--<excludes>-->
-        <!--<exclude>target/**</exclude>-->
-        <!--<exclude>local/**</exclude>-->
-        <!--<exclude>.*/**</exclude>-->
-        <!--<exclude>nbproject/**</exclude>-->
-        <!--<exclude>*.ipr</exclude>-->
-        <!--<exclude>.*.iws</exclude>-->
-        <!--<exclude>*.iml</exclude>-->
-        <!--<exclude>.git/**</exclude>-->
-      <!--</excludes>-->
-    <!--</fileSet>-->
+    <fileSet><!-- Note: going outside the module dir is bad, but it is not fetching generated files -->
+      <directory>../droolsjbpm-integration-examples</directory>
+      <outputDirectory>examples/sources</outputDirectory>
+      <excludes>
+        <exclude>target/**</exclude>
+        <exclude>local/**</exclude>
+        <exclude>.*/**</exclude>
+        <exclude>nbproject/**</exclude>
+        <exclude>*.ipr</exclude>
+        <exclude>.*.iws</exclude>
+        <exclude>*.iml</exclude>
+        <exclude>.git/**</exclude>
+      </excludes>
+    </fileSet>
   </fileSets>
 
   <dependencySets>
     <dependencySet>
       <excludes>
-        <!--<exclude>org.drools:droolsjbpm-integration-examples</exclude>-->
+        <exclude>org.drools:droolsjbpm-integration-examples</exclude>
         <exclude>org.drools:droolsjbpm-integration-docs</exclude>
         <!--<exclude>*:javadoc</exclude>-->
         <exclude>*:sources</exclude>
@@ -69,16 +69,16 @@
       <outputDirectory>binaries</outputDirectory>
       <useStrictFiltering>true</useStrictFiltering>
     </dependencySet>
-    <!--<dependencySet>-->
-      <!--<includes>-->
-        <!--<include>org.drools:droolsjbpm-integration-examples:jar</include>-->
-      <!--</includes>-->
-      <!--<excludes>-->
-        <!--<exclude>*:sources</exclude>-->
-      <!--</excludes>-->
-      <!--<outputDirectory>examples/binaries</outputDirectory>-->
-      <!--<useStrictFiltering>true</useStrictFiltering>-->
-    <!--</dependencySet>-->
+    <dependencySet>
+      <includes>
+        <include>org.drools:droolsjbpm-integration-examples:jar</include>
+      </includes>
+      <excludes>
+        <exclude>org.drools:droolsjbpm-integration-examples:jar:sources</exclude>
+      </excludes>
+      <outputDirectory>examples/binaries</outputDirectory>
+      <useStrictFiltering>true</useStrictFiltering>
+    </dependencySet>
     <!--<dependencySet>-->
       <!--<includes>-->
         <!--<include>org.drools:droolsjbpm-integration-:*:javadoc</include>-->
@@ -105,9 +105,9 @@
       <includes>
         <include>org.drools:*:jar:sources</include>
       </includes>
-      <!--<excludes>-->
-        <!--<exclude>org.drools:droolsjbpm-integration-examples:jar:sources</exclude>-->
-      <!--</excludes>-->
+      <excludes>
+        <exclude>org.drools:droolsjbpm-integration-examples:jar:sources</exclude>
+      </excludes>
       <outputDirectory>sources</outputDirectory>
       <unpack>false</unpack>
       <useStrictFiltering>true</useStrictFiltering>
