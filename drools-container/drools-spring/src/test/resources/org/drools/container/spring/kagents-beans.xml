@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:drools="http://drools.org/schema/drools-spring"     
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.3.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <drools:resource-change-scanner id="s1" interval="5" />
@@ -34,7 +34,7 @@
       </drools:resources>
   </drools:kagent>
 
-  <drools:kagent id="kagent3" kbase="kbase3" new-instance="true" />
+  <drools:kagent id="kagent3" kbase="kbase3" new-instance="true" use-kbase-classloader="true"/>
 
   <drools:ksession id="ksession3" type="stateless" kbase="kbase2"/>  
 

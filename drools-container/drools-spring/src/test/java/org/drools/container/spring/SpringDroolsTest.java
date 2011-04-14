@@ -130,6 +130,7 @@ public class SpringDroolsTest {
         assertEquals( 0,
                       kagent1.getResourceDirectories().size() );
         assertFalse( kagent1.isNewInstance() );
+        assertFalse( kagent1.isUseKBaseClassLoaderForCompiling() );
 
         KnowledgeAgentImpl kagent2 = (KnowledgeAgentImpl) context.getBean( "kagent2" );
         assertSame( kagent2.getKnowledgeBase(),
@@ -137,9 +138,11 @@ public class SpringDroolsTest {
         assertEquals( 1,
                       kagent2.getResourceDirectories().size() );
         assertFalse( kagent2.isNewInstance() );
+        assertFalse( kagent2.isUseKBaseClassLoaderForCompiling() );
 
         KnowledgeAgentImpl kagent3 = (KnowledgeAgentImpl) context.getBean( "kagent3" );
         assertTrue( kagent3.isNewInstance() );
+        assertTrue( kagent3.isUseKBaseClassLoaderForCompiling() );
 
         StatelessKnowledgeSessionImpl ksession1 = (StatelessKnowledgeSessionImpl) context.getBean( "ksession1" );
         assertSame( kbase1.getRuleBase(),
