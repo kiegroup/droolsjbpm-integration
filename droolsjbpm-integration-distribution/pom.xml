@@ -50,7 +50,7 @@
           <descriptors>
             <descriptor>src/main/assembly/assembly-droolsjbpm-integration.xml</descriptor>
           </descriptors>
-          <appendAssemblyId>false</appendAssemblyId> 
+          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
       </plugin>
     </plugins>
