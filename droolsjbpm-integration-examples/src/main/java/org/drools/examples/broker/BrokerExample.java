@@ -32,7 +32,7 @@ import org.drools.time.impl.JDKTimerService;
 /**
  * This is the main class for the broker example.
  */
-public class BrokerMain {
+public class BrokerExample {
 
     /**
      * @param args
@@ -50,7 +50,7 @@ public class BrokerMain {
         TimerService clock = new JDKTimerService(1);
         StockTickPersister source = new StockTickPersister();
         try {
-            source.openForRead( new InputStreamReader( BrokerMain.class.getResourceAsStream("/org/drools/examples/broker/data/stocktickstream.dat") ),
+            source.openForRead( new InputStreamReader( BrokerExample.class.getResourceAsStream("/org/drools/examples/broker/data/stocktickstream.dat") ),
                                 System.currentTimeMillis() );
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("Could not read data file.", e);

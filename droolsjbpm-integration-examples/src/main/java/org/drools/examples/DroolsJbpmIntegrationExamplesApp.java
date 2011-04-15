@@ -25,7 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.drools.examples.broker.BrokerMain;
+import org.drools.examples.broker.BrokerExample;
 import org.drools.examples.conway.ui.ConwayGUI;
 import org.drools.examples.numberguess.NumberGuessExample;
 
@@ -51,9 +51,9 @@ public class DroolsJbpmIntegrationExamplesApp extends JFrame {
                 ConwayGUI.main(new String[0]);
             }
         }));
-        contentPane.add(new JButton(new AbstractAction("BrokerMain (Fusion CEP)") {
+        contentPane.add(new JButton(new AbstractAction("BrokerExample (Fusion CEP)") {
             public void actionPerformed(ActionEvent e) {
-                BrokerMain.main(new String[0]);
+                BrokerExample.main(new String[0]);
             }
         }));
         contentPane.add(new JLabel("Which output example do you want to see?"));
