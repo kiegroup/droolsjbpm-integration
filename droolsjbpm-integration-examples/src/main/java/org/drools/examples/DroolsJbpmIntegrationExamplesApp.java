@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.drools.examples.broker.BrokerMain;
+import org.drools.examples.conway.ui.ConwayGUI;
 import org.drools.examples.numberguess.NumberGuessExample;
 
 public class DroolsJbpmIntegrationExamplesApp extends JFrame {
@@ -45,6 +46,11 @@ public class DroolsJbpmIntegrationExamplesApp extends JFrame {
     private Container createContentPane() {
         JPanel contentPane = new JPanel(new GridLayout(0, 1));
         contentPane.add(new JLabel("Which GUI example do you want to see?"));
+        contentPane.add(new JButton(new AbstractAction("ConwayGUI") {
+            public void actionPerformed(ActionEvent e) {
+                ConwayGUI.main(new String[0]);
+            }
+        }));
         contentPane.add(new JButton(new AbstractAction("BrokerMain (Fusion CEP)") {
             public void actionPerformed(ActionEvent e) {
                 BrokerMain.main(new String[0]);
