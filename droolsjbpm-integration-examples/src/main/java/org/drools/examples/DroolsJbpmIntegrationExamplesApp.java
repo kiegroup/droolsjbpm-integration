@@ -38,7 +38,7 @@ public class DroolsJbpmIntegrationExamplesApp extends JFrame {
     }
 
     public DroolsJbpmIntegrationExamplesApp() {
-        super("Drools examples");
+        super("Drools and jBPM integration examples");
         setContentPane(createContentPane());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -46,6 +46,7 @@ public class DroolsJbpmIntegrationExamplesApp extends JFrame {
     private Container createContentPane() {
         JPanel contentPane = new JPanel(new GridLayout(0, 1));
         contentPane.add(new JLabel("Which GUI example do you want to see?"));
+
         contentPane.add(new JButton(new AbstractAction("ConwayGUI") {
             public void actionPerformed(ActionEvent e) {
                 ConwayGUI.main(new String[0]);
@@ -56,7 +57,9 @@ public class DroolsJbpmIntegrationExamplesApp extends JFrame {
                 BrokerExample.main(new String[0]);
             }
         }));
+
         contentPane.add(new JLabel("Which output example do you want to see?"));
+        
         contentPane.add(new JButton(new AbstractAction("NumberGuessExample") {
             public void actionPerformed(ActionEvent e) {
                 NumberGuessExample.main(new String[0]);
