@@ -16,6 +16,7 @@
 
 package org.drools.examples.broker;
 
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
@@ -37,7 +38,7 @@ public class BrokerMain {
      * @param args
      * @throws UnsupportedLookAndFeelException 
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // set up and show main window
         Locale.setDefault( Locale.US );
         CompanyRegistry registry = new CompanyRegistry();
@@ -48,9 +49,13 @@ public class BrokerMain {
         
         TimerService clock = new JDKTimerService(1);
         StockTickPersister source = new StockTickPersister();
-        source.openForRead( new InputStreamReader( BrokerMain.class.getResourceAsStream("/org/drools/examples/broker/data/stocktickstream.dat") ),
-                            System.currentTimeMillis() );
-        
+        try {
+            source.openForRead( new InputStreamReader( BrokerMain.class.getResourceAsStream("/org/drools/examples/broker/data/stocktickstream.dat") ),
+                                System.currentTimeMillis() );
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("Could not read data file.", e);
+        }
+
         EventFeeder feeder = new EventFeeder(clock, source, broker );
         feeder.feed();
         
