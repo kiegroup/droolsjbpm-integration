@@ -77,5 +77,11 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
     </dependency>
+    
+    <!-- Needed for logging -->
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+    </dependency>
   </dependencies>
 </project>
