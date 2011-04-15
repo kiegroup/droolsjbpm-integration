@@ -20,8 +20,7 @@
        xmlns:cxf="http://camel.apache.org/schema/cxf"
        xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xmlns:drools="http://drools.org/schema/drools-spring"
-       xsi:schemaLocation="
-       http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
+       xsi:schemaLocation="http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.3.0.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd

@@ -43,6 +43,8 @@ public class KnowledgeAgentBeanFactory
     private String                      id;
 
     private String                      newInstance;
+    
+    private String                      useKbaseClassloader = "false";
 
     private List<DroolsResourceAdapter> resources = Collections.emptyList();
 
@@ -62,6 +64,9 @@ public class KnowledgeAgentBeanFactory
 
         kagentConf.setProperty( "drools.agent.newInstance",
                                 newInstance );
+        
+        kagentConf.setProperty( "drools.agent.useKBaseClassLoaderForCompiling",
+                                useKbaseClassloader );
 
         this.kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.id,
                                                                this.kbase,
@@ -117,6 +122,14 @@ public class KnowledgeAgentBeanFactory
 
     public void setNewInstance(String newInstance) {
         this.newInstance = newInstance;
+    }
+
+    public String getUseKbaseClassloader() {
+        return useKbaseClassloader;
+    }
+
+    public void setUseKbaseClassloader(String useKbaseClassloader) {
+        this.useKbaseClassloader = useKbaseClassloader;
     }
 
     public List<DroolsResourceAdapter> getResources() {

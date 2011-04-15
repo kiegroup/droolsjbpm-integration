@@ -57,6 +57,12 @@ public class KnowledgeAgentDefinitionParser extends AbstractBeanDefinitionParser
             factory.addPropertyValue( "newInstance",
                                       newInstance );
         }
+        
+        String useKbaseClassloader = element.getAttribute( "use-kbase-classloader" );
+        if (!useKbaseClassloader.trim().equals("")) {
+            factory.addPropertyValue( "useKbaseClassloader",
+                                      useKbaseClassloader );
+        }
 
         ManagedList resources = KnowledgeBaseDefinitionParser.getResources( element,
                                                                             parserContext,

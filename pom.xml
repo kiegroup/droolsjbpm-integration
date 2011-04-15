@@ -50,6 +50,7 @@
     <module>drools-grid</module>
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
+    <module>droolsjbpm-integration-examples</module>
   </modules>
 
   <profiles>
@@ -62,6 +63,7 @@
       </activation>
       <modules>
         <module>droolsjbpm-integration-docs</module>
+        <module>droolsjbpm-integration-distribution</module>
       </modules>
     </profile>
   </profiles>
