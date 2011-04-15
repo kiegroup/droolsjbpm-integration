@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.command.CommandFactory;
@@ -30,10 +31,12 @@ import org.drools.command.runtime.DisposeCommand;
 import org.drools.command.runtime.GetFactCountCommand;
 import org.drools.command.runtime.GetGlobalsCommand;
 import org.drools.command.runtime.process.AbortProcessInstanceCommand;
+import org.drools.command.runtime.process.CreateProcessInstanceCommand;
 import org.drools.command.runtime.process.GetProcessInstanceCommand;
 import org.drools.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
+import org.drools.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.command.runtime.rule.GetFactHandleCommand;
@@ -50,7 +53,6 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.grid.remote.command.GetWorkItemManagerCommand;
 import org.drools.grid.remote.command.GetWorkingMemoryEntryPointRemoteCommand;
 import org.drools.runtime.Calendars;
 import org.drools.runtime.Channel;
@@ -501,6 +503,42 @@ public class StatefulKnowledgeSessionRemoteClient
 
         return (ProcessInstance) result;
     }
+
+	public ProcessInstance createProcessInstance(String processId,
+			                                     Map<String, Object> parameters) {
+		String kresultsId = "kresults_" + this.gsd.getId();
+		CommandImpl cmd = new CommandImpl( "execute",
+				                           Arrays.asList( new Object[] { new KnowledgeContextResolveFromContextCommand( new CreateProcessInstanceCommand( processId,
+				                        		                                                                                                          parameters ),
+				                        		                                                                        null,
+				                        		                                                                        null,
+				                        		                                                                        this.instanceId, 
+	                                                                                                                    kresultsId )} ) );
+
+		Object result = ConversationUtil.sendMessage( this.cm,
+				                                      (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(), 
+				                                      this.gsd.getId(), 
+				                                      cmd );
+
+		return (ProcessInstance) result;
+	}
+
+	public ProcessInstance startProcessInstance( long processInstanceId ) {
+		String kresultsId = "kresults_" + this.gsd.getId();
+		CommandImpl cmd = new CommandImpl( "execute",
+				                           Arrays.asList( new Object[] { new KnowledgeContextResolveFromContextCommand( new StartProcessInstanceCommand( processInstanceId ),
+				                        		                                                                        null, 
+				                        		                                                                        null, 
+				                        		                                                                        this.instanceId, 
+				                        		                                                                        kresultsId )} ) );
+
+		Object result = ConversationUtil.sendMessage( this.cm,
+				                                      (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(), 
+				                                      this.gsd.getId(), 
+				                                      cmd );
+
+		return (ProcessInstance) result;
+	}
 
     public void signalEvent(String type,
                             Object event) {
