@@ -20,6 +20,9 @@ declare Message
     text : String
 end
     
+query "get All Messages"
+    $m : Message()	
+end    
 
 rule "echo" dialect "mvel"
 when
