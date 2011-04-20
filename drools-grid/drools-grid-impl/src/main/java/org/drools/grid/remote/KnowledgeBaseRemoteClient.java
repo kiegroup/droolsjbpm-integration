@@ -139,7 +139,7 @@ public class KnowledgeBaseRemoteClient
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf ),
+                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf , environment),
                                                                                                                                                null,
                                                                                                                                                this.instanceId,
                                                                                                                                                null,

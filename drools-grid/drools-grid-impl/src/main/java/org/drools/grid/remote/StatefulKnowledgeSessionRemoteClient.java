@@ -306,7 +306,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       kresultsId )} ) );
 
         ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress[]) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                                       this.gsd.getId(),
                                       cmd );
 
@@ -630,25 +630,6 @@ public class StatefulKnowledgeSessionRemoteClient
 
     public WorkItemManager getWorkItemManager() {
         
-        //This is not needed right??? or should I send the message to see if something is wrong..??
-        
-//         String kresultsId = "kresults_" + this.gsd.getId();
-//        
-//        CommandImpl cmd = new CommandImpl("execute",
-//                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand(new GetWorkItemManagerCommand(),
-//                                                                                  null,
-//                                                                                  null,
-//                                                                                  this.instanceId,
-//                                                                                  kresultsId )}));
-//        
-//         ConversationUtil.sendMessage(this.cm,
-//                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-//                this.gsd.getId(),
-//                cmd);
-        
-         
-           
-            
          return new WorkItemManagerRemoteClient(this.instanceId, this.gsd, this.cm);
         
 
@@ -693,6 +674,6 @@ public class StatefulKnowledgeSessionRemoteClient
     public String getInstanceId() {
         return instanceId;
     }
-    
-    
+
+       
 }

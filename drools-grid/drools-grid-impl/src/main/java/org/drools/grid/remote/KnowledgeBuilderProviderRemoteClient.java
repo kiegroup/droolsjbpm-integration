@@ -27,8 +27,8 @@ import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
+import org.drools.command.CommandFactory;
 import org.drools.command.SetVariableCommand;
-import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -49,7 +49,18 @@ public class KnowledgeBuilderProviderRemoteClient
     }
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String localId = UUID.randomUUID().toString();
+        System.out.println("This InstanceId (just generated) = "+localId);
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{ CommandFactory.newNewKnowledgeBuilderConfigurationCommand( localId ) } ) );
+
+        ConversationManager connm = this.grid.get( ConversationManager.class );
+        ConversationUtil.sendMessage( connm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
+
+        return new KnowledgeBuilderConfigurationRemoteClient(localId, grid, gsd);
     }
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration(Properties properties,
@@ -80,11 +91,14 @@ public class KnowledgeBuilderProviderRemoteClient
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBase kbase,
                                                 KnowledgeBuilderConfiguration conf) {
         String localId = UUID.randomUUID().toString();
-
+        String remoteConfId = null;
+        if(conf != null) {
+            remoteConfId = ((KnowledgeBuilderConfigurationRemoteClient)conf).getId();
+        }
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new NewKnowledgeBuilderCommand( conf ) )} ) );
+                                                                                                new NewKnowledgeBuilderRemoteCommand( remoteConfId ) )} ) );
 
         ConversationManager connm = this.grid.get( ConversationManager.class );
         ConversationUtil.sendMessage( connm,
