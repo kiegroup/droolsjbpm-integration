@@ -7,16 +7,16 @@ import java.util.Map;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.process.AbortWorkItemCommand;
 import org.drools.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.command.runtime.process.RegisterWorkItemHandlerCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.internal.commands.RegisterWorkItemHandlerRemoteCommand;
 
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
 
-public class WorkItemManagerRemoteClient
+ public class WorkItemManagerRemoteClient
     implements
     WorkItemManager,
     Serializable {
@@ -78,15 +78,16 @@ public class WorkItemManagerRemoteClient
                                         WorkItemHandler handler) {
         
         String kresultsId = "kresults_" + this.gsd.getId();
-        
+        //The work item handler implementation should be in the remote location
+        //The work item will be instantiated in the remote location using reflection
         CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new RegisterWorkItemHandlerCommand( workItemName,
-                                                                                                               handler ),
+                Arrays.asList(new Object[]{ new KnowledgeContextResolveFromContextCommand( new RegisterWorkItemHandlerRemoteCommand( workItemName,
+                                                                                                               handler.getClass().getCanonicalName() ),
                                                                                   null,
                                                                                   null,
                                                                                   this.instanceId,
                                                                                   kresultsId )}));
-        
+         
          ConversationUtil.sendMessage(this.cm,
                 (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
                 this.gsd.getId(),

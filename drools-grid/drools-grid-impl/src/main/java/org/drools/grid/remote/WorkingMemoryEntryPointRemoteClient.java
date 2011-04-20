@@ -17,7 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,12 +26,10 @@ import org.drools.FactHandle;
 import org.drools.WorkingMemoryEntryPoint;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
-import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.grid.service.directory.Address;
 import org.drools.runtime.ObjectFilter;
 
 public class WorkingMemoryEntryPointRemoteClient
@@ -41,7 +38,7 @@ public class WorkingMemoryEntryPointRemoteClient
 
     private String                 instanceId;
     private String                 name;
-    private GridServiceDescription gsd;
+    private GridServiceDescription<GridNode> gsd;
     private ConversationManager    cm;
 
     public WorkingMemoryEntryPointRemoteClient(String instanceId,
@@ -71,8 +68,8 @@ public class WorkingMemoryEntryPointRemoteClient
                                                                                                                       kresultsId )} ) );
 
         Object result = ConversationUtil.sendMessage( this.cm,
-                                                      ((InetSocketAddress[]) ((Address) this.gsd.getAddresses().get( "socket" )).getObject()),
-                                                      this.gsd.getServiceInterface().getName(),
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
                                                       cmd );
         return ((FactHandle) result);
 
