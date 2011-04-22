@@ -44,7 +44,7 @@ public class NumberGuessExample {
 
         final StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/numberguess");
+//        KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/numberguess");
 
         ksession.insert( new GameRules( 100,
                                         5 ) );
@@ -54,7 +54,7 @@ public class NumberGuessExample {
         ksession.startProcess( "Number Guess" );
         ksession.fireAllRules();
 
-        logger.close();
+//        logger.close();
 
         ksession.dispose();
     }
