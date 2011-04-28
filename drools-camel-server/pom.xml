@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
-      <exclusions>
+      <!--exclusions>
         <exclusion>
           <groupId>net.sf.saxon</groupId>
           <artifactId>saxon</artifactId>
@@ -57,7 +57,7 @@
           <groupId>net.sf.saxon</groupId>
           <artifactId>saxon-xpath</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions-->
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
