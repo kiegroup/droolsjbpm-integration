@@ -8,4 +8,4 @@ do
 done
 
 # execute the server
-java -cp "drools-grid-remote-dir-mina-5.2.0-SNAPSHOT.jar:${SERVER_CLASSPATH}" org.drools.grid.remote.mina.MinaNodeRunner --address 127.0.0.1 --port 9123
+java -cp "drools-grid-remote-dir-mina-5.3.0-SNAPSHOT.jar:${SERVER_CLASSPATH}" org.drools.grid.remote.mina.MinaNodeRunner --address 127.0.0.1 --port 9123
