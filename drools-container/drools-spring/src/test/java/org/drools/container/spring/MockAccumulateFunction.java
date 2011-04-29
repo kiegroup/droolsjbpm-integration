@@ -70,4 +70,8 @@ public class MockAccumulateFunction
 
     }
 
+    public Class<?> getResultType() {
+        return null;
+    }
+
 }
