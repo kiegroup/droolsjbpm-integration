@@ -91,9 +91,13 @@
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <!-- TODO JBRULES-3026 use cxf-rt-frontend-jaxrs instead -->
+      <!-- TODO JBRULES-3026 use cxf-rt-frontend-jaxrs and cxf-rt-transports-http-jetty instead -->
       <artifactId>cxf-bundle-jaxrs</artifactId>
       <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>xerces</groupId>
           <artifactId>xercesImpl</artifactId>
