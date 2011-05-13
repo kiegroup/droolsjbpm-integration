@@ -19,6 +19,8 @@ package org.drools.grid.remote.commands;
 
 
 
+import java.util.HashMap;
+import java.util.Map;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.ProcessInstance;
 import org.junit.Assert;
@@ -38,6 +40,18 @@ public class RemoteProcessCommandTests extends BaseRemoteTest{
         StatefulKnowledgeSession ksession = createProcessSession();
         
         ProcessInstance processInstance = ksession.startProcess("Minimal");
+        
+        Assert.assertNotNull(processInstance);
+        
+        Assert.assertEquals("Minimal", processInstance.getProcessId());
+     }
+     
+     @Test
+     public void startProcessWithParametersTest() {
+        StatefulKnowledgeSession ksession = createProcessSession();
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("long", 1L);
+        ProcessInstance processInstance = ksession.startProcess("Minimal", parameters);
         
         Assert.assertNotNull(processInstance);
         

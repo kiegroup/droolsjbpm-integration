@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
+import org.drools.RuleBaseConfiguration;
 import org.drools.SessionConfiguration;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommand;
@@ -49,7 +50,7 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration() {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        return new RuleBaseConfiguration();
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
