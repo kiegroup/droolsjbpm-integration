@@ -43,7 +43,7 @@ then
 end
 
 
-# bellow we have rules controlled by the process,
+# below we have rules controlled by the process,
 # i.e., the process will fire these rules when necessary
 # to re-evaluate the position
 rule "If the drop is between 6% and 8%, buy more shares"
