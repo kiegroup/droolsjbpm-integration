@@ -65,7 +65,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-spring</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -75,7 +75,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-camel</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -86,7 +86,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-camel-server</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -96,7 +96,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-pipeline</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -106,7 +106,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-impl</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -116,7 +116,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-simulator</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
 
@@ -128,7 +128,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>droolsjbpm-integration-examples</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <classifier>sources</classifier>
     </dependency>
 

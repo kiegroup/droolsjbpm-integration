@@ -24,7 +24,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-api</artifactId>
-      <version>${project.version}</version>
+      <version>${droolsjbpm-integration.version}</version>
       <type>jar</type>
     </dependency>
     <!-- REMOVE -->
