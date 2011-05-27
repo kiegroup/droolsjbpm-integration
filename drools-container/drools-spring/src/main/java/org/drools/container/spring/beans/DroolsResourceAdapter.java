@@ -20,6 +20,7 @@ import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
 import org.drools.io.impl.ClassPathResource;
+import org.drools.io.impl.URLClassPathResource;
 import org.drools.io.impl.UrlResource;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -47,6 +48,8 @@ public class DroolsResourceAdapter
         if ( resource.trim().startsWith( "classpath:" ) ) {
             this.resource = new ClassPathResource( resource.substring( resource.indexOf( ':' ) + 1 ),
                                                    ClassPathResource.class.getClassLoader() );
+        } else if (resource.trim().startsWith( "URLClasspath:" )){
+            this.resource = new URLClassPathResource( resource.substring( resource.indexOf( ':' ) + 1 ) );
         } else {
             this.resource = new UrlResource( resource );
         }

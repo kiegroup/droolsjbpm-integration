@@ -18,6 +18,7 @@ package org.drools.container.spring.beans;
 
 import org.drools.io.Resource;
 import org.drools.io.impl.ClassPathResource;
+import org.drools.io.impl.URLClassPathResource;
 import org.drools.io.impl.UrlResource;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -31,6 +32,8 @@ public class ResourceBeanFactory
         if ( source.trim().startsWith( "classpath:" ) ) {
             resource = new ClassPathResource( source.substring( source.indexOf( ':' ) + 1 ),
                                               ClassPathResource.class.getClassLoader() );
+        } else if (source.trim().startsWith( "URLClasspath:" )){
+            resource = new URLClassPathResource( source.substring( source.indexOf( ':' ) + 1 ) );
         } else {
             resource = new UrlResource( source );
         }

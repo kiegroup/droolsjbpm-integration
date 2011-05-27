@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -41,6 +39,7 @@ import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.io.impl.ResourceChangeScannerImpl;
+import org.drools.io.impl.URLClassPathResource;
 import org.drools.io.impl.UrlResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
@@ -282,5 +281,17 @@ public class SpringDroolsTest {
                       ur.getUsername() );
         assertEquals( "",
                       ur.getPassword() );
+    }
+    
+    @Test
+    public void testURLClasspathResource(){
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+        DroolsResourceAdapter resourceAdapter = (DroolsResourceAdapter) context.getBean("UCPresource");
+        
+        assertNotNull( resourceAdapter );
+
+        Resource resource = resourceAdapter.getDroolsResource();
+        assertTrue( resource instanceof URLClassPathResource );
+        
     }
 }
