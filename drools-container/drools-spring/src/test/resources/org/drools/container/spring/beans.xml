@@ -19,8 +19,6 @@
    <drools:resource id="secureResource" basic-authentication="enabled" username="someUser" password="somePassword" type="DRL" source="http://someHost:1234/someDRLResource.drl"/>
    <drools:resource id="insecureResource" type="DRL" source="http://someHost:1234/someOtherDRLResource.drl"/>
    
-  <drools:resource id="UCPresource" type="DRL" source="URLClasspath:org/drools/container/spring/testSpring.drl"/>
-
   <drools:kbase id="kbase1" node="node1">
       <drools:resources>
       <drools:resource source="classpath:org/drools/container/spring/IntegrationExampleTest.xls" type="DTABLE">
