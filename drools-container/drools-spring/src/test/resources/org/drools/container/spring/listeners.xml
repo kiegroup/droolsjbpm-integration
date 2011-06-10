@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"       
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.4.0.xsd
+                           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <drools:grid id="grid1">
+       <drools:whitepages />
+  </drools:grid>
+
+  <drools:grid-node id="node1" grid="grid1" />
+
+  <drools:grid-node id="node2" />
+
+  <drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+
+  <drools:kbase id="kbase1" node="node1">
+      <drools:resources>
+      <drools:resource ref="resource1"/>
+    </drools:resources>
+  </drools:kbase>
+
+
+  <drools:ksession id="ksession1" type="stateless" name="stateless1" kbase="kbase1" node="node1"/>
+  <drools:ksession id="ksession2" type="stateful" kbase="kbase1" node="node1"/>
+</beans>
