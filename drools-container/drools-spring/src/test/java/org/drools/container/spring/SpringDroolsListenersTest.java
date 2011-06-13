@@ -37,9 +37,11 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.process.WorkItemHandler;
 import org.jbpm.process.instance.impl.humantask.HumanTaskHandler;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.security.KeyStoreSpi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,15 +50,61 @@ import static org.junit.Assert.*;
 
 public class SpringDroolsListenersTest {
 
-    @Test
-    public void testStatelessAgendaEventListener() throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/listeners.xml" );
-
-        GridNode node1 = (GridNode) context.getBean( "node1" );
-        assertNotNull( node1 );
-
-        GridNode node2 = (GridNode) context.getBean( "node2" );
-        assertNotNull( node2 );
+    static ClassPathXmlApplicationContext context = null;
+    @BeforeClass
+	public static void runBeforeClass() {
+         context = new ClassPathXmlApplicationContext( "org/drools/container/spring/listeners.xml" );
     }
 
+    @Test
+    public void testStatefulAgendaEventListener() throws Exception {
+
+        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean( "statefulSession" );
+        assertEquals(1, statefulKnowledgeSession.getAgendaEventListeners().size());
+        assertTrue(statefulKnowledgeSession.getAgendaEventListeners().toArray()[0] instanceof MockAgendaEventListener);
+
+        List<String> list = new ArrayList<String>();
+        statefulKnowledgeSession.setGlobal( "list", list );
+        statefulKnowledgeSession.insert(new Person( "Darth", "Cheddar", 50 ));
+        statefulKnowledgeSession.fireAllRules();
+    }
+
+    @Test
+    public void testStatefulProcessEventListener() throws Exception {
+        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean( "statefulSession" );
+        assertEquals(1, statefulKnowledgeSession.getProcessEventListeners().size());
+        assertTrue(statefulKnowledgeSession.getProcessEventListeners().toArray()[0] instanceof MockProcessEventListener);
+    }
+
+    @Test
+    public void testStatefullWMEventListener() throws Exception {
+        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean( "statefulSession" );
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
+    }
+
+    @Test
+    public void testStatelessAgendaEventListener() throws Exception {
+        StatelessKnowledgeSessionImpl statelessKnowledgeSession = (StatelessKnowledgeSessionImpl) context.getBean( "statelessSession" );
+        assertEquals(1, statelessKnowledgeSession.getAgendaEventListeners().size());
+        assertTrue(statelessKnowledgeSession.getAgendaEventListeners().toArray()[0] instanceof MockAgendaEventListener);
+
+        List<String> list = new ArrayList<String>();
+        statelessKnowledgeSession.setGlobal( "list", list );
+        statelessKnowledgeSession.execute(new Person( "Darth", "Cheddar", 50 ));
+    }
+
+    @Test
+    public void testStatelessProcessEventListener() throws Exception {
+        StatelessKnowledgeSessionImpl kstateless = (StatelessKnowledgeSessionImpl) context.getBean( "statelessSession" );
+        assertEquals(1, kstateless.getProcessEventListeners().size());
+        assertTrue(kstateless.getProcessEventListeners().toArray()[0] instanceof MockProcessEventListener);
+    }
+
+    @Test
+    public void testStatelessWMEventListener() throws Exception {
+        StatelessKnowledgeSessionImpl kstateless = (StatelessKnowledgeSessionImpl) context.getBean( "statelessSession" );
+        assertEquals(1, kstateless.getWorkingMemoryEventListeners().size());
+        assertTrue(kstateless.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
+    }
 }

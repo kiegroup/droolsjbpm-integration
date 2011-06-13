@@ -18,6 +18,7 @@ package org.drools.container.spring.namespace;
 
 import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.ClockType;
@@ -34,6 +35,7 @@ import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.Jpa
 import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -49,283 +51,289 @@ import org.w3c.dom.NodeList;
 
 public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionParser {
 
-    private static final String KBASE_ATTRIBUTE          = "kbase";
-    private static final String EMF_ATTRIBUTE            = "entity-manager-factory";
-    private static final String TX_MANAGER_ATTRIBUTE     = "transaction-manager";
-    private static final String FORCLASS_ATTRIBUTE       = "for-class";
+    private static final String KBASE_ATTRIBUTE = "kbase";
+    private static final String EMF_ATTRIBUTE = "entity-manager-factory";
+    private static final String TX_MANAGER_ATTRIBUTE = "transaction-manager";
+    private static final String FORCLASS_ATTRIBUTE = "for-class";
     private static final String IMPLEMENTATION_ATTRIBUTE = "implementation";
 
-    private static final String NAME_ATTRIBUTE           = "name";
-    private static final String GRID_NODE_ATTRIBUTE      = "node";
-    private static final String TYPE_ATTRIBUTE           = "type";
+    private static final String NAME_ATTRIBUTE = "name";
+    private static final String GRID_NODE_ATTRIBUTE = "node";
+    private static final String TYPE_ATTRIBUTE = "type";
 
-    private static final String KEEP_REFERENCE           = "keep-reference";
-    private static final String CLOCK_TYPE               = "clock-type";
+    private static final String KEEP_REFERENCE = "keep-reference";
+    private static final String CLOCK_TYPE = "clock-type";
 
-    private static final String WORK_ITEMS               = "work-item-handlers";
+    private static final String WORK_ITEMS = "work-item-handlers";
 
-    private static final String WORK_ITEM                = "work-item-handler";
+    private static final String WORK_ITEM = "work-item-handler";
 
     @SuppressWarnings("unchecked")
     protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
 
-        String id = element.getAttribute( "id" );
-        emptyAttributeCheck( element.getLocalName(),
-                             "id",
-                             id );
+        String id = element.getAttribute("id");
+        emptyAttributeCheck(element.getLocalName(), "id", id);
 
-        String kbase = element.getAttribute( KBASE_ATTRIBUTE );
-        emptyAttributeCheck( element.getLocalName(),
-                             KBASE_ATTRIBUTE,
-                             kbase );
+        String kbase = element.getAttribute(KBASE_ATTRIBUTE);
+        emptyAttributeCheck(element.getLocalName(), KBASE_ATTRIBUTE, kbase);
 
-        String sessionType = element.getAttribute( TYPE_ATTRIBUTE );
+        String sessionType = element.getAttribute(TYPE_ATTRIBUTE);
         BeanDefinitionBuilder factory;
 
-        if ( "stateful".equals( sessionType ) ) {
-            factory = BeanDefinitionBuilder.rootBeanDefinition( StatefulKnowledgeSessionBeanFactory.class );
-        } else if ( "stateless".equals( sessionType ) ) {
-            factory = BeanDefinitionBuilder.rootBeanDefinition( StatelessKnowledgeSessionBeanFactory.class );
+        if ("stateful".equals(sessionType)) {
+            factory = BeanDefinitionBuilder.rootBeanDefinition(StatefulKnowledgeSessionBeanFactory.class);
+        } else if ("stateless".equals(sessionType)) {
+            factory = BeanDefinitionBuilder.rootBeanDefinition(StatelessKnowledgeSessionBeanFactory.class);
         } else {
-            throw new IllegalArgumentException( "Invalid value for " + TYPE_ATTRIBUTE + " attribute: " + sessionType );
+            throw new IllegalArgumentException("Invalid value for " + TYPE_ATTRIBUTE + " attribute: " + sessionType);
         }
 
-        factory.addPropertyReference( "kbase",
-                                      kbase );
+        factory.addPropertyReference("kbase", kbase);
 
-        String node = element.getAttribute( GRID_NODE_ATTRIBUTE );
-        if ( node != null && node.length() > 0 ) {
-            factory.addPropertyReference( "node",
-                                          node );
+        String node = element.getAttribute(GRID_NODE_ATTRIBUTE);
+        if (node != null && node.length() > 0) {
+            factory.addPropertyReference("node", node);
         }
 
-        String name = element.getAttribute( NAME_ATTRIBUTE );
-        if ( StringUtils.hasText( name ) ) {
-            factory.addPropertyValue( "name",
-                                      name );
+        String name = element.getAttribute(NAME_ATTRIBUTE);
+        if (StringUtils.hasText(name)) {
+            factory.addPropertyValue("name", name);
         } else {
-            factory.addPropertyValue( "name",
-                                      id );
+            factory.addPropertyValue("name", id);
         }
 
-        Element ksessionConf = DomUtils.getChildElementByTagName( element,
-                                                                  "configuration" );
-        if ( ksessionConf != null ) {
-            Element persistenceElm = DomUtils.getChildElementByTagName( ksessionConf,
-                                                                        "jpa-persistence" );
-            if ( persistenceElm != null ) {
-                BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( JpaConfiguration.class );
+        // Additions for JIRA JBRULES-3076
+        List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, "eventListener");
+        ManagedList listeners = new ManagedList();
+        for (Element listener : eventListeners) {
+            String beanName = listener.getAttribute("ref");
+            String listenerType = listener.getAttribute("type");
+            if ("agenda-event-listener".equalsIgnoreCase(listenerType) || "process-event-listener".equalsIgnoreCase(listenerType) || "working-memory-event-listener".equalsIgnoreCase(listenerType)) {
+                listeners.add(new RuntimeBeanReference(beanName));
+            } else {
+                throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
+            }
+        }
+        factory.addPropertyValue("eventListeners", listeners);
+        // End of Additions for JIRA JBRULES-3076
 
-                String loadId = persistenceElm.getAttribute( "load" );
-                if ( StringUtils.hasText( loadId ) ) {
-                    beanBuilder.addPropertyValue( "id",
-                                                  Long.parseLong( loadId ) );
+        Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
+        if (ksessionConf != null) {
+            Element persistenceElm = DomUtils.getChildElementByTagName(ksessionConf,
+                    "jpa-persistence");
+            if (persistenceElm != null) {
+                BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(JpaConfiguration.class);
+
+                String loadId = persistenceElm.getAttribute("load");
+                if (StringUtils.hasText(loadId)) {
+                    beanBuilder.addPropertyValue("id",
+                            Long.parseLong(loadId));
                 }
 
-                Element tnxMng = DomUtils.getChildElementByTagName( persistenceElm,
-                                                                    TX_MANAGER_ATTRIBUTE );
-                String ref = tnxMng.getAttribute( "ref" );
+                Element tnxMng = DomUtils.getChildElementByTagName(persistenceElm,
+                        TX_MANAGER_ATTRIBUTE);
+                String ref = tnxMng.getAttribute("ref");
 
-                beanBuilder.addPropertyReference( "platformTransactionManager",
-                                                  ref );
+                beanBuilder.addPropertyReference("platformTransactionManager",
+                        ref);
 
-                Element emf = DomUtils.getChildElementByTagName( persistenceElm,
-                                                                 EMF_ATTRIBUTE );
-                ref = emf.getAttribute( "ref" );
-                beanBuilder.addPropertyReference( "entityManagerFactory",
-                                                  ref );
+                Element emf = DomUtils.getChildElementByTagName(persistenceElm,
+                        EMF_ATTRIBUTE);
+                ref = emf.getAttribute("ref");
+                beanBuilder.addPropertyReference("entityManagerFactory",
+                        ref);
 
-                Element variablePersisters = DomUtils.getChildElementByTagName( persistenceElm,
-                                                                                "variable-persisters" );
-                if ( variablePersisters != null && variablePersisters.hasChildNodes() ) {
-                    List<Element> childPersisterElems = DomUtils.getChildElementsByTagName( variablePersisters,
-                                                                                            "persister" );
-                    ManagedMap persistors = new ManagedMap( childPersisterElems.size() );
-                    for ( Element persisterElem : childPersisterElems ) {
-                        String forClass = persisterElem.getAttribute( FORCLASS_ATTRIBUTE );
-                        String implementation = persisterElem.getAttribute( IMPLEMENTATION_ATTRIBUTE );
-                        if ( !StringUtils.hasText( forClass ) ) {
-                            throw new RuntimeException( "persister element must have valid for-class attribute" );
+                Element variablePersisters = DomUtils.getChildElementByTagName(persistenceElm,
+                        "variable-persisters");
+                if (variablePersisters != null && variablePersisters.hasChildNodes()) {
+                    List<Element> childPersisterElems = DomUtils.getChildElementsByTagName(variablePersisters,
+                            "persister");
+                    ManagedMap persistors = new ManagedMap(childPersisterElems.size());
+                    for (Element persisterElem : childPersisterElems) {
+                        String forClass = persisterElem.getAttribute(FORCLASS_ATTRIBUTE);
+                        String implementation = persisterElem.getAttribute(IMPLEMENTATION_ATTRIBUTE);
+                        if (!StringUtils.hasText(forClass)) {
+                            throw new RuntimeException("persister element must have valid for-class attribute");
                         }
-                        if ( !StringUtils.hasText( implementation ) ) {
-                            throw new RuntimeException( "persister element must have valid implementation attribute" );
+                        if (!StringUtils.hasText(implementation)) {
+                            throw new RuntimeException("persister element must have valid implementation attribute");
                         }
-                        persistors.put( forClass,
-                                        implementation );
+                        persistors.put(forClass,
+                                implementation);
                     }
-                    beanBuilder.addPropertyValue( "variablePersisters",
-                                                  persistors );
+                    beanBuilder.addPropertyValue("variablePersisters",
+                            persistors);
                 }
 
-                factory.addPropertyValue( "jpaConfiguration",
-                                          beanBuilder.getBeanDefinition() );
+                factory.addPropertyValue("jpaConfiguration",
+                        beanBuilder.getBeanDefinition());
             }
-            BeanDefinitionBuilder rbaseConfBuilder = BeanDefinitionBuilder.rootBeanDefinition( SessionConfiguration.class );
-            Element e = DomUtils.getChildElementByTagName( ksessionConf,
-                                                           KEEP_REFERENCE );
-            if ( e != null && StringUtils.hasText( e.getAttribute( "enabled" ) ) ) {
-                rbaseConfBuilder.addPropertyValue( "keepReference",
-                                                   Boolean.parseBoolean( e.getAttribute( "enabled" ) ) );
+            BeanDefinitionBuilder rbaseConfBuilder = BeanDefinitionBuilder.rootBeanDefinition(SessionConfiguration.class);
+            Element e = DomUtils.getChildElementByTagName(ksessionConf,
+                    KEEP_REFERENCE);
+            if (e != null && StringUtils.hasText(e.getAttribute("enabled"))) {
+                rbaseConfBuilder.addPropertyValue("keepReference",
+                        Boolean.parseBoolean(e.getAttribute("enabled")));
             }
 
-            e = DomUtils.getChildElementByTagName( ksessionConf,
-                                                   CLOCK_TYPE );
-            if ( e != null && StringUtils.hasText( e.getAttribute( "type" ) ) ) {
-                rbaseConfBuilder.addPropertyValue( "clockType",
-                                                   ClockType.resolveClockType( e.getAttribute( "type" ) ) );
+            e = DomUtils.getChildElementByTagName(ksessionConf,
+                    CLOCK_TYPE);
+            if (e != null && StringUtils.hasText(e.getAttribute("type"))) {
+                rbaseConfBuilder.addPropertyValue("clockType",
+                        ClockType.resolveClockType(e.getAttribute("type")));
             }
-            factory.addPropertyValue( "conf",
-                                      rbaseConfBuilder.getBeanDefinition() );
+            factory.addPropertyValue("conf",
+                    rbaseConfBuilder.getBeanDefinition());
 
-            e = DomUtils.getChildElementByTagName( ksessionConf,
-                                                   WORK_ITEMS );
-            if ( e != null ) {
-                List<Element> children = DomUtils.getChildElementsByTagName( e,
-                                                                             WORK_ITEM );
-                if ( children != null && !children.isEmpty() ) {
+            e = DomUtils.getChildElementByTagName(ksessionConf,
+                    WORK_ITEMS);
+            if (e != null) {
+                List<Element> children = DomUtils.getChildElementsByTagName(e,
+                        WORK_ITEM);
+                if (children != null && !children.isEmpty()) {
                     ManagedMap workDefs = new ManagedMap();
-                    for ( Element child : children ) {
-                        workDefs.put( child.getAttribute( "name" ),
-                                       new RuntimeBeanReference( child.getAttribute( "ref" ) ) );
+                    for (Element child : children) {
+                        workDefs.put(child.getAttribute("name"),
+                                new RuntimeBeanReference(child.getAttribute("ref")));
                     }
-                    factory.addPropertyValue( "workItems",
-                                              workDefs );
+                    factory.addPropertyValue("workItems",
+                            workDefs);
                 }
             }
         }
 
-        Element batch = DomUtils.getChildElementByTagName( element,
-                                                           "batch" );
-        if ( batch == null ) {
+        Element batch = DomUtils.getChildElementByTagName(element,
+                "batch");
+        if (batch == null) {
             // just temporary legacy suppport
-            batch = DomUtils.getChildElementByTagName( element,
-                                                       "script" );
+            batch = DomUtils.getChildElementByTagName(element,
+                    "script");
         }
-        if ( batch != null ) {
+        if (batch != null) {
             // we know there can only ever be one
             ManagedList children = new ManagedList();
 
-            for ( int i = 0, length = batch.getChildNodes().getLength(); i < length; i++ ) {
-                Node n = batch.getChildNodes().item( i );
-                if ( n instanceof Element ) {
+            for (int i = 0, length = batch.getChildNodes().getLength(); i < length; i++) {
+                Node n = batch.getChildNodes().item(i);
+                if (n instanceof Element) {
                     Element e = (Element) n;
 
                     BeanDefinitionBuilder beanBuilder = null;
-                    if ( "insert-object".equals( e.getLocalName() ) ) {
-                        String ref = e.getAttribute( "ref" );
-                        Element nestedElm = getFirstElement( e.getChildNodes() );
-                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( InsertObjectCommand.class );
-                        if ( StringUtils.hasText( ref ) ) {
-                            beanBuilder.addConstructorArgReference( ref );
-                        } else if ( nestedElm != null ) {
-                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parsePropertySubElement( nestedElm,
-                                                                                                                     null,
-                                                                                                                     null ) );
+                    if ("insert-object".equals(e.getLocalName())) {
+                        String ref = e.getAttribute("ref");
+                        Element nestedElm = getFirstElement(e.getChildNodes());
+                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(InsertObjectCommand.class);
+                        if (StringUtils.hasText(ref)) {
+                            beanBuilder.addConstructorArgReference(ref);
+                        } else if (nestedElm != null) {
+                            beanBuilder.addConstructorArgValue(parserContext.getDelegate().parsePropertySubElement(nestedElm,
+                                    null,
+                                    null));
                         } else {
-                            throw new IllegalArgumentException( "insert-object must either specify a 'ref' attribute or have a nested bean" );
+                            throw new IllegalArgumentException("insert-object must either specify a 'ref' attribute or have a nested bean");
                         }
-                    } else if ( "set-global".equals( e.getLocalName() ) ) {
-                        String ref = e.getAttribute( "ref" );
-                        Element nestedElm = getFirstElement( e.getChildNodes() );
-                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( SetGlobalCommand.class );
-                        beanBuilder.addConstructorArgValue( e.getAttribute( "identifier" ) );
-                        if ( StringUtils.hasText( ref ) ) {
-                            beanBuilder.addConstructorArgReference( ref );
-                        } else if ( nestedElm != null ) {
-                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parsePropertySubElement( nestedElm,
-                                                                                                                     null,
-                                                                                                                     null ) );
+                    } else if ("set-global".equals(e.getLocalName())) {
+                        String ref = e.getAttribute("ref");
+                        Element nestedElm = getFirstElement(e.getChildNodes());
+                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(SetGlobalCommand.class);
+                        beanBuilder.addConstructorArgValue(e.getAttribute("identifier"));
+                        if (StringUtils.hasText(ref)) {
+                            beanBuilder.addConstructorArgReference(ref);
+                        } else if (nestedElm != null) {
+                            beanBuilder.addConstructorArgValue(parserContext.getDelegate().parsePropertySubElement(nestedElm,
+                                    null,
+                                    null));
                         } else {
-                            throw new IllegalArgumentException( "set-global must either specify a 'ref' attribute or have a nested bean" );
+                            throw new IllegalArgumentException("set-global must either specify a 'ref' attribute or have a nested bean");
                         }
-                    } else if ( "fire-until-halt".equals( e.getLocalName() ) ) {
-                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( FireUntilHaltCommand.class );
-                    } else if ( "fire-all-rules".equals( e.getLocalName() ) ) {
-                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( FireAllRulesCommand.class );
-                        String max = e.getAttribute( "max" );
-                        if ( StringUtils.hasText( max ) ) {
-                            beanBuilder.addPropertyValue( "max",
-                                                          max );
+                    } else if ("fire-until-halt".equals(e.getLocalName())) {
+                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(FireUntilHaltCommand.class);
+                    } else if ("fire-all-rules".equals(e.getLocalName())) {
+                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(FireAllRulesCommand.class);
+                        String max = e.getAttribute("max");
+                        if (StringUtils.hasText(max)) {
+                            beanBuilder.addPropertyValue("max",
+                                    max);
                         }
-                    } else if ( "start-process".equals( e.getLocalName() ) ) {
+                    } else if ("start-process".equals(e.getLocalName())) {
 
-                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( StartProcessCommand.class );
-                        String processId = e.getAttribute( "process-id" );
-                        if ( !StringUtils.hasText( processId ) ) {
-                            throw new IllegalArgumentException( "start-process must specify a process-id" );
+                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(StartProcessCommand.class);
+                        String processId = e.getAttribute("process-id");
+                        if (!StringUtils.hasText(processId)) {
+                            throw new IllegalArgumentException("start-process must specify a process-id");
                         }
-                        beanBuilder.addConstructorArgValue( processId );
+                        beanBuilder.addConstructorArgValue(processId);
 
-                        List<Element> params = DomUtils.getChildElementsByTagName( e,
-                                                                                   "parameter" );
-                        if ( !params.isEmpty() ) {
+                        List<Element> params = DomUtils.getChildElementsByTagName(e,
+                                "parameter");
+                        if (!params.isEmpty()) {
                             ManagedMap map = new ManagedMap();
-                            for ( Element param : params ) {
-                                String identifier = param.getAttribute( "identifier" );
-                                if ( !StringUtils.hasText( identifier ) ) {
-                                    throw new IllegalArgumentException( "start-process paramaters must specify an identifier" );
+                            for (Element param : params) {
+                                String identifier = param.getAttribute("identifier");
+                                if (!StringUtils.hasText(identifier)) {
+                                    throw new IllegalArgumentException("start-process paramaters must specify an identifier");
                                 }
 
-                                String ref = param.getAttribute( "ref" );
-                                Element nestedElm = getFirstElement( param.getChildNodes() );
-                                if ( StringUtils.hasText( ref ) ) {
-                                    map.put( identifier,
-                                             new RuntimeBeanReference( ref ) );
-                                } else if ( nestedElm != null ) {
-                                    map.put( identifier,
-                                             parserContext.getDelegate().parsePropertySubElement( nestedElm,
-                                                                                                  null,
-                                                                                                  null ) );
+                                String ref = param.getAttribute("ref");
+                                Element nestedElm = getFirstElement(param.getChildNodes());
+                                if (StringUtils.hasText(ref)) {
+                                    map.put(identifier,
+                                            new RuntimeBeanReference(ref));
+                                } else if (nestedElm != null) {
+                                    map.put(identifier,
+                                            parserContext.getDelegate().parsePropertySubElement(nestedElm,
+                                                    null,
+                                                    null));
                                 } else {
-                                    throw new IllegalArgumentException( "start-process paramaters must either specify a 'ref' attribute or have a nested bean" );
+                                    throw new IllegalArgumentException("start-process paramaters must either specify a 'ref' attribute or have a nested bean");
                                 }
                             }
-                            beanBuilder.addPropertyValue( "parameters",
-                                                          map );
+                            beanBuilder.addPropertyValue("parameters",
+                                    map);
                         }
-                    } else if ( "signal-event".equals( e.getLocalName() ) ) {
-                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition( SignalEventCommand.class );
-                        String processInstanceId = e.getAttribute( "process-instance-id" );
-                        if ( StringUtils.hasText( processInstanceId ) ) {
-                            beanBuilder.addConstructorArgValue( processInstanceId );
+                    } else if ("signal-event".equals(e.getLocalName())) {
+                        beanBuilder = BeanDefinitionBuilder.genericBeanDefinition(SignalEventCommand.class);
+                        String processInstanceId = e.getAttribute("process-instance-id");
+                        if (StringUtils.hasText(processInstanceId)) {
+                            beanBuilder.addConstructorArgValue(processInstanceId);
                         }
 
-                        beanBuilder.addConstructorArgValue( e.getAttribute( "event-type" ) );
+                        beanBuilder.addConstructorArgValue(e.getAttribute("event-type"));
 
-                        String ref = e.getAttribute( "ref" );
-                        Element nestedElm = getFirstElement( e.getChildNodes() );
-                        if ( StringUtils.hasText( ref ) ) {
-                            beanBuilder.addConstructorArgReference( ref );
-                        } else if ( nestedElm != null ) {
-                            beanBuilder.addConstructorArgValue( parserContext.getDelegate().parsePropertySubElement( nestedElm,
-                                                                                                                     null,
-                                                                                                                     null ) );
+                        String ref = e.getAttribute("ref");
+                        Element nestedElm = getFirstElement(e.getChildNodes());
+                        if (StringUtils.hasText(ref)) {
+                            beanBuilder.addConstructorArgReference(ref);
+                        } else if (nestedElm != null) {
+                            beanBuilder.addConstructorArgValue(parserContext.getDelegate().parsePropertySubElement(nestedElm,
+                                    null,
+                                    null));
                         } else {
-                            throw new IllegalArgumentException( "signal-event must either specify a 'ref' attribute or have a nested bean" );
+                            throw new IllegalArgumentException("signal-event must either specify a 'ref' attribute or have a nested bean");
                         }
                     }
-                    if ( beanBuilder == null ) {
-                        throw new IllegalStateException( "Unknow element: " + e.getLocalName() );
+                    if (beanBuilder == null) {
+                        throw new IllegalStateException("Unknow element: " + e.getLocalName());
                     }
-                    children.add( beanBuilder.getBeanDefinition() );
+                    children.add(beanBuilder.getBeanDefinition());
                 }
             }
-            factory.addPropertyValue( "batch",
-                                      children );
+            factory.addPropertyValue("batch",
+                    children);
         }
 
         // find any kagent's for the current kbase and assign (only if this 
         // is a stateless session)
-        if (sessionType.equals("stateless")){
-            for ( String beanName : parserContext.getRegistry().getBeanDefinitionNames() ) {
-                BeanDefinition def = parserContext.getRegistry().getBeanDefinition( beanName );
-                if ( KnowledgeAgentBeanFactory.class.getName().equals( def.getBeanClassName() ) ) {
-                    PropertyValue pvalue = def.getPropertyValues().getPropertyValue( "kbase" );
+        if (sessionType.equals("stateless")) {
+            for (String beanName : parserContext.getRegistry().getBeanDefinitionNames()) {
+                BeanDefinition def = parserContext.getRegistry().getBeanDefinition(beanName);
+                if (KnowledgeAgentBeanFactory.class.getName().equals(def.getBeanClassName())) {
+                    PropertyValue pvalue = def.getPropertyValues().getPropertyValue("kbase");
                     RuntimeBeanReference tbf = (RuntimeBeanReference) pvalue.getValue();
-                    if ( kbase.equals( tbf.getBeanName() ) ) {
-                        factory.addPropertyValue( "knowledgeAgent",
-                                                  new RuntimeBeanReference( beanName ) );
+                    if (kbase.equals(tbf.getBeanName())) {
+                        factory.addPropertyValue("knowledgeAgent",
+                                new RuntimeBeanReference(beanName));
                     }
                 }
             }
@@ -335,9 +343,9 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     }
 
     private Element getFirstElement(NodeList list) {
-        for ( int j = 0, lengthj = list.getLength(); j < lengthj; j++ ) {
-            if ( list.item( j ) instanceof Element ) {
-                return (Element) list.item( j );
+        for (int j = 0, lengthj = list.getLength(); j < lengthj; j++) {
+            if (list.item(j) instanceof Element) {
+                return (Element) list.item(j);
             }
         }
         return null;

@@ -16,11 +16,16 @@
 
 package org.drools.container.spring.beans;
 
+import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
+import org.drools.event.process.ProcessEventListener;
+import org.drools.event.rule.AgendaEventListener;
+import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -29,6 +34,9 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NamedBean;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 public abstract class AbstractKnowledgeSessionBeanFactory
     implements
@@ -46,8 +54,19 @@ public abstract class AbstractKnowledgeSessionBeanFactory
 
     private List<Command< ? >>            batch;
 
+    // Additions for JIRA JBRULES-3076
+    private List<AgendaEventListener>            agendaEventListeners;
+    private List<ProcessEventListener>           processEventListeners;
+    private List<WorkingMemoryEventListener>     workingMemoryEventListeners;
+    // End of additions for JIRA JBRULES-3076
+
     public AbstractKnowledgeSessionBeanFactory() {
         super();
+        // Additions for JIRA JBRULES-3076
+        agendaEventListeners = new ArrayList<AgendaEventListener>();
+        processEventListeners = new ArrayList<ProcessEventListener>();
+        workingMemoryEventListeners = new ArrayList<WorkingMemoryEventListener>();
+        // End of additions for JIRA JBRULES-3076
     }
 
     public Object getObject() throws Exception {
@@ -129,4 +148,44 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         return beanName;
     }
 
+    // Additions for JIRA JBRULES-3076
+    public void setEventListeners(List<Object> eventListeners){
+        for ( Object eventListener: eventListeners ) {
+            if ( eventListener instanceof AgendaEventListener) {
+                agendaEventListeners.add((AgendaEventListener) eventListener);
+            } else if (eventListener instanceof WorkingMemoryEventListener) {
+                workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+            } else if (eventListener instanceof ProcessEventListener) {
+                processEventListeners.add((ProcessEventListener) eventListener);
+            } else {
+                throw new IllegalArgumentException( "Unsupported Event Listener Type" );
+            }
+        }
+    }
+    
+    public List<AgendaEventListener> getAgendaEventListeners() {
+        return agendaEventListeners;
+    }
+
+    public void setAgendaEventListeners(List<AgendaEventListener> agendaEventListeners) {
+        this.agendaEventListeners = agendaEventListeners;
+    }
+
+    public List<ProcessEventListener> getProcessEventListeners() {
+        return processEventListeners;
+    }
+
+    public void setProcessEventListeners(List<ProcessEventListener> processEventListeners) {
+        this.processEventListeners = processEventListeners;
+    }
+
+    public List<WorkingMemoryEventListener> getWorkingMemoryEventListeners() {
+        return workingMemoryEventListeners;
+    }
+
+    public void setWorkingMemoryEventListeners(List<WorkingMemoryEventListener> workingMemoryEventListeners) {
+        this.workingMemoryEventListeners = workingMemoryEventListeners;
+    }
+
+    // End of Changes for JIRA JBRULES-3076
 }
