@@ -145,6 +145,24 @@ public class StatefulKnowledgeSessionRemoteClient
 
         return (Integer) result;
     }
+    
+    public int fireAllRules(AgendaFilter agendaFilter,
+                            int max) {
+        String kresultsId = "kresults_" + this.gsd.getId();
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand( agendaFilter, max ),
+                                                                                                                       null,
+                                                                                                                       null,
+                                                                                                                       this.instanceId,
+                                                                                                                       kresultsId )} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return (Integer) result;
+    }
 
     public void fireUntilHalt() {
         fireUntilHalt( null );
@@ -674,6 +692,5 @@ public class StatefulKnowledgeSessionRemoteClient
     public String getInstanceId() {
         return instanceId;
     }
-
        
 }
