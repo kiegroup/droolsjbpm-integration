@@ -1,22 +1,16 @@
 package org.drools.grid.service.directory.impl;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.HashedMap;
-import org.drools.grid.CoreServicesLookup;
-import org.drools.grid.Grid;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.Conversation;
-import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.timer.impl.ServiceConfiguration;
 
 public class WhitePagesServer
     implements
