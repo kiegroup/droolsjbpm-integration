@@ -24,6 +24,9 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.conf.EventProcessingOption;
 import org.drools.conf.MBeansOption;
+import org.drools.event.DebugProcessEventListener;
+import org.drools.event.rule.DebugAgendaEventListener;
+import org.drools.event.rule.DebugWorkingMemoryEventListener;
 import org.drools.examples.broker.events.Event;
 import org.drools.examples.broker.events.EventReceiver;
 import org.drools.examples.broker.model.Company;
@@ -79,6 +82,10 @@ public class Broker implements EventReceiver, BrokerServices {
     private StatefulKnowledgeSession createSession() {
         KnowledgeBase kbase = loadRuleBase();
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+//        session.addEventListener( new DebugAgendaEventListener() );
+//        session.addEventListener( new DebugWorkingMemoryEventListener() );
+//        session.addEventListener( new DebugProcessEventListener() );         
+        
         //KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger( session );
         session.setGlobal( "services", this );
         for( Company company : this.companies.getCompanies() ) {
