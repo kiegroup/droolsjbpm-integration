@@ -2,6 +2,7 @@ package org.drools.grid.timer.impl;
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.drools.time.JobHandle;
 
@@ -10,6 +11,8 @@ public class UuidJobHandle
     JobHandle,
     Serializable {
     private UUID uuid;
+    
+    private AtomicBoolean cancel = new AtomicBoolean(false);
 
     public UuidJobHandle() {
         this.uuid = UUID.randomUUID();
@@ -44,5 +47,13 @@ public class UuidJobHandle
 
     public UUID getUuid() {
         return this.uuid;
+    }
+
+    public boolean isCancel() {
+        return cancel.get();
+    }
+
+    public void setCancel(boolean cancel) {
+        this.cancel.set( cancel );
     }
 }
