@@ -21,12 +21,14 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.command.CommandFactory;
 import org.drools.command.GetSessionClockCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.command.SetVariableCommand;
 import org.drools.command.runtime.DisposeCommand;
 import org.drools.command.runtime.GetFactCountCommand;
 import org.drools.command.runtime.GetGlobalsCommand;
@@ -54,6 +56,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.command.GetWorkingMemoryEntryPointRemoteCommand;
+import org.drools.grid.remote.command.QueryRemoteCommand;
 import org.drools.runtime.Calendars;
 import org.drools.runtime.Channel;
 import org.drools.runtime.Environment;
@@ -340,7 +343,28 @@ public class StatefulKnowledgeSessionRemoteClient
 
     public QueryResults getQueryResults(String query,
                                         Object... arguments) {
-        throw new UnsupportedOperationException( "Not supported yet." );
+        
+        String localId = "query_"+UUID.randomUUID().toString();
+        String kresultsId = "kresults_" + this.gsd.getId();
+
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
+                                                                                                localId,
+                                                                                                new KnowledgeContextResolveFromContextCommand( new QueryRemoteCommand(localId+query, query, arguments),
+                                                                                                                     null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId, 
+                                                                                                                      kresultsId ) )} ) );
+        
+        
+        
+        ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+
+        return new QueryResultsRemoteClient(query, this.instanceId, localId,  this.gsd, this.cm);
+        
     }
 
     public LiveQuery openLiveQuery(String query,

@@ -24,7 +24,10 @@ import org.drools.common.DefaultFactHandle;
 import org.drools.grid.NodeTests.MyObject;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
+import org.drools.runtime.rule.QueryResults;
+import org.drools.runtime.rule.QueryResultsRow;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RemoteSessionCommandTests extends BaseRemoteTest{
@@ -108,40 +111,40 @@ public class RemoteSessionCommandTests extends BaseRemoteTest{
      
      }
      
-//     @Test
-//     public void getFactHandleTest() {
-//        StatefulKnowledgeSession ksession = createSession();
-//        
-//        ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
-//        MyObject obj1 = new MyObject("obj1");
-//        FactHandle handle = ksession.insert(obj1);
-//        Assert.assertNotNull(handle);
-//        Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
-//        // The session assertMap doesn't find the factHandle for this object
-//        FactHandle newHandle = ksession.getFactHandle(obj1);
-//        
-//        Assert.assertEquals( newHandle, handle );
-//        
-//     
-//     }
+     @Ignore // FIX
+     public void getFactHandleTest() {
+        StatefulKnowledgeSession ksession = createSession();
+        
+        ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
+        MyObject obj1 = new MyObject("obj1");
+        FactHandle handle = ksession.insert(obj1);
+        Assert.assertNotNull(handle);
+        Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
+        // The session assertMap doesn't find the factHandle for this object
+        FactHandle newHandle = ksession.getFactHandle(obj1);
+        
+        Assert.assertEquals( newHandle, handle );
+        
+     
+     }
      
      
-//     @Test
-//     public void getFactHandlesTest() {
-//        StatefulKnowledgeSession ksession = createSession();
-//        
-//        ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
-//        MyObject obj1 = new MyObject("obj1");
-//        FactHandle handle = ksession.insert(obj1);
-//        Assert.assertNotNull(handle);
-//        Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
-//        //I'm having problems with ObjectStoreWrapper that it's not serializable
-//        Collection<FactHandle> factHandles = ksession.getFactHandles();
-//        Assert.assertEquals(1, factHandles.size());
-//        Assert.assertEquals(handle, factHandles.iterator().next() );
-//        
-//     
-//     }
+     @Ignore // FIX
+     public void getFactHandlesTest() {
+        StatefulKnowledgeSession ksession = createSession();
+        
+        ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
+        MyObject obj1 = new MyObject("obj1");
+        FactHandle handle = ksession.insert(obj1);
+        Assert.assertNotNull(handle);
+        Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
+        //I'm having problems with ObjectStoreWrapper that it's not serializable
+        Collection<FactHandle> factHandles = ksession.getFactHandles();
+        Assert.assertEquals(1, factHandles.size());
+        Assert.assertEquals(handle, factHandles.iterator().next() );
+        
+     
+     }
      
       @Test
      public void getObjectTest() {
@@ -159,7 +162,40 @@ public class RemoteSessionCommandTests extends BaseRemoteTest{
         
      
      }
+      
+      @Test
+     public void queryTest() {
+        StatefulKnowledgeSession ksession = createSession();
+        
+        ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
+        MyObject obj1 = new MyObject("obj1");
+        FactHandle handle = ksession.insert(obj1);
+        Assert.assertNotNull(handle);
+        Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
+        
+        Object result = ksession.getObject(handle);
+        
+        Assert.assertEquals(obj1,  result);
+        QueryResults queryResults = ksession.getQueryResults("getMyObjects", new Object[]{});
+        
+        String[] identifiers = queryResults.getIdentifiers();
+        Assert.assertEquals(1,  identifiers.length);
+        Assert.assertEquals(1,  queryResults.size());
+        for(QueryResultsRow row : queryResults){
+            Object o = row.get(identifiers[0]);
+            System.out.println("Object from the query = "+o);
+            Assert.assertNotNull(o);
+            handle = row.getFactHandle(identifiers[0]);
+            Assert.assertNotNull(handle);
+            System.out.println("FactHandle from the query = "+handle);
+        }
+        
+        
      
+     }
+     
+      
+      
       
       
       
