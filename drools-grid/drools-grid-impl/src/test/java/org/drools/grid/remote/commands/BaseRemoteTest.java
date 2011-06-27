@@ -17,6 +17,8 @@
 
 package org.drools.grid.remote.commands;
 
+import org.drools.conf.AssertBehaviorOption;
+import org.drools.KnowledgeBaseConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 import org.drools.KnowledgeBase;
@@ -157,7 +159,8 @@ public abstract class BaseRemoteTest {
             }
             fail("KnowledgeBase did not build");
         }
-
+//        KnowledgeBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
+//        kbaseConf.setProperty(AssertBehaviorOption.PROPERTY_NAME, "equality");
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
 
         assertNotNull( kbase );
@@ -208,8 +211,9 @@ public abstract class BaseRemoteTest {
             }
             fail("KnowledgeBase did not build");
         }
-
-        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        KnowledgeBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
+        kbaseConf.setProperty(AssertBehaviorOption.PROPERTY_NAME, "equality");
+        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(kbaseConf);
 
         assertNotNull( kbase );
 

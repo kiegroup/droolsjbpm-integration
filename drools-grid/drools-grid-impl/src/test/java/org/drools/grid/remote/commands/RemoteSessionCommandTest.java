@@ -30,9 +30,9 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class RemoteSessionCommandTests extends BaseRemoteTest{
+public class RemoteSessionCommandTest extends BaseRemoteTest{
 
-    public RemoteSessionCommandTests() {
+    public RemoteSessionCommandTest() {
     }
 
    
@@ -118,10 +118,12 @@ public class RemoteSessionCommandTests extends BaseRemoteTest{
         ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
         MyObject obj1 = new MyObject("obj1");
         FactHandle handle = ksession.insert(obj1);
+         System.out.println("Handle Identity HashCode -> "+handle.toExternalForm());
         Assert.assertNotNull(handle);
         Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
         // The session assertMap doesn't find the factHandle for this object
         FactHandle newHandle = ksession.getFactHandle(obj1);
+        System.out.println("Handle Identity HashCode -> "+newHandle.toExternalForm());
         
         Assert.assertEquals( newHandle, handle );
         
@@ -129,7 +131,7 @@ public class RemoteSessionCommandTests extends BaseRemoteTest{
      }
      
      
-     @Ignore // FIX
+     @Test 
      public void getFactHandlesTest() {
         StatefulKnowledgeSession ksession = createSession();
         
@@ -138,10 +140,14 @@ public class RemoteSessionCommandTests extends BaseRemoteTest{
         FactHandle handle = ksession.insert(obj1);
         Assert.assertNotNull(handle);
         Assert.assertEquals(true, ((DefaultFactHandle)handle).isDisconnected());
+         System.out.println("Handle Identity HashCode -> "+handle.toExternalForm());
+         
         //I'm having problems with ObjectStoreWrapper that it's not serializable
         Collection<FactHandle> factHandles = ksession.getFactHandles();
         Assert.assertEquals(1, factHandles.size());
-        Assert.assertEquals(handle, factHandles.iterator().next() );
+        FactHandle newHandle = factHandles.iterator().next();
+        System.out.println("Handle Identity HashCode -> "+newHandle.toExternalForm());
+        Assert.assertEquals(handle, newHandle );
         
      
      }

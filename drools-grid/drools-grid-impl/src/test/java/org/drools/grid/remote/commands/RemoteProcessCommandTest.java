@@ -26,9 +26,9 @@ import org.drools.runtime.process.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class RemoteProcessCommandTests extends BaseRemoteTest{
+public class RemoteProcessCommandTest extends BaseRemoteTest{
 
-    public RemoteProcessCommandTests() {
+    public RemoteProcessCommandTest() {
     }
 
    

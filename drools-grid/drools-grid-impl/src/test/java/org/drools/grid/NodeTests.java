@@ -328,10 +328,18 @@ public class NodeTests {
 
         @Override
         public int hashCode() {
-            int hash = 7;
-            hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+            int hash = 3;
+            hash = 59 * hash + (this.name != null ? this.name.hashCode() : 0);
             return hash;
         }
+
+        @Override
+        public String toString() {
+            return "MyObject{" + "name=" + name + '}';
+        }
+
+        
+       
         
         
     }

@@ -491,7 +491,7 @@ public class StatefulKnowledgeSessionRemoteClient
     public <T extends FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetFactHandlesCommand( filter ),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetFactHandlesCommand( filter, true ),
                                                                                                                       null,
                                                                                                                       null,
                                                                                                                       this.instanceId,
