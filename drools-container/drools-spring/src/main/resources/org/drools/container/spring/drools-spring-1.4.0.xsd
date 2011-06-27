@@ -214,8 +214,11 @@
 
     <xsd:element name="eventListener">
         <xsd:complexType>
-            <xsd:attribute name="ref" use="required" type="xsd:string"/>
-            <xsd:attribute name="type" use="required" type="eventListenerTypeEnum"/>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element ref="spring:bean"/>
+            </xsd:choice>
+            <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+            <xsd:attribute name="type" use="optional" type="eventListenerTypeEnum"/>
         </xsd:complexType>
     </xsd:element>
   <!-- end of additions for JIRA JBRULES-3076 -->

@@ -105,17 +105,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
 
         // Additions for JIRA JBRULES-3076
         List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, "eventListener");
-        ManagedList listeners = new ManagedList();
-        for (Element listener : eventListeners) {
-            String beanName = listener.getAttribute("ref");
-            String listenerType = listener.getAttribute("type");
-            if ("agenda-event-listener".equalsIgnoreCase(listenerType) || "process-event-listener".equalsIgnoreCase(listenerType) || "working-memory-event-listener".equalsIgnoreCase(listenerType)) {
-                listeners.add(new RuntimeBeanReference(beanName));
-            } else {
-                throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
-            }
-        }
-        factory.addPropertyValue("eventListeners", listeners);
+        parseEventListeners(parserContext, factory, eventListeners);
         // End of Additions for JIRA JBRULES-3076
 
         Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
@@ -342,6 +332,57 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         return factory.getBeanDefinition();
     }
 
+     // Additions for JIRA JBRULES-3076
+    private void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, List<Element> eventListeners) {
+        ManagedMap listeners = new ManagedMap();
+        for (Element listener : eventListeners) {
+            String beanName = listener.getAttribute("ref");
+            String listenerType = listener.getAttribute("type");
+            // if this a bean ref
+            if ( StringUtils.hasText(beanName)) {
+                //if type is specified
+                if (StringUtils.hasText(listenerType)) {
+                    if ("agenda-event-listener".equalsIgnoreCase(listenerType) || "process-event-listener".equalsIgnoreCase(listenerType) || "working-memory-event-listener".equalsIgnoreCase(listenerType)) {
+                        ManagedList subList = (ManagedList) listeners.get(listenerType);
+                        if ( subList == null ) {
+                            subList = new ManagedList();
+                            listeners.put(listenerType, subList);
+                        }
+                        subList.add(new RuntimeBeanReference(beanName));
+                    } else {
+                        throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
+                    }
+                } else {
+                    //try and infer from the bean at runtime....
+                    ManagedList subList = (ManagedList) listeners.get("infer");
+                    if ( subList == null ) {
+                        subList = new ManagedList();
+                        listeners.put("infer", subList);
+                    }
+                    subList.add(new RuntimeBeanReference(beanName));
+                }
+            } else {
+                //not a ref check if it is a nested bean
+                Element nestedBean = DomUtils.getChildElementByTagName(listener, "bean");
+                if ( nestedBean == null ) {
+                    // this is a problem, no ref, no nested bean...scream and bail out, not much to do here
+                    throw new IllegalArgumentException("eventListener must either specify a 'ref' attribute or have a nested bean");
+                } else {
+                    String type = StringUtils.hasText(listenerType) ? listenerType: "infer";
+                    Object obj = parserContext.getDelegate().parsePropertySubElement(nestedBean,null,null);
+                    ManagedList subList = (ManagedList) listeners.get(type);
+                    if ( subList == null ) {
+                        subList = new ManagedList();
+                        listeners.put(type, subList);
+                    }
+                    subList.add(obj);
+                }
+            }
+        }
+        factory.addPropertyValue("eventListeners", listeners);
+    }
+    // End of Additions for JIRA JBRULES-3076
+    
     private Element getFirstElement(NodeList list) {
         for (int j = 0, lengthj = list.getLength(); j < lengthj; j++) {
             if (list.item(j) instanceof Element) {

@@ -16,10 +16,7 @@
 
 package org.drools.container.spring.beans;
 
-import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
@@ -149,16 +146,39 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     }
 
     // Additions for JIRA JBRULES-3076
-    public void setEventListeners(List<Object> eventListeners){
-        for ( Object eventListener: eventListeners ) {
-            if ( eventListener instanceof AgendaEventListener) {
-                agendaEventListeners.add((AgendaEventListener) eventListener);
-            } else if (eventListener instanceof WorkingMemoryEventListener) {
-                workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
-            } else if (eventListener instanceof ProcessEventListener) {
-                processEventListeners.add((ProcessEventListener) eventListener);
-            } else {
-                throw new IllegalArgumentException( "Unsupported Event Listener Type" );
+    public void setEventListeners(Map<String, List> eventListenerMap){
+        for ( String key : eventListenerMap.keySet() ) {
+            List<Object> eventListenerList = eventListenerMap.get(key);
+            if ( "infer".equalsIgnoreCase(key)) {
+                for ( Object eventListener : eventListenerList) {
+                    if (eventListener instanceof AgendaEventListener) {
+                        agendaEventListeners.add((AgendaEventListener) eventListener);
+                    }
+                    if (eventListener instanceof WorkingMemoryEventListener) {
+                        workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+                    }
+                    if (eventListener instanceof ProcessEventListener) {
+                        processEventListeners.add((ProcessEventListener) eventListener);
+                    }
+                }
+            } else if ("agenda-event-listener".equalsIgnoreCase(key)) {
+                for ( Object eventListener : eventListenerList) {
+                    if (eventListener instanceof AgendaEventListener) {
+                        agendaEventListeners.add((AgendaEventListener) eventListener);
+                    }
+                }
+            } else if ("working-memory-event-listener".equalsIgnoreCase(key)) {
+                for ( Object eventListener : eventListenerList) {
+                    if (eventListener instanceof WorkingMemoryEventListener) {
+                        workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+                    }
+                }
+            } else if ("process-event-listener".equalsIgnoreCase(key)) {
+                for ( Object eventListener : eventListenerList) {
+                    if (eventListener instanceof ProcessEventListener) {
+                        processEventListeners.add((ProcessEventListener) eventListener);
+                    }
+                }
             }
         }
     }

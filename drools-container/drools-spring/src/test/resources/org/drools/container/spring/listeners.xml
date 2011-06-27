@@ -37,5 +37,45 @@
     <drools:eventListener ref="mock-process-listener" type="process-event-listener"/>
     <drools:eventListener ref="mock-wm-listener" type="working-memory-event-listener"/>
   </drools:ksession>
-  
+
+
+  <drools:ksession id="statefulWithNestedBeanAndType" type="stateful" kbase="kbase1" node="node1">
+    <drools:eventListener type="working-memory-event-listener">
+      <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+    </drools:eventListener>
+  </drools:ksession>
+
+  <drools:ksession id="statefulWithRefAndType" type="stateful" kbase="kbase1" node="node1">
+    <drools:eventListener ref="mock-wm-listener" type="working-memory-event-listener"/>
+  </drools:ksession>
+
+  <drools:ksession id="statefulWithNestedBeanAndNoType" type="stateful" kbase="kbase1" node="node1">
+    <drools:eventListener>
+      <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+    </drools:eventListener>
+  </drools:ksession>
+
+  <drools:ksession id="statefulWithRefAndNoType" type="stateful" kbase="kbase1" node="node1">
+    <drools:eventListener ref="mock-wm-listener"/>
+  </drools:ksession>
+
+    <drools:ksession id="statelessWithNestedBeanAndType" type="stateless" kbase="kbase1" node="node1">
+    <drools:eventListener type="working-memory-event-listener">
+      <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+    </drools:eventListener>
+  </drools:ksession>
+
+  <drools:ksession id="statelessWithRefAndType" type="stateless" kbase="kbase1" node="node1">
+    <drools:eventListener ref="mock-wm-listener" type="working-memory-event-listener"/>
+  </drools:ksession>
+
+  <drools:ksession id="statelessWithNestedBeanAndNoType" type="stateless" kbase="kbase1" node="node1">
+    <drools:eventListener>
+      <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+    </drools:eventListener>
+  </drools:ksession>
+
+  <drools:ksession id="statelessWithRefAndNoType" type="stateless" kbase="kbase1" node="node1">
+    <drools:eventListener ref="mock-wm-listener"/>
+  </drools:ksession>
 </beans>

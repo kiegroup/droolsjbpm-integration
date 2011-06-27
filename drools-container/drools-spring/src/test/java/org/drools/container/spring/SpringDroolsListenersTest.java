@@ -107,4 +107,53 @@ public class SpringDroolsListenersTest {
         assertEquals(1, kstateless.getWorkingMemoryEventListeners().size());
         assertTrue(kstateless.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
     }
+
+    @Test
+    public void testStatefulWithNestedBeanAndType() throws Exception {
+        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean( "statefulWithNestedBeanAndType" );
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testStatefulWithNestedBeanAndNoType() throws Exception {
+        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean( "statefulWithNestedBeanAndNoType" );
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testStatefulWithRefAndNoType() throws Exception {
+        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean( "statefulWithRefAndNoType" );
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testStatefulWithRefAndType() throws Exception {
+        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean( "statefulWithRefAndType" );
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    //stateless
+    @Test
+    public void testStatelessWithNestedBeanAndType() throws Exception {
+        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "statelessWithNestedBeanAndType" );
+        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testStatelessWithNestedBeanAndNoType() throws Exception {
+        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "statelessWithNestedBeanAndNoType" );
+        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testStatelessWithRefAndNoType() throws Exception {
+        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "statelessWithRefAndNoType" );
+        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testStatelessWithRefAndType() throws Exception {
+        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "statelessWithRefAndType" );
+        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
 }
