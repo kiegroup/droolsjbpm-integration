@@ -39,18 +39,6 @@
   </dependencies>
   <modules>
      <module>drools-grid-impl</module>
-      <!--module>drools-grid-api</module>
-      <module>drools-grid-local</module>
-      <module>drools-grid-remote-api</module>
-      <module>drools-grid-remote-dir-mina</module>
-      <module>drools-grid-remote-mina</module>
-      <module>drools-grid-task</module>
-      <module>drools-grid-services</module>
-      <module>drools-grid-distributed-api</module-->
-
-      <!--module>drools-grid-distributed-rio</module-->
-      <!--module>drools-grid-distributed-dir-rio</module-->
-     
   </modules>
 
 </project>
