@@ -602,6 +602,169 @@
 </programlisting>
           </example>
         </section>
+
+        <section>
+          <title>&lt;drools:ksession&gt;'s parameters as nested
+          elements:</title>
+
+          <para>When configuring a <emphasis>Event Listener</emphasis>
+          resource you can nest a
+          <emphasis>&lt;drools:eventListener&gt;</emphasis> tag to configure
+          the listener.</para>
+        </section>
+      </section>
+    </section>
+
+    <section>
+      <title>Define Listeners</title>
+
+      <para>Drools supports adding 3 types of listeners to KnowledgeSessions.
+      The Drools-Spring module now supports all 3 of them (AgendaListener,
+      WorkingMemoryListener, ProcessEventListener).</para>
+
+      <section>
+        <title>&lt;drools:eventListener&gt;'s parameters as
+        attributes:</title>
+
+        <table>
+          <tgroup align="left" cols="3" colsep="1" rowsep="1">
+            <thead>
+              <row>
+                <entry align="center">Attribute</entry>
+
+                <entry align="center">Required</entry>
+
+                <entry align="center">Description</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>ref</entry>
+
+                <entry>No</entry>
+
+                <entry>A reference to another declared bean. <para /><para>If
+                a <emphasis>ref</emphasis> is not provided, it is expected
+                that a nested bean is declared inside this
+                <emphasis>eventListener</emphasis> tag.</para></entry>
+              </row>
+
+              <row>
+                <entry>type</entry>
+
+                <entry>No</entry>
+
+                <entry><emphasis>agenda-event-listener</emphasis> or
+                <emphasis>process-event-listener</emphasis> or
+                <emphasis>working-memory-event-listener</emphasis></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <example>
+          <title>AgendaListener configuration example - using a
+          bean:ref.</title>
+
+          <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+
+  &lt;drools:kbase id="kbase1"&gt;
+    &lt;drools:resources&gt;
+      &lt;drools:resource ref="resource1"/&gt;
+    &lt;/drools:resources&gt;
+  &lt;/drools:kbase&gt;
+
+  &lt;bean id="mock-agenda-listener" class="org.drools.container.spring.MockAgendaEventListener" /&gt;
+
+  &lt;drools:ksession id="statelessSession" type="stateless" name="stateless1" kbase="kbase1"&gt;
+    &lt;drools:eventListener ref="mock-agenda-listener" type="agenda-event-listener"/&gt;
+  &lt;/drools:ksession&gt;
+</programlisting>
+        </example>
+      </section>
+
+      <section>
+        <title>&lt;drools:eventListener&gt;'s parameters as nested
+        elements:</title>
+
+        <itemizedlist>
+          <listitem>
+            <para>bean</para>
+
+            <itemizedlist>
+              <listitem>
+                <para>class = String</para>
+              </listitem>
+
+              <listitem>
+                <para>name = String</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+
+        <example>
+          <title>AgendaListener configuration example - using nested
+          bean.</title>
+
+          <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+
+  &lt;drools:kbase id="kbase1"&gt;
+    &lt;drools:resources&gt;
+      &lt;drools:resource ref="resource1"/&gt;
+    &lt;/drools:resources&gt;
+  &lt;/drools:kbase&gt;
+
+  &lt;drools:ksession id="statelessSession" type="stateless" name="stateless1" kbase="kbase1"&gt;
+
+    &lt;drools:eventListener type="agenda-event-listener"&gt;
+      &lt;bean class="org.drools.container.spring.MockAgendaEventListener"/&gt;
+    &lt;/drools:eventListener&gt;
+
+  &lt;/drools:ksession&gt;
+
+</programlisting>
+        </example>
+      </section>
+
+      <section>
+        <title>&lt;drools:eventListener&gt;'s - Points to Note</title>
+
+        <note>
+          <para>Important Things to note while using the
+          <emphasis>drools:eventListener</emphasis>.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>ref</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>Either the <emphasis>ref</emphasis> attribute or a
+                  nested <emphasis>bean</emphasis> is mandatory!</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+
+            <listitem>
+              <para>type</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>If the <emphasis>type</emphasis> is not specified,
+                  then the bean is introspected at runtime and the exact
+                  interface(s) inferred. For example: if the bean implements
+                  <emphasis>org.drools.event.rule.AgendaEventListener</emphasis>
+                  and
+                  <emphasis>org.drools.event.process.MockProcessEventListener</emphasis>
+                  interfaces, this bean is added as an agenda listener and
+                  also as a process event listener.</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </itemizedlist>
+        </note>
       </section>
     </section>
   </section>

@@ -214,7 +214,7 @@
 
     <xsd:element name="eventListener">
         <xsd:complexType>
-            <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:element ref="spring:bean"/>
             </xsd:choice>
             <xsd:attribute name="ref" use="optional" type="xsd:string"/>
