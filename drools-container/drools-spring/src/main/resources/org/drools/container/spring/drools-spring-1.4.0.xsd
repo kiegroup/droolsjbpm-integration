@@ -204,32 +204,28 @@
   <xsd:element name="kstore" />
 
   <!-- additions for JIRA JBRULES-3076 -->
-  <xsd:simpleType name="eventListenerTypeEnum">
-    <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="agenda-event-listener" />
-      <xsd:enumeration value="process-event-listener" />
-      <xsd:enumeration value="working-memory-event-listener" />
-    </xsd:restriction>
-  </xsd:simpleType>
+  <xsd:complexType name="eventListener">
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+          <xsd:element ref="spring:bean"/>
+      </xsd:choice>
+      <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+      <!--<xsd:attribute name="type" use="optional" type="eventListenerTypeEnum"/>-->
+  </xsd:complexType>
 
-    <xsd:element name="eventListener">
-        <xsd:complexType>
-            <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="spring:bean"/>
-            </xsd:choice>
-            <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-            <xsd:attribute name="type" use="optional" type="eventListenerTypeEnum"/>
-        </xsd:complexType>
-    </xsd:element>
+  <xsd:element name="agendaEventListener" type="eventListener"/>
+  <xsd:element name="workingMemoryEventListener" type="eventListener"/>
+  <xsd:element name="processEventListener" type="eventListener"/>
   <!-- end of additions for JIRA JBRULES-3076 -->
 
   <xsd:element name="ksession">
     <xsd:complexType>
       <xsd:sequence>
         <!-- additions for JIRA JBRULES-3076 -->
-        <xsd:element ref="eventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
         <!-- end of additions for JIRA JBRULES-3076 -->
-        <xsd:choice minOccurs="0" >
+        <xsd:choice minOccurs="0" maxOccurs="1">
           <xsd:element name="batch" minOccurs="0" maxOccurs="1">
             <xsd:complexType>
               <xsd:sequence>
