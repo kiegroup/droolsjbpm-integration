@@ -18,38 +18,76 @@
       <runs-inside>
          <parent-resource-type name="JMX Server" plugin="JMX"/>
       </runs-inside>
-
+      
       <plugin-configuration>
          <c:simple-property name="objectName" readOnly="true" default="org.drools:type=DroolsManagementAgent"/>
       </plugin-configuration>
+
+       <service name="Drools Knowledge Bases"
+                description="The Drools Knowledge Base monitoring service."
+                discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+                class="org.rhq.plugins.jmx.MBeanResourceComponent">
+    
+          <plugin-configuration>
+             <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%"/>
+             <c:simple-property name="nameTemplate" readOnly="true" default="KBase {kbaseId}"/>
+             <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Knowledge Base {kbaseId}"/>
+             <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Knowledge Base Id"/>
+          </plugin-configuration>
+    
+          <operation name="startInternalMBeans"
+                     displayName="Start Internal MBeans"
+                     description="Starts all the internal dependent MBeans.">
+          </operation>
+    
+          <operation name="stopInternalMBeans"
+                     displayName="Stop Internal MBeans"
+                     description="Stops all the internal dependent MBeans.">
+          </operation>
+          
+           <service name="Drools Knowledge Sessions"
+                    description="The Drools Knowledge Session monitoring service."
+                    discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+                    class="org.rhq.plugins.jmx.MBeanResourceComponent">
+        
+              <plugin-configuration>
+                 <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%,group=Sessions,sessionId=%sessionId%"/>
+                 <c:simple-property name="nameTemplate" readOnly="true" default="KBase {kbaseId}, KSession {sessionId}"/>
+                 <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Knowledge Base {kbaseId}, Knowledge session {sessionId}"/>
+                 <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Knowledge Base Id"/>
+                 <c:simple-property name="sessionId" type="string" readOnly="true" description="The Knowledge Session Id"/>
+              </plugin-configuration>
+        
+              <metric displayName="Total Fact Count" property="TotalFactCount"
+                      description="The total number of facts in memory"
+                      category="utilization" displayType="summary" measurementType="dynamic"/>      
+        
+              <metric displayName="Total Activations Created" property="TotalActivationsCreated"
+                      description="The total number of activations created since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Activations Fired" property="TotalActivationsFired"
+                      description="The total number of activations fired since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Activations Cancelled" property="TotalActivationsCancelled"
+                      description="The total number of activations cancelled since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Firing Time" property="TotalFiringTime" units="ms"
+                      description="The total time spent firing rules since reset" 
+                      category="performance" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Process Instances Started" property="TotalProcessInstancesStarted"
+                      description="The total number of process instances started since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Process Instances Completed" property="TotalProcessInstancesCompleted"
+                      description="The total number of process instances completed since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+           </service>
+       </service>
    </service>
 
-   <service name="Drools Knowledge Bases"
-            description="The Drools Knowledge Base monitoring service."
-            discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
-            class="org.rhq.plugins.jmx.MBeanResourceComponent">
-
-      <runs-inside>
-         <parent-resource-type name="JMX Server" plugin="JMX"/>
-      </runs-inside>
-
-      <plugin-configuration>
-         <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:id=%kbaseId%"/>
-         <c:simple-property name="nameTemplate" default="KBase '{kbaseId}'"/>
-         <c:simple-property name="descriptionTemplate" default="A JMX bean for Knowledge Base '{kbaseId}'"/>
-         <c:simple-property name="kbaseId" type="string" description="The Knowledge Base Id"/>
-      </plugin-configuration>
-
-      <operation name="startInternalMBeans"
-                 displayName="Start Internal MBeans"
-                 description="Starts all the internal dependent MBeans.">
-      </operation>
-
-      <operation name="stopInternalMBeans"
-                 displayName="Stop Internal MBeans"
-                 description="Stops all the internal dependent MBeans.">
-      </operation>
-
-   </service>
 
 </plugin>
