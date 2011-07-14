@@ -52,12 +52,47 @@
         
               <plugin-configuration>
                  <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%,group=Sessions,sessionId=%sessionId%"/>
-                 <c:simple-property name="nameTemplate" readOnly="true" default="KBase {kbaseId}, KSession {sessionId}"/>
+                 <c:simple-property name="nameTemplate" readOnly="true" default="KSession {sessionId}"/>
                  <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Knowledge Base {kbaseId}, Knowledge session {sessionId}"/>
                  <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Knowledge Base Id"/>
                  <c:simple-property name="sessionId" type="string" readOnly="true" description="The Knowledge Session Id"/>
               </plugin-configuration>
         
+              <operation name="reset" displayName="Reset Metrics" description="Reset all metric counters."/>
+          
+              <operation name="getStatsForRule"
+                         displayName="Get statistics for rule"
+                         description="Get and return the statistics for a specific rule.">
+                  <parameters>
+                      <c:simple-property name="ruleName" displayName="Rule Name" required="true"/>
+                  </parameters>    
+                  <results>
+                      <c:simple-property name="stats"/>
+                  </results>
+              </operation>
+          
+              <operation name="getStatsForProcess"
+                         displayName="Get statistics for process"
+                         description="Get and return the statistics for a specific process.">
+                  <parameters>
+                      <c:simple-property name="processId" displayName="Process ID" required="true"/>
+                  </parameters>    
+                  <results>
+                      <c:simple-property name="stats"/>
+                  </results>
+              </operation>
+          
+              <operation name="getStatsForProcessInstance"
+                         displayName="Get statistics for process instance"
+                         description="Get and return the statistics for a specific process instance.">
+                  <parameters>
+                      <c:simple-property name="processInstanceId" displayName="Process Instance ID" required="true"/>
+                  </parameters>    
+                  <results>
+                      <c:simple-property name="stats"/>
+                  </results>
+              </operation>
+
               <metric displayName="Total Fact Count" property="TotalFactCount"
                       description="The total number of facts in memory"
                       category="utilization" displayType="summary" measurementType="dynamic"/>      
@@ -74,7 +109,7 @@
                       description="The total number of activations cancelled since reset"
                       category="throughput" displayType="summary" measurementType="trendsup"/>      
         
-              <metric displayName="Total Firing Time" property="TotalFiringTime" units="ms"
+              <metric displayName="Total Firing Time" property="TotalFiringTime" units="milliseconds"
                       description="The total time spent firing rules since reset" 
                       category="performance" displayType="summary" measurementType="trendsup"/>      
         
@@ -84,7 +119,15 @@
         
               <metric displayName="Total Process Instances Completed" property="TotalProcessInstancesCompleted"
                       description="The total number of process instances completed since reset"
-                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+                      category="throughput" displayType="summary" measurementType="trendsup"/>     
+                      
+              <metric property="LastReset"
+                      description="The timestamp of the last reset operation"
+                      displayName="Last Reset"
+                      dataType="trait"
+                      displayType="summary" />                       
+
+          
            </service>
        </service>
    </service>
