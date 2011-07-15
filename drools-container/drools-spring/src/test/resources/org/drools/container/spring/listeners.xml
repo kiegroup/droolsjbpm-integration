@@ -46,6 +46,8 @@
     <drools:workingMemoryEventListener/>
   </drools:ksession>
 
+  <drools:ksession id="statefulWithGroupedListeners" type="stateful" kbase="kbase1" node="node1" listeners="debugListeners"/>
+
   <drools:ksession id="statelessSession" type="stateless" name="stateless1" kbase="kbase1" node="node1">
     <drools:agendaEventListener ref="mock-agenda-listener"/>
     <drools:processEventListener ref="mock-process-listener"/>
@@ -72,5 +74,13 @@
   <drools:ksession id="statelessWithDefault" type="stateless" kbase="kbase1" node="node1">
     <drools:workingMemoryEventListener/>
   </drools:ksession>
+
+  <drools:ksession id="statelessWithGroupedListeners" type="stateless" kbase="kbase1" node="node1" listeners="debugListeners"/>
+
+  <drools:eventListeners id="debugListeners">
+    <drools:agendaEventListener ref="mock-agenda-listener"/>
+    <drools:processEventListener ref="mock-process-listener"/>
+    <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+  </drools:eventListeners>
   
 </beans>

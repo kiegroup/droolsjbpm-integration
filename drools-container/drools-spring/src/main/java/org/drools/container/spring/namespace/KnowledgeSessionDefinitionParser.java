@@ -63,6 +63,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     private static final String NAME_ATTRIBUTE = "name";
     private static final String GRID_NODE_ATTRIBUTE = "node";
     private static final String TYPE_ATTRIBUTE = "type";
+    private static final String LISTENERS_ATTRIBUTE = "listeners";
 
     private static final String KEEP_REFERENCE = "keep-reference";
     private static final String CLOCK_TYPE = "clock-type";
@@ -107,7 +108,11 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         }
 
         // Additions for JIRA JBRULES-3076
-        parseEventListeners(parserContext, factory, element);
+        String listeners = element.getAttribute(LISTENERS_ATTRIBUTE);
+        if ( StringUtils.hasText(listeners)){
+            factory.addPropertyValue("eventListenersFromGroup", new RuntimeBeanReference(listeners));
+        }
+        EventListenersUtil.parseEventListeners(parserContext, factory, element);
         // End of Additions for JIRA JBRULES-3076
 
         Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
@@ -334,79 +339,6 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         return factory.getBeanDefinition();
     }
 
-     // Additions for JIRA JBRULES-3076
-    private void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, Element element) {
-        ManagedMap completeListenersList = new ManagedMap();
-        
-        String listenerType = "agenda-event-listener";
-        List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, "agendaEventListener");
-        ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
-        completeListenersList.putAll(listeners);
-
-        listenerType = "process-event-listener";
-        eventListeners = DomUtils.getChildElementsByTagName(element, "processEventListener");
-        listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
-        completeListenersList.putAll(listeners);
-
-        listenerType = "working-memory-event-listener";
-        eventListeners = DomUtils.getChildElementsByTagName(element, "workingMemoryEventListener");
-        listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
-        completeListenersList.putAll(listeners);
-
-        factory.addPropertyValue("eventListeners", completeListenersList);
-    }
-    
-    private ManagedMap parseEventListenersByType(ParserContext parserContext, List<Element> eventListeners, String listenerType) {
-        ManagedMap listeners = new ManagedMap();
-        for (Element listener : eventListeners) {
-            String beanName = listener.getAttribute("ref");
-            // if this a bean ref
-            if ( StringUtils.hasText(beanName)) {
-                if ("agenda-event-listener".equalsIgnoreCase(listenerType) || "process-event-listener".equalsIgnoreCase(listenerType) || "working-memory-event-listener".equalsIgnoreCase(listenerType)) {
-                    ManagedList subList = (ManagedList) listeners.get(listenerType);
-                    if ( subList == null ) {
-                        subList = new ManagedList();
-                        listeners.put(listenerType, subList);
-                    }
-                    subList.add(new RuntimeBeanReference(beanName));
-                } else {
-                    throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
-                }
-            } else {
-                //not a ref check if it is a nested bean
-                Element nestedBean = DomUtils.getChildElementByTagName(listener, "bean");
-                if ( nestedBean == null ) {
-                    //no 'ref' and no nested beans, add the default debug listeners part of the core libs.
-                    Object obj = null;
-                    if ("agenda-event-listener".equalsIgnoreCase(listenerType)){
-                        obj = new DebugAgendaEventListener();
-                    } else if ("process-event-listener".equalsIgnoreCase(listenerType)) {
-                        obj = new DebugProcessEventListener();
-                    } else if ("working-memory-event-listener".equalsIgnoreCase(listenerType)){
-                        obj = new DebugWorkingMemoryEventListener();
-                    }
-                    ManagedList subList = (ManagedList) listeners.get(listenerType);
-                    if ( subList == null ) {
-                        subList = new ManagedList();
-                        listeners.put(listenerType, subList);
-                    }
-                    subList.add(obj);
-                } else {
-                    //String type = StringUtils.hasText(listenerType) ? listenerType: "infer";
-                    Object obj = parserContext.getDelegate().parsePropertySubElement(nestedBean,null,null);
-                    ManagedList subList = (ManagedList) listeners.get(listenerType);
-                    if ( subList == null ) {
-                        subList = new ManagedList();
-                        listeners.put(listenerType, subList);
-                    }
-                    subList.add(obj);
-                }
-            }
-        }
-        return listeners;
-    }
-    // End of Additions for JIRA JBRULES-3076
-    
     private Element getFirstElement(NodeList list) {
         for (int j = 0, lengthj = list.getLength(); j < lengthj; j++) {
             if (list.item(j) instanceof Element) {

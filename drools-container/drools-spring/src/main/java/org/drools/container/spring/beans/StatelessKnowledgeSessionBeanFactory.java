@@ -16,6 +16,7 @@
 
 package org.drools.container.spring.beans;
 
+import java.util.EventListener;
 import java.util.Map;
 
 import org.drools.SessionConfiguration;

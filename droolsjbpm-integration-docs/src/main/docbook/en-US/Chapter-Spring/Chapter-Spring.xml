@@ -381,6 +381,16 @@
 
                   <entry>no</entry>
                 </row>
+
+                <row>
+                  <entry>listeners</entry>
+
+                  <entry>Specifies the reference to the event listeners group
+                  (see <link linkend="grouping-listeners">'Defining a Group of
+                  listeners'</link> section below).</entry>
+
+                  <entry>no</entry>
+                </row>
               </tbody>
             </tgroup>
           </table>
@@ -616,58 +626,183 @@
     </section>
 
     <section>
-      <title>Define Listeners</title>
+      <title>Event Listeners</title>
 
-      <para>Drools supports adding 3 types of listeners to KnowledgeSessions.
-      The Drools-Spring module now supports all 3 of them (AgendaListener,
-      WorkingMemoryListener, ProcessEventListener).</para>
+      <para>Drools supports adding 3 types of listeners to KnowledgeSessions -
+      <emphasis>AgendaListener</emphasis>,
+      <emphasis>WorkingMemoryListener</emphasis>,
+      <emphasis>ProcessEventListener</emphasis></para>
+
+      <para>The drools-spring module allows you to configure these listeners
+      to KnowledgeSessions using XML tags. These tags have identical names as
+      the actual listener interfaces i.e.,
+      &lt;drools:agendaEventListener....&gt;,
+      &lt;drools:workingMemoryEventListener....&gt; and
+      &lt;drools:processEventListener....&gt;.</para>
+
+      <para>drools-spring provides features to define the listeners as
+      standalone (individual) listeners and also to define them as a
+      group.</para>
 
       <section>
-        <title>&lt;drools:eventListener&gt;'s parameters as
-        attributes:</title>
+        <title>Defining Stand alone Listeners:</title>
 
-        <table>
-          <tgroup align="left" cols="3" colsep="1" rowsep="1">
-            <thead>
-              <row>
-                <entry align="center">Attribute</entry>
+        <section>
+          <title>Attributes:</title>
 
-                <entry align="center">Required</entry>
+          <table>
+            <tgroup align="left" cols="3" colsep="1" rowsep="1">
+              <thead>
+                <row>
+                  <entry align="center">Attribute</entry>
 
-                <entry align="center">Description</entry>
-              </row>
-            </thead>
+                  <entry align="center">Required</entry>
 
-            <tbody>
-              <row>
-                <entry>ref</entry>
+                  <entry align="center">Description</entry>
+                </row>
+              </thead>
 
-                <entry>No</entry>
+              <tbody>
+                <row>
+                  <entry>ref</entry>
 
-                <entry>A reference to another declared bean. <para /><para>If
-                a <emphasis>ref</emphasis> is not provided, it is expected
-                that a nested bean is declared inside this
-                <emphasis>eventListener</emphasis> tag.</para></entry>
-              </row>
+                  <entry>No</entry>
 
-              <row>
-                <entry>type</entry>
+                  <entry>A reference to another declared bean.
+                  <para /></entry>
+                </row>
 
-                <entry>No</entry>
+                <row />
+              </tbody>
+            </tgroup>
+          </table>
 
-                <entry><emphasis>agenda-event-listener</emphasis> or
-                <emphasis>process-event-listener</emphasis> or
-                <emphasis>working-memory-event-listener</emphasis></entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table>
+          <example>
+            <title>Listener configuration example - using a bean:ref.</title>
 
-        <example>
-          <title>AgendaListener configuration example - using a
-          bean:ref.</title>
+            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
 
-          <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+  &lt;drools:kbase id="kbase1"&gt;
+    &lt;drools:resources&gt;
+      &lt;drools:resource ref="resource1"/&gt;
+    &lt;/drools:resources&gt;
+  &lt;/drools:kbase&gt;
+
+  &lt;bean id="mock-agenda-listener" class="org.drools.container.spring.MockAgendaEventListener" /&gt;
+  &lt;bean id="mock-wm-listener" class="org.drools.container.spring.MockWorkingMemoryEventListener" /&gt;
+  &lt;bean id="mock-process-listener" class="org.drools.container.spring.MockProcessEventListener" /&gt;
+
+  &lt;drools:ksession id="statefulSession" type="stateful" kbase="kbase1" node="node1"&gt;
+    &lt;drools:agendaEventListener ref="mock-agenda-listener"/&gt;
+    &lt;drools:processEventListener ref="mock-process-listener"/&gt;
+    &lt;drools:workingMemoryEventListener ref="mock-wm-listener"/&gt;
+  &lt;/drools:ksession&gt;
+
+</programlisting>
+          </example>
+        </section>
+
+        <section>
+          <title>Nested Elements:</title>
+
+          <itemizedlist>
+            <listitem>
+              <para>bean</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>class = String</para>
+                </listitem>
+
+                <listitem>
+                  <para>name = String (optional)</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </itemizedlist>
+
+          <example>
+            <title>Listener configuration example - using nested bean.</title>
+
+            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+
+  &lt;drools:kbase id="kbase1"&gt;
+    &lt;drools:resources&gt;
+      &lt;drools:resource ref="resource1"/&gt;
+    &lt;/drools:resources&gt;
+  &lt;/drools:kbase&gt;
+
+  &lt;drools:ksession id="statefulWithNestedBean" type="stateful" kbase="kbase1" node="node1"&gt;
+
+    &lt;drools:agendaEventListener&gt;
+      &lt;bean class="org.drools.container.spring.MockAgendaEventListener"/&gt;
+    &lt;/drools:agendaEventListener&gt;
+
+    &lt;drools:workingMemoryEventListener&gt;
+      &lt;bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/&gt;
+    &lt;/drools:workingMemoryEventListener&gt;
+
+    &lt;drools:processEventListener&gt;
+      &lt;bean class="org.drools.container.spring.MockProcessEventListener"/&gt;
+    &lt;/drools:processEventListener&gt;
+
+  &lt;/drools:ksession&gt;
+
+
+</programlisting>
+          </example>
+        </section>
+
+        <section>
+          <title>Empty Tag : Declaration with no 'ref' and without a nested
+          bean</title>
+
+          <para>When a listener is defined without a reference to a
+          implementing bean and does not contain a nested bean,
+          <emphasis>&lt;drools:workingMemoryEventListener/&gt;</emphasis> the
+          underlying implementation adds the Debug version of the listener
+          defined in the API.</para>
+
+          <para>The debug listeners print the corresponding Event toString
+          message to <emphasis>System.err. </emphasis></para>
+
+          <example>
+            <title>Listener configuration example - defaulting to the debug
+            versions provided by the Knowledge-API .</title>
+
+            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+
+  &lt;drools:kbase id="kbase1"&gt;
+    &lt;drools:resources&gt;
+      &lt;drools:resource ref="resource1"/&gt;
+    &lt;/drools:resources&gt;
+  &lt;/drools:kbase&gt;
+
+  &lt;drools:ksession id="statefulWithDefault" type="stateful" kbase="kbase1" node="node1"&gt;
+
+    &lt;drools:agendaEventListener/&gt; &lt;!-- attaches the org.drools.event.rule.DebugAgendaEventListener --&gt;
+    &lt;drools:workingMemoryEventListener/&gt; &lt;!-- attaches the org.drools.event.rule.DebugWorkingMemoryEventListener --&gt;
+    &lt;drools:processEventListener/&gt; &lt;!-- attaches the org.drools.event.DebugProcessEventListener --&gt;
+
+  &lt;/drools:ksession&gt;
+
+
+</programlisting>
+          </example>
+        </section>
+
+        <section>
+          <title>Mix and Match of different declaration styles</title>
+
+          <para>The drools-spring module allows you to mix and match the
+          different declarative styles within the same KnowledgeSession. The
+          below sample provides more clarity.</para>
+
+          <example>
+            <title>Listener configuration example - mix and match of
+            'ref'/nested-bean/empty styles.</title>
+
+            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
 
   &lt;drools:kbase id="kbase1"&gt;
     &lt;drools:resources&gt;
@@ -677,36 +812,117 @@
 
   &lt;bean id="mock-agenda-listener" class="org.drools.container.spring.MockAgendaEventListener" /&gt;
 
-  &lt;drools:ksession id="statelessSession" type="stateless" name="stateless1" kbase="kbase1"&gt;
-    &lt;drools:eventListener ref="mock-agenda-listener" type="agenda-event-listener"/&gt;
+  &lt;drools:ksession id="statefulWithMixAndMatchOfStyles" type="stateful" kbase="kbase1" node="node1"&gt;
+
+     &lt;drools:workingMemoryEventListener&gt;
+      &lt;bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/&gt;
+    &lt;/drools:workingMemoryEventListener&gt;
+
+    &lt;drools:agendaEventListener ref="mock-agenda-listener"/&gt;
+
+    &lt;drools:processEventListener/&gt; &lt;!-- attaches the org.drools.event.DebugProcessEventListener --&gt;
+
   &lt;/drools:ksession&gt;
+
+
 </programlisting>
-        </example>
+          </example>
+        </section>
+
+        <section>
+          <title>Defining multiple listeners of the same type</title>
+
+          <para>It is also valid to define multiple beans of the same event
+          listener types for a KnowledgeSession.</para>
+
+          <example>
+            <title>Listener configuration example - multiple listeners of the
+            same type.</title>
+
+            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+
+  &lt;drools:kbase id="kbase1"&gt;
+    &lt;drools:resources&gt;
+      &lt;drools:resource ref="resource1"/&gt;
+    &lt;/drools:resources&gt;
+  &lt;/drools:kbase&gt;
+
+  &lt;bean id="mock-wm-listener" class="org.drools.container.spring.MockWorkingMemoryEventListener" /&gt;
+
+  &lt;drools:ksession id="statefulWithMultipleSameType" type="stateful" kbase="kbase1" node="node1"&gt;
+
+    &lt;!-- 2 different implementations of the same listener attached to one ksession --&gt;
+    &lt;drools:workingMemoryEventListener&gt;
+      &lt;bean class="org.drools.container.spring.ConsoleWorkingMemoryEventListener"/&gt;
+    &lt;/drools:workingMemoryEventListener&gt;
+
+    &lt;drools:workingMemoryEventListener ref="mock-wm-listener"/&gt;
+
+  &lt;/drools:ksession&gt;
+
+
+</programlisting>
+          </example>
+        </section>
       </section>
 
-      <section>
-        <title>&lt;drools:eventListener&gt;'s parameters as nested
-        elements:</title>
+      <section id="grouping-listeners">
+        <title>Defining a Group of listeners:</title>
 
-        <itemizedlist>
-          <listitem>
-            <para>bean</para>
+        <para>drools-spring allows for grouping of listeners. This is
+        particularly useful when you define a set of listeners and want to
+        attach them to multiple sessions. The grouping feature is also very
+        useful, when we define a set of listeners for 'testing' and then want
+        to swtich them for 'production' use.</para>
 
-            <itemizedlist>
-              <listitem>
-                <para>class = String</para>
-              </listitem>
+       <section>
+          <title>Attributes:</title>
 
-              <listitem>
-                <para>name = String</para>
-              </listitem>
-            </itemizedlist>
-          </listitem>
-        </itemizedlist>
+          <table>
+            <tgroup align="left" cols="3" colsep="1" rowsep="1">
+              <thead>
+                <row>
+                  <entry align="center">Attribute</entry>
 
-        <example>
-          <title>AgendaListener configuration example - using nested
-          bean.</title>
+                  <entry align="center">Required</entry>
+
+                  <entry align="center">Description</entry>
+                </row>
+              </thead>
+
+              <tbody>
+                <row>
+                  <entry>ID</entry>
+
+                  <entry>yes</entry>
+
+                  <entry>Unique identifier</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+	</section>
+        <section>
+          <title>Nested Elements:</title>
+
+          <itemizedlist>
+            <listitem>
+              <para>drools:agendaEventListener...</para>
+            </listitem>
+            <listitem>
+              <para>drools:workingMemoryEventListener...</para>
+            </listitem>
+            <listitem>
+              <para>drools:processEventListener...</para>
+            </listitem>
+          </itemizedlist>
+		  <para>  </para>
+		  <note>The above mentioned child elements can be declared in any order. Only one declaration of each type is allowed in a group.</note>
+		</section>
+        <section>
+          <title>Example:</title>
+	<example>
+          <title>Group of listeners - example</title>
 
           <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
 
@@ -716,55 +932,27 @@
     &lt;/drools:resources&gt;
   &lt;/drools:kbase&gt;
 
-  &lt;drools:ksession id="statelessSession" type="stateless" name="stateless1" kbase="kbase1"&gt;
+  &lt;bean id="mock-wm-listener" class="org.drools.container.spring.MockWorkingMemoryEventListener" /&gt;
 
-    &lt;drools:eventListener type="agenda-event-listener"&gt;
-      &lt;bean class="org.drools.container.spring.MockAgendaEventListener"/&gt;
-    &lt;/drools:eventListener&gt;
+  &lt;drools:ksession id="statelessWithGroupedListeners" type="stateless" kbase="kbase1" node="node1" listeners="<emphasis
+              role="bold">mockListeners</emphasis>"/&gt;
 
-  &lt;/drools:ksession&gt;
+  &lt;drools:eventListeners id="mockListeners"&gt;
+    &lt;drools:agendaEventListener ref="mock-agenda-listener"/&gt;
+    &lt;drools:processEventListener ref="mock-process-listener"/&gt;
+    &lt;drools:workingMemoryEventListener ref="mock-wm-listener"/&gt;
+  &lt;/drools:eventListeners&gt;
+
+  &lt;drools:eventListeners id="debugListeners"&gt;
+    &lt;drools:agendaEventListener/&gt;
+    &lt;drools:processEventListener/&gt;
+    &lt;drools:workingMemoryEventListener/&gt;
+  &lt;/drools:eventListeners&gt;
+
 
 </programlisting>
         </example>
-      </section>
-
-      <section>
-        <title>&lt;drools:eventListener&gt;'s - Points to Note</title>
-
-        <note>
-          <para>Important Things to note while using the
-          <emphasis>drools:eventListener</emphasis>.</para>
-
-          <itemizedlist>
-            <listitem>
-              <para>ref</para>
-
-              <itemizedlist>
-                <listitem>
-                  <para>Either the <emphasis>ref</emphasis> attribute or a
-                  nested <emphasis>bean</emphasis> is mandatory!</para>
-                </listitem>
-              </itemizedlist>
-            </listitem>
-
-            <listitem>
-              <para>type</para>
-
-              <itemizedlist>
-                <listitem>
-                  <para>If the <emphasis>type</emphasis> is not specified,
-                  then the bean is introspected at runtime and the exact
-                  interface(s) inferred. For example: if the bean implements
-                  <emphasis>org.drools.event.rule.AgendaEventListener</emphasis>
-                  and
-                  <emphasis>org.drools.event.process.MockProcessEventListener</emphasis>
-                  interfaces, this bean is added as an agenda listener and
-                  also as a process event listener.</para>
-                </listitem>
-              </itemizedlist>
-            </listitem>
-          </itemizedlist>
-        </note>
+		</section>
       </section>
     </section>
   </section>

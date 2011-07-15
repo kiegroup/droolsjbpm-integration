@@ -16,6 +16,8 @@
 
 package org.drools.container.spring;
 
+import org.drools.event.DebugProcessEventListener;
+import org.drools.event.rule.DebugAgendaEventListener;
 import org.drools.event.rule.DebugWorkingMemoryEventListener;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
@@ -24,6 +26,8 @@ import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -98,6 +102,11 @@ public class SpringDroolsListenersTest {
         assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
     }
 
+    @Test
+    public void testStatefulWithGroupedListeners() throws Exception {
+        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean( "statefulWithGroupedListeners" );
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
     //stateless
     @Test
     public void testStatelessWithNestedBean() throws Exception {
@@ -122,5 +131,18 @@ public class SpringDroolsListenersTest {
         StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "statelessWithDefault" );
         assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
         assertTrue(statelessKnowledgeSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
+    }
+
+    @Test
+    public void testStatelessWithGroupedListeners() throws Exception {
+        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "statelessWithGroupedListeners" );
+        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+    }
+
+    @Test
+    public void testEventListenersBean() throws Exception {
+        Object debugListeners = context.getBean("debugListeners");
+        assertTrue(debugListeners instanceof List);
+        assertEquals(3, ((List) debugListeners).size());
     }
 }

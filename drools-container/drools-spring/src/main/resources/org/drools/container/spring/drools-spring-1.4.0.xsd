@@ -209,12 +209,22 @@
           <xsd:element ref="spring:bean"/>
       </xsd:choice>
       <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-      <!--<xsd:attribute name="type" use="optional" type="eventListenerTypeEnum"/>-->
   </xsd:complexType>
 
   <xsd:element name="agendaEventListener" type="eventListener"/>
   <xsd:element name="workingMemoryEventListener" type="eventListener"/>
   <xsd:element name="processEventListener" type="eventListener"/>
+
+  <xsd:element name="eventListeners">
+    <xsd:complexType>
+      <xsd:all maxOccurs="1" minOccurs="0">
+        <xsd:element ref="agendaEventListener"/>
+        <xsd:element ref="workingMemoryEventListener"/>
+        <xsd:element ref="processEventListener"/>
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
   <!-- end of additions for JIRA JBRULES-3076 -->
 
   <xsd:element name="ksession">
@@ -280,6 +290,9 @@
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
       <xsd:attribute name="node" use="optional" type="xsd:string"/>
       <xsd:attribute name="name" use="optional" type="xsd:string"/>
+      <!-- additions for JIRA JBRULES-3076 -->
+      <xsd:attribute name="listeners" use="optional" type="xsd:string"/>
+      <!-- end of additions for JIRA JBRULES-3076 -->
     </xsd:complexType>
   </xsd:element>
 

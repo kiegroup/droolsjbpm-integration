@@ -111,6 +111,7 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
         for (WorkingMemoryEventListener workingMemoryEventListener :getWorkingMemoryEventListeners()) {
             ksession.addEventListener(workingMemoryEventListener);
         }
+
         // End of Additions for JIRA JBRULES-3076
     }
 

@@ -36,25 +36,26 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 public abstract class AbstractKnowledgeSessionBeanFactory
-    implements
-    FactoryBean,
-    InitializingBean,
-    BeanNameAware,
-    NamedBean {
+        implements
+        FactoryBean,
+        InitializingBean,
+        BeanNameAware,
+        NamedBean {
 
-    private GridNode                      node;
-    private Map<String, WorkItemHandler>  workItems;
+    private GridNode node;
+    private Map<String, WorkItemHandler> workItems;
     private KnowledgeSessionConfiguration conf;
-    private KnowledgeBase                 kbase;
-    private String                        beanName;
-    private String                        name;
+    private KnowledgeBase kbase;
+    private String beanName;
+    private String name;
 
-    private List<Command< ? >>            batch;
+    private List<Command<?>> batch;
 
     // Additions for JIRA JBRULES-3076
-    private List<AgendaEventListener>            agendaEventListeners;
-    private List<ProcessEventListener>           processEventListeners;
-    private List<WorkingMemoryEventListener>     workingMemoryEventListeners;
+    protected List<AgendaEventListener> agendaEventListeners;
+    protected List<ProcessEventListener> processEventListeners;
+    protected List<WorkingMemoryEventListener> workingMemoryEventListeners;
+    protected List<Object> groupedListeners = new ArrayList<Object>();
     // End of additions for JIRA JBRULES-3076
 
     public AbstractKnowledgeSessionBeanFactory() {
@@ -106,19 +107,19 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         return true;
     }
 
-    public List<Command< ? >> getBatch() {
+    public List<Command<?>> getBatch() {
         return batch;
     }
 
-    public void setBatch(List<Command< ? >> commands) {
+    public void setBatch(List<Command<?>> commands) {
         this.batch = commands;
     }
 
     public final void afterPropertiesSet() throws Exception {
-        if ( kbase == null ) {
-            throw new IllegalArgumentException( "kbase property is mandatory" );
+        if (kbase == null) {
+            throw new IllegalArgumentException("kbase property is mandatory");
         }
-        if ( name == null ) {
+        if (name == null) {
             name = beanName;
         }
         internalAfterPropertiesSet();
@@ -146,35 +147,40 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     }
 
     // Additions for JIRA JBRULES-3076
-    public void setEventListeners(Map<String, List> eventListenerMap){
-        for ( String key : eventListenerMap.keySet() ) {
+    public void setEventListenersFromGroup(List<Object> eventListenerList) {
+        //System.out.println(eventListenerList.getClass());
+        for (Object eventListener : eventListenerList) {
+            if (eventListener instanceof AgendaEventListener) {
+                agendaEventListeners.add((AgendaEventListener) eventListener);
+            }
+            if (eventListener instanceof WorkingMemoryEventListener) {
+                workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+            }
+            if (eventListener instanceof ProcessEventListener) {
+                processEventListeners.add((ProcessEventListener) eventListener);
+            }
+        }
+        groupedListeners.addAll(eventListenerList);
+       // System.out.println("adding listener-group elements " + groupedListeners.size());
+    }
+
+    public void setEventListeners(Map<String, List> eventListenerMap) {
+        for (String key : eventListenerMap.keySet()) {
             List<Object> eventListenerList = eventListenerMap.get(key);
-            if ( "infer".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
-                    if (eventListener instanceof AgendaEventListener) {
-                        agendaEventListeners.add((AgendaEventListener) eventListener);
-                    }
-                    if (eventListener instanceof WorkingMemoryEventListener) {
-                        workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
-                    }
-                    if (eventListener instanceof ProcessEventListener) {
-                        processEventListeners.add((ProcessEventListener) eventListener);
-                    }
-                }
-            } else if ("agenda-event-listener".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
+            if ("agenda-event-listener".equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof AgendaEventListener) {
                         agendaEventListeners.add((AgendaEventListener) eventListener);
                     }
                 }
             } else if ("working-memory-event-listener".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
+                for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof WorkingMemoryEventListener) {
                         workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
                     }
                 }
             } else if ("process-event-listener".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
+                for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof ProcessEventListener) {
                         processEventListeners.add((ProcessEventListener) eventListener);
                     }
@@ -182,7 +188,7 @@ public abstract class AbstractKnowledgeSessionBeanFactory
             }
         }
     }
-    
+
     public List<AgendaEventListener> getAgendaEventListeners() {
         return agendaEventListeners;
     }
