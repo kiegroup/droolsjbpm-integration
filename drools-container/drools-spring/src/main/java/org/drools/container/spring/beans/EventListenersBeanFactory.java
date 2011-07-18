@@ -17,6 +17,7 @@
 
 package org.drools.container.spring.beans;
 
+import org.drools.container.spring.namespace.EventListenersUtil;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
@@ -46,27 +47,27 @@ public class EventListenersBeanFactory implements
     }
 
     public void afterPropertiesSet() throws Exception {
-        
+
     }
 
-    public void setEventListeners(Map<String, List> eventListenerMap){
+    public void setEventListeners(Map<String, List> eventListenerMap) {
         eventListeners = new ArrayList<Object>();
-        for ( String key : eventListenerMap.keySet() ) {
+        for (String key : eventListenerMap.keySet()) {
             List<Object> eventListenerList = eventListenerMap.get(key);
-            if ("agenda-event-listener".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
+            if (EventListenersUtil.TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof AgendaEventListener) {
                         eventListeners.add((AgendaEventListener) eventListener);
                     }
                 }
-            } else if ("working-memory-event-listener".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
+            } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof WorkingMemoryEventListener) {
                         eventListeners.add((WorkingMemoryEventListener) eventListener);
                     }
                 }
-            } else if ("process-event-listener".equalsIgnoreCase(key)) {
-                for ( Object eventListener : eventListenerList) {
+            } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof ProcessEventListener) {
                         eventListeners.add((ProcessEventListener) eventListener);
                     }

@@ -21,9 +21,11 @@ import org.drools.event.rule.ObjectRetractedEvent;
 import org.drools.event.rule.ObjectUpdatedEvent;
 import org.drools.event.rule.WorkingMemoryEventListener;
 
-public class MockWorkingMemoryEventListener implements WorkingMemoryEventListener{
+public class MockWorkingMemoryEventListener implements WorkingMemoryEventListener {
     public void objectInserted(ObjectInsertedEvent objectInsertedEvent) {
         System.out.println("MockWorkingMemoryEventListener :: objectInserted");
+        //System.out.println(objectInsertedEvent.getObject());
+        SpringDroolsListenersTest.incrementValueFromListener();
     }
 
     public void objectUpdated(ObjectUpdatedEvent objectUpdatedEvent) {

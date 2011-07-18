@@ -20,6 +20,7 @@ import java.util.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
+import org.drools.container.spring.namespace.EventListenersUtil;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
@@ -31,9 +32,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NamedBean;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 public abstract class AbstractKnowledgeSessionBeanFactory
         implements
@@ -148,7 +146,6 @@ public abstract class AbstractKnowledgeSessionBeanFactory
 
     // Additions for JIRA JBRULES-3076
     public void setEventListenersFromGroup(List<Object> eventListenerList) {
-        //System.out.println(eventListenerList.getClass());
         for (Object eventListener : eventListenerList) {
             if (eventListener instanceof AgendaEventListener) {
                 agendaEventListeners.add((AgendaEventListener) eventListener);
@@ -161,25 +158,25 @@ public abstract class AbstractKnowledgeSessionBeanFactory
             }
         }
         groupedListeners.addAll(eventListenerList);
-       // System.out.println("adding listener-group elements " + groupedListeners.size());
+        // System.out.println("adding listener-group elements " + groupedListeners.size());
     }
 
     public void setEventListeners(Map<String, List> eventListenerMap) {
         for (String key : eventListenerMap.keySet()) {
             List<Object> eventListenerList = eventListenerMap.get(key);
-            if ("agenda-event-listener".equalsIgnoreCase(key)) {
+            if (EventListenersUtil.TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof AgendaEventListener) {
                         agendaEventListeners.add((AgendaEventListener) eventListener);
                     }
                 }
-            } else if ("working-memory-event-listener".equalsIgnoreCase(key)) {
+            } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof WorkingMemoryEventListener) {
                         workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
                     }
                 }
-            } else if ("process-event-listener".equalsIgnoreCase(key)) {
+            } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof ProcessEventListener) {
                         processEventListeners.add((ProcessEventListener) eventListener);

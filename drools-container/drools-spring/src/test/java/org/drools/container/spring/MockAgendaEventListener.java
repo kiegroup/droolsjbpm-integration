@@ -18,7 +18,7 @@ package org.drools.container.spring;
 
 import org.drools.event.rule.*;
 
-public class MockAgendaEventListener implements AgendaEventListener{
+public class MockAgendaEventListener implements AgendaEventListener {
 
     public void activationCreated(ActivationCreatedEvent activationCreatedEvent) {
         System.out.println("MockAgendaEventListener:: activationCreated");
@@ -30,6 +30,7 @@ public class MockAgendaEventListener implements AgendaEventListener{
 
     public void beforeActivationFired(BeforeActivationFiredEvent beforeActivationFiredEvent) {
         System.out.println("MockAgendaEventListener:: beforeActivationFired");
+        SpringDroolsListenersTest.incrementValueFromListener();
     }
 
     public void afterActivationFired(AfterActivationFiredEvent afterActivationFiredEvent) {

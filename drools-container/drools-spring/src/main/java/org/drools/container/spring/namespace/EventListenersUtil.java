@@ -31,30 +31,38 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
-abstract class EventListenersUtil {
-    
+public abstract class EventListenersUtil {
+
+    public static final String TYPE_AGENDA_EVENT_LISTENER = "agenda-event-listener";
+    public static final String TYPE_PROCESS_EVENT_LISTENER = "process-event-listener";
+    public static final String TYPE_WORKING_MEMORY_EVENT_LISTENER = "working-memory-event-listener";
+
+    public static final String ELEMENT_AGENDA_EVENT_LISTENER = "agendaEventListener";
+    public static final String ELEMENT_PROCESS_EVENT_LISTENER = "processEventListener";
+    public static final String ELEMENT_WORKING_MEMORY_EVENT_LISTENER = "workingMemoryEventListener";
+
     // Additions for JIRA JBRULES-3076
     public static void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, Element element) {
         ManagedMap completeListenersList = new ManagedMap();
         ManagedMap listeners = null;
 
-        String listenerType = "agenda-event-listener";
-        List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, "agendaEventListener");
-        if ( eventListeners != null ) {
+        String listenerType = TYPE_AGENDA_EVENT_LISTENER;
+        List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_AGENDA_EVENT_LISTENER);
+        if (eventListeners != null) {
             listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
             completeListenersList.putAll(listeners);
         }
 
-        listenerType = "process-event-listener";
-        eventListeners = DomUtils.getChildElementsByTagName(element, "processEventListener");
-        if ( eventListeners != null ) {
+        listenerType = TYPE_PROCESS_EVENT_LISTENER;
+        eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_PROCESS_EVENT_LISTENER);
+        if (eventListeners != null) {
             listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
             completeListenersList.putAll(listeners);
         }
 
-        listenerType = "working-memory-event-listener";
-        eventListeners = DomUtils.getChildElementsByTagName(element, "workingMemoryEventListener");
-        if ( eventListeners != null ) {
+        listenerType = TYPE_WORKING_MEMORY_EVENT_LISTENER;
+        eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_WORKING_MEMORY_EVENT_LISTENER);
+        if (eventListeners != null) {
             listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
             completeListenersList.putAll(listeners);
         }
@@ -67,10 +75,10 @@ abstract class EventListenersUtil {
         for (Element listener : eventListeners) {
             String beanName = listener.getAttribute("ref");
             // if this a bean ref
-            if ( StringUtils.hasText(beanName)) {
-                if ("agenda-event-listener".equalsIgnoreCase(listenerType) || "process-event-listener".equalsIgnoreCase(listenerType) || "working-memory-event-listener".equalsIgnoreCase(listenerType)) {
+            if (StringUtils.hasText(beanName)) {
+                if (TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(listenerType) || TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(listenerType) || TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                     ManagedList subList = (ManagedList) listeners.get(listenerType);
-                    if ( subList == null ) {
+                    if (subList == null) {
                         subList = new ManagedList();
                         listeners.put(listenerType, subList);
                     }
@@ -81,27 +89,27 @@ abstract class EventListenersUtil {
             } else {
                 //not a ref check if it is a nested bean
                 Element nestedBean = DomUtils.getChildElementByTagName(listener, "bean");
-                if ( nestedBean == null ) {
+                if (nestedBean == null) {
                     //no 'ref' and no nested beans, add the default debug listeners part of the core libs.
                     Object obj = null;
-                    if ("agenda-event-listener".equalsIgnoreCase(listenerType)){
+                    if (TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                         obj = new DebugAgendaEventListener();
-                    } else if ("process-event-listener".equalsIgnoreCase(listenerType)) {
+                    } else if (TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                         obj = new DebugProcessEventListener();
-                    } else if ("working-memory-event-listener".equalsIgnoreCase(listenerType)){
+                    } else if (TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                         obj = new DebugWorkingMemoryEventListener();
                     }
                     ManagedList subList = (ManagedList) listeners.get(listenerType);
-                    if ( subList == null ) {
+                    if (subList == null) {
                         subList = new ManagedList();
                         listeners.put(listenerType, subList);
                     }
                     subList.add(obj);
                 } else {
                     //String type = StringUtils.hasText(listenerType) ? listenerType: "infer";
-                    Object obj = parserContext.getDelegate().parsePropertySubElement(nestedBean,null,null);
+                    Object obj = parserContext.getDelegate().parsePropertySubElement(nestedBean, null, null);
                     ManagedList subList = (ManagedList) listeners.get(listenerType);
-                    if ( subList == null ) {
+                    if (subList == null) {
                         subList = new ManagedList();
                         listeners.put(listenerType, subList);
                     }
