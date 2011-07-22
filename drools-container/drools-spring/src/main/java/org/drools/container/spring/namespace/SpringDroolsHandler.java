@@ -48,6 +48,9 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
 
         registerBeanDefinitionParser( "grid-node",
                                       new GridNodeDefinitionParser() );
+
+        registerBeanDefinitionParser( "eventListeners",
+                                      new EventListenersDefinitionParser() );
     }
 
 }

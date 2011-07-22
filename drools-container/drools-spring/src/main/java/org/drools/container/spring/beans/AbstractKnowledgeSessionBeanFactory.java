@@ -16,11 +16,14 @@
 
 package org.drools.container.spring.beans;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
+import org.drools.container.spring.namespace.EventListenersUtil;
+import org.drools.event.process.ProcessEventListener;
+import org.drools.event.rule.AgendaEventListener;
+import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.grid.GridNode;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -31,23 +34,35 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NamedBean;
 
 public abstract class AbstractKnowledgeSessionBeanFactory
-    implements
-    FactoryBean,
-    InitializingBean,
-    BeanNameAware,
-    NamedBean {
+        implements
+        FactoryBean,
+        InitializingBean,
+        BeanNameAware,
+        NamedBean {
 
-    private GridNode                      node;
-    private Map<String, WorkItemHandler>  workItems;
+    private GridNode node;
+    private Map<String, WorkItemHandler> workItems;
     private KnowledgeSessionConfiguration conf;
-    private KnowledgeBase                 kbase;
-    private String                        beanName;
-    private String                        name;
+    private KnowledgeBase kbase;
+    private String beanName;
+    private String name;
 
-    private List<Command< ? >>            batch;
+    private List<Command<?>> batch;
+
+    // Additions for JIRA JBRULES-3076
+    protected List<AgendaEventListener> agendaEventListeners;
+    protected List<ProcessEventListener> processEventListeners;
+    protected List<WorkingMemoryEventListener> workingMemoryEventListeners;
+    protected List<Object> groupedListeners = new ArrayList<Object>();
+    // End of additions for JIRA JBRULES-3076
 
     public AbstractKnowledgeSessionBeanFactory() {
         super();
+        // Additions for JIRA JBRULES-3076
+        agendaEventListeners = new ArrayList<AgendaEventListener>();
+        processEventListeners = new ArrayList<ProcessEventListener>();
+        workingMemoryEventListeners = new ArrayList<WorkingMemoryEventListener>();
+        // End of additions for JIRA JBRULES-3076
     }
 
     public Object getObject() throws Exception {
@@ -90,19 +105,19 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         return true;
     }
 
-    public List<Command< ? >> getBatch() {
+    public List<Command<?>> getBatch() {
         return batch;
     }
 
-    public void setBatch(List<Command< ? >> commands) {
+    public void setBatch(List<Command<?>> commands) {
         this.batch = commands;
     }
 
     public final void afterPropertiesSet() throws Exception {
-        if ( kbase == null ) {
-            throw new IllegalArgumentException( "kbase property is mandatory" );
+        if (kbase == null) {
+            throw new IllegalArgumentException("kbase property is mandatory");
         }
-        if ( name == null ) {
+        if (name == null) {
             name = beanName;
         }
         internalAfterPropertiesSet();
@@ -129,4 +144,71 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         return beanName;
     }
 
+    // Additions for JIRA JBRULES-3076
+    public void setEventListenersFromGroup(List<Object> eventListenerList) {
+        for (Object eventListener : eventListenerList) {
+            if (eventListener instanceof AgendaEventListener) {
+                agendaEventListeners.add((AgendaEventListener) eventListener);
+            }
+            if (eventListener instanceof WorkingMemoryEventListener) {
+                workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+            }
+            if (eventListener instanceof ProcessEventListener) {
+                processEventListeners.add((ProcessEventListener) eventListener);
+            }
+        }
+        groupedListeners.addAll(eventListenerList);
+        // System.out.println("adding listener-group elements " + groupedListeners.size());
+    }
+
+    public void setEventListeners(Map<String, List> eventListenerMap) {
+        for (String key : eventListenerMap.keySet()) {
+            List<Object> eventListenerList = eventListenerMap.get(key);
+            if (EventListenersUtil.TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
+                    if (eventListener instanceof AgendaEventListener) {
+                        agendaEventListeners.add((AgendaEventListener) eventListener);
+                    }
+                }
+            } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
+                    if (eventListener instanceof WorkingMemoryEventListener) {
+                        workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+                    }
+                }
+            } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {
+                for (Object eventListener : eventListenerList) {
+                    if (eventListener instanceof ProcessEventListener) {
+                        processEventListeners.add((ProcessEventListener) eventListener);
+                    }
+                }
+            }
+        }
+    }
+
+    public List<AgendaEventListener> getAgendaEventListeners() {
+        return agendaEventListeners;
+    }
+
+    public void setAgendaEventListeners(List<AgendaEventListener> agendaEventListeners) {
+        this.agendaEventListeners = agendaEventListeners;
+    }
+
+    public List<ProcessEventListener> getProcessEventListeners() {
+        return processEventListeners;
+    }
+
+    public void setProcessEventListeners(List<ProcessEventListener> processEventListeners) {
+        this.processEventListeners = processEventListeners;
+    }
+
+    public List<WorkingMemoryEventListener> getWorkingMemoryEventListeners() {
+        return workingMemoryEventListeners;
+    }
+
+    public void setWorkingMemoryEventListeners(List<WorkingMemoryEventListener> workingMemoryEventListeners) {
+        this.workingMemoryEventListeners = workingMemoryEventListeners;
+    }
+
+    // End of Changes for JIRA JBRULES-3076
 }

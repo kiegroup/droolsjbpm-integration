@@ -23,6 +23,9 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.SessionConfiguration;
 import org.drools.command.Command;
+import org.drools.event.process.ProcessEventListener;
+import org.drools.event.rule.AgendaEventListener;
+import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.marshalling.ObjectMarshallingStrategy;
 import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
@@ -98,6 +101,18 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
             getNode().set( getName(),
                            this.ksession );
         }
+        // Additions for JIRA JBRULES-3076
+        for (AgendaEventListener agendaEventListener :getAgendaEventListeners()) {
+            ksession.addEventListener(agendaEventListener);
+        }
+        for (ProcessEventListener processEventListener :getProcessEventListeners()) {
+            ksession.addEventListener(processEventListener);
+        }
+        for (WorkingMemoryEventListener workingMemoryEventListener :getWorkingMemoryEventListeners()) {
+            ksession.addEventListener(workingMemoryEventListener);
+        }
+
+        // End of Additions for JIRA JBRULES-3076
     }
 
     public static class JpaConfiguration {

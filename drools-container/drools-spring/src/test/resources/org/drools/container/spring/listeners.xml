@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.4.0.xsd
+                           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <drools:grid id="grid1">
+        <drools:whitepages/>
+    </drools:grid>
+
+    <drools:grid-node id="node1" grid="grid1"/>
+
+    <drools:grid-node id="node2"/>
+
+    <drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+
+    <drools:kbase id="kbase1" node="node1">
+        <drools:resources>
+            <drools:resource ref="resource1"/>
+        </drools:resources>
+    </drools:kbase>
+
+    <bean id="mock-agenda-listener" class="org.drools.container.spring.MockAgendaEventListener"/>
+    <bean id="mock-wm-listener" class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+    <bean id="mock-process-listener" class="org.drools.container.spring.MockProcessEventListener"/>
+
+    <drools:ksession id="statefulSession" type="stateful" kbase="kbase1" node="node1">
+        <drools:agendaEventListener ref="mock-agenda-listener"/>
+        <drools:processEventListener ref="mock-process-listener"/>
+        <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+    </drools:ksession>
+
+    <drools:ksession id="statefulWithNestedBean" type="stateful" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener>
+            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+        </drools:workingMemoryEventListener>
+    </drools:ksession>
+
+    <drools:ksession id="statefulWithRef" type="stateful" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+    </drools:ksession>
+
+    <drools:ksession id="statefulWithDefault" type="stateful" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener/>
+    </drools:ksession>
+
+    <drools:ksession id="statefulWithGroupedListeners" type="stateful" kbase="kbase1" node="node1"
+                     listeners="debugListeners"/>
+
+    <drools:ksession id="statelessSession" type="stateless" name="stateless1" kbase="kbase1" node="node1">
+        <drools:agendaEventListener ref="mock-agenda-listener"/>
+        <drools:processEventListener ref="mock-process-listener"/>
+        <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+    </drools:ksession>
+
+    <drools:ksession id="statelessWithNestedBean" type="stateless" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener>
+            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+        </drools:workingMemoryEventListener>
+    </drools:ksession>
+
+    <drools:ksession id="statelessWithRef" type="stateless" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+    </drools:ksession>
+
+    <drools:ksession id="statelessWithMultipleSameType" type="stateless" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener>
+            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+        </drools:workingMemoryEventListener>
+        <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+    </drools:ksession>
+
+    <drools:ksession id="statelessWithDefault" type="stateless" kbase="kbase1" node="node1">
+        <drools:workingMemoryEventListener/>
+    </drools:ksession>
+
+    <drools:ksession id="statelessWithGroupedListeners" type="stateless" kbase="kbase1" node="node1"
+                     listeners="debugListeners"/>
+
+    <drools:eventListeners id="debugListeners">
+        <drools:agendaEventListener ref="mock-agenda-listener"/>
+        <drools:processEventListener ref="mock-process-listener"/>
+        <drools:workingMemoryEventListener ref="mock-wm-listener"/>
+    </drools:eventListeners>
+
+</beans>
