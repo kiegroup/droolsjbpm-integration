@@ -58,7 +58,7 @@ public class SpringDroolsListenersTest {
         counterFromListener++;
     }
 
-    @Test
+    //@Test
     public void testStatefulAgendaEventListener() throws Exception {
         StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean("statefulSession");
         assertEquals(1, statefulKnowledgeSession.getAgendaEventListeners().size());
