@@ -84,4 +84,40 @@
       <artifactId>xstream</artifactId>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>soaProfile</id>
+      <activation>
+        <property>
+          <name>soa</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>soa_overlay</id>
+                <phase>process-resources</phase>
+                <configuration>
+                  <tasks>
+                    <replace file="${basedir}/src/main/java/org/drools/examples/DroolsJbpmIntegrationExamplesApp.java" >
+                      <replacefilter token="Drools and jBPM integration examples" value="JBoss BRMS examples" />
+                    </replace>      
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
