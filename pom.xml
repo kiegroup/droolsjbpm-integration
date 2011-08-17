@@ -44,6 +44,7 @@
   </scm>
 
   <modules>
+    <module>drools-benchmark</module>
     <module>drools-container</module>
     <module>drools-camel</module>
     <module>drools-camel-server</module>
