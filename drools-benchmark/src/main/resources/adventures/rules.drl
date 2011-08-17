@@ -1,0 +1,80 @@
+package org.drools.adventures
+
+import org.drools.adventures.commands.MoveCommand
+import org.drools.adventures.commands.PickupCommand
+import org.drools.adventures.commands.DropCommand
+
+dialect "mvel"
+
+rule invalidMove agenda-group "commands" lock-on-active auto-focus when
+    $mc : MoveCommand()
+    $h : Here()
+    not ?connect( $mc.room, $h.room; )
+then
+    System.out.println( rule.name + ':' + $mc );
+end
+
+
+rule validMove agenda-group "commands" lock-on-active auto-focus  when
+    $mc : MoveCommand()
+    $h : Here( )
+    exists ?connect( $mc.room, $h.room; )
+then
+    System.out.println( $h );
+    //System.out.println( rule.name + ':' + $c );
+    insert( new ExitEvent( $h.room ) );
+    insert( new EnterEvent( $mc.room ) );
+    //System.out.println( $c );
+    modify( $h ) { room = $mc.room };
+end
+
+
+rule invalidPickup agenda-group "commands" lock-on-active auto-focus  when
+    $pc : PickupCommand( )
+    $h : Here( )
+    not Location( $pc.thing, $h.room; )
+then
+    System.out.println( rule.name + ':' + $pc );
+end
+
+rule validPickup agenda-group "commands" lock-on-active auto-focus  when
+    $pc : PickupCommand( )
+    $h : Here()
+    $l : Location( $pc.thing, $h.room; )
+then
+    insert( new PickupEvent( "xxx", $pc.thing ) );
+    insert( new Holding( "xxx", $pc.thing ) );
+    modify( $l ) { target = null };
+    //System.out.println( rule.name + ':' + $pc );
+end
+
+rule invalidDrop agenda-group "commands" lock-on-active auto-focus  when
+    $dc : DropCommand( )
+    not ( Holding( "xxx", $dc.thing;) )
+then
+    System.out.println( rule.name + ':' + $dc );
+end
+
+rule validDrop agenda-group "commands" lock-on-active auto-focus  when
+    $dc : DropCommand( )
+    $hld : Holding( "xxx", $dc.thing;)
+    $h : Here()
+    $l : Location( $dc.thing, null; )
+then
+    insert( new DropEvent( "xxx", $dc.thing ) );
+    modify( $l ) { target = $h.room };
+    retract ( $hld );
+    //System.out.println( rule.name + ':' + $c );
+end
+
+rule printEvent when
+    $e : GameEvent()
+then
+    System.out.println( $e );
+end
+
+rule retractCommand agenda-group "commands" lock-on-active auto-focus salience -100 when
+    $c : Command()
+then
+    retract( $c );
+end

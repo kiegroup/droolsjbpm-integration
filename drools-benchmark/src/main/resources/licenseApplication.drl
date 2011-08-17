@@ -1,0 +1,8 @@
+import org.drools.benchmark.model.*
+
+rule "Is of valid age and gender"
+when
+    $a : Applicant( age >= 18, gender == Gender.MALE )
+then
+    $a.setValid( true );
+end
