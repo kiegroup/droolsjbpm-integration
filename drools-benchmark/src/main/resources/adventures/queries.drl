@@ -1,0 +1,17 @@
+package org.drools.adventures
+
+import java.util.List
+
+query connect( Room x, Room y )
+    Door(x, y;)
+    or
+    Door(y, x;)
+end
+
+query look(Room room, List things, List exits)
+    Here(room;)
+    things := List() from accumulate( Location(thing, room;),
+                                      collectList( thing ) )
+    exits := List() from accumulate( ?connect(room, exit;),
+                                     collectList( exit ) )
+end

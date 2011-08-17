@@ -1,0 +1,8 @@
+import org.drools.benchmark.model.*
+
+rule "Dummy rule with empty constraint"
+when
+    $a : DummyBean( seed == 1 )
+then
+//    System.out.println( $a );
+end
