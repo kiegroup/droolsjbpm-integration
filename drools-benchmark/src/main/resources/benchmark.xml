@@ -1,0 +1,58 @@
+<benchmarks delay="1">
+
+    <benchmark description= "Insert 10K objects and retract them (no rules)"
+               enabled="true"
+               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+        <arg>10000</arg>
+    </benchmark>
+
+    <benchmark description= "Insert 10K objects and retract them with a single pattern of empty constraints"
+               enabled="true"
+               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+        <arg>10000</arg>
+        <arg>emptyConstraintRule.drl</arg>
+    </benchmark>
+
+    <benchmark description= "Insert 10K objects and retract them with a simple literal constraint"
+               enabled="true"
+               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+        <arg>10000</arg>
+        <arg>literalConstraintRule.drl</arg>
+    </benchmark>
+
+    <benchmark description= "Insert 1M objects and retract them (no rules)"
+               enabled="false"
+               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+        <arg>1000000</arg>
+    </benchmark>
+
+    <benchmark description= "Insert and retract each one in turn 10K objects (no rules)"
+               repetitions="10000" enabled="true"
+               classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    </benchmark>
+
+    <benchmark description= "Insert and retract each one in turn 10K objects with a single pattern of empty constraints"
+               repetitions="10000" enabled="true"
+               classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+        <arg>emptyConstraintRule.drl</arg>
+    </benchmark>
+
+    <benchmark description= "Insert and retract each one in turn 10K objects with a simple literal constraint"
+               repetitions="10000" enabled="true"
+               classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+        <arg>literalConstraintRule.drl</arg>
+    </benchmark>
+
+    <benchmark description= "SingleStatelessRule"
+               enabled="false"
+               classname="org.drools.benchmark.benchmarks.SingleStatelessRule">
+    </benchmark>
+
+    <benchmark description="Rule parsing"
+               repetitions="10" enabled="true"
+               classname="org.drools.benchmark.benchmarks.RuleParsing">
+        <!--arg>adventures/model.drl,adventures/queries.drl,adventures/rules.drl</arg-->
+        <!--arg>licenseApplication.drl</arg-->
+        <arg>fireAlarm.drl</arg>
+    </benchmark>
+</benchmarks>
