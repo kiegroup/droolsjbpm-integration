@@ -16,24 +16,32 @@
 
 package org.drools.benchmark.model;
 
-public class Sprinkler {
+import java.math.BigInteger;
 
-    private Room room;
-    private boolean on;
+public class Fibonacci {
+    private int sequence;
 
-    public Room getRoom() {
-        return room;
+    private BigInteger value;
+
+    public Fibonacci() { }
+
+    public Fibonacci(final int sequence) {
+        this.sequence = sequence;
+        this.value = new BigInteger("-1");
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public int getSequence() {
+        return this.sequence;
     }
 
-    public boolean isOn() {
-        return on;
+    public void setValue(final BigInteger value) {
+        this.value = value;
+    }
+    public BigInteger getValue() {
+        return this.value;
     }
 
-    public void setOn(boolean on) {
-        this.on = on;
+    public String toString() {
+        return "Fibonacci(" + this.sequence + "/" + this.value + ")";
     }
 }

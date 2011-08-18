@@ -20,29 +20,36 @@ import org.drools.*;
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
 import org.drools.runtime.*;
-import org.drools.runtime.rule.*;
-import org.drools.runtime.rule.FactHandle;
 
-public class InsertAndRetractInTurn extends AbstractBenchmark {
+public class FibonacciBenchmark extends AbstractBenchmark {
+
+    private int number;
+    private String drlFile;
 
     private StatefulKnowledgeSession ksession;
 
-    private String[] drlFiles;
-
-    public InsertAndRetractInTurn() { }
-
-    public InsertAndRetractInTurn(String drlFile) {
-        this.drlFiles = drlFile.split(",");
+    public FibonacciBenchmark(int number) {
+        this(number, "fibonacci.drl");
     }
 
+    public FibonacciBenchmark(int number, String drlFile) {
+        this.number = number;
+        this.drlFile = drlFile;
+    }
+
+    @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
+        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
         ksession = kbase.newStatefulKnowledgeSession();
+        ksession.insert(new Fibonacci(number));
     }
 
     public void execute(int repNr) {
-        FactHandle fact = ksession.insert(new DummyBean(repNr));
         ksession.fireAllRules();
-        ksession.retract(fact);
+    }
+
+    @Override
+    public void terminate() {
+        ksession.dispose(); // Stateful rule session must always be disposed when finished
     }
 }

@@ -49,10 +49,22 @@
     </benchmark>
 
     <benchmark description="Rule parsing"
-               repetitions="10" enabled="true"
+               repetitions="1000" enabled="true"
                classname="org.drools.benchmark.benchmarks.RuleParsing">
-        <!--arg>adventures/model.drl,adventures/queries.drl,adventures/rules.drl</arg-->
         <!--arg>licenseApplication.drl</arg-->
         <arg>fireAlarm.drl</arg>
+    </benchmark>
+
+    <benchmark description="Fibonacci calculator (use index)"
+               enabled="true"
+               classname="org.drools.benchmark.benchmarks.FibonacciBenchmark">
+        <arg>3000</arg>
+    </benchmark>
+
+    <benchmark description="Fibonacci calculator (don't use index)"
+               enabled="true"
+               classname="org.drools.benchmark.benchmarks.FibonacciBenchmark">
+        <arg>3000</arg>
+        <arg>fibonacci_no_index.drl</arg>
     </benchmark>
 </benchmarks>

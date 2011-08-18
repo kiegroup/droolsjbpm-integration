@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,6 @@ import org.drools.benchmark.model.*;
 import org.drools.runtime.*;
 import org.drools.runtime.rule.FactHandle;
 
-/**
- * @author Mario Fusco
- */
 public class InsertAllAndRetract extends AbstractBenchmark {
 
     private final int objectNumbers;
