@@ -43,7 +43,8 @@ public class BenchmarkRunner {
 
     private BenchmarkResult execute(BenchmarkConfig config, BenchmarkDefinition definition) {
         BenchmarkResult result = new BenchmarkResult(definition);
-        result.setUsedMemoryBeforeStart(usedMemory(true));
+        result.setUsedMemoryBeforeStart(usedMemory());
+        warmUpExecution(definition);
 
         Benchmark benchmark = definition.instance();
         out.println("Executing: " + definition.getDescription());
@@ -51,33 +52,50 @@ public class BenchmarkRunner {
 
         result.setDuration(executeBenchmark(definition, benchmark));
         benchmark.terminate();
-        result.setUsedMemoryAfterEnd(usedMemory(false));
+        result.setUsedMemoryAfterEnd(usedMemory());
         benchmark = null; // destroy the benchmark in order to allow GC to free the memory allocated by it
 
         afterBenchmarkRun(config);
-        result.setUsedMemoryAfterGC(usedMemory(true));
+        result.setUsedMemoryAfterGC(usedMemory());
         return result;
     }
 
-    private long executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
-        long start = currentTimeMillis();
-        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
-        return currentTimeMillis() - start;
+    private void warmUpExecution(BenchmarkDefinition definition) {
+        if (definition.getWarmups() < 1) return;
+        Benchmark benchmark = definition.instance();
+        benchmark.init(definition);
+        for (int i = 0; i < definition.getWarmups(); i++) benchmark.execute(0);
+        benchmark.terminate();
     }
 
-    private long usedMemory(boolean runGC) {
+    private double executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
+        long start = nanoTime();
+        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
+        return ((nanoTime() - start) / 1000) / 1000.0;
+    }
+
+    private long usedMemory() {
         Runtime r = Runtime.getRuntime();
-        if (runGC) r.gc();
         return r.totalMemory() - r.freeMemory();
     }
 
     private void afterBenchmarkRun(BenchmarkConfig config) {
-        Runtime.getRuntime().gc();
+        long prevUsedMemory = usedMemory();
+        for (int i = 0; i < config.getDelay(); i++) {
+            long usedMemory = freeMemory();
+            if (prevUsedMemory - usedMemory <= 0) break;
+            prevUsedMemory = usedMemory;
+        }
+    }
+    
+    private long freeMemory() {
+        runFinalization();
+        gc();
         try {
-            Thread.sleep(config.getDelay() * 1000L);
+            Thread.sleep(1000L);
         } catch (InterruptedException e) {
             // Ignore
         }
-        Runtime.getRuntime().gc();
+        return usedMemory();
     }
 }

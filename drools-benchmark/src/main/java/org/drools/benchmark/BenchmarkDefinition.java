@@ -24,6 +24,7 @@ public class BenchmarkDefinition {
     private Object[] args;
     private String description;
     private int repetitions;
+    private int warmups;
     private boolean enabled = true;
 
     public BenchmarkDefinition(Constructor<?> constructor, Object[] args) {
@@ -44,6 +45,14 @@ public class BenchmarkDefinition {
     }
     public BenchmarkDefinition setRepetitions(int repetitions) {
         this.repetitions = repetitions;
+        return this;
+    }
+
+    public int getWarmups() {
+        return warmups;
+    }
+    public BenchmarkDefinition setWarmups(int warmups) {
+        this.warmups = warmups;
         return this;
     }
 

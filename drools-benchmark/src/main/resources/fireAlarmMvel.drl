@@ -1,3 +1,5 @@
+dialect "mvel"
+
 import java.util.*
 import org.drools.benchmark.model.*
 

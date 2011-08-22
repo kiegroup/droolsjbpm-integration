@@ -71,13 +71,13 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
         Constructor<?> constructor = getConstructorForArgs(className, args);
 
         String description = element.getAttribute("description");
-        int repetitions = getAttributeValueAsInt(element, "repetitions", 1);
         String en = element.getAttribute("enabled");
         boolean enabled = en.isEmpty() || !en.trim().toLowerCase().equals("false");
 
         return new BenchmarkDefinition(constructor, toArgs(constructor.getParameterTypes(), args))
                 .setDescription(description)
-                .setRepetitions(repetitions)
+                .setRepetitions(getAttributeValueAsInt(element, "repetitions", 1))
+                .setWarmups(getAttributeValueAsInt(element, "warmups", 0))
                 .setEnabled(enabled);
     }
 
