@@ -1,4 +1,4 @@
-<benchmarks delay="10">
+<benchmarks delay="10" repetitions="10">
 
   <!-- Runtime -->
 
@@ -23,7 +23,7 @@
   </benchmark>
 
   <benchmark description="Insert 1M objects and retract them (no rules)"
-             warmups="1" enabled="false"
+             warmups="1" enabled="true"
              classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
     <arg>1000000</arg>
   </benchmark>
@@ -89,17 +89,31 @@
     <arg>fibonacci_no_index.drl</arg>
   </benchmark>
 
-  <!-- Compile-time -->
-
-  <benchmark description="Compile Java Rule"
-             warmups="1500" repetitions="1000" enabled="true"
-             classname="org.drools.benchmark.benchmarks.RuleParsing">
+  <benchmark description="Java Fire Alarm - test joins"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
+    <arg>10000</arg>
     <arg>fireAlarmJava.drl</arg>
   </benchmark>
 
-  <benchmark description="Compile MVEL Rule"
+  <benchmark description="Mvel Fire Alarm - test joins"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
+    <arg>10000</arg>
+    <arg>fireAlarmMvel.drl</arg>
+  </benchmark>
+
+  <!-- Compile-time -->
+
+  <benchmark description="Compile Java Rules"
              warmups="1500" repetitions="1000" enabled="true"
-             classname="org.drools.benchmark.benchmarks.RuleParsing">
+             classname="org.drools.benchmark.benchmarks.RuleCompile">
+    <arg>fireAlarmJava.drl</arg>
+  </benchmark>
+
+  <benchmark description="Compile MVEL Rules"
+             warmups="1500" repetitions="1000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.RuleCompile">
     <arg>fireAlarmMvel.drl</arg>
   </benchmark>
 </benchmarks>

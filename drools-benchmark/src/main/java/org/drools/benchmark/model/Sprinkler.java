@@ -19,7 +19,13 @@ package org.drools.benchmark.model;
 public class Sprinkler {
 
     private Room room;
-    private boolean on;
+    private boolean on = false;
+
+    public Sprinkler() { }
+
+    public Sprinkler(Room room) {
+        this.room = room;
+    }
 
     public Room getRoom() {
         return room;
@@ -35,5 +41,21 @@ public class Sprinkler {
 
     public void setOn(boolean on) {
         this.on = on;
+    }
+
+    @Override
+    public int hashCode() {
+        return room.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Sprinkler)) return false;
+        return room.equals(((Sprinkler)obj).getRoom());
+    }
+
+    @Override
+    public String toString() {
+        return "Sprinkler for " + room;
     }
 }

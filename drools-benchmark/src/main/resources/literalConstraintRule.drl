@@ -1,6 +1,6 @@
 import org.drools.benchmark.model.*
 
-rule "Dummy rule with empty constraint"
+rule "Dummy rule with simple literal constraint"
 when
     $a : DummyBean( seed == 1 )
 then

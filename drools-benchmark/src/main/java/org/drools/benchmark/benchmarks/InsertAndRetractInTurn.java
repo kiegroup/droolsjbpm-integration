@@ -35,6 +35,7 @@ public class InsertAndRetractInTurn extends AbstractBenchmark {
         this.drlFiles = drlFile.split(",");
     }
 
+    @Override
     public void init(BenchmarkDefinition definition) {
         KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
         ksession = kbase.newStatefulKnowledgeSession();
@@ -44,5 +45,11 @@ public class InsertAndRetractInTurn extends AbstractBenchmark {
         FactHandle fact = ksession.insert(new DummyBean(repNr));
         ksession.fireAllRules();
         ksession.retract(fact);
+        ksession.fireAllRules();
+    }
+
+    @Override
+    public void terminate() {
+        ksession.dispose(); // Stateful rule session must always be disposed when finished
     }
 }

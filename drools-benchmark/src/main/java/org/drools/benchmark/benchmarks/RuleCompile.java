@@ -26,14 +26,14 @@ import java.util.*;
 /**
  * @author Mario Fusco
  */
-public class RuleParsing extends AbstractBenchmark {
+public class RuleCompile extends AbstractBenchmark {
 
     private String[] drlFiles;
     private Map<String, String[]> drls;
 
     private KnowledgeBuilder kbuilder;
 
-    public RuleParsing(String drlFile) {
+    public RuleCompile(String drlFile) {
         this.drlFiles = drlFile.split(",");
     }
 
@@ -61,7 +61,7 @@ public class RuleParsing extends AbstractBenchmark {
             isr = new InputStreamReader(getClass().getClassLoader().getResourceAsStream(fileName));
             br = new BufferedReader(isr);
             for (String line = br.readLine(); line != null; line = br.readLine()) {
-                sb.append(line).append(" ");
+                sb.append(line).append("\n");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -80,6 +80,10 @@ public class RuleParsing extends AbstractBenchmark {
         for (String drlFile : drlFiles) {
             String drl = drls.get(drlFile)[repNr];
             kbuilder.add(ResourceFactory.newByteArrayResource(drl.getBytes()), ResourceType.DRL);
+            if (kbuilder.hasErrors()) {
+                System.err.println(drl);
+                throw new RuntimeException(kbuilder.getErrors().toString());
+            }
         }
     }
 }

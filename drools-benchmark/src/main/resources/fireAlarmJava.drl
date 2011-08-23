@@ -9,7 +9,7 @@ when
     $sprinklerA_ : Sprinkler( room == $roomA_, on == false )
 then
     modify( $sprinklerA_ ) { setOn( true ) };
-    System.out.println( "Turn on the sprinkler for room " + $roomA_.getName() );
+//    System.out.println( "Turn on the sprinkler for room " + $roomA_.getName() );
 end
 
 rule "When the fire is gone turn off the sprinkler"
@@ -19,7 +19,7 @@ when
     not Fire( room == $roomB_ )
 then
     modify( $sprinklerB_ ) { setOn( false ) };
-    System.out.println( "Turn off the sprinkler for room " + $roomB_.getName() );
+//    System.out.println( "Turn off the sprinkler for room " + $roomB_.getName() );
 end
 
 rule "Raise the alarm when we have one or more fires"
@@ -27,7 +27,7 @@ when
     exists Fire()
 then
     insert( new Alarm() );
-    System.out.println( "Raise the alarm" );
+//    System.out.println( "Raise the alarm" );
 end
 
 rule "Cancel the alarm when all the fires have gone"
@@ -36,7 +36,7 @@ when
     $alarm_ : Alarm()
 then
     retract( $alarm_ );
-    System.out.println( "Cancel the alarm" );
+//    System.out.println( "Cancel the alarm" );
 end
 
 rule "Status output when things are ok"
@@ -44,5 +44,5 @@ when
     not Alarm()
     not Sprinkler( on == true )
 then
-    System.out.println( "Everything is ok" );
+//    System.out.println( "Everything is ok" );
 end

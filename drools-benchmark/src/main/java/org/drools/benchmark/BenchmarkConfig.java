@@ -27,7 +27,8 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
 
     private List<BenchmarkDefinition> benchmarks;
 
-    private int delay = 10;
+    private int delay = 1;
+    private int repetitions = 1;
 
     public BenchmarkConfig(String configFile) {
         benchmarks = parse(configFile);
@@ -39,6 +40,10 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
 
     public int getDelay() {
         return delay;
+    }
+
+    public int getRepetitions() {
+        return repetitions;
     }
 
     private List<BenchmarkDefinition> parse(String configFile) {
@@ -55,7 +60,8 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
     }
 
     private void parseRootAttrs(Element root) throws Exception {
-        delay = getAttributeValueAsInt(root, "delay", 10);
+        delay = getAttributeValueAsInt(root, "delay", 1);
+        repetitions = getAttributeValueAsInt(root, "repetitions", 1);
     }
 
     private List<BenchmarkDefinition> parseBenchmarks(Element root) throws Exception {

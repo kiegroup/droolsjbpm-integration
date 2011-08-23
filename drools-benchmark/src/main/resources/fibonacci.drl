@@ -28,5 +28,5 @@ rule Calculate
         f3 : Fibonacci( s3 : sequence == (f2.sequence + 1 ), value == new BigInteger("-1") )
     then
         modify ( f3 ) { value = f1.value.add(f2.value) };
-        System.out.println( s3 + " == " + f3.value ); // see how you can access pattern and field  bindings
+//        System.out.println( s3 + " == " + f3.value ); // see how you can access pattern and field  bindings
 end 
