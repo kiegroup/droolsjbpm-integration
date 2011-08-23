@@ -16,41 +16,35 @@
 
 package org.drools.benchmark.benchmarks;
 
-import org.drools.KnowledgeBase;
+import org.drools.*;
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
 import org.drools.runtime.*;
-import org.drools.runtime.rule.FactHandle;
 
-public class InsertAllAndRetract extends AbstractBenchmark {
+public class FibonacciBenchmark extends AbstractBenchmark {
 
-    private final int objectsNumber;
+    private int number;
+    private String drlFile;
 
-    private String[] drlFiles;
-
-    private FactHandle[] facts;
     private StatefulKnowledgeSession ksession;
 
-    public InsertAllAndRetract(int objectsNumber) {
-        this.objectsNumber = objectsNumber;
+    public FibonacciBenchmark(int number) {
+        this(number, "fibonacci.drl");
     }
 
-    public InsertAllAndRetract(int objectsNumber, String drlFile) {
-        this(objectsNumber);
-        this.drlFiles = drlFile.split(",");
+    public FibonacciBenchmark(int number, String drlFile) {
+        this.number = number;
+        this.drlFile = drlFile;
     }
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
+        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
         ksession = kbase.newStatefulKnowledgeSession();
-        facts = new FactHandle[objectsNumber];
+        ksession.insert(new Fibonacci(number));
     }
 
     public void execute(int repNr) {
-        for (int i = 0; i < objectsNumber; i++) facts[i] = ksession.insert(new DummyBean(i));
-        ksession.fireAllRules();
-        for (FactHandle fact : facts) ksession.retract(fact);
         ksession.fireAllRules();
     }
 

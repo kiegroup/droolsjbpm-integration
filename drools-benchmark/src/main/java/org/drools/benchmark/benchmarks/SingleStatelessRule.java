@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ import org.drools.builder.*;
 import org.drools.io.*;
 import org.drools.runtime.*;
 
-/**
- * @author Mario Fusco
- */
 public class SingleStatelessRule extends AbstractBenchmark {
 
     public void execute(int repNr) {

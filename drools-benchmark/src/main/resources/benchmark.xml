@@ -1,58 +1,119 @@
-<benchmarks delay="1">
+<benchmarks delay="10" repetitions="10">
 
-    <benchmark description= "Insert 10K objects and retract them (no rules)"
-               enabled="true"
-               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
-        <arg>10000</arg>
-    </benchmark>
+  <!-- Runtime -->
 
-    <benchmark description= "Insert 10K objects and retract them with a single pattern of empty constraints"
-               enabled="true"
-               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
-        <arg>10000</arg>
-        <arg>emptyConstraintRule.drl</arg>
-    </benchmark>
+  <benchmark description="Insert 10K objects and retract them (no rules)"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+    <arg>10000</arg>
+  </benchmark>
 
-    <benchmark description= "Insert 10K objects and retract them with a simple literal constraint"
-               enabled="true"
-               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
-        <arg>10000</arg>
-        <arg>literalConstraintRule.drl</arg>
-    </benchmark>
+  <benchmark description="Insert 10K objects and retract them with a single pattern of empty constraints"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+    <arg>10000</arg>
+    <arg>emptyConstraintRule.drl</arg>
+  </benchmark>
 
-    <benchmark description= "Insert 1M objects and retract them (no rules)"
-               enabled="false"
-               classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
-        <arg>1000000</arg>
-    </benchmark>
+  <benchmark description="Insert 10K objects and retract them with a simple literal constraint"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+    <arg>10000</arg>
+    <arg>literalConstraintRule.drl</arg>
+  </benchmark>
 
-    <benchmark description= "Insert and retract each one in turn 10K objects (no rules)"
-               repetitions="10000" enabled="true"
-               classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
-    </benchmark>
+  <benchmark description="Insert 1M objects and retract them (no rules)"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+    <arg>1000000</arg>
+  </benchmark>
 
-    <benchmark description= "Insert and retract each one in turn 10K objects with a single pattern of empty constraints"
-               repetitions="10000" enabled="true"
-               classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
-        <arg>emptyConstraintRule.drl</arg>
-    </benchmark>
+  <benchmark description="Insert 1M objects and retract them with a single pattern of empty constraints"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+    <arg>1000000</arg>
+    <arg>emptyConstraintRule.drl</arg>
+  </benchmark>
 
-    <benchmark description= "Insert and retract each one in turn 10K objects with a simple literal constraint"
-               repetitions="10000" enabled="true"
-               classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
-        <arg>literalConstraintRule.drl</arg>
-    </benchmark>
+  <benchmark description="Insert 1M objects and retract them with a simple literal constraint"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
+    <arg>1000000</arg>
+    <arg>literalConstraintRule.drl</arg>
+  </benchmark>
 
-    <benchmark description= "SingleStatelessRule"
-               enabled="false"
-               classname="org.drools.benchmark.benchmarks.SingleStatelessRule">
-    </benchmark>
+  <benchmark description="Insert and retract each one in turn 10K objects (no rules)"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+  </benchmark>
 
-    <benchmark description="Rule parsing"
-               repetitions="10" enabled="true"
-               classname="org.drools.benchmark.benchmarks.RuleParsing">
-        <!--arg>adventures/model.drl,adventures/queries.drl,adventures/rules.drl</arg-->
-        <!--arg>licenseApplication.drl</arg-->
-        <arg>fireAlarm.drl</arg>
-    </benchmark>
+  <benchmark description="Insert and retract each one in turn 10K objects with a single pattern of empty constraints"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>emptyConstraintRule.drl</arg>
+  </benchmark>
+
+  <benchmark description="Insert and retract each one in turn 10K objects with a simple literal constraint"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>literalConstraintRule.drl</arg>
+  </benchmark>
+
+  <benchmark description="Insert and retract each one in turn 1M objects (no rules)"
+             warmups="1500" repetitions="1000000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+  </benchmark>
+
+  <benchmark description="Insert and retract each one in turn 1M objects with a single pattern of empty constraints"
+             warmups="1500" repetitions="1000000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>emptyConstraintRule.drl</arg>
+  </benchmark>
+
+  <benchmark description="Insert and retract each one in turn 1M objects with a simple literal constraint"
+             warmups="1500" repetitions="1000000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>literalConstraintRule.drl</arg>
+  </benchmark>
+
+  <benchmark description="Fibonacci calculator (use index)"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.FibonacciBenchmark">
+    <arg>2000</arg>
+  </benchmark>
+
+  <benchmark description="Fibonacci calculator (don't use index - fan out literal values)"
+             warmups="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.FibonacciBenchmark">
+    <arg>2000</arg>
+    <arg>fibonacci_no_index.drl</arg>
+  </benchmark>
+
+  <benchmark description="Java Fire Alarm - test joins"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
+    <arg>10000</arg>
+    <arg>fireAlarmJava.drl</arg>
+  </benchmark>
+
+  <benchmark description="Mvel Fire Alarm - test joins"
+             warmups="1500" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
+    <arg>10000</arg>
+    <arg>fireAlarmMvel.drl</arg>
+  </benchmark>
+
+  <!-- Compile-time -->
+
+  <benchmark description="Compile Java Rules"
+             warmups="1500" repetitions="1000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.RuleCompile">
+    <arg>fireAlarmJava.drl</arg>
+  </benchmark>
+
+  <benchmark description="Compile MVEL Rules"
+             warmups="1500" repetitions="1000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.RuleCompile">
+    <arg>fireAlarmMvel.drl</arg>
+  </benchmark>
 </benchmarks>

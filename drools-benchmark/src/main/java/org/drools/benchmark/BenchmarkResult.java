@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,10 @@
 
 package org.drools.benchmark;
 
-/**
- * @author Mario Fusco
- */
 public class BenchmarkResult {
 
     private final BenchmarkDefinition definition;
-    private long duration;
+    private double duration;
     private long usedMemoryBeforeStart;
     private long usedMemoryAfterEnd;
     private long usedMemoryAfterGC;
@@ -31,10 +28,10 @@ public class BenchmarkResult {
         this.definition = definition;
     }
 
-    public long getDuration() {
+    public double getDuration() {
         return duration;
     }
-    public void setDuration(long duration) {
+    public void setDuration(double duration) {
         this.duration = duration;
     }
 
@@ -59,13 +56,25 @@ public class BenchmarkResult {
         this.usedMemoryAfterGC = usedMemoryAfterGC;
     }
 
+    public long memoryUsedByBenchmark() {
+        return usedMemoryAfterEnd - usedMemoryBeforeStart;
+    }
+
+    public long unfreedMemory() {
+        return Math.max(0L, usedMemoryAfterGC - usedMemoryBeforeStart);
+    }
+
+    public String getDescription() {
+        return definition.getDescription();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("*** Execution of " + definition.getDescription() + "\n");
+        sb.append("*** Execution of " + getDescription() + "\n");
         sb.append("Done in " + duration + " msecs" + "\n");
-        sb.append("Memory used by benchmark " + (usedMemoryAfterEnd - usedMemoryBeforeStart) + " bytes" + "\n");
-        sb.append("Memory unfreed after benchmark run " + (usedMemoryAfterGC - usedMemoryBeforeStart) + " bytes" + "\n");
+        sb.append("Memory used by benchmark " + memoryUsedByBenchmark() + " bytes" + "\n");
+        sb.append("Memory unfreed after benchmark run " + unfreedMemory() + " bytes" + "\n");
         return sb.toString();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,6 @@ import org.drools.runtime.*;
 import org.drools.runtime.rule.*;
 import org.drools.runtime.rule.FactHandle;
 
-/**
- * @author Mario Fusco
- */
 public class InsertAndRetractInTurn extends AbstractBenchmark {
 
     private StatefulKnowledgeSession ksession;
@@ -38,6 +35,7 @@ public class InsertAndRetractInTurn extends AbstractBenchmark {
         this.drlFiles = drlFile.split(",");
     }
 
+    @Override
     public void init(BenchmarkDefinition definition) {
         KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
         ksession = kbase.newStatefulKnowledgeSession();
@@ -47,5 +45,11 @@ public class InsertAndRetractInTurn extends AbstractBenchmark {
         FactHandle fact = ksession.insert(new DummyBean(repNr));
         ksession.fireAllRules();
         ksession.retract(fact);
+        ksession.fireAllRules();
+    }
+
+    @Override
+    public void terminate() {
+        ksession.dispose(); // Stateful rule session must always be disposed when finished
     }
 }

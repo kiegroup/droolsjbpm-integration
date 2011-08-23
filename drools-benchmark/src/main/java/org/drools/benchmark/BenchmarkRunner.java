@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,67 +20,112 @@ import java.util.*;
 
 import static java.lang.System.*;
 
-/**
- * @author Mario Fusco
- */
 public class BenchmarkRunner {
 
     private static final String CONFIG_FILE = "benchmark.xml";
 
     public static void main(String[] args) {
-        new BenchmarkRunner().execute();
+        new BenchmarkRunner().run();
     }
 
-    private List<BenchmarkResult> execute() {
+    private void run() {
+        long start = currentTimeMillis();
         BenchmarkConfig config = new BenchmarkConfig(CONFIG_FILE);
+        List<List<BenchmarkResult>> results = new ArrayList<List<BenchmarkResult>>();
+        for (int i = 0; i < config.getRepetitions(); i++) results.add(executeAll(config, i));
+        printResults(accumulateResults(results));
+        System.out.println("\nDone in " + (currentTimeMillis() - start) + " msecs");
+    }
+
+    private void printResults(List<ResultsAccumulator> results) {
+        System.out.println(ResultsAccumulator.RESULTS_FORMAT);
+        for (ResultsAccumulator result : results) System.out.println(result);
+    }
+
+    private List<ResultsAccumulator> accumulateResults(List<List<BenchmarkResult>> results) {
+        int benchmarksNr = results.get(0).size();
+        List<ResultsAccumulator> accumulatedResults = new ArrayList<ResultsAccumulator>();
+        for (int i = 0; i < benchmarksNr; i++) {
+            ResultsAccumulator accumulator = new ResultsAccumulator();
+            for (List<BenchmarkResult> runResults : results) accumulator.accumulate(runResults.get(i));
+            accumulatedResults.add(accumulator);
+        }
+        return accumulatedResults;
+    }
+
+    private List<BenchmarkResult> executeAll(BenchmarkConfig config, int execNr) {
         List<BenchmarkResult> results = new ArrayList<BenchmarkResult>();
         for (BenchmarkDefinition benchmarkDef : config) {
             if (benchmarkDef.isEnabled()) {
-                BenchmarkResult result = execute(config, benchmarkDef);
+                BenchmarkResult result = execute(config, benchmarkDef, execNr == 0);
                 out.println(result);
                 results.add(result);
             }
         }
+        afterBenchmarkRun(config);
         return results;
     }
 
-    private BenchmarkResult execute(BenchmarkConfig config, BenchmarkDefinition definition) {
+    private BenchmarkResult execute(BenchmarkConfig config, BenchmarkDefinition definition, boolean shouldWarmUp) {
         BenchmarkResult result = new BenchmarkResult(definition);
-        result.setUsedMemoryBeforeStart(usedMemory(true));
+
+        if (shouldWarmUp) {
+            out.println("Warming up: " + definition.getDescription());
+            warmUpExecution(definition);
+            afterBenchmarkRun(config);
+        }
 
         Benchmark benchmark = definition.instance();
+        result.setUsedMemoryBeforeStart(usedMemory());
         out.println("Executing: " + definition.getDescription());
         benchmark.init(definition);
 
         result.setDuration(executeBenchmark(definition, benchmark));
         benchmark.terminate();
-        result.setUsedMemoryAfterEnd(usedMemory(false));
+        result.setUsedMemoryAfterEnd(usedMemory());
         benchmark = null; // destroy the benchmark in order to allow GC to free the memory allocated by it
 
         afterBenchmarkRun(config);
-        result.setUsedMemoryAfterGC(usedMemory(true));
+        result.setUsedMemoryAfterGC(usedMemory());
         return result;
     }
 
-    private long executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
-        long start = currentTimeMillis();
-        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
-        return currentTimeMillis() - start;
+    private void warmUpExecution(BenchmarkDefinition definition) {
+        if (definition.getWarmups() < 1) return;
+        Benchmark benchmark = definition.instance();
+        benchmark.init(definition);
+        for (int i = 0; i < definition.getWarmups(); i++) benchmark.execute(0);
+        benchmark.terminate();
     }
 
-    private long usedMemory(boolean runGC) {
+    private double executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
+        long start = nanoTime();
+        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
+        return ((nanoTime() - start) / 1000) / 1000.0;
+    }
+
+    private long usedMemory() {
         Runtime r = Runtime.getRuntime();
-        if (runGC) r.gc();
         return r.totalMemory() - r.freeMemory();
     }
 
     private void afterBenchmarkRun(BenchmarkConfig config) {
-        Runtime.getRuntime().gc();
+        long prevUsedMemory = usedMemory();
+        for (int i = 0; i < config.getDelay(); i++) {
+            long usedMemory = freeMemory();
+            if (prevUsedMemory - usedMemory <= 0) break;
+            prevUsedMemory = usedMemory;
+        }
+    }
+    
+    private long freeMemory() {
+        runFinalization();
+        gc();
         try {
-            Thread.sleep(config.getDelay() * 1000L);
+            Thread.sleep(1000L);
         } catch (InterruptedException e) {
             // Ignore
         }
-        Runtime.getRuntime().gc();
+        return usedMemory();
     }
 }
