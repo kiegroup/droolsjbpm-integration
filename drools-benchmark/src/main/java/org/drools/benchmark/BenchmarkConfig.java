@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,12 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-/**
- * @author Mario Fusco
- */
 public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
 
     private List<BenchmarkDefinition> benchmarks;
 
-    private int delay = 10;
+    private int delay = 1;
+    private int repetitions = 1;
 
     public BenchmarkConfig(String configFile) {
         benchmarks = parse(configFile);
@@ -42,6 +40,10 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
 
     public int getDelay() {
         return delay;
+    }
+
+    public int getRepetitions() {
+        return repetitions;
     }
 
     private List<BenchmarkDefinition> parse(String configFile) {
@@ -58,7 +60,8 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
     }
 
     private void parseRootAttrs(Element root) throws Exception {
-        delay = getAttributeValueAsInt(root, "delay", 10);
+        delay = getAttributeValueAsInt(root, "delay", 1);
+        repetitions = getAttributeValueAsInt(root, "repetitions", 1);
     }
 
     private List<BenchmarkDefinition> parseBenchmarks(Element root) throws Exception {
@@ -74,13 +77,13 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
         Constructor<?> constructor = getConstructorForArgs(className, args);
 
         String description = element.getAttribute("description");
-        int repetitions = getAttributeValueAsInt(element, "repetitions", 1);
         String en = element.getAttribute("enabled");
         boolean enabled = en.isEmpty() || !en.trim().toLowerCase().equals("false");
 
         return new BenchmarkDefinition(constructor, toArgs(constructor.getParameterTypes(), args))
                 .setDescription(description)
-                .setRepetitions(repetitions)
+                .setRepetitions(getAttributeValueAsInt(element, "repetitions", 1))
+                .setWarmups(getAttributeValueAsInt(element, "warmups", 0))
                 .setEnabled(enabled);
     }
 

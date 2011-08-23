@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@ package org.drools.benchmark;
 
 import java.lang.reflect.*;
 
-/**
- * @author Mario Fusco
- */
 public class BenchmarkDefinition {
 
     private Constructor<?> constructor;
     private Object[] args;
     private String description;
     private int repetitions;
+    private int warmups;
     private boolean enabled = true;
 
     public BenchmarkDefinition(Constructor<?> constructor, Object[] args) {
@@ -47,6 +45,14 @@ public class BenchmarkDefinition {
     }
     public BenchmarkDefinition setRepetitions(int repetitions) {
         this.repetitions = repetitions;
+        return this;
+    }
+
+    public int getWarmups() {
+        return warmups;
+    }
+    public BenchmarkDefinition setWarmups(int warmups) {
+        this.warmups = warmups;
         return this;
     }
 

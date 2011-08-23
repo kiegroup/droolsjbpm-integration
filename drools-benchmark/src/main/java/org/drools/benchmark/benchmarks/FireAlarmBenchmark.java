@@ -16,41 +16,51 @@
 
 package org.drools.benchmark.benchmarks;
 
-import org.drools.KnowledgeBase;
+import org.drools.*;
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
 import org.drools.runtime.*;
+import org.drools.runtime.*;
 import org.drools.runtime.rule.FactHandle;
 
-public class InsertAllAndRetract extends AbstractBenchmark {
+import java.util.*;
 
-    private final int objectsNumber;
+public class FireAlarmBenchmark extends AbstractBenchmark {
+    private final int roomsNumber;
 
-    private String[] drlFiles;
+    private String[] drlFile;
 
-    private FactHandle[] facts;
     private StatefulKnowledgeSession ksession;
 
-    public InsertAllAndRetract(int objectsNumber) {
-        this.objectsNumber = objectsNumber;
-    }
+    private Room[] rooms;
 
-    public InsertAllAndRetract(int objectsNumber, String drlFile) {
-        this(objectsNumber);
-        this.drlFiles = drlFile.split(",");
+    private Random random = new Random();
+
+    public FireAlarmBenchmark(int roomsNumber, String drlFile) {
+        this.roomsNumber = roomsNumber;
+        this.drlFile = drlFile.split(",");
     }
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
+        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
         ksession = kbase.newStatefulKnowledgeSession();
-        facts = new FactHandle[objectsNumber];
+
+        rooms = new Room[roomsNumber];
+        for (int i = 0; i < roomsNumber; i++) {
+            Room room = new Room("Room" + i);
+            ksession.insert(room);
+            Sprinkler sprinkler = new Sprinkler(room);
+            ksession.insert(sprinkler);
+            rooms[i] = room;
+        }
     }
 
     public void execute(int repNr) {
-        for (int i = 0; i < objectsNumber; i++) facts[i] = ksession.insert(new DummyBean(i));
+        int roomNr = random.nextInt(roomsNumber);
+        FactHandle fact = ksession.insert(new Fire(rooms[roomNr]));;
         ksession.fireAllRules();
-        for (FactHandle fact : facts) ksession.retract(fact);
+        ksession.retract(fact);
         ksession.fireAllRules();
     }
 

@@ -16,46 +16,32 @@
 
 package org.drools.benchmark.model;
 
-public class Sprinkler {
+import java.math.BigInteger;
 
-    private Room room;
-    private boolean on = false;
+public class Fibonacci {
+    private int sequence;
 
-    public Sprinkler() { }
+    private BigInteger value;
 
-    public Sprinkler(Room room) {
-        this.room = room;
+    public Fibonacci() { }
+
+    public Fibonacci(final int sequence) {
+        this.sequence = sequence;
+        this.value = new BigInteger("-1");
     }
 
-    public Room getRoom() {
-        return room;
+    public int getSequence() {
+        return this.sequence;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setValue(final BigInteger value) {
+        this.value = value;
+    }
+    public BigInteger getValue() {
+        return this.value;
     }
 
-    public boolean isOn() {
-        return on;
-    }
-
-    public void setOn(boolean on) {
-        this.on = on;
-    }
-
-    @Override
-    public int hashCode() {
-        return room.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Sprinkler)) return false;
-        return room.equals(((Sprinkler)obj).getRoom());
-    }
-
-    @Override
     public String toString() {
-        return "Sprinkler for " + room;
+        return "Fibonacci(" + this.sequence + "/" + this.value + ")";
     }
 }
