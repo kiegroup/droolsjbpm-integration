@@ -87,6 +87,12 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
+    
+    <!-- Examples only dependencies. -->
+    <!--
+      WARNING: every examples only dependency must be properly dealt with in
+      droolsjbpm-integration-distribution/src/main/assembly/assembly-droolsjbpm-integration.xml
+    -->
   </dependencies>
 
   <profiles>
