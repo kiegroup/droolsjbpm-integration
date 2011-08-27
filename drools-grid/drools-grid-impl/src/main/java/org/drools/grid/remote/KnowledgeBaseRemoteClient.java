@@ -20,6 +20,7 @@ package org.drools.grid.remote;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
@@ -182,6 +183,10 @@ public class KnowledgeBaseRemoteClient
     }
 
     public Collection<KnowledgeBaseEventListener> getKnowledgeBaseEventListeners() {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public Set<String> getEntryPointIds() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
