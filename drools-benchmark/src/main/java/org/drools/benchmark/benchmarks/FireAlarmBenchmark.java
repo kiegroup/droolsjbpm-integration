@@ -46,6 +46,8 @@ public class FireAlarmBenchmark extends AbstractBenchmark {
         KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
         ksession = kbase.newStatefulKnowledgeSession();
 
+        ksession.setGlobal("myGlobalList", new ArrayList());
+
         rooms = new Room[roomsNumber];
         for (int i = 0; i < roomsNumber; i++) {
             Room room = new Room("Room" + i);

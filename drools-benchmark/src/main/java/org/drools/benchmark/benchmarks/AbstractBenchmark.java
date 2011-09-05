@@ -22,6 +22,9 @@ import org.drools.builder.*;
 import org.drools.io.*;
 
 public abstract class AbstractBenchmark implements Benchmark {
+
+    protected final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     public void init(BenchmarkDefinition definition) { }
     public void terminate() { }
 

@@ -61,7 +61,7 @@ public class RuleCompile extends AbstractBenchmark {
             isr = new InputStreamReader(getClass().getClassLoader().getResourceAsStream(fileName));
             br = new BufferedReader(isr);
             for (String line = br.readLine(); line != null; line = br.readLine()) {
-                sb.append(line).append("\n");
+                sb.append(line).append(LINE_SEPARATOR);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

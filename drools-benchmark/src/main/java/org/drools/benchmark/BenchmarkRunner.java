@@ -69,11 +69,7 @@ public class BenchmarkRunner {
     private BenchmarkResult execute(BenchmarkConfig config, BenchmarkDefinition definition, boolean shouldWarmUp) {
         BenchmarkResult result = new BenchmarkResult(definition);
 
-        if (shouldWarmUp) {
-            out.println("Warming up: " + definition.getDescription());
-            warmUpExecution(definition);
-            afterBenchmarkRun(config);
-        }
+        if (shouldWarmUp) warmUpExecution(config, definition);
 
         Benchmark benchmark = definition.instance();
         result.setUsedMemoryBeforeStart(usedMemory());
@@ -82,6 +78,7 @@ public class BenchmarkRunner {
 
         result.setDuration(executeBenchmark(definition, benchmark));
         benchmark.terminate();
+        afterBenchmarkRun(config);
         result.setUsedMemoryAfterEnd(usedMemory());
         benchmark = null; // destroy the benchmark in order to allow GC to free the memory allocated by it
 
@@ -90,12 +87,14 @@ public class BenchmarkRunner {
         return result;
     }
 
-    private void warmUpExecution(BenchmarkDefinition definition) {
+    private void warmUpExecution(BenchmarkConfig config, BenchmarkDefinition definition) {
         if (definition.getWarmups() < 1) return;
+        out.println("Warming up: " + definition.getDescription());
         Benchmark benchmark = definition.instance();
         benchmark.init(definition);
         for (int i = 0; i < definition.getWarmups(); i++) benchmark.execute(0);
         benchmark.terminate();
+        afterBenchmarkRun(config);
     }
 
     private double executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
