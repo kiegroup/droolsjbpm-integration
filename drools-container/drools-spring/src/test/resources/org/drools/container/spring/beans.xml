@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:drools="http://drools.org/schema/drools-spring"       
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.5.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <drools:grid id="grid1">
@@ -16,6 +16,8 @@
 
   <drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
 
+   <drools:resource id="resourceWithNameAndDescription" name="A Name" description="A Description" type="DRL" source="http://someHost:1234/someDRLResource2.drl"/>
+   
    <drools:resource id="secureResource" basic-authentication="enabled" username="someUser" password="somePassword" type="DRL" source="http://someHost:1234/someDRLResource.drl"/>
    <drools:resource id="insecureResource" type="DRL" source="http://someHost:1234/someOtherDRLResource.drl"/>
 

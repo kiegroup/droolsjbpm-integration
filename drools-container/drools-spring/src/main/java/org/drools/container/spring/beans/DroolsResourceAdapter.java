@@ -21,6 +21,7 @@ import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.io.impl.UrlResource;
+import org.drools.io.internal.InternalResource;
 import org.springframework.beans.factory.InitializingBean;
 
 public class DroolsResourceAdapter
@@ -76,6 +77,20 @@ public class DroolsResourceAdapter
         ((UrlResource) this.resource).setPassword( password );
     }
 
+    public void setName(String name){
+        if ( !(this.resource instanceof InternalResource) ) {
+            throw new IllegalArgumentException( "'name' attribute is only valid for InternalResource subclasses" );
+        }
+        ((InternalResource) this.resource).setName( name );
+    }
+    
+    public void setDescription(String description){
+        if ( !(this.resource instanceof InternalResource) ) {
+            throw new IllegalArgumentException( "'description' attribute is only valid for InternalResource subclasses" );
+        }
+        ((InternalResource) this.resource).setDescription( description );
+    }
+    
     public DroolsResourceAdapter(String resource,
                                  ResourceType resourceType) {
         this( resource,
