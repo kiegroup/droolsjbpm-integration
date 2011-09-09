@@ -40,6 +40,8 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String USERNAME_ATTRIBUTE             = "username";
     private static final String PASSWORD_ATTRIBUTE             = "password";
     private static final String REF                            = "ref";
+    private static final String NAME                            = "name";
+    private static final String DESCRIPTION                            = "description";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -82,6 +84,15 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
             factory.addPropertyValue( "basicAuthenticationPassword",
                                       password );
         }
+        
+        String name = element.getAttribute( NAME );
+        factory.addPropertyValue( "name",
+                                  name.isEmpty()? null : name );
+        
+        String description = element.getAttribute( DESCRIPTION );
+        factory.addPropertyValue( "description",
+                                  description.isEmpty()? null : description );
+        
 
         if ( "xsd".equals( resourceType.toLowerCase() ) ) {
             XsdParser.parse( element,

@@ -283,4 +283,24 @@ public class SpringDroolsTest {
         assertEquals( "",
                       ur.getPassword() );
     }
+    
+    @Test
+    public void testResourceNameAndDescription() throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
+        
+        DroolsResourceAdapter resource = (DroolsResourceAdapter)context.getBean("secureResource");
+        assertNotNull(resource);
+        Resource secureResource = resource.getDroolsResource();
+        
+        assertNull(secureResource.getName());
+        assertNull(secureResource.getDescription());
+        
+        resource = (DroolsResourceAdapter)context.getBean("resourceWithNameAndDescription");
+        assertNotNull( resource );
+        Resource resourceWithNameAndDescription = resource.getDroolsResource();
+        
+        assertEquals("A Name", resourceWithNameAndDescription.getName());
+        assertEquals("A Description", resourceWithNameAndDescription.getDescription());
+        
+    }
 }
