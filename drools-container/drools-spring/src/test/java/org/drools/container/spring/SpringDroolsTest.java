@@ -42,6 +42,7 @@ import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.io.impl.ResourceChangeScannerImpl;
 import org.drools.io.impl.UrlResource;
+import org.drools.io.internal.InternalResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.process.WorkItemHandler;
@@ -290,14 +291,14 @@ public class SpringDroolsTest {
         
         DroolsResourceAdapter resource = (DroolsResourceAdapter)context.getBean("secureResource");
         assertNotNull(resource);
-        Resource secureResource = resource.getDroolsResource();
+        InternalResource secureResource = (InternalResource) resource.getDroolsResource();
         
         assertNull(secureResource.getName());
         assertNull(secureResource.getDescription());
         
         resource = (DroolsResourceAdapter)context.getBean("resourceWithNameAndDescription");
         assertNotNull( resource );
-        Resource resourceWithNameAndDescription = resource.getDroolsResource();
+        InternalResource resourceWithNameAndDescription = (InternalResource) resource.getDroolsResource();
         
         assertEquals("A Name", resourceWithNameAndDescription.getName());
         assertEquals("A Description", resourceWithNameAndDescription.getDescription());
