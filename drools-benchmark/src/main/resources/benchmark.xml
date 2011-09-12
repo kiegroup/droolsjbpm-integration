@@ -90,7 +90,7 @@
   </benchmark>
 
   <benchmark description="Java Fire Alarm - test joins"
-             warmups="15000" repetitions="100000" enabled="false"
+             warmups="15000" repetitions="100000" enabled="true"
              classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
     <arg>100000</arg>
     <arg>fireAlarmJava.drl</arg>
@@ -117,7 +117,7 @@
   </benchmark>
 
   <benchmark description="Compile MVEL Rules"
-             warmups="1500" repetitions="1000" enabled="true"
+             warmups="1500" repetitions="1000" enabled="false"
              classname="org.drools.benchmark.benchmarks.RuleCompile">
     <arg>fireAlarmMvel.drl</arg>
   </benchmark>

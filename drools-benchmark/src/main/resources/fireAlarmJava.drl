@@ -5,11 +5,12 @@ import org.drools.benchmark.model.*
 
 rule "When there is a fire turn on the sprinkler"
 when
-    Fire($roomA_ : room)
+    $fire: Fire($roomA_ : room)
     $sprinklerA_ : Sprinkler( room == $roomA_, on == false )
 then
     modify( $sprinklerA_ ) { setOn( true ) };
 //    System.out.println( "Turn on the sprinkler for room " + $roomA_.getName() );
+//    System.out.println( $fire );
 end
 
 rule "When the fire is gone turn off the sprinkler"
