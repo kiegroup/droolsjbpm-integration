@@ -42,31 +42,52 @@ public class DroolsSpringTransactionManager
 
     private boolean localTransaction;
 
-    public void begin() {
-        if ( getStatus() == TransactionManager.STATUS_NO_TRANSACTION ) {
-            // If there is no transaction then start one, we will commit within the same Command
-            // it seems in spring calling getTransaction is enough to begin a new transaction
-            currentTransaction = this.ptm.getTransaction( td );
-            localTransaction = true;
-        } else {
-            localTransaction = false;
+    public boolean begin() {
+        try {
+            if ( getStatus() == TransactionManager.STATUS_NO_TRANSACTION ) {
+                // If there is no transaction then start one, we will commit within the same Command
+                // it seems in spring calling getTransaction is enough to begin a new transaction
+                currentTransaction = this.ptm.getTransaction( td );
+                return true;
+            } else {
+                return false;
+            }
+        } catch ( Exception e ) {
+            logger.warn( "Unable to begin transaction",
+                         e );
+            throw new RuntimeException( "Unable to begin transaction",
+                                        e );
         }
     }
 
-    public void commit() {
-        if ( this.localTransaction ) {
-            // if we didn't begin this transaction, then do nothing
-            this.localTransaction = false;
-            this.ptm.commit( currentTransaction );
-            currentTransaction = null;
+    public void commit(boolean transactionOwner) {
+        if ( transactionOwner ) {
+            try {
+                // if we didn't begin this transaction, then do nothing
+                this.localTransaction = false;
+                this.ptm.commit( currentTransaction );
+                currentTransaction = null;
+            } catch ( Exception e ) {
+                logger.warn( "Unable to commit transaction",
+                             e );
+                throw new RuntimeException( "Unable to commit transaction",
+                                            e );
+            }
         }
     }
 
-    public void rollback() {
-        if ( this.localTransaction ) {
-            this.localTransaction = false;
-            this.ptm.rollback( currentTransaction );
-            currentTransaction = null;
+    public void rollback(boolean transactionOwner) {
+        try {
+            if ( transactionOwner ) {
+                this.localTransaction = false;
+                this.ptm.rollback( currentTransaction );
+                currentTransaction = null;
+            }
+        } catch ( Exception e ) {
+            logger.warn( "Unable to rollback transaction",
+                         e );
+            throw new RuntimeException( "Unable to rollback transaction",
+                                        e );
         }
     }
 
