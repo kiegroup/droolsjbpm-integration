@@ -11,7 +11,6 @@ public class UuidJobHandle
     JobHandle,
     Serializable {
     private UUID uuid;
-    
     private AtomicBoolean cancel = new AtomicBoolean(false);
 
     public UuidJobHandle() {
@@ -55,5 +54,9 @@ public class UuidJobHandle
 
     public void setCancel(boolean cancel) {
         this.cancel.set( cancel );
+    }
+
+    public long getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

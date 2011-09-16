@@ -16,6 +16,8 @@
  */
 package org.drools.grid;
 
+import org.drools.time.JobContext;
+import org.drools.time.JobHandle;
 import java.io.Serializable;
 import java.util.Date;
 import org.drools.grid.impl.GridNodeServer;
@@ -27,10 +29,7 @@ import org.drools.command.impl.ContextImplWithEviction;
 import org.drools.grid.impl.EvictionJob;
 import org.drools.time.Trigger;
 import org.drools.time.impl.JDKTimerService;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -55,14 +54,14 @@ public class TempEvictionTest {
         ((ContextImplWithEviction) contextTemp).setEntryEvictionTime(2000); // 2 seconds 
         ((ContextImplWithEviction) contextTemp).setEvictionWakeUpTime(1000); // 1 seconds
         JDKTimerService timer = new JDKTimerService(1);
-
+        
         contextTemp.set("myvalue", "value");
 
 
         Long evictionWakeUpTime = contextTemp.getEvictionWakeUpTime();
 
 
-        timer.scheduleJob(new EvictionJob(contextTemp), null, new MockTrigger(new Date(), evictionWakeUpTime));
+        timer.scheduleJob(new EvictionJob(contextTemp), new MockJobContext(), new MockTrigger(new Date(), evictionWakeUpTime));
         //Set the timestamp for the first time
         contextTemp.set("myvalue", "value");
 
@@ -109,6 +108,35 @@ public class TempEvictionTest {
 
         }
     }
+    
+    public static class MockJobContext
+        implements
+        JobContext,
+        Serializable {
+        private String text;
+
+        public MockJobContext() {
+
+        }
+
+        public MockJobContext(String text) {
+            this.text = text;
+        }
+
+        public JobHandle getJobHandle() {
+            return null;
+        }
+
+        public void setJobHandle(JobHandle jobHandle) {
+
+        }
+
+        public String getText() {
+            return this.text;
+        }
+
+    }
+    
 //    @Test
 //    public void evictionTemp() throws InterruptedException {
 //        Grid grid1 = new GridImpl(new HashMap<String, Object>());
