@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.drools.grid.Grid;
@@ -32,7 +33,6 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.grid.service.directory.Address;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
@@ -50,6 +50,8 @@ public class SchedulerClient
     private ConversationManager    conversationManager;
 
     private Grid                   grid;
+    
+    private AtomicLong                    idCounter = new AtomicLong();
 
     public SchedulerClient(Grid grid,
                            GridServiceDescription schedulerGsd) {
@@ -158,7 +160,7 @@ public class SchedulerClient
             jobHandles.add( handle );
         }
 
-        return new MultiJobHandle( jobHandles );
+        return new MultiJobHandle( idCounter.incrementAndGet(), jobHandles );
 
     }
 
