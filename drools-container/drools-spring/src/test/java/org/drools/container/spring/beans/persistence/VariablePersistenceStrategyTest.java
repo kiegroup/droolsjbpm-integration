@@ -129,6 +129,7 @@ public class VariablePersistenceStrategyTest {
                  txManager );
         env.set( EnvironmentName.GLOBALS,
                  new MapGlobalResolver() );
+        
         env.set( EnvironmentName.OBJECT_MARSHALLING_STRATEGIES,
                  new ObjectMarshallingStrategy[]{new JPAPlaceholderResolverStrategy( env ),
                                                                     new SerializablePlaceholderResolverStrategy( ClassObjectMarshallingStrategyAcceptor.DEFAULT )} );

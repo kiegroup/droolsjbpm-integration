@@ -30,8 +30,11 @@ import java.util.Properties;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.compiler.PackageBuilder;
 import org.drools.core.util.DroolsStreamUtils;
+import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.drools.persistence.SingleSessionCommandService;
 import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
@@ -46,6 +49,7 @@ import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.compiler.ProcessBuilderImpl;
 import org.jbpm.process.core.timer.Timer;
+import org.jbpm.process.instance.ProcessRuntimeImpl;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.jbpm.workflow.core.Node;
@@ -579,6 +583,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         long procId = processInstance.getId();
         log.info( "---> Started ProcessTimer id: {}",
                   procId );
+        
         service.dispose();
         log.info( "---> session disposed" );
 
@@ -593,7 +598,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,
                                                        null,
-                                                       env );
+                                                       env );               
 
         log.info( "---> load session: " + sessionId );
         processInstance = service.getProcessInstance( procId );
