@@ -40,8 +40,6 @@ public class DroolsSpringTransactionManager
         this.ptm = ptm;
     }
 
-    private boolean localTransaction;
-
     public boolean begin() {
         try {
             if ( getStatus() == TransactionManager.STATUS_NO_TRANSACTION ) {
@@ -64,7 +62,6 @@ public class DroolsSpringTransactionManager
         if ( transactionOwner ) {
             try {
                 // if we didn't begin this transaction, then do nothing
-                this.localTransaction = false;
                 this.ptm.commit( currentTransaction );
                 currentTransaction = null;
             } catch ( Exception e ) {
@@ -79,7 +76,6 @@ public class DroolsSpringTransactionManager
     public void rollback(boolean transactionOwner) {
         try {
             if ( transactionOwner ) {
-                this.localTransaction = false;
                 this.ptm.rollback( currentTransaction );
                 currentTransaction = null;
             }

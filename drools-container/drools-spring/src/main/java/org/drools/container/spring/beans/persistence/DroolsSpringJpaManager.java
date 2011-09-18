@@ -50,7 +50,7 @@ public class DroolsSpringJpaManager
         this.emf = (EntityManagerFactory) env.get( EnvironmentName.ENTITY_MANAGER_FACTORY );
 
         getApplicationScopedPersistenceContext(); // we create this on initialisation so that we own the EMF reference
-                                             // otherwise Spring will close it after the transaction finishes
+                                                  // otherwise Spring will close it after the transaction finishes
     }
 
     public PersistenceContext getApplicationScopedPersistenceContext() {
@@ -112,7 +112,7 @@ public class DroolsSpringJpaManager
     public void endCommandScopedEntityManager() {
         if ( TransactionSynchronizationManager.hasResource( "cmdEM" ) ) {
             TransactionSynchronizationManager.unbindResource( "cmdEM" );
-            if ( getCommandScopedPersistenceContext() != null ) {
+            if ( this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER ) != null ) {
                 getCommandScopedPersistenceContext().close();
             }
 
