@@ -7,7 +7,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>5.3.0.CR1</version>
+    <version>5.3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>drools-benchmark</artifactId>
@@ -49,6 +49,7 @@
     <dependency>
       <groupId>org.mvel</groupId>
       <artifactId>mvel2</artifactId>
+      <version>2.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
