@@ -1,6 +1,16 @@
-<benchmarks delay="10" repetitions="1">
+<benchmarks delay="10" repetitions="10">
 
   <!-- Runtime -->
+
+  <benchmark description="Create a stateful session"
+             warmups="10000" repetitions="10000" enabled="true"
+             classname="org.drools.benchmark.benchmarks.StatefulSessionCreation">
+  </benchmark>
+
+  <benchmark description="Execute stateless session executing one rule on one object"
+             warmups="20000" repetitions="10000" enabled="false"
+             classname="org.drools.benchmark.benchmarks.SingleStatelessRule">
+  </benchmark>
 
   <benchmark description="Insert 10K objects and retract them (no rules)"
              warmups="1" enabled="false"
@@ -90,7 +100,7 @@
   </benchmark>
 
   <benchmark description="Java Fire Alarm - test joins"
-             warmups="15000" repetitions="100000" enabled="true"
+             warmups="15000" repetitions="100000" enabled="false"
              classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
     <arg>100000</arg>
     <arg>fireAlarmJava.drl</arg>

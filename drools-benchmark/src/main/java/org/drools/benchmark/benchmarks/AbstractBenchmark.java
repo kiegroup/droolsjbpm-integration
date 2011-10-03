@@ -18,6 +18,7 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.*;
 import org.drools.benchmark.*;
+import org.drools.benchmark.util.DroolsUtil;
 import org.drools.builder.*;
 import org.drools.io.*;
 
@@ -29,17 +30,10 @@ public abstract class AbstractBenchmark implements Benchmark {
     public void terminate() { }
 
     protected final KnowledgeBuilder createKnowledgeBuilder(String... drlFiles) {
-        if (drlFiles == null) return null;
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        for (String drlFile : drlFiles)
-            kbuilder.add(ResourceFactory.newClassPathResource(drlFile, getClass()), ResourceType.DRL);
-        if (kbuilder.hasErrors()) throw new RuntimeException(kbuilder.getErrors().toString());
-        return kbuilder;
+        return DroolsUtil.createKnowledgeBuilder(this, drlFiles);
     }
 
     protected final KnowledgeBase createKnowledgeBase(KnowledgeBuilder kbuilder) {
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        if (kbuilder != null) kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-        return kbase;
+        return DroolsUtil.createKnowledgeBase(kbuilder);
     }
 }

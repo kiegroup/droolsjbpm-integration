@@ -17,6 +17,8 @@
 package org.drools.benchmark.benchmarks;
 
 import static org.drools.benchmark.model.Gender.*;
+
+import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.*;
 
 import org.drools.*;
@@ -26,9 +28,13 @@ import org.drools.runtime.*;
 
 public class SingleStatelessRule extends AbstractBenchmark {
 
-    public void execute(int repNr) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder("licenseApplication.drl"));
+    private KnowledgeBase kbase;
 
+    public void init(BenchmarkDefinition definition) {
+        kbase = createKnowledgeBase(createKnowledgeBuilder("licenseApplication.drl"));
+    }
+
+    public void execute(int repNr) {
         StatelessKnowledgeSession ksession = kbase.newStatelessKnowledgeSession();
         Applicant applicant = new Applicant("Mr John Smith", 21, MALE);
 
