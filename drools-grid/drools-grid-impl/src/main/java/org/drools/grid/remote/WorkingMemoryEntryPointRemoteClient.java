@@ -126,7 +126,6 @@ public class WorkingMemoryEntryPointRemoteClient
     }
 
     public void dispose() {
-        // TODO workaround for compilation error of https://github.com/droolsjbpm/drools/commit/260cb53d20b1ed321a7307924521d79d701f66df
     }
 
 }
