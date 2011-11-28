@@ -125,4 +125,6 @@ public class WorkingMemoryEntryPointRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
+    public void dispose() {
+    }
 }
