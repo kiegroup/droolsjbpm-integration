@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 
-import javax.jms.IllegalStateException;
-
 public class IoUtils {
 
     public static int findPort() {
