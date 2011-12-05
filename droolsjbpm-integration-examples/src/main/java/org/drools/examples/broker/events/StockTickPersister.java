@@ -56,7 +56,12 @@ public class StockTickPersister implements EventSource {
     }
     
     public StockTick load() throws ParseException, IOException {
-        Object[] results = format.parse( in.readLine() );
+        String line = in.readLine();
+        if (line == null) {
+            System.out.println("End of file");
+            return null;
+        }
+        Object[] results = format.parse(line);
         StockTick tick = new StockTick( (String)results[1],
                                         ((Number)results[2]).doubleValue(),
                                         ((Number)results[0]).longValue()+baseTimestamp );
@@ -80,11 +85,15 @@ public class StockTickPersister implements EventSource {
         if( in != null ) {
             try {
                 StockTick tick = load();
+                if (tick == null) {
+                    return false;
+                }
                 next = new EventImpl<StockTick>( tick.getTimestamp(), tick );
                 return true;
             } catch ( Exception e ) {
                 // nothing to do, return false
                 e.printStackTrace();
+                return false;
             }
         }
         return false;
