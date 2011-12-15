@@ -37,9 +37,7 @@ public class NewKnowledgeBuilderRemoteCommand
         if ( this.kbuilderConfId == null || this.kbuilderConfId.equals("") ) {
             kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         } else {
-            KnowledgeBuilderConfiguration conf = (KnowledgeBuilderConfiguration) context
-                                    .getContextManager()
-                                    .getDefaultContext().get(kbuilderConfId);
+            KnowledgeBuilderConfiguration conf = (KnowledgeBuilderConfiguration) context.get(kbuilderConfId);
             kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder( conf );
         }
         

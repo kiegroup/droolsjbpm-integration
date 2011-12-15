@@ -37,8 +37,8 @@ public class SetQueryIteratorRemoteCommand implements GenericCommand<Void>{
     }
     
     public Void execute(Context context) {
-        Iterator<QueryResultsRow>  it = ((QueryResults)context.getContextManager().getDefaultContext().get( this.queryResultsId )).iterator();
-        context.getContextManager().getDefaultContext().set( "Iterator - "+this.queryResultsId, it);
+        Iterator<QueryResultsRow>  it = ((QueryResults)context.get( this.queryResultsId )).iterator();
+        context.set( "Iterator - "+this.queryResultsId, it);
         return null;
     }
     

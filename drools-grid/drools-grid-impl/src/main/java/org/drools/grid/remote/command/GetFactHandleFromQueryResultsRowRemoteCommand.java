@@ -42,7 +42,7 @@ public class GetFactHandleFromQueryResultsRowRemoteCommand implements GenericCom
     }
     
     public FactHandle execute(Context context) {
-        FactHandle handle = ((QueryResultsRow) context.getContextManager().getDefaultContext().get( "Row - "+rowId+" - "+this.queryResultsId)).getFactHandle(identifier);
+        FactHandle handle = ((QueryResultsRow) context.get( "Row - "+rowId+" - "+this.queryResultsId)).getFactHandle(identifier);
         if(handle instanceof DefaultFactHandle){
             FactHandle disconnectedHandle = ((DefaultFactHandle)handle).clone();
             ((DefaultFactHandle)disconnectedHandle).disconnect();

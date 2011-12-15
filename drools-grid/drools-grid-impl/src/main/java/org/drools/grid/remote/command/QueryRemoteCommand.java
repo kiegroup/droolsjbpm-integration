@@ -98,7 +98,7 @@ public class QueryRemoteCommand  implements GenericCommand<QueryResults> {
         
         if ( this.outIdentifier != null ) {
             //((StatefulKnowledgeSessionImpl)ksession).session.getExecutionResult().getResults().put( this.outIdentifier, results );
-            context.getContextManager().getDefaultContext().set( this.outIdentifier, results );
+            context.set( this.outIdentifier, results );
         }
         
         

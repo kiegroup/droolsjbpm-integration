@@ -20,6 +20,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.command.Context;
+import org.drools.command.ContextManager;
 import org.drools.command.impl.GenericCommand;
 
 public class NewKnowledgeBuilderRemoteCommand
@@ -35,9 +36,7 @@ public class NewKnowledgeBuilderRemoteCommand
     public KnowledgeBuilder execute(Context context) {
         KnowledgeBuilder kbuilder = null;
         KnowledgeBuilderConfiguration kconf = 
-                        (KnowledgeBuilderConfiguration) context
-                                                        .getContextManager()
-                                                        .getDefaultContext().get(kbuilderConfId);
+                        (KnowledgeBuilderConfiguration) context.get(kbuilderConfId);
         if ( kconf == null ) {
             kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         } else {
