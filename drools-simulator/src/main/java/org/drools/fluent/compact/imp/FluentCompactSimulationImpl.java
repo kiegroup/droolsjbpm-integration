@@ -46,7 +46,6 @@ import org.drools.simulation.Path;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.Step;
 import org.drools.simulation.impl.PathImpl;
-import org.drools.simulation.impl.PrintVariableCommand;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.StepImpl;
 

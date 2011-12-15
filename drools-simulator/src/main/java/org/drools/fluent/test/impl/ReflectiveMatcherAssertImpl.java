@@ -22,7 +22,6 @@ import java.util.Map;
 import org.drools.command.Context;
 import org.drools.fluent.test.ReflectiveMatcher;
 import org.drools.fluent.test.ReflectiveMatcherAssert;
-import org.drools.simulation.impl.Person;
 import org.hamcrest.Matcher;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
