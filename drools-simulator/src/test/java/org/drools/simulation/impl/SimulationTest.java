@@ -21,11 +21,10 @@ import java.util.List;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.Person;
 import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.command.Command;
+import org.drools.command.ContextManager;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
@@ -38,6 +37,7 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.fluent.test.impl.ReflectiveMatcherAssertCommand;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -46,7 +46,6 @@ import org.drools.simulation.Simulation;
 import org.drools.simulation.Step;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 
 import org.junit.After;
 import org.junit.Before;
@@ -65,6 +64,7 @@ public class SimulationTest {
 
         String str = "";
         str += "package org.drools \n";
+        str += "import " + Person.class.getName() + ";\n"; 
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "    dialect \"java\" \n";
@@ -81,104 +81,73 @@ public class SimulationTest {
 
         List<Command> cmds = new ArrayList<Command>();
 
+        cmds.add( new NewKnowledgeBuilderCommand( null ) );
         cmds.add( new SetVariableCommand( "path1",
-                                          "kbuilder",
-                                          new NewKnowledgeBuilderCommand( null ) ) );
+                                          KnowledgeBuilder.class.getName() ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                                                                                 ResourceType.DRL,
-                                                                                                 null ),
-                                                                 "kbuilder",
-                                                                 null,
-                                                                 null, null ) );
+        cmds.add( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                                                  ResourceType.DRL,
+                                                  null ) );
 
+        cmds.add( new NewKnowledgeBaseCommand( null ) );
         cmds.add( new SetVariableCommand( "path1",
-                                          "kbase",
-                                          new NewKnowledgeBaseCommand( null ) ) );
+                                          KnowledgeBase.class.getName() ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 null, null ) );
+        cmds.add( new KnowledgeBaseAddKnowledgePackagesCommand() );
 
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
 
+        cmds.add( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
         cmds.add( new SetVariableCommand( "path1",
-                                          "ksession",
-                                          new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ),
-                                                                                         "kbuilder",
-                                                                                         "kbase",
-                                                                                         null, null ) ) );
+                                          StatefulKnowledgeSession.class.getName() ) );
 
         List list = new ArrayList();
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new SetGlobalCommand( "list",
-                                                                                       list ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new SetGlobalCommand( "list",
+                                        list ) );
 
         steps.add( new StepImpl( path,
                                  cmds,
                                  0 ) );
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "darth",
-                                                                                                      97 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "darth",
+                                                       97 ) ) );
+        cmds.add( new FireAllRulesCommand() );
+
         steps.add( new StepImpl( path,
                                  cmds,
                                  2000 ) );
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "yoda",
-                                                                                                      98 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "yoda",
+                                                       98 ) ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new FireAllRulesCommand() );
+
         steps.add( new StepImpl( path,
                                  cmds,
                                  4000 ) );
 
         cmds = new ArrayList<Command>();
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check List size",
-                                                                                   2,
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "size()" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check List size",
+                                    2,
+                                    new GetGlobalCommand( "list" ),
+                                    "size()" ) );
+        
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "darth",
+                                                97 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 0 )" ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "darth",
-                                                                                               97 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 0 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "yoda",
-                                                                                               98 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 1 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "yoda",
+                                                98 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 1 )" ) );
 
         steps.add( new StepImpl( path,
                                  new TestGroupCommand( "test1",
@@ -191,11 +160,6 @@ public class SimulationTest {
                                    path );
 
         return simulation;
-
-        //        Simulator simulator = new Simulator( simulation,
-        //                                             System.currentTimeMillis() );
-        //
-        //        simulator.run();
     }
 
     @Test
@@ -205,6 +169,7 @@ public class SimulationTest {
 
         String str = "";
         str += "package org.drools \n";
+        str += "import " + Person.class.getName() + ";\n";     
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "    dialect \"java\" \n";
@@ -221,72 +186,51 @@ public class SimulationTest {
 
         List<Command> cmds = new ArrayList<Command>();
 
-        cmds.add( new SetVariableCommand( "ROOT",
-                                          "kbuilder",
-                                          new NewKnowledgeBuilderCommand( null ) ) );
+        cmds.add( new NewKnowledgeBuilderCommand( null ) );
+        cmds.add( new SetVariableCommand( ContextManager.ROOT,
+                                          KnowledgeBuilder.class.getName() ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                                                                                 ResourceType.DRL,
-                                                                                                 null ),
-                                                                 "kbuilder",
-                                                                 null,
-                                                                 null, null ) );
+        cmds.add( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                                                  ResourceType.DRL,
+                                                  null ) );
 
-        cmds.add( new SetVariableCommand( "ROOT",
-                                          "kbase",
-                                          new NewKnowledgeBaseCommand( null ) ) );
+        cmds.add( new NewKnowledgeBaseCommand( null ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBaseAddKnowledgePackagesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 null, null ) );
+        cmds.add( new SetVariableCommand( ContextManager.ROOT,
+                                          KnowledgeBase.class.getName() ) );
+
+        cmds.add( new KnowledgeBaseAddKnowledgePackagesCommand() );
 
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
 
-        cmds.add( new SetVariableCommand( "ROOT",
-                                          "ksession",
-                                          new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ),
-                                                                                         "kbuilder",
-                                                                                         "kbase",
-                                                                                         null, null ) ) );
+        cmds.add( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
+        cmds.add( new SetVariableCommand( ContextManager.ROOT,
+                                          StatefulKnowledgeSession.class.getName() ) );
 
         List list = new ArrayList();
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new SetGlobalCommand( "list",
-                                                                                       list ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new SetGlobalCommand( "list",
+                                        list ) );
 
         steps.add( new StepImpl( path,
                                  cmds,
                                  0 ) );
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "darth",
-                                                                                                      97 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "darth",
+                                                       97 ) ) );
+        cmds.add( new FireAllRulesCommand() );
+
         steps.add( new StepImpl( path,
                                  cmds,
                                  2000 ) );
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "yoda",
-                                                                                                      98 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "yoda",
+                                                       98 ) ) );
+        cmds.add( new FireAllRulesCommand() );
+
         steps.add( new StepImpl( path,
                                  cmds,
                                  4000 ) );
@@ -302,101 +246,67 @@ public class SimulationTest {
         steps = new ArrayList<Step>();
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "bobba",
-                                                                                                      77 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "bobba",
+                                                       77 ) ) );
+        cmds.add( new FireAllRulesCommand() );
         steps.add( new StepImpl( path,
                                  cmds,
                                  1500 ) );
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "luke",
-                                                                                                      30 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "luke",
+                                                       30 ) ) );
+        cmds.add( new FireAllRulesCommand() );
+
         steps.add( new StepImpl( path,
                                  cmds,
                                  2200 ) );
 
         cmds = new ArrayList<Command>();
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new InsertObjectCommand( new Person( "ben",
-                                                                                                      150 ) ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new FireAllRulesCommand(),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new InsertObjectCommand( new Person( "ben",
+                                                       150 ) ) );
+        cmds.add( new FireAllRulesCommand() );
+
         steps.add( new StepImpl( path,
                                  cmds,
                                  4500 ) );
 
         cmds = new ArrayList<Command>();
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check List size",
-                                                                                   5,
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "size()" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check List size",
+                                    5,
+                                    new GetGlobalCommand( "list" ),
+                                    "size()" ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "bobba",
-                                                                                               77 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 0 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "bobba",
+                                                77 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 0 )" ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "darth",
-                                                                                               97 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 1 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "darth",
+                                                97 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 1 )" ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "luke",
-                                                                                               30 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 2 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "luke",
+                                                30 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 2 )" ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "yoda",
-                                                                                               98 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 3 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "yoda",
+                                                98 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 3 )" ) );
 
-        cmds.add( new KnowledgeContextResolveFromContextCommand( new AssertEquals( "Check Person",
-                                                                                   new Person( "ben",
-                                                                                               150 ),
-                                                                                   new GetGlobalCommand( "list" ),
-                                                                                   "get( 4 )" ),
-                                                                 "kbuilder",
-                                                                 "kbase",
-                                                                 "ksession", null ) );
+        cmds.add( new AssertEquals( "Check Person",
+                                    new Person( "ben",
+                                                150 ),
+                                    new GetGlobalCommand( "list" ),
+                                    "get( 4 )" ) );
 
         steps.add( new StepImpl( path,
                                  new TestGroupCommand( "test2",
@@ -409,6 +319,5 @@ public class SimulationTest {
                                    path );
 
         return simulation;
-
     }
 }

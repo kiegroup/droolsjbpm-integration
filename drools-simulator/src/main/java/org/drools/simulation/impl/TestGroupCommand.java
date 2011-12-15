@@ -23,7 +23,7 @@ import java.util.Map;
 import org.drools.command.Command;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.impl.KnowledgeCommandContext;
+import org.drools.command.impl.FixedKnowledgeCommandContext;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.reteoo.ReteooWorkingMemory;
 import org.drools.runtime.StatefulKnowledgeSession;

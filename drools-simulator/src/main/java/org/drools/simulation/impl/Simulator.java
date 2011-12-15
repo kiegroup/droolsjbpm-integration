@@ -28,8 +28,10 @@ import org.drools.StatefulSession;
 import org.drools.command.Command;
 import org.drools.command.Context;
 import org.drools.command.ContextManager;
+import org.drools.command.GetDefaultValue;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
+import org.drools.command.ResolvingKnowledgeCommandContext;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
@@ -44,32 +46,38 @@ import org.drools.time.SessionPseudoClock;
 
 public class Simulator
     implements
-    ContextManager {
+    ContextManager,
+    GetDefaultValue {
 
-    private PriorityQueue<Step>  queue;
-    private SimulationImpl       simulation;
+    private PriorityQueue<Step>           queue;
+    private SimulationImpl                simulation;
     //    private SessionPseudoClock  clock;
-    private long                 startTime;
+    private long                          startTime;
 
-    private Context              root;
-    private Map<String, Context> contexts;
+    private Context                       root;
+    private Map<String, Context>          contexts;
 
-    private String               ROOT = "ROOT";
-    
+    private static String                 ROOT             = "ROOT";
+
     private Set<StatefulKnowledgeSession> ksessions;
-    
-    private CommandExecutionHandler executionHandler = new DefaultCommandExecutionHandler();
 
-    public Simulator(Simulation simulation,
-              //SessionPseudoClock clock,
-              long startTime) {
-        //        this.clock = clock;
+    private CommandExecutionHandler       executionHandler = new DefaultCommandExecutionHandler();
+
+    private Object                        lastReturnValue;
+
+    public Simulator( Simulation simulation,
+                      //SessionPseudoClock clock,
+                      long startTime ) {
+        //  this.clock = clock;
         this.ksessions = new HashSet<StatefulKnowledgeSession>();
-        
+
         this.startTime = startTime;
         this.simulation = (SimulationImpl) simulation;
         this.root = new ContextImpl( ROOT,
                                      this );
+        
+        this.root.set( "simulator", 
+                       this );
 
         this.contexts = new HashMap<String, Context>();
         this.contexts.put( ROOT,
@@ -120,42 +128,41 @@ public class Simulator
         StepImpl step = (StepImpl) this.queue.remove();
         PathImpl path = (PathImpl) step.getPath();
 
-        Context pathContext = this.contexts.get( path.getName() );
-        
+        Context pathContext = new ResolvingKnowledgeCommandContext( this.contexts.get( path.getName() ) );
+
         // increment the clock for all the registered ksessions
         for ( StatefulKnowledgeSession ksession : this.ksessions ) {
-          SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
-  
-          long newTime = this.startTime + step.getTemporalDistance();
-          long currentTime = clock.getCurrentTime();
-          clock.advanceTime( (currentTime + (newTime - currentTime)),
-                             TimeUnit.MICROSECONDS );
+            SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
+            long newTime = startTime + step.getTemporalDistance();
+            long currentTime = clock.getCurrentTime();
+
+            clock.advanceTime( newTime - currentTime,
+                               TimeUnit.MILLISECONDS );
         }
-        
+
         for ( Command cmd : step.getCommands() ) {
-            if ( cmd instanceof KnowledgeContextResolveFromContextCommand) {
-                if ( ((KnowledgeContextResolveFromContextCommand)cmd).getCommand() instanceof NewStatefulKnowledgeSessionCommand ) {
-                    // instantiate the ksession, set it's clock and register it
-                    StatefulKnowledgeSession ksession = ( StatefulKnowledgeSession ) executionHandler.execute( (GenericCommand) cmd, pathContext );
-                    if ( ksession != null ) {
-                        SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
-                        if ( clock.getCurrentTime() == 0 ) {
-                            clock.advanceTime( startTime,
-                                               TimeUnit.MILLISECONDS );
-                        }
-                        this.ksessions.add( ksession );
-                    }
-                } else if ( cmd instanceof GenericCommand) {
-                    executionHandler.execute( (GenericCommand) cmd, pathContext );
+            if ( cmd instanceof NewStatefulKnowledgeSessionCommand ) {
+                // instantiate the ksession, set it's clock and register it
+                StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) executionHandler.execute( (GenericCommand) cmd,
+                                                                                                         pathContext );
+                if ( ksession != null ) {
+                    SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
+                    long newTime = startTime + step.getTemporalDistance();
+                    long currentTime = clock.getCurrentTime();
+                    clock.advanceTime( newTime - currentTime,
+                                       TimeUnit.MILLISECONDS );
+                    this.ksessions.add( ksession );
+                    this.lastReturnValue = ksession;
                 }
-            }  else if ( cmd instanceof GenericCommand) {
-                executionHandler.execute( (GenericCommand) cmd, pathContext );
+            } else if ( cmd instanceof GenericCommand ) {
+                this.lastReturnValue = executionHandler.execute( (GenericCommand) cmd,
+                                                                 pathContext );
             }
         }
 
         return step;
     }
-    
+
     public void setCommandExecutionHandler(CommandExecutionHandler executionHandler) {
         this.executionHandler = executionHandler;
     }
@@ -163,54 +170,65 @@ public class Simulator
     public Context getContext(String identifier) {
         return this.contexts.get( identifier );
     }
-    
-    public Context getDefaultContext() {
+
+    public Context getRootContext() {
         return this.root;
     }
-    
+
     public Simulation getSimulation() {
         return this.simulation;
     }
     
-    public static interface CommandExecutionHandler  {
-        public Object execute(GenericCommand command, Context context);
+    public Object getLastReturnValue() {
+        return this.lastReturnValue;
     }
-    
-    public static class DefaultCommandExecutionHandler implements CommandExecutionHandler  {
-        public Object execute(GenericCommand command, Context context) {
+
+    public static interface CommandExecutionHandler {
+        public Object execute(GenericCommand command,
+                              Context context);
+    }
+
+    public static class DefaultCommandExecutionHandler
+        implements
+        CommandExecutionHandler {
+        public Object execute(GenericCommand command,
+                              Context context) {
             return command.execute( context );
         }
     }
 
+    public Object getObject() {
+        return lastReturnValue;
+    }
 
-//    public static interface CommandExecutorService<T> {
-//        T execute(Command command);
-//    }
-//    
-//    public static class SimulatorCommandExecutorService<T> implements CommandExecutorService {
-//        Map map = new HashMap() {
-//            {
-//               put( KnowledgeBuilderAddCommand.class, null);
-//            }
-//        };
-//        
-//        public  T execute(Command command) {
-//            return null;
-//        }
-//    }
-//    
-//    public static interface CommandContextAdapter {
-//        Context getContext();
-//    }
-//    
-//    public static class KnowledgeBuilderCommandContextAdapter implements CommandContextAdapter {
-//
-//        public Context getContext() {
-//            return new KnowledgeBuilderCommandContext();
-//        }
-//        
-//    }
-    
+    //    public static interface CommandExecutorService<T> {
+    //        T execute(Command command);
+    //    }
+    //    
+    //    public static class SimulatorCommandExecutorService<T> implements CommandExecutorService {
+    //        Map map = new HashMap() {
+    //            {
+    //               put( KnowledgeBuilderAddCommand.class, null);
+    //            }
+    //        };
+    //        
+    //        public  T execute(Command command) {
+    //            return null;
+    //        }
+    //    }
+    //    
+    //    public static interface CommandContextAdapter {
+    //        Context getContext();
+    //    }
+    //    
+    //    public static class KnowledgeBuilderCommandContextAdapter implements CommandContextAdapter {
+    //
+    //        public Context getContext() {
+    //            return new KnowledgeBuilderCommandContext();
+    //        }
+    //        
+    //    }
+
     //    public void runUntil(Step step) {
     //        
     //    }

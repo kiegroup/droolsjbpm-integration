@@ -52,4 +52,10 @@ public class PathImpl
         return this.steps;
     }
 
+    @Override
+    public String toString() {
+        return "PathImpl [name=" + name + ", steps=" + steps.size() + "]";
+    }
+ 
+
 }

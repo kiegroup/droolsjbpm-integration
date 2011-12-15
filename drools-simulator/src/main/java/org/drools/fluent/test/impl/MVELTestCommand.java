@@ -1,0 +1,67 @@
+package org.drools.fluent.test.impl;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.drools.command.Context;
+import org.drools.command.impl.GenericCommand;
+import org.mvel2.MVEL;
+import org.mvel2.ParserContext;
+
+import static org.junit.Assert.fail;
+
+public class MVELTestCommand implements GenericCommand<Void>  {
+    public static final String MVEL_HEADER = "MVEL_HEADER";
+    private String              headerText = "";
+    private String              text;
+    private String              reason;
+    
+    public MVELTestCommand() {
+        
+    }
+    
+    public String getHeaderText() {
+        return headerText;
+    }
+    
+    public void setHeaderText(String headerText) {
+        this.headerText = headerText;
+    }
+    
+    public String getText() {
+        return text;
+    }
+    
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public Void execute(Context context) {
+        //ParserContext ctx = new Parser
+        
+        ParserContext parserCtx = new ParserContext( );
+        String t = headerText + text;
+        MVEL.compileExpression( t, parserCtx );
+        
+        Map<String, Class> inputs = parserCtx.getInputs();
+                
+        Map<String, Object> vars = new HashMap<String, Object>();
+        
+        for ( String name : inputs.keySet() ) {
+            vars.put( name, context.get( name ) );
+        }
+        
+        if ( ! (( Boolean ) MVEL.eval( headerText + text, vars )).booleanValue() ) {
+            fail( text + "\n" + reason );
+        }
+        return null;
+    }
+}

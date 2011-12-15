@@ -60,4 +60,9 @@ public class StepImpl
         return this.path;
     }
 
+    @Override
+    public String toString() {
+        return "StepImpl [distance=" + distance + ", path=" + path + ", commands=" + commands + "]";
+    }
+
 }
