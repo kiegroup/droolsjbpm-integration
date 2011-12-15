@@ -87,11 +87,11 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
         
         String name = element.getAttribute( NAME );
         factory.addPropertyValue( "name",
-                                  name.isEmpty()? null : name );
+                                  org.drools.core.util.StringUtils.isEmpty(name) ? null : name);
         
         String description = element.getAttribute( DESCRIPTION );
         factory.addPropertyValue( "description",
-                                  description.isEmpty()? null : description );
+                                  org.drools.core.util.StringUtils.isEmpty(description) ? null : description);
         
 
         if ( "xsd".equals( resourceType.toLowerCase() ) ) {

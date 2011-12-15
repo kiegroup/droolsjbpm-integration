@@ -16,6 +16,7 @@
 
 package org.drools.benchmark;
 
+import org.drools.core.util.StringUtils;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
@@ -78,7 +79,7 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
 
         String description = element.getAttribute("description");
         String en = element.getAttribute("enabled");
-        boolean enabled = en.isEmpty() || !en.trim().toLowerCase().equals("false");
+        boolean enabled = StringUtils.isEmpty(en) || !en.trim().toLowerCase().equals("false");
 
         return new BenchmarkDefinition(constructor, toArgs(constructor.getParameterTypes(), args))
                 .setDescription(description)
@@ -119,6 +120,6 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
 
     private int getAttributeValueAsInt(Element elem, String name, int def) {
         String value = elem.getAttribute(name);
-        return value.isEmpty() ? def : Integer.parseInt(value);
+        return StringUtils.isEmpty(value) ? def : Integer.parseInt(value);
     }
 }
