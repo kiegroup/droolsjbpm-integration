@@ -112,7 +112,7 @@ public class VariablePersistenceStrategyTest {
     }
 
     @After
-    public void destrySpringContext() {
+    public void destroySpringContext() {
         log.info( "destroy spring context" );
         ctx.destroy();
     }
