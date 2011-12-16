@@ -28,7 +28,8 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.command.CommandFactory;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -96,9 +97,9 @@ public class KnowledgeBuilderProviderRemoteClient
             remoteConfId = ((KnowledgeBuilderConfigurationRemoteClient)conf).getId();
         }
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
-                                                                                                localId,
-                                                                                                new NewKnowledgeBuilderRemoteCommand( remoteConfId ) )} ) );
+                                           Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
+                                                                                                          localId,
+                                                                                                          new NewKnowledgeBuilderRemoteCommand( remoteConfId ) )} ) );
 
         ConversationManager connm = this.grid.get( ConversationManager.class );
         ConversationUtil.sendMessage( connm,
