@@ -18,7 +18,7 @@ package org.drools.fluent.standard.imp;
 
 import org.drools.KnowledgeBase;
 import org.drools.command.GetVariableCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
@@ -61,13 +61,13 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
     
     public FluentStandardStep end(String context, String name) {
         getSim().addCommand( new GetVariableCommand( StatefulKnowledgeSession.class.getName() ) );
-        getSim().addCommand( new SetVariableCommand( context, name ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
     public FluentStandardStep end(String name) {
         getSim().addCommand( new GetVariableCommand( StatefulKnowledgeSession.class.getName() ) );
-        getSim().addCommand( new SetVariableCommand( name ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
@@ -76,7 +76,7 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
     }
 
     public FluentStandardStatefulKnowledgeSession set(String name) {
-        getSim().addCommand( new SetVariableCommand( null, name ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( null, name ) );
         return this;
     }
 

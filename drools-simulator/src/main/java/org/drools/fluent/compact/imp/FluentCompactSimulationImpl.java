@@ -30,7 +30,7 @@ import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.fluent.VariableContext;
@@ -106,17 +106,17 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
 
 
         addCommand( new NewKnowledgeBaseCommand(null) );        
-        addCommand( new SetVariableCommand( ContextManager.ROOT, KnowledgeBase.class.getName() )); 
+        addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, KnowledgeBase.class.getName() )); 
         
         
         addCommand( new NewKnowledgeBuilderCommand( null, KnowledgeBase.class.getName() ) );
-        addCommand( new SetVariableCommand( ContextManager.ROOT, KnowledgeBuilder.class.getName() ));
+        addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, KnowledgeBuilder.class.getName() ));
         
         
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
         addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );             
-        addCommand( new SetVariableCommand( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));        
+        addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));        
 
         return new FluentCompactStatefulKnowledgeSessionImpl(this);
     } 

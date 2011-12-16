@@ -28,6 +28,10 @@ public class NewKnowledgeBuilderRemoteCommand
     GenericCommand<KnowledgeBuilder> {
 
     private String kbuilderConfId;
+    
+    public NewKnowledgeBuilderRemoteCommand() {
+        System.out.println(this);
+    }
 
     public NewKnowledgeBuilderRemoteCommand(String kbuilderConfId) {
         this.kbuilderConfId = kbuilderConfId;

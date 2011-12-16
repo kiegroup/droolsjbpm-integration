@@ -24,7 +24,7 @@ import org.drools.command.ContextManager;
 import org.drools.command.GetVariableCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.FluentPath;
 import org.drools.fluent.FluentStep;
@@ -55,7 +55,7 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
     public FluentStandardKnowledgeBuilder newKnowledgeBuilder() {
         getSim().addCommand( new NewKnowledgeBuilderCommand( null,
                                                              null ) );
-        getSim().addCommand( new SetVariableCommand( KnowledgeBuilder.class.getName() ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
 
         return new FluentStandardKnowledgeBuilderImpl( getSim(),
                                                        this );
@@ -63,7 +63,7 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
 
     public FluentStandardKnowledgeBase newKnowledgeBase() {
         getSim().addCommand( new NewKnowledgeBaseCommand( null ) );
-        getSim().addCommand( new SetVariableCommand( KnowledgeBase.class.getName() ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
         return new FluentStandardKnowledgeBaseImpl( getSim(),
                                                     this );
@@ -73,7 +73,7 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
         getSim().addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        getSim().addCommand( new SetVariableCommand( StatefulKnowledgeSession.class.getName() ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
         return new FluentStandardStatefulKnowledgeSessionImpl( getSim(),
                                                                this );
@@ -96,7 +96,7 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
 
     public FluentStandardKnowledgeBuilder getKnowledgeBuilder(String name) {
         getSim().addCommand( new GetVariableCommand( name ) );
-        getSim().addCommand( new SetVariableCommand( KnowledgeBuilder.class.getName() ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
 
         return new FluentStandardKnowledgeBuilderImpl( getSim(),
                                                        this );
@@ -104,7 +104,7 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
 
     public FluentStandardKnowledgeBase getKnowledgeBase(String name) {
         getSim().addCommand( new GetVariableCommand( name ) );
-        getSim().addCommand( new SetVariableCommand( KnowledgeBase.class.getName() ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
         return new FluentStandardKnowledgeBaseImpl( getSim(),
                                                     this );
@@ -112,7 +112,7 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
 
     public FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession(String name) {
         getSim().addCommand( new GetVariableCommand( name ) );
-        getSim().addCommand( new SetVariableCommand( StatefulKnowledgeSession.class.getName() ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
         return new FluentStandardStatefulKnowledgeSessionImpl( getSim(),
                                                                this );

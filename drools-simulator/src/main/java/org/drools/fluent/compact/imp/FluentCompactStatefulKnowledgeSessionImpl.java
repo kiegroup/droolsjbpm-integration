@@ -17,7 +17,7 @@
 package org.drools.fluent.compact.imp;
 
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
@@ -63,12 +63,12 @@ public class FluentCompactStatefulKnowledgeSessionImpl extends AbstractFluentTes
     }
 
     public FluentCompactStatefulKnowledgeSession set(String contextName, String variableName) {
-        getSim().addCommand( new SetVariableCommand( contextName, variableName ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( contextName, variableName ) );
         return this;
     }
     
     public FluentCompactStatefulKnowledgeSession set(String name) {
-        getSim().addCommand( new SetVariableCommand( null, name ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( null, name ) );
         return this;
     }
 

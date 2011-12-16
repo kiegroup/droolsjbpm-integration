@@ -169,7 +169,6 @@ public class RemoteSessionCommandTest extends BaseRemoteTest{
      
      }
       
-      @Test
      public void queryTest() {
         StatefulKnowledgeSession ksession = createSession();
         

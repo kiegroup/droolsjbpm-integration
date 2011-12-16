@@ -29,7 +29,7 @@ import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.assertion.AssertEquals;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
@@ -82,7 +82,7 @@ public class SimulationTest {
         List<Command> cmds = new ArrayList<Command>();
 
         cmds.add( new NewKnowledgeBuilderCommand( null ) );
-        cmds.add( new SetVariableCommand( "path1",
+        cmds.add( new SetVariableCommandFromLastReturn( "path1",
                                           KnowledgeBuilder.class.getName() ) );
 
         cmds.add( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
@@ -90,7 +90,7 @@ public class SimulationTest {
                                                   null ) );
 
         cmds.add( new NewKnowledgeBaseCommand( null ) );
-        cmds.add( new SetVariableCommand( "path1",
+        cmds.add( new SetVariableCommandFromLastReturn( "path1",
                                           KnowledgeBase.class.getName() ) );
 
         cmds.add( new KnowledgeBaseAddKnowledgePackagesCommand() );
@@ -99,7 +99,7 @@ public class SimulationTest {
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
 
         cmds.add( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        cmds.add( new SetVariableCommand( "path1",
+        cmds.add( new SetVariableCommandFromLastReturn( "path1",
                                           StatefulKnowledgeSession.class.getName() ) );
 
         List list = new ArrayList();
@@ -187,7 +187,7 @@ public class SimulationTest {
         List<Command> cmds = new ArrayList<Command>();
 
         cmds.add( new NewKnowledgeBuilderCommand( null ) );
-        cmds.add( new SetVariableCommand( ContextManager.ROOT,
+        cmds.add( new SetVariableCommandFromLastReturn( ContextManager.ROOT,
                                           KnowledgeBuilder.class.getName() ) );
 
         cmds.add( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
@@ -196,7 +196,7 @@ public class SimulationTest {
 
         cmds.add( new NewKnowledgeBaseCommand( null ) );
 
-        cmds.add( new SetVariableCommand( ContextManager.ROOT,
+        cmds.add( new SetVariableCommandFromLastReturn( ContextManager.ROOT,
                                           KnowledgeBase.class.getName() ) );
 
         cmds.add( new KnowledgeBaseAddKnowledgePackagesCommand() );
@@ -205,7 +205,7 @@ public class SimulationTest {
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
 
         cmds.add( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        cmds.add( new SetVariableCommand( ContextManager.ROOT,
+        cmds.add( new SetVariableCommandFromLastReturn( ContextManager.ROOT,
                                           StatefulKnowledgeSession.class.getName() ) );
 
         List list = new ArrayList();

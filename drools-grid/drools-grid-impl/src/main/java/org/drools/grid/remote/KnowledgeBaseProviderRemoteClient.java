@@ -27,7 +27,8 @@ import org.drools.KnowledgeBaseFactoryService;
 import org.drools.RuleBaseConfiguration;
 import org.drools.SessionConfiguration;
 import org.drools.command.NewKnowledgeBaseCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -92,7 +93,7 @@ public class KnowledgeBaseProviderRemoteClient
         }
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
+                                           Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId,
                                                                                                 new NewKnowledgeBaseCommand( conf ) )} ) );
         ConversationManager connm = this.grid.get( ConversationManager.class );

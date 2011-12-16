@@ -21,7 +21,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
 import org.drools.command.GetVariableCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.FluentPath;
 import org.drools.fluent.FluentStep;
@@ -64,13 +64,13 @@ public class FluentStandardKnowledgeBuilderImpl extends AbstractFluentTest<Fluen
 
     public FluentStandardStep end(String context, String name) {
         getSim().addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
-        getSim().addCommand( new SetVariableCommand( context, name ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
     public FluentStandardStep end(String name) {
         getSim().addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
-        getSim().addCommand( new SetVariableCommand( name ) );
+        getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 

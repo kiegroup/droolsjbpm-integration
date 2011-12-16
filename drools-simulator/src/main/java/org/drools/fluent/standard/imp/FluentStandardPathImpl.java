@@ -24,7 +24,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.command.Command;
 import org.drools.command.Context;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.FluentPath;
 import org.drools.fluent.FluentStep;

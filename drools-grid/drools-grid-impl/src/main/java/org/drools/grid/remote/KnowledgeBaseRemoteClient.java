@@ -26,7 +26,8 @@ import org.drools.KnowledgeBase;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommand;
+import org.drools.command.SetVariableCommandFromCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.definition.KnowledgePackage;
 import org.drools.definition.process.Process;
 import org.drools.definition.rule.Query;
@@ -138,7 +139,7 @@ public class KnowledgeBaseRemoteClient
         String localId = UUID.randomUUID().toString();
 
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{new SetVariableCommand( "__TEMP__",
+                                           Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId,
                                                                                                 new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf , environment),
                                                                                                                                                null,

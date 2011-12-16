@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.drools.command.Context;
+import org.drools.command.ContextManager;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
@@ -98,7 +99,7 @@ public class QueryRemoteCommand  implements GenericCommand<QueryResults> {
         
         if ( this.outIdentifier != null ) {
             //((StatefulKnowledgeSessionImpl)ksession).session.getExecutionResult().getResults().put( this.outIdentifier, results );
-            context.set( this.outIdentifier, results );
+            context.getContextManager().getContext( ContextManager.ROOT ).set( this.outIdentifier, results );
         }
         
         
