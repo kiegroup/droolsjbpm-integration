@@ -18,6 +18,7 @@ package org.drools.grid.remote.command;
 
 import java.util.Iterator;
 import org.drools.command.Context;
+import org.drools.command.ContextManager;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.QueryResultsRow;
@@ -37,7 +38,7 @@ public class SetQueryIteratorRemoteCommand implements GenericCommand<Void>{
     }
     
     public Void execute(Context context) {
-        Iterator<QueryResultsRow>  it = ((QueryResults)context.get( this.queryResultsId )).iterator();
+        Iterator<QueryResultsRow>  it = ((QueryResults)context.getContextManager().getContext( ContextManager.ROOT ).get( this.queryResultsId )).iterator();
         context.set( "Iterator - "+this.queryResultsId, it);
         return null;
     }

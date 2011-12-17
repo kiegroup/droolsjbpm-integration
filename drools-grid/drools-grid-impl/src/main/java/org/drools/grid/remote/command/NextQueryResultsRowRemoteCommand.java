@@ -19,6 +19,7 @@ package org.drools.grid.remote.command;
 import java.util.Iterator;
 import java.util.UUID;
 import org.drools.command.Context;
+import org.drools.command.ContextManager;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResultsRow;
 
@@ -38,7 +39,7 @@ public class NextQueryResultsRowRemoteCommand implements GenericCommand<String>{
     
     public String execute(Context context) {
         String rowId = UUID.randomUUID().toString();
-        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.get( "Iterator - "+this.queryResultsId)).next();
+        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getContext( ContextManager.ROOT ).get( "Iterator - "+this.queryResultsId)).next();
         context.set("Row - "+rowId+" - "+this.queryResultsId, row);
         return rowId;
         

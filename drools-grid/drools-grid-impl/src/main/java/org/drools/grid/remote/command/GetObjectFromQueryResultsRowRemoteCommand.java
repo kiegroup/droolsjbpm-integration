@@ -18,6 +18,7 @@ package org.drools.grid.remote.command;
 
 import java.util.Iterator;
 import org.drools.command.Context;
+import org.drools.command.ContextManager;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResultsRow;
 
@@ -40,7 +41,7 @@ public class GetObjectFromQueryResultsRowRemoteCommand implements GenericCommand
     }
     
     public Object execute(Context context) {
-        return ((QueryResultsRow) context.get( "Row - "+rowId+" - "+this.queryResultsId)).get(identifier);
+        return ((QueryResultsRow) context.getContextManager().getContext( ContextManager.ROOT ).get( "Row - "+rowId+" - "+this.queryResultsId)).get(identifier);
         
     }
     

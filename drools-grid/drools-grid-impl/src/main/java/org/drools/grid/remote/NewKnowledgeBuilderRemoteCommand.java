@@ -40,7 +40,7 @@ public class NewKnowledgeBuilderRemoteCommand
     public KnowledgeBuilder execute(Context context) {
         KnowledgeBuilder kbuilder = null;
         KnowledgeBuilderConfiguration kconf = 
-                        (KnowledgeBuilderConfiguration) context.get(kbuilderConfId);
+                        (KnowledgeBuilderConfiguration) context.getContextManager().getContext( ContextManager.ROOT ).get(kbuilderConfId);
         if ( kconf == null ) {
             kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         } else {
