@@ -39,8 +39,13 @@ public class NextQueryResultsRowRemoteCommand implements GenericCommand<String>{
     
     public String execute(Context context) {
         String rowId = UUID.randomUUID().toString();
+<<<<<<< HEAD
         QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getDefaultContext().get( "Iterator - "+this.queryResultsId)).next();
         context.getContextManager().getDefaultContext().set("Row - "+rowId+" - "+this.queryResultsId, row);
+=======
+        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getContext( ContextManager.ROOT ).get( "Iterator - "+this.queryResultsId)).next();
+        context.set("Row - "+rowId+" - "+this.queryResultsId, row);
+>>>>>>> 8bc485d... JBRULES-3315 Remove drools-grid from spring
         return rowId;
         
     }

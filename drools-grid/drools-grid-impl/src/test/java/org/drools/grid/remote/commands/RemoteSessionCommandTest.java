@@ -168,13 +168,9 @@ public class RemoteSessionCommandTest extends BaseRemoteTest{
         
      
      }
-      
-<<<<<<< HEAD
-      @Test
-=======
+
       @Ignore
       // @FIXME
->>>>>>> 8bc485d... JBRULES-3315 Remove drools-grid from spring
      public void queryTest() {
         StatefulKnowledgeSession ksession = createSession();
         
