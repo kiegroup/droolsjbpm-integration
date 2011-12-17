@@ -19,6 +19,7 @@ package org.drools.grid.remote.command;
 import java.util.Iterator;
 import java.util.UUID;
 import org.drools.command.Context;
+import org.drools.command.ContextManager;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResultsRow;
 
