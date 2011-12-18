@@ -35,13 +35,12 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.builder.ResourceType;
-import org.drools.grid.ConnectionFactoryService;
-import org.drools.grid.GridConnection;
-import org.drools.grid.GridNode;
-import org.drools.grid.GridServiceDescription;
-import org.drools.grid.SocketService;
-import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
+//import org.drools.grid.ConnectionFactoryService;
+//import org.drools.grid.GridConnection;
+//import org.drools.grid.GridNode;
+//import org.drools.grid.GridServiceDescription;
+//import org.drools.grid.SocketService;
+//import org.drools.grid.service.directory.WhitePages;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.Ignore;
@@ -53,81 +52,81 @@ public class CxfSoapClientServerGridTest {
 
     @org.junit.Test @Ignore
     public void test1() throws Exception {
-        ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext( "classpath:beans-test-grid.xml" );
-
-        SOAPMessage soapMessage = createMessageForKsession("ksession3");
-
-        Test test = new Test();
-        String response = test.execute( soapMessage,
-                                        (CamelContext) springContext.getBean( "camel-client-ctx" ) );
-        
-        //System.out.println("Response 1 = "+ response );
-        assertTrue( response.contains( "execution-results" ) );
-        assertTrue( response.contains( "echo" ) );
-        
-        
-        GridImpl grid2 = (GridImpl) springContext.getBean("grid2");
-        GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "node1" );
-        GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
-        GridNode remoteN1 = conn.connect();
-
-        KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
-
-        assertNotNull( kbuilder );
-        
-        String rule = "package  org.grid.test\n"
-                + "declare Message2\n"
-                +    "text : String\n"
-                + "end\n"
-                + "rule \"echo2\" \n"
-                + "dialect \"mvel\"\n"
-                +   "when\n"
-                + "     $m : Message2()\n"
-                +   "then\n"
-                +       "$m.text = \"echo2:\" + $m.text;\n"
-                + "end\n";
-                //System.out.println("Rule = "+rule);
-        kbuilder.add( new ByteArrayResource( rule.getBytes() ),
-                      ResourceType.DRL );
-
-        KnowledgeBuilderErrors errors = kbuilder.getErrors();
-        if ( errors != null && errors.size() > 0 ) {
-            for ( KnowledgeBuilderError error : errors ) {
-                System.out.println( "Error: " + error.getMessage() );
-
-            }
-            fail("KnowledgeBase did not build");
-        }
-
-        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
-
-        assertNotNull( kbase );
-
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-
-        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-
-        assertNotNull( session );
-        
-        
-        remoteN1.set("ksession2", session);
-        
-        
-        soapMessage = createMessageForKsession("ksession2");
-        
-        String response2 = test.execute( soapMessage,
-                                        (CamelContext) springContext.getBean( "camel-client-ctx" ) );
-        
-        //System.out.println("Response 2 = "+response2  );
-        assertTrue( response2.contains( "execution-results" ) );
-        assertTrue( response2.contains( "echo2" ) );
-        
-        remoteN1.dispose();
-        GridImpl grid1 = (GridImpl) springContext.getBean("grid1");
-        grid1.get(SocketService.class).close();
-       
-        springContext.registerShutdownHook();
-        springContext.stop();
+//        ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext( "classpath:beans-test-grid.xml" );
+//
+//        SOAPMessage soapMessage = createMessageForKsession("ksession3");
+//
+//        Test test = new Test();
+//        String response = test.execute( soapMessage,
+//                                        (CamelContext) springContext.getBean( "camel-client-ctx" ) );
+//        
+//        //System.out.println("Response 1 = "+ response );
+//        assertTrue( response.contains( "execution-results" ) );
+//        assertTrue( response.contains( "echo" ) );
+//        
+//        
+//        GridImpl grid2 = (GridImpl) springContext.getBean("grid2");
+//        GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "node1" );
+//        GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
+//        GridNode remoteN1 = conn.connect();
+//
+//        KnowledgeBuilder kbuilder = remoteN1.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
+//
+//        assertNotNull( kbuilder );
+//        
+//        String rule = "package  org.grid.test\n"
+//                + "declare Message2\n"
+//                +    "text : String\n"
+//                + "end\n"
+//                + "rule \"echo2\" \n"
+//                + "dialect \"mvel\"\n"
+//                +   "when\n"
+//                + "     $m : Message2()\n"
+//                +   "then\n"
+//                +       "$m.text = \"echo2:\" + $m.text;\n"
+//                + "end\n";
+//                //System.out.println("Rule = "+rule);
+//        kbuilder.add( new ByteArrayResource( rule.getBytes() ),
+//                      ResourceType.DRL );
+//
+//        KnowledgeBuilderErrors errors = kbuilder.getErrors();
+//        if ( errors != null && errors.size() > 0 ) {
+//            for ( KnowledgeBuilderError error : errors ) {
+//                System.out.println( "Error: " + error.getMessage() );
+//
+//            }
+//            fail("KnowledgeBase did not build");
+//        }
+//
+//        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+//
+//        assertNotNull( kbase );
+//
+//        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+//
+//        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+//
+//        assertNotNull( session );
+//        
+//        
+//        remoteN1.set("ksession2", session);
+//        
+//        
+//        soapMessage = createMessageForKsession("ksession2");
+//        
+//        String response2 = test.execute( soapMessage,
+//                                        (CamelContext) springContext.getBean( "camel-client-ctx" ) );
+//        
+//        //System.out.println("Response 2 = "+response2  );
+//        assertTrue( response2.contains( "execution-results" ) );
+//        assertTrue( response2.contains( "echo2" ) );
+//        
+//        remoteN1.dispose();
+//        GridImpl grid1 = (GridImpl) springContext.getBean("grid1");
+//        grid1.get(SocketService.class).close();
+//       
+//        springContext.registerShutdownHook();
+//        springContext.stop();
         
     }
     
