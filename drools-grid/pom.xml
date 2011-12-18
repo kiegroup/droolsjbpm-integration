@@ -38,7 +38,7 @@
     </dependency>
   </dependencies>
   <modules>
-     <module>drools-grid-impl</module>
+     <!-- module>drools-grid-impl</module-->
   </modules>
 
 </project>
