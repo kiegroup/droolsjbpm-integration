@@ -37,6 +37,7 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  
   <modules>
      <!-- module>drools-grid-impl</module-->
   </modules>
