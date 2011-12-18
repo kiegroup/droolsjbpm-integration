@@ -106,17 +106,17 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
 
 
         addCommand( new NewKnowledgeBaseCommand(null) );        
-        addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, KnowledgeBase.class.getName() )); 
+        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() )); 
         
         
         addCommand( new NewKnowledgeBuilderCommand( null, KnowledgeBase.class.getName() ) );
-        addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, KnowledgeBuilder.class.getName() ));
+        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ));
         
         
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
         addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );             
-        addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));        
+        addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ));        
 
         return new FluentCompactStatefulKnowledgeSessionImpl(this);
     } 

@@ -227,15 +227,16 @@ public class CompactFluentTest {
 
         String str1 = "package org.drools.simulation.test\n" +
                       "import " + Person.class.getName() + "\n" +
-                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
+                      "rule updateAge1 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
         
         String str2 = "package org.drools.simulation.test\n" +
                       "import " + Person.class.getName() + "\n" +
-                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";        
+                      "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";        
 
 
         // @formatter:off
-        f.newStatefulKnowledgeSession()
+        f.
+          newStatefulKnowledgeSession()
              .getKnowledgeBase()
                  .addKnowledgePackages( ResourceFactory.newByteArrayResource( str1.getBytes() ),
                                         ResourceType.DRL )
