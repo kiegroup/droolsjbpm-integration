@@ -46,11 +46,16 @@
          <groupId>javax.xml.bind</groupId>
          <artifactId>jaxb-api</artifactId>
       </dependency>
-      <dependency>
+      <!--dependency>
          <groupId>org.hamcrest</groupId>
          <artifactId>hamcrest-core</artifactId>
-         <version>1.2.1</version>
-      </dependency>
+         <version>1.1</version>
+      </dependency-->
+     <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-integration</artifactId>
+        <version>1.1</version>
+     </dependency>
       <!-- dependency>
          <groupId>org.hamsandwich</groupId>
          <artifactId>hamsandwich</artifactId>
