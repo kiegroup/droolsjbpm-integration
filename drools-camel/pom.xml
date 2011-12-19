@@ -22,6 +22,10 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
+      <artifactId>knowledge-internal-api</artifactId>
+    </dependency>	
+    <dependency>
+      <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
     </dependency>
     <dependency>
@@ -36,10 +40,10 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-spring</artifactId>
     </dependency>
-    <dependency>
+    <!-- dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-impl</artifactId>
-    </dependency>
+    </dependency -->
     <!-- Camel -->
     <dependency>
       <groupId>org.apache.camel</groupId>

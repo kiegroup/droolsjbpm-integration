@@ -43,8 +43,6 @@ import org.drools.core.util.StringUtils;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -128,8 +126,6 @@ public abstract class BatchTest extends ContextTestSupport {
         Context context = super.createJndiContext();
 
         GridImpl grid = new GridImpl( new HashMap() );
-        grid.addService( WhitePages.class,
-                         new WhitePagesImpl() );
         node = grid.createGridNode( "node" );
         node.set( "ksession1",
                   this.exec );

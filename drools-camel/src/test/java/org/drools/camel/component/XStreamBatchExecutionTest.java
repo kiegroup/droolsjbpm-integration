@@ -51,8 +51,6 @@ import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
@@ -93,8 +91,6 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         Context context = super.createJndiContext();
 
         GridImpl grid = new GridImpl( new HashMap() );
-        grid.addService( WhitePages.class,
-                         new WhitePagesImpl() );
         node = grid.createGridNode( "local" );
         
         node.set( "ksession1",

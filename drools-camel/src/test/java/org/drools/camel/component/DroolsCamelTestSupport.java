@@ -49,8 +49,6 @@ import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
@@ -88,8 +86,8 @@ public abstract class DroolsCamelTestSupport extends ContextTestSupport {
         Context context = super.createJndiContext();
 
         GridImpl grid = new GridImpl( new HashMap() );
-        grid.addService( WhitePages.class,
-                         new WhitePagesImpl() );
+//        grid.addService( WhitePages.class,
+//                         new WhitePagesImpl() );
         node = grid.createGridNode( "node" );
         context.bind( "node",
                       node );
