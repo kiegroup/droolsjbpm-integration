@@ -201,6 +201,26 @@ public class Simulator
         return lastReturnValue;
     }
 
+	public ContextManager getContextManager() {
+		return this;
+	}
+
+	public String getName() {
+		return root.getName();
+	}
+
+	public Object get(String identifier) {
+		return root.get( identifier );
+	}
+
+	public void set(String identifier, Object value) {
+		root.set( identifier, value );
+	}
+
+	public void remove(String identifier) {
+		root.remove( identifier );
+	}
+
     //    public static interface CommandExecutorService<T> {
     //        T execute(Command command);
     //    }

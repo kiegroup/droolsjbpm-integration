@@ -20,7 +20,7 @@ import org.drools.fluent.compact.InternalSimulation;
 import org.drools.fluent.test.ReflectiveMatcherAssert;
 import org.hamcrest.Matcher;
 
-import static org.hamcrest.MatcherAssert.*;
+import static org.junit.Assert.assertThat;
 
 public class AbstractFluentTest<P> {
 

@@ -83,13 +83,12 @@ public class ReflectiveMatcherAssertImpl implements ReflectiveMatcherAssert {
             sbuilder.append( ";\n" );
         }
         
-        sbuilder.append(  "assertThat(" );
-        sbuilder.append(  actual );
-        sbuilder.append(  ", " );
-        
-        if ( text != null ) {
+        sbuilder.append(  "assertThat(" );        
+        if ( text != null ) {            
             sbuilder.append( text );
         } else {
+            sbuilder.append(  actual );
+            sbuilder.append(  ", " );            
             matcher.build( sbuilder );
         }
         
@@ -100,6 +99,8 @@ public class ReflectiveMatcherAssertImpl implements ReflectiveMatcherAssert {
         //pctx.setStrongTyping( true );
         
         String t = sbuilder.toString();
+        
+        //System.out.println( t );
         
         ParserContext parserCtx = new ParserContext( );
         MVEL.compileExpression( t, parserCtx );

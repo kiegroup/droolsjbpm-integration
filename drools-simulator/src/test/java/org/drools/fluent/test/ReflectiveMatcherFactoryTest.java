@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.*;
 public class ReflectiveMatcherFactoryTest {    
     @Test
@@ -40,7 +40,7 @@ public class ReflectiveMatcherFactoryTest {
         assertThat( p.getAge(), equalTo(150) );
         
         List<String> imports = new ArrayList<String>(); 
-        imports.add( "org.hamcrest.MatcherAssert.assertThat" );
+        imports.add( "org.junit.Assert.assertThat" );
         imports.add( "org.hamcrest.CoreMatchers.is" );
         imports.add( "org.hamcrest.CoreMatchers.equalTo" );
         
