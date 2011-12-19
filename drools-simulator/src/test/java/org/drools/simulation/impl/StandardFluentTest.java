@@ -17,8 +17,6 @@
 package org.drools.simulation.impl;
 
 import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
-import static org.hamsandwich.core.ReplayMatcher.on;
-import static org.hamsandwich.core.ReplayMatcher.replayMatcher;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,35 +33,11 @@ import org.drools.fluent.standard.FluentStandardSimulation;
 import org.drools.fluent.standard.imp.FluentStandardSimulationImpl;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.io.ResourceFactory;
-import org.drools.simulation.impl.CompactFluentTest.PersonMatchers;
 import org.hamcrest.Matcher;
-import org.hamsandwich.core.AdaptingMatcher;
-import org.hamsandwich.core.CannotAdaptException;
-import org.hamsandwich.core.HamSandwichFactory;
 import org.junit.Test;
 
 public class StandardFluentTest {
 
-
-    public static class PersonMatchers {
-
-        @HamSandwichFactory
-        public static Matcher<Person> name(Matcher<String>... nameMatchers) {
-            return replayMatcher( on( Person.class ).getName(),
-                                  nameMatchers );
-        }
-
-        @HamSandwichFactory
-        public static Matcher<Person> age(Matcher< ? super Integer>... ageMatchers) {
-            return new AdaptingMatcher<Person, Integer>( ageMatchers ) {
-
-                public Integer get(Person in) throws CannotAdaptException {
-                    return in.getAge();
-                }
-            };
-        }
-    }
-    
     @Test
     public void testUsingImplicit() {
         FluentStandardSimulation f = new FluentStandardSimulationImpl();        
@@ -75,8 +49,6 @@ public class StandardFluentTest {
         imports.add( "org.hamcrest.CoreMatchers.is" );
         imports.add( "org.hamcrest.CoreMatchers.equalTo" );
         imports.add( "org.hamcrest.CoreMatchers.allOf" );
-        imports.add( PersonMatchers.class.getName() + ".name" );
-        imports.add( PersonMatchers.class.getName() + ".age" );
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
@@ -173,8 +145,6 @@ public class StandardFluentTest {
         imports.add( "org.hamcrest.CoreMatchers.is" );
         imports.add( "org.hamcrest.CoreMatchers.equalTo" );
         imports.add( "org.hamcrest.CoreMatchers.allOf" );
-        imports.add( PersonMatchers.class.getName() + ".name" );
-        imports.add( PersonMatchers.class.getName() + ".age" );
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
@@ -266,8 +236,6 @@ public class StandardFluentTest {
         imports.add( "org.hamcrest.CoreMatchers.is" );
         imports.add( "org.hamcrest.CoreMatchers.equalTo" );
         imports.add( "org.hamcrest.CoreMatchers.allOf" );
-        imports.add( PersonMatchers.class.getName() + ".name" );
-        imports.add( PersonMatchers.class.getName() + ".age" );
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 

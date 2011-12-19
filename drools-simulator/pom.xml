@@ -51,18 +51,18 @@
          <artifactId>hamcrest-core</artifactId>
          <version>1.2.1</version>
       </dependency>
-      <dependency>
+      <!-- dependency>
          <groupId>org.hamsandwich</groupId>
          <artifactId>hamsandwich</artifactId>
          <version>1.2</version>
-      </dependency>
+      </dependency-->
    </dependencies>
 
-   <repositories>
+   <!-- repositories>
       <repository>
          <id>hamsandwich-repo</id>
          <name>hamsandwich repository on GitHub</name>
          <url>http://wcmatthysen.github.com/hamsandwich/repository/</url>
       </repository>
-   </repositories>
+   </repositories -->
 </project>
