@@ -70,8 +70,7 @@ public class FluentStandardSimulationImpl extends
     }
 
     public <P> VariableContext<P> getVariableContext() {
-        // TODO Auto-generated method stub
-        return null;
+        return vars;
     }
 
     public FluentStandardPath newPath(String name) {
