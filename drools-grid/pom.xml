@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>5.4.0-SNAPSHOT</version>
+    <version>5.4.0.Beta1</version>
   </parent>
 
   <artifactId>drools-grid</artifactId>
@@ -39,7 +39,7 @@
   </dependencies>
   
   <modules>
-     <!-- module>drools-grid-impl</module-->
+     <!--module>drools-grid-impl</module-->
   </modules>
 
 </project>

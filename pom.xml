@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-parent</artifactId>
-    <version>5.4.0-SNAPSHOT</version>
+    <version>5.4.0.Beta1</version>
     <!-- relativePath causes out-of-date problems on hudson slaves -->
     <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
   </parent>
@@ -47,10 +47,10 @@
   <modules>
     <module>drools-benchmark</module>
     <module>drools-container</module>
+    <module>drools-grid</module>
     <module>drools-camel</module>
     <module>drools-camel-server</module>
     <module>drools-pipeline</module>
-    <module>drools-grid</module>
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
     <module>droolsjbpm-integration-examples</module>
