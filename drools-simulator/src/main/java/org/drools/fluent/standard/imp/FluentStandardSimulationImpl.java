@@ -69,10 +69,6 @@ public class FluentStandardSimulationImpl extends
         sim = new SimulationImpl();
     }
 
-    public <P> VariableContext<P> getVariableContext() {
-        return vars;
-    }
-
     public FluentStandardPath newPath(String name) {
         steps = new ArrayList<Step>();
         
@@ -98,10 +94,6 @@ public class FluentStandardSimulationImpl extends
                                            path.getName() );
     }
 
-    public void addCommand(Command cmd) {
-        cmds.add( cmd );
-    }
-
     public void newStep(long distance) {
         cmds = new ArrayList<Command>();
 
@@ -112,6 +104,14 @@ public class FluentStandardSimulationImpl extends
         steps.add( step );
     }
 
+    public void addCommand(Command cmd) {
+        cmds.add( cmd );
+    }
+
+    public <P> VariableContext<P> getVariableContext() {
+        return vars;
+    }
+
     public Simulation getSimulation() {
         return sim;
     }
@@ -119,4 +119,5 @@ public class FluentStandardSimulationImpl extends
     public Map<String, Path> getPaths() {
         return sim.getPaths();
     }
+
 }

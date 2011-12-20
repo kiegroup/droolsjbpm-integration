@@ -75,25 +75,6 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
     	vars = new MapVariableContext();    	
         sim = new SimulationImpl();         
     }
-    
-    public void addCommand(Command cmd) {
-        cmds.add( cmd );
-    }
-
-
-    public void newStep(long distance) {
-        cmds = new ArrayList<Command>();
-
-        step = new StepImpl( path,
-                             cmds,
-                             distance );
-
-        steps.add( step );
-    }
-
-    public <P> VariableContext<P> getVariableContext() {
-        return vars;
-    }
 
     public FluentCompactStatefulKnowledgeSession newStatefulKnowledgeSession() {
         steps = new ArrayList<Step>();         
@@ -119,8 +100,26 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
         addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ));        
 
         return new FluentCompactStatefulKnowledgeSessionImpl(this);
-    } 
-    
+    }
+
+    public void newStep(long distance) {
+        cmds = new ArrayList<Command>();
+
+        step = new StepImpl( path,
+                             cmds,
+                             distance );
+
+        steps.add( step );
+    }
+
+    public void addCommand(Command cmd) {
+        cmds.add( cmd );
+    }
+
+    public <P> VariableContext<P> getVariableContext() {
+        return vars;
+    }
+
     public Simulation getSimulation() {
         return sim;
     }

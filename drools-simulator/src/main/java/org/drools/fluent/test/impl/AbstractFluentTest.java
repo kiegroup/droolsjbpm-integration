@@ -57,7 +57,7 @@ public class AbstractFluentTest<P> {
         sim.addCommand( testCmd );
         
         return (P) this;
-    }    
+    }
     
     public <T> P test(ReflectiveMatcherAssert matcherAssert) {
         ReflectiveMatcherAssertCommand matcherCmd = new ReflectiveMatcherAssertCommand( matcherAssert );
@@ -65,4 +65,5 @@ public class AbstractFluentTest<P> {
         
         return ( P ) this;
     }
+
 }
