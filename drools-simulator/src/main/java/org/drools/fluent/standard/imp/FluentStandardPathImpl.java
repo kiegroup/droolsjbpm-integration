@@ -16,30 +16,11 @@
 
 package org.drools.fluent.standard.imp;
 
-import java.util.ArrayList;
-
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.command.Command;
-import org.drools.command.Context;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
-import org.drools.command.builder.NewKnowledgeBuilderCommand;
-import org.drools.fluent.FluentPath;
-import org.drools.fluent.FluentStep;
-import org.drools.fluent.compact.InternalSimulation;
-import org.drools.fluent.standard.FluentStandardKnowledgeBase;
-import org.drools.fluent.standard.FluentStandardKnowledgeBuilder;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardPath;
 import org.drools.fluent.standard.FluentStandardSimulation;
-import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.conf.ClockTypeOption;
-import org.drools.simulation.impl.StepImpl;
 
 public class FluentStandardPathImpl extends AbstractFluentTest<FluentStandardPath>
     implements

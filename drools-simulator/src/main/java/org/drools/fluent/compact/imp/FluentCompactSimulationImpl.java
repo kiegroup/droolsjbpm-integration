@@ -17,7 +17,6 @@
 package org.drools.fluent.compact.imp;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,18 +24,14 @@ import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.command.Command;
-import org.drools.command.ContextManager;
-import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.compact.FluentCompactSimulation;
 import org.drools.fluent.compact.FluentCompactStatefulKnowledgeSession;
-import org.drools.fluent.compact.InternalSimulation;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.runtime.KnowledgeSessionConfiguration;

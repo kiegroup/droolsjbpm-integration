@@ -20,11 +20,10 @@ import org.drools.KnowledgeBaseConfiguration;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.compact.FluentCompactKnowledgeBase;
 import org.drools.fluent.compact.FluentCompactStatefulKnowledgeSession;
-import org.drools.fluent.compact.InternalSimulation;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
 

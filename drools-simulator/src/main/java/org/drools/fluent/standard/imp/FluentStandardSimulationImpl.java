@@ -21,18 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.command.Command;
-import org.drools.command.ContextManager;
-import org.drools.fluent.FluentPath;
-import org.drools.fluent.FluentStep;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.VariableContext;
-import org.drools.fluent.compact.FluentCompactSimulation;
-import org.drools.fluent.compact.InternalSimulation;
-import org.drools.fluent.standard.FluentStandardKnowledgeBase;
-import org.drools.fluent.standard.FluentStandardKnowledgeBuilder;
 import org.drools.fluent.standard.FluentStandardPath;
 import org.drools.fluent.standard.FluentStandardSimulation;
-import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
-import org.drools.fluent.test.ReflectiveMatcherAssert;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.simulation.Path;
@@ -41,13 +33,12 @@ import org.drools.simulation.Step;
 import org.drools.simulation.impl.PathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.StepImpl;
-import org.hamcrest.Matcher;
 
 public class FluentStandardSimulationImpl extends
         AbstractFluentTest<FluentStandardSimulation>
     implements
     FluentStandardSimulation,
-    InternalSimulation {
+        InternalSimulation {
 
     private Path            path;
 
@@ -101,7 +92,7 @@ public class FluentStandardSimulationImpl extends
                              cmds,
                              distance );
 
-        steps.add( step );
+        steps.add(step);
     }
 
     public void addCommand(Command cmd) {

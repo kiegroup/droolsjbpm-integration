@@ -16,19 +16,14 @@
 
 package org.drools.fluent.standard.imp;
 
-import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
 import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
-import org.drools.fluent.FluentPath;
-import org.drools.fluent.FluentStep;
-import org.drools.fluent.compact.InternalSimulation;
-import org.drools.fluent.standard.FluentStandardKnowledgeBase;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardKnowledgeBuilder;
-import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;

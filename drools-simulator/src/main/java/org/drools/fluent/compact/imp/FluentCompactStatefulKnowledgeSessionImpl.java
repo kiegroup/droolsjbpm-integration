@@ -16,16 +16,14 @@
 
 package org.drools.fluent.compact.imp;
 
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.compact.FluentCompactKnowledgeBase;
 import org.drools.fluent.compact.FluentCompactSimulation;
 import org.drools.fluent.compact.FluentCompactStatefulKnowledgeSession;
-import org.drools.fluent.compact.InternalSimulation;
-import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
 public class FluentCompactStatefulKnowledgeSessionImpl extends AbstractFluentTest<FluentCompactStatefulKnowledgeSession>

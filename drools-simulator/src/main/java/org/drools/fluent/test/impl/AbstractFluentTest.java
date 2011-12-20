@@ -16,7 +16,7 @@
 
 package org.drools.fluent.test.impl;
 
-import org.drools.fluent.compact.InternalSimulation;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.test.ReflectiveMatcherAssert;
 import org.hamcrest.Matcher;
 

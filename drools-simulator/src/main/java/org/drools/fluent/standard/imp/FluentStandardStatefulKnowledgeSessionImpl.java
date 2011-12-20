@@ -16,15 +16,12 @@
 
 package org.drools.fluent.standard.imp;
 
-import org.drools.KnowledgeBase;
 import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.fluent.FluentStep;
-import org.drools.fluent.compact.InternalSimulation;
-import org.drools.fluent.standard.FluentStandardKnowledgeBase;
+import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
