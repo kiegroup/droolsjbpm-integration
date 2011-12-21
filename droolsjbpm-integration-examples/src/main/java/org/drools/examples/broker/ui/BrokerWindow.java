@@ -69,9 +69,8 @@ public class BrokerWindow {
         frame.setTitle( "Drools Fusion Example: Simple Broker" );
         frame.setResizable( true );
         frame.pack();
-        
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation( (screen.width-frame.getWidth())/2, (screen.height-frame.getHeight())/2 );
+
+        frame.setLocationRelativeTo( null );
         
         Thread bannerThread = new Thread( banner );
         bannerThread.setPriority( bannerThread.getPriority()-1 );
