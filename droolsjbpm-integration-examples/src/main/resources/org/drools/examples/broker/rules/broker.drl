@@ -22,7 +22,7 @@ import org.drools.examples.broker.model.StockTick
 import org.drools.examples.broker.model.SuddenDropEvent
 
 # it is possible to import static methods as functions for usage in the rules
-import org.drools.examples.broker.misc.Utils
+import org.drools.examples.broker.misc.BrokerUtils
 
 # a common pattern is to expose services to rules through
 # a helper service class
@@ -103,7 +103,7 @@ when
     $st : StockTick( $sb : symbol, $ts : timestamp, $pr : price, $dt : delta < -0.05 ) from entry-point "StockTick stream"
     not( StockTick( symbol == $sb, timestamp > $ts ) from entry-point "StockTick stream" )
 then
-    services.log( "Drop >5%: "+$sb+" delta: "+ Utils.percent($dt)+" price: $"+$pr );
+    services.log( "Drop >5%: "+$sb+" delta: "+ BrokerUtils.percent($dt)+" price: $"+$pr );
     
     # we also want to create an event and forward it into the engine to a predefined entry point
     # that is being listened by other rules 

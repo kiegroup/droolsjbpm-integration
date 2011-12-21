@@ -22,12 +22,12 @@ import org.drools.examples.broker.model.Action
 import java.util.Map
 import java.util.HashMap
 
-import function org.drools.examples.broker.misc.Utils.selectAction
+import function org.drools.examples.broker.misc.BrokerUtils.selectAction
 
 dialect "mvel"
 
 # an event declaration to represent situations
-# where a suddent drop happens. In this case we are not
+# where a sudden drop happens. In this case we are not
 # defining any explicit expiration policy. 
 declare SuddenDropEvent
     @role( event )

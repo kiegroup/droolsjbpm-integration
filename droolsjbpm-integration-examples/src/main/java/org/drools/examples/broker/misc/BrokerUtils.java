@@ -21,7 +21,7 @@ import java.util.Random;
 
 import org.drools.examples.broker.model.Action;
 
-public class Utils {
+public class BrokerUtils {
     private static final Random rand = new Random(System.currentTimeMillis());
     
     public static String percent( double number ) {
