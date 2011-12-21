@@ -62,9 +62,7 @@ public class EventFeeder {
         }
     }
 
-    private static class FeedJob
-        implements
-        Job {
+    private static class FeedJob implements Job {
 
         private final EventSource   source;
         private final EventReceiver sink;
@@ -93,9 +91,8 @@ public class EventFeeder {
         }
     }
 
-    private static class FeedContext
-        implements
-        JobContext {
+    private static class FeedContext implements JobContext {
+
         private JobHandle  handle;
         private Event< ? > event;
 

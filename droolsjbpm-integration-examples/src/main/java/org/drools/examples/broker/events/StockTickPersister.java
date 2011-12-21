@@ -31,6 +31,7 @@ import org.drools.examples.broker.model.StockTick;
  * A helper to save and load StockTicks
  */
 public class StockTickPersister implements EventSource {
+
     private MessageFormat format = new MessageFormat("{0,number,0};{1};{2,number,currency}");
     private BufferedWriter out;
     private BufferedReader in;

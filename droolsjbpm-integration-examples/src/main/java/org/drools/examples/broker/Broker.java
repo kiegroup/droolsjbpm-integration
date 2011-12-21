@@ -41,6 +41,7 @@ import org.drools.runtime.rule.WorkingMemoryEntryPoint;
  * The broker application
  */
 public class Broker implements EventReceiver, BrokerServices {
+
     private static final String[] ASSET_FILES = {
             "/org/drools/examples/broker/rules/broker.drl",
             "/org/drools/examples/broker/rules/notify.drl",
@@ -121,4 +122,5 @@ public class Broker implements EventReceiver, BrokerServices {
     public void log(String message) {
         window.log( message );
     }
+
 }
