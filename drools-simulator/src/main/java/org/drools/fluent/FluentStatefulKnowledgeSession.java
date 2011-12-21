@@ -16,9 +16,7 @@
 
 package org.drools.fluent;
 
-import org.drools.fluent.compact.FluentCompactStatefulKnowledgeSession;
-
-public interface FluentStatefulKnowledgeSession<T>  extends FluentBase  {
+public interface FluentStatefulKnowledgeSession<T> extends FluentBase  {
             
     T fireAllRules();
     
@@ -31,5 +29,6 @@ public interface FluentStatefulKnowledgeSession<T>  extends FluentBase  {
      * @param name
      * @return
      */
-    FluentStatefulKnowledgeSession<T> set(String name);    
+    FluentStatefulKnowledgeSession<T> set(String name);
+
 }
