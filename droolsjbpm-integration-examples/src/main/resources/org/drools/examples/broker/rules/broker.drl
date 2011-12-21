@@ -40,7 +40,7 @@ declare StockTick
 end 
 
 # an event declaration to represent situations
-# where a suddent drop happens. In this case we are not
+# where a sudden drop happens. In this case we are not
 # defining any explicit expiration policy. 
 declare SuddenDropEvent
     @role( event )
