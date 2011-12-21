@@ -20,7 +20,9 @@ import org.drools.fluent.FluentStatefulKnowledgeSession;
 import org.drools.fluent.FluentTest;
 
 
-public interface FluentCompactStatefulKnowledgeSession  extends FluentStatefulKnowledgeSession<FluentCompactStatefulKnowledgeSession>, FluentTest<FluentCompactStatefulKnowledgeSession> { 
+public interface FluentCompactStatefulKnowledgeSession
+        extends FluentStatefulKnowledgeSession<FluentCompactStatefulKnowledgeSession>, FluentTest<FluentCompactStatefulKnowledgeSession> {
+
     FluentCompactStatefulKnowledgeSession newStep(long distance);
     
     /**
@@ -41,4 +43,5 @@ public interface FluentCompactStatefulKnowledgeSession  extends FluentStatefulKn
      * @return
      */
     FluentCompactSimulation end();
+
 }

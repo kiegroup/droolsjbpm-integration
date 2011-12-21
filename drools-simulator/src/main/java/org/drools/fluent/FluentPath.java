@@ -16,10 +16,9 @@
 
 package org.drools.fluent;
 
-import org.drools.fluent.standard.FluentStandardSimulation;
-
 
 public interface FluentPath<T, S> extends FluentBase, FluentTest<T> {
+
     S newStep(long distance);
     
 //    FluentPath newPath(String name); // ends current path and creates a new one

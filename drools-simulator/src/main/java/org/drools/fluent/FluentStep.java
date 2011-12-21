@@ -18,6 +18,7 @@ package org.drools.fluent;
 
 
 public interface FluentStep<ST, BU, BA, S> extends FluentBase, FluentTest<ST> {
+
     BU newKnowledgeBuilder();
     BA newKnowledgeBase();
     S newStatefulKnowledgeSession();
@@ -29,4 +30,5 @@ public interface FluentStep<ST, BU, BA, S> extends FluentBase, FluentTest<ST> {
     BU getKnowledgeBuilder(String name);
     BA getKnowledgeBase(String name);
     S getStatefulKnowledgeSession(String name);
+
 }

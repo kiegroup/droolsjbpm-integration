@@ -21,5 +21,7 @@ import org.drools.fluent.FluentRoot;
 import org.drools.fluent.FluentTest;
 
 public interface FluentCompactSimulation extends FluentBase, FluentRoot, FluentTest<FluentCompactSimulation> {
-    FluentCompactStatefulKnowledgeSession newStatefulKnowledgeSession();  
+
+    FluentCompactStatefulKnowledgeSession newStatefulKnowledgeSession();
+
 }

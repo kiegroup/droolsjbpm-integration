@@ -25,4 +25,5 @@ public interface FluentStandardPath extends FluentPath<FluentStandardPath, Fluen
     FluentStandardPath newPath(String name);
     
     FluentStandardSimulation end();
+
 }
