@@ -56,7 +56,5 @@ public class PortfolioAction {
     public String toString() {
         return "PortfolioAction( "+action+" "+symbol+" "+quant+ " )";
     }
-    
-
 
 }

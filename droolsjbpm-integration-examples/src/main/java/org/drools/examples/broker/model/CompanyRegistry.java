@@ -64,5 +64,4 @@ public class CompanyRegistry {
         return this.companies.get( symbol );
     }
     
-    
 }

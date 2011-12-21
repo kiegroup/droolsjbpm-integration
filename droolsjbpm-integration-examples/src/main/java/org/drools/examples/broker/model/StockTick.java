@@ -65,4 +65,5 @@ public class StockTick {
         this.delta = delta;
         this.str = createString();
     }
+
 }
