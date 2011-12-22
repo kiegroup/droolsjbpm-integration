@@ -35,9 +35,8 @@ import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
 
-public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardStep>
-    implements
-    FluentStandardStep {
+public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardStep> implements FluentStandardStep {
+
     private FluentStandardPath path;
 
     public FluentStandardStepImpl(InternalSimulation sim,

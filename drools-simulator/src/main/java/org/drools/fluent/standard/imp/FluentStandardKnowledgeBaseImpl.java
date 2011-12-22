@@ -36,7 +36,8 @@ import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
 
-public class FluentStandardKnowledgeBaseImpl extends AbstractFluentTest<FluentStandardKnowledgeBase> implements FluentStandardKnowledgeBase {
+public class FluentStandardKnowledgeBaseImpl extends AbstractFluentTest<FluentStandardKnowledgeBase>
+        implements FluentStandardKnowledgeBase {
 
     private FluentStandardStepImpl step;
     

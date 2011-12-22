@@ -27,7 +27,8 @@ import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.StatefulKnowledgeSession;
 
-public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTest<FluentStandardStatefulKnowledgeSession> implements FluentStandardStatefulKnowledgeSession {
+public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTest<FluentStandardStatefulKnowledgeSession>
+        implements FluentStandardStatefulKnowledgeSession {
     
     private FluentStandardStepImpl step;
     
@@ -76,6 +77,5 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
         getSim().addCommand( new SetVariableCommandFromLastReturn( null, name ) );
         return this;
     }
-
 
 }

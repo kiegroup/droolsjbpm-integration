@@ -118,8 +118,8 @@ public class JUnitSimulationRunner extends Runner {
     }
 
     public static class JunitCommandExecutionHandler
-        implements
-        CommandExecutionHandler {
+            implements CommandExecutionHandler {
+
         private RunNotifier              notifier;
         private Map<String, Description> testGroups;
 

@@ -23,8 +23,7 @@ import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
 public class FluentStandardPathImpl extends AbstractFluentTest<FluentStandardPath>
-    implements
-    FluentStandardPath {
+        implements FluentStandardPath {
 
     private String defaultContext;
 

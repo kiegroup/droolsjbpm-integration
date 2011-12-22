@@ -27,7 +27,9 @@ import org.mvel2.ParserContext;
 import static org.junit.Assert.fail;
 
 public class MVELTestCommand implements GenericCommand<Void>  {
+
     public static final String MVEL_HEADER = "MVEL_HEADER";
+
     private String              headerText = "";
     private String              text;
     private String              reason;
@@ -80,4 +82,5 @@ public class MVELTestCommand implements GenericCommand<Void>  {
         }
         return null;
     }
+
 }

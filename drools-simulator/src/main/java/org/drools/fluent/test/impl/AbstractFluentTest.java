@@ -55,15 +55,14 @@ public class AbstractFluentTest<P> {
         testCmd.setText( text );
         
         sim.addCommand( testCmd );
-        
         return (P) this;
     }
     
     public <T> P test(ReflectiveMatcherAssert matcherAssert) {
         ReflectiveMatcherAssertCommand matcherCmd = new ReflectiveMatcherAssertCommand( matcherAssert );
+
         sim.addCommand( matcherCmd );
-        
-        return ( P ) this;
+        return (P) this;
     }
 
 }

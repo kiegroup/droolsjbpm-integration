@@ -28,8 +28,7 @@ import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
 
 public class FluentCompactKnowledgeBaseImpl extends AbstractFluentTest<FluentCompactKnowledgeBase>
-    implements
-    FluentCompactKnowledgeBase {
+        implements FluentCompactKnowledgeBase {
 
     private FluentCompactStatefulKnowledgeSession ksession;
 

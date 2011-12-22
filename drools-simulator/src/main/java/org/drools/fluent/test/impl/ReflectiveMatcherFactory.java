@@ -23,6 +23,7 @@ import org.drools.fluent.test.ReflectiveMatcher;
 import org.drools.fluent.test.ReflectiveMatcherAssert;
 
 public class ReflectiveMatcherFactory {
+
     private List<String> staticImports;
     
     public ReflectiveMatcherFactory(List<String> staticImports) {

@@ -27,8 +27,7 @@ import org.drools.fluent.compact.FluentCompactStatefulKnowledgeSession;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
 public class FluentCompactStatefulKnowledgeSessionImpl extends AbstractFluentTest<FluentCompactStatefulKnowledgeSession>
-    implements
-    FluentCompactStatefulKnowledgeSession {
+        implements FluentCompactStatefulKnowledgeSession {
     
     public FluentCompactStatefulKnowledgeSessionImpl(InternalSimulation sim) {
         super();

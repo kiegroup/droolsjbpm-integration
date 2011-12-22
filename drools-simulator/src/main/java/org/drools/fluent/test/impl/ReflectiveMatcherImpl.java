@@ -23,6 +23,7 @@ import org.drools.fluent.test.ReflectiveMatcher;
 import org.hamcrest.Matcher;
 
 public class ReflectiveMatcherImpl implements ReflectiveMatcher {
+
     private String name;
     private Object object;
 

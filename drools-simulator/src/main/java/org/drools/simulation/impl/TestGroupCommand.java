@@ -31,8 +31,7 @@ import org.drools.runtime.rule.AgendaFilter;
 import org.mvel2.MVEL;
 
 public class TestGroupCommand
-    implements
-    GenericCommand<Void> {
+        implements GenericCommand<Void> {
 
     private String        name;
     private List<Command> commands;

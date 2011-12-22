@@ -34,11 +34,8 @@ import org.drools.simulation.impl.PathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.StepImpl;
 
-public class FluentStandardSimulationImpl extends
-        AbstractFluentTest<FluentStandardSimulation>
-    implements
-    FluentStandardSimulation,
-        InternalSimulation {
+public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStandardSimulation>
+        implements FluentStandardSimulation, InternalSimulation {
 
     private Path            path;
 

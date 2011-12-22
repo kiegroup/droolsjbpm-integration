@@ -26,8 +26,8 @@ import org.drools.simulation.Simulation;
 import org.drools.simulation.Step;
 
 public class PathImpl
-    implements
-    Path {
+        implements Path {
+
     private SimulationImpl   simulation;
 
     private String           name;
@@ -56,6 +56,5 @@ public class PathImpl
     public String toString() {
         return "PathImpl [name=" + name + ", steps=" + steps.size() + "]";
     }
- 
 
 }

@@ -45,8 +45,7 @@ import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.StepImpl;
 
 public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompactSimulation>
-    implements
-    FluentCompactSimulation, InternalSimulation {
+        implements FluentCompactSimulation, InternalSimulation {
 
     private Path       path;
 

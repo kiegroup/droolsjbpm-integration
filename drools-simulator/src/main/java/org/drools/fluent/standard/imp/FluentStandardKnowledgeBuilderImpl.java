@@ -28,7 +28,9 @@ import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
 
-public class FluentStandardKnowledgeBuilderImpl extends AbstractFluentTest<FluentStandardKnowledgeBuilder> implements FluentStandardKnowledgeBuilder {    
+public class FluentStandardKnowledgeBuilderImpl extends AbstractFluentTest<FluentStandardKnowledgeBuilder>
+        implements FluentStandardKnowledgeBuilder {
+    
     private FluentStandardStepImpl step;
     
     public FluentStandardKnowledgeBuilderImpl(InternalSimulation sim,

@@ -45,9 +45,7 @@ import org.drools.simulation.Step;
 import org.drools.time.SessionPseudoClock;
 
 public class Simulator
-    implements
-    ContextManager,
-    GetDefaultValue {
+        implements ContextManager, GetDefaultValue {
 
     private PriorityQueue<Step>           queue;
     private SimulationImpl                simulation;

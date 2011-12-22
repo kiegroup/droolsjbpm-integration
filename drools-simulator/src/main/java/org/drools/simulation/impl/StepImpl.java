@@ -25,8 +25,8 @@ import org.drools.simulation.Path;
 import org.drools.simulation.Step;
 
 public class StepImpl
-    implements
-    Step {
+        implements Step {
+
     private Path                path;
     private Collection<Command> commands;
     private long                distance;
