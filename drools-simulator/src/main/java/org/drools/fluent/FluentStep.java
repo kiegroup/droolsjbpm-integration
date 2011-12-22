@@ -17,7 +17,7 @@
 package org.drools.fluent;
 
 
-public interface FluentStep<ST, BU, BA, S> extends FluentBase, FluentTest<ST> {
+public interface FluentStep<T, BU, BA, S> extends FluentBase, FluentTest<T> {
 
     BU newKnowledgeBuilder();
     BA newKnowledgeBase();
