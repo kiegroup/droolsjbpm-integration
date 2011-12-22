@@ -245,41 +245,40 @@ public class CompactFluentTest {
                       "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";
 
         // @formatter:off
-        f.
-                newStatefulKnowledgeSession()
-                .getKnowledgeBase()
+        f.newStatefulKnowledgeSession()
+            .getKnowledgeBase()
                 .addKnowledgePackages( ResourceFactory.newByteArrayResource( str1.getBytes() ),
                                        ResourceType.DRL )
                 .end()
-                .newStep( 100 )
+            .newStep( 100 )
                 .insert( new Person( "yoda1",
                                      150 ) ).set( "y1" )
                 .fireAllRules()
-                .newStep( 200 )
+            .newStep( 200 )
                 .insert( new Person( "darth1",
                                      70 ) ).set( "d1" )
                 .fireAllRules()
-                .end()
-                .test( "y1.age == 160" )
-                .test( "d1.age == 80" )
-                .newStatefulKnowledgeSession()
-                .getKnowledgeBase()
+            .end()
+        .test( "y1.age == 160" )
+        .test( "d1.age == 80" )
+        .newStatefulKnowledgeSession()
+            .getKnowledgeBase()
                 .addKnowledgePackages( ResourceFactory.newByteArrayResource( str2.getBytes() ),
                                        ResourceType.DRL )
                 .end()
-                .newStep( 100 )
+            .newStep( 100 )
                 .insert( new Person( "yoda2",
                                      150 ) ).set( "y2" )
                 .fireAllRules()
-                .newStep( 200 )
+            .newStep( 200 )
                 .insert( new Person( "darth2",
                                      70 ) ).set( "d2" )
                 .fireAllRules()
-                .end()
-                .test( "y2.age == 170" )
-                .test( "d2.age == 90" )
-                .test( "y1 == null" )
-                .test( "d1 == null" );
+            .end()
+        .test( "y2.age == 170" )
+        .test( "d2.age == 90" )
+        .test( "y1 == null" )
+        .test( "d1 == null" );
         // @formatter:on
 
         runSimulation( f );
