@@ -16,12 +16,25 @@
 
 package org.drools.fluent.standard;
 
-import org.drools.fluent.FluentStep;
+import org.drools.fluent.FluentBase;
+import org.drools.fluent.FluentTest;
 
-public interface FluentStandardStep extends FluentStep<FluentStandardStep, FluentStandardKnowledgeBuilder, FluentStandardKnowledgeBase, FluentStandardStatefulKnowledgeSession> {
+public interface FluentStandardStep extends FluentBase, FluentTest<FluentStandardStep>  {
 
     FluentStandardStep newStep(long distance);
     
     FluentStandardPath end();
+
+    FluentStandardKnowledgeBuilder newKnowledgeBuilder();
+    FluentStandardKnowledgeBase newKnowledgeBase();
+    FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession();
+
+    FluentStandardKnowledgeBuilder getKnowledgeBuilder();
+    FluentStandardKnowledgeBase getKnowledgeBase();
+    FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession();
+
+    FluentStandardKnowledgeBuilder getKnowledgeBuilder(String name);
+    FluentStandardKnowledgeBase getKnowledgeBase(String name);
+    FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession(String name);
 
 }

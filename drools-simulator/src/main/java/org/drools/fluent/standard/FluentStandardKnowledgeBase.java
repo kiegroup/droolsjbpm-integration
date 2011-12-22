@@ -17,7 +17,6 @@
 package org.drools.fluent.standard;
 
 import org.drools.fluent.FluentKnowledgeBase;
-import org.drools.fluent.FluentStep;
 import org.drools.fluent.FluentTest;
 
 
