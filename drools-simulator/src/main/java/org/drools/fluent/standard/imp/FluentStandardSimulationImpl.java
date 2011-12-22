@@ -29,19 +29,19 @@ import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.simulation.Path;
 import org.drools.simulation.Simulation;
-import org.drools.simulation.Step;
+import org.drools.simulation.SimulationStep;
 import org.drools.simulation.impl.PathImpl;
 import org.drools.simulation.impl.SimulationImpl;
-import org.drools.simulation.impl.StepImpl;
+import org.drools.simulation.impl.SimulationStepImpl;
 
 public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStandardSimulation>
         implements FluentStandardSimulation, InternalSimulation {
 
     private Path            path;
 
-    private List<Step>      steps;
+    private List<SimulationStep>      steps;
 
-    private Step            step;
+    private SimulationStep step;
 
     private List<Command>   cmds;
 
@@ -58,7 +58,7 @@ public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStand
     }
 
     public FluentStandardPath newPath(String name) {
-        steps = new ArrayList<Step>();
+        steps = new ArrayList<SimulationStep>();
         
         path = new PathImpl( sim,
                              name );
@@ -73,7 +73,7 @@ public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStand
     public FluentStandardPath getPath(String name) {
         path = sim.getPaths().get( name );        
         steps = (List) path.getSteps();
-        step = ( Step ) steps.get( steps.size() - 1 );
+        step = (SimulationStep) steps.get( steps.size() - 1 );
         if ( !step.getCommands().isEmpty() ) {
             cmds = (List) step.getCommands();
         }
@@ -85,7 +85,7 @@ public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStand
     public void newStep(long distance) {
         cmds = new ArrayList<Command>();
 
-        step = new StepImpl( path,
+        step = new SimulationStepImpl( path,
                              cmds,
                              distance );
 

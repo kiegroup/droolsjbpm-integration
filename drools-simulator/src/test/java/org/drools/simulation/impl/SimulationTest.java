@@ -26,7 +26,6 @@ import org.drools.builder.ResourceType;
 import org.drools.command.Command;
 import org.drools.command.ContextManager;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
@@ -37,22 +36,14 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.fluent.test.impl.ReflectiveMatcherAssertCommand;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
 import org.drools.simulation.Simulation;
-import org.drools.simulation.Step;
+import org.drools.simulation.SimulationStep;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import static junit.framework.Assert.*;
 
 @RunWith(JUnitSimulationRunner.class)
 public class SimulationTest {
@@ -77,7 +68,7 @@ public class SimulationTest {
         PathImpl path = new PathImpl( simulation,
                                       "path1" );
 
-        List<Step> steps = new ArrayList<Step>();
+        List<SimulationStep> steps = new ArrayList<SimulationStep>();
 
         List<Command> cmds = new ArrayList<Command>();
 
@@ -107,7 +98,7 @@ public class SimulationTest {
         cmds.add( new SetGlobalCommand( "list",
                                         list ) );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  0 ) );
 
@@ -116,7 +107,7 @@ public class SimulationTest {
                                                        97 ) ) );
         cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  2000 ) );
 
@@ -126,7 +117,7 @@ public class SimulationTest {
 
         cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  4000 ) );
 
@@ -149,7 +140,7 @@ public class SimulationTest {
                                     new GetGlobalCommand( "list" ),
                                     "get( 1 )" ) );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  new TestGroupCommand( "test1",
                                                        cmds ),
                                  5000 ) );
@@ -182,7 +173,7 @@ public class SimulationTest {
         PathImpl path = new PathImpl( simulation,
                                       "path1" );
 
-        List<Step> steps = new ArrayList<Step>();
+        List<SimulationStep> steps = new ArrayList<SimulationStep>();
 
         List<Command> cmds = new ArrayList<Command>();
 
@@ -213,7 +204,7 @@ public class SimulationTest {
         cmds.add( new SetGlobalCommand( "list",
                                         list ) );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  0 ) );
 
@@ -222,7 +213,7 @@ public class SimulationTest {
                                                        97 ) ) );
         cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  2000 ) );
 
@@ -231,7 +222,7 @@ public class SimulationTest {
                                                        98 ) ) );
         cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  4000 ) );
 
@@ -243,13 +234,13 @@ public class SimulationTest {
         path = new PathImpl( simulation,
                              "path2" );
 
-        steps = new ArrayList<Step>();
+        steps = new ArrayList<SimulationStep>();
 
         cmds = new ArrayList<Command>();
         cmds.add( new InsertObjectCommand( new Person( "bobba",
                                                        77 ) ) );
         cmds.add( new FireAllRulesCommand() );
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  1500 ) );
 
@@ -258,7 +249,7 @@ public class SimulationTest {
                                                        30 ) ) );
         cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  2200 ) );
 
@@ -267,7 +258,7 @@ public class SimulationTest {
                                                        150 ) ) );
         cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  cmds,
                                  4500 ) );
 
@@ -308,7 +299,7 @@ public class SimulationTest {
                                     new GetGlobalCommand( "list" ),
                                     "get( 4 )" ) );
 
-        steps.add( new StepImpl( path,
+        steps.add( new SimulationStepImpl( path,
                                  new TestGroupCommand( "test2",
                                                        cmds ),
                                  5000 ) );

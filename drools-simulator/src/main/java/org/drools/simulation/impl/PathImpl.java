@@ -17,13 +17,10 @@
 package org.drools.simulation.impl;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.drools.command.Context;
 import org.drools.simulation.Path;
 import org.drools.simulation.Simulation;
-import org.drools.simulation.Step;
+import org.drools.simulation.SimulationStep;
 
 public class PathImpl
         implements Path {
@@ -32,7 +29,7 @@ public class PathImpl
 
     private String           name;
 
-    private Collection<Step> steps;
+    private Collection<SimulationStep> steps;
 
     public PathImpl(Simulation simulation,
                     String name) {
@@ -40,7 +37,7 @@ public class PathImpl
         this.simulation = (SimulationImpl) simulation;
     }
 
-    public void setSteps(Collection<Step> steps) {
+    public void setSteps(Collection<SimulationStep> steps) {
         this.steps = steps;
     }
 
@@ -48,7 +45,7 @@ public class PathImpl
         return this.name;
     }
 
-    public Collection<Step> getSteps() {
+    public Collection<SimulationStep> getSteps() {
         return this.steps;
     }
 

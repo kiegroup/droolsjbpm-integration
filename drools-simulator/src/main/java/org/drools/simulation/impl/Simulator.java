@@ -24,30 +24,24 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.StatefulSession;
 import org.drools.command.Command;
 import org.drools.command.Context;
 import org.drools.command.ContextManager;
 import org.drools.command.GetDefaultValue;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.ResolvingKnowledgeCommandContext;
-import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.reteoo.ReteooStatefulSession;
-import org.drools.reteoo.ReteooWorkingMemory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.simulation.Path;
 import org.drools.simulation.Simulation;
-import org.drools.simulation.Step;
+import org.drools.simulation.SimulationStep;
 import org.drools.time.SessionPseudoClock;
 
 public class Simulator
         implements ContextManager, GetDefaultValue {
 
-    private PriorityQueue<Step>           queue;
+    private PriorityQueue<SimulationStep>           queue;
     private SimulationImpl                simulation;
     //    private SessionPseudoClock  clock;
     private long                          startTime;
@@ -99,31 +93,31 @@ public class Simulator
         }
 
         this.queue = new PriorityQueue( capacity,
-                                        new Comparator<Step>() {
-                                            public int compare(Step s1,
-                                                               Step s2) {
+                                        new Comparator<SimulationStep>() {
+                                            public int compare(SimulationStep s1,
+                                                               SimulationStep s2) {
                                                 return (int) (s1.getTemporalDistance() - s2.getTemporalDistance());
                                             }
                                         } );
 
         for ( Path path : paths.values() ) {
-            for ( Step step : path.getSteps() )
+            for ( SimulationStep step : path.getSteps() )
                 this.queue.add( step );
         }
     }
 
     public void run() {
-        Step step;
+        SimulationStep step;
         while ( (step = executeNextStep()) != null ) {
 
         }
     }
 
-    public Step executeNextStep() {
+    public SimulationStep executeNextStep() {
         if ( this.queue.isEmpty() ) {
             return null;
         }
-        StepImpl step = (StepImpl) this.queue.remove();
+        SimulationStepImpl step = (SimulationStepImpl) this.queue.remove();
         PathImpl path = (PathImpl) step.getPath();
 
         Context pathContext = new ResolvingKnowledgeCommandContext( this.contexts.get( path.getName() ) );
@@ -247,7 +241,7 @@ public class Simulator
     //        
     //    }
 
-    //    public void runUntil(Step step) {
+    //    public void runUntil(SimulationStep step) {
     //        
     //    }
     //    

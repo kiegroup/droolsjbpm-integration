@@ -16,7 +16,6 @@
 
 package org.drools.simulation.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,12 +27,10 @@ import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.simulation.Path;
 import org.drools.simulation.Simulation;
-import org.drools.simulation.Step;
+import org.drools.simulation.SimulationStep;
 import org.drools.simulation.impl.Simulator.CommandExecutionHandler;
 import org.junit.Test;
 import org.junit.runner.Description;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Request;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -69,7 +66,7 @@ public class JUnitSimulationRunner extends Runner {
                                                                     null );
 
                 for ( Path path : simulation.getPaths().values() ) {
-                    for ( Step step : path.getSteps() ) {
+                    for ( SimulationStep step : path.getSteps() ) {
                         for ( Command command : step.getCommands() ) {
                             if ( command instanceof TestGroupCommand ) {
                                 String testName = ((TestGroupCommand) command).getName();

@@ -22,26 +22,26 @@ import java.util.List;
 
 import org.drools.command.Command;
 import org.drools.simulation.Path;
-import org.drools.simulation.Step;
+import org.drools.simulation.SimulationStep;
 
-public class StepImpl
-        implements Step {
+public class SimulationStepImpl
+        implements SimulationStep {
 
     private Path                path;
     private Collection<Command> commands;
     private long                distance;
 
-    public StepImpl(Path path,
-                    Collection<Command> commands,
-                    long distance) {
+    public SimulationStepImpl(Path path,
+            Collection<Command> commands,
+            long distance) {
         this.path = path;
         this.commands = commands;
         this.distance = distance;
     }
     
-    public StepImpl(Path path,
-                    Command command,
-                    long distance) {
+    public SimulationStepImpl(Path path,
+            Command command,
+            long distance) {
         this.path = path;
         commands = new ArrayList<Command>();
         ((List<Command>)this.commands).add( command );
@@ -62,7 +62,7 @@ public class StepImpl
 
     @Override
     public String toString() {
-        return "StepImpl [distance=" + distance + ", path=" + path + ", commands=" + commands + "]";
+        return "SimulationStepImpl [distance=" + distance + ", path=" + path + ", commands=" + commands + "]";
     }
 
 }
