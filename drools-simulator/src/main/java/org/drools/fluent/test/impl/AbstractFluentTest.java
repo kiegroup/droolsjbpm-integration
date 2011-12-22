@@ -40,8 +40,8 @@ public class AbstractFluentTest<P> {
     public <T> P test(String reason,
                       T actual,
                       Matcher<T> matcher) {
-        // TODO Auto-generated method stub
-        return null;
+        assertThat(reason, actual, matcher);
+        return (P) this;
     }
 
     public <T> P test(T actual,
