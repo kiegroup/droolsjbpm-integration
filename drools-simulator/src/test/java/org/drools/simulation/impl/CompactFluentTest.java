@@ -82,45 +82,44 @@ public class CompactFluentTest {
 
         // @formatter:off        
         f.newStatefulKnowledgeSession()
-                .getKnowledgeBase()
+            .getKnowledgeBase()
                 .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
                                        ResourceType.DRL )
                 .end()
-                .insert( new Person( "yoda",
-                                     150 ) ).set( "y" )
-                .fireAllRules()
-                // show testing inside of ksession execution
-                .test( "y.name == 'yoda'" )
-                .test( "y.age == 160" )
+            .insert( new Person( "yoda", 150 ) ).set( "y" )
+            .fireAllRules()
+            // show testing inside of ksession execution
+            .test( "y.name == 'yoda'" )
+            .test( "y.age == 160" )
 
-                // test hamcrest         
-                .test( rf.assertThat( "y.name",
-                                      matcher( "equalTo",
-                                               "'yoda'" ) ) )
-                .test( rf.assertThat( "y.name, equalTo('yoda')" ) )
-                .test( rf.assertThat( "y.age",
-                                      matcher( "equalTo",
-                                               "160" ) ) )
-                .test( rf.assertThat( "y.age, equalTo(160)" ) )
+            // test hamcrest
+            .test( rf.assertThat( "y.name",
+                                  matcher( "equalTo",
+                                           "'yoda'" ) ) )
+            .test( rf.assertThat( "y.name, equalTo('yoda')" ) )
+            .test( rf.assertThat( "y.age",
+                                  matcher( "equalTo",
+                                           "160" ) ) )
+            .test( rf.assertThat( "y.age, equalTo(160)" ) )
 
-                // @ FIXME commented out until hamsandwich works in the build             
-                //             // test hamsandwich
-                //             .test( rf.assertThat( "y", matcher( "allOf", matcher("name",  matcher( "equalTo", "'yoda'" ) ),
-                //                                                          matcher("age",  matcher( "equalTo", "160" ) )
-                //                                                )) )            
-                .end()
+            // @ FIXME commented out until hamsandwich works in the build
+            //             // test hamsandwich
+            //             .test( rf.assertThat( "y", matcher( "allOf", matcher("name",  matcher( "equalTo", "'yoda'" ) ),
+            //                                                          matcher("age",  matcher( "equalTo", "160" ) )
+            //                                                )) )
+            .end()
 
-                // show complex testing after the ksession has finished
-                .test( "y.name == 'yoda'" )
-                .test( "y.age == 160" )
+        // show complex testing after the ksession has finished
+        .test( "y.name == 'yoda'" )
+        .test( "y.age == 160" )
 
-                // test hamcrest         
-                .test( rf.assertThat( "y.name",
-                                      matcher( "equalTo",
-                                               "'yoda'" ) ) )
-                .test( rf.assertThat( "y.age",
-                                      matcher( "equalTo",
-                                               "160" ) ) );
+        // test hamcrest
+        .test( rf.assertThat( "y.name",
+                              matcher( "equalTo",
+                                       "'yoda'" ) ) )
+        .test( rf.assertThat( "y.age",
+                              matcher( "equalTo",
+                                       "160" ) ) );
 
         // @ FIXME commented out until hamsandwich works in the build      
         //         // test hamsandwich
@@ -152,15 +151,14 @@ public class CompactFluentTest {
 
         // @formatter:off        
         f.newStatefulKnowledgeSession()
-                .getKnowledgeBase()
+            .getKnowledgeBase()
                 .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
                                        ResourceType.DRL )
                 .end()
-                .insert( new Person( "yoda",
-                                     150 ) ).set( "y" )
-                .fireAllRules()
-                // show testing inside of ksession execution
-                .test( "y.age == 110" );
+            .insert( new Person( "yoda", 150 ) ).set( "y" )
+            .fireAllRules()
+            // show testing inside of ksession execution
+            .test( "y.age == 110" );
         // @formatter:on    
 
         boolean fail = false;
@@ -178,7 +176,7 @@ public class CompactFluentTest {
              .getKnowledgeBase()
                  .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
                                         ResourceType.DRL )
-             .end()
+                .end()
              .insert( new Person( "yoda", 150 ) ).set( "y" )
              .fireAllRules()
              // show testing inside of ksession execution
@@ -258,9 +256,9 @@ public class CompactFluentTest {
                 .insert( new Person( "darth1",
                                      70 ) ).set( "d1" )
                 .fireAllRules()
-            .end()
-        .test( "y1.age == 160" )
-        .test( "d1.age == 80" )
+                .end()
+            .test( "y1.age == 160" )
+            .test( "d1.age == 80" )
         .newStatefulKnowledgeSession()
             .getKnowledgeBase()
                 .addKnowledgePackages( ResourceFactory.newByteArrayResource( str2.getBytes() ),
@@ -274,11 +272,11 @@ public class CompactFluentTest {
                 .insert( new Person( "darth2",
                                      70 ) ).set( "d2" )
                 .fireAllRules()
-            .end()
-        .test( "y2.age == 170" )
-        .test( "d2.age == 90" )
-        .test( "y1 == null" )
-        .test( "d1 == null" );
+                .end()
+            .test( "y2.age == 170" )
+            .test( "d2.age == 90" )
+            .test( "y1 == null" )
+            .test( "d1 == null" );
         // @formatter:on
 
         runSimulation( f );
@@ -291,4 +289,5 @@ public class CompactFluentTest {
                                              new Date().getTime() );
         simulator.run();
     }
+
 }

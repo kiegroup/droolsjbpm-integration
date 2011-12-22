@@ -67,71 +67,70 @@ public class StandardFluentTest {
                 .newKnowledgeBuilder()
                     .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                           ResourceType.DRL )
-                .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
+                    .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
                 .newStatefulKnowledgeSession()
                     .setGlobal( "list", list ).set( "list" )
                     .fireAllRules()
+                    .end()
                 .end()
-            .end()
         .newPath( "path1" )
             .newStep( 1000 )
                 .newStatefulKnowledgeSession()
                     .setGlobal( "list", list ).set( "list" )
                     .insert( new Person( "yoda", 150 ) ).set( "y" )
                     .fireAllRules()
-                 // show testing inside of ksession execution
-                .test( "y.name == 'yoda'" )
-                .test( "y.age == 160" )
-                .test( "list[list.size()-1] - list[0] == 1000" )
+                     // show testing inside of ksession execution
+                    .test( "y.name == 'yoda'" )
+                    .test( "y.age == 160" )
+                    .test( "list[list.size()-1] - list[0] == 1000" )
+                    .end()
                 .end()
-            .end()
             .newStep( 2000 )
                 .getStatefulKnowledgeSession()
                     .insert( new Person( "darth", 110 ) ).set( "d" )
                     .fireAllRules()
-                 // show testing inside of ksession execution
-                .test( "d.name == 'darth'" )
-                .test( "d.age == 120" )
-                .test( "y.name == 'yoda'" )
-                .test( "y.age == 160" )
-                .test( "list[list.size()-1] - list[0] == 2000" )
+                     // show testing inside of ksession execution
+                    .test( "d.name == 'darth'" )
+                    .test( "d.age == 120" )
+                    .test( "y.name == 'yoda'" )
+                    .test( "y.age == 160" )
+                    .test( "list[list.size()-1] - list[0] == 2000" )
+                    .end()
                 .end()
-            .end()
         .newPath(  "path2" )
              .newStep( 1500 )
                  .newStatefulKnowledgeSession()
                      .setGlobal( "list", list ).set( "list" )
                      .insert( new Person( "bobba", 75 ) ).set( "b" )
                      .fireAllRules()
-                  // show testing inside of ksession execution
-                 .test( "y == null" )
-                 .test( "b.name == 'bobba'" )
-                 .test( "b.age == 85" )
-                 .test( "list[list.size()-1] - list[0] == 1500" )
+                      // show testing inside of ksession execution
+                     .test( "y == null" )
+                     .test( "b.name == 'bobba'" )
+                     .test( "b.age == 85" )
+                     .test( "list[list.size()-1] - list[0] == 1500" )
+                     .end()
                  .end()
-             .end()
         .getPath(  "path1" )
-             .newStep( 1300 )
-                 .newStatefulKnowledgeSession()
-                     .setGlobal( "list", list )
-                     .insert( new Person( "luke", 35 ) ).set( "b" )
-                     .fireAllRules()
-                  // show testing inside of ksession execution
-                 .test( "y.name == 'yoda'" )
-                 .test( "y.age == 160" )
-                 .test( "b.name == 'luke'" )
-                 .test( "b.age == 45" )
-                 .test( "list[list.size()-1] - list[0] == 1300" )
-                 .end()
-             .end()
-        .end();
+            .newStep( 1300 )
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list )
+                    .insert( new Person( "luke", 35 ) ).set( "b" )
+                    .fireAllRules()
+                     // show testing inside of ksession execution
+                    .test( "y.name == 'yoda'" )
+                    .test( "y.age == 160" )
+                    .test( "b.name == 'luke'" )
+                    .test( "b.age == 45" )
+                    .test( "list[list.size()-1] - list[0] == 1300" )
+                    .end()
+                .end()
+            .end();
         // @formatter:on
 
         runSimulation( f );
-            
     }
     
     @Test
@@ -165,63 +164,62 @@ public class StandardFluentTest {
         
         VariableContext<?> vc = f.getVariableContext();
         // @formatter:off          
-            f.newPath("init")
-                 .newStep( 0 )
-                     .newKnowledgeBuilder()
-                         .add( ResourceFactory.newByteArrayResource( str1.getBytes() ),
-                               ResourceType.DRL )
-                     .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
-                     .newKnowledgeBase()
-                         .addKnowledgePackages()
-                     .end(ContextManager.ROOT,"kb1" )
-                    .newStatefulKnowledgeSession()
-                        .setGlobal( "list", list1 ).set( "list" )
-                        .fireAllRules()
-                     .end( )
-                     
-                     .newKnowledgeBuilder()
-                         .add( ResourceFactory.newByteArrayResource( str2.getBytes() ),
-                               ResourceType.DRL )
-                     .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
-                     .newKnowledgeBase()
-                         .addKnowledgePackages()
-                     .end(ContextManager.ROOT, "kb2" )
-                    .newStatefulKnowledgeSession()
-                        .setGlobal( "list", list2 ).set( "list" )
-                        .fireAllRules()
-                     .end( "kb1" )                     
+        f.newPath("init")
+            .newStep( 0 )
+                .newKnowledgeBuilder()
+                    .add( ResourceFactory.newByteArrayResource( str1.getBytes() ),
+                          ResourceType.DRL )
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                .newKnowledgeBase()
+                    .addKnowledgePackages()
+                    .end(ContextManager.ROOT,"kb1" )
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list1 ).set( "list" )
+                    .fireAllRules()
+                    .end()
+                .newKnowledgeBuilder()
+                    .add( ResourceFactory.newByteArrayResource( str2.getBytes() ),
+                          ResourceType.DRL )
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                .newKnowledgeBase()
+                    .addKnowledgePackages()
+                    .end(ContextManager.ROOT, "kb2" )
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list2 ).set( "list" )
+                    .fireAllRules()
+                    .end( "kb1" )
                 .end()
-                
-                
-             .newPath( "path1" )
-                .newStep( 1000 )
-                    .getKnowledgeBase( "kb1" ).end()
-                    .newStatefulKnowledgeSession()
-                        .setGlobal( "list", list1 ).set( "list" )
-                        .insert( new Person( "yoda", 150 ) ).set( "y" )
-                        .fireAllRules()
-                         // show testing inside of ksession execution
-                        .test( "y.name == 'yoda'" )
-                        .test( "y.age == 170" )
-                        .test( "list[list.size()-1] - list[0] == 1000" )
+        .newPath( "path1" )
+            .newStep( 1000 )
+                .getKnowledgeBase( "kb1" )
+                    .end()
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list1 ).set( "list" )
+                    .insert( new Person( "yoda", 150 ) ).set( "y" )
+                    .fireAllRules()
+                     // show testing inside of ksession execution
+                    .test( "y.name == 'yoda'" )
+                    .test( "y.age == 170" )
+                    .test( "list[list.size()-1] - list[0] == 1000" )
                     .end()
                 .end()
-                .newStep( 2000 )
-                    .getKnowledgeBase( "kb2" ).end()            
-                    .newStatefulKnowledgeSession()
-                        .setGlobal( "list", list1 ).set( "list" )
-                        .insert( new Person( "yoda", 150 ) ).set( "y" )
-                        .fireAllRules()
-                         // show testing inside of ksession execution
-                        .test( "y.name == 'yoda'" )
-                        .test( "System.out.println( y.age ); return true")
-                        .test( "list[list.size()-1] - list[0] == 2000" )
+            .newStep( 2000 )
+                .getKnowledgeBase( "kb2" )
                     .end()
-                .end()                             
-             .end();            
-            // @formatter:on
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list1 ).set( "list" )
+                    .insert( new Person( "yoda", 150 ) ).set( "y" )
+                    .fireAllRules()
+                     // show testing inside of ksession execution
+                    .test( "y.name == 'yoda'" )
+                    .test( "System.out.println( y.age ); return true")
+                    .test( "list[list.size()-1] - list[0] == 2000" )
+                    .end()
+                .end()
+            .end();
+        // @formatter:on
             
-            runSimulation( f );                           
+        runSimulation( f );
     }    
     
     
@@ -249,47 +247,39 @@ public class StandardFluentTest {
         
         VariableContext<?> vc = f.getVariableContext();
         // @formatter:off          
-            f.newPath("init")
-                 .newStep( 0 )
-                     .newKnowledgeBuilder()
-                         .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                               ResourceType.DRL )
-                     .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
-                     .newKnowledgeBase()
-                         .addKnowledgePackages()
-                     .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
-                    .newStatefulKnowledgeSession()
-                        .setGlobal( "list", list ).set( "list" )
-                        .fireAllRules()
-                     .end()
-                .end()
-             .newPath( "path1" )
-                .newStep( 1000 )
-                    .newStatefulKnowledgeSession()
-                        .setGlobal( "list", list ).set( "list" )
-                        .insert( new Person( "yoda", 150 ) ).set( "y" )
-                        .fireAllRules()
-                         // show testing inside of ksession execution
-                        .test( "y.name == 'yoda'" )
-                        .test( "y.age == 160" )
-                        .test( "list[list.size()-1] - list[0] == 1000" )
+        f.newPath("init")
+            .newStep( 0 )
+                .newKnowledgeBuilder()
+                    .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                          ResourceType.DRL )
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                .newKnowledgeBase()
+                    .addKnowledgePackages()
+                    .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list ).set( "list" )
+                    .fireAllRules()
                     .end()
-                    .test( "y.name == 'yoda'" )                        
-                .end()    
-             .test( "y.name == 'yoda'" )                
-             .end();            
-            // @formatter:on
-            
-            runSimulation( f );                            
-    }    
-    
-    private void runSimulation(FluentCompactSimulation f) {
-        SimulationImpl sim = (SimulationImpl) ((FluentCompactSimulationImpl) f).getSimulation();
-    
-        Simulator simulator = new Simulator( sim,
-                                             new Date().getTime() );
-        simulator.run();
-    }    
+                .end()
+        .newPath( "path1" )
+            .newStep( 1000 )
+                .newStatefulKnowledgeSession()
+                    .setGlobal( "list", list ).set( "list" )
+                    .insert( new Person( "yoda", 150 ) ).set( "y" )
+                    .fireAllRules()
+                     // show testing inside of ksession execution
+                    .test( "y.name == 'yoda'" )
+                    .test( "y.age == 160" )
+                    .test( "list[list.size()-1] - list[0] == 1000" )
+                    .end()
+                .test( "y.name == 'yoda'" )
+                .end()
+            .test( "y.name == 'yoda'" )
+            .end();
+        // @formatter:on
+
+        runSimulation( f );
+    }
     
     private void runSimulation(FluentStandardSimulation f) {
         SimulationImpl sim = (SimulationImpl) ((FluentStandardSimulationImpl) f).getSimulation();
