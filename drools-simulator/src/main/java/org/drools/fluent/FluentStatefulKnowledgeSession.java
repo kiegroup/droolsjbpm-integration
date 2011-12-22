@@ -29,6 +29,6 @@ public interface FluentStatefulKnowledgeSession<T> extends FluentBase  {
      * @param name
      * @return
      */
-    FluentStatefulKnowledgeSession<T> set(String name);
+    T set(String name);
 
 }
