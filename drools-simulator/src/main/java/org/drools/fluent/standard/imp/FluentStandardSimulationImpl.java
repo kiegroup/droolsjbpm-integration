@@ -27,17 +27,17 @@ import org.drools.fluent.standard.FluentStandardPath;
 import org.drools.fluent.standard.FluentStandardSimulation;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
-import org.drools.simulation.impl.PathImpl;
+import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 
 public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStandardSimulation>
         implements FluentStandardSimulation, InternalSimulation {
 
-    private Path            path;
+    private SimulationPath path;
 
     private List<SimulationStep>      steps;
 
@@ -60,11 +60,11 @@ public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStand
     public FluentStandardPath newPath(String name) {
         steps = new ArrayList<SimulationStep>();
         
-        path = new PathImpl( sim,
+        path = new SimulationPathImpl( sim,
                              name );
         sim.getPaths().put( path.getName(),
                             path );
-        ((PathImpl) path).setSteps( steps );
+        ((SimulationPathImpl) path).setSteps( steps );
 
         return new FluentStandardPathImpl( this,
                                            path.getName() );
@@ -104,7 +104,7 @@ public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStand
         return sim;
     }
 
-    public Map<String, Path> getPaths() {
+    public Map<String, SimulationPath> getPaths() {
         return sim.getPaths();
     }
 

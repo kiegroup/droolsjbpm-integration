@@ -65,7 +65,7 @@ public class SimulationTest {
         str += "    list.add( $p ); \n";
         str += "end \n";
 
-        PathImpl path = new PathImpl( simulation,
+        SimulationPathImpl path = new SimulationPathImpl( simulation,
                                       "path1" );
 
         List<SimulationStep> steps = new ArrayList<SimulationStep>();
@@ -170,7 +170,7 @@ public class SimulationTest {
         str += "    list.add( $p ); \n";
         str += "end \n";
 
-        PathImpl path = new PathImpl( simulation,
+        SimulationPathImpl path = new SimulationPathImpl( simulation,
                                       "path1" );
 
         List<SimulationStep> steps = new ArrayList<SimulationStep>();
@@ -231,7 +231,7 @@ public class SimulationTest {
         simulation.getPaths().put( "path1",
                                    path );
 
-        path = new PathImpl( simulation,
+        path = new SimulationPathImpl( simulation,
                              "path2" );
 
         steps = new ArrayList<SimulationStep>();

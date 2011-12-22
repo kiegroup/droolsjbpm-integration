@@ -37,17 +37,17 @@ import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
-import org.drools.simulation.impl.PathImpl;
+import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 
 public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompactSimulation>
         implements FluentCompactSimulation, InternalSimulation {
 
-    private Path       path;
+    private SimulationPath path;
 
     private List<SimulationStep> steps;
 
@@ -72,10 +72,10 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
 
     public FluentCompactStatefulKnowledgeSession newStatefulKnowledgeSession() {
         steps = new ArrayList<SimulationStep>();
-        path = new PathImpl( sim,
+        path = new SimulationPathImpl( sim,
                              "path" + pathCounter++ );        
         sim.getPaths().put( path.getName(), path );     
-        ((PathImpl)path).setSteps( steps );        
+        ((SimulationPathImpl)path).setSteps( steps );
         
         newStep( 0l );
 
@@ -118,7 +118,7 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
         return sim;
     }
 
-    public Map<String, Path> getPaths() {
+    public Map<String, SimulationPath> getPaths() {
         return sim.getPaths();
     }
 

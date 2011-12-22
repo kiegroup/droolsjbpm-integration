@@ -19,19 +19,18 @@ package org.drools.simulation.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.command.Context;
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 
 public class SimulationImpl implements Simulation {
 
-    private Map<String, Path> paths;
+    private Map<String, SimulationPath> paths;
     
     public SimulationImpl() {
-        this.paths = new HashMap<String, Path>();
+        this.paths = new HashMap<String, SimulationPath>();
     }
     
-    public Map<String, Path> getPaths() {
+    public Map<String, SimulationPath> getPaths() {
         return this.paths;
     }
         

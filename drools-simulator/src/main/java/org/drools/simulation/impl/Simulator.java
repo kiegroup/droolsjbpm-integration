@@ -33,7 +33,7 @@ import org.drools.command.ResolvingKnowledgeCommandContext;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
 import org.drools.time.SessionPseudoClock;
@@ -75,11 +75,11 @@ public class Simulator
         this.contexts.put( ROOT,
                            this.root );
 
-        Map<String, Path> paths = this.simulation.getPaths();
+        Map<String, SimulationPath> paths = this.simulation.getPaths();
 
         // calculate capacity
         int capacity = 0;
-        for ( Path path : paths.values() ) {
+        for ( SimulationPath path : paths.values() ) {
             this.contexts.put( path.getName(),
                                new ContextImpl( path.getName(),
                                                 this,
@@ -100,7 +100,7 @@ public class Simulator
                                             }
                                         } );
 
-        for ( Path path : paths.values() ) {
+        for ( SimulationPath path : paths.values() ) {
             for ( SimulationStep step : path.getSteps() )
                 this.queue.add( step );
         }
@@ -118,7 +118,7 @@ public class Simulator
             return null;
         }
         SimulationStepImpl step = (SimulationStepImpl) this.queue.remove();
-        PathImpl path = (PathImpl) step.getPath();
+        SimulationPathImpl path = (SimulationPathImpl) step.getPath();
 
         Context pathContext = new ResolvingKnowledgeCommandContext( this.contexts.get( path.getName() ) );
 

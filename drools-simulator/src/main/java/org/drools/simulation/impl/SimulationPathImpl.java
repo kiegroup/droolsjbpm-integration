@@ -18,12 +18,12 @@ package org.drools.simulation.impl;
 
 import java.util.Collection;
 
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
 
-public class PathImpl
-        implements Path {
+public class SimulationPathImpl
+        implements SimulationPath {
 
     private SimulationImpl   simulation;
 
@@ -31,8 +31,8 @@ public class PathImpl
 
     private Collection<SimulationStep> steps;
 
-    public PathImpl(Simulation simulation,
-                    String name) {
+    public SimulationPathImpl(Simulation simulation,
+            String name) {
         this.name = name;
         this.simulation = (SimulationImpl) simulation;
     }
@@ -51,7 +51,7 @@ public class PathImpl
 
     @Override
     public String toString() {
-        return "PathImpl [name=" + name + ", steps=" + steps.size() + "]";
+        return "SimulationPathImpl [name=" + name + ", steps=" + steps.size() + "]";
     }
 
 }

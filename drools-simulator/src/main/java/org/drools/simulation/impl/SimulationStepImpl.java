@@ -21,17 +21,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.drools.command.Command;
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.SimulationStep;
 
 public class SimulationStepImpl
         implements SimulationStep {
 
-    private Path                path;
+    private SimulationPath path;
     private Collection<Command> commands;
     private long                distance;
 
-    public SimulationStepImpl(Path path,
+    public SimulationStepImpl(SimulationPath path,
             Collection<Command> commands,
             long distance) {
         this.path = path;
@@ -39,7 +39,7 @@ public class SimulationStepImpl
         this.distance = distance;
     }
     
-    public SimulationStepImpl(Path path,
+    public SimulationStepImpl(SimulationPath path,
             Command command,
             long distance) {
         this.path = path;
@@ -56,7 +56,7 @@ public class SimulationStepImpl
         return distance;
     }
 
-    public Path getPath() {
+    public SimulationPath getPath() {
         return this.path;
     }
 

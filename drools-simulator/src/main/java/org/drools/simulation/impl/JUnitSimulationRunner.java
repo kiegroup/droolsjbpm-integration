@@ -25,7 +25,7 @@ import java.util.Map;
 import org.drools.command.Command;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
-import org.drools.simulation.Path;
+import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
 import org.drools.simulation.impl.Simulator.CommandExecutionHandler;
@@ -65,7 +65,7 @@ public class JUnitSimulationRunner extends Runner {
                 Simulation simulation = (Simulation) method.invoke( object,
                                                                     null );
 
-                for ( Path path : simulation.getPaths().values() ) {
+                for ( SimulationPath path : simulation.getPaths().values() ) {
                     for ( SimulationStep step : path.getSteps() ) {
                         for ( Command command : step.getCommands() ) {
                             if ( command instanceof TestGroupCommand ) {
