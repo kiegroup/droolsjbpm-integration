@@ -16,14 +16,19 @@
 
 package org.drools.fluent.standard;
 
-import org.drools.fluent.FluentPath;
+import org.drools.fluent.FluentBase;
+import org.drools.fluent.FluentTest;
 
-public interface FluentStandardPath extends FluentPath<FluentStandardPath, FluentStandardStep> {
+public interface FluentStandardPath extends FluentBase, FluentTest<FluentStandardPath> {
     
     FluentStandardPath getPath(String name);
     
     FluentStandardPath newPath(String name);
     
     FluentStandardSimulation end();
+
+    FluentStandardStep newStep(long distance);
+
+//    FluentPath newPath(String name); // ends current path and creates a new one
 
 }

@@ -17,7 +17,6 @@
 package org.drools.fluent.standard;
 
 import org.drools.fluent.FluentBase;
-import org.drools.fluent.FluentPath;
 import org.drools.fluent.FluentRoot;
 import org.drools.fluent.FluentStep;
 import org.drools.fluent.FluentTest;
