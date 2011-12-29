@@ -21,11 +21,14 @@ import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.command.runtime.rule.RetractCommand;
+import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.FactHandle;
 
 public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTest<FluentStandardStatefulKnowledgeSession>
         implements FluentStandardStatefulKnowledgeSession {
@@ -49,6 +52,16 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
     public FluentStandardStatefulKnowledgeSession insert(Object object) {
         getSim().addCommand( new InsertObjectCommand( object ) );
         
+        return this;
+    }
+    
+    public FluentStandardStatefulKnowledgeSession update(FactHandle handle, Object object) {
+        getSim().addCommand( new UpdateCommand( handle, object ) );
+        return this;
+    }
+    
+    public FluentStandardStatefulKnowledgeSession retract(FactHandle handle) {
+        getSim().addCommand( new RetractCommand( handle ) );
         return this;
     }
     
@@ -77,5 +90,7 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
         getSim().addCommand( new SetVariableCommandFromLastReturn( null, name ) );
         return this;
     }
+
+    
 
 }

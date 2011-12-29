@@ -14,27 +14,16 @@
  * limitations under the License.
  */
 
-package org.drools.fluent;
+package org.drools.fluent.batch;
 
-import org.drools.runtime.rule.FactHandle;
 
-public interface FluentStatefulKnowledgeSession<T> extends FluentBase  {
-            
-    T fireAllRules();
-    
-    T insert(Object object);  
-    
-    T update( FactHandle handle, Object object );  
-    
-    T retract(FactHandle handle);
-    
-    T setGlobal( String identifier, Object object );
-    
-    /**
-     * The last executed command, if it returns a value, is set to a name in this executings context
-     * @param name
-     * @return
-     */
-    T set(String name);
+import org.drools.command.BatchExecutionCommand;
+import org.drools.fluent.FluentBase;
+import org.drools.fluent.FluentRoot;
+import org.drools.fluent.FluentStatefulKnowledgeSession;
 
+public interface FluentBatchExecution  extends FluentBase, FluentRoot, FluentStatefulKnowledgeSession<FluentBatchExecution>{
+
+    FluentBatchExecution newBatchExecution();
+    BatchExecutionCommand getBatchExecution();
 }
