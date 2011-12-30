@@ -44,7 +44,8 @@ public class BatchFluentTest {
         List list = new ArrayList();
 
         // @formatter:off          
-        BatchExecutionCommand cmd = f.newBatchExecution().setGlobal("list", list)
+        BatchExecutionCommand cmd = f.newBatchExecution()
+                .setGlobal("list", list)
                 .insert(new Person("yoda", 150)).set("y")
                 .insert(new Person("salaboy", 28)).set("x")
                 .fireAllRules()
@@ -56,8 +57,39 @@ public class BatchFluentTest {
         ExecutionResults results = createStatelessSession().execute(cmd);
 
         assertEquals(2, results.getIdentifiers().size());
-        
+        assertEquals("y", (String) results.getIdentifiers().toArray()[0]);
+        assertEquals("x", (String) results.getIdentifiers().toArray()[1]);
 
+        // @formatter:on
+
+    }
+     @Test
+    public void testBatchSimpleWithSetInGlobal() {
+
+
+        FluentBatchExecution f = new FluentBatchExecutionImpl();
+
+        List list = new ArrayList();
+
+        // @formatter:off          
+        BatchExecutionCommand cmd = f.newBatchExecution()
+                .setGlobal("list", list).set("myGlobal")
+                .insert(new Person("yoda", 150)).set("y")
+                .insert(new Person("salaboy", 28)).set("x")
+                .fireAllRules()
+                .getBatchExecution();
+
+
+        assertEquals(4, ((BatchExecutionCommandImpl) cmd).getCommands().size());
+
+        ExecutionResults results = createStatelessSession().execute(cmd);
+
+        assertEquals(3, results.getIdentifiers().size());
+        assertEquals("myGlobal", (String) results.getIdentifiers().toArray()[0]);
+        assertEquals("y", (String) results.getIdentifiers().toArray()[1]);
+        assertEquals("x", (String) results.getIdentifiers().toArray()[2]);
+
+        
         // @formatter:on
 
     }
