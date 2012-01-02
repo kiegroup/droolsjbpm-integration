@@ -17,6 +17,8 @@ package org.drools.fluent.batch.imp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.drools.command.*;
 import org.drools.command.impl.GenericCommand;
@@ -40,13 +42,8 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
     private GenericCommand<?> lastAddedCommand;
 
     public FluentBatchExecutionImpl() {
-        
-        
         vars = new MapVariableContext();
     }
-
-  
-  
 
     public void addCommand(GenericCommand<?> cmd) {
         cmds.add(cmd);
@@ -55,8 +52,6 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
     public <P> VariableContext<P> getVariableContext() {
         return vars;
     }
-
-   
 
     public BatchExecutionCommand getBatchExecution() {
         return new BatchExecutionCommandImpl((List<GenericCommand<?>>) cmds);
@@ -97,25 +92,14 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
     }
 
     public FluentBatchExecution set(String name) {
-//        try {
-//            Method method = lastAddedCommand.getClass().getDeclaredMethod("setOutIdentifier", new Class[]{String.class});
-//            try {
-//                method.invoke(lastAddedCommand, name);
-//            } catch (IllegalAccessException ex) {
-//                Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (IllegalArgumentException ex) {
-//                Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (InvocationTargetException ex) {
-//                Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        } catch (NoSuchMethodException ex) {
-//            Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (SecurityException ex) {
-//            Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        if(lastAddedCommand instanceof IdentifiableResult){
-            ((IdentifiableResult)lastAddedCommand).setOutIdentifier(name);
+        if (lastAddedCommand instanceof IdentifiableResult){
+            ((IdentifiableResult) lastAddedCommand).setOutIdentifier(name);
+        } else {
+            Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.WARNING,
+                    "The lastAddedCommand class (" + lastAddedCommand.getClass()
+                            + ") is not an instanceof IdentifiableResult.");
         }
         return this;
     }
+
 }
