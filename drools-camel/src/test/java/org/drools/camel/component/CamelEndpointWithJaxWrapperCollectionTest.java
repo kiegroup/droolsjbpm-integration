@@ -73,7 +73,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 
         SetGlobalCommand setGlobal = new SetGlobalCommand( "list",
                                                            new WrappedList() );
-        setGlobal.setOut( true );
+        setGlobal.setOutIdentifier( "list" );
 
         cmd.getCommands().add( setGlobal );
         cmd.getCommands().add( new InsertObjectCommand( new Person( "baunax" ) ) );
