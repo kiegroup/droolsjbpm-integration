@@ -16,10 +16,10 @@ public class JSonBatchExecutionTest extends BatchTest {//extends ContextTestSupp
                                 String resultXml) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode tree1 = mapper.readTree( expectedXml );
-            JsonNode tree2 = mapper.readTree( resultXml );
-            assertTrue( "Expected:" + expectedXml + "\nwas:" + resultXml,
-                        tree1.equals( tree2 ) );
+            JsonNode expectedTree = mapper.readTree( expectedXml );
+            JsonNode resultTree = mapper.readTree( resultXml );
+            assertEquals("Expected:" + expectedXml + "\nwas:" + resultXml,
+                    expectedTree, resultTree);
         } catch ( Exception e ) {
             throw new RuntimeException( "XML Assertion failure",
                                         e );
