@@ -61,8 +61,6 @@ public class BatchFluentTest {
 
     @Test
     public void testBatchSimpleWithSetInGlobal() {
-
-
         FluentBatchExecution f = new FluentBatchExecutionImpl();
 
         List list = new ArrayList();
@@ -90,7 +88,12 @@ public class BatchFluentTest {
         String str = "package org.drools.simulation.test\n"
                 + "import " + Person.class.getName() + "\n"
                 + "global java.util.List list\n"
-                + "rule updateAge no-loop when  $p : Person() then  modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
+                + "rule updateAge no-loop\n"
+                + "  when\n"
+                + "    $p : Person()\n"
+                + "  then\n"
+                + "    modify( $p ) { setAge( $p.getAge() + 10 ) };\n"
+                + "end\n";
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add(new ByteArrayResource(str.getBytes()), ResourceType.DRL);
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();

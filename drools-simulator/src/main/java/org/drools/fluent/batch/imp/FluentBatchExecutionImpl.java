@@ -36,7 +36,6 @@ import org.drools.runtime.rule.FactHandle;
 public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExecution>
         implements FluentBatchExecution {
 
-   
     private List<GenericCommand<?>> cmds = new ArrayList<GenericCommand<?>>();
     private VariableContext vars;
     private GenericCommand<?> lastAddedCommand;
@@ -55,7 +54,6 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
 
     public BatchExecutionCommand getBatchExecution() {
         return new BatchExecutionCommandImpl((List<GenericCommand<?>>) cmds);
-        
     }
 
     public FluentBatchExecution newBatchExecution() {

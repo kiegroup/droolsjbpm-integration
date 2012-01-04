@@ -50,7 +50,6 @@ public class SimulationTest {
 
     @Test
     public Simulation testOnePathNoDSL() {
-
         Simulation simulation = new SimulationImpl();
 
         String str = "";
@@ -155,7 +154,6 @@ public class SimulationTest {
 
     @Test
     public Simulation testTwoPathsNoDSL() {
-
         Simulation simulation = new SimulationImpl();
 
         String str = "";
@@ -311,4 +309,5 @@ public class SimulationTest {
 
         return simulation;
     }
+
 }

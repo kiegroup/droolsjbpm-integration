@@ -17,11 +17,11 @@
 package org.drools.simulation.impl;
 
 public class Person {
+
     private String name;
     private int age;
     
     public Person() {
-        
     }
     
     public Person(String name) {
@@ -71,6 +71,5 @@ public class Person {
         } else if ( !name.equals( other.name ) ) return false;
         return true;
     }  
-    
-    
+
 }
