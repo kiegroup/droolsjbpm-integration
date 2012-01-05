@@ -729,7 +729,6 @@ public abstract class BatchTest extends ContextTestSupport {
                                     factHandles.get( 0 ).toExternalForm(),
                                     factHandles.get( 1 ).toExternalForm() ),
                         outXml );
-
     }
 
     @Test

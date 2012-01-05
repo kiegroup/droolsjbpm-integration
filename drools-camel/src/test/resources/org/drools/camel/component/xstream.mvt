@@ -259,7 +259,7 @@
 @declare{"testInsertElements.in.1"}
 
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <list/>
     </set-global>
     <insert-elements>
@@ -301,7 +301,7 @@
 @declare{"testInsertElementsWithReturnObjects.in.1"}
 
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <list/>
     </set-global>
     <insert-elements out-identifier="myfacts" return-objects="true">
@@ -364,7 +364,7 @@
     <set-global identifier="list1">
         <list/>
     </set-global>
-    <set-global identifier="list2" out="true">
+    <set-global identifier="list2" out-identifier="list2">
         <list/>
     </set-global>
     <set-global identifier="list3" out-identifier="outList3">
@@ -416,7 +416,7 @@
 @declare{"testGetGlobal.in.1"}
 
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <list/>
     </set-global>
     <insert out-identifier="outStilton" return-object="true">
@@ -514,7 +514,7 @@
 @declare{"testManualFireAllRules.in.1"}
 
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <list/>
     </set-global>
     <insert-elements>

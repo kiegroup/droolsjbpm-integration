@@ -298,7 +298,7 @@
 @declare{"testInsertElements.in.1"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper"/>
     </set-global>
     <insert-elements return-objects="true">
@@ -413,13 +413,13 @@
 @declare{"testSetGlobal.in.1"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <set-global identifier="list1" out="false">
+    <set-global identifier="list1">
         <object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper"/>
     </set-global>
-    <set-global identifier="list2" out="true">
+    <set-global identifier="list2" out-identifier="list2">
         <object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper"/>
     </set-global>
-    <set-global identifier="list3" out="true" out-identifier="outList3">
+    <set-global identifier="list3" out-identifier="outList3">
         <object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper"/>
     </set-global>
     <insert out-identifier="outStilton" return-object="true">
@@ -474,7 +474,7 @@
 @declare{"testGetGlobal.in.1"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper"/>
     </set-global>
     <insert out-identifier="outStilton" return-object="true">
@@ -639,7 +639,7 @@
 @declare{"testManualFireAllRules.in.1"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <set-global identifier="list1" out="true">
+    <set-global identifier="list1" out-identifier="list1">
         <object xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper"/>
     </set-global>
     <insert-elements return-objects="true">
