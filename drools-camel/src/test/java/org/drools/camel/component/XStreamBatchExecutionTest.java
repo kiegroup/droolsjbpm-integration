@@ -617,7 +617,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         String inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <set-global identifier='list' out='true' return-objects='true'>";
+        inXml += "  <set-global identifier='list' out-identifier='list' return-objects='true'>";
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements>";
@@ -740,7 +740,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         String inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <set-global identifier='list' out='true' >";
+        inXml += "  <set-global identifier='list' out-identifier='list' >";
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements out-identifier='myfacts' return-objects='true'>";
@@ -849,7 +849,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "  <set-global identifier='list1'>";
         inXml += "    <list/>";
         inXml += "  </set-global>";
-        inXml += "  <set-global identifier='list2' out='true'>";
+        inXml += "  <set-global identifier='list2' out-identifier='list2'>";
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <set-global identifier='list3' out-identifier='outList3'>";
@@ -1223,7 +1223,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         String inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <set-global identifier='list' out='true'>";
+        inXml += "  <set-global identifier='list' out-identifier='list'>";
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements>";
