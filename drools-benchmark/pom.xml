@@ -44,10 +44,11 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
     </dependency>
-    <dependency>
+    <!-- dependency>
       <groupId>org.mvel</groupId>
       <artifactId>mvel2</artifactId>
-    </dependency>
+      <version>2.1-SNAPSHOT</version>
+    </dependency-->
   </dependencies>
 
 </project>

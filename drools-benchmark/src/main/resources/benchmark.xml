@@ -3,7 +3,7 @@
   <!-- Runtime -->
 
   <benchmark description="Create a stateful session"
-             warmups="10000" repetitions="10000" enabled="true"
+             warmups="10000" repetitions="10000" enabled="false"
              classname="org.drools.benchmark.benchmarks.StatefulSessionCreation">
   </benchmark>
 
@@ -81,7 +81,7 @@
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 1M objects with a simple literal constraint"
-             warmups="1500" repetitions="1000000" enabled="false"
+             warmups="10000" repetitions="1000000" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
     <arg>literalConstraintRule.drl</arg>
   </benchmark>
@@ -116,6 +116,13 @@
   <benchmark description="Manners"
              warmups="0" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.MannersBenchmark">
+  </benchmark>
+
+  <benchmark description="Join"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.JoinBenchmark">
+    <arg>5000</arg>
+    <arg>joins.drl</arg>
   </benchmark>
 
   <!-- Compile-time -->

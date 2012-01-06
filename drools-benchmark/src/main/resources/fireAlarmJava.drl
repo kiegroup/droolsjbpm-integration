@@ -5,7 +5,8 @@ import org.drools.benchmark.model.*
 
 rule "When there is a fire turn on the sprinkler"
 when
-    $fire: Fire($roomA_ : room)
+//    $fire: Fire($roomA_ : room)
+    $roomA_ : Room( name == "pippo" )
     $sprinklerA_ : Sprinkler( room == $roomA_, on == false )
 then
     modify( $sprinklerA_ ) { setOn( true ) };
