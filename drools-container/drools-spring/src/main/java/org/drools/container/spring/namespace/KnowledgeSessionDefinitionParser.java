@@ -283,7 +283,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
                                                     null,
                                                     null));
                                 } else {
-                                    throw new IllegalArgumentException("start-process paramaters must either specify a 'ref' attribute or have a nested bean");
+                                    throw new IllegalArgumentException("start-process parameters must either specify a 'ref' attribute or have a nested bean");
                                 }
                             }
                             beanBuilder.addPropertyValue("parameters",
