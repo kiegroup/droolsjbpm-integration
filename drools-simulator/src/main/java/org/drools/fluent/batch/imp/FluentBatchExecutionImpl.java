@@ -17,6 +17,7 @@ package org.drools.fluent.batch.imp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +25,9 @@ import org.drools.command.*;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.SetGlobalCommand;
+import org.drools.command.runtime.process.CreateProcessInstanceCommand;
+import org.drools.command.runtime.process.StartProcessCommand;
+import org.drools.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
@@ -95,9 +99,42 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
         } else {
             Logger.getLogger(FluentBatchExecutionImpl.class.getName()).log(Level.WARNING,
                     "The lastAddedCommand class (" + lastAddedCommand.getClass()
-                            + ") is not an instanceof IdentifiableResult.");
+                            + ") is not an instanceof IdentifiableResult.\n "
+                    + "As result, the variable '"+name+"' will not be set.");
         }
         return this;
+    }
+
+    public FluentBatchExecution startProcess(String identifier, Map<String, Object> params) {
+        lastAddedCommand = new StartProcessCommand(identifier, params);
+        addCommand(lastAddedCommand);
+        return this;
+    }
+
+    public FluentBatchExecution startProcess(String identifier) {
+        lastAddedCommand = new StartProcessCommand(identifier);
+        addCommand(lastAddedCommand);
+        return this;
+    }
+
+    public FluentBatchExecution createProcessInstance(String identifier, Map<String, Object> params) {
+        lastAddedCommand = new CreateProcessInstanceCommand(identifier, params);
+        addCommand(lastAddedCommand);
+        return this;
+    }
+
+    public FluentBatchExecution startProcessInstnace(long processId) {
+        lastAddedCommand = new StartProcessInstanceCommand(processId);
+        addCommand(lastAddedCommand);
+        return this;
+    }
+
+    public FluentBatchExecution signalEvent(String id, Object event, long processId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public FluentBatchExecution signalEvent(String id, Object event) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

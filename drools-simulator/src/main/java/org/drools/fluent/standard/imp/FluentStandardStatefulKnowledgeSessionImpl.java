@@ -16,9 +16,14 @@
 
 package org.drools.fluent.standard.imp;
 
+import java.util.Map;
 import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.SetGlobalCommand;
+import org.drools.command.runtime.process.CreateProcessInstanceCommand;
+import org.drools.command.runtime.process.SignalEventCommand;
+import org.drools.command.runtime.process.StartProcessCommand;
+import org.drools.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
@@ -88,6 +93,37 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
 
     public FluentStandardStatefulKnowledgeSession set(String name) {
         getSim().addCommand( new SetVariableCommandFromLastReturn( null, name ) );
+        return this;
+    }
+
+    public FluentStandardStatefulKnowledgeSession startProcess(String identifier, Map<String, Object> params) {
+        getSim().addCommand(new StartProcessCommand(identifier, params));
+        return this;
+    }
+
+    public FluentStandardStatefulKnowledgeSession startProcess(String identifier) {
+        getSim().addCommand(new StartProcessCommand(identifier));
+        return this;
+    }
+    
+
+    public FluentStandardStatefulKnowledgeSession createProcessInstance(String identifier, Map<String, Object> params) {
+        getSim().addCommand(new CreateProcessInstanceCommand(identifier, params));
+        return this;
+    }
+
+    public FluentStandardStatefulKnowledgeSession startProcessInstnace(long processId) {
+        getSim().addCommand(new StartProcessInstanceCommand(processId));
+        return this;
+    }
+
+    public FluentStandardStatefulKnowledgeSession signalEvent(String id, Object event, long processId) {
+        getSim().addCommand(new SignalEventCommand(processId, id, event));
+        return this;
+    }
+
+    public FluentStandardStatefulKnowledgeSession signalEvent(String id, Object event) {
+        getSim().addCommand(new SignalEventCommand(id, event));
         return this;
     }
 
