@@ -41,29 +41,24 @@ public abstract class EventListenersUtil {
     public static final String ELEMENT_PROCESS_EVENT_LISTENER = "processEventListener";
     public static final String ELEMENT_WORKING_MEMORY_EVENT_LISTENER = "workingMemoryEventListener";
 
-    // Additions for JIRA JBRULES-3076
     public static void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, Element element) {
         ManagedMap completeListenersList = new ManagedMap();
-        ManagedMap listeners = null;
 
-        String listenerType = TYPE_AGENDA_EVENT_LISTENER;
         List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_AGENDA_EVENT_LISTENER);
         if (eventListeners != null) {
-            listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
+            ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_AGENDA_EVENT_LISTENER);
             completeListenersList.putAll(listeners);
         }
 
-        listenerType = TYPE_PROCESS_EVENT_LISTENER;
         eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_PROCESS_EVENT_LISTENER);
         if (eventListeners != null) {
-            listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
+            ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_PROCESS_EVENT_LISTENER);
             completeListenersList.putAll(listeners);
         }
 
-        listenerType = TYPE_WORKING_MEMORY_EVENT_LISTENER;
         eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_WORKING_MEMORY_EVENT_LISTENER);
         if (eventListeners != null) {
-            listeners = parseEventListenersByType(parserContext, eventListeners, listenerType);
+            ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_WORKING_MEMORY_EVENT_LISTENER);
             completeListenersList.putAll(listeners);
         }
 
@@ -119,5 +114,5 @@ public abstract class EventListenersUtil {
         }
         return listeners;
     }
-    // End of Additions for JIRA JBRULES-3076
+
 }
