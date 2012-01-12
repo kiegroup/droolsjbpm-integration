@@ -162,24 +162,34 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     }
 
     public void setEventListeners(Map<String, List> eventListenerMap) {
-        for (String key : eventListenerMap.keySet()) {
-            List<Object> eventListenerList = eventListenerMap.get(key);
+        for (Map.Entry<String, List> entry : eventListenerMap.entrySet()) {
+            String key = entry.getKey();
+            List<Object> eventListenerList = entry.getValue();
             if (EventListenersUtil.TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof AgendaEventListener) {
                         agendaEventListeners.add((AgendaEventListener) eventListener);
+                    } else {
+                        throw new IllegalArgumentException("The agendaEventListener (" + eventListener.getClass()
+                                + ") is not an instance of " + AgendaEventListener.class);
                     }
                 }
             } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof WorkingMemoryEventListener) {
                         workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+                    } else {
+                        throw new IllegalArgumentException("The workingMemoryEventListener (" + eventListener.getClass()
+                                + ") is not an instance of " + WorkingMemoryEventListener.class);
                     }
                 }
             } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
                     if (eventListener instanceof ProcessEventListener) {
                         processEventListeners.add((ProcessEventListener) eventListener);
+                    } else {
+                        throw new IllegalArgumentException("The processEventListener (" + eventListener.getClass()
+                                + ") is not an instance of " + ProcessEventListener.class);
                     }
                 }
             }
