@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc
+ * Copyright 2012 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,22 @@ public class StandardjBPM5FluentTest {
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
         String str = "package org.drools.simulation.test\n" +
-                     "import " + Person.class.getName() + "\n" +
-                     "global java.util.List list\n" +
-                     "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
-                     "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";        
+                "import " + Person.class.getName() + "\n" +
+                "global java.util.List list\n" +
+                "rule setTime\n" +
+                "  when\n" +
+                "  then\n" +
+                "    list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n" +
+                "end\n" +
+                "rule updateAge no-loop\n" +
+                "  when\n" +
+                "    $p : Person()\n" +
+                "  then\n" +
+                "    list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n" +
+                "    modify( $p ) {\n" +
+                "      setAge( $p.getAge() + 10 )\n" +
+                "    };\n" +
+                "end\n";
         String strProcess = "<definitions id='Definition' "
                 + "targetNamespace='http://www.jboss.org/drools' "
                 + "typeLanguage='http://www.java.com/javaTypes' "
@@ -112,8 +124,6 @@ public class StandardjBPM5FluentTest {
 
         runSimulation( f );
     }
-    
-   
     
     private void runSimulation(FluentStandardSimulation f) {
         SimulationImpl sim = (SimulationImpl) ((FluentStandardSimulationImpl) f).getSimulation();
