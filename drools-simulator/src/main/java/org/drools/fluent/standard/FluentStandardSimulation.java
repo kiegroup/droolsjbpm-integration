@@ -24,5 +24,7 @@ public interface FluentStandardSimulation extends FluentRoot, FluentTest<FluentS
     FluentStandardPath newPath(String name);
     
     FluentStandardPath getPath(String name);
-    
+
+    // TODO FluentStandardStep newStep(long distance);
+
 }
