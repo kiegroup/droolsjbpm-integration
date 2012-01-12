@@ -141,7 +141,14 @@ public class SpringDroolsListenersTest {
     public void testStatefulWithDefault() throws Exception {
         StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithDefault");
         assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
-        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
+        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+    }
+
+    @Test
+    public void testStatefulWithLegacyDebugListener() throws Exception {
+        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithDebugListener");
+        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
     }
 
     @Test

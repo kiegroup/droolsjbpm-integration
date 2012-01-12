@@ -42,42 +42,42 @@ public abstract class EventListenersUtil {
     public static final String ELEMENT_WORKING_MEMORY_EVENT_LISTENER = "workingMemoryEventListener";
 
     public static void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, Element element) {
-        ManagedMap completeListenersList = new ManagedMap();
+        ManagedMap completeListenersMap = new ManagedMap();
 
         List<Element> eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_AGENDA_EVENT_LISTENER);
         if (eventListeners != null) {
             ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_AGENDA_EVENT_LISTENER);
-            completeListenersList.putAll(listeners);
+            completeListenersMap.putAll(listeners);
         }
 
         eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_PROCESS_EVENT_LISTENER);
         if (eventListeners != null) {
             ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_PROCESS_EVENT_LISTENER);
-            completeListenersList.putAll(listeners);
+            completeListenersMap.putAll(listeners);
         }
 
         eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_WORKING_MEMORY_EVENT_LISTENER);
         if (eventListeners != null) {
             ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_WORKING_MEMORY_EVENT_LISTENER);
-            completeListenersList.putAll(listeners);
+            completeListenersMap.putAll(listeners);
         }
 
-        factory.addPropertyValue("eventListeners", completeListenersList);
+        factory.addPropertyValue("eventListeners", completeListenersMap);
     }
 
     private static ManagedMap parseEventListenersByType(ParserContext parserContext, List<Element> eventListeners, String listenerType) {
         ManagedMap listeners = new ManagedMap();
         for (Element listener : eventListeners) {
-            String beanName = listener.getAttribute("ref");
+            String ref = listener.getAttribute("ref");
             // if this a bean ref
-            if (StringUtils.hasText(beanName)) {
+            if (StringUtils.hasText(ref)) {
                 if (TYPE_AGENDA_EVENT_LISTENER.equalsIgnoreCase(listenerType) || TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(listenerType) || TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                     ManagedList subList = (ManagedList) listeners.get(listenerType);
                     if (subList == null) {
                         subList = new ManagedList();
                         listeners.put(listenerType, subList);
                     }
-                    subList.add(new RuntimeBeanReference(beanName));
+                    subList.add(new RuntimeBeanReference(ref));
                 } else {
                     throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
                 }
@@ -93,6 +93,8 @@ public abstract class EventListenersUtil {
                         obj = new DebugProcessEventListener();
                     } else if (TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                         obj = new DebugWorkingMemoryEventListener();
+                    } else {
+                        throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
                     }
                     ManagedList subList = (ManagedList) listeners.get(listenerType);
                     if (subList == null) {
