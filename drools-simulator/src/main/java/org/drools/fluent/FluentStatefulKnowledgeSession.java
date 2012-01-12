@@ -18,7 +18,7 @@ package org.drools.fluent;
 
 import org.drools.runtime.rule.FactHandle;
 
-public interface FluentStatefulKnowledgeSession<T> extends FluentBase  {
+public interface FluentStatefulKnowledgeSession<T> extends FluentBase , FluentStatefulProcessSession<T> {
             
     T fireAllRules();
     
@@ -29,7 +29,7 @@ public interface FluentStatefulKnowledgeSession<T> extends FluentBase  {
     T retract(FactHandle handle);
     
     T setGlobal( String identifier, Object object );
-    
+     
     /**
      * The last executed command, if it returns a value, is set to a name in this executings context
      * @param name
