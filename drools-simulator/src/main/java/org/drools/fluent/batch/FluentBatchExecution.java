@@ -18,11 +18,10 @@ package org.drools.fluent.batch;
 
 
 import org.drools.command.BatchExecutionCommand;
-import org.drools.fluent.FluentBase;
 import org.drools.fluent.FluentRoot;
 import org.drools.fluent.FluentStatefulKnowledgeSession;
 
-public interface FluentBatchExecution extends FluentBase, FluentRoot, FluentStatefulKnowledgeSession<FluentBatchExecution>{
+public interface FluentBatchExecution extends FluentRoot, FluentStatefulKnowledgeSession<FluentBatchExecution>{
 
     FluentBatchExecution newBatchExecution();
     BatchExecutionCommand getBatchExecution();

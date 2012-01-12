@@ -16,10 +16,9 @@
 
 package org.drools.fluent.standard;
 
-import org.drools.fluent.FluentBase;
 import org.drools.fluent.FluentTest;
 
-public interface FluentStandardStep extends FluentBase, FluentTest<FluentStandardStep>  {
+public interface FluentStandardStep extends FluentTest<FluentStandardStep>  {
 
     FluentStandardStep newStep(long distance);
     

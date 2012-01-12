@@ -16,10 +16,9 @@
 
 package org.drools.fluent.standard;
 
-import org.drools.fluent.FluentBase;
 import org.drools.fluent.FluentTest;
 
-public interface FluentStandardPath extends FluentBase, FluentTest<FluentStandardPath> {
+public interface FluentStandardPath extends FluentTest<FluentStandardPath> {
     
     FluentStandardPath getPath(String name);
     

@@ -40,7 +40,7 @@ public class StandardFluentTest {
 
     @Test
     public void testUsingImplicit() {
-        FluentStandardSimulation f = new FluentStandardSimulationImpl();        
+        FluentStandardSimulation f = new FluentStandardSimulationImpl();
         
         VariableContext<Person> pc = f.<Person> getVariableContext();
 

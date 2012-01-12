@@ -18,7 +18,7 @@ package org.drools.fluent;
 
 import org.drools.runtime.rule.FactHandle;
 
-public interface FluentStatefulKnowledgeSession<T> extends FluentBase , FluentStatefulProcessSession<T> {
+public interface FluentStatefulKnowledgeSession<T> extends FluentStatefulProcessSession<T> {
             
     T fireAllRules();
     
