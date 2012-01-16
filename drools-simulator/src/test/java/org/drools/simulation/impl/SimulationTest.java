@@ -83,7 +83,7 @@ public class SimulationTest {
 
         cmds.add( new SetVariableCommand( "path1",
                                           "kbuilder",
-                                          new NewKnowledgeBuilderCommand( null ) ) );
+                                          new NewKnowledgeBuilderCommand( ) ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
                                                                                                  ResourceType.DRL,
@@ -223,7 +223,7 @@ public class SimulationTest {
 
         cmds.add( new SetVariableCommand( "ROOT",
                                           "kbuilder",
-                                          new NewKnowledgeBuilderCommand( null ) ) );
+                                          new NewKnowledgeBuilderCommand( ) ) );
 
         cmds.add( new KnowledgeContextResolveFromContextCommand( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
                                                                                                  ResourceType.DRL,
