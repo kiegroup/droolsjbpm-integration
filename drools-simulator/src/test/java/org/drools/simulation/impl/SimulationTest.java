@@ -71,7 +71,7 @@ public class SimulationTest {
 
         List<Command> cmds = new ArrayList<Command>();
 
-        cmds.add( new NewKnowledgeBuilderCommand( null ) );
+        cmds.add( new NewKnowledgeBuilderCommand( ) );
         cmds.add( new SetVariableCommandFromLastReturn( "path1",
                                           KnowledgeBuilder.class.getName() ) );
 
@@ -175,7 +175,7 @@ public class SimulationTest {
 
         List<Command> cmds = new ArrayList<Command>();
 
-        cmds.add( new NewKnowledgeBuilderCommand( null ) );
+        cmds.add( new NewKnowledgeBuilderCommand( ) );
         cmds.add( new SetVariableCommandFromLastReturn( ContextManager.ROOT,
                                           KnowledgeBuilder.class.getName() ) );
 
