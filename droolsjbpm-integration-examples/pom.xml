@@ -85,7 +85,11 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
     <!-- Needed for logging -->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>

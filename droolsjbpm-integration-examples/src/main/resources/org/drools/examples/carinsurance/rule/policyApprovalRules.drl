@@ -1,0 +1,40 @@
+/*
+ * Copyright 2012 JBoss Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.drools.examples.carinsurance.rule;
+    dialect "java"
+
+import org.drools.examples.carinsurance.domain.Car;
+import org.drools.examples.carinsurance.domain.CarType;
+import org.drools.examples.carinsurance.domain.Driver;
+import org.drools.examples.carinsurance.domain.policy.Coverage;
+import org.drools.examples.carinsurance.domain.policy.CoverageType;
+import org.drools.examples.carinsurance.domain.policy.Policy;
+import org.drools.examples.carinsurance.domain.request.CoverageRequest;
+import org.drools.examples.carinsurance.domain.request.PolicyRequest;
+
+// ############################################################################
+// Policy rejections
+// ############################################################################
+
+rule "rejectMinors" no-loop
+    when
+        $driver : Driver(age < 18)
+        $policyRequest : PolicyRequest(driver == $driver)
+    then
+        $policyRequest.setAutomaticallyDisapproved(true);
+        $policyRequest.addDisapprovalMessage("The driver of age " + $driver.getAge() + " is too young.");
+end
