@@ -200,9 +200,7 @@ public class SpringDroolsTest {
         KnowledgeBaseImpl kbase1 = (KnowledgeBaseImpl) context.getBean( "kbase1" );
         RuleBaseConfiguration rconf = ((InternalRuleBase) kbase1.getRuleBase()).getConfiguration();
         assertTrue( rconf.isAdvancedProcessRuleIntegration() );
-        assertTrue( rconf.isMultithreadEvaluation() );
-        assertEquals( 5,
-                      rconf.getMaxThreads() );
+        assertFalse( rconf.isMultithreadEvaluation() );
         assertEquals( EventProcessingOption.STREAM,
                       rconf.getEventProcessingMode() );
         assertEquals( AssertBehaviour.IDENTITY,

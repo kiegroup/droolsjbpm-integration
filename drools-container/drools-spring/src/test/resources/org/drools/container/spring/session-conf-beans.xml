@@ -25,7 +25,7 @@
      <drools:configuration>
         <drools:advanced-process-rule-integration enabled="true" />
 
-        <drools:multithread enabled="true" max-threads="5" />
+        <!-- no longer supported drools:multithread enabled="true" max-threads="5" / -->
 
         <drools:mbeans enabled="true" />
 
