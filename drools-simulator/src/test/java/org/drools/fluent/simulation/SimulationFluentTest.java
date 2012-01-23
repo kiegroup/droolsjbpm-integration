@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.simulation.impl;
+package org.drools.fluent.simulation;
 
 import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
 
@@ -31,9 +31,10 @@ import org.drools.fluent.simulation.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.io.ResourceFactory;
+import org.drools.simulation.impl.Person;
 import org.junit.Test;
 
-public class StandardFluentTest {
+public class SimulationFluentTest {
 
     @Test
     public void testUsingImplicit() {
@@ -161,54 +162,54 @@ public class StandardFluentTest {
         VariableContext<?> vc = f.getVariableContext();
         // @formatter:off          
         f.newPath("init")
-            .newStep( 0 )
+            .newStep(0)
                 .newKnowledgeBuilder()
-                    .add( ResourceFactory.newByteArrayResource( str1.getBytes() ),
-                          ResourceType.DRL )
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                    .add(ResourceFactory.newByteArrayResource(str1.getBytes()),
+                            ResourceType.DRL)
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT,"kb1" )
+                    .end(ContextManager.ROOT, "kb1")
                 .newStatefulKnowledgeSession()
-                    .setGlobal( "list", list1 ).set( "list" )
+                    .setGlobal("list", list1).set("list")
                     .fireAllRules()
                     .end()
                 .newKnowledgeBuilder()
-                    .add( ResourceFactory.newByteArrayResource( str2.getBytes() ),
-                          ResourceType.DRL )
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                    .add(ResourceFactory.newByteArrayResource(str2.getBytes()),
+                            ResourceType.DRL)
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, "kb2" )
+                    .end(ContextManager.ROOT, "kb2")
                 .newStatefulKnowledgeSession()
-                    .setGlobal( "list", list2 ).set( "list" )
+                    .setGlobal("list", list2).set("list")
                     .fireAllRules()
-                    .end( "kb1" )
+                    .end("kb1")
                 .end()
-        .newPath( "path1" )
-            .newStep( 1000 )
-                .getKnowledgeBase( "kb1" )
+        .newPath("path1")
+            .newStep(1000)
+                .getKnowledgeBase("kb1")
                     .end()
                 .newStatefulKnowledgeSession()
-                    .setGlobal( "list", list1 ).set( "list" )
-                    .insert( new Person( "yoda", 150 ) ).set( "y" )
+                    .setGlobal("list", list1).set("list")
+                    .insert(new Person("yoda", 150)).set("y")
                     .fireAllRules()
                      // show testing inside of ksession execution
-                    .test( "y.name == 'yoda'" )
-                    .test( "y.age == 170" )
+                    .test("y.name == 'yoda'")
+                    .test("y.age == 170")
                     .test( "list[list.size()-1] - list[0] == 1000" )
                     .end()
                 .end()
-            .newStep( 2000 )
-                .getKnowledgeBase( "kb2" )
+            .newStep(2000)
+                .getKnowledgeBase("kb2")
                     .end()
                 .newStatefulKnowledgeSession()
-                    .setGlobal( "list", list1 ).set( "list" )
-                    .insert( new Person( "yoda", 150 ) ).set( "y" )
+                    .setGlobal("list", list1).set("list")
+                    .insert(new Person("yoda", 150)).set("y")
                     .fireAllRules()
                      // show testing inside of ksession execution
-                    .test( "y.name == 'yoda'" )
-                    .test( "System.out.println( y.age ); return true")
+                    .test("y.name == 'yoda'")
+                    .test("System.out.println( y.age ); return true")
                     .test( "list[list.size()-1] - list[0] == 2000" )
                     .end()
                 .end()
@@ -243,33 +244,33 @@ public class StandardFluentTest {
         VariableContext<?> vc = f.getVariableContext();
         // @formatter:off          
         f.newPath("init")
-            .newStep( 0 )
+            .newStep(0)
                 .newKnowledgeBuilder()
-                    .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                          ResourceType.DRL )
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                    .add(ResourceFactory.newByteArrayResource(str.getBytes()),
+                            ResourceType.DRL)
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
+                    .end(ContextManager.ROOT, KnowledgeBase.class.getName())
                 .newStatefulKnowledgeSession()
-                    .setGlobal( "list", list ).set( "list" )
+                    .setGlobal("list", list).set("list")
                     .fireAllRules()
                     .end()
                 .end()
-        .newPath( "path1" )
-            .newStep( 1000 )
+        .newPath("path1")
+            .newStep(1000)
                 .newStatefulKnowledgeSession()
-                    .setGlobal( "list", list ).set( "list" )
-                    .insert( new Person( "yoda", 150 ) ).set( "y" )
+                    .setGlobal("list", list).set("list")
+                    .insert(new Person("yoda", 150)).set("y")
                     .fireAllRules()
                      // show testing inside of ksession execution
-                    .test( "y.name == 'yoda'" )
-                    .test( "y.age == 160" )
+                    .test("y.name == 'yoda'")
+                    .test("y.age == 160")
                     .test( "list[list.size()-1] - list[0] == 1000" )
                     .end()
-                .test( "y.name == 'yoda'" )
+                .test("y.name == 'yoda'")
                 .end()
-            .test( "y.name == 'yoda'" )
+            .test("y.name == 'yoda'")
             .end()
         .runSimulation();
         // @formatter:on
