@@ -30,7 +30,8 @@ import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
-import org.drools.fluent.standard.FluentStandardStep;
+import org.drools.fluent.step.SimulationStepFluent;
+import org.drools.fluent.step.DefaultSimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
@@ -38,10 +39,10 @@ import org.drools.runtime.rule.FactHandle;
 public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTest<FluentStandardStatefulKnowledgeSession>
         implements FluentStandardStatefulKnowledgeSession {
     
-    private FluentStandardStepImpl step;
+    private DefaultSimulationStepFluent step;
     
     public FluentStandardStatefulKnowledgeSessionImpl(InternalSimulation sim,
-                                                     FluentStandardStepImpl step) {
+                                                     DefaultSimulationStepFluent step) {
         super();
         setSim( sim );
         this.step = step;
@@ -75,19 +76,19 @@ public class FluentStandardStatefulKnowledgeSessionImpl extends AbstractFluentTe
         return this;
     }
     
-    public FluentStandardStep end(String context, String name) {
+    public SimulationStepFluent end(String context, String name) {
         getSim().addCommand( new GetVariableCommand( StatefulKnowledgeSession.class.getName() ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
-    public FluentStandardStep end(String name) {
+    public SimulationStepFluent end(String name) {
         getSim().addCommand( new GetVariableCommand( StatefulKnowledgeSession.class.getName() ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
-    public FluentStandardStep end() {
+    public SimulationStepFluent end() {
         return step;
     }
 

@@ -29,7 +29,8 @@ import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardKnowledgeBase;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
-import org.drools.fluent.standard.FluentStandardStep;
+import org.drools.fluent.step.SimulationStepFluent;
+import org.drools.fluent.step.DefaultSimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -39,10 +40,10 @@ import org.drools.runtime.conf.ClockTypeOption;
 public class FluentStandardKnowledgeBaseImpl extends AbstractFluentTest<FluentStandardKnowledgeBase>
         implements FluentStandardKnowledgeBase {
 
-    private FluentStandardStepImpl step;
+    private DefaultSimulationStepFluent step;
     
     public FluentStandardKnowledgeBaseImpl(InternalSimulation sim,
-                                           FluentStandardStepImpl step) {
+                                           DefaultSimulationStepFluent step) {
         super();
         setSim( sim );
         this.step = step;
@@ -72,19 +73,19 @@ public class FluentStandardKnowledgeBaseImpl extends AbstractFluentTest<FluentSt
         return this;
     }
 
-    public FluentStandardStep end(String context, String name) {
+    public SimulationStepFluent end(String context, String name) {
         getSim().addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
-    public FluentStandardStep end(String name) {
+    public SimulationStepFluent end(String name) {
         getSim().addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
-    public FluentStandardStep end() {
+    public SimulationStepFluent end() {
         return step;
     }
 

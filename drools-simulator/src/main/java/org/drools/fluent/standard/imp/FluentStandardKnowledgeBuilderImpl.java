@@ -24,17 +24,18 @@ import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.standard.FluentStandardKnowledgeBuilder;
-import org.drools.fluent.standard.FluentStandardStep;
+import org.drools.fluent.step.SimulationStepFluent;
+import org.drools.fluent.step.DefaultSimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
 
 public class FluentStandardKnowledgeBuilderImpl extends AbstractFluentTest<FluentStandardKnowledgeBuilder>
         implements FluentStandardKnowledgeBuilder {
     
-    private FluentStandardStepImpl step;
+    private DefaultSimulationStepFluent step;
     
     public FluentStandardKnowledgeBuilderImpl(InternalSimulation sim,
-                                              FluentStandardStepImpl step) {
+                                              DefaultSimulationStepFluent step) {
         super();
         setSim( sim );
         this.step = step;
@@ -59,19 +60,19 @@ public class FluentStandardKnowledgeBuilderImpl extends AbstractFluentTest<Fluen
         return this;
     }
 
-    public FluentStandardStep end(String context, String name) {
+    public SimulationStepFluent end(String context, String name) {
         getSim().addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
-    public FluentStandardStep end(String name) {
+    public SimulationStepFluent end(String name) {
         getSim().addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
-    public FluentStandardStep end() {
+    public SimulationStepFluent end() {
         return step;
     }
 

@@ -18,16 +18,17 @@ package org.drools.fluent.standard;
 
 import org.drools.fluent.FluentKnowledgeBase;
 import org.drools.fluent.FluentTest;
+import org.drools.fluent.step.SimulationStepFluent;
 
 
 public interface FluentStandardKnowledgeBase extends FluentKnowledgeBase<FluentStandardKnowledgeBase>, FluentTest<FluentStandardKnowledgeBase> {  
     
     FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession();
     
-    FluentStandardStep end(String context, String name);
+    SimulationStepFluent end(String context, String name);
     
-    FluentStandardStep end(String name);
+    SimulationStepFluent end(String name);
     
-    FluentStandardStep end();
+    SimulationStepFluent end();
         
 }

@@ -18,12 +18,13 @@ package org.drools.fluent.standard;
 
 import org.drools.fluent.FluentKnowledgeBuilder;
 import org.drools.fluent.FluentTest;
+import org.drools.fluent.step.SimulationStepFluent;
 
 
 public interface FluentStandardKnowledgeBuilder extends FluentKnowledgeBuilder<FluentStandardKnowledgeBuilder>, FluentTest<FluentStandardKnowledgeBuilder> {
     
-    FluentStandardStep end(String context, String name);
-    FluentStandardStep end(String name);    
-    FluentStandardStep end();
+    SimulationStepFluent end(String context, String name);
+    SimulationStepFluent end(String name);
+    SimulationStepFluent end();
 
 }

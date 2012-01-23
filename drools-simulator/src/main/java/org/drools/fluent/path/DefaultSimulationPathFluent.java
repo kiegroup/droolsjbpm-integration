@@ -18,8 +18,8 @@ package org.drools.fluent.path;
 
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.fluent.standard.FluentStandardStep;
-import org.drools.fluent.standard.imp.FluentStandardStepImpl;
+import org.drools.fluent.step.DefaultSimulationStepFluent;
+import org.drools.fluent.step.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
 public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPathFluent>
@@ -94,10 +94,10 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
 
-    public FluentStandardStep newStep(long distance) {
+    public SimulationStepFluent newStep(long distance) {
         getSim().newStep( distance );
         
-        return new FluentStandardStepImpl( getSim(), this );
+        return new DefaultSimulationStepFluent( getSim(), this );
     }
     
     public SimulationPathFluent newPath(String name) {
