@@ -79,7 +79,7 @@ public class PolicyApprovalTest {
         runSimulation(simulationFluent);
     }
 
-    @Test @Ignore("TODO FIXME")
+    @Test
     public void rejectMinors() {
         FluentStandardSimulation simulationFluent = new FluentStandardSimulationImpl();
 

@@ -62,7 +62,11 @@ public class Driver {
     // Non getters and setters
     // ############################################################################
 
-    private int getAge() {
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+    
+    public int getAge() {
         return Years.yearsBetween(birthDate, new LocalDate()).getYears();
     }
 
