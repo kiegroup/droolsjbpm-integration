@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.standard.imp;
+package org.drools.fluent.simulation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.drools.command.Command;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.standard.FluentStandardPath;
-import org.drools.fluent.standard.FluentStandardSimulation;
+import org.drools.fluent.standard.imp.FluentStandardPathImpl;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.simulation.SimulationPath;
@@ -34,8 +34,8 @@ import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 
-public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStandardSimulation>
-        implements FluentStandardSimulation, InternalSimulation {
+public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent>
+        implements SimulationFluent, InternalSimulation {
 
     private SimulationPath path;
 
@@ -49,7 +49,7 @@ public class FluentStandardSimulationImpl extends AbstractFluentTest<FluentStand
 
     private VariableContext vars;
 
-    public FluentStandardSimulationImpl() {
+    public DefaultSimulationFluent() {
         super();
         setSim( this );
 

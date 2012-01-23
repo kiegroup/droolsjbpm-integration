@@ -17,8 +17,8 @@
 package org.drools.fluent.standard.imp;
 
 import org.drools.fluent.InternalSimulation;
+import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.standard.FluentStandardPath;
-import org.drools.fluent.standard.FluentStandardSimulation;
 import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
@@ -101,15 +101,15 @@ public class FluentStandardPathImpl extends AbstractFluentTest<FluentStandardPat
     }
     
     public FluentStandardPath newPath(String name) {
-        return (( FluentStandardSimulation ) getSim()).newPath( name );
+        return ((SimulationFluent) getSim()).newPath( name );
     }
     
     public FluentStandardPath getPath(String name) {
-        return (( FluentStandardSimulation ) getSim()).getPath( name );
+        return ((SimulationFluent) getSim()).getPath( name );
     }    
 
-    public FluentStandardSimulation end() {
-        return ( FluentStandardSimulation ) getSim();
+    public SimulationFluent end() {
+        return (SimulationFluent) getSim();
     }
 
 }

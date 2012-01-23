@@ -17,6 +17,7 @@
 package org.drools.fluent.standard;
 
 import org.drools.fluent.FluentTest;
+import org.drools.fluent.simulation.SimulationFluent;
 
 public interface FluentStandardPath extends FluentTest<FluentStandardPath> {
     
@@ -24,7 +25,7 @@ public interface FluentStandardPath extends FluentTest<FluentStandardPath> {
     
     FluentStandardPath newPath(String name);
     
-    FluentStandardSimulation end();
+    SimulationFluent end();
 
     FluentStandardStep newStep(long distance);
 

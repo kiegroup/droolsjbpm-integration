@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.standard;
+package org.drools.fluent.simulation;
 
 import org.drools.fluent.FluentRoot;
 import org.drools.fluent.FluentTest;
+import org.drools.fluent.standard.FluentStandardPath;
 
-public interface FluentStandardSimulation extends FluentRoot, FluentTest<FluentStandardSimulation> {
+public interface SimulationFluent extends FluentRoot, FluentTest<SimulationFluent> {
     
     FluentStandardPath newPath(String name);
     

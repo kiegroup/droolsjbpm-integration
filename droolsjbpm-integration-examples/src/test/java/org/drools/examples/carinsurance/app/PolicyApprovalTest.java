@@ -26,26 +26,22 @@ import org.drools.examples.carinsurance.domain.Driver;
 import org.drools.examples.carinsurance.domain.policy.CoverageType;
 import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
-import org.drools.fluent.VariableContext;
-import org.drools.fluent.standard.FluentStandardSimulation;
-import org.drools.fluent.standard.imp.FluentStandardSimulationImpl;
+import org.drools.fluent.simulation.DefaultSimulationFluent;
+import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.io.ResourceFactory;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.Simulator;
 import org.joda.time.LocalDate;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class PolicyApprovalTest {
 
     @Test
     public void approvePolicyRequest() {
-        FluentStandardSimulation simulationFluent = new FluentStandardSimulationImpl();
+        SimulationFluent simulationFluentFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate(1970, 1, 1));
         Car mini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
@@ -55,7 +51,7 @@ public class PolicyApprovalTest {
 
 
         // @formatter:off          
-        simulationFluent.newPath("init")
+        simulationFluentFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
@@ -76,12 +72,12 @@ public class PolicyApprovalTest {
             .end();
         // @formatter:on
 
-        runSimulation(simulationFluent);
+        runSimulation(simulationFluentFluent);
     }
 
     @Test
     public void rejectMinors() {
-        FluentStandardSimulation simulationFluent = new FluentStandardSimulationImpl();
+        SimulationFluent simulationFluentFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate().minusYears(10));
         Car mini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
@@ -91,7 +87,7 @@ public class PolicyApprovalTest {
 
 
         // @formatter:off
-        simulationFluent.newPath("init")
+        simulationFluentFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
@@ -112,11 +108,11 @@ public class PolicyApprovalTest {
             .end();
         // @formatter:on
 
-        runSimulation(simulationFluent);
+        runSimulation(simulationFluentFluent);
     }
     
-    private void runSimulation(FluentStandardSimulation f) {
-        SimulationImpl sim = (SimulationImpl) ((FluentStandardSimulationImpl) f).getSimulation();
+    private void runSimulation(SimulationFluent f) {
+        SimulationImpl sim = (SimulationImpl) ((DefaultSimulationFluent) f).getSimulation();
     
         Simulator simulator = new Simulator( sim,
                                              new Date().getTime() );
