@@ -69,10 +69,9 @@ public class PolicyApprovalTest {
                     .test("johnMiniPolicyRequest.disapprovalMessageList.size() == 0")
                     .end()
                 .end()
-            .end();
+            .end()
+        .runSimulation();
         // @formatter:on
-
-        runSimulation(simulationFluentFluent);
     }
 
     @Test
@@ -105,18 +104,9 @@ public class PolicyApprovalTest {
                     .test("johnMiniPolicyRequest.disapprovalMessageList.size() == 1")
                     .end()
                 .end()
-            .end();
+            .end()
+        .runSimulation();
         // @formatter:on
-
-        runSimulation(simulationFluentFluent);
     }
-    
-    private void runSimulation(SimulationFluent f) {
-        SimulationImpl sim = (SimulationImpl) ((DefaultSimulationFluent) f).getSimulation();
-    
-        Simulator simulator = new Simulator( sim,
-                                             new Date().getTime() );
-        simulator.run();
-    }       
 
 }

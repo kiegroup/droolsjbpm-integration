@@ -17,6 +17,7 @@
 package org.drools.fluent.simulation;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import org.drools.simulation.SimulationStep;
 import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
+import org.drools.simulation.impl.Simulator;
 
 public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent>
         implements SimulationFluent, InternalSimulation {
@@ -106,6 +108,15 @@ public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent
 
     public Map<String, SimulationPath> getPaths() {
         return sim.getPaths();
+    }
+
+    public void runSimulation() {
+        runSimulation( new Date().getTime() );
+    }
+
+    public void runSimulation(long startTimeMillis) {
+        Simulator simulator = new Simulator( getSimulation(), startTimeMillis );
+        simulator.run();
     }
 
 }

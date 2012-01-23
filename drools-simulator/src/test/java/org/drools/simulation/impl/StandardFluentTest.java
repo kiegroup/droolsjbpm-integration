@@ -124,10 +124,9 @@ public class StandardFluentTest {
                     .test( "list[list.size()-1] - list[0] == 1300" )
                     .end()
                 .end()
-            .end();
+            .end()
+        .runSimulation();
         // @formatter:on
-
-        runSimulation( f );
     }
     
     @Test
@@ -213,11 +212,10 @@ public class StandardFluentTest {
                     .test( "list[list.size()-1] - list[0] == 2000" )
                     .end()
                 .end()
-            .end();
+            .end()
+        .runSimulation();
         // @formatter:on
-            
-        runSimulation( f );
-    }    
+    }
     
     
     @Test
@@ -272,18 +270,9 @@ public class StandardFluentTest {
                 .test( "y.name == 'yoda'" )
                 .end()
             .test( "y.name == 'yoda'" )
-            .end();
+            .end()
+        .runSimulation();
         // @formatter:on
-
-        runSimulation( f );
     }
-    
-    private void runSimulation(SimulationFluent f) {
-        SimulationImpl sim = (SimulationImpl) ((DefaultSimulationFluent) f).getSimulation();
-    
-        Simulator simulator = new Simulator( sim,
-                                             new Date().getTime() );
-        simulator.run();
-    }       
 
 }

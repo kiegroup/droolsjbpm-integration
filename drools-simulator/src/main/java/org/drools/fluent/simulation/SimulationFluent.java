@@ -28,4 +28,15 @@ public interface SimulationFluent extends FluentRoot, FluentTest<SimulationFluen
 
     // TODO SimulationStepFluent newStep(long distance);
 
+    /**
+     * Runs the Simulation with startTimeMillis now.
+     */
+    void runSimulation();
+
+    /**
+     * Runs the Simulation.
+     * @param startTimeMillis never null
+     */
+    void runSimulation(long startTimeMillis);
+
 }
