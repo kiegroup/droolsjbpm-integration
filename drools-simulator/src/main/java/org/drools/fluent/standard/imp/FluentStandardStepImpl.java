@@ -25,9 +25,9 @@ import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.InternalSimulation;
+import org.drools.fluent.path.SimulationPathFluent;
 import org.drools.fluent.standard.FluentStandardKnowledgeBase;
 import org.drools.fluent.standard.FluentStandardKnowledgeBuilder;
-import org.drools.fluent.standard.FluentStandardPath;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 import org.drools.fluent.standard.FluentStandardStep;
 import org.drools.fluent.test.impl.AbstractFluentTest;
@@ -37,13 +37,13 @@ import org.drools.runtime.conf.ClockTypeOption;
 
 public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardStep> implements FluentStandardStep {
 
-    private FluentStandardPath path;
+    private SimulationPathFluent pathFluent;
 
     public FluentStandardStepImpl(InternalSimulation sim,
-                                  FluentStandardPath path) {
+                                  SimulationPathFluent pathFluent) {
         super();
         setSim( sim );
-        this.path = path;
+        this.pathFluent = pathFluent;
     }
 
     public FluentStandardKnowledgeBuilder newKnowledgeBuilder() {
@@ -113,11 +113,11 @@ public class FluentStandardStepImpl extends AbstractFluentTest<FluentStandardSte
     }
 
     public FluentStandardStep newStep(long distance) {
-        return path.newStep( distance );
+        return pathFluent.newStep( distance );
     }
 
-    public FluentStandardPath end() {
-        return path;
+    public SimulationPathFluent end() {
+        return pathFluent;
     }
 
 }

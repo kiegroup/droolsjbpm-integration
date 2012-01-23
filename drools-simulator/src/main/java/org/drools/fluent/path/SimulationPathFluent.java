@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.simulation;
+package org.drools.fluent.path;
 
-import org.drools.fluent.FluentRoot;
 import org.drools.fluent.FluentTest;
-import org.drools.fluent.path.SimulationPathFluent;
+import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.standard.FluentStandardStep;
 
-public interface SimulationFluent extends FluentRoot, FluentTest<SimulationFluent> {
+public interface SimulationPathFluent extends FluentTest<SimulationPathFluent> {
+    
+    SimulationPathFluent getPath(String name);
     
     SimulationPathFluent newPath(String name);
     
-    SimulationPathFluent getPath(String name);
+    SimulationFluent end();
 
-    // TODO FluentStandardStep newStep(long distance);
+    FluentStandardStep newStep(long distance);
+
+//    FluentPath newPath(String name); // ends current path and creates a new one
 
 }

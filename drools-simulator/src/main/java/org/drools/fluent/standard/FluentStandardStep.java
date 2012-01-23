@@ -17,12 +17,13 @@
 package org.drools.fluent.standard;
 
 import org.drools.fluent.FluentTest;
+import org.drools.fluent.path.SimulationPathFluent;
 
 public interface FluentStandardStep extends FluentTest<FluentStandardStep>  {
 
     FluentStandardStep newStep(long distance);
     
-    FluentStandardPath end();
+    SimulationPathFluent end();
 
     FluentStandardKnowledgeBuilder newKnowledgeBuilder();
     FluentStandardKnowledgeBase newKnowledgeBase();

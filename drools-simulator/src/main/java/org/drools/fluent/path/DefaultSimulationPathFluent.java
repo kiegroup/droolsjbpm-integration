@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.standard.imp;
+package org.drools.fluent.path;
 
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.fluent.standard.FluentStandardPath;
 import org.drools.fluent.standard.FluentStandardStep;
+import org.drools.fluent.standard.imp.FluentStandardStepImpl;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
-public class FluentStandardPathImpl extends AbstractFluentTest<FluentStandardPath>
-        implements FluentStandardPath {
+public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPathFluent>
+        implements SimulationPathFluent {
 
     private String defaultContext;
 
-    public FluentStandardPathImpl(InternalSimulation sim,
-                                  String defaultContext) {
+    public DefaultSimulationPathFluent(InternalSimulation sim,
+                                       String defaultContext) {
         super();
         setSim( sim );
         this.defaultContext = defaultContext;
     }
 
-    //    public FluentStandardKnowledgeBuilderImpl<FluentStandardPathImpl> newKnowledgeBuilder() {
+    //    public FluentStandardKnowledgeBuilderImpl<DefaultSimulationPathFluent> newKnowledgeBuilder() {
     //        getSim().addCommand( new NewKnowledgeBuilderCommand( null,
     //                                                             KnowledgeBase.class.getName() ) );
     //        getSim().addCommand( new SetVariableCommand( defaultContext,
     //                                                     KnowledgeBuilder.class.getName() ) );
     //
-    //        return new FluentStandardKnowledgeBuilderImpl<FluentStandardPathImpl>( getSim(),
+    //        return new FluentStandardKnowledgeBuilderImpl<DefaultSimulationPathFluent>( getSim(),
     //                                                                               this,
     //                                                                               defaultContext );
     //    }
@@ -100,11 +100,11 @@ public class FluentStandardPathImpl extends AbstractFluentTest<FluentStandardPat
         return new FluentStandardStepImpl( getSim(), this );
     }
     
-    public FluentStandardPath newPath(String name) {
+    public SimulationPathFluent newPath(String name) {
         return ((SimulationFluent) getSim()).newPath( name );
     }
     
-    public FluentStandardPath getPath(String name) {
+    public SimulationPathFluent getPath(String name) {
         return ((SimulationFluent) getSim()).getPath( name );
     }    
 
