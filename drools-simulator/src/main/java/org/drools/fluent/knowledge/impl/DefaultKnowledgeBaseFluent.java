@@ -51,14 +51,14 @@ public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBase
     }
     
     public KnowledgeBaseFluent addKnowledgePackages() {
-        getSim().addCommand(  new KnowledgeBaseAddKnowledgePackagesCommand() );
+        step.addCommand(  new KnowledgeBaseAddKnowledgePackagesCommand() );
         return this;
     }    
     
     
     public KnowledgeBaseFluent addKnowledgePackages(Resource resource,
                                                             ResourceType type) {
-        getSim().addCommand(  new KnowledgeBuilderAddCommand( resource,
+        step.addCommand(  new KnowledgeBuilderAddCommand( resource,
                                                               type,
                                                               null ) );
         return this;
@@ -67,7 +67,7 @@ public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBase
     public KnowledgeBaseFluent addKnowledgePackages(Resource resource,
                                                             ResourceType type,
                                                             ResourceConfiguration configuration) {
-        getSim().addCommand( new KnowledgeBuilderAddCommand( resource,
+        step.addCommand( new KnowledgeBuilderAddCommand( resource,
                                                              type,
                                                              configuration ) );
         
@@ -75,14 +75,14 @@ public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBase
     }
 
     public SimulationStepFluent end(String context, String name) {
-        getSim().addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
+        step.addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
+        step.addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
     public SimulationStepFluent end(String name) {
-        getSim().addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
+        step.addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
+        step.addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
@@ -93,8 +93,8 @@ public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBase
     public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
-        getSim().addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );             
-        getSim().addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));        
+        step.addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
+        step.addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));
 
         return new DefaultStatefulKnowledgeSessionFluent(getSim(), step);
     }

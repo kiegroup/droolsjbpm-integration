@@ -19,10 +19,7 @@ package org.drools.fluent.simulation.impl;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
-import org.drools.command.GetVariableCommand;
-import org.drools.command.NewKnowledgeBaseCommand;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
+import org.drools.command.*;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.knowledge.impl.DefaultKnowledgeBaseFluent;
@@ -50,17 +47,17 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
     }
 
     public KnowledgeBuilderFluent newKnowledgeBuilder() {
-        getSim().addCommand( new NewKnowledgeBuilderCommand( null,
+        addCommand( new NewKnowledgeBuilderCommand( null,
                                                              null ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
 
         return new DefaultKnowledgeBuilderFluent( getSim(),
                                                        this );
     }
 
     public KnowledgeBaseFluent newKnowledgeBase() {
-        getSim().addCommand( new NewKnowledgeBaseCommand( null ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
+        addCommand( new NewKnowledgeBaseCommand( null ) );
+        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
         return new DefaultKnowledgeBaseFluent( getSim(),
                                                     this );
@@ -69,8 +66,8 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
     public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
-        getSim().addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
+        addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
+        addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
         return new DefaultStatefulKnowledgeSessionFluent( getSim(),
                                                                this );
@@ -92,24 +89,24 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
     }
 
     public KnowledgeBuilderFluent getKnowledgeBuilder(String name) {
-        getSim().addCommand( new GetVariableCommand( name ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+        addCommand( new GetVariableCommand( name ) );
+        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
 
         return new DefaultKnowledgeBuilderFluent( getSim(),
                                                        this );
     }
 
     public KnowledgeBaseFluent getKnowledgeBase(String name) {
-        getSim().addCommand( new GetVariableCommand( name ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
+        addCommand( new GetVariableCommand( name ) );
+        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
         return new DefaultKnowledgeBaseFluent( getSim(),
                                                     this );
     }
 
     public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession(String name) {
-        getSim().addCommand( new GetVariableCommand( name ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
+        addCommand( new GetVariableCommand( name ) );
+        addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
         return new DefaultStatefulKnowledgeSessionFluent( getSim(),
                                                                this );
@@ -117,6 +114,10 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
 
     public SimulationStepFluent newStep(long distance) {
         return pathFluent.newStep( distance );
+    }
+    
+    public void addCommand(Command cmd) {
+        getSim().addCommand(cmd);
     }
 
     public SimulationPathFluent end() {

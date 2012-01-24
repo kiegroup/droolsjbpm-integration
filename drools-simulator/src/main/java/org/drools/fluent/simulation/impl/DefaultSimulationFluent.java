@@ -72,10 +72,10 @@ public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent
 
     public SimulationPathFluent getPath(String name) {
         path = simulation.getPaths().get( name );
-        steps = (List) path.getSteps();
+        steps = (List<SimulationStep>) path.getSteps();
         SimulationStep step = (SimulationStep) steps.get( steps.size() - 1 );
         if ( !step.getCommands().isEmpty() ) {
-            commands = (List) step.getCommands();
+            commands = (List<Command>) step.getCommands();
         }
         
         return new DefaultSimulationPathFluent( this,

@@ -43,7 +43,7 @@ public class DefaultKnowledgeBuilderFluent extends AbstractFluentTest<KnowledgeB
 
     public KnowledgeBuilderFluent add(Resource resource,
                                               ResourceType type) {
-        getSim().addCommand(  new KnowledgeBuilderAddCommand( resource,
+        step.addCommand(  new KnowledgeBuilderAddCommand( resource,
                                                               type,
                                                               null ) );
         
@@ -53,7 +53,7 @@ public class DefaultKnowledgeBuilderFluent extends AbstractFluentTest<KnowledgeB
     public KnowledgeBuilderFluent add(Resource resource,
                                               ResourceType type,
                                               ResourceConfiguration configuration) {
-        getSim().addCommand( new KnowledgeBuilderAddCommand( resource,
+        step.addCommand( new KnowledgeBuilderAddCommand( resource,
                                                              type,
                                                              configuration ) );
         
@@ -61,14 +61,14 @@ public class DefaultKnowledgeBuilderFluent extends AbstractFluentTest<KnowledgeB
     }
 
     public SimulationStepFluent end(String context, String name) {
-        getSim().addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( context, name ) );
+        step.addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
+        step.addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
     public SimulationStepFluent end(String name) {
-        getSim().addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
-        getSim().addCommand( new SetVariableCommandFromLastReturn( name ) );
+        step.addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
+        step.addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
