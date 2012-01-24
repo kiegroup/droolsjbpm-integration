@@ -18,7 +18,6 @@ package org.drools.fluent.simulation;
 
 import org.drools.fluent.FluentRoot;
 import org.drools.fluent.FluentTest;
-import org.drools.fluent.path.SimulationPathFluent;
 
 public interface SimulationFluent extends FluentRoot, FluentTest<SimulationFluent> {
     

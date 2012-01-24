@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.path;
+package org.drools.fluent.simulation;
 
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.fluent.step.DefaultSimulationStepFluent;
-import org.drools.fluent.step.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 
 public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPathFluent>

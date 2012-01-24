@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.step;
+package org.drools.fluent.simulation;
 
 import org.drools.fluent.FluentTest;
 import org.drools.fluent.knowledge.KnowledgeBaseFluent;
 import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
-import org.drools.fluent.path.SimulationPathFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
 
 public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  {

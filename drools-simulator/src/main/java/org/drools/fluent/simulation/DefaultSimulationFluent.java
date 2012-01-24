@@ -24,8 +24,6 @@ import java.util.Map;
 import org.drools.command.Command;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.VariableContext;
-import org.drools.fluent.path.DefaultSimulationPathFluent;
-import org.drools.fluent.path.SimulationPathFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.simulation.SimulationPath;

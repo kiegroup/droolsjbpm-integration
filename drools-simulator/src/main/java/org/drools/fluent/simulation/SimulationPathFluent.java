@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.path;
+package org.drools.fluent.simulation;
 
 import org.drools.fluent.FluentTest;
-import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.fluent.step.SimulationStepFluent;
 
 public interface SimulationPathFluent extends FluentTest<SimulationPathFluent> {
     

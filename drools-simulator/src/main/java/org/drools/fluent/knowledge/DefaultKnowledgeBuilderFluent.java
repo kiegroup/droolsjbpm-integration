@@ -23,9 +23,8 @@ import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
-import org.drools.fluent.step.SimulationStepFluent;
-import org.drools.fluent.step.DefaultSimulationStepFluent;
+import org.drools.fluent.simulation.DefaultSimulationStepFluent;
+import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
 

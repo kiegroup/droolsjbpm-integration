@@ -19,7 +19,7 @@ package org.drools.fluent.knowledge;
 import org.drools.fluent.FluentKnowledgeBase;
 import org.drools.fluent.FluentTest;
 import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
-import org.drools.fluent.step.SimulationStepFluent;
+import org.drools.fluent.simulation.SimulationStepFluent;
 
 
 public interface KnowledgeBaseFluent extends FluentKnowledgeBase<KnowledgeBaseFluent>, FluentTest<KnowledgeBaseFluent> {

@@ -18,7 +18,7 @@ package org.drools.fluent.session;
 
 import org.drools.fluent.FluentStatefulKnowledgeSession;
 import org.drools.fluent.FluentTest;
-import org.drools.fluent.step.SimulationStepFluent;
+import org.drools.fluent.simulation.SimulationStepFluent;
 
 
 public interface StatefulKnowledgeSessionFluent extends FluentStatefulKnowledgeSession<StatefulKnowledgeSessionFluent>, FluentTest<StatefulKnowledgeSessionFluent>  {

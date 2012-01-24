@@ -18,7 +18,7 @@ package org.drools.fluent.knowledge;
 
 import org.drools.fluent.FluentKnowledgeBuilder;
 import org.drools.fluent.FluentTest;
-import org.drools.fluent.step.SimulationStepFluent;
+import org.drools.fluent.simulation.SimulationStepFluent;
 
 
 public interface KnowledgeBuilderFluent extends FluentKnowledgeBuilder<KnowledgeBuilderFluent>, FluentTest<KnowledgeBuilderFluent> {
