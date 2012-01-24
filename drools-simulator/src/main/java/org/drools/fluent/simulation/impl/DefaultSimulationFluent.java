@@ -39,32 +39,30 @@ import org.drools.simulation.impl.Simulator;
 public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent>
         implements SimulationFluent, InternalSimulation {
 
+    private Simulation simulation;
+    private VariableContext variableContext;
+
     private SimulationPath path;
 
-    private List<SimulationStep>      steps;
+    private List<SimulationStep> steps;
 
-    private SimulationStep step;
+    private List<Command> commands;
 
-    private List<Command>   cmds;
-
-    private SimulationImpl  sim;
-
-    private VariableContext vars;
 
     public DefaultSimulationFluent() {
         super();
         setSim( this );
 
-        vars = new MapVariableContext();
-        sim = new SimulationImpl();
+        simulation = new SimulationImpl();
+        variableContext = new MapVariableContext();
     }
 
     public SimulationPathFluent newPath(String name) {
         steps = new ArrayList<SimulationStep>();
-        
-        path = new SimulationPathImpl( sim,
+
+        path = new SimulationPathImpl(simulation,
                              name );
-        sim.getPaths().put( path.getName(),
+        simulation.getPaths().put( path.getName(),
                             path );
         ((SimulationPathImpl) path).setSteps( steps );
 
@@ -73,11 +71,11 @@ public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent
     }
 
     public SimulationPathFluent getPath(String name) {
-        path = sim.getPaths().get( name );        
+        path = simulation.getPaths().get( name );
         steps = (List) path.getSteps();
-        step = (SimulationStep) steps.get( steps.size() - 1 );
+        SimulationStep step = (SimulationStep) steps.get( steps.size() - 1 );
         if ( !step.getCommands().isEmpty() ) {
-            cmds = (List) step.getCommands();
+            commands = (List) step.getCommands();
         }
         
         return new DefaultSimulationPathFluent( this,
@@ -85,37 +83,35 @@ public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent
     }
 
     public void newStep(long distance) {
-        cmds = new ArrayList<Command>();
+        commands = new ArrayList<Command>();
 
-        step = new SimulationStepImpl( path,
-                             cmds,
-                             distance );
-
+        SimulationStep step = new SimulationStepImpl( path, commands, distance );
         steps.add(step);
     }
 
     public void addCommand(Command cmd) {
-        cmds.add( cmd );
+        commands.add(cmd);
     }
 
     public <P> VariableContext<P> getVariableContext() {
-        return vars;
+        return variableContext;
     }
 
     public Simulation getSimulation() {
-        return sim;
+        return simulation;
     }
 
     public Map<String, SimulationPath> getPaths() {
-        return sim.getPaths();
+        return simulation.getPaths();
     }
+
 
     public void runSimulation() {
         runSimulation( new Date().getTime() );
     }
 
     public void runSimulation(long startTimeMillis) {
-        Simulator simulator = new Simulator( getSimulation(), startTimeMillis );
+        Simulator simulator = new Simulator( simulation, startTimeMillis );
         simulator.run();
     }
 

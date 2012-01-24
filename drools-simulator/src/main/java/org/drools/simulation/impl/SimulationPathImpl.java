@@ -25,7 +25,7 @@ import org.drools.simulation.SimulationStep;
 public class SimulationPathImpl
         implements SimulationPath {
 
-    private SimulationImpl   simulation;
+    private Simulation   simulation;
 
     private String           name;
 
@@ -34,7 +34,7 @@ public class SimulationPathImpl
     public SimulationPathImpl(Simulation simulation,
             String name) {
         this.name = name;
-        this.simulation = (SimulationImpl) simulation;
+        this.simulation = simulation;
     }
 
     public void setSteps(Collection<SimulationStep> steps) {

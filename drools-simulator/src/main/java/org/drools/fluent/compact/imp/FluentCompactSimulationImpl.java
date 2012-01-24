@@ -73,7 +73,7 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
     public FluentCompactStatefulKnowledgeSession newStatefulKnowledgeSession() {
         steps = new ArrayList<SimulationStep>();
         path = new SimulationPathImpl( sim,
-                             "path" + pathCounter++ );        
+                             "path" + pathCounter++ );
         sim.getPaths().put( path.getName(), path );     
         ((SimulationPathImpl)path).setSteps( steps );
         
