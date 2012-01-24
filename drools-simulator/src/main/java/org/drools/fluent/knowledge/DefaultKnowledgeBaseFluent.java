@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.standard.imp;
+package org.drools.fluent.knowledge;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -27,8 +27,9 @@ import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.standard.FluentStandardKnowledgeBase;
+import org.drools.fluent.knowledge.KnowledgeBaseFluent;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
+import org.drools.fluent.standard.imp.FluentStandardStatefulKnowledgeSessionImpl;
 import org.drools.fluent.step.SimulationStepFluent;
 import org.drools.fluent.step.DefaultSimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
@@ -37,25 +38,25 @@ import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
 
-public class FluentStandardKnowledgeBaseImpl extends AbstractFluentTest<FluentStandardKnowledgeBase>
-        implements FluentStandardKnowledgeBase {
+public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBaseFluent>
+        implements KnowledgeBaseFluent {
 
     private DefaultSimulationStepFluent step;
     
-    public FluentStandardKnowledgeBaseImpl(InternalSimulation sim,
-                                           DefaultSimulationStepFluent step) {
+    public DefaultKnowledgeBaseFluent(InternalSimulation sim,
+                                      DefaultSimulationStepFluent step) {
         super();
         setSim( sim );
         this.step = step;
     }
     
-    public FluentStandardKnowledgeBase addKnowledgePackages() {
+    public KnowledgeBaseFluent addKnowledgePackages() {
         getSim().addCommand(  new KnowledgeBaseAddKnowledgePackagesCommand() );
         return this;
     }    
     
     
-    public FluentStandardKnowledgeBase addKnowledgePackages(Resource resource,
+    public KnowledgeBaseFluent addKnowledgePackages(Resource resource,
                                                             ResourceType type) {
         getSim().addCommand(  new KnowledgeBuilderAddCommand( resource,
                                                               type,
@@ -63,7 +64,7 @@ public class FluentStandardKnowledgeBaseImpl extends AbstractFluentTest<FluentSt
         return this;
     }
 
-    public FluentStandardKnowledgeBase addKnowledgePackages(Resource resource,
+    public KnowledgeBaseFluent addKnowledgePackages(Resource resource,
                                                             ResourceType type,
                                                             ResourceConfiguration configuration) {
         getSim().addCommand( new KnowledgeBuilderAddCommand( resource,

@@ -25,12 +25,12 @@ import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.InternalSimulation;
+import org.drools.fluent.knowledge.DefaultKnowledgeBaseFluent;
 import org.drools.fluent.knowledge.DefaultKnowledgeBuilderFluent;
+import org.drools.fluent.knowledge.KnowledgeBaseFluent;
 import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
 import org.drools.fluent.path.SimulationPathFluent;
-import org.drools.fluent.standard.FluentStandardKnowledgeBase;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
-import org.drools.fluent.standard.imp.FluentStandardKnowledgeBaseImpl;
 import org.drools.fluent.standard.imp.FluentStandardStatefulKnowledgeSessionImpl;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -57,11 +57,11 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
                                                        this );
     }
 
-    public FluentStandardKnowledgeBase newKnowledgeBase() {
+    public KnowledgeBaseFluent newKnowledgeBase() {
         getSim().addCommand( new NewKnowledgeBaseCommand( null ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
-        return new FluentStandardKnowledgeBaseImpl( getSim(),
+        return new DefaultKnowledgeBaseFluent( getSim(),
                                                     this );
     }
 
@@ -80,8 +80,8 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
                                                        this );
     }
 
-    public FluentStandardKnowledgeBase getKnowledgeBase() {
-        return new FluentStandardKnowledgeBaseImpl( getSim(),
+    public KnowledgeBaseFluent getKnowledgeBase() {
+        return new DefaultKnowledgeBaseFluent( getSim(),
                                                     this );
     }
 
@@ -98,11 +98,11 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
                                                        this );
     }
 
-    public FluentStandardKnowledgeBase getKnowledgeBase(String name) {
+    public KnowledgeBaseFluent getKnowledgeBase(String name) {
         getSim().addCommand( new GetVariableCommand( name ) );
         getSim().addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
-        return new FluentStandardKnowledgeBaseImpl( getSim(),
+        return new DefaultKnowledgeBaseFluent( getSim(),
                                                     this );
     }
 

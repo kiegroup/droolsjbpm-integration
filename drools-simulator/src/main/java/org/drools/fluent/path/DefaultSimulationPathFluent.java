@@ -45,7 +45,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //                                                                               defaultContext );
     //    }
     //
-    //    public FluentStandardKnowledgeBase newKnowledgeBase() {
+    //    public KnowledgeBaseFluent newKnowledgeBase() {
     //        getSim().addCommand( new NewKnowledgeBuilderCommand( null,
     //                                                             KnowledgeBase.class.getName() ) );
     //        getSim().addCommand( new SetVariableCommand( defaultContext,
@@ -69,7 +69,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public FluentStandardKnowledgeBase getKnowledgeBase() {
+    //    public KnowledgeBaseFluent getKnowledgeBase() {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
@@ -84,7 +84,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public FluentStandardKnowledgeBase getKnowledgeBase(String name) {
+    //    public KnowledgeBaseFluent getKnowledgeBase(String name) {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
