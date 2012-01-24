@@ -106,7 +106,7 @@ public class FluentCompactStatefulKnowledgeSessionImpl extends AbstractFluentTes
         return this;
     }
 
-    public FluentCompactStatefulKnowledgeSession startProcessInstnace(long processId) {
+    public FluentCompactStatefulKnowledgeSession startProcessInstance(long processId) {
         getSim().addCommand( new StartProcessInstanceCommand( processId ) );
         return this;
     }

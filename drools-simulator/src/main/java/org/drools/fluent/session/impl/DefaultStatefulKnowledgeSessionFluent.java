@@ -113,7 +113,7 @@ public class DefaultStatefulKnowledgeSessionFluent extends AbstractFluentTest<St
         return this;
     }
 
-    public StatefulKnowledgeSessionFluent startProcessInstnace(long processId) {
+    public StatefulKnowledgeSessionFluent startProcessInstance(long processId) {
         getSim().addCommand(new StartProcessInstanceCommand(processId));
         return this;
     }

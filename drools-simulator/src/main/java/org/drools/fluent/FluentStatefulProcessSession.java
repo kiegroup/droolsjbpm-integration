@@ -29,7 +29,7 @@ public interface FluentStatefulProcessSession<T> {
 
     T createProcessInstance(String identifier, Map<String, Object> params);
 
-    T startProcessInstnace(long processId);
+    T startProcessInstance(long processId);
     
     T signalEvent(String id, Object event, long processId);
     

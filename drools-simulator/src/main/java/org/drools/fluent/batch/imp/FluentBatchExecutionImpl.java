@@ -123,7 +123,7 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
         return this;
     }
 
-    public FluentBatchExecution startProcessInstnace(long processId) {
+    public FluentBatchExecution startProcessInstance(long processId) {
         lastAddedCommand = new StartProcessInstanceCommand(processId);
         addCommand(lastAddedCommand);
         return this;
