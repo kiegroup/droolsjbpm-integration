@@ -20,7 +20,7 @@ import org.drools.fluent.FluentTest;
 import org.drools.fluent.knowledge.KnowledgeBaseFluent;
 import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
 import org.drools.fluent.path.SimulationPathFluent;
-import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
+import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
 
 public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  {
 
@@ -30,14 +30,14 @@ public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  
 
     KnowledgeBuilderFluent newKnowledgeBuilder();
     KnowledgeBaseFluent newKnowledgeBase();
-    FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession();
+    StatefulKnowledgeSessionFluent newStatefulKnowledgeSession();
 
     KnowledgeBuilderFluent getKnowledgeBuilder();
     KnowledgeBaseFluent getKnowledgeBase();
-    FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession();
+    StatefulKnowledgeSessionFluent getStatefulKnowledgeSession();
 
     KnowledgeBuilderFluent getKnowledgeBuilder(String name);
     KnowledgeBaseFluent getKnowledgeBase(String name);
-    FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession(String name);
+    StatefulKnowledgeSessionFluent getStatefulKnowledgeSession(String name);
 
 }

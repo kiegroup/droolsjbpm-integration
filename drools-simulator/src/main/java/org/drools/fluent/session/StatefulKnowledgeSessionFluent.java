@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.standard;
+package org.drools.fluent.session;
 
-import org.drools.fluent.FluentKnowledgeBase;
+import org.drools.fluent.FluentStatefulKnowledgeSession;
 import org.drools.fluent.FluentTest;
 import org.drools.fluent.step.SimulationStepFluent;
 
 
-public interface FluentStandardKnowledgeBase extends FluentKnowledgeBase<FluentStandardKnowledgeBase>, FluentTest<FluentStandardKnowledgeBase> {  
-    
-    FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession();
+public interface StatefulKnowledgeSessionFluent extends FluentStatefulKnowledgeSession<StatefulKnowledgeSessionFluent>, FluentTest<StatefulKnowledgeSessionFluent>  {
     
     SimulationStepFluent end(String context, String name);
-    
     SimulationStepFluent end(String name);
-    
     SimulationStepFluent end();
-        
+    
 }

@@ -27,9 +27,8 @@ import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.knowledge.KnowledgeBaseFluent;
-import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
-import org.drools.fluent.standard.imp.FluentStandardStatefulKnowledgeSessionImpl;
+import org.drools.fluent.session.DefaultStatefulKnowledgeSessionFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
 import org.drools.fluent.step.SimulationStepFluent;
 import org.drools.fluent.step.DefaultSimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
@@ -90,13 +89,13 @@ public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBase
         return step;
     }
 
-    public FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession() {
+    public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
         getSim().addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );             
         getSim().addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));        
 
-        return new FluentStandardStatefulKnowledgeSessionImpl(getSim(), step);
+        return new DefaultStatefulKnowledgeSessionFluent(getSim(), step);
     }
 
 }

@@ -54,7 +54,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession() {
+    //    public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
     //        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
     //        ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
     //        getSim().addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
@@ -74,7 +74,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession() {
+    //    public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession() {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
@@ -89,7 +89,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession(String name) {
+    //    public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession(String name) {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
