@@ -26,16 +26,13 @@ import org.drools.examples.carinsurance.domain.Driver;
 import org.drools.examples.carinsurance.domain.policy.CoverageType;
 import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
-import org.drools.fluent.simulation.DefaultSimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.io.ResourceFactory;
-import org.drools.simulation.impl.SimulationImpl;
-import org.drools.simulation.impl.Simulator;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class PolicyApprovalTest {
 

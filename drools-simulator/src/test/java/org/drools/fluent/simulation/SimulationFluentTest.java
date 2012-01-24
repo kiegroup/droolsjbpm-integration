@@ -19,7 +19,6 @@ package org.drools.fluent.simulation;
 import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
@@ -27,8 +26,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceType;
 import org.drools.command.ContextManager;
 import org.drools.fluent.VariableContext;
-import org.drools.fluent.simulation.DefaultSimulationFluent;
-import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.io.ResourceFactory;
 import org.drools.simulation.impl.Person;

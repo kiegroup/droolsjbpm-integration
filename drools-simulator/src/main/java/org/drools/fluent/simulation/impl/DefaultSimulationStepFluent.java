@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.simulation;
+package org.drools.fluent.simulation.impl;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -25,12 +25,14 @@ import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.knowledge.DefaultKnowledgeBaseFluent;
-import org.drools.fluent.knowledge.DefaultKnowledgeBuilderFluent;
+import org.drools.fluent.knowledge.impl.DefaultKnowledgeBaseFluent;
+import org.drools.fluent.knowledge.impl.DefaultKnowledgeBuilderFluent;
 import org.drools.fluent.knowledge.KnowledgeBaseFluent;
 import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
-import org.drools.fluent.session.DefaultStatefulKnowledgeSessionFluent;
+import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
+import org.drools.fluent.simulation.SimulationPathFluent;
+import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;

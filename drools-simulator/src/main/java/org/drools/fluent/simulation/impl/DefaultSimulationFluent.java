@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.simulation;
+package org.drools.fluent.simulation.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +24,8 @@ import java.util.Map;
 import org.drools.command.Command;
 import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.VariableContext;
+import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.SimulationPathFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.simulation.SimulationPath;

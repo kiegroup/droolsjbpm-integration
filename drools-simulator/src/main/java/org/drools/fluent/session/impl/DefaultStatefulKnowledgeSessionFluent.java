@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.session;
+package org.drools.fluent.session.impl;
 
 import java.util.Map;
 import org.drools.command.GetVariableCommand;
@@ -29,7 +29,8 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.simulation.DefaultSimulationStepFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationStepFluent;
 import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.StatefulKnowledgeSession;
