@@ -17,9 +17,9 @@
 package org.drools.fluent.step;
 
 import org.drools.fluent.FluentTest;
+import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
 import org.drools.fluent.path.SimulationPathFluent;
 import org.drools.fluent.standard.FluentStandardKnowledgeBase;
-import org.drools.fluent.standard.FluentStandardKnowledgeBuilder;
 import org.drools.fluent.standard.FluentStandardStatefulKnowledgeSession;
 
 public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  {
@@ -28,15 +28,15 @@ public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  
     
     SimulationPathFluent end();
 
-    FluentStandardKnowledgeBuilder newKnowledgeBuilder();
+    KnowledgeBuilderFluent newKnowledgeBuilder();
     FluentStandardKnowledgeBase newKnowledgeBase();
     FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession();
 
-    FluentStandardKnowledgeBuilder getKnowledgeBuilder();
+    KnowledgeBuilderFluent getKnowledgeBuilder();
     FluentStandardKnowledgeBase getKnowledgeBase();
     FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession();
 
-    FluentStandardKnowledgeBuilder getKnowledgeBuilder(String name);
+    KnowledgeBuilderFluent getKnowledgeBuilder(String name);
     FluentStandardKnowledgeBase getKnowledgeBase(String name);
     FluentStandardStatefulKnowledgeSession getStatefulKnowledgeSession(String name);
 
