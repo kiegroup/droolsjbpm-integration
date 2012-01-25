@@ -34,7 +34,6 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
-@Ignore
 public class PolicyApprovalTest {
 
     @Test
@@ -124,10 +123,10 @@ public class PolicyApprovalTest {
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
                             ResourceType.DRL)
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
+                    .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, KnowledgeBase.class.getName())
+                    .end(World.ROOT, KnowledgeBase.class.getName())
                 .newStatefulKnowledgeSession()
                     .insert(john).set("john")
                     .insert(mini).set("mini")
