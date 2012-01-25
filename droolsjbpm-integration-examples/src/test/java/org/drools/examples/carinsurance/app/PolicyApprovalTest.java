@@ -106,4 +106,38 @@ public class PolicyApprovalTest {
         // @formatter:on
     }
 
+    @Test(expected = AssertionError.class)
+    public void rejectMinorsFailingAssertion() {
+        SimulationFluent simulationFluent = new DefaultSimulationFluent();
+
+        Driver john = new Driver("John", "Smith", new LocalDate().minusYears(10));
+        Car mini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
+        PolicyRequest johnMiniPolicyRequest = new PolicyRequest(john, mini);
+        johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
+        johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
+
+
+        // @formatter:off
+        simulationFluent.newPath("init")
+            .newStep(0)
+                .newKnowledgeBuilder()
+                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
+                            ResourceType.DRL)
+                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
+                .newKnowledgeBase()
+                    .addKnowledgePackages()
+                    .end(ContextManager.ROOT, KnowledgeBase.class.getName())
+                .newStatefulKnowledgeSession()
+                    .insert(john).set("john")
+                    .insert(mini).set("mini")
+                    .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
+                    .fireAllRules()
+                    .test("johnMiniPolicyRequest.automaticallyDisapproved == false")
+                    .end()
+                .end()
+            .end()
+        .runSimulation();
+        // @formatter:on
+    }
+
 }
