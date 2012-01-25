@@ -24,12 +24,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.command.Command;
-import org.drools.command.Context;
-import org.drools.command.GetDefaultValue;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.ResolvingKnowledgeCommandContext;
-import org.drools.command.World;
+import org.drools.command.*;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -37,17 +32,16 @@ import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
 import org.drools.time.SessionPseudoClock;
-import org.drools.world.impl.WorldImpl;
 
 public class Simulator
-        implements GetDefaultValue {
+        implements World, GetDefaultValue {
 
     private PriorityQueue<SimulationStep>           queue;
     private SimulationImpl                simulation;
     //    private SessionPseudoClock  clock;
     private long                          startTime;
 
-    private World                         root;
+    private Context                       root;
     private Map<String, Context>          contexts;
 
     private static String                 ROOT             = "ROOT";
@@ -66,7 +60,8 @@ public class Simulator
 
         this.startTime = startTime;
         this.simulation = (SimulationImpl) simulation;
-        this.root = new WorldImpl(); // new ContextImpl( ROOT, this );
+        this.root = new ContextImpl( ROOT,
+                                     this );
         
         this.root.set( "simulator", 
                        this );
@@ -80,12 +75,11 @@ public class Simulator
         // calculate capacity
         int capacity = 0;
         for ( SimulationPath path : paths.values() ) {
-            this.contexts.put( path.getName(), new WorldImpl());
-/*
+            this.contexts.put( path.getName(),
                                new ContextImpl( path.getName(),
                                                 this,
                                                 root ) );
-*/
+
             capacity += path.getSteps().size();
         }
 
@@ -193,11 +187,11 @@ public class Simulator
     public Object getObject() {
         return lastReturnValue;
     }
-/*
-	public ContextManager getContextManager() {
+
+	public World getContextManager() {
 		return this;
 	}
-*/
+
 	public String getName() {
 		return root.getName();
 	}
