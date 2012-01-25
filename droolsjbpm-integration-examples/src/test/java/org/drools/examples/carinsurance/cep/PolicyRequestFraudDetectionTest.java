@@ -40,17 +40,18 @@ public class PolicyRequestFraudDetectionTest {
     public void lyingAboutAge() {
         SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
-        Car mini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
 
         Driver realJohn = new Driver("John", "Smith", new LocalDate().minusYears(10));
-        PolicyRequest realJohnMiniPolicyRequest = new PolicyRequest(realJohn, mini);
+        Car realMini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
+        PolicyRequest realJohnMiniPolicyRequest = new PolicyRequest(realJohn, realMini);
         realJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         realJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
         realJohnMiniPolicyRequest.setAutomaticallyRejected(true);
         realJohnMiniPolicyRequest.addRejectedMessage("Too young.");
 
         Driver fakeJohn = new Driver("John", "Smith", new LocalDate().minusYears(30));
-        PolicyRequest fakeJohnMiniPolicyRequest = new PolicyRequest(fakeJohn, mini);
+        Car fakeMini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
+        PolicyRequest fakeJohnMiniPolicyRequest = new PolicyRequest(fakeJohn, fakeMini);
         fakeJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         fakeJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
         fakeJohnMiniPolicyRequest.setAutomaticallyRejected(false);
@@ -67,11 +68,11 @@ public class PolicyRequestFraudDetectionTest {
                     .addKnowledgePackages()
                     .end(World.ROOT, KnowledgeBase.class.getName())
                 .newStatefulKnowledgeSession()
-                    .insert(mini).set("mini")
                     .end()
             .newStep(1000)
                 .getStatefulKnowledgeSession()
                     .insert(realJohn).set("realJohn")
+                    .insert(realMini).set("realMini")
                     .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
                     .fireAllRules()
                     .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
@@ -80,6 +81,7 @@ public class PolicyRequestFraudDetectionTest {
             .newStep(5000)
                 .getStatefulKnowledgeSession()
                     .insert(fakeJohn).set("fakeJohn")
+                    .insert(fakeMini).set("fakeMini")
                     .insert(fakeJohnMiniPolicyRequest).set("fakeJohnMiniPolicyRequest")
                     .fireAllRules()
                     .test("fakeJohnMiniPolicyRequest.requiresManualApproval == true")
