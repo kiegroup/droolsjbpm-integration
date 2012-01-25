@@ -11,7 +11,7 @@
              xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
-  <itemDefinition id="policyRequestClass" structureRef="org.drools.examples.carinsurance.domain.request.PolicyRequest" />
+  <itemDefinition id="PolicyRequest" structureRef="org.drools.examples.carinsurance.domain.request.PolicyRequest" />
 
   <process id="policyRequestProcess" name="PolicyRequest process"
            processType="Private" isExecutable="true" tns:packageName="defaultPackage" >
@@ -20,12 +20,12 @@
      <!--<tns:import name="org.jbpm.examples.quickstarts.HelloService" />-->
     <!--</extensionElements>-->
     <!-- process variables -->
-    <property id="policyRequest" itemSubjectRef="policyRequestClass"/>
+    <property id="policyRequest" itemSubjectRef="PolicyRequest"/>
 
     <!-- nodes -->
     <startEvent id="start" name="StartProcess" />
     <scriptTask id="manualApproval" name="Script" >
-      <script>System.out.println("PolicyRequest for " + policyRequest.getOwner().getFullName());</script>
+      <script>policyRequest.setManuallyApproved(true);</script>
     </scriptTask>
     <endEvent id="end" name="End" >
       <terminateEventDefinition/>

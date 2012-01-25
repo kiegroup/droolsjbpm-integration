@@ -37,6 +37,9 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class PolicyApprovalWorkflowTest {
 
     @Test
@@ -50,8 +53,9 @@ public class PolicyApprovalWorkflowTest {
         PolicyRequest johnMiniPolicyRequest = new PolicyRequest(john, mini);
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
-        processParams.put("johnMiniPolicyRequest", johnMiniPolicyRequest);
+        processParams.put("policyRequest", johnMiniPolicyRequest);
 
+        assertEquals(false, johnMiniPolicyRequest.isManuallyApproved());
         // @formatter:off          
         simulationFluent.newPath("init")
             .newStep(0L)
@@ -63,12 +67,13 @@ public class PolicyApprovalWorkflowTest {
                     .addKnowledgePackages()
                     .end(World.ROOT, KnowledgeBase.class.getName())
                 .newStatefulKnowledgeSession()
-                    .createProcessInstance("policyRequestProcess", processParams)
+                    .startProcess("policyRequestProcess", processParams)
                     .end()
                 .end()
             .end()
         .runSimulation();
         // @formatter:on
+        assertEquals(true, johnMiniPolicyRequest.isManuallyApproved());
     }
 
 }
