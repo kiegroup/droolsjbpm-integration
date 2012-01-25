@@ -27,7 +27,7 @@ import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
 
 // ############################################################################
-// Policy rejections
+// PolicyRequest rejections
 // ############################################################################
 
 rule "rejectMinors" no-loop
@@ -35,7 +35,7 @@ rule "rejectMinors" no-loop
         $driver : Driver(age < 18)
         $policyRequest : PolicyRequest(owner == $driver)
     then
-        $policyRequest.setAutomaticallyDisapproved(true);
-        $policyRequest.addDisapprovalMessage("The driver " + $driver.getFullName() + " of age " + $driver.getAge()
+        $policyRequest.setAutomaticallyRejected(true);
+        $policyRequest.addRejectedMessage("The driver " + $driver.getFullName() + " of age " + $driver.getAge()
             + " is too young.");
 end
