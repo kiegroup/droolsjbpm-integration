@@ -69,7 +69,7 @@ public class FluentCompactStatefulKnowledgeSessionImpl extends AbstractFluentTes
     }
 
     public FluentCompactStatefulKnowledgeSession newStep(long distance) {
-        getSim().newStep( distance );
+        getSim().newInternalStep(distance);
         return this;
     }
 

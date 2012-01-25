@@ -77,7 +77,7 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
         sim.getPaths().put( path.getName(), path );     
         ((SimulationPathImpl)path).setSteps( steps );
         
-        newStep( 0l );
+        newInternalStep(0l);
 
 
         addCommand( new NewKnowledgeBaseCommand(null) );        
@@ -96,7 +96,7 @@ public class FluentCompactSimulationImpl extends AbstractFluentTest<FluentCompac
         return new FluentCompactStatefulKnowledgeSessionImpl(this);
     }
 
-    public void newStep(long distance) {
+    public void newInternalStep(long distance) {
         cmds = new ArrayList<Command>();
 
         step = new SimulationStepImpl( path,

@@ -25,6 +25,8 @@ public interface SimulationFluent extends FluentRoot, FluentTest<SimulationFluen
     
     SimulationPathFluent getPath(String name);
 
+    SimulationStepFluent newStep(long distance);
+
     // TODO SimulationStepFluent newStep(long distance);
 
     /**

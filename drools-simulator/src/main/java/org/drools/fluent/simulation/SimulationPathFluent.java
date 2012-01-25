@@ -19,10 +19,10 @@ package org.drools.fluent.simulation;
 import org.drools.fluent.FluentTest;
 
 public interface SimulationPathFluent extends FluentTest<SimulationPathFluent> {
+
+    SimulationPathFluent newPath(String name);
     
     SimulationPathFluent getPath(String name);
-    
-    SimulationPathFluent newPath(String name);
     
     SimulationFluent end();
 

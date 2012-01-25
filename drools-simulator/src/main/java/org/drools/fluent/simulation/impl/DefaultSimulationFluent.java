@@ -26,6 +26,7 @@ import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.SimulationPathFluent;
+import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.simulation.SimulationPath;
@@ -42,7 +43,7 @@ public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent
     private Simulation simulation;
     private VariableContext variableContext;
 
-    private SimulationPath path;
+    private SimulationPath lastPath = null;
 
     private List<SimulationStep> steps;
 
@@ -60,32 +61,39 @@ public class DefaultSimulationFluent extends AbstractFluentTest<SimulationFluent
     public SimulationPathFluent newPath(String name) {
         steps = new ArrayList<SimulationStep>();
 
-        path = new SimulationPathImpl(simulation,
+        lastPath = new SimulationPathImpl(simulation,
                              name );
-        simulation.getPaths().put( path.getName(),
-                            path );
-        ((SimulationPathImpl) path).setSteps( steps );
+        simulation.getPaths().put(lastPath.getName(),
+                lastPath);
+        ((SimulationPathImpl) lastPath).setSteps(steps);
 
         return new DefaultSimulationPathFluent( this,
-                                           path.getName() );
+                                           lastPath.getName() );
     }
 
     public SimulationPathFluent getPath(String name) {
-        path = simulation.getPaths().get( name );
-        steps = (List<SimulationStep>) path.getSteps();
+        lastPath = simulation.getPaths().get( name );
+        steps = (List<SimulationStep>) lastPath.getSteps();
         SimulationStep step = (SimulationStep) steps.get( steps.size() - 1 );
         if ( !step.getCommands().isEmpty() ) {
             commands = (List<Command>) step.getCommands();
         }
         
         return new DefaultSimulationPathFluent( this,
-                                           path.getName() );
+                                           lastPath.getName() );
     }
 
-    public void newStep(long distance) {
+    public SimulationStepFluent newStep(long distance) {
+        if (lastPath == null) {
+            newPath("default");
+        }
+        return getPath("default").newStep(distance);
+    }
+
+    public void newInternalStep(long distance) {
         commands = new ArrayList<Command>();
 
-        SimulationStep step = new SimulationStepImpl( path, commands, distance );
+        SimulationStep step = new SimulationStepImpl(lastPath, commands, distance );
         steps.add(step);
     }
 

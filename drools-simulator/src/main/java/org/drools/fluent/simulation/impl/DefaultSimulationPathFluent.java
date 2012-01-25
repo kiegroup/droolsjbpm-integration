@@ -95,7 +95,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //    }
 
     public SimulationStepFluent newStep(long distance) {
-        getSim().newStep( distance );
+        getSim().newInternalStep(distance);
         
         return new DefaultSimulationStepFluent( getSim(), this );
     }
