@@ -16,57 +16,43 @@
 
 package org.drools.fluent.knowledge.impl;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
-import org.drools.command.ContextManager;
 import org.drools.command.GetVariableCommand;
-import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.knowledge.KnowledgeBaseFluent;
-import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionFluent;
-import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
+import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationStepFluent;
 import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.io.Resource;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.conf.ClockTypeOption;
 
-public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBaseFluent>
-        implements KnowledgeBaseFluent {
-
+public class DefaultKnowledgeBuilderSimFluent extends AbstractFluentTest<KnowledgeBuilderSimFluent>
+        implements KnowledgeBuilderSimFluent {
+    
     private DefaultSimulationStepFluent step;
     
-    public DefaultKnowledgeBaseFluent(InternalSimulation sim,
-                                      DefaultSimulationStepFluent step) {
+    public DefaultKnowledgeBuilderSimFluent(InternalSimulation sim,
+                                            DefaultSimulationStepFluent step) {
         super();
         setSim( sim );
         this.step = step;
     }
-    
-    public KnowledgeBaseFluent addKnowledgePackages() {
-        step.addCommand(  new KnowledgeBaseAddKnowledgePackagesCommand() );
-        return this;
-    }    
-    
-    
-    public KnowledgeBaseFluent addKnowledgePackages(Resource resource,
-                                                            ResourceType type) {
+
+    public KnowledgeBuilderSimFluent add(Resource resource,
+                                              ResourceType type) {
         step.addCommand(  new KnowledgeBuilderAddCommand( resource,
                                                               type,
                                                               null ) );
+        
         return this;
     }
 
-    public KnowledgeBaseFluent addKnowledgePackages(Resource resource,
-                                                            ResourceType type,
-                                                            ResourceConfiguration configuration) {
+    public KnowledgeBuilderSimFluent add(Resource resource,
+                                              ResourceType type,
+                                              ResourceConfiguration configuration) {
         step.addCommand( new KnowledgeBuilderAddCommand( resource,
                                                              type,
                                                              configuration ) );
@@ -75,28 +61,19 @@ public class DefaultKnowledgeBaseFluent extends AbstractFluentTest<KnowledgeBase
     }
 
     public SimulationStepFluent end(String context, String name) {
-        step.addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
+        step.addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
         step.addCommand( new SetVariableCommandFromLastReturn( context, name ) );
         return step;
     }
     
     public SimulationStepFluent end(String name) {
-        step.addCommand( new GetVariableCommand( KnowledgeBase.class.getName() ) );
+        step.addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
         step.addCommand( new SetVariableCommandFromLastReturn( name ) );
         return step;
     }
 
     public SimulationStepFluent end() {
         return step;
-    }
-
-    public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
-        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
-        ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
-        step.addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        step.addCommand( new SetVariableCommandFromLastReturn( ContextManager.ROOT, StatefulKnowledgeSession.class.getName() ));
-
-        return new DefaultStatefulKnowledgeSessionFluent(getSim(), step);
     }
 
 }

@@ -21,7 +21,7 @@ import org.drools.fluent.FluentTest;
 import org.drools.fluent.simulation.SimulationStepFluent;
 
 
-public interface KnowledgeBuilderFluent extends FluentKnowledgeBuilder<KnowledgeBuilderFluent>, FluentTest<KnowledgeBuilderFluent> {
+public interface KnowledgeBuilderSimFluent extends FluentKnowledgeBuilder<KnowledgeBuilderSimFluent>, FluentTest<KnowledgeBuilderSimFluent> {
     
     SimulationStepFluent end(String context, String name);
     SimulationStepFluent end(String name);

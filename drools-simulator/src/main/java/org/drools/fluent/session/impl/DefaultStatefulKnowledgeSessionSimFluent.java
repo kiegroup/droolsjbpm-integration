@@ -29,49 +29,49 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationStepFluent;
 import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 
-public class DefaultStatefulKnowledgeSessionFluent extends AbstractFluentTest<StatefulKnowledgeSessionFluent>
-        implements StatefulKnowledgeSessionFluent {
+public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractFluentTest<StatefulKnowledgeSessionSimFluent>
+        implements StatefulKnowledgeSessionSimFluent {
     
     private DefaultSimulationStepFluent step;
     
-    public DefaultStatefulKnowledgeSessionFluent(InternalSimulation sim,
-                                                 DefaultSimulationStepFluent step) {
+    public DefaultStatefulKnowledgeSessionSimFluent(InternalSimulation sim,
+                                                    DefaultSimulationStepFluent step) {
         super();
         setSim( sim );
         this.step = step;
     }
 
 
-    public StatefulKnowledgeSessionFluent setGlobal(String identifier,
+    public StatefulKnowledgeSessionSimFluent setGlobal(String identifier,
                                                             Object object) {
         step.addCommand( new SetGlobalCommand( identifier, object ) );
         return this;
     }    
     
-    public StatefulKnowledgeSessionFluent insert(Object object) {
+    public StatefulKnowledgeSessionSimFluent insert(Object object) {
         step.addCommand( new InsertObjectCommand( object ) );
         
         return this;
     }
     
-    public StatefulKnowledgeSessionFluent update(FactHandle handle, Object object) {
+    public StatefulKnowledgeSessionSimFluent update(FactHandle handle, Object object) {
         step.addCommand( new UpdateCommand( handle, object ) );
         return this;
     }
     
-    public StatefulKnowledgeSessionFluent retract(FactHandle handle) {
+    public StatefulKnowledgeSessionSimFluent retract(FactHandle handle) {
         step.addCommand( new RetractCommand( handle ) );
         return this;
     }
     
-    public StatefulKnowledgeSessionFluent fireAllRules() {
+    public StatefulKnowledgeSessionSimFluent fireAllRules() {
         step.addCommand( new FireAllRulesCommand() );
         return this;
     }
@@ -92,38 +92,38 @@ public class DefaultStatefulKnowledgeSessionFluent extends AbstractFluentTest<St
         return step;
     }
 
-    public StatefulKnowledgeSessionFluent set(String name) {
+    public StatefulKnowledgeSessionSimFluent set(String name) {
         step.addCommand( new SetVariableCommandFromLastReturn( null, name ) );
         return this;
     }
 
-    public StatefulKnowledgeSessionFluent startProcess(String identifier, Map<String, Object> params) {
+    public StatefulKnowledgeSessionSimFluent startProcess(String identifier, Map<String, Object> params) {
         step.addCommand(new StartProcessCommand(identifier, params));
         return this;
     }
 
-    public StatefulKnowledgeSessionFluent startProcess(String identifier) {
+    public StatefulKnowledgeSessionSimFluent startProcess(String identifier) {
         step.addCommand(new StartProcessCommand(identifier));
         return this;
     }
     
 
-    public StatefulKnowledgeSessionFluent createProcessInstance(String identifier, Map<String, Object> params) {
+    public StatefulKnowledgeSessionSimFluent createProcessInstance(String identifier, Map<String, Object> params) {
         step.addCommand(new CreateProcessInstanceCommand(identifier, params));
         return this;
     }
 
-    public StatefulKnowledgeSessionFluent startProcessInstance(long processId) {
+    public StatefulKnowledgeSessionSimFluent startProcessInstance(long processId) {
         step.addCommand(new StartProcessInstanceCommand(processId));
         return this;
     }
 
-    public StatefulKnowledgeSessionFluent signalEvent(String id, Object event, long processId) {
+    public StatefulKnowledgeSessionSimFluent signalEvent(String id, Object event, long processId) {
         step.addCommand(new SignalEventCommand(processId, id, event));
         return this;
     }
 
-    public StatefulKnowledgeSessionFluent signalEvent(String id, Object event) {
+    public StatefulKnowledgeSessionSimFluent signalEvent(String id, Object event) {
         step.addCommand(new SignalEventCommand(id, event));
         return this;
     }

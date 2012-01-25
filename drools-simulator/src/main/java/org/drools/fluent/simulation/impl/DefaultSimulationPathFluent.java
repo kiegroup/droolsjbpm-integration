@@ -34,18 +34,18 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
         this.defaultContext = defaultContext;
     }
 
-    //    public DefaultKnowledgeBuilderFluent<DefaultSimulationPathFluent> newKnowledgeBuilder() {
+    //    public DefaultKnowledgeBuilderSimFluent<DefaultSimulationPathFluent> newKnowledgeBuilder() {
     //        getSim().addCommand( new NewKnowledgeBuilderCommand( null,
     //                                                             KnowledgeBase.class.getName() ) );
     //        getSim().addCommand( new SetVariableCommand( defaultContext,
     //                                                     KnowledgeBuilder.class.getName() ) );
     //
-    //        return new DefaultKnowledgeBuilderFluent<DefaultSimulationPathFluent>( getSim(),
+    //        return new DefaultKnowledgeBuilderSimFluent<DefaultSimulationPathFluent>( getSim(),
     //                                                                               this,
     //                                                                               defaultContext );
     //    }
     //
-    //    public KnowledgeBaseFluent newKnowledgeBase() {
+    //    public KnowledgeBaseSimFluent newKnowledgeBase() {
     //        getSim().addCommand( new NewKnowledgeBuilderCommand( null,
     //                                                             KnowledgeBase.class.getName() ) );
     //        getSim().addCommand( new SetVariableCommand( defaultContext,
@@ -54,7 +54,7 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
+    //    public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession() {
     //        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
     //        ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
     //        getSim().addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
@@ -64,32 +64,32 @@ public class DefaultSimulationPathFluent extends AbstractFluentTest<SimulationPa
     //        return null;
     //    }
     //
-    //    public KnowledgeBuilderFluent getKnowledgeBuilder() {
+    //    public KnowledgeBuilderSimFluent getKnowledgeBuilder() {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
     //
-    //    public KnowledgeBaseFluent getKnowledgeBase() {
+    //    public KnowledgeBaseSimFluent getKnowledgeBase() {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
     //
-    //    public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession() {
+    //    public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession() {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
     //
-    //    public KnowledgeBuilderFluent getKnowledgeBuilder(String name) {
+    //    public KnowledgeBuilderSimFluent getKnowledgeBuilder(String name) {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
     //
-    //    public KnowledgeBaseFluent getKnowledgeBase(String name) {
+    //    public KnowledgeBaseSimFluent getKnowledgeBase(String name) {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }
     //
-    //    public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession(String name) {
+    //    public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String name) {
     //        // TODO Auto-generated method stub
     //        return null;
     //    }

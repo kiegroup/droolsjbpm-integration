@@ -17,9 +17,9 @@
 package org.drools.fluent.simulation;
 
 import org.drools.fluent.FluentTest;
-import org.drools.fluent.knowledge.KnowledgeBaseFluent;
-import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
-import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
+import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
+import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 
 public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  {
 
@@ -27,16 +27,16 @@ public interface SimulationStepFluent extends FluentTest<SimulationStepFluent>  
     
     SimulationPathFluent end();
 
-    KnowledgeBuilderFluent newKnowledgeBuilder();
-    KnowledgeBaseFluent newKnowledgeBase();
-    StatefulKnowledgeSessionFluent newStatefulKnowledgeSession();
+    KnowledgeBuilderSimFluent newKnowledgeBuilder();
+    KnowledgeBaseSimFluent newKnowledgeBase();
+    StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession();
 
-    KnowledgeBuilderFluent getKnowledgeBuilder();
-    KnowledgeBaseFluent getKnowledgeBase();
-    StatefulKnowledgeSessionFluent getStatefulKnowledgeSession();
+    KnowledgeBuilderSimFluent getKnowledgeBuilder();
+    KnowledgeBaseSimFluent getKnowledgeBase();
+    StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession();
 
-    KnowledgeBuilderFluent getKnowledgeBuilder(String name);
-    KnowledgeBaseFluent getKnowledgeBase(String name);
-    StatefulKnowledgeSessionFluent getStatefulKnowledgeSession(String name);
+    KnowledgeBuilderSimFluent getKnowledgeBuilder(String name);
+    KnowledgeBaseSimFluent getKnowledgeBase(String name);
+    StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String name);
 
 }

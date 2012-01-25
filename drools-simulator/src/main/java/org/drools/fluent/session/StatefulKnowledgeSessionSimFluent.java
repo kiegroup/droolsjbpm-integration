@@ -21,7 +21,7 @@ import org.drools.fluent.FluentTest;
 import org.drools.fluent.simulation.SimulationStepFluent;
 
 
-public interface StatefulKnowledgeSessionFluent extends FluentStatefulKnowledgeSession<StatefulKnowledgeSessionFluent>, FluentTest<StatefulKnowledgeSessionFluent>  {
+public interface StatefulKnowledgeSessionSimFluent extends FluentStatefulKnowledgeSession<StatefulKnowledgeSessionSimFluent>, FluentTest<StatefulKnowledgeSessionSimFluent>  {
     
     SimulationStepFluent end(String context, String name);
     SimulationStepFluent end(String name);

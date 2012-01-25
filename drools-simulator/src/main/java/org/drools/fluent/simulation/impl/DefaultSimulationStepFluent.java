@@ -22,12 +22,12 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.command.*;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.InternalSimulation;
-import org.drools.fluent.knowledge.impl.DefaultKnowledgeBaseFluent;
-import org.drools.fluent.knowledge.impl.DefaultKnowledgeBuilderFluent;
-import org.drools.fluent.knowledge.KnowledgeBaseFluent;
-import org.drools.fluent.knowledge.KnowledgeBuilderFluent;
-import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionFluent;
-import org.drools.fluent.session.StatefulKnowledgeSessionFluent;
+import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
+import org.drools.fluent.knowledge.impl.DefaultKnowledgeBaseSimFluent;
+import org.drools.fluent.knowledge.impl.DefaultKnowledgeBuilderSimFluent;
+import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationPathFluent;
 import org.drools.fluent.simulation.SimulationStepFluent;
 import org.drools.fluent.test.impl.AbstractFluentTest;
@@ -46,69 +46,69 @@ public class DefaultSimulationStepFluent extends AbstractFluentTest<SimulationSt
         this.pathFluent = pathFluent;
     }
 
-    public KnowledgeBuilderFluent newKnowledgeBuilder() {
+    public KnowledgeBuilderSimFluent newKnowledgeBuilder() {
         addCommand( new NewKnowledgeBuilderCommand( null,
                                                              null ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
 
-        return new DefaultKnowledgeBuilderFluent( getSim(),
+        return new DefaultKnowledgeBuilderSimFluent( getSim(),
                                                        this );
     }
 
-    public KnowledgeBaseFluent newKnowledgeBase() {
+    public KnowledgeBaseSimFluent newKnowledgeBase() {
         addCommand( new NewKnowledgeBaseCommand( null ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
-        return new DefaultKnowledgeBaseFluent( getSim(),
+        return new DefaultKnowledgeBaseSimFluent( getSim(),
                                                     this );
     }
 
-    public StatefulKnowledgeSessionFluent newStatefulKnowledgeSession() {
+    public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession() {
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
         addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
         addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
-        return new DefaultStatefulKnowledgeSessionFluent( getSim(),
+        return new DefaultStatefulKnowledgeSessionSimFluent( getSim(),
                                                                this );
     }
 
-    public KnowledgeBuilderFluent getKnowledgeBuilder() {
-        return new DefaultKnowledgeBuilderFluent( getSim(),
+    public KnowledgeBuilderSimFluent getKnowledgeBuilder() {
+        return new DefaultKnowledgeBuilderSimFluent( getSim(),
                                                        this );
     }
 
-    public KnowledgeBaseFluent getKnowledgeBase() {
-        return new DefaultKnowledgeBaseFluent( getSim(),
+    public KnowledgeBaseSimFluent getKnowledgeBase() {
+        return new DefaultKnowledgeBaseSimFluent( getSim(),
                                                     this );
     }
 
-    public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession() {
-        return new DefaultStatefulKnowledgeSessionFluent( getSim(),
+    public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession() {
+        return new DefaultStatefulKnowledgeSessionSimFluent( getSim(),
                                                                this );
     }
 
-    public KnowledgeBuilderFluent getKnowledgeBuilder(String name) {
+    public KnowledgeBuilderSimFluent getKnowledgeBuilder(String name) {
         addCommand( new GetVariableCommand( name ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
 
-        return new DefaultKnowledgeBuilderFluent( getSim(),
+        return new DefaultKnowledgeBuilderSimFluent( getSim(),
                                                        this );
     }
 
-    public KnowledgeBaseFluent getKnowledgeBase(String name) {
+    public KnowledgeBaseSimFluent getKnowledgeBase(String name) {
         addCommand( new GetVariableCommand( name ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
-        return new DefaultKnowledgeBaseFluent( getSim(),
+        return new DefaultKnowledgeBaseSimFluent( getSim(),
                                                     this );
     }
 
-    public StatefulKnowledgeSessionFluent getStatefulKnowledgeSession(String name) {
+    public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String name) {
         addCommand( new GetVariableCommand( name ) );
         addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
-        return new DefaultStatefulKnowledgeSessionFluent( getSim(),
+        return new DefaultStatefulKnowledgeSessionSimFluent( getSim(),
                                                                this );
     }
 
