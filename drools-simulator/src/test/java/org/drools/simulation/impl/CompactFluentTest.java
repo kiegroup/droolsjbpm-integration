@@ -37,8 +37,10 @@ import org.hamcrest.Matcher;
 //import org.hamsandwich.core.AdaptingMatcher;
 //import org.hamsandwich.core.CannotAdaptException;
 //import org.hamsandwich.core.HamSandwichFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class CompactFluentTest {
 
     //    public static class PersonMatchers {

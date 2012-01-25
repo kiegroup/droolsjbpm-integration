@@ -24,7 +24,7 @@ import java.util.List;
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceType;
-import org.drools.command.ContextManager;
+import org.drools.command.World;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
@@ -63,10 +63,10 @@ public class SimulationFluentTest {
                 .newKnowledgeBuilder()
                     .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                           ResourceType.DRL )
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                    .end(World.ROOT, KnowledgeBuilder.class.getName() )
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
+                    .end(World.ROOT, KnowledgeBase.class.getName() )
                 .newStatefulKnowledgeSession()
                     .setGlobal( "list", list ).set( "list" )
                     .fireAllRules()
@@ -164,10 +164,10 @@ public class SimulationFluentTest {
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newByteArrayResource(str1.getBytes()),
                             ResourceType.DRL)
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
+                    .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, "kb1")
+                    .end(World.ROOT, "kb1")
                 .newStatefulKnowledgeSession()
                     .setGlobal("list", list1).set("list")
                     .fireAllRules()
@@ -175,10 +175,10 @@ public class SimulationFluentTest {
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newByteArrayResource(str2.getBytes()),
                             ResourceType.DRL)
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
+                    .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, "kb2")
+                    .end(World.ROOT, "kb2")
                 .newStatefulKnowledgeSession()
                     .setGlobal("list", list2).set("list")
                     .fireAllRules()
@@ -246,10 +246,10 @@ public class SimulationFluentTest {
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newByteArrayResource(str.getBytes()),
                             ResourceType.DRL)
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName())
+                    .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, KnowledgeBase.class.getName())
+                    .end(World.ROOT, KnowledgeBase.class.getName())
                 .newStatefulKnowledgeSession()
                     .setGlobal("list", list).set("list")
                     .fireAllRules()

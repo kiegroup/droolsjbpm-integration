@@ -25,7 +25,7 @@ import java.util.List;
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceType;
-import org.drools.command.ContextManager;
+import org.drools.command.World;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
@@ -106,10 +106,10 @@ public class StandardjBPM5FluentTest {
                           ResourceType.DRL )
                     .add( ResourceFactory.newByteArrayResource( strProcess.getBytes() ),
                           ResourceType.BPMN2 )
-                    .end(ContextManager.ROOT, KnowledgeBuilder.class.getName() )
+                    .end(World.ROOT, KnowledgeBuilder.class.getName() )
                 .newKnowledgeBase()
                     .addKnowledgePackages()
-                    .end(ContextManager.ROOT, KnowledgeBase.class.getName() )
+                    .end(World.ROOT, KnowledgeBase.class.getName() )
                 .newStatefulKnowledgeSession()
                     .setGlobal( "list", list ).set( "list" )
                     .startProcess("DummyProcess")
