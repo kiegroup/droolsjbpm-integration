@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.examples.carinsurance.app;
+package org.drools.examples.carinsurance.rule;
 
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
@@ -51,7 +51,7 @@ public class PolicyApprovalTest {
         simulationFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
+                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
                             ResourceType.DRL)
                     .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
@@ -86,7 +86,7 @@ public class PolicyApprovalTest {
         simulationFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
+                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
                             ResourceType.DRL)
                     .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()
@@ -121,7 +121,7 @@ public class PolicyApprovalTest {
         simulationFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
+                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
                             ResourceType.DRL)
                     .end(World.ROOT, KnowledgeBuilder.class.getName())
                 .newKnowledgeBase()

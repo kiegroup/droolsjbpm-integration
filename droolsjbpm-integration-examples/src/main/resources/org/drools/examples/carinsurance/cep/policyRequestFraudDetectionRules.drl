@@ -45,10 +45,10 @@ rule "lyingAboutAge" no-loop
             this after[1s, 10s] $rejectedPolicyRequest,
             automaticallyRejected == false,
             owner.fullName == $fullName,
-            owner.age != $age,
+            owner.age != $age
         )
     then
         $flaggedPolicyRequest.setRequiresManualApproval(true);
-        $flaggedPolicyRequest.addFlaggedMessage("A driver with the same name (" + $fullName + ") of different age ("
-            + $driver.getAge() + ") recently filed a rejected request.");
+        $flaggedPolicyRequest.addFlaggedMessage("A driver with the same name (" + $fullName + ") but a different age ("
+            + $age + ") recently filed a rejected request.");
 end
