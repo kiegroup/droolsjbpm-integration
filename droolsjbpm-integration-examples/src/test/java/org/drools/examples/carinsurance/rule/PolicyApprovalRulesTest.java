@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
-public class PolicyApprovalTest {
+public class PolicyApprovalRulesTest {
 
     @Test
     public void approvePolicyRequest() {

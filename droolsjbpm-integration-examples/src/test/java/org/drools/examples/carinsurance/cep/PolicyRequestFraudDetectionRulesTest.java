@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
-public class PolicyRequestFraudDetectionTest {
+public class PolicyRequestFraudDetectionRulesTest {
 
     @Test
     public void lyingAboutAge() {
@@ -134,7 +134,7 @@ public class PolicyRequestFraudDetectionTest {
                     .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
                     .end()
                 .end()
-            .newStep(2L * 60L *60L * 1000L)
+            .newStep(2L * 60L * 60L * 1000L)
                 .getStatefulKnowledgeSession()
                     .insert(otherJohn).set("otherJohn")
                     .insert(otherMini).set("otherMini")
