@@ -38,7 +38,7 @@ public class PolicyApprovalTest {
 
     @Test
     public void approvePolicyRequest() {
-        SimulationFluent simulationFluentFluent = new DefaultSimulationFluent();
+        SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate(1970, 1, 1));
         Car mini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
@@ -48,7 +48,7 @@ public class PolicyApprovalTest {
 
 
         // @formatter:off          
-        simulationFluentFluent.newPath("init")
+        simulationFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
@@ -73,7 +73,7 @@ public class PolicyApprovalTest {
 
     @Test
     public void rejectMinors() {
-        SimulationFluent simulationFluentFluent = new DefaultSimulationFluent();
+        SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate().minusYears(10));
         Car mini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
@@ -83,7 +83,7 @@ public class PolicyApprovalTest {
 
 
         // @formatter:off
-        simulationFluentFluent.newPath("init")
+        simulationFluent.newPath("init")
             .newStep(0)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyApprovalRules.drl"),
