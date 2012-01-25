@@ -47,7 +47,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitSimulationRunner.class)
-@Ignore
 public class SimulationTest {
 
     @Test
