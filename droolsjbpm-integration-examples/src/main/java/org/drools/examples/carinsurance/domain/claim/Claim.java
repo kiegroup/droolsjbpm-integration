@@ -16,16 +16,17 @@
 
 package org.drools.examples.carinsurance.domain.claim;
 
-import org.drools.examples.carinsurance.domain.policy.CoverageType;
+import org.drools.examples.carinsurance.domain.policy.Policy;
+import org.joda.time.LocalDate;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 public class Claim {
-    
-    private Incident incident;
-    
-    private CoverageType coverageType;
-    private BigDecimal damagesCost;
+
+    private Policy policy;
+    private LocalDate date;
+
+    private List<ClaimPart> claimPartList;
 
     // ############################################################################
     // Non getters and setters
