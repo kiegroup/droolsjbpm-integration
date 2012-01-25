@@ -49,7 +49,7 @@ public class PolicyApprovalTest {
 
         // @formatter:off          
         simulationFluent.newPath("init")
-            .newStep(0)
+            .newStep(0L)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
                             ResourceType.DRL)
@@ -84,7 +84,7 @@ public class PolicyApprovalTest {
 
         // @formatter:off
         simulationFluent.newPath("init")
-            .newStep(0)
+            .newStep(0L)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
                             ResourceType.DRL)
@@ -119,7 +119,7 @@ public class PolicyApprovalTest {
 
         // @formatter:off
         simulationFluent.newPath("init")
-            .newStep(0)
+            .newStep(0L)
                 .newKnowledgeBuilder()
                     .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
                             ResourceType.DRL)

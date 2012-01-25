@@ -92,4 +92,60 @@ public class PolicyRequestFraudDetectionTest {
         // @formatter:on
     }
 
+    @Test
+    public void notLyingAboutAge() {
+        SimulationFluent simulationFluent = new DefaultSimulationFluent();
+
+
+        Driver realJohn = new Driver("John", "Smith", new LocalDate().minusYears(10));
+        Car realMini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
+        PolicyRequest realJohnMiniPolicyRequest = new PolicyRequest(realJohn, realMini);
+        realJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
+        realJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
+        realJohnMiniPolicyRequest.setAutomaticallyRejected(true);
+        realJohnMiniPolicyRequest.addRejectedMessage("Too young.");
+
+        Driver otherJohn = new Driver("John", "Smith", new LocalDate().minusYears(30));
+        Car otherMini = new Car("MINI-01", CarType.SMALL, false, new BigDecimal("10000.00"));
+        PolicyRequest otherJohnMiniPolicyRequest = new PolicyRequest(otherJohn, otherMini);
+        otherJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
+        otherJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
+        otherJohnMiniPolicyRequest.setAutomaticallyRejected(false);
+
+
+        // @formatter:off
+        simulationFluent.newPath("init")
+            .newStep(0)
+                .newKnowledgeBuilder()
+                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/cep/policyRequestFraudDetectionRules.drl"),
+                            ResourceType.DRL)
+                    .end(World.ROOT, KnowledgeBuilder.class.getName())
+                .newKnowledgeBase()
+                    .addKnowledgePackages()
+                    .end(World.ROOT, KnowledgeBase.class.getName())
+                .newStatefulKnowledgeSession()
+                    .end()
+            .newStep(1000L)
+                .getStatefulKnowledgeSession()
+                    .insert(realJohn).set("realJohn")
+                    .insert(realMini).set("realMini")
+                    .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
+                    .fireAllRules()
+                    .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
+                    .end()
+                .end()
+            .newStep(2L * 60L *60L * 1000L)
+                .getStatefulKnowledgeSession()
+                    .insert(otherJohn).set("otherJohn")
+                    .insert(otherMini).set("otherMini")
+                    .insert(otherJohnMiniPolicyRequest).set("otherJohnMiniPolicyRequest")
+                    .fireAllRules()
+                    .test("otherJohnMiniPolicyRequest.requiresManualApproval == false")
+                    .end()
+                .end()
+            .end()
+        .runSimulation();
+        // @formatter:on
+    }
+
 }
