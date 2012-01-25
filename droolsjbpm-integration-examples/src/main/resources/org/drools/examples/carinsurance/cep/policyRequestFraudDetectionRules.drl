@@ -42,7 +42,7 @@ rule "lyingAboutAge" no-loop
             $age : owner.age
         )
         $flaggedPolicyRequest : PolicyRequest(
-            this after[1s, 10s] $rejectedPolicyRequest,
+            this after[1s, 30s] $rejectedPolicyRequest,
             automaticallyRejected == false,
             owner.fullName == $fullName,
             owner.age != $age
