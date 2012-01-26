@@ -115,19 +115,8 @@ public class StandardjBPM5FluentTest {
                     .startProcess("DummyProcess")
                     .fireAllRules()
                     .end()
-                .end();
-       
+                .runSimulation();
         // @formatter:on
-
-        runSimulation( f );
     }
-    
-    private void runSimulation(SimulationFluent f) {
-        SimulationImpl sim = (SimulationImpl) ((DefaultSimulationFluent) f).getSimulation();
-    
-        Simulator simulator = new Simulator( sim,
-                                             new Date().getTime() );
-        simulator.run();
-    }       
 
 }

@@ -57,19 +57,16 @@ public class PolicyApprovalWorkflowTest {
 
         assertEquals(false, johnMiniPolicyRequest.isManuallyApproved());
         // @formatter:off          
-        simulationFluent.newPath("init")
-            .newStep(0L)
-                .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/workflow/policyRequestWorkflow.bpmn"),
-                            ResourceType.BPMN2)
-                    .end(World.ROOT, KnowledgeBuilder.class.getName())
-                .newKnowledgeBase()
-                    .addKnowledgePackages()
-                    .end(World.ROOT, KnowledgeBase.class.getName())
-                .newStatefulKnowledgeSession()
-                    .startProcess("policyRequestProcess", processParams)
-                    .end()
-                .end()
+        simulationFluent
+        .newKnowledgeBuilder()
+            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/workflow/policyRequestWorkflow.bpmn"),
+                    ResourceType.BPMN2)
+            .end(World.ROOT, KnowledgeBuilder.class.getName())
+        .newKnowledgeBase()
+            .addKnowledgePackages()
+            .end(World.ROOT, KnowledgeBase.class.getName())
+        .newStatefulKnowledgeSession()
+            .startProcess("policyRequestProcess", processParams)
             .end()
         .runSimulation();
         // @formatter:on

@@ -19,61 +19,63 @@ package org.drools.fluent.knowledge.impl;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceConfiguration;
 import org.drools.builder.ResourceType;
+import org.drools.command.Command;
 import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
-import org.drools.fluent.InternalSimulation;
 import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
-import org.drools.fluent.simulation.impl.DefaultSimulationStepFluent;
-import org.drools.fluent.simulation.SimulationStepFluent;
-import org.drools.fluent.test.impl.AbstractFluentTest;
+import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.test.impl.AbstractTestableFluent;
 import org.drools.io.Resource;
 
-public class DefaultKnowledgeBuilderSimFluent extends AbstractFluentTest<KnowledgeBuilderSimFluent>
+public class DefaultKnowledgeBuilderSimFluent extends AbstractTestableFluent<KnowledgeBuilderSimFluent>
         implements KnowledgeBuilderSimFluent {
     
-    private DefaultSimulationStepFluent step;
+    private SimulationFluent simulationFluent;
     
-    public DefaultKnowledgeBuilderSimFluent(InternalSimulation sim,
-                                            DefaultSimulationStepFluent step) {
+    public DefaultKnowledgeBuilderSimFluent(SimulationFluent simulationFluent) {
         super();
-        setSim( sim );
-        this.step = step;
+        this.simulationFluent = simulationFluent;
+    }
+
+    protected KnowledgeBuilderSimFluent addCommand(Command command) {
+        simulationFluent.addCommand(command);
+        return this;
     }
 
     public KnowledgeBuilderSimFluent add(Resource resource,
-                                              ResourceType type) {
-        step.addCommand(  new KnowledgeBuilderAddCommand( resource,
-                                                              type,
-                                                              null ) );
+                                         ResourceType type) {
+        addCommand(new KnowledgeBuilderAddCommand(resource,
+                type,
+                null));
         
         return this;
     }
 
     public KnowledgeBuilderSimFluent add(Resource resource,
-                                              ResourceType type,
-                                              ResourceConfiguration configuration) {
-        step.addCommand( new KnowledgeBuilderAddCommand( resource,
-                                                             type,
-                                                             configuration ) );
+                                         ResourceType type,
+                                         ResourceConfiguration configuration) {
+        addCommand(new KnowledgeBuilderAddCommand(resource,
+                type,
+                configuration));
         
         return this;
     }
 
-    public SimulationStepFluent end(String context, String name) {
-        step.addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
-        step.addCommand( new SetVariableCommandFromLastReturn( context, name ) );
-        return step;
+    public SimulationFluent end(String context, String name) {
+        addCommand(new GetVariableCommand(KnowledgeBuilder.class.getName()));
+        addCommand(new SetVariableCommandFromLastReturn(context, name));
+        return simulationFluent;
     }
     
-    public SimulationStepFluent end(String name) {
-        step.addCommand( new GetVariableCommand( KnowledgeBuilder.class.getName() ) );
-        step.addCommand( new SetVariableCommandFromLastReturn( name ) );
-        return step;
+    public SimulationFluent end(String name) {
+        addCommand(new GetVariableCommand(KnowledgeBuilder.class.getName()));
+        addCommand(new SetVariableCommandFromLastReturn(name));
+        return simulationFluent;
     }
 
-    public SimulationStepFluent end() {
-        return step;
+    public SimulationFluent end() {
+        return simulationFluent;
     }
 
 }

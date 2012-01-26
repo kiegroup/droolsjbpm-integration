@@ -17,19 +17,19 @@
 package org.drools.fluent.knowledge;
 
 import org.drools.fluent.FluentKnowledgeBase;
-import org.drools.fluent.FluentTest;
+import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
-import org.drools.fluent.simulation.SimulationStepFluent;
+import org.drools.fluent.simulation.SimulationFluent;
 
 
-public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, FluentTest<KnowledgeBaseSimFluent> {
+public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, TestableFluent<KnowledgeBaseSimFluent> {
     
     StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession();
-    
-    SimulationStepFluent end(String context, String name);
-    
-    SimulationStepFluent end(String name);
-    
-    SimulationStepFluent end();
+
+    SimulationFluent end(String context, String name);
+
+    SimulationFluent end(String name);
+
+    SimulationFluent end();
         
 }

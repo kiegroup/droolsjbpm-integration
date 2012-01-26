@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.compact;
+package org.drools.fluent.test;
 
-import org.drools.fluent.FluentKnowledgeBase;
-import org.drools.fluent.FluentTest;
+import org.drools.fluent.test.ReflectiveMatcherAssert;
 
-public interface FluentCompactKnowledgeBase extends FluentKnowledgeBase<FluentCompactKnowledgeBase>, FluentTest<FluentCompactKnowledgeBase> {
+public interface TestableFluent<P> {
+
+    <T> P test(java.lang.String reason, T actual, org.hamcrest.Matcher<T> matcher);
     
-    FluentCompactStatefulKnowledgeSession end();
+    <T> P test(T actual, org.hamcrest.Matcher<T> matcher);
     
+    <T> P test(String text);
+    
+    <T> P test(ReflectiveMatcherAssert matcher);
+
 }

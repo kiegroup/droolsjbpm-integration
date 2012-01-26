@@ -17,52 +17,39 @@
 package org.drools.simulation.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.drools.command.Command;
 import org.drools.simulation.SimulationPath;
 import org.drools.simulation.SimulationStep;
 
-public class SimulationStepImpl
-        implements SimulationStep {
+public class SimulationStepImpl implements SimulationStep {
 
     private SimulationPath path;
-    private Collection<Command> commands;
-    private long                distance;
+    private long distanceMillis;
+    private List<Command> commands = new ArrayList<Command>();
 
-    public SimulationStepImpl(SimulationPath path,
-            Collection<Command> commands,
-            long distance) {
+    public SimulationStepImpl(SimulationPath path, long distanceMillis) {
         this.path = path;
-        this.commands = commands;
-        this.distance = distance;
-    }
-    
-    public SimulationStepImpl(SimulationPath path,
-            Command command,
-            long distance) {
-        this.path = path;
-        commands = new ArrayList<Command>();
-        ((List<Command>)this.commands).add( command );
-        this.distance = distance;
-    }
-
-    public Collection<Command> getCommands() {
-        return commands;
-    }
-
-    public long getTemporalDistance() {
-        return distance;
+        this.distanceMillis = distanceMillis;
     }
 
     public SimulationPath getPath() {
         return this.path;
     }
 
+    public long getDistanceMillis() {
+        return distanceMillis;
+    }
+
+    public List<Command> getCommands() {
+        return commands;
+    }
+
     @Override
     public String toString() {
-        return "SimulationStepImpl [distance=" + distance + ", path=" + path + ", commands=" + commands + "]";
+        return "SimulationStepImpl [path=" + path + ", distanceMillis=" + distanceMillis
+                + ", commands=" + commands + "]";
     }
 
 }

@@ -48,24 +48,21 @@ public class PolicyApprovalRulesTest {
 
 
         // @formatter:off          
-        simulationFluent.newPath("init")
-            .newStep(0L)
-                .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
-                            ResourceType.DRL)
-                    .end(World.ROOT, KnowledgeBuilder.class.getName())
-                .newKnowledgeBase()
-                    .addKnowledgePackages()
-                    .end(World.ROOT, KnowledgeBase.class.getName())
-                .newStatefulKnowledgeSession()
-                    .insert(john).set("john")
-                    .insert(mini).set("mini")
-                    .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
-                    .fireAllRules()
-                    .test("johnMiniPolicyRequest.automaticallyRejected == false")
-                    .test("johnMiniPolicyRequest.rejectedMessageList.size() == 0")
-                    .end()
-                .end()
+        simulationFluent
+        .newKnowledgeBuilder()
+            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
+                    ResourceType.DRL)
+            .end(World.ROOT, KnowledgeBuilder.class.getName())
+        .newKnowledgeBase()
+            .addKnowledgePackages()
+            .end(World.ROOT, KnowledgeBase.class.getName())
+        .newStatefulKnowledgeSession()
+            .insert(john).set("john")
+            .insert(mini).set("mini")
+            .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
+            .fireAllRules()
+            .test("johnMiniPolicyRequest.automaticallyRejected == false")
+            .test("johnMiniPolicyRequest.rejectedMessageList.size() == 0")
             .end()
         .runSimulation();
         // @formatter:on
@@ -83,24 +80,21 @@ public class PolicyApprovalRulesTest {
 
 
         // @formatter:off
-        simulationFluent.newPath("init")
-            .newStep(0L)
-                .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
-                            ResourceType.DRL)
-                    .end(World.ROOT, KnowledgeBuilder.class.getName())
-                .newKnowledgeBase()
-                    .addKnowledgePackages()
-                    .end(World.ROOT, KnowledgeBase.class.getName())
-                .newStatefulKnowledgeSession()
-                    .insert(john).set("john")
-                    .insert(mini).set("mini")
-                    .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
-                    .fireAllRules()
-                    .test("johnMiniPolicyRequest.automaticallyRejected == true")
-                    .test("johnMiniPolicyRequest.rejectedMessageList.size() == 1")
-                    .end()
-                .end()
+        simulationFluent
+        .newKnowledgeBuilder()
+            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
+                    ResourceType.DRL)
+            .end(World.ROOT, KnowledgeBuilder.class.getName())
+        .newKnowledgeBase()
+            .addKnowledgePackages()
+            .end(World.ROOT, KnowledgeBase.class.getName())
+        .newStatefulKnowledgeSession()
+            .insert(john).set("john")
+            .insert(mini).set("mini")
+            .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
+            .fireAllRules()
+            .test("johnMiniPolicyRequest.automaticallyRejected == true")
+            .test("johnMiniPolicyRequest.rejectedMessageList.size() == 1")
             .end()
         .runSimulation();
         // @formatter:on
@@ -118,23 +112,20 @@ public class PolicyApprovalRulesTest {
 
 
         // @formatter:off
-        simulationFluent.newPath("init")
-            .newStep(0L)
-                .newKnowledgeBuilder()
-                    .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
-                            ResourceType.DRL)
-                    .end(World.ROOT, KnowledgeBuilder.class.getName())
-                .newKnowledgeBase()
-                    .addKnowledgePackages()
-                    .end(World.ROOT, KnowledgeBase.class.getName())
-                .newStatefulKnowledgeSession()
-                    .insert(john).set("john")
-                    .insert(mini).set("mini")
-                    .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
-                    .fireAllRules()
-                    .test("johnMiniPolicyRequest.automaticallyRejected == false")
-                    .end()
-                .end()
+        simulationFluent
+        .newKnowledgeBuilder()
+            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
+                    ResourceType.DRL)
+            .end(World.ROOT, KnowledgeBuilder.class.getName())
+        .newKnowledgeBase()
+            .addKnowledgePackages()
+            .end(World.ROOT, KnowledgeBase.class.getName())
+        .newStatefulKnowledgeSession()
+            .insert(john).set("john")
+            .insert(mini).set("mini")
+            .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
+            .fireAllRules()
+            .test("johnMiniPolicyRequest.automaticallyRejected == false")
             .end()
         .runSimulation();
         // @formatter:on

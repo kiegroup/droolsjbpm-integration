@@ -91,7 +91,7 @@ public class Simulator
                                         new Comparator<SimulationStep>() {
                                             public int compare(SimulationStep s1,
                                                                SimulationStep s2) {
-                                                return (int) (s1.getTemporalDistance() - s2.getTemporalDistance());
+                                                return (int) (s1.getDistanceMillis() - s2.getDistanceMillis());
                                             }
                                         } );
 
@@ -120,7 +120,7 @@ public class Simulator
         // increment the clock for all the registered ksessions
         for ( StatefulKnowledgeSession ksession : this.ksessions ) {
             SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
-            long newTime = startTime + step.getTemporalDistance();
+            long newTime = startTime + step.getDistanceMillis();
             long currentTime = clock.getCurrentTime();
 
             clock.advanceTime( newTime - currentTime,
@@ -134,7 +134,7 @@ public class Simulator
                                                                                                          pathContext );
                 if ( ksession != null ) {
                     SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
-                    long newTime = startTime + step.getTemporalDistance();
+                    long newTime = startTime + step.getDistanceMillis();
                     long currentTime = clock.getCurrentTime();
                     clock.advanceTime( newTime - currentTime,
                                        TimeUnit.MILLISECONDS );

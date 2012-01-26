@@ -17,14 +17,14 @@
 package org.drools.fluent.knowledge;
 
 import org.drools.fluent.FluentKnowledgeBuilder;
-import org.drools.fluent.FluentTest;
-import org.drools.fluent.simulation.SimulationStepFluent;
+import org.drools.fluent.test.TestableFluent;
+import org.drools.fluent.simulation.SimulationFluent;
 
 
-public interface KnowledgeBuilderSimFluent extends FluentKnowledgeBuilder<KnowledgeBuilderSimFluent>, FluentTest<KnowledgeBuilderSimFluent> {
-    
-    SimulationStepFluent end(String context, String name);
-    SimulationStepFluent end(String name);
-    SimulationStepFluent end();
+public interface KnowledgeBuilderSimFluent extends FluentKnowledgeBuilder<KnowledgeBuilderSimFluent>, TestableFluent<KnowledgeBuilderSimFluent> {
+
+    SimulationFluent end(String context, String name);
+    SimulationFluent end(String name);
+    SimulationFluent end();
 
 }

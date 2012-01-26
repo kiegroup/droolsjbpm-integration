@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.drools.builder.ResourceType;
 import org.drools.fluent.VariableContext;
-import org.drools.fluent.compact.FluentCompactSimulation;
-import org.drools.fluent.compact.imp.FluentCompactSimulationImpl;
+import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.AssertThatImpl;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.io.ResourceFactory;
@@ -63,7 +63,7 @@ public class CompactFluentTest {
 
     @Test
     public void testSimpleForAllAssertionsTypes() {
-        FluentCompactSimulation f = new FluentCompactSimulationImpl();
+        SimulationFluent f = new DefaultSimulationFluent();
 
         VariableContext<Person> pc = f.<Person> getVariableContext();
 
@@ -82,11 +82,11 @@ public class CompactFluentTest {
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
         // @formatter:off        
-        f.newStatefulKnowledgeSession()
-            .getKnowledgeBase()
-                .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                       ResourceType.DRL )
-                .end()
+        f.newKnowledgeBase()
+            .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                                   ResourceType.DRL )
+            .end()
+        .newStatefulKnowledgeSession()
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
             // show testing inside of ksession execution
@@ -120,21 +120,20 @@ public class CompactFluentTest {
                                        "'yoda'" ) ) )
         .test( rf.assertThat( "y.age",
                               matcher( "equalTo",
-                                       "160" ) ) );
+                                       "160" ) ) )
+        .runSimulation();
 
         // @ FIXME commented out until hamsandwich works in the build      
         //         // test hamsandwich
         //         .test( rf.assertThat( "y", matcher( "allOf", matcher("name",  matcher( "equalTo", "'yoda'" ) ),
         //                                                      matcher("age",  matcher( "equalTo", "160" ) )
         //                                            )) );                 
-        // @formatter:on    
-
-        runSimulation( f );
+        // @formatter:on
     }
 
     @Test
     public void testAssertionsFail() {
-        FluentCompactSimulation f = new FluentCompactSimulationImpl();
+        SimulationFluent f = new DefaultSimulationFluent();
 
         VariableContext<Person> pc = f.<Person> getVariableContext();
 
@@ -151,11 +150,11 @@ public class CompactFluentTest {
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
         // @formatter:off        
-        f.newStatefulKnowledgeSession()
-            .getKnowledgeBase()
-                .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                       ResourceType.DRL )
-                .end()
+        f.newKnowledgeBase()
+            .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                                   ResourceType.DRL )
+            .end()
+        .newStatefulKnowledgeSession()
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
             // show testing inside of ksession execution
@@ -164,20 +163,20 @@ public class CompactFluentTest {
 
         boolean fail = false;
         try {
-            runSimulation( f );
+            f.runSimulation();
         } catch ( AssertionError e ) {
             fail = true;
         }
         assertTrue( "Assertion should have failed",
                     fail );
 
-        f = new FluentCompactSimulationImpl();
+        f = new DefaultSimulationFluent();
         // @formatter:off        
-        f.newStatefulKnowledgeSession()
-             .getKnowledgeBase()
-                 .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                        ResourceType.DRL )
-                .end()
+        f.newKnowledgeBase()
+             .addKnowledgePackages( ResourceFactory.newByteArrayResource( str.getBytes() ),
+                                    ResourceType.DRL )
+            .end()
+        .newStatefulKnowledgeSession()
              .insert( new Person( "yoda", 150 ) ).set( "y" )
              .fireAllRules()
              // show testing inside of ksession execution
@@ -188,7 +187,7 @@ public class CompactFluentTest {
 
         fail = false;
         try {
-            runSimulation( f );
+            f.runSimulation();
         } catch ( AssertionError e) {
             fail = true;
         } 
@@ -221,7 +220,7 @@ public class CompactFluentTest {
 
     @Test
     public void testMultipleKsessionsWithSteps() {
-        FluentCompactSimulation f = new FluentCompactSimulationImpl();
+        SimulationFluent f = new DefaultSimulationFluent();
 
         VariableContext<Person> pc = f.<Person> getVariableContext();
 
@@ -244,51 +243,46 @@ public class CompactFluentTest {
                       "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";
 
         // @formatter:off
-        f.newStatefulKnowledgeSession()
-            .getKnowledgeBase()
-                .addKnowledgePackages( ResourceFactory.newByteArrayResource( str1.getBytes() ),
-                                       ResourceType.DRL )
-                .end()
-            .newStep( 100 )
-                .insert( new Person( "yoda1",
-                                     150 ) ).set( "y1" )
-                .fireAllRules()
-            .newStep( 200 )
-                .insert( new Person( "darth1",
-                                     70 ) ).set( "d1" )
-                .fireAllRules()
-                .end()
-            .test( "y1.age == 160" )
-            .test( "d1.age == 80" )
+        f.newKnowledgeBase()
+            .addKnowledgePackages( ResourceFactory.newByteArrayResource( str1.getBytes() ),
+                                   ResourceType.DRL )
+            .end()
+        .newStep( 100 )
         .newStatefulKnowledgeSession()
-            .getKnowledgeBase()
-                .addKnowledgePackages( ResourceFactory.newByteArrayResource( str2.getBytes() ),
-                                       ResourceType.DRL )
-                .end()
-            .newStep( 100 )
-                .insert( new Person( "yoda2",
-                                     150 ) ).set( "y2" )
-                .fireAllRules()
-            .newStep( 200 )
-                .insert( new Person( "darth2",
-                                     70 ) ).set( "d2" )
-                .fireAllRules()
-                .end()
-            .test( "y2.age == 170" )
-            .test( "d2.age == 90" )
-            .test( "y1 == null" )
-            .test( "d1 == null" );
+            .insert( new Person( "yoda1",
+                                 150 ) ).set( "y1" )
+            .fireAllRules()
+            .end()
+        .newStep( 200 )
+        .getStatefulKnowledgeSession()
+            .insert( new Person( "darth1",
+                                 70 ) ).set( "d1" )
+            .fireAllRules()
+            .end()
+        .test( "y1.age == 160" )
+        .test( "d1.age == 80" )
+        .newStep( 100 )
+        .newKnowledgeBase()
+            .addKnowledgePackages( ResourceFactory.newByteArrayResource( str2.getBytes() ),
+                                   ResourceType.DRL )
+            .end()
+        .newStatefulKnowledgeSession()
+            .insert( new Person( "yoda2",
+                                 150 ) ).set( "y2" )
+            .fireAllRules()
+            .end()
+        .newStep( 200 )
+        .getStatefulKnowledgeSession()
+            .insert( new Person( "darth2",
+                                 70 ) ).set( "d2" )
+            .fireAllRules()
+            .end()
+        .test( "y2.age == 170" )
+        .test( "d2.age == 90" )
+        .test( "y1 == null" )
+        .test( "d1 == null" )
+        .runSimulation();
         // @formatter:on
-
-        runSimulation( f );
-    }
-
-    private void runSimulation(FluentCompactSimulation f) {
-        SimulationImpl sim = (SimulationImpl) ((FluentCompactSimulationImpl) f).getSimulation();
-
-        Simulator simulator = new Simulator( sim,
-                                             new Date().getTime() );
-        simulator.run();
     }
 
 }

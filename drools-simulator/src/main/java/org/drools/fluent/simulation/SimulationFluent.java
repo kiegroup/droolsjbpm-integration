@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc
+ * Copyright 2012 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,53 @@
 
 package org.drools.fluent.simulation;
 
+import org.drools.command.Command;
 import org.drools.fluent.FluentRoot;
-import org.drools.fluent.FluentTest;
+import org.drools.fluent.test.TestableFluent;
+import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
+import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.simulation.Simulation;
 
-public interface SimulationFluent extends FluentRoot, FluentTest<SimulationFluent> {
-    
-    SimulationPathFluent newPath(String name);
-    
-    SimulationPathFluent getPath(String name);
+import java.util.concurrent.TimeUnit;
 
-    SimulationStepFluent newStep(long distance);
+public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationFluent> {
 
-    // TODO SimulationStepFluent newStep(long distance);
+    SimulationFluent newPath(String id);
+    SimulationFluent getPath(String id);
+
+    SimulationFluent newStep(long distanceMillis);
+    SimulationFluent newStep(long distanceMillis, TimeUnit timeUnit);
+    SimulationFluent newRelativeStep(long relativeDistance);
+    SimulationFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit);
+
+    SimulationFluent addCommand(Command command);
+
+    KnowledgeBuilderSimFluent newKnowledgeBuilder();
+    KnowledgeBuilderSimFluent getKnowledgeBuilder();
+    KnowledgeBuilderSimFluent getKnowledgeBuilder(String id);
+
+    KnowledgeBaseSimFluent newKnowledgeBase();
+    KnowledgeBaseSimFluent getKnowledgeBase();
+    KnowledgeBaseSimFluent getKnowledgeBase(String id);
+
+    StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession();
+    StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession();
+    StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String id);
 
     /**
-     * Runs the Simulation with startTimeMillis now.
+     * Gets the Simulation
+     * @return never null
+     */
+    Simulation getSimulation();
+
+    /**
+     * Run the Simulation with startTimeMillis now.
      */
     void runSimulation();
 
     /**
-     * Runs the Simulation.
+     * Run the Simulation.
      * @param startTimeMillis never null
      */
     void runSimulation(long startTimeMillis);
