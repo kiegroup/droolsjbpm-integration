@@ -26,6 +26,29 @@ import org.drools.examples.carinsurance.domain.policy.Policy;
 import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
 
-// TODO
+// ############################################################################
+// PolicyRequest fraud
+// ############################################################################
 
+declare PolicyRequest
+    @role(event)
+end
 
+rule "lyingAboutAge" no-loop
+    when
+        $rejectedPolicyRequest : PolicyRequest(
+            automaticallyRejected == true,
+            $fullName : owner.fullName,
+            $age : owner.age
+        )
+        $flaggedPolicyRequest : PolicyRequest(
+            this after[1s, 30s] $rejectedPolicyRequest,
+            automaticallyRejected == false,
+            owner.fullName == $fullName,
+            owner.age != $age
+        )
+    then
+        $flaggedPolicyRequest.setRequiresManualApproval(true);
+        $flaggedPolicyRequest.addFlaggedMessage("A driver with the same name (" + $fullName + ") but a different age ("
+            + $age + ") recently filed a rejected request.");
+end

@@ -47,7 +47,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitSimulationRunner.class)
-@Ignore
 public class SimulationTest {
 
     @Test
@@ -71,83 +70,79 @@ public class SimulationTest {
 
         List<SimulationStep> steps = new ArrayList<SimulationStep>();
 
-        List<Command> cmds = new ArrayList<Command>();
+        SimulationStepImpl step1 = new SimulationStepImpl(path, 0);
+        List<Command> cmds1 = step1.getCommands();
 
-        cmds.add( new NewKnowledgeBuilderCommand( ) );
-        cmds.add( new SetVariableCommandFromLastReturn( "path1",
-                                          KnowledgeBuilder.class.getName() ) );
+        cmds1.add(new NewKnowledgeBuilderCommand( ) );
+        cmds1.add(new SetVariableCommandFromLastReturn("path1",
+                KnowledgeBuilder.class.getName()));
 
-        cmds.add( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                                  ResourceType.DRL,
-                                                  null ) );
+        cmds1.add(new KnowledgeBuilderAddCommand(ResourceFactory.newByteArrayResource(str.getBytes()),
+                ResourceType.DRL,
+                null));
 
-        cmds.add( new NewKnowledgeBaseCommand( null ) );
-        cmds.add( new SetVariableCommandFromLastReturn( "path1",
-                                          KnowledgeBase.class.getName() ) );
+        cmds1.add(new NewKnowledgeBaseCommand(null));
+        cmds1.add(new SetVariableCommandFromLastReturn("path1",
+                KnowledgeBase.class.getName()));
 
-        cmds.add( new KnowledgeBaseAddKnowledgePackagesCommand() );
+        cmds1.add(new KnowledgeBaseAddKnowledgePackagesCommand());
 
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
-        ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
+        ksessionConf.setOption(ClockTypeOption.get("pseudo"));
 
-        cmds.add( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        cmds.add( new SetVariableCommandFromLastReturn( "path1",
+        cmds1.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
+        cmds1.add( new SetVariableCommandFromLastReturn( "path1",
                                           StatefulKnowledgeSession.class.getName() ) );
 
         List list = new ArrayList();
 
-        cmds.add( new SetGlobalCommand( "list",
-                                        list ) );
+        cmds1.add(new SetGlobalCommand("list",
+                list));
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 0 ) );
+        steps.add(step1);
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "darth",
-                                                       97 ) ) );
-        cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 2000 ) );
+        SimulationStepImpl step2 = new SimulationStepImpl(path, 2000);
+        List<Command> cmds2 = step2.getCommands();
+        cmds2.add(new InsertObjectCommand(new Person("darth",
+                97)));
+        cmds2.add(new FireAllRulesCommand());
+        steps.add( step2 );
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "yoda",
+
+        SimulationStepImpl step3 = new SimulationStepImpl(path, 4000);
+        List<Command> cmds3 = step3.getCommands();
+        cmds3.add( new InsertObjectCommand( new Person( "yoda",
                                                        98 ) ) );
+        cmds3.add(new FireAllRulesCommand());
+        steps.add( step3 );
 
-        cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 4000 ) );
+        SimulationStepImpl step4 = new SimulationStepImpl(path, 5000);
+        List<Command> cmds4 = new ArrayList<Command>();
 
-        cmds = new ArrayList<Command>();
-
-        cmds.add( new AssertEquals( "Check List size",
+        cmds4.add( new AssertEquals( "Check List size",
                                     2,
                                     new GetGlobalCommand( "list" ),
                                     "size()" ) );
         
-        cmds.add( new AssertEquals( "Check Person",
+        cmds4.add( new AssertEquals( "Check Person",
                                     new Person( "darth",
                                                 97 ),
                                     new GetGlobalCommand( "list" ),
                                     "get( 0 )" ) );
 
-        cmds.add( new AssertEquals( "Check Person",
-                                    new Person( "yoda",
-                                                98 ),
-                                    new GetGlobalCommand( "list" ),
-                                    "get( 1 )" ) );
+        cmds4.add(new AssertEquals("Check Person",
+                new Person("yoda",
+                        98),
+                new GetGlobalCommand("list"),
+                "get( 1 )"));
 
-        steps.add( new SimulationStepImpl( path,
-                                 new TestGroupCommand( "test1",
-                                                       cmds ),
-                                 5000 ) );
+        step4.getCommands().add(new TestGroupCommand( "test1", cmds4));
+        steps.add( step4 );
+
 
         path.setSteps( steps );
-
         simulation.getPaths().put( "path1",
                                    path );
 
@@ -170,144 +165,145 @@ public class SimulationTest {
         str += "    list.add( $p ); \n";
         str += "end \n";
 
-        SimulationPathImpl path = new SimulationPathImpl( simulation,
+        SimulationPathImpl path1 = new SimulationPathImpl( simulation,
                                       "path1" );
 
-        List<SimulationStep> steps = new ArrayList<SimulationStep>();
+        List<SimulationStep> steps1 = new ArrayList<SimulationStep>();
 
-        List<Command> cmds = new ArrayList<Command>();
+        SimulationStepImpl step11 = new SimulationStepImpl(path1,
+                0);
+        List<Command> cmds11 = step11.getCommands();
 
-        cmds.add( new NewKnowledgeBuilderCommand( ) );
-        cmds.add( new SetVariableCommandFromLastReturn( World.ROOT,
-                                          KnowledgeBuilder.class.getName() ) );
+        cmds11.add(new NewKnowledgeBuilderCommand( ) );
+        cmds11.add(new SetVariableCommandFromLastReturn(World.ROOT,
+                KnowledgeBuilder.class.getName()));
 
-        cmds.add( new KnowledgeBuilderAddCommand( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                                  ResourceType.DRL,
-                                                  null ) );
+        cmds11.add(new KnowledgeBuilderAddCommand(ResourceFactory.newByteArrayResource(str.getBytes()),
+                ResourceType.DRL,
+                null));
 
-        cmds.add( new NewKnowledgeBaseCommand( null ) );
+        cmds11.add(new NewKnowledgeBaseCommand(null));
 
-        cmds.add( new SetVariableCommandFromLastReturn( World.ROOT,
-                                          KnowledgeBase.class.getName() ) );
+        cmds11.add(new SetVariableCommandFromLastReturn(World.ROOT,
+                KnowledgeBase.class.getName()));
 
-        cmds.add( new KnowledgeBaseAddKnowledgePackagesCommand() );
+        cmds11.add(new KnowledgeBaseAddKnowledgePackagesCommand());
 
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
-        ksessionConf.setOption( ClockTypeOption.get( "pseudo" ) );
+        ksessionConf.setOption(ClockTypeOption.get("pseudo"));
 
-        cmds.add( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
-        cmds.add( new SetVariableCommandFromLastReturn( World.ROOT,
-                                          StatefulKnowledgeSession.class.getName() ) );
+        cmds11.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
+        cmds11.add(new SetVariableCommandFromLastReturn(World.ROOT,
+                StatefulKnowledgeSession.class.getName()));
 
         List list = new ArrayList();
+        cmds11.add(new SetGlobalCommand("list",
+                list));
 
-        cmds.add( new SetGlobalCommand( "list",
-                                        list ) );
+        steps1.add(step11);
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 0 ) );
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "darth",
+        SimulationStepImpl step12 = new SimulationStepImpl(path1,
+                2000);
+        List<Command> cmds12 = step12.getCommands();
+        cmds12.add( new InsertObjectCommand( new Person( "darth",
                                                        97 ) ) );
-        cmds.add( new FireAllRulesCommand() );
+        cmds12.add( new FireAllRulesCommand() );
+        steps1.add(step12);
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 2000 ) );
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "yoda",
+        SimulationStepImpl step13 = new SimulationStepImpl(path1,
+                4000);
+        List<Command> cmds13 = step13.getCommands();
+        cmds13.add( new InsertObjectCommand( new Person( "yoda",
                                                        98 ) ) );
-        cmds.add( new FireAllRulesCommand() );
+        cmds13.add(new FireAllRulesCommand());
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 4000 ) );
+        steps1.add(step13);
 
-        path.setSteps( steps );
 
+        path1.setSteps(steps1);
         simulation.getPaths().put( "path1",
-                                   path );
+                                   path1 );
 
-        path = new SimulationPathImpl( simulation,
+        SimulationPathImpl path2 = new SimulationPathImpl( simulation,
                              "path2" );
 
-        steps = new ArrayList<SimulationStep>();
+        List<SimulationStep> steps2 = new ArrayList<SimulationStep>();
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "bobba",
+
+        SimulationStepImpl step21 = new SimulationStepImpl(path2,
+                1500);
+        List<Command> cmds21 = step21.getCommands();
+        cmds21.add( new InsertObjectCommand( new Person( "bobba",
                                                        77 ) ) );
-        cmds.add( new FireAllRulesCommand() );
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 1500 ) );
+        cmds21.add(new FireAllRulesCommand());
+        steps2.add(step21);
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "luke",
-                                                       30 ) ) );
-        cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 2200 ) );
+        SimulationStepImpl step22 = new SimulationStepImpl(path2,
+                2200);
+        List<Command> cmds22 = step22.getCommands();
+        cmds22.add(new InsertObjectCommand(new Person("luke",
+                30)));
+        cmds22.add(new FireAllRulesCommand());
+        steps2.add(step22);
 
-        cmds = new ArrayList<Command>();
-        cmds.add( new InsertObjectCommand( new Person( "ben",
-                                                       150 ) ) );
-        cmds.add( new FireAllRulesCommand() );
 
-        steps.add( new SimulationStepImpl( path,
-                                 cmds,
-                                 4500 ) );
+        SimulationStepImpl step23 = new SimulationStepImpl(path2,
+                4500);
+        List<Command> cmds23 = step23.getCommands();
+        cmds23.add(new InsertObjectCommand(new Person("ben",
+                150)));
+        cmds23.add(new FireAllRulesCommand());
 
-        cmds = new ArrayList<Command>();
+        steps2.add(step23);
 
-        cmds.add( new AssertEquals( "Check List size",
-                                    5,
-                                    new GetGlobalCommand( "list" ),
-                                    "size()" ) );
 
-        cmds.add( new AssertEquals( "Check Person",
-                                    new Person( "bobba",
-                                                77 ),
-                                    new GetGlobalCommand( "list" ),
-                                    "get( 0 )" ) );
+        SimulationStepImpl step24 = new SimulationStepImpl(path2,
+                5000);
+        List<Command> cmds24 = new ArrayList<Command>();
+        cmds24.add(new AssertEquals("Check List size",
+                5,
+                new GetGlobalCommand("list"),
+                "size()"));
 
-        cmds.add( new AssertEquals( "Check Person",
-                                    new Person( "darth",
-                                                97 ),
-                                    new GetGlobalCommand( "list" ),
-                                    "get( 1 )" ) );
+        cmds24.add(new AssertEquals("Check Person",
+                new Person("bobba",
+                        77),
+                new GetGlobalCommand("list"),
+                "get( 0 )" ) );
 
-        cmds.add( new AssertEquals( "Check Person",
-                                    new Person( "luke",
-                                                30 ),
-                                    new GetGlobalCommand( "list" ),
-                                    "get( 2 )" ) );
+        cmds24.add(new AssertEquals("Check Person",
+                new Person("darth",
+                        97),
+                new GetGlobalCommand("list"),
+                "get( 1 )"));
 
-        cmds.add( new AssertEquals( "Check Person",
-                                    new Person( "yoda",
-                                                98 ),
-                                    new GetGlobalCommand( "list" ),
-                                    "get( 3 )" ) );
+        cmds24.add(new AssertEquals("Check Person",
+                new Person("luke",
+                        30),
+                new GetGlobalCommand("list"),
+                "get( 2 )"));
 
-        cmds.add( new AssertEquals( "Check Person",
-                                    new Person( "ben",
-                                                150 ),
-                                    new GetGlobalCommand( "list" ),
-                                    "get( 4 )" ) );
+        cmds24.add(new AssertEquals("Check Person",
+                new Person("yoda",
+                        98),
+                new GetGlobalCommand("list"),
+                "get( 3 )"));
 
-        steps.add( new SimulationStepImpl( path,
-                                 new TestGroupCommand( "test2",
-                                                       cmds ),
-                                 5000 ) );
+        cmds24.add(new AssertEquals("Check Person",
+                new Person("ben",
+                        150),
+                new GetGlobalCommand("list"),
+                "get( 4 )"));
+        step24.getCommands().add(new TestGroupCommand("test2", cmds24));
+        steps2.add(step24);
 
-        path.setSteps( steps );
 
+        path2.setSteps(steps2);
         simulation.getPaths().put( "path2",
-                                   path );
+                                   path2 );
 
         return simulation;
     }

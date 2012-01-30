@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc
+ * Copyright 2012 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.drools.fluent.session;
 
-package org.drools.fluent.standard;
+import java.util.Map;
 
-import org.drools.fluent.FluentKnowledgeBase;
-import org.drools.fluent.FluentTest;
+/**
+ *
+ * @author salaboy
+ */
+public interface StatefulProcessSessionFluent<T> {
 
+    T startProcess(String identifier, Map<String, Object> params);
 
-public interface FluentStandardKnowledgeBase extends FluentKnowledgeBase<FluentStandardKnowledgeBase>, FluentTest<FluentStandardKnowledgeBase> {  
+    T startProcess(String identifier);
+
+    T createProcessInstance(String identifier, Map<String, Object> params);
+
+    T startProcessInstance(long processId);
     
-    FluentStandardStatefulKnowledgeSession newStatefulKnowledgeSession();
+    T signalEvent(String id, Object event, long processId);
     
-    FluentStandardStep end(String context, String name);
-    
-    FluentStandardStep end(String name);
-    
-    FluentStandardStep end();
-        
+    T signalEvent(String id, Object event);
 }

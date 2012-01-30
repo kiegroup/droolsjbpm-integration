@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc
+ * Copyright 2012 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package org.drools.fluent;
+package org.drools.examples.carinsurance.domain.claim;
 
-import org.drools.fluent.test.ReflectiveMatcherAssert;
+import org.drools.examples.carinsurance.domain.policy.CoverageType;
 
-public interface FluentTest<P> {
+import java.math.BigDecimal;
 
-    <T> P test(java.lang.String reason, T actual, org.hamcrest.Matcher<T> matcher);
+public class ClaimPart {
     
-    <T> P test(T actual, org.hamcrest.Matcher<T> matcher);
+    private Claim claim;
     
-    <T> P test(String text);
-    
-    <T> P test(ReflectiveMatcherAssert matcher);
+    private CoverageType coverageType;
+    private BigDecimal damagesCost;
+
+    // ############################################################################
+    // Non getters and setters
+    // ############################################################################
 
 }

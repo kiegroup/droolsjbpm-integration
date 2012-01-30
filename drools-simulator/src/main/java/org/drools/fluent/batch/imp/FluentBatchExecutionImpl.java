@@ -33,12 +33,11 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.batch.FluentBatchExecution;
-import org.drools.fluent.test.impl.AbstractFluentTest;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.drools.runtime.rule.FactHandle;
 
-public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExecution>
-        implements FluentBatchExecution {
+// TODO Do we really want this as a separate class hierarchy just to do batches? Does this fit in with the SimulationFluent?
+public class FluentBatchExecutionImpl implements FluentBatchExecution {
 
     private List<GenericCommand<?>> cmds = new ArrayList<GenericCommand<?>>();
     private VariableContext vars;
@@ -123,7 +122,7 @@ public class FluentBatchExecutionImpl extends AbstractFluentTest<FluentBatchExec
         return this;
     }
 
-    public FluentBatchExecution startProcessInstnace(long processId) {
+    public FluentBatchExecution startProcessInstance(long processId) {
         lastAddedCommand = new StartProcessInstanceCommand(processId);
         addCommand(lastAddedCommand);
         return this;

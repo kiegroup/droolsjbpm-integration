@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="policyRequestWorkflow"
+             targetNamespace="http://www.jboss.org/drools"
+             typeLanguage="http://www.java.com/javaTypes"
+             expressionLanguage="http://www.mvel.org/2.0"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:tns="http://www.jboss.org/drools">
+
+  <itemDefinition id="PolicyRequest" structureRef="org.drools.examples.carinsurance.domain.request.PolicyRequest" />
+
+  <process id="policyRequestProcess" name="PolicyRequest process"
+           processType="Private" isExecutable="true" tns:packageName="defaultPackage" >
+
+    <!--<extensionElements>-->
+     <!--<tns:import name="org.jbpm.examples.quickstarts.HelloService" />-->
+    <!--</extensionElements>-->
+    <!-- process variables -->
+    <property id="policyRequest" itemSubjectRef="PolicyRequest"/>
+
+    <!-- nodes -->
+    <startEvent id="start" name="StartProcess" />
+    <scriptTask id="manualApproval" name="Script" >
+      <script>policyRequest.setManuallyApproved(true);</script>
+    </scriptTask>
+    <endEvent id="end" name="End" >
+      <terminateEventDefinition/>
+    </endEvent>
+
+    <!-- connections -->
+    <sequenceFlow id="start-manualApproval" sourceRef="start" targetRef="manualApproval" />
+    <sequenceFlow id="manualApproval-end" sourceRef="manualApproval" targetRef="end" />
+
+  </process>
+
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane bpmnElement="com.sample.script" >
+      <bpmndi:BPMNShape bpmnElement="start" >
+        <dc:Bounds x="16" y="16" width="48" height="48" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="manualApproval" >
+        <dc:Bounds x="96" y="16" width="80" height="48" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" >
+        <dc:Bounds x="208" y="16" width="48" height="48" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="start-manualApproval" >
+        <di:waypoint x="40" y="40" />
+        <di:waypoint x="136" y="40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="manualApproval-end" >
+        <di:waypoint x="136" y="40" />
+        <di:waypoint x="232" y="40" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

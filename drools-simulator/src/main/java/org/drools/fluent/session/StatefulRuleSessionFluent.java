@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.drools.fluent;
+package org.drools.fluent.session;
 
 import org.drools.runtime.rule.FactHandle;
 
-public interface FluentStatefulKnowledgeSession<T> extends FluentStatefulProcessSession<T> {
+public interface StatefulRuleSessionFluent<T> {
             
     T fireAllRules();
     

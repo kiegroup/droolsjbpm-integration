@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.standard;
+package org.drools.fluent.test;
 
-import org.drools.fluent.FluentRoot;
-import org.drools.fluent.FluentTest;
+import org.drools.fluent.test.ReflectiveMatcherAssert;
 
-public interface FluentStandardSimulation extends FluentRoot, FluentTest<FluentStandardSimulation> {
+public interface TestableFluent<P> {
+
+    <T> P test(java.lang.String reason, T actual, org.hamcrest.Matcher<T> matcher);
     
-    FluentStandardPath newPath(String name);
+    <T> P test(T actual, org.hamcrest.Matcher<T> matcher);
     
-    FluentStandardPath getPath(String name);
-
-    // TODO FluentStandardStep newStep(long distance);
+    <T> P test(String text);
+    
+    <T> P test(ReflectiveMatcherAssert matcher);
 
 }
