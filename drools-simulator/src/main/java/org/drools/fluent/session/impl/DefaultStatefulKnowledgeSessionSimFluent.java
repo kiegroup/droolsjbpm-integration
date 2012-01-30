@@ -17,6 +17,7 @@
 package org.drools.fluent.session.impl;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.drools.command.Command;
 import org.drools.command.GetVariableCommand;
@@ -77,6 +78,10 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
         addCommand(new FireAllRulesCommand());
         return this;
     }
+
+    public String getActiveKnowledgeSessionId() {
+        return simulationFluent.getActiveKnowledgeSessionId();
+    }
     
     public SimulationFluent end(String context, String name) {
         addCommand(new GetVariableCommand(StatefulKnowledgeSession.class.getName()));
@@ -127,6 +132,26 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
 
     public StatefulKnowledgeSessionSimFluent signalEvent(String id, Object event) {
         addCommand(new SignalEventCommand(id, event));
+        return this;
+    }
+
+    public StatefulKnowledgeSessionSimFluent newStep(long distanceMillis) {
+        simulationFluent.newStep(distanceMillis);
+        return this;
+    }
+
+    public StatefulKnowledgeSessionSimFluent newStep(long distanceMillis, TimeUnit timeUnit) {
+        simulationFluent.newStep(distanceMillis, timeUnit);
+        return this;
+    }
+
+    public StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance) {
+        simulationFluent.newRelativeStep(relativeDistance);
+        return this;
+    }
+
+    public StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit) {
+        simulationFluent.newRelativeStep(relativeDistance, timeUnit);
         return this;
     }
 

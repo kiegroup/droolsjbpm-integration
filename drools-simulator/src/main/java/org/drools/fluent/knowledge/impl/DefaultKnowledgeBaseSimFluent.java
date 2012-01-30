@@ -69,12 +69,16 @@ public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<Knowle
         return this;
     }
 
+    public String getActiveKnowledgeBaseId() {
+        return simulationFluent.getActiveKnowledgeBaseId();
+    }
+
     public SimulationFluent end(String context, String name) {
         addCommand(new GetVariableCommand(KnowledgeBase.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(context, name));
         return simulationFluent;
     }
-    
+
     public SimulationFluent end(String name) {
         addCommand(new GetVariableCommand(KnowledgeBase.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(name));
@@ -83,15 +87,6 @@ public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<Knowle
 
     public SimulationFluent end() {
         return simulationFluent;
-    }
-
-    public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession() {
-        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
-        ksessionConf.setOption( ClockTypeOption.get("pseudo"));
-        addCommand(new NewStatefulKnowledgeSessionCommand(ksessionConf));
-        addCommand(new SetVariableCommandFromLastReturn(World.ROOT, StatefulKnowledgeSession.class.getName()));
-
-        return new DefaultStatefulKnowledgeSessionSimFluent(simulationFluent);
     }
 
 }

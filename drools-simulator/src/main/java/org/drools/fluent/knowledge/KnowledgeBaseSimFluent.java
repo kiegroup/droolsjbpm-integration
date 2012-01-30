@@ -23,8 +23,6 @@ import org.drools.fluent.simulation.SimulationFluent;
 
 
 public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, TestableFluent<KnowledgeBaseSimFluent> {
-    
-    StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession();
 
     SimulationFluent end(String context, String name);
 

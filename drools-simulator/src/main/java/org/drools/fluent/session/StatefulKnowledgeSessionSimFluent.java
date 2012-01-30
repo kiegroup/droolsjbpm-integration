@@ -20,8 +20,15 @@ import org.drools.fluent.FluentStatefulKnowledgeSession;
 import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 
+import java.util.concurrent.TimeUnit;
+
 
 public interface StatefulKnowledgeSessionSimFluent extends FluentStatefulKnowledgeSession<StatefulKnowledgeSessionSimFluent>, TestableFluent<StatefulKnowledgeSessionSimFluent> {
+
+    StatefulKnowledgeSessionSimFluent newStep(long distanceMillis);
+    StatefulKnowledgeSessionSimFluent newStep(long distanceMillis, TimeUnit timeUnit);
+    StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance);
+    StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit);
 
     SimulationFluent end(String context, String name);
     SimulationFluent end(String name);

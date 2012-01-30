@@ -38,14 +38,17 @@ public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationF
 
     SimulationFluent addCommand(Command command);
 
+    String getActiveKnowledgeBuilderId();
     KnowledgeBuilderSimFluent newKnowledgeBuilder();
     KnowledgeBuilderSimFluent getKnowledgeBuilder();
     KnowledgeBuilderSimFluent getKnowledgeBuilder(String id);
 
+    String getActiveKnowledgeBaseId();
     KnowledgeBaseSimFluent newKnowledgeBase();
     KnowledgeBaseSimFluent getKnowledgeBase();
     KnowledgeBaseSimFluent getKnowledgeBase(String id);
 
+    String getActiveKnowledgeSessionId();
     StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession();
     StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession();
     StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String id);

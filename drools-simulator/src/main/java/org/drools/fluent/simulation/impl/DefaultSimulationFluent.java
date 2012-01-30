@@ -48,13 +48,20 @@ import org.drools.simulation.impl.Simulator;
 public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFluent>
         implements SimulationFluent {
     
-    public static final String DEFAULT_PATH_ID = "default";
 
     private Simulation simulation;
     private VariableContext variableContext;
 
     private SimulationPath activePath = null;
+    private int pathCounter = 0;
     private SimulationStep activeStep = null;
+
+    private String activeKnowledgeBuilderId = null;
+    private int knowledgeBuilderCounter = 0;
+    private String activeKnowledgeBaseId = null;
+    private int knowledgeBaseCounter = 0;
+    private String activeKnowledgeSessionId = null;
+    private int knowledgeSessionCounter = 0;
 
     public DefaultSimulationFluent() {
         super();
@@ -65,6 +72,13 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
 
     public <P> VariableContext<P> getVariableContext() {
         return variableContext;
+    }
+
+    public SimulationFluent newPath() {
+        String pathId = "path" + pathCounter;
+        pathCounter++;
+        activeKnowledgeSessionId = null;
+        return newPath(pathId);
     }
 
     public SimulationFluent newPath(String id) {
@@ -87,7 +101,7 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
 
     private void assureActivePath() {
         if (activePath == null) {
-            newPath(DEFAULT_PATH_ID);
+            newPath();
         }
     }
 
@@ -125,52 +139,102 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         return this;
     }
 
-    // TODO Doesn't this need an id?
+    public String getActiveKnowledgeBuilderId() {
+        return activeKnowledgeBuilderId;
+    }
+
     public KnowledgeBuilderSimFluent newKnowledgeBuilder() {
+        String knowledgeBuilderId = KnowledgeBuilder.class.getName() + knowledgeBuilderCounter;
+        knowledgeBuilderCounter++;
+        return newKnowledgeBuilder(knowledgeBuilderId);
+    }
+
+    public KnowledgeBuilderSimFluent newKnowledgeBuilder(String id) {
         assureActiveStep();
+        activeKnowledgeBuilderId = id;
         addCommand(new NewKnowledgeBuilderCommand(null,
                 null ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+        activeKnowledgeBaseId = null;
 
         return new DefaultKnowledgeBuilderSimFluent( this );
     }
 
     public KnowledgeBuilderSimFluent getKnowledgeBuilder() {
         assureActiveStep();
+        if (activeKnowledgeBuilderId == null) {
+            throw new IllegalStateException("There is no activeKnowledgeBuilder. Call newKnowledgeBuilder() instead.");
+        }
+        activeKnowledgeBaseId = null;
         return new DefaultKnowledgeBuilderSimFluent( this );
     }
 
-    // TODO What's the point of this id?
     public KnowledgeBuilderSimFluent getKnowledgeBuilder(String id) {
         assureActiveStep();
-        addCommand( new GetVariableCommand( id ) );
-        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+        activeKnowledgeBuilderId = id;
+        addCommand(new GetVariableCommand(id));
+        addCommand(new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+        activeKnowledgeBaseId = null;
 
         return new DefaultKnowledgeBuilderSimFluent( this );
     }
 
-    // TODO Doesn't this need an id?
+    public String getActiveKnowledgeBaseId() {
+        return activeKnowledgeBaseId;
+    }
+
     public KnowledgeBaseSimFluent newKnowledgeBase() {
+        String knowledgeBaseId = KnowledgeBase.class.getName() + knowledgeBaseCounter;
+        knowledgeBaseCounter++;
+        return newKnowledgeBase(knowledgeBaseId);
+    }
+
+    public KnowledgeBaseSimFluent newKnowledgeBase(String id) {
+        assureActiveStep();
+        activeKnowledgeBaseId = id;
         addCommand( new NewKnowledgeBaseCommand( null ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
-        return new DefaultKnowledgeBaseSimFluent( this );
+        return new DefaultKnowledgeBaseSimFluent(this);
     }
 
     public KnowledgeBaseSimFluent getKnowledgeBase() {
-        return new DefaultKnowledgeBaseSimFluent( this );
+        assureActiveStep();
+        if (activeKnowledgeBaseId == null) {
+            throw new IllegalStateException("There is no activeKnowledgeBase. Call newKnowledgeBase() instead.");
+        }
+        return new DefaultKnowledgeBaseSimFluent(this);
     }
 
-    // TODO What's the point of this id?
     public KnowledgeBaseSimFluent getKnowledgeBase(String id) {
+        assureActiveStep();
+        activeKnowledgeBaseId = id;
         addCommand( new GetVariableCommand( id ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
         return new DefaultKnowledgeBaseSimFluent( this );
     }
 
-    // TODO Doesn't this need an id?
+    public void assureActiveKnowledgeBase() {
+        assureActiveStep();
+        if (activeKnowledgeBaseId == null) {
+            newKnowledgeBase().addKnowledgePackages();
+        }
+    }
+
+    public String getActiveKnowledgeSessionId() {
+        return activeKnowledgeSessionId;
+    }
+
     public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession() {
+        String knowledgeSessionId = StatefulKnowledgeSession.class.getName() + knowledgeSessionCounter;
+        knowledgeSessionCounter++;
+        return newStatefulKnowledgeSession(knowledgeSessionId);
+    }
+    
+    public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession(String id) {
+        assureActiveKnowledgeBase();
+        activeKnowledgeSessionId = id;
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption( ClockTypeOption.get("pseudo") );
         addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
@@ -180,11 +244,16 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     }
 
     public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession() {
+        assureActiveKnowledgeBase();
+        if (activeKnowledgeSessionId == null) {
+            throw new IllegalStateException("There is no activeKnowledgeSession. Call newStatefulKnowledgeSession() instead.");
+        }
         return new DefaultStatefulKnowledgeSessionSimFluent( this );
     }
 
-    // TODO What's the point of this id?
     public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String id) {
+        assureActiveKnowledgeBase();
+        activeKnowledgeSessionId = id;
         addCommand(new GetVariableCommand(id));
         addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));
 
