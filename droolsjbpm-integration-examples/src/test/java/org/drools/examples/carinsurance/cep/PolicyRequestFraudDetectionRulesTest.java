@@ -63,7 +63,7 @@ public class PolicyRequestFraudDetectionRulesTest {
         .newKnowledgeBuilder()
             .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/cep/policyRequestFraudDetectionRules.drl"),
                     ResourceType.DRL)
-            .end(World.ROOT, KnowledgeBuilder.class.getName())
+            .end()
         .newKnowledgeBase()
             .addKnowledgePackages()
             .end(World.ROOT, KnowledgeBase.class.getName())
@@ -116,7 +116,7 @@ public class PolicyRequestFraudDetectionRulesTest {
         .newKnowledgeBuilder()
             .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/cep/policyRequestFraudDetectionRules.drl"),
                     ResourceType.DRL)
-            .end(World.ROOT, KnowledgeBuilder.class.getName())
+            .end()
         .newKnowledgeBase()
             .addKnowledgePackages()
             .end(World.ROOT, KnowledgeBase.class.getName())

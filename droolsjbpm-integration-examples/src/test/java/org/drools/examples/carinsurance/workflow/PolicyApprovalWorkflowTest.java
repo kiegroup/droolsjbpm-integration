@@ -61,7 +61,7 @@ public class PolicyApprovalWorkflowTest {
         .newKnowledgeBuilder()
             .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/workflow/policyRequestWorkflow.bpmn"),
                     ResourceType.BPMN2)
-            .end(World.ROOT, KnowledgeBuilder.class.getName())
+            .end()
         .newKnowledgeBase()
             .addKnowledgePackages()
             .end(World.ROOT, KnowledgeBase.class.getName())
