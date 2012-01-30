@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.drools.fluent;
+package org.drools.fluent.session;
 
 import java.util.Map;
 
@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author salaboy
  */
-public interface FluentStatefulProcessSession<T> {
+public interface StatefulProcessSessionFluent<T> {
 
     T startProcess(String identifier, Map<String, Object> params);
 

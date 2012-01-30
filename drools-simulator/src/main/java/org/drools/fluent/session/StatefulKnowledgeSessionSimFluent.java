@@ -16,14 +16,16 @@
 
 package org.drools.fluent.session;
 
-import org.drools.fluent.FluentStatefulKnowledgeSession;
 import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 
 import java.util.concurrent.TimeUnit;
 
 
-public interface StatefulKnowledgeSessionSimFluent extends FluentStatefulKnowledgeSession<StatefulKnowledgeSessionSimFluent>, TestableFluent<StatefulKnowledgeSessionSimFluent> {
+public interface StatefulKnowledgeSessionSimFluent
+        extends StatefulRuleSessionFluent<StatefulKnowledgeSessionSimFluent>,
+        StatefulProcessSessionFluent<StatefulKnowledgeSessionSimFluent>,
+        TestableFluent<StatefulKnowledgeSessionSimFluent> {
 
     StatefulKnowledgeSessionSimFluent newStep(long distanceMillis);
     StatefulKnowledgeSessionSimFluent newStep(long distanceMillis, TimeUnit timeUnit);
