@@ -211,7 +211,7 @@ public class CompactFluentTest {
         //        // @formatter:on    
         //        
         //        try {
-        //            runSimulation( f );
+        //            f.runSimulation();
         //            fail( "age is 160, so should fail" );
         //        } catch ( AssertionError e) {
         //            System.out.println( e );
