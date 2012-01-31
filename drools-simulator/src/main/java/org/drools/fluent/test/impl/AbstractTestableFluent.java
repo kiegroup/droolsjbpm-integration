@@ -16,26 +16,19 @@
 
 package org.drools.fluent.test.impl;
 
-import org.drools.fluent.InternalSimulation;
+import org.drools.command.Command;
+import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.test.ReflectiveMatcherAssert;
 import org.hamcrest.Matcher;
 
 import static org.junit.Assert.assertThat;
 
-public class AbstractFluentTest<P> {
-
-    private InternalSimulation sim;
+public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
     
-    public AbstractFluentTest() {
-    }
-      
-    public InternalSimulation getSim() {
-        return sim;
+    public AbstractTestableFluent() {
     }
 
-    public void setSim(InternalSimulation sim) {
-        this.sim = sim;
-    }
+    protected abstract TestableFluent<P> addCommand(Command command);
 
     public <T> P test(String reason,
                       T actual,
@@ -54,14 +47,14 @@ public class AbstractFluentTest<P> {
         MVELTestCommand testCmd = new MVELTestCommand();
         testCmd.setText( text );
         
-        sim.addCommand( testCmd );
+        addCommand(testCmd);
         return (P) this;
     }
     
     public <T> P test(ReflectiveMatcherAssert matcherAssert) {
         ReflectiveMatcherAssertCommand matcherCmd = new ReflectiveMatcherAssertCommand( matcherAssert );
 
-        sim.addCommand( matcherCmd );
+        addCommand(matcherCmd);
         return (P) this;
     }
 

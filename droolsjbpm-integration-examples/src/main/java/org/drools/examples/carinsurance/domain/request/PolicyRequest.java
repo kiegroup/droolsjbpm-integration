@@ -18,7 +18,6 @@ package org.drools.examples.carinsurance.domain.request;
 
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.Driver;
-import org.drools.examples.carinsurance.domain.policy.Policy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +28,9 @@ public class PolicyRequest {
     private Car car;
     private List<CoverageRequest> coverageRequestList = new ArrayList<CoverageRequest>();
 
-    private boolean automaticallyDisapproved = false;
-    private List<String> disapprovalMessageList = new ArrayList<String>();
+    private boolean automaticallyRejected = false;
+    private List<String> rejectedMessageList = new ArrayList<String>();
+    private List<String> flaggedMessageList = new ArrayList<String>();
     private boolean requiresManualApproval = false;
     private boolean manuallyApproved = false;
 
@@ -62,12 +62,16 @@ public class PolicyRequest {
         return coverageRequestList;
     }
 
-    public boolean isAutomaticallyDisapproved() {
-        return automaticallyDisapproved;
+    public boolean isAutomaticallyRejected() {
+        return automaticallyRejected;
     }
 
-    public void setAutomaticallyDisapproved(boolean automaticallyDisapproved) {
-        this.automaticallyDisapproved = automaticallyDisapproved;
+    public void setAutomaticallyRejected(boolean automaticallyRejected) {
+        this.automaticallyRejected = automaticallyRejected;
+    }
+
+    public List<String> getRejectedMessageList() {
+        return rejectedMessageList;
     }
 
     public boolean isRequiresManualApproval() {
@@ -86,8 +90,8 @@ public class PolicyRequest {
         this.manuallyApproved = manuallyApproved;
     }
 
-    public List<String> getDisapprovalMessageList() {
-        return disapprovalMessageList;
+    public List<String> getFlaggedMessageList() {
+        return flaggedMessageList;
     }
 
     // ############################################################################
@@ -99,8 +103,16 @@ public class PolicyRequest {
         coverageRequestList.add(coverageRequest);
     }
 
-    public void addDisapprovalMessage(String disapprovalMessage) {
-        disapprovalMessageList.add(disapprovalMessage);
+    public void addRejectedMessage(String rejectedMessage) {
+        rejectedMessageList.add(rejectedMessage);
+    }
+
+    public void addFlaggedMessage(String flaggedMessage) {
+        flaggedMessageList.add(flaggedMessage);
+    }
+
+    public boolean isApproved() {
+        return !automaticallyRejected && (!requiresManualApproval || manuallyApproved);
     }
     
 }

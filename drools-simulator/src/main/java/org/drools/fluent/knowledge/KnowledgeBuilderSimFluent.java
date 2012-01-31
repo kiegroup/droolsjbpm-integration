@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 JBoss Inc
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.drools.fluent;
 
-import java.util.Map;
+package org.drools.fluent.knowledge;
 
-/**
- *
- * @author salaboy
- */
-public interface FluentStatefulProcessSession<T> {
+import org.drools.fluent.FluentKnowledgeBuilder;
+import org.drools.fluent.test.TestableFluent;
+import org.drools.fluent.simulation.SimulationFluent;
 
-    T startProcess(String identifier, Map<String, Object> params);
 
-    T startProcess(String identifier);
+public interface KnowledgeBuilderSimFluent extends FluentKnowledgeBuilder<KnowledgeBuilderSimFluent>, TestableFluent<KnowledgeBuilderSimFluent> {
 
-    T createProcessInstance(String identifier, Map<String, Object> params);
+    SimulationFluent end(String context, String name);
+    SimulationFluent end(String name);
+    SimulationFluent end();
 
-    T startProcessInstnace(long processId);
-    
-    T signalEvent(String id, Object event, long processId);
-    
-    T signalEvent(String id, Object event);
 }

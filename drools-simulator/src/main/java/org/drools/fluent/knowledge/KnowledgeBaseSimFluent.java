@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.compact;
+package org.drools.fluent.knowledge;
 
 import org.drools.fluent.FluentKnowledgeBase;
-import org.drools.fluent.FluentTest;
+import org.drools.fluent.test.TestableFluent;
+import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.fluent.simulation.SimulationFluent;
 
-public interface FluentCompactKnowledgeBase extends FluentKnowledgeBase<FluentCompactKnowledgeBase>, FluentTest<FluentCompactKnowledgeBase> {
-    
-    FluentCompactStatefulKnowledgeSession end();
-    
+
+public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, TestableFluent<KnowledgeBaseSimFluent> {
+
+    SimulationFluent end(String context, String name);
+
+    SimulationFluent end(String name);
+
+    SimulationFluent end();
+        
 }

@@ -16,37 +16,37 @@
 
 package org.drools.simulation.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
 
-public class SimulationPathImpl
-        implements SimulationPath {
+public class SimulationPathImpl implements SimulationPath {
 
-    private SimulationImpl   simulation;
+    private Simulation   simulation;
+    private String       name;
 
-    private String           name;
-
-    private Collection<SimulationStep> steps;
+    private List<SimulationStep> steps = new ArrayList<SimulationStep>();
 
     public SimulationPathImpl(Simulation simulation,
             String name) {
         this.name = name;
-        this.simulation = (SimulationImpl) simulation;
-    }
-
-    public void setSteps(Collection<SimulationStep> steps) {
-        this.steps = steps;
+        this.simulation = simulation;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public Collection<SimulationStep> getSteps() {
+    public List<SimulationStep> getSteps() {
         return this.steps;
+    }
+
+    public void setSteps(List<SimulationStep> steps) {
+        this.steps = steps;
     }
 
     @Override

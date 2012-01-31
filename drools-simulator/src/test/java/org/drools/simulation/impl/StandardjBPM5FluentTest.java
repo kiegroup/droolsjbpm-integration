@@ -27,22 +27,17 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceType;
 import org.drools.command.World;
 import org.drools.fluent.VariableContext;
-import org.drools.fluent.compact.FluentCompactSimulation;
-import org.drools.fluent.compact.imp.FluentCompactSimulationImpl;
-import org.drools.fluent.standard.FluentStandardSimulation;
-import org.drools.fluent.standard.imp.FluentStandardSimulationImpl;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.io.ResourceFactory;
-import org.hamcrest.Matcher;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class StandardjBPM5FluentTest {
 
     @Test
     public void testUsingImplicit() {
-        FluentStandardSimulation f = new FluentStandardSimulationImpl();        
+        SimulationFluent f = new DefaultSimulationFluent();
         
         VariableContext<Person> pc = f.<Person> getVariableContext();
 
@@ -120,19 +115,8 @@ public class StandardjBPM5FluentTest {
                     .startProcess("DummyProcess")
                     .fireAllRules()
                     .end()
-                .end();
-       
+                .runSimulation();
         // @formatter:on
-
-        runSimulation( f );
     }
-    
-    private void runSimulation(FluentStandardSimulation f) {
-        SimulationImpl sim = (SimulationImpl) ((FluentStandardSimulationImpl) f).getSimulation();
-    
-        Simulator simulator = new Simulator( sim,
-                                             new Date().getTime() );
-        simulator.run();
-    }       
 
 }
