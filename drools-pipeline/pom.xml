@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>5.4.0-SNAPSHOT</version>
+    <version>5.4.0.Beta2</version>
   </parent>
 
   <artifactId>drools-pipeline</artifactId>
@@ -29,13 +29,17 @@
       <artifactId>drools-compiler</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-spring</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-grid-impl</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.drools</groupId>-->
+      <!--<artifactId>drools-grid-impl</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>

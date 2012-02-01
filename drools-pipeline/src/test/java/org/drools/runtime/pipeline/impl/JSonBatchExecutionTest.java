@@ -53,8 +53,6 @@ import org.drools.common.InternalRuleBase;
 import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
@@ -1808,69 +1806,69 @@ public class JSonBatchExecutionTest {
         assertTrue( outXml.indexOf( "\"price\":30" ) >= 0 );
     }
 
-    @Test
-    public void testVsmPipeline() throws Exception {
-        String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
-        str += "rule rule1 \n";
-        str += "  when \n";
-        str += "    $c : Cheese() \n";
-        str += " \n";
-        str += "  then \n";
-        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
-        str += "end\n";
-
-        String inXml = "";
-        inXml += "{\"batch-execution\":{\"lookup\":\"ksession1\", \"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
-        inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += "]}}";
-        inXml = roundTripFromXml( inXml );
-        
-        GridImpl grid = new GridImpl( new HashMap() );
-        grid.addService( WhitePages.class, new WhitePagesImpl() );
-        GridNode node = grid.createGridNode( "local" );
-        
-        StatefulKnowledgeSession ksession = getExecutionNodeSessionStateful(node, ResourceFactory.newByteArrayResource( str.getBytes() ) );
-
-        node.set( "ksession1", ksession );
-
-        XStreamResolverStrategy xstreamStrategy = new XStreamResolverStrategy() {
-            public XStream lookup(String name) {
-                return BatchExecutionHelper.newJSonMarshaller();
-            }
-        };
-
-        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
-        getPipelineSessionStateful(node, xstreamStrategy).insert(inXml, resultHandler);
-        String outXml = (String) resultHandler.getObject();
-
-        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
-        Cheese stilton = (Cheese) result.getValue( "outStilton" );
-        assertEquals( 30,
-                      stilton.getPrice() );
-
-        FactHandle factHandle = (FactHandle) result.getFactHandle( "outStilton" );
-        stilton = (Cheese) ksession.getObject( factHandle );
-        assertEquals( 30,
-                      stilton.getPrice() );
-
-//        String expectedXml = "";
-//        expectedXml += "<execution-results>\n";
-//        expectedXml += "  <result identifier=\"outStilton\">\n";
-//        expectedXml += "    <org.drools.Cheese>\n";
-//        expectedXml += "      <type>stilton</type>\n";
-//        expectedXml += "      <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      <price>30</price>\n";
-//        expectedXml += "    </org.drools.Cheese>\n";
-//        expectedXml += "  </result>\n";
-//        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
-//        expectedXml += "</execution-results>\n";
+//    @Test
+//    public void testVsmPipeline() throws Exception {
+//        String str = "";
+//        str += "package org.drools \n";
+//        str += "import org.drools.Cheese \n";
+//        str += "rule rule1 \n";
+//        str += "  when \n";
+//        str += "    $c : Cheese() \n";
+//        str += " \n";
+//        str += "  then \n";
+//        str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
+//        str += "end\n";
 //
-//        assertXMLEqual( expectedXml,
-//                        outXml );
-    }
+//        String inXml = "";
+//        inXml += "{\"batch-execution\":{\"lookup\":\"ksession1\", \"commands\":[";
+//        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+//        inXml += ", {\"fire-all-rules\":\"\"}";
+//        inXml += "]}}";
+//        inXml = roundTripFromXml( inXml );
+//
+//        GridImpl grid = new GridImpl( new HashMap() );
+//        grid.addService( WhitePages.class, new WhitePagesImpl() );
+//        GridNode node = grid.createGridNode( "local" );
+//
+//        StatefulKnowledgeSession ksession = getExecutionNodeSessionStateful(node, ResourceFactory.newByteArrayResource( str.getBytes() ) );
+//
+//        node.set( "ksession1", ksession );
+//
+//        XStreamResolverStrategy xstreamStrategy = new XStreamResolverStrategy() {
+//            public XStream lookup(String name) {
+//                return BatchExecutionHelper.newJSonMarshaller();
+//            }
+//        };
+//
+//        ResultHandlerImpl resultHandler = new ResultHandlerImpl();
+//        getPipelineSessionStateful(node, xstreamStrategy).insert(inXml, resultHandler);
+//        String outXml = (String) resultHandler.getObject();
+//
+//        ExecutionResults result = (ExecutionResults) BatchExecutionHelper.newJSonMarshaller().fromXML( outXml );
+//        Cheese stilton = (Cheese) result.getValue( "outStilton" );
+//        assertEquals( 30,
+//                      stilton.getPrice() );
+//
+//        FactHandle factHandle = (FactHandle) result.getFactHandle( "outStilton" );
+//        stilton = (Cheese) ksession.getObject( factHandle );
+//        assertEquals( 30,
+//                      stilton.getPrice() );
+//
+////        String expectedXml = "";
+////        expectedXml += "<execution-results>\n";
+////        expectedXml += "  <result identifier=\"outStilton\">\n";
+////        expectedXml += "    <org.drools.Cheese>\n";
+////        expectedXml += "      <type>stilton</type>\n";
+////        expectedXml += "      <oldPrice>0</oldPrice>\n";
+////        expectedXml += "      <price>30</price>\n";
+////        expectedXml += "    </org.drools.Cheese>\n";
+////        expectedXml += "  </result>\n";
+////        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
+////        expectedXml += "</execution-results>\n";
+////
+////        assertXMLEqual( expectedXml,
+////                        outXml );
+//    }
 
     private Pipeline getPipeline(StatelessKnowledgeSession ksession) {
         Action executeResultHandler = PipelineFactory.newExecuteResultHandler();
