@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>5.4.0-SNAPSHOT</version>
+    <version>5.4.0.Beta2</version>
   </parent>
 
   <artifactId>droolsjbpm-integration-distribution</artifactId>
@@ -79,15 +79,15 @@
       <artifactId>drools-pipeline</artifactId>
       <classifier>sources</classifier>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-impl</artifactId>
-    </dependency>
-    <dependency>
+    </dependency-->
+    <!--dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-impl</artifactId>
       <classifier>sources</classifier>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-simulator</artifactId>
