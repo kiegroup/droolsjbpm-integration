@@ -55,7 +55,7 @@ public class JxlsTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         // kbuilder.add( ResourceFactory.newClassPathResource( "test_JXLS.drl", getClass() ), ResourceType.DRL );
         
-        ClassLoader cl = ((KnowledgeBuilderImpl)kbuilder).pkgBuilder.getRootClassLoader();
+        ClassLoader cl = ((KnowledgeBuilderImpl)kbuilder).getPackageBuilder().getRootClassLoader();
         Thread.currentThread().setContextClassLoader( cl );
 
         InputStream inputXLS = new BufferedInputStream(getClass().getResourceAsStream( "departmentData.xls"));
