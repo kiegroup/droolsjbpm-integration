@@ -16,38 +16,38 @@
 
 package org.drools.examples.broker
 
-# importing classes
+// importing classes
 import org.drools.examples.broker.model.Company
 import org.drools.examples.broker.model.StockTick
 import org.drools.examples.broker.model.SuddenDropEvent
 
-# it is possible to import static methods as functions for usage in the rules
+// it is possible to import static methods as functions for usage in the rules
 import org.drools.examples.broker.misc.BrokerUtils
 
-# a common pattern is to expose services to rules through
-# a helper service class
+// a common pattern is to expose services to rules through
+// a helper service class
 global org.drools.examples.broker.BrokerServices services
 
-# default dialect for the semantic code will be MVEL
+// default dialect for the semantic code will be MVEL
 dialect "mvel"
  
-# tells the engine that a StockTick instance will assume the
-# role (semantics) of events and that the default retention 
-# policy will be 2 minutes 
+// tells the engine that a StockTick instance will assume the
+// role (semantics) of events and that the default retention
+// policy will be 2 minutes
 declare StockTick
     @role( event )
     @expires( 2m )
 end 
 
-# an event declaration to represent situations
-# where a sudden drop happens. In this case we are not
-# defining any explicit expiration policy. 
+// an event declaration to represent situations
+// where a sudden drop happens. In this case we are not
+// defining any explicit expiration policy.
 declare SuddenDropEvent
     @role( event )
 end
 
-# One can even declare helper facts to make rules easier and
-# simpler to write and maintain
+// One can even declare helper facts to make rules easier and
+// simpler to write and maintain
 declare Statistics
     symbol : String @key()
     average : double
@@ -63,9 +63,9 @@ then
    insert( s );
 end
 
-# a simple rule to show that it is possible to join
-# events from an entry-point (stream) with facts 
-# present in the working memory
+// a simple rule to show that it is possible to join
+// events from an entry-point (stream) with facts
+// present in the working memory
 rule "Update stock price"
     agenda-group "evaluation"
     lock-on-active
@@ -83,8 +83,8 @@ then
     modify( $st ) { delta = $cp.delta }
 end
 
-# a low salience rule is used some times to change rule execution phases.
-# in this case, it moves processing from "evaluation" to "report" phase.
+// a low salience rule is used some times to change rule execution phases.
+// in this case, it moves processing from "evaluation" to "report" phase.
 rule "evaluation done"
     agenda-group "evaluation"
     salience -10
@@ -94,8 +94,8 @@ then
     drools.setFocus( "report" );
 end
 
-# this rule shows a trick to get the last available event as well as 
-# how to call global services from the consequence
+// this rule shows a trick to get the last available event as well as
+// how to call global services from the consequence
 rule "sudden drop"
     enabled true
     agenda-group "report"

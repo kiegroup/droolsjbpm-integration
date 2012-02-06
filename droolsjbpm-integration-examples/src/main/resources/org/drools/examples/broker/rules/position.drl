@@ -26,14 +26,14 @@ import function org.drools.examples.broker.misc.BrokerUtils.selectAction
 
 dialect "mvel"
 
-# an event declaration to represent situations
-# where a sudden drop happens. In this case we are not
-# defining any explicit expiration policy. 
+// an event declaration to represent situations
+// where a sudden drop happens. In this case we are not
+// defining any explicit expiration policy.
 declare SuddenDropEvent
     @role( event )
 end
 
-# here we have an example of a rule that controls a process
+// here we have an example of a rule that controls a process
 rule "Start adjust position process"
 when
     $sde : SuddenDropEvent( ) from entry-point "Analysis Events"
@@ -43,9 +43,9 @@ then
 end
 
 
-# below we have rules controlled by the process,
-# i.e., the process will fire these rules when necessary
-# to re-evaluate the position
+// below we have rules controlled by the process,
+// i.e., the process will fire these rules when necessary
+// to re-evaluate the position
 rule "If the drop is between 6% and 8%, buy more shares"
     ruleflow-group "evaluate position"
 when
