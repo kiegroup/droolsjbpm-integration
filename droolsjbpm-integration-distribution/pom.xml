@@ -86,7 +86,7 @@
       <artifactId>drools-camel-server</artifactId>
       <classifier>sources</classifier>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-pipeline</artifactId>
     </dependency>
@@ -112,7 +112,7 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-simulator</artifactId>
       <classifier>sources</classifier>
-    </dependency>
+    </dependency-->
 
     <!-- Examples -->
     <dependency>
