@@ -44,4 +44,21 @@ public class MockAgendaEventListener implements AgendaEventListener {
     public void agendaGroupPushed(AgendaGroupPushedEvent agendaGroupPushedEvent) {
         System.out.println("MockAgendaEventListener:: agendaGroupPushed");
     }
+
+    public void beforeRuleFlowGroupActivated(RuleFlowGroupActivatedEvent event) {
+        System.out.println("MockAgendaEventListener:: beforeRuleFlowGroupActivated");
+    }
+
+    public void afterRuleFlowGroupActivated(RuleFlowGroupActivatedEvent event) {
+        System.out.println("MockAgendaEventListener:: afterRuleFlowGroupActivated");
+    }
+
+    public void beforeRuleFlowGroupDeactivated(RuleFlowGroupDeactivatedEvent event) {
+        System.out.println("MockAgendaEventListener:: beforeRuleFlowGroupDeactivated");
+    }
+
+    public void afterRuleFlowGroupDeactivated(RuleFlowGroupDeactivatedEvent event) {
+        System.out.println("MockAgendaEventListener:: afterRuleFlowGroupDeactivated");
+    }
+
 }
