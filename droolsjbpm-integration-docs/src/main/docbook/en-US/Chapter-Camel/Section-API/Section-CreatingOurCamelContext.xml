@@ -22,6 +22,4 @@ CamelContext camelContext = new DefaultCamelContext(jndiContext);</programlistin
   <para>After this code, we have a properly configured CamelContext with all
   the configurations to use a DroolsComponent. However, before we are ready to
   execute Drools, we need to configure Camel entry points.</para>
-
-  <para></para>
 </section>
