@@ -31,11 +31,15 @@
 
 package org.drools.camel.component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.drools.command.BatchExecutionCommand;
+import org.drools.command.Command;
 import org.drools.command.CommandFactory;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
@@ -70,6 +74,8 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
                     response != null );
         assertTrue( "ExecutionResults missing expected fact",
                     response.getFactHandle( "salaboy" ) != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) instanceof FactHandle);
     }
 
     @Test
@@ -80,14 +86,33 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
         InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert( person,
                                                                                   "salaboy" );
 
-        ExecutionResults response = (ExecutionResults) template.requestBodyAndHeader( "direct:test-no-session",
-                                                                                      cmd,
-                                                                                      DroolsComponent.DROOLS_LOOKUP,
-                                                                                      "ksession1" );
+        ExecutionResults response = (ExecutionResults) template.requestBodyAndHeader("direct:test-no-session",
+                cmd,
+                DroolsComponent.DROOLS_LOOKUP,
+                "ksession1");
         assertTrue( "Expected valid ExecutionResults object",
                     response != null );
         assertTrue( "ExecutionResults missing expected fact",
                     response.getFactHandle( "salaboy" ) != null );
+    }
+
+    @Test
+    public void testSessionBatchExecutionCommand() throws Exception {
+        Person john = new Person();
+        john.setName("John Smith");
+
+        List<Command> commands = new ArrayList<Command>();
+        commands.add(CommandFactory.newInsert(john, "john"));
+        BatchExecutionCommand batchExecutionCommand = CommandFactory.newBatchExecution(commands);
+
+        ExecutionResults response = (ExecutionResults) template.requestBody("direct:test-with-session",
+                batchExecutionCommand);
+        assertTrue( "Expected valid ExecutionResults object",
+                response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                response.getFactHandle( "john" ) != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                response.getFactHandle( "john" ) instanceof FactHandle);
     }
 
     @Test
@@ -101,9 +126,9 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
         assertTrue( "Expected valid ExecutionResults object",
                     response != null );
         assertTrue( "ExecutionResults missing expected object",
-                    response.getValue( "rider" ) != null );
-        assertTrue( "FactHandle object not of expected type",
-                    response.getValue( "rider" ) instanceof Person );
+                    response.getValue("rider") != null );
+        assertTrue("FactHandle object not of expected type",
+                response.getValue("rider") instanceof Person);
         assertEquals( "Hadrian",
                       ((Person) response.getValue( "rider" )).getName() );
     }
