@@ -31,7 +31,7 @@
     </listitem>
   </itemizedlist>
 
-  <para>Drools can be configured like any norma camel component, but notice
+  <para>Drools can be configured like any normal camel component, but notice
   the policy that wraps the drools related segments. This will route all
   payloads to ksession1</para>
 
