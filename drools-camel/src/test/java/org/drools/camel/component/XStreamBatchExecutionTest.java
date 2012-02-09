@@ -554,7 +554,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <modify fact-handle='" + factHandle.toExternalForm() + "'> <set accessor='oldPrice' value='\"42\"' /><set accessor='price' value='50' /></modify>";
+        inXml += "  <modify fact-handle='" + factHandle.toExternalForm() + "'> <set accessor='oldPrice' value='42' /><set accessor='price' value='50' /></modify>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
         template.requestBody( "direct:exec",

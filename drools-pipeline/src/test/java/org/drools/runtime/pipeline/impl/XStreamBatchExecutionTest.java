@@ -483,7 +483,7 @@ public class XStreamBatchExecutionTest {
 
         inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <modify fact-handle='" + factHandle.toExternalForm() + "'> <set accessor='oldPrice' value='\"42\"' /><set accessor='price' value='50' /></modify>";
+        inXml += "  <modify fact-handle='" + factHandle.toExternalForm() + "'> <set accessor='oldPrice' value='42' /><set accessor='price' value='50' /></modify>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
         getPipelineStateful( ksession ).insert( inXml,

@@ -148,7 +148,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         cmd += "<batch-execution lookup='ksession1'>\n";
         cmd += "   <modify fact-handle='" + handle + "'>\n";
         cmd += "      <setters>";
-        cmd += "          <item accessor='name' value='\"salaboy\"' />\n";
+        cmd += "          <item accessor='name' value='salaboy' />\n";
         cmd += "      </setters>\n";
         cmd += "   </modify>\n";
         cmd += "</batch-execution>\n";
