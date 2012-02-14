@@ -193,7 +193,7 @@ public class StatefulKnowledgeSessionRemoteClient
             logger.debug(" ### Calling Execute from the SKS Remote Client with instanceId: "+instanceId);
         }
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new ExecuteCommand(kresultsId, command , true),
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new ExecuteCommand( command , true),
                                                                                                                       null,
                                                                                                                       null,
                                                                                                                       this.instanceId,
