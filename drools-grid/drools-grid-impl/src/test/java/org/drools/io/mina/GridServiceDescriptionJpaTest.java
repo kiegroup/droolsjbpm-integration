@@ -26,7 +26,7 @@ public class GridServiceDescriptionJpaTest {
         GridServiceDescription<WhitePages> gsd1 = wp.create( WhitePages.class.getName() );
         gsd1.setServiceInterface(  WhitePages.class );
         gsd1.addAddress( "socket" ).setObject( new InetSocketAddress( "127.0.0.1",
-                                                                      5011 ) );
+                                                                      8010 ) );
         gsd1.addAddress( "p1" ).setObject( "v1" );
 
         EntityManager em = emf.createEntityManager();
@@ -38,7 +38,7 @@ public class GridServiceDescriptionJpaTest {
         GridServiceDescriptionImpl gsd2 = new GridServiceDescriptionImpl( "s1" );
         gsd2.setServiceInterface( WhitePages.class );
         gsd2.addAddress( "socket" ).setObject( new InetSocketAddress( "127.0.0.1",
-                                                                      5012 ) );
+                                                                      8000 ) );
         gsd2.addAddress( "p2" ).setObject( "v2" );
 
         em = emf.createEntityManager();
@@ -54,7 +54,7 @@ public class GridServiceDescriptionJpaTest {
         assertEquals( gsd1,
                       gsd1r );
         assertEquals( new InetSocketAddress( "127.0.0.1",
-                                             5011 ),
+                                             8010 ),
                       gsd1.getAddresses().get( "socket" ).getObject() );
         assertEquals( "v1",
                       gsd1.getAddresses().get( "p1" ).getObject() );
@@ -65,7 +65,7 @@ public class GridServiceDescriptionJpaTest {
         assertEquals( gsd2,
                       gsd2r );
         assertEquals( new InetSocketAddress( "127.0.0.1",
-                                             5012 ),
+                                             8000 ),
                       gsd2.getAddresses().get( "socket" ).getObject() );
         assertEquals( "v2",
                       gsd2.getAddresses().get( "p2" ).getObject() );

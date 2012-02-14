@@ -4,8 +4,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -16,15 +14,14 @@ import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
-import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
+import org.junit.Ignore;
 
 public class LocalGridNodeTest {
 
@@ -80,7 +77,7 @@ public class LocalGridNodeTest {
         GridNode gnode = grid.createGridNode( "test1@local" );
 
         WhitePages pages = grid.get( WhitePages.class );
-        GridServiceDescription<GridNode> gsd = pages.create( "test1@local" );
+        GridServiceDescription<GridNode> gsd = pages.create( "test1@local");
         
         GridServiceDescription<GridNode> serviceDescription = pages.lookup( "test1@local" );
 

@@ -30,19 +30,17 @@ import org.drools.runtime.rule.QueryResultsRow;
 public class GetFactHandleFromQueryResultsRowRemoteCommand implements GenericCommand<FactHandle>{
     private String queryName;
     private String localId;
-    private String queryResultsId;
     private String rowId;
     private String identifier;
     public GetFactHandleFromQueryResultsRowRemoteCommand(String rowId, String queryName, String localId, String identifier) {
         this.queryName = queryName;
         this.localId = localId;
-        this.queryResultsId = this.localId + this.queryName;
         this.rowId = rowId;
         this.identifier = identifier;
     }
     
     public FactHandle execute(Context context) {
-        FactHandle handle = ((QueryResultsRow) context.get( "Row - "+rowId+" - "+this.queryResultsId)).getFactHandle(identifier);
+        FactHandle handle = ((QueryResultsRow) context.get( "Row - "+rowId+" - "+this.localId)).getFactHandle(identifier);
         if(handle instanceof DefaultFactHandle){
             FactHandle disconnectedHandle = ((DefaultFactHandle)handle).clone();
             ((DefaultFactHandle)disconnectedHandle).disconnect();

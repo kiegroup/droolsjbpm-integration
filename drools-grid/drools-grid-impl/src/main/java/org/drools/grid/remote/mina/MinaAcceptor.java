@@ -15,10 +15,13 @@ import org.drools.grid.DaemonService;
 import org.drools.grid.io.Acceptor;
 import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.MessageReceiverHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MinaAcceptor
     implements
     Acceptor {
+    private static Logger logger = LoggerFactory.getLogger(MinaAcceptor.class);
     private IoAcceptor             acceptor;
 
     private MessageReceiverHandler handler;
@@ -33,6 +36,9 @@ public class MinaAcceptor
     public synchronized void open(InetSocketAddress address,
                                   MessageReceiverHandler handler,
                                   SystemEventListener systemEventListener) {
+        if(logger.isTraceEnabled()){
+            logger.trace(" ### Binding a new SocketAcceptor to "+address.getHostName()+":"+address.getPort());
+        }
         if ( this.acceptor == null ) {
             acceptor = new NioSocketAcceptor();
 

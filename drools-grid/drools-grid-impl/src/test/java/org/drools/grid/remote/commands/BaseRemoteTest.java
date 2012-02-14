@@ -68,15 +68,17 @@ public abstract class BaseRemoteTest {
     public void tearDown() {
         remoteN1.dispose();
         grid1.get(SocketService.class).close();
+        
+        
     }
     
     private void createRemoteNode(){
-        grid1 = new GridImpl( new HashMap<String, Object>() );
+        grid1 = new GridImpl("peer1", new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
                         null );
 
-        Grid grid2 = new GridImpl( new HashMap<String, Object>() );
+        Grid grid2 = new GridImpl("peer2", new HashMap<String, Object>() );
         configureGrid1( grid2,
                         -1,
                         grid1.get( WhitePages.class ) );
@@ -137,8 +139,8 @@ public abstract class BaseRemoteTest {
          String rule = "package test\n"
                  + "import org.drools.grid.NodeTests.MyObject;\n"
                  + "global MyObject myGlobalObj;\n"
-                 + "query getMyObjects()\n"
-                 + "  $mo: MyObject()\n"
+                 + "query getMyObjects(String n)\n"
+                 + "  $mo: MyObject(name == n)\n"
                  + "end\n"
                  + "rule \"test\""
                  + "  when"
@@ -159,15 +161,18 @@ public abstract class BaseRemoteTest {
             }
             fail("KnowledgeBase did not build");
         }
-//        KnowledgeBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
-//        kbaseConf.setProperty(AssertBehaviorOption.PROPERTY_NAME, "equality");
-        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        KnowledgeBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
+        kbaseConf.setProperty(AssertBehaviorOption.PROPERTY_NAME, "equality");
+        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(kbaseConf);
 
         assertNotNull( kbase );
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+        
+        remoteN1.set("ksession-rules", session);
+        
         return session;
     
     }
@@ -220,6 +225,9 @@ public abstract class BaseRemoteTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+        
+        remoteN1.set("ksession-processes", session);
+        
         return session;
     
     }

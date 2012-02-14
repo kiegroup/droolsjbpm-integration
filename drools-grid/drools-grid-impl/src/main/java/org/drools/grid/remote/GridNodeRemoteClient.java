@@ -31,6 +31,7 @@ import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 
@@ -53,6 +54,31 @@ public class GridNodeRemoteClient<T>
 
     public <T> T get(String identifier,
                      Class<T> cls) {
+        //@TODO: this was done just as a hack to have the information ready, requires review and refactoring
+        if(cls.isAssignableFrom(String.class)){
+            CommandImpl cmd = new CommandImpl( "lookupKsessionId",
+                                               Arrays.asList( new Object[]{identifier} ) );
+
+            ConversationManager connm = this.grid.get( ConversationManager.class );
+            Object result = ConversationUtil.sendMessage( connm,
+                                          (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                                          this.gsd.getId(),
+                                          cmd );
+            return (T)result;
+        }
+        if(cls.isAssignableFrom(StatefulKnowledgeSession.class) ){
+            CommandImpl cmd = new CommandImpl( "lookupKsession",
+                                               Arrays.asList( new Object[]{identifier} ) );
+
+            ConversationManager connm = this.grid.get( ConversationManager.class );
+            Object result = ConversationUtil.sendMessage( connm,
+                                          (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                                          this.gsd.getId(),
+                                          cmd );
+            
+            
+            return (T)new StatefulKnowledgeSessionRemoteClient((String)result, gsd, connm);
+        }
         T service = (T) localContext.get( identifier );
         if ( service == null ) {
             service = this.serviceRegistry.get( cls );

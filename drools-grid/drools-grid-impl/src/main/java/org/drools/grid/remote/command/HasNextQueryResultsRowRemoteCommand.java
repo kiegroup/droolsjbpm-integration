@@ -18,7 +18,7 @@ package org.drools.grid.remote.command;
 
 import java.util.Iterator;
 import org.drools.command.Context;
-import org.drools.command.ContextManager;
+import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResultsRow;
 
@@ -29,15 +29,15 @@ import org.drools.runtime.rule.QueryResultsRow;
 public class HasNextQueryResultsRowRemoteCommand implements GenericCommand<Boolean>{
     private String queryName;
     private String localId;
-    private String queryResultsId;
+    
     public HasNextQueryResultsRowRemoteCommand(String queryName, String localId) {
         this.queryName = queryName;
         this.localId = localId;
-        this.queryResultsId = this.localId + this.queryName;
+        
     }
     
     public Boolean execute(Context context) {
-        Iterator<QueryResultsRow>  it = (Iterator<QueryResultsRow>) context.getContextManager().getContext( ContextManager.ROOT ).get( "Iterator - "+this.queryResultsId);
+        Iterator<QueryResultsRow>  it = (Iterator<QueryResultsRow>) context.getContextManager().getContext( World.ROOT ).get( "Iterator - "+this.localId);
         return it.hasNext();
     }
     

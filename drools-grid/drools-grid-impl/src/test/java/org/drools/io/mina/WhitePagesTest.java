@@ -41,7 +41,7 @@ public class WhitePagesTest {
 
         SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
 
-        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        GridImpl grid1 = new GridImpl("peer1", new ConcurrentHashMap<String, Object>() );
 
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
@@ -57,11 +57,11 @@ public class WhitePagesTest {
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
         conf.addConfiguration( wplConf );
 
-        socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 5012 );
+        socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 8000 );
 
         conf.configure( grid1 );
 
-        GridImpl grid2 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        GridImpl grid2 = new GridImpl( "peer2", new ConcurrentHashMap<String, Object>() );
         conf = new GridPeerConfiguration();
 
         //coreServicesMap = Hazelcast.newHazelcastInstance( null ).getMap( CoreServicesLookup.class.getName() );

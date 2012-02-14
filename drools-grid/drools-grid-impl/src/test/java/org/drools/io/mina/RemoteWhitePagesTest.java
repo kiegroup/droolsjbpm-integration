@@ -41,7 +41,7 @@ public class RemoteWhitePagesTest {
 
         SystemEventListener l = SystemEventListenerFactory.getSystemEventListener();
 
-        GridImpl grid1 = new GridImpl( new ConcurrentHashMap<String, Object>() );
+        GridImpl grid1 = new GridImpl("peer", new ConcurrentHashMap<String, Object>() );
 
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
@@ -58,7 +58,7 @@ public class RemoteWhitePagesTest {
         wplConf.setWhitePages( new JpaWhitePages( Persistence.createEntityManagerFactory( "org.drools.grid" ) ) );
         conf.addConfiguration( wplConf );
 
-        socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 5012 );
+        socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 8000 );
 
         conf.configure( grid1 );
 

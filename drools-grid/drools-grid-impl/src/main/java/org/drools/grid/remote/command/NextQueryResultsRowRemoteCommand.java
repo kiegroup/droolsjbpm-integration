@@ -19,7 +19,7 @@ package org.drools.grid.remote.command;
 import java.util.Iterator;
 import java.util.UUID;
 import org.drools.command.Context;
-import org.drools.command.ContextManager;
+import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResultsRow;
 
@@ -30,17 +30,15 @@ import org.drools.runtime.rule.QueryResultsRow;
 public class NextQueryResultsRowRemoteCommand implements GenericCommand<String>{
     private String queryName;
     private String localId;
-    private String queryResultsId;
     public NextQueryResultsRowRemoteCommand(String queryName, String localId) {
         this.queryName = queryName;
         this.localId = localId;
-        this.queryResultsId = this.localId + this.queryName;
     }
     
     public String execute(Context context) {
         String rowId = UUID.randomUUID().toString();
-        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getContext( ContextManager.ROOT ).get( "Iterator - "+this.queryResultsId)).next();
-        context.set("Row - "+rowId+" - "+this.queryResultsId, row);
+        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getContext( World.ROOT ).get( "Iterator - "+this.localId)).next();
+        context.getContextManager().getContext( World.ROOT ).set("Row - "+rowId+" - "+this.localId, row);
         return rowId;
         
     }

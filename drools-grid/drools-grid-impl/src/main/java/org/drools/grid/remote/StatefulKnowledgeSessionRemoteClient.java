@@ -17,6 +17,7 @@
 
 package org.drools.grid.remote;
 
+
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,12 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.drools.KnowledgeBase;
-import org.drools.command.Command;
-import org.drools.command.CommandFactory;
-import org.drools.command.GetSessionClockCommand;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.SetVariableCommandFromCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
+import org.drools.command.*;
 import org.drools.command.runtime.DisposeCommand;
 import org.drools.command.runtime.GetFactCountCommand;
 import org.drools.command.runtime.GetGlobalsCommand;
@@ -76,6 +72,8 @@ import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.ViewChangedEventListener;
 import org.drools.runtime.rule.WorkingMemoryEntryPoint;
 import org.drools.time.SessionClock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatefulKnowledgeSessionRemoteClient
     implements
@@ -83,7 +81,7 @@ public class StatefulKnowledgeSessionRemoteClient
     private String                           instanceId;
     private GridServiceDescription<GridNode> gsd;
     private ConversationManager              cm;
-
+    private static Logger logger = LoggerFactory.getLogger(StatefulKnowledgeSessionRemoteClient.class);
     public StatefulKnowledgeSessionRemoteClient(String localId,
                                                 GridServiceDescription gsd,
                                                 ConversationManager cm) {
@@ -190,7 +188,25 @@ public class StatefulKnowledgeSessionRemoteClient
 
     public <T> T execute(Command<T> command) {
 
-        throw new UnsupportedOperationException( "Not supported yet." );
+        String kresultsId = "kresults_" + this.gsd.getId();
+        if(logger.isDebugEnabled()){
+            logger.debug(" ### Calling Execute from the SKS Remote Client with instanceId: "+instanceId);
+        }
+        CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new ExecuteCommand(kresultsId, command , true),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId ),this.instanceId} ) );
+
+        Object result = ConversationUtil.sendMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+        if(logger.isDebugEnabled()){
+            logger.debug(" ### Execute Method Returns: "+result);
+        }
+        return (T) result;
 
     }
 
@@ -348,12 +364,12 @@ public class StatefulKnowledgeSessionRemoteClient
 
         String localId = "query_" + UUID.randomUUID().toString();
         String kresultsId = "kresults_" + this.gsd.getId();
-
+        
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                           localId,
-                                                                                                          new KnowledgeContextResolveFromContextCommand( new QueryRemoteCommand( localId + query,
-                                                                                                                                                                                 query,
+                                                                                                          new KnowledgeContextResolveFromContextCommand( new QueryRemoteCommand( localId ,
+                                                                                                                                                                                 query, true,
                                                                                                                                                                                  arguments ),
                                                                                                                                                          null,
                                                                                                                                                          null,

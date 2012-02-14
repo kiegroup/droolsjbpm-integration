@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc..
+ * Copyright 2012 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.drools.grid.remote.command;
-
+package org.drools.grid.remote;
 
 import org.drools.command.Context;
 import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
-import org.drools.runtime.rule.QueryResults;
+import org.drools.rule.Declaration;
 
 /**
  *
  * @author salaboy
  */
-public class GetQueryResultsSizeRemoteCommand implements GenericCommand<Integer>{
-    private String queryName;
+public class GetQueryObjectRemoteCommand implements GenericCommand<Object>{
     private String localId;
-    
-    public GetQueryResultsSizeRemoteCommand(String queryName, String localId) {
-        this.queryName = queryName;
+    private String key;
+    public GetQueryObjectRemoteCommand(String localId, String key) {
         this.localId = localId;
-     
+        this.key = key;
     }
     
-    public Integer execute(Context context) {
-        return ((QueryResults)context.getContextManager().getContext( World.ROOT ).get( this.localId )).size();
+    
+    
+    public Object execute(Context context) {
+        Object result = ((org.drools.QueryResults)context.getContextManager()
+                            .getContext( World.ROOT ).get( this.localId+"-native" )).get(0).get(key);
+        return result;
     }
     
 }

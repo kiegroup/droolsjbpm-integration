@@ -84,8 +84,10 @@ public class MessageImpl
     /* (non-Javadoc)
      * @see org.drools.grid.io.impl.Message#toString()
      */
+
     @Override
     public String toString() {
-        return "[Message conversationId=" + this.conversationId + "senderId=" + this.senderId + " requestId=" + this.requestId + " payload=" + this.body + "]";
+        return "MessageImpl{" + "conversationId=" + conversationId + ", senderId=" + senderId + ", recipientId=" + recipientId + ", requestId=" + requestId + ", responseId=" + responseId + ", body=" + body + '}';
     }
+  
 }

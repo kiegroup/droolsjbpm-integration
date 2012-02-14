@@ -1,15 +1,14 @@
 package org.drools.grid.io.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.drools.command.Context;
-import org.drools.command.ContextManager;
+import org.drools.command.World;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.ContextImplWithEviction;
 import org.drools.grid.ContextManagerImpl;
 
 public class NodeData {
-    private ContextManager contextManager;
+    private World contextManager;
 
     private Context        root;
     private Context        temp;
@@ -42,11 +41,11 @@ public class NodeData {
         return this.sessionIdCounter;
     }
 
-    public ContextManager getContextManager() {
+    public World getContextManager() {
         return this.contextManager;
     }
 
-    public void setContextManager(ContextManager contextManager) {
+    public void setContextManager(World contextManager) {
         this.contextManager = contextManager;
     }
 

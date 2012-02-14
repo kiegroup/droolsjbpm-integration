@@ -22,12 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderResults;
-import org.drools.builder.ResourceConfiguration;
-import org.drools.builder.ResourceType;
-import org.drools.builder.ResultSeverity;
+import org.drools.builder.*;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
@@ -125,5 +120,14 @@ public class KnowledgeBuilderRemoteClient
     public boolean hasResults( ResultSeverity... severities ) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
+
+    public void undo() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CompositeKnowledgeBuilder batch() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
 
 }

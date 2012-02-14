@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 JBoss Inc..
+ * Copyright 2012 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.drools.grid.remote.command;
-
+package org.drools.grid.remote;
 
 import org.drools.command.Context;
 import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
-import org.drools.runtime.rule.QueryResults;
+import org.drools.rule.Declaration;
+import org.drools.runtime.rule.impl.NativeQueryResults;
 
 /**
  *
  * @author salaboy
  */
-public class GetQueryResultsSizeRemoteCommand implements GenericCommand<Integer>{
-    private String queryName;
+public class GetQueryParametersRemoteCommand implements GenericCommand<String[]>{
+     private String queryName;
     private String localId;
     
-    public GetQueryResultsSizeRemoteCommand(String queryName, String localId) {
+    public GetQueryParametersRemoteCommand(String queryName, String localId) {
         this.queryName = queryName;
         this.localId = localId;
-     
+        
     }
     
-    public Integer execute(Context context) {
-        return ((QueryResults)context.getContextManager().getContext( World.ROOT ).get( this.localId )).size();
+    public String[] execute(Context context) {
+        Declaration[] parameters = ((org.drools.QueryResults)context.getContextManager().getContext( World.ROOT ).get( this.localId+"-native" )).getParameters();
+        String[] results = new String[parameters.length];
+        int i = 0;
+        for(Declaration param : parameters){
+            results[i]=param.getIdentifier();
+            i++;
+        }
+        return results;
     }
-    
 }

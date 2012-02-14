@@ -17,7 +17,7 @@ package org.drools.grid.remote.command;
 
 
 import org.drools.command.Context;
-import org.drools.command.ContextManager;
+import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
 import org.drools.runtime.rule.QueryResults;
 
@@ -28,15 +28,14 @@ import org.drools.runtime.rule.QueryResults;
 public class GetQueryIdentifiersRemoteCommand implements GenericCommand<String[]>{
     private String queryName;
     private String localId;
-    private String queryResultsId;
     public GetQueryIdentifiersRemoteCommand(String queryName, String localId) {
         this.queryName = queryName;
         this.localId = localId;
-        this.queryResultsId = localId + queryName;
+        
     }
     
     public String[] execute(Context context) {
-        return ((QueryResults)context.getContextManager().getContext( ContextManager.ROOT ).get( this.queryResultsId )).getIdentifiers();
+        return ((QueryResults)context.getContextManager().getContext( World.ROOT ).get( this.localId )).getIdentifiers();
     }
     
 }

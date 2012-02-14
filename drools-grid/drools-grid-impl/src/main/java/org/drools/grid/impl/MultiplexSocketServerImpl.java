@@ -16,6 +16,8 @@ import org.drools.grid.io.Acceptor;
 import org.drools.grid.io.AcceptorFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.local.LocalGridNodeConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MultiplexSocketServerImpl
     implements
@@ -29,6 +31,8 @@ public class MultiplexSocketServerImpl
     private Map<Integer, Acceptor> acceptors;
     
     private Grid                   grid;
+    
+    private static Logger logger = LoggerFactory.getLogger(MultiplexSocketServerImpl.class);
 
     public MultiplexSocketServerImpl(String ip,
                                      AcceptorFactoryService factory,
@@ -56,7 +60,9 @@ public class MultiplexSocketServerImpl
             acc = factory.newAcceptor();
 
             MultiplexSocket ms = new MultiplexSocket();
-
+            if(logger.isTraceEnabled()){
+                    logger.trace(" ### Opening Acceptor: "+port);
+                }
             acc.open( new InetSocketAddress( this.ip,
                                              port ),
                                              ms,
@@ -66,8 +72,7 @@ public class MultiplexSocketServerImpl
         }
 
         MultiplexSocket ms = (MultiplexSocket) acc.getMessageReceiverHandler();
-        ms.getHandlers().put( id,
-                              handlerFactory.getMessageReceiverHandler() );
+        ms.getHandlers().put( id, h );
         handlerFactory.registerSocketService( this.grid, id, this.ip, port );
     }
 
@@ -79,7 +84,7 @@ public class MultiplexSocketServerImpl
         Acceptor acc = this.acceptors.get( socket );
         if ( acc != null ) {
             MultiplexSocket ms = (MultiplexSocket) acc.getMessageReceiverHandler();
-            ms.getHandlers().remove( id );
+            ms.getHandlers().remove( id  );
             if ( ms.getHandlers().isEmpty() ) {
                 // If there are no more services on this socket, then close it
                 acc.close();
@@ -90,7 +95,13 @@ public class MultiplexSocketServerImpl
     public void close() {
         for ( Acceptor acc : this.acceptors.values() ) {
             if ( acc.isOpen() ) {
+                if(logger.isTraceEnabled()){
+                    logger.trace(" ### Closing Acceptor: "+acc.isOpen());
+                }
                 acc.close();
+                if(logger.isTraceEnabled()){
+                    logger.trace(" ### Acceptor Closed: "+acc.isOpen());
+                }
             }
 
         }

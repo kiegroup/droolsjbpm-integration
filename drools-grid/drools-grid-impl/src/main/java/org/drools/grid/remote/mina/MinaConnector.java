@@ -16,11 +16,15 @@ import org.drools.grid.io.Connector;
 import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MinaConnector
     implements
     Connector {
 
+    private static Logger logger = LoggerFactory.getLogger(MinaConnector.class);
+    
     protected MinaIoWriter    writer;
 
     protected SocketConnector connector;
@@ -48,7 +52,7 @@ public class MinaConnector
         if ( address == null ) {
             throw new IllegalArgumentException( "Address cannot be null" );
         }
-
+         
         if ( this.connector == null ) {
             // Allow users to pass their own configured SocketConnector
             this.connector = new NioSocketConnector();
@@ -76,6 +80,9 @@ public class MinaConnector
         this.connector.setHandler( new MinaIoHandler( systemEventListener,
                                                       handler ) );
 
+        if(logger.isTraceEnabled()){
+            logger.trace(" ### Connecting with "+address.getHostName()+":"+address.getPort());
+        }                                              
         ConnectFuture future1 = this.connector.connect( address );
         future1.join();
         if ( !future1.isConnected() ) {

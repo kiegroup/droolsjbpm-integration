@@ -51,17 +51,17 @@ public class MinaTest {
 
         Acceptor acc = new MinaAcceptor();
         acc.open( new InetSocketAddress( "127.0.0.1",
-                                         5012 ),
+                                         8000 ),
                   accHandler,
                   l );
 
 
-        ConversationManager cm = new ConversationManagerImpl( new GridImpl(),
+        ConversationManager cm = new ConversationManagerImpl( new GridImpl("peer"),
                                                               l );
 
         Conversation cv = cm.startConversation( "s1",
                                                 new InetSocketAddress( "127.0.0.1",
-                                                                       5012 ),
+                                                                       8000 ),
                                                                        "r1" );
 
         BlockingMessageResponseHandler blockHandler = new BlockingMessageResponseHandler();
