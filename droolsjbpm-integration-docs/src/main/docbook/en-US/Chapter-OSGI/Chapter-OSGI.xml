@@ -54,6 +54,14 @@
     <listitem>
       <para>drools-decisiontables</para>
     </listitem>
+
+    <listitem>
+      <para>drools-spring</para>
+    </listitem>
+
+    <listitem>
+      <para>drools-camel</para>
+    </listitem>
   </itemizedlist>
 
   <para>The following Services can be located as OSGi Bundles</para>
@@ -81,21 +89,21 @@
 
     <programlisting language="xml">&lt;scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"&gt;
 &lt;implementation class="testosgi.TestComponent"/&gt;
- 
+
 &lt;reference bind="setKnowledgeBaseFactoryService"
            unbind="unsetKnowledgeBaseFactoryService"
            interface="org.drools.KnowledgeBaseFactoryService"
            /&gt;
-          
+
 &lt;reference bind="setResourceFactoryService"
            unbind="unsetResourceFactoryService"
            interface="org.drools.io.ResourceFactoryService"
-           /&gt;          
-          
+           /&gt;
+
 &lt;reference bind="setKnowledgeBuilderFactoryService"
            unbind="unsetKnowledgeBuilderFactoryService"
            interface="org.drools.builder.KnowledgeBuilderFactoryService"
-           target="(org.drools.compiler.DecisionTableProvider=true)"  /&gt;          
+           target="(org.drools.compiler.DecisionTableProvider=true)"  /&gt;
 &lt;/scr:component&gt;</programlisting>
   </example>
 
@@ -116,7 +124,7 @@
 ServiceRegistry registry = (ServiceRegistry) bundleContext.getService( serviceRef );
 
 KnowledgeBuilderFactoryService knowledgeBuilderFactoryService = registry.get( KnowledgeBuilderFactoryService.class );
-        
+
 KnowledgeBaseFactoryService knowledgeBaseFactoryService = registry.get( KnowledgeBaseFactoryService.class );
 ResourceFactoryService resourceFactoryService = registry.get( ResourceFactoryService.class );
 
