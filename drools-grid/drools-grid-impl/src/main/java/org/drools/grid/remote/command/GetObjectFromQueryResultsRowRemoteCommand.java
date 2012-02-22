@@ -39,7 +39,7 @@ public class GetObjectFromQueryResultsRowRemoteCommand implements GenericCommand
     }
     
     public Object execute(Context context) {
-        return ((QueryResultsRow) context.getContextManager().getContext( World.ROOT ).get( "Row - "+rowId+" - "+this.localId)).get(identifier);
+        return ((QueryResultsRow) context.getContextManager().getContext( "__TEMP__").get( "Row - "+rowId+" - "+this.localId)).get(identifier);
         
     }
     

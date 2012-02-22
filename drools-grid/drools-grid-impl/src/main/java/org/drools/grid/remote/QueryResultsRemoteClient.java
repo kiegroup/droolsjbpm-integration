@@ -96,6 +96,7 @@ public class QueryResultsRemoteClient implements QueryResults {
 
     public int size() {
         String kresultsId = "kresults_" + this.gsd.getId();
+        
          CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetQueryResultsSizeRemoteCommand(this.queryName, this.localId  ),
                                                                                                                       null,

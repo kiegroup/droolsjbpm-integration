@@ -44,6 +44,7 @@ public class InternalQueryResultsClient {
     
     public String[] getParameters(){
         String kresultsId = "kresults_" + this.gsd.getId();
+        
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetQueryParametersRemoteCommand(this.queryName, this.localId  ),
                                                                                                                       null,
@@ -63,7 +64,8 @@ public class InternalQueryResultsClient {
     }
     
     public Object getObject(String key){
-        String kresultsId = "kresults_" + this.gsd.getId();
+        //String kresultsId = "kresults_" + this.gsd.getId();
+        String kresultsId = "kresults_execute" ;
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{ new KnowledgeContextResolveFromContextCommand( new GetQueryObjectRemoteCommand(this.localId, key ),
                                                                                                                       null,

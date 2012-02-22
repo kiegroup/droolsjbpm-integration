@@ -36,7 +36,7 @@ public class GetQueryResultsSizeRemoteCommand implements GenericCommand<Integer>
     }
     
     public Integer execute(Context context) {
-        return ((QueryResults)context.getContextManager().getContext( World.ROOT ).get( this.localId )).size();
+        return ((QueryResults)context.getContextManager().getContext( "__TEMP__" ).get( this.localId )).size();
     }
     
 }

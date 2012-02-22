@@ -17,6 +17,7 @@ package org.drools.grid.helper;
 
 import java.util.HashMap;
 import java.util.UUID;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import org.drools.grid.*;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
@@ -35,36 +36,35 @@ import org.slf4j.LoggerFactory;
  */
 public class GridHelper {
 
+    private static Grid gridHelper;
     public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
 
     public static Grid getGrid() {
-        Grid gridHelper = new GridImpl(new HashMap<String, Object>());
 
+        gridHelper = new GridImpl(new HashMap<String, Object>());
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
 
         //Configuring the a local WhitePages service that is being shared with all the grid peers
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
+
         wplConf.setWhitePages(new JpaWhitePages(Persistence.createEntityManagerFactory("org.drools.grid")));
         conf.addConfiguration(wplConf);
 
         conf.configure(gridHelper);
 
+
         return gridHelper;
 
     }
 
-    public static GridNode getGridNode(String name) {
+    public static synchronized GridNode getGridNode(String name) {
         if (logger.isDebugEnabled()) {
             logger.debug(" ### Grid Helper trying to locate GridNode: " + name);
         }
-        Grid gridHelper = getGrid();
-        
-        if (logger.isDebugEnabled()) {
-            logger.debug(" ### Grid Helper Looking up: " + name);
-        }
-        GridServiceDescription<GridNode> nGsd = gridHelper.get(WhitePages.class).lookup(name);
+
+        GridServiceDescription<GridNode> nGsd = getGrid().get(WhitePages.class).lookup(name);
 
         if (nGsd == null) {
             if (logger.isDebugEnabled()) {
@@ -84,7 +84,7 @@ public class GridHelper {
             logger.debug(" ### \t Interface: " + nGsd.getServiceInterface());
             logger.debug(" ### \t DATA: " + nGsd.getData());
         }
-        GridConnection<GridNode> conn = gridHelper.get(ConnectionFactoryService.class).createConnection(nGsd);
+        GridConnection<GridNode> conn = getGrid().get(ConnectionFactoryService.class).createConnection(nGsd);
         if (logger.isDebugEnabled()) {
             logger.debug(" ### Grid Helper Create a Conection: " + name);
         }
@@ -99,7 +99,7 @@ public class GridHelper {
     public static QueryResultsRemoteClient getQueryResultRemoteClient(String nodeId, String sessionId, String queryName, String remoteResultsId) {
 
         GridServiceDescription<GridNode> gsd = getGridServiceDescriptor(nodeId);
-        GridNode node = getGridNode(nodeId);    
+        GridNode node = getGridNode(nodeId);
         String reverseId = node.get(sessionId, String.class);
         return new QueryResultsRemoteClient(queryName, reverseId, remoteResultsId, gsd, getGrid().get(ConversationManager.class));
     }
@@ -108,12 +108,12 @@ public class GridHelper {
         if (logger.isDebugEnabled()) {
             logger.debug(" ### Grid Helper trying to locate GridNode: " + name);
         }
-        Grid gridHelper = getGrid();
-        
+
+
         if (logger.isDebugEnabled()) {
             logger.debug(" ### Grid Helper Looking up: " + name);
         }
-        GridServiceDescription<GridNode> nGsd = gridHelper.get(WhitePages.class).lookup(name);
+        GridServiceDescription<GridNode> nGsd = getGrid().get(WhitePages.class).lookup(name);
         return nGsd;
     }
 }

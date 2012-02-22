@@ -16,9 +16,8 @@
 package org.drools.grid.remote;
 
 import org.drools.command.Context;
-import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
-import org.drools.rule.Declaration;
+import org.drools.runtime.rule.impl.NativeQueryResults;
 
 /**
  *
@@ -35,8 +34,7 @@ public class GetQueryObjectRemoteCommand implements GenericCommand<Object>{
     
     
     public Object execute(Context context) {
-        Object result = ((org.drools.QueryResults)context.getContextManager()
-                            .getContext( World.ROOT ).get( this.localId+"-native" )).get(0).get(key);
+        Object result = ((NativeQueryResults)context.getContextManager().getContext( "__TEMP__" ).get( this.localId )).getResults().get(0).get(key);
         return result;
     }
     

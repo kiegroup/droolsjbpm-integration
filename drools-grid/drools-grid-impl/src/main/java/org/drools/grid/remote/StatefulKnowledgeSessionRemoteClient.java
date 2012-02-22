@@ -36,15 +36,7 @@ import org.drools.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.process.StartProcessInstanceCommand;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
-import org.drools.command.runtime.rule.FireUntilHaltCommand;
-import org.drools.command.runtime.rule.GetFactHandleCommand;
-import org.drools.command.runtime.rule.GetFactHandlesCommand;
-import org.drools.command.runtime.rule.GetObjectCommand;
-import org.drools.command.runtime.rule.GetObjectsCommand;
-import org.drools.command.runtime.rule.HaltCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.command.runtime.rule.UpdateCommand;
+import org.drools.command.runtime.rule.*;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
@@ -101,7 +93,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       null,
                                                                                                                       null,
                                                                                                                       this.instanceId,
-                                                                                                                      kresultsId )} ) );
+                                                                                                                      kresultsId ), this.instanceId} ) );
 
         ConversationUtil.sendMessage( this.cm,
                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
@@ -190,7 +182,7 @@ public class StatefulKnowledgeSessionRemoteClient
 
         String kresultsId = "kresults_" + this.gsd.getId();
         if(logger.isDebugEnabled()){
-            logger.debug(" ### Calling Execute from the SKS Remote Client with instanceId: "+instanceId);
+            logger.debug(" ### Calling Execute from the SKS Remote Client with instanceId: "+this.instanceId);
         }
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new ExecuteCommand( command , true),
@@ -365,17 +357,17 @@ public class StatefulKnowledgeSessionRemoteClient
         String localId = "query_" + UUID.randomUUID().toString();
         String kresultsId = "kresults_" + this.gsd.getId();
         
+        
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
-                                                                                                          localId,
-                                                                                                          new KnowledgeContextResolveFromContextCommand( new QueryRemoteCommand( localId ,
-                                                                                                                                                                                 query, true,
-                                                                                                                                                                                 arguments ),
+                                           Arrays.asList( new Object[]{ new SetVariableCommandFromCommand("__TEMP__", localId, 
+                                                                                new KnowledgeContextResolveFromContextCommand( new QueryRemoteCommand( localId ,
+                                                                                                                                                        query, false,
+                                                                                                                                                        arguments ),
                                                                                                                                                          null,
                                                                                                                                                          null,
-                                                                                                                                                         this.instanceId,
-                                                                                                                                                         kresultsId ) )} ) );
-
+                                                                                                                                                        this.instanceId,
+                                                                                                                                                         kresultsId ))  } ) );
+         
         ConversationUtil.sendMessage( this.cm,
                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                                       this.gsd.getId(),

@@ -37,8 +37,8 @@ public class NextQueryResultsRowRemoteCommand implements GenericCommand<String>{
     
     public String execute(Context context) {
         String rowId = UUID.randomUUID().toString();
-        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getContext( World.ROOT ).get( "Iterator - "+this.localId)).next();
-        context.getContextManager().getContext( World.ROOT ).set("Row - "+rowId+" - "+this.localId, row);
+        QueryResultsRow row = ((Iterator<QueryResultsRow>) context.getContextManager().getContext( "__TEMP__" ).get( "Iterator - "+this.localId)).next();
+        context.getContextManager().getContext( "__TEMP__" ).set("Row - "+rowId+" - "+this.localId, row);
         return rowId;
         
     }

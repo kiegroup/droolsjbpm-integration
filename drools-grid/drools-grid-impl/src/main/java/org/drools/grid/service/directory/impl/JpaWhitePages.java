@@ -33,8 +33,10 @@ public class JpaWhitePages
     }
 
     public GridServiceDescription lookup(String serviceDescriptionId) {
-        GridServiceDescription gsd = this.emf.createEntityManager().find( GridServiceDescriptionImpl.class,
+        EntityManager em = this.emf.createEntityManager();
+        GridServiceDescription gsd = em.find( GridServiceDescriptionImpl.class,
                                                                           serviceDescriptionId );
+        em.close();
         return (gsd == null) ? null : new GridServiceDescriptionJpa( gsd,
                                                                      emf );
     }

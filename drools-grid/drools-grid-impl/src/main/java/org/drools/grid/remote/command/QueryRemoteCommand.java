@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.drools.grid.remote.command;
 
 import java.util.Arrays;
@@ -37,37 +36,37 @@ import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.Variable;
 import org.drools.runtime.rule.impl.NativeQueryResults;
 
-@XmlAccessorType( XmlAccessType.NONE )
-public class QueryRemoteCommand  implements GenericCommand<QueryResults> {
+@XmlAccessorType(XmlAccessType.NONE)
+public class QueryRemoteCommand implements GenericCommand<QueryResults> {
 
     private static final long serialVersionUID = 510l;
-
     @XmlAttribute(name = "out-identifier")
     private String outIdentifier;
     @XmlAttribute(required = true)
     private String name;
-    
     @XmlElement
     private List<Object> arguments;
-    @XmlAttribute(name="disconnected")
+    @XmlAttribute(required = true)
     private boolean disconnected = false;
 
     public QueryRemoteCommand() {
     }
+
     public QueryRemoteCommand(String outIdentifier, String name, boolean disconnected, Object... arguments) {
         this.outIdentifier = outIdentifier;
         this.name = name;
         this.disconnected = disconnected;
-        if ( arguments != null ) {
-            this.arguments = Arrays.asList( arguments );
+        if (arguments != null) {
+            this.arguments = Arrays.asList(arguments);
         } else {
             this.arguments = Collections.EMPTY_LIST;
         }
     }
+
     public QueryRemoteCommand(String outIdentifier, String name, Object... arguments) {
-        this(outIdentifier,name, false, arguments);
+        this(outIdentifier, name, false, arguments);
     }
-    
+
     public String getOutIdentifier() {
         return outIdentifier;
     }
@@ -79,17 +78,20 @@ public class QueryRemoteCommand  implements GenericCommand<QueryResults> {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public List<Object> getArguments() {
         if (this.arguments == null) {
             this.arguments = Collections.emptyList();
         }
         return this.arguments;
     }
+
     public void setArguments(List<Object> arguments) {
-        if ( arguments == null || arguments.isEmpty() ) {
+        if (arguments == null || arguments.isEmpty()) {
             this.arguments = Collections.emptyList();
         }
         this.arguments = arguments;
@@ -97,37 +99,37 @@ public class QueryRemoteCommand  implements GenericCommand<QueryResults> {
 
     public QueryResults execute(Context context) {
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
-        
-        if ( this.arguments == null || this.arguments.isEmpty() ) {
+
+        if (this.arguments == null || this.arguments.isEmpty()) {
             this.arguments = Collections.emptyList();
         }
-        
+
         for (int j = 0; j < arguments.size(); j++) {
             if (arguments.get(j) instanceof Variable) {
                 arguments.set(j, Variable.v);
             }
         }
 
-        QueryResults results = null;
-       
-        results = ksession.getQueryResults( name, this.arguments.toArray() );
-        
-          if( this.disconnected && this.outIdentifier != null ){
-            context.getContextManager().getContext( World.ROOT ).set( this.outIdentifier, results );
-            context.getContextManager().getContext( World.ROOT ).set( this.outIdentifier+"-native", ((NativeQueryResults)results).getResults() );
-            QueryResults disconnectedResults = new QueryResultsDescriptor(name, this.outIdentifier , results.size());
-            if(((StatefulKnowledgeSessionImpl)ksession).session.getExecutionResult() != null){
-                ((StatefulKnowledgeSessionImpl)ksession).session.getExecutionResult().getResults().put( this.outIdentifier, disconnectedResults );
+        QueryResults results = ksession.getQueryResults(name, this.arguments.toArray());
+
+        if (this.outIdentifier != null) {
+            
+            if (((StatefulKnowledgeSessionImpl) ksession).session.getExecutionResult() != null && !this.disconnected) {
+                ((StatefulKnowledgeSessionImpl) ksession).session.getExecutionResult().getResults().put(this.outIdentifier, results);
             }
-            return disconnectedResults;
+            if (((StatefulKnowledgeSessionImpl) ksession).session.getExecutionResult() != null && this.disconnected) {
+                QueryResultsDescriptor disconnectedResults = new QueryResultsDescriptor(this.name, this.outIdentifier, results.size());
+                ((StatefulKnowledgeSessionImpl) ksession).session.getExecutionResult().getResults().put(this.outIdentifier, disconnectedResults);
+                context.getContextManager().getContext( "__TEMP__" ).set(this.outIdentifier, results);
+                return disconnectedResults;
+            }
         }
 
         return results;
-    }    
-    
+    }
 
     @Override
     public String toString() {
-        return "QueryRemoteCommand{" + "outIdentifier=" + outIdentifier + ", name=" + name + ", arguments=" + arguments + '}';
+        return "QueryRemoteCommand{" + "outIdentifier=" + outIdentifier + ", name=" + name + ", arguments=" + arguments + ", disconnected=" + disconnected + '}';
     }
 }

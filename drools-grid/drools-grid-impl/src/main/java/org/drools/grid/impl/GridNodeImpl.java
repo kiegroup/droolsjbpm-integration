@@ -28,7 +28,9 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.NodeData;
+import org.drools.grid.remote.StatefulKnowledgeSessionRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
+import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
 import org.slf4j.Logger;
@@ -64,7 +66,12 @@ public class GridNodeImpl
         // @TODO: this is a hack we need to have a more flexible mechanisms to expose session identifiers
         if (cls.isAssignableFrom(String.class)) {
             if (logger.isDebugEnabled()) {
-                logger.debug(" ### GridNodeImpl: Resolving String.class with ID: " + identifier + ")");
+                logger.debug(" ### GridNodeImpl("+this+"): Resolving String.class with ID: " + identifier + ")");
+                
+            }
+            if(logger.isTraceEnabled()){
+                logger.trace(" ### GridNodeImpl: \t available sessionsid: " + sessionids + ")");
+                logger.trace(" ### GridNodeImpl: \t available reverse sessionsid: " + reversesessionids + ")");
             }
             service = (T) sessionids.get(identifier);
 
@@ -72,7 +79,15 @@ public class GridNodeImpl
         }
         if (cls.isAssignableFrom(StatefulKnowledgeSession.class)) {
             if (logger.isDebugEnabled()) {
-                logger.debug(" ### GridNodeImpl: Resolving StatefulKnowledgeSession.class with ID: " + identifier + ")");
+                logger.debug(" ### GridNodeImpl("+this+"): Resolving StatefulKnowledgeSession.class with ID: " + identifier + ")");
+                
+            }
+            if( logger.isTraceEnabled()){
+                logger.trace(" ### GridNodeImpl: \t localContext KeySet: " + localContext.keySet() + ")");
+                logger.trace(" ### GridNodeImpl: \t sessions KeySet: " + sessionids.keySet() + ")");
+                logger.trace(" ### GridNodeImpl: \t reversesessionids KeySet: " + reversesessionids.keySet() + ")");
+                logger.trace(" ### GridNodeImpl: \t sessions values: " + sessionids.values() + ")");
+                logger.trace(" ### GridNodeImpl: \t reverse sessions values: " + reversesessionids.values() + ")");
             }
             Object o = localContext.get(identifier);
             if (o != null) {
@@ -83,18 +98,21 @@ public class GridNodeImpl
                 //Try with reverse
                 String sessionId = reversesessionids.get(identifier);
                 if (logger.isDebugEnabled()) {
-                    logger.debug(" ### GridNodeImpl: Resolving StatefulKnowledgeSession.class with reverse ID: " + identifier + " - Found: -> "+sessionId+")");
+                    logger.debug(" ### GridNodeImpl("+this+"): Resolving StatefulKnowledgeSession.class with reverse ID: " + identifier + " - Found: -> " + sessionId + ")");
                 }
-                
-                o = localContext.get(sessionId);
-                if (o != null) {
-                    service = (T) o;
+                if (sessionId != null) {
+                    o = localContext.get(sessionId);
+                    if (o != null) {
+                        service = (T) o;
+                    }
                 }
             }
-
-
-            return (T) service;
-
+            if (logger.isDebugEnabled()) {
+                logger.debug(" ### GridNodeImpl("+this+"): Resolving StatefulKnowledgeSession.class with ID: " + identifier + " - Instance Found: " + service + " )");
+            }
+            if (service != null) {
+                return (T) service;
+            }
         }
         service = (T) localContext.get(identifier);
         if (service == null) {
@@ -120,14 +138,28 @@ public class GridNodeImpl
             Object object) {
 
         if (object instanceof StatefulKnowledgeSession) {
-            String randomId = UUID.randomUUID().toString();
+            String instanceId = "";
             if (logger.isDebugEnabled()) {
-                logger.debug(" ### GridNodeImpl: Registering  (" + this.id + ") id: " + identifier + " (reverse: " + randomId + ") - SFKS: " + object);
+                logger.debug(" ### GridNodeImpl("+this+"): Registering session: " + object);
             }
-
-            this.sessionids.put(identifier, randomId);
-            this.reversesessionids.put(randomId, identifier);
+            if(object instanceof StatefulKnowledgeSessionRemoteClient){
+                throw new IllegalStateException("I'm registering a remote client!!!");
+                //instanceId = ((StatefulKnowledgeSessionRemoteClient)object).getInstanceId();
+            }
+            if(object instanceof StatefulKnowledgeSessionImpl){
+                instanceId = UUID.randomUUID().toString();
+            }
+            StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) object;
+            
+            if (logger.isDebugEnabled()) {
+                logger.debug(" ### GridNodeImpl("+this+"): Registering  (" + this.id + ") id: " + identifier + " (reverse - clientSessionId: " + instanceId + ") - SFKS: " + ksession);
+            }
+            this.sessionids.put(identifier, instanceId);
+            this.reversesessionids.put(instanceId, identifier);
+            this.localContext.put(identifier, ksession);
+            return;
         }
+
         this.localContext.put(identifier,
                 object);
     }
@@ -161,14 +193,15 @@ public class GridNodeImpl
         WhitePages wp = grid.get(WhitePages.class);
 
         GridServiceDescription<GridNode> gsd = wp.lookup(id);
-
-        if (gsd == null) {
+        if (gsd
+                == null) {
             gsd = wp.create(id);
         }
 
         gsd.setServiceInterface(GridNode.class);
 
-        gsd.addAddress("socket").setObject(new InetSocketAddress(ip,
+        gsd.addAddress(
+                "socket").setObject(new InetSocketAddress(ip,
                 port));
     }
 }

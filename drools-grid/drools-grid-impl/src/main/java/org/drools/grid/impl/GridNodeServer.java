@@ -40,7 +40,12 @@ public class GridNodeServer
 
     private GridNode gnode;
     private NodeData data;
+    //This map keesp the relationship between the session name and the generated id inside the gnode
+    // Example: session1, <UUID generated inside this specific gnode> 
     private Map<String, String> sessions = new HashMap<String, String>();
+    // This map keeps the relationship between the clientSessionid and the Session name
+    // Example: <UUID-SessionId>, session1
+    private Map<String, String> clientSessions = new HashMap<String, String>();
     private static Logger logger = LoggerFactory.getLogger(GridNodeServer.class);
 
     public GridNodeServer(GridNode gnode,
@@ -83,29 +88,50 @@ public class GridNodeServer
                             ExecutionResultImpl localKresults = new ExecutionResultImpl();
                             localSessionContext.set("kresults_" + cmd.getName(),
                                     localKresults);
-                            //Bad Hack that works for now, I need to do a proper check (execute command, etc)
+
+                            //This is a set of Bad Hack that works for now, I need to do a proper check (execute command, etc)
+                            // These hacks where done to make it work and must be corrected to make it work properly
                             if (list.size() > 1) {
                                 String instanceId = (String) list.get(1);
                                 if (instanceId != null || !instanceId.equals("")) {
+
+//                                  
                                     if (logger.isDebugEnabled()) {
-                                        logger.debug(" ### GridNodeServer: I'm inside the node =" + gnode.getId() + " instance: " + gnode);
-                                        logger.debug(" ### GridNodeServer: Setting in the local context instanceId = " + instanceId
-                                                + " - session = " + gnode.get(instanceId, StatefulKnowledgeSession.class));
+                                        logger.debug(" ### GridNodeServer(execute): Looking for id: =" + instanceId + " inside gnode");
+                                        
                                     }
-                                    localSessionContext.set(instanceId, gnode.get(instanceId, StatefulKnowledgeSession.class));
+                                    if( logger.isTraceEnabled()){
+                                        logger.trace(" ### GridNodeServer(execute): sessions mappings: =" + sessions.keySet());
+                                        logger.trace(" ### GridNodeServer(execute): client sessions mappings: =" + clientSessions.keySet());
+                                        logger.trace(" ### GridNodeServer(execute): sessions mappings values: =" + sessions.values());
+                                        logger.trace(" ### GridNodeServer(execute): client sessions mappings values: =" + clientSessions.values());
+                                    }
+                                    
+
+                                    String sessionName = clientSessions.get(instanceId);
+                                    StatefulKnowledgeSession ksession = gnode.get(sessionName, StatefulKnowledgeSession.class);
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug(" ### GridNodeServer(execute): Looking for id: =" + instanceId + " inside (sessionName = " + sessionName + ")cached client sessions - result: " + ksession);
+                                    }
+
+                                    if (ksession != null) {
+                                        localSessionContext.set(instanceId, ksession);
+                                    }
+
                                 }
                             }
-
                             ResolvingKnowledgeCommandContext resolvingContext = new ResolvingKnowledgeCommandContext(localSessionContext);
+
                             if (logger.isTraceEnabled()) {
-                                        logger.trace(" ### GridNodeServer (execute): "+command);
+                                logger.trace(" ### GridNodeServer (execute): " + command);
                             }
                             Object result = command.execute(resolvingContext);
 
                             con.respond(result);
                         }
                     });
-            put("registerKsession",
+            put(
+                    "registerKsession",
                     new Exec() {
 
                         public void execute(Object object,
@@ -114,18 +140,32 @@ public class GridNodeServer
                                 CommandImpl cmd) {
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
-                            String instanceId = (String) list.get(1);
+                            String sessionName = (String) list.get(0);
+                            String clientInstanceId = (String) list.get(1);
+
                             // Set the already created session into the node localcontext
-                            gnode.set((String) list.get(0), data.getTemp().get(instanceId));
                             if (logger.isDebugEnabled()) {
-                                logger.debug(" ### GridNodeServer (registerKsession):  node: (" + gnode.getId() + ") - session: (" + (String) list.get(0) + ") - instanceId : " + instanceId);
+                                logger.debug(" ### GridNodeServer (registerKsession):  registering into GNODE - sessionName: (" + sessionName + ") - instanceId : " + clientInstanceId);
                             }
-                            sessions.put((String) list.get(0), instanceId);
+                            // Inside the Gnode and inside the local cache we have the locally generated IDs
+                            gnode.set(sessionName, data.getTemp().get(clientInstanceId));
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(" ### GridNodeServer (registerKsession):  param: (" + clientInstanceId + ") - resolve from node String.class : " + gnode.get(sessionName, String.class));
+                            }
+                            sessions.put(sessionName, gnode.get(sessionName, String.class));
+
+                            clientSessions.put(clientInstanceId, sessionName);
+
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(" ### GridNodeServer (registerKsession): clientSession Entry [ " + clientInstanceId + " , " + sessionName + " ]");
+                                logger.trace(" ### GridNodeServer (registerKsession): sessions Entry [ " + sessionName + " , " + clientInstanceId + " ]");
+                            }
                             // Respond nothing
                             con.respond(null);
                         }
                     });
-            put("lookupKsession",
+            put(
+                    "lookupKsession",
                     new Exec() {
 
                         public void execute(Object object,
@@ -134,24 +174,31 @@ public class GridNodeServer
                                 CommandImpl cmd) {
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
-                            String sessionId = (String) list.get(0);
+                            String sessionName = (String) list.get(0);
                             if (logger.isDebugEnabled()) {
-                                logger.debug(" ### GridNodeServer (lookupKsession): Looking inside gnode: (" + gnode.getId() + ") session: " + sessionId);
+                                logger.debug(" ### GridNodeServer (lookupKsession):  node: (" + gnode.getId() + ") - sessionname: (" + sessionName + ")");
+                                
                             }
-                            String instanceId = sessions.get(sessionId);
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(" ### GridNodeServer (lookupKsession): Available Sessions: " + sessions);
-                                logger.trace(" ### GridNodeServer (lookupKsession): Instance Id Found inside GridNodeServer for session (" + sessionId + ") - " + instanceId);
+                            if( logger.isTraceEnabled()){
+                                logger.trace(" ### GridNodeServer (lookupKsession):  \t available client sessions: " + clientSessions.keySet());
+                                logger.trace(" ### GridNodeServer (lookupKsession):  \t available cached sessions: " + sessions.keySet());
                             }
-                            if (instanceId == null || instanceId.equals("")) {
-                                if (logger.isTraceEnabled()) {
-                                    logger.trace(" ### GridNodeServer (lookupKsession): The session is in the local context: " + gnode.get(sessionId, String.class));
-                                    logger.trace(" ### GridNodeServer (lookupKsession): I'm inside the node =" + gnode.getId() + " instance: " + gnode);
+                            String clientSessionId = clientSessions.get(sessionName);
+
+                            if (clientSessionId == null || clientSessionId.equals("")) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(" ### GridNodeServer (lookupKsession): The session is in the local context: " + gnode.get(sessionName, String.class));
+                                    logger.debug(" ### GridNodeServer (lookupKsession): I'm inside the node =" + gnode.getId() + " instance: " + gnode);
                                 }
-                                instanceId = gnode.get(sessionId, String.class);
-                                sessions.put(sessionId, instanceId);
+                                clientSessionId = gnode.get(sessionName, String.class);
+                                clientSessions.put( clientSessionId, sessionName);
                             }
-                            con.respond(instanceId);
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(" ### GridNodeServer (lookupKsession):  return =" + clientSessionId);
+
+                            }
+                            con.respond(clientSessionId);
                         }
                     });
             put("lookupKsessionId",
@@ -164,24 +211,28 @@ public class GridNodeServer
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
                             String sessionId = (String) list.get(0);
-
-                            String instanceId = sessions.get(sessionId);
+                            logger.debug(" ### GridNodeServer (lookupKsessionId): SessionID???????: " + sessionId);
+                            String gnodeInternalSessionId = clientSessions.get(sessionId);
                             if (logger.isDebugEnabled()) {
                                 logger.debug(" ### GridNodeServer (lookupKsessionId): Available Sessions: " + sessions);
-                                logger.debug(" ### GridNodeServer (lookupKsessionId): Instance Id Found inside gnode: (" + gnode.getId() + ") for session (" + sessionId + ") - " + instanceId);
+                                logger.debug(" ### GridNodeServer (lookupKsessionId): Instance Id Found inside gnode: (" + gnode.getId() + ") for session (" + sessionId + ") - " + gnodeInternalSessionId);
+
+
                             }
-                            if (instanceId == null || instanceId.equals("")) {
+                            if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
                                 if (logger.isDebugEnabled()) {
                                     logger.debug(" ### GridNodeServer (lookupKsessionId): The session is in the local context: " + gnode.get(sessionId, String.class));
-                                    logger.debug(" ### GridNodeServer (lookupKsessionId): I'm inside the node =" + gnode.getId() + " instance: " + gnode);
+                                    logger.debug(
+                                            " ### GridNodeServer (lookupKsessionId): I'm inside the node =" + gnode.getId() + " instance: " + gnode);
                                 }
-                                instanceId = gnode.get(sessionId, String.class);
-                                sessions.put(sessionId, instanceId);
+                                gnodeInternalSessionId = gnode.get(sessionId, String.class);
+                                sessions.put(sessionId, gnodeInternalSessionId);
                             }
-
-                            con.respond(instanceId);
+                            con.respond(gnodeInternalSessionId);
                         }
                     });
+
+
         }
     };
 

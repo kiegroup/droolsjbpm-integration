@@ -37,7 +37,7 @@ public class HasNextQueryResultsRowRemoteCommand implements GenericCommand<Boole
     }
     
     public Boolean execute(Context context) {
-        Iterator<QueryResultsRow>  it = (Iterator<QueryResultsRow>) context.getContextManager().getContext( World.ROOT ).get( "Iterator - "+this.localId);
+        Iterator<QueryResultsRow>  it = (Iterator<QueryResultsRow>) context.getContextManager().getContext( "__TEMP__" ).get( "Iterator - "+this.localId);
         return it.hasNext();
     }
     

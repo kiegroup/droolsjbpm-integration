@@ -35,7 +35,7 @@ public class GetQueryIdentifiersRemoteCommand implements GenericCommand<String[]
     }
     
     public String[] execute(Context context) {
-        return ((QueryResults)context.getContextManager().getContext( World.ROOT ).get( this.localId )).getIdentifiers();
+        return ((QueryResults)context.getContextManager().getContext( "__TEMP__" ).get( this.localId )).getIdentifiers();
     }
     
 }
