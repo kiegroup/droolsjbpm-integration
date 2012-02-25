@@ -1,4 +1,4 @@
-<benchmarks delay="10" repetitions="1">
+<benchmarks delay="0" repetitions="3">
 
   <!-- Runtime -->
 
@@ -100,7 +100,7 @@
   </benchmark>
 
   <benchmark description="Java Fire Alarm - test joins"
-             warmups="15000" repetitions="100000" enabled="true"
+             warmups="15000" repetitions="100000" enabled="false"
              classname="org.drools.benchmark.benchmarks.FireAlarmBenchmark">
     <arg>100000</arg>
     <arg>fireAlarmJava.drl</arg>
@@ -116,6 +116,11 @@
   <benchmark description="Manners"
              warmups="0" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.MannersBenchmark">
+  </benchmark>
+
+  <benchmark description="Waltz"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.WaltzBenchmark">
   </benchmark>
 
   <benchmark description="Join"
