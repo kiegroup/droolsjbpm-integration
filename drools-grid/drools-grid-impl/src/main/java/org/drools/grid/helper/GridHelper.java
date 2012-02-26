@@ -16,13 +16,13 @@
 package org.drools.grid.helper;
 
 import java.util.HashMap;
-import java.util.UUID;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import org.drools.agent.KnowledgeAgent;
 import org.drools.grid.*;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.io.ConversationManager;
+import org.drools.grid.remote.KnowledgeAgentRemoteClient;
 import org.drools.grid.remote.QueryResultsRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
@@ -102,6 +102,14 @@ public class GridHelper {
         GridNode node = getGridNode(nodeId);
         String reverseId = node.get(sessionId, String.class);
         return new QueryResultsRemoteClient(queryName, reverseId, remoteResultsId, gsd, getGrid().get(ConversationManager.class));
+    }
+    
+    
+    public static KnowledgeAgent getKnowledgeAgentRemoteClient(String nodeId, String sessionId){
+        GridServiceDescription<GridNode> gsd = getGridServiceDescriptor(nodeId);
+        GridNode node = getGridNode(nodeId);
+        String reverseId = node.get(sessionId, String.class);
+        return new KnowledgeAgentRemoteClient(reverseId, gsd, getGrid().get(ConversationManager.class));
     }
 
     private static GridServiceDescription<GridNode> getGridServiceDescriptor(String name) {

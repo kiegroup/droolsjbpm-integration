@@ -25,9 +25,7 @@ import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.definition.KnowledgePackage;
 import org.drools.definition.process.Process;
 import org.drools.definition.rule.Query;
@@ -39,6 +37,8 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.remote.command.NewStatefulKnowledgeSessionFromKAgentRemoteCommand;
+import org.drools.grid.remote.command.RegisterKAgentRemoteCommand;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -137,11 +137,24 @@ public class KnowledgeBaseRemoteClient
                                                                 Environment environment) {
         String kresultsId = "kresults_" + this.cm.toString();
         String localId = UUID.randomUUID().toString();
-
-        CommandImpl cmd = new CommandImpl( "execute",
+        
+        CommandImpl registerKAgentCmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
+                                                                                                localId+"_kAgent",
+                                                                                                new KnowledgeContextResolveFromContextCommand( new RegisterKAgentRemoteCommand( localId ),
+                                                                                                                                               null,
+                                                                                                                                               this.instanceId,
+                                                                                                                                               null,
+                                                                                                                                               kresultsId ) )} ) );
+        ConversationUtil.sendMessage( this.cm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      registerKAgentCmd );
+        
+        CommandImpl newSessionCmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionCommand( conf , environment),
+                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionFromKAgentRemoteCommand( conf , environment, localId),
                                                                                                                                                null,
                                                                                                                                                this.instanceId,
                                                                                                                                                null,
@@ -150,7 +163,7 @@ public class KnowledgeBaseRemoteClient
         ConversationUtil.sendMessage( this.cm,
                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                                       this.gsd.getId(),
-                                      cmd );
+                                      newSessionCmd );
 
         return new StatefulKnowledgeSessionRemoteClient( localId,
                                                          this.gsd,
