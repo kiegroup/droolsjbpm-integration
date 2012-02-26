@@ -49,7 +49,9 @@ public class BenchmarkRunner {
         List<ResultsAccumulator> accumulatedResults = new ArrayList<ResultsAccumulator>();
         for (int i = 0; i < benchmarksNr; i++) {
             ResultsAccumulator accumulator = new ResultsAccumulator();
-            for (List<BenchmarkResult> runResults : results) accumulator.accumulate(runResults.get(i));
+            for (List<BenchmarkResult> runResults : results) {
+                accumulator.accumulate(runResults.get(i));
+            }
             accumulatedResults.add(accumulator);
         }
         return accumulatedResults;

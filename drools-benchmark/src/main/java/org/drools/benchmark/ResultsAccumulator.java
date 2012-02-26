@@ -45,8 +45,12 @@ public class ResultsAccumulator {
 
     @Override
     public String toString() {
+        double averageDuration = resultsCounter < 4 ?
+                totalDuration / (double)resultsCounter :
+                (totalDuration - minDuration - maxDuration) / (double)(resultsCounter - 2);
+
         return benchmarkDescription + ";" +
-                nf.format(minDuration) + ";" + nf.format(maxDuration) + ";" + nf.format(totalDuration / (double)resultsCounter) + ";" +
+                nf.format(minDuration) + ";" + nf.format(maxDuration) + ";" + nf.format(averageDuration) + ";" +
                 nf.format(minUsedMemory) + ";" + nf.format(maxUsedMemory) + ";" + nf.format(totalUsedMemory / resultsCounter);
     }
 }
