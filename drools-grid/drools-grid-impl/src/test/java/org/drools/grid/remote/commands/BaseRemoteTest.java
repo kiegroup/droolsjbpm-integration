@@ -17,10 +17,12 @@
 
 package org.drools.grid.remote.commands;
 
+import java.sql.SQLException;
 import org.drools.conf.AssertBehaviorOption;
 import org.drools.KnowledgeBaseConfiguration;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.Persistence;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
 import org.drools.SystemEventListenerFactory;
@@ -43,10 +45,13 @@ import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
+import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.h2.tools.DeleteDbFiles;
+import org.h2.tools.Server;
 import org.junit.After;
 import org.junit.Before;
 
@@ -54,12 +59,29 @@ import static org.junit.Assert.*;
 
 public abstract class BaseRemoteTest {
     
+    
+    
     private Map<String, GridServiceDescription> coreServicesMap;
     protected Grid grid1;
+    
     protected GridNode remoteN1;
+    private Server server;
     
     @Before
     public void setUp() {
+         DeleteDbFiles.execute("~", "mydb", false);
+
+        System.out.println("Staring DB for white pages ...");
+        
+        try {
+            
+            server = Server.createTcpServer(new String[] {"-tcp","-tcpAllowOthers","-tcpDaemon","-trace"}).start(); 
+        } catch (SQLException ex) {
+            System.out.println("ERROR: "+ex.getMessage());
+            
+        }
+        System.out.println("DB for white pages started! ");
+
         this.coreServicesMap = new HashMap();
         createRemoteNode();
     }
@@ -68,7 +90,7 @@ public abstract class BaseRemoteTest {
     public void tearDown() {
         remoteN1.dispose();
         grid1.get(SocketService.class).close();
-        
+        server.stop();
         
     }
     
@@ -76,7 +98,7 @@ public abstract class BaseRemoteTest {
         grid1 = new GridImpl("peer1", new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
-                        null );
+                        new JpaWhitePages(Persistence.createEntityManagerFactory("org.drools.grid")) );
 
         Grid grid2 = new GridImpl("peer2", new HashMap<String, Object>() );
         configureGrid1( grid2,
@@ -89,6 +111,8 @@ public abstract class BaseRemoteTest {
         GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "n1" );
         GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
         remoteN1 = conn.connect();
+        
+        
     
     }
     
@@ -122,12 +146,16 @@ public abstract class BaseRemoteTest {
                                                                                                                               new MinaAcceptorFactoryService(),
                                                                                                                               SystemEventListenerFactory.getSystemEventListener(),
                                                                                                                               grid) );
+            
             socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), port );
+            
 //            socketConf.addService( SchedulerService.class.getName(), schlConf.getSchedulerService(), port );
                         
             conf.addConfiguration( socketConf );
         }
         conf.configure( grid );
+        
+        
 
     }
     

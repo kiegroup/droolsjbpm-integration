@@ -214,10 +214,21 @@ public class GridNodeServer
                             logger.debug(" ### GridNodeServer (lookupKsessionId): SessionID???????: " + sessionId);
                             String gnodeInternalSessionId = clientSessions.get(sessionId);
                             if (logger.isDebugEnabled()) {
+                                logger.debug(" ### GridNodeServer (lookupKsessionId): Available Client Sessions: " + clientSessions);
                                 logger.debug(" ### GridNodeServer (lookupKsessionId): Available Sessions: " + sessions);
                                 logger.debug(" ### GridNodeServer (lookupKsessionId): Instance Id Found inside gnode: (" + gnode.getId() + ") for session (" + sessionId + ") - " + gnodeInternalSessionId);
 
 
+                            }
+                            if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
+                                for(String key : clientSessions.keySet()){
+                                    if(clientSessions.get(key).equals(sessionId)){
+                                        gnodeInternalSessionId = key;
+                                    }
+                                }
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(" ### GridNodeServer (lookupKsessionId): gnodeInternalSessionId found using reverse lookup: " + gnodeInternalSessionId);
+                                }
                             }
                             if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
                                 if (logger.isDebugEnabled()) {

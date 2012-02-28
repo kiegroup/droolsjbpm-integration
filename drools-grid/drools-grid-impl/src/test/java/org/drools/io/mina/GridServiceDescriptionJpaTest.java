@@ -1,16 +1,21 @@
 package org.drools.io.mina;
 
 import java.net.InetSocketAddress;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.SocketService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.AddressImpl;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesImpl;
+import org.h2.tools.DeleteDbFiles;
+import org.h2.tools.Server;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +23,33 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class GridServiceDescriptionJpaTest {
+    private Server server;
+    
+    @Before
+    public void setUp() {
+         DeleteDbFiles.execute("~", "mydb", false);
+
+        System.out.println("Staring DB for white pages ...");
+        
+        try {
+            
+            server = Server.createTcpServer(new String[] {"-tcp","-tcpAllowOthers","-tcpDaemon","-trace"}).start(); 
+        } catch (SQLException ex) {
+            System.out.println("ERROR: "+ex.getMessage());
+            
+        }
+        System.out.println("DB for white pages started! ");
+
+       
+    }
+
+    @After
+    public void tearDown() {
+      
+        server.stop();
+        
+    }
+    
     @Test
     public void test1() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );

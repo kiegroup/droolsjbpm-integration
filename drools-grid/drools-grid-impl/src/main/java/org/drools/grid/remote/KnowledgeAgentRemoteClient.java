@@ -35,7 +35,7 @@ import org.drools.runtime.StatelessKnowledgeSession;
  *
  * @author salaboy
  */
-public class KnowledgeAgentRemoteClient implements KnowledgeAgent{
+public class KnowledgeAgentRemoteClient implements KnowledgeAgent {
 
     private String id;
     private GridServiceDescription<GridNode> gsd;
@@ -46,9 +46,7 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent{
         this.gsd = gsd;
         this.cm = cm;
     }
-    
-    
-    
+
     public void addEventListener(KnowledgeAgentEventListener kl) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -78,20 +76,23 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent{
     }
 
     public void applyChangeSet(Resource rsrc) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{new ApplyChangeSetRemoteCommand(this.id, rsrc)}));
+
+        ConversationUtil.sendAsyncMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
     }
 
     public void applyChangeSet(ChangeSet cs) {
-        String kresultsId = "kresults_" + this.gsd.getId();
-        CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{  new ApplyChangeSetRemoteCommand(this.id, cs)} ) );
-        
-        
-        
-        String[] results = (String[]) ConversationUtil.sendMessage( this.cm,
-                                                     (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        CommandImpl cmd = new CommandImpl("execute",
+                Arrays.asList(new Object[]{new ApplyChangeSetRemoteCommand(this.id, cs)}));
+
+        ConversationUtil.sendAsyncMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                cmd);
     }
 
     public void setSystemEventListener(SystemEventListener sl) {
@@ -101,5 +102,4 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent{
     public void dispose() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
 }

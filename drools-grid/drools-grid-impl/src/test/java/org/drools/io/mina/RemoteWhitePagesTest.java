@@ -1,5 +1,6 @@
 package org.drools.io.mina;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,9 +32,38 @@ import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
+import org.h2.tools.DeleteDbFiles;
+import org.h2.tools.Server;
 
 public class RemoteWhitePagesTest {
 
+     private Server server;
+    
+    @Before
+    public void setUp() {
+         DeleteDbFiles.execute("~", "mydb", false);
+
+        System.out.println("Staring DB for white pages ...");
+        
+        try {
+            
+            server = Server.createTcpServer(new String[] {"-tcp","-tcpAllowOthers","-tcpDaemon","-trace"}).start(); 
+        } catch (SQLException ex) {
+            System.out.println("ERROR: "+ex.getMessage());
+            
+        }
+        System.out.println("DB for white pages started! ");
+
+    
+    }
+
+    @After
+    public void tearDown() {
+        
+        server.stop();
+        
+    }
+    
     @Test
     public void test1() {
 

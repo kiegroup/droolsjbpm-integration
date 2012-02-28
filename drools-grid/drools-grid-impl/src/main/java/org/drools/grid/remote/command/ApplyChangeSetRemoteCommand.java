@@ -20,6 +20,7 @@ import org.drools.ChangeSet;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
+import org.drools.io.Resource;
 
 public class ApplyChangeSetRemoteCommand
     implements
@@ -29,17 +30,29 @@ public class ApplyChangeSetRemoteCommand
     
     private String kbaseKagentId;
     private ChangeSet cs;
+    private Resource res;
     
     public ApplyChangeSetRemoteCommand( String kbaseKagentId, ChangeSet cs) { 
         this.kbaseKagentId = kbaseKagentId;
         this.cs = cs;
     }
     
+    public ApplyChangeSetRemoteCommand( String kbaseKagentId, Resource res) { 
+        this.kbaseKagentId = kbaseKagentId;
+        this.res = res;
+    }
+    
 
     public Void execute(Context context) {
         
+        
         KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext("__TEMP__").get(kbaseKagentId+"_kAgent");
-        if(agent != null){
+        if(this.res != null){
+            System.out.println("Applying Resource: "+this.res);
+            agent.applyChangeSet(this.res);
+        }
+        if(this.cs != null){
+            System.out.println("Applying Change-set: "+this.cs);
             agent.applyChangeSet(this.cs);
         }
         return null;

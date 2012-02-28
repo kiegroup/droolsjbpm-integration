@@ -24,9 +24,11 @@ import org.drools.grid.impl.GridImpl;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.remote.KnowledgeAgentRemoteClient;
 import org.drools.grid.remote.QueryResultsRemoteClient;
+import org.drools.grid.remote.StatefulKnowledgeSessionRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +111,9 @@ public class GridHelper {
         GridServiceDescription<GridNode> gsd = getGridServiceDescriptor(nodeId);
         GridNode node = getGridNode(nodeId);
         String reverseId = node.get(sessionId, String.class);
+        if (logger.isDebugEnabled()) {
+            logger.debug(" ### Grid Helper: Creating KnowledgeAgent Client for: reverseId: " + reverseId +" - session-id: "+sessionId);
+        }
         return new KnowledgeAgentRemoteClient(reverseId, gsd, getGrid().get(ConversationManager.class));
     }
 

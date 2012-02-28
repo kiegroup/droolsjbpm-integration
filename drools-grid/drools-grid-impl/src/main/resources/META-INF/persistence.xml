@@ -9,7 +9,7 @@
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
       <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
-      <property name="hibernate.connection.url" value="jdbc:h2:mem:mydb"/>
+      <property name="hibernate.connection.url" value="jdbc:h2:tcp://localhost/~/mydb;DB_CLOSE_ON_EXIT=FALSE"/>
       <!--property name="hibernate.connection.url" value="jdbc:h2:file:/h2/test;AUTO_SERVER=TRUE" /-->
       <!--  property name="hibernate.connection.url" value="jdbc:h2:file:\dev\drools\trunk7\jbpm-process\jbpm-human-task\mydb"/ -->
       <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>-->
@@ -19,8 +19,8 @@
       <property name="hibernate.connection.password" value="sasa"/>
       <property name="hibernate.connection.autocommit" value="false"/>
       <property name="hibernate.max_fetch_depth" value="3"/>
-      <property name="hibernate.hbm2ddl.auto" value="create"/>
-      <property name="hibernate.show_sql" value="false"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.show_sql" value="true"/>
     </properties>
   </persistence-unit>
 </persistence>

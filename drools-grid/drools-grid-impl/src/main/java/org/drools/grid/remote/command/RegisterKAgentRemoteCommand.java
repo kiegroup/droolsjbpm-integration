@@ -17,6 +17,9 @@
 package org.drools.grid.remote.command;
 
 import org.drools.KnowledgeBase;
+import org.drools.SystemEventListener;
+import org.drools.SystemEventListenerFactory;
+import org.drools.SystemEventListenerService;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.runtime.Environment;
@@ -26,6 +29,7 @@ import org.drools.agent.KnowledgeAgentConfiguration;
 import org.drools.agent.KnowledgeAgentFactory;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.command.Context;
+import org.drools.impl.SystemEventListenerServiceImpl;
 public class RegisterKAgentRemoteCommand
     implements
     GenericCommand<KnowledgeAgent> {
@@ -42,7 +46,44 @@ public class RegisterKAgentRemoteCommand
         KnowledgeBase kbase = ((KnowledgeCommandContext) context).getKnowledgeBase();
         KnowledgeAgentConfiguration kaConfig = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
         kaConfig.setProperty("drools.agent.newInstance", "false");
-        return KnowledgeAgentFactory.newKnowledgeAgent(this.kAgentId, kbase, kaConfig);
+        KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent(this.kAgentId, kbase, kaConfig);
+        SystemEventListener systemEventListener = new SystemEventListener() {
+
+            public void info(String string) {
+                System.out.println("INFO: "+string);
+            }
+
+            public void info(String string, Object o) {
+                System.out.println("INFO: "+string +", "+o);
+            }
+
+            public void warning(String string) {
+                System.out.println("WARN: "+string );
+            }
+
+            public void warning(String string, Object o) {
+                System.out.println("WARN: "+string +", "+o);
+            }
+
+            public void exception(String string, Throwable thrwbl) {
+                System.out.println("EXCEPTION: "+string +", "+thrwbl);
+            }
+
+            public void exception(Throwable thrwbl) {
+                System.out.println("EXCEPTION: "+thrwbl);
+            }
+
+            public void debug(String string) {
+                System.out.println("DEBUG: "+string );
+            }
+
+            public void debug(String string, Object o) {
+                System.out.println("DEBUG: "+string +", "+o);
+            }
+        };
+        
+        kagent.setSystemEventListener(systemEventListener);
+        return kagent;
     }
 
 }
