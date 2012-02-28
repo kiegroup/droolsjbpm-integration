@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.naming.Context;
-import junit.framework.TestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -39,11 +38,13 @@ import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
  * Camel - JSON reproducer
  * https://bugzilla.redhat.com/show_bug.cgi?id=771193
  */
-public class JsonQueryTest extends TestCase {
+public class JsonQueryTest {
     
     private ProducerTemplate template;       
     

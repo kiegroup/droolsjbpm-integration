@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.naming.Context;
-import junit.framework.TestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -42,12 +41,15 @@ import org.drools.runtime.rule.FactHandle;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
  * Camel - JAXB reproducer test
  * https://bugzilla.redhat.com/show_bug.cgi?id=771203
  * https://bugzilla.redhat.com/show_bug.cgi?id=771209
  */
-public class JaxbInsertTest extends TestCase {
+public class JaxbInsertTest {
+
     private ProducerTemplate template;       
     private StatefulKnowledgeSession ksession;
     
