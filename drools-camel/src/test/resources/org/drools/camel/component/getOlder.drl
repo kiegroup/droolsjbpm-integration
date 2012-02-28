@@ -1,4 +1,5 @@
 package org.drools.camel.component
+
 import org.drools.Person;
 
 rule "getOlder rule"
