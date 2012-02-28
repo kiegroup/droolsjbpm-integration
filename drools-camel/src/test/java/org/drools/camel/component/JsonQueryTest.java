@@ -56,8 +56,8 @@ public class JsonQueryTest extends TestCase {
     private CamelContext configure(StatefulKnowledgeSession session) throws Exception {
         GridImpl grid = new GridImpl(new HashMap());
         GridNode node = grid.createGridNode("testnode");
-	Context context = new JndiContext();
-	context.bind("testnode", node);
+        Context context = new JndiContext();
+        context.bind("testnode", node);
         node.set("ksession", session);
         
         CamelContext camelContext = new DefaultCamelContext(context);

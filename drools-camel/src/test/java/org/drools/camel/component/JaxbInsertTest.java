@@ -66,10 +66,10 @@ public class JaxbInsertTest extends TestCase {
     private CamelContext configure(StatefulKnowledgeSession session) throws Exception {
 
         GridImpl grid = new GridImpl(new HashMap<String, Object>());        
-	GridNode node = grid.createGridNode("testnode");
-        
-	Context context = new JndiContext();
-	context.bind("testnode", node);
+        GridNode node = grid.createGridNode("testnode");
+
+        Context context = new JndiContext();
+        context.bind("testnode", node);
         node.set("ksession", session);
         
         CamelContext camelContext = new DefaultCamelContext(context);
@@ -111,7 +111,7 @@ public class JaxbInsertTest extends TestCase {
      * creates batch-execution command with insert. Marshalls it to XML 
      * and send to drools
      */
-   @Test
+    @Test
     public void testInsert() throws Exception {
       
         Person p = new Person("Alice", "spicy meals", 30);
@@ -153,4 +153,5 @@ public class JaxbInsertTest extends TestCase {
             + "</batch-execution>";
         template.requestBody("direct:test-session", insertElements, String.class);
     }
+
 }

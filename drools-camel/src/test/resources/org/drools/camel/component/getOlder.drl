@@ -4,12 +4,11 @@ import org.drools.Person;
 
 rule "getOlder rule"
     no-loop
-	when
-            $p : Person()
-	then
-            $p.setAge($p.getAge() + 1); 
-            update($p);
-            
+    when
+        $p : Person()
+    then
+        $p.setAge($p.getAge() + 1);
+        update($p);
 end
 
 query "people over the age of x"  (int x)
