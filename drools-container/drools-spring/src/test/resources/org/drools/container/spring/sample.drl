@@ -1,0 +1,8 @@
+package org.drools.container.spring
+
+rule "sample rule"
+	@output("\"Hello world!\"")
+	when
+	then
+		System.out.println("\"Hello world!\"");
+end
