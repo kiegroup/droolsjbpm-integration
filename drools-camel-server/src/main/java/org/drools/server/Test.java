@@ -43,7 +43,7 @@ public class Test {
     }
 
     public String send(String msg) {
-        ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:camel-client.xml");
+        ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:/camel-client.xml");
         String batch = "";
         batch += "<batch-execution lookup=\"ksession1\">\n";
         batch += "  <insert out-identifier=\"message\">\n";
