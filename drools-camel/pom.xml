@@ -23,7 +23,7 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>knowledge-internal-api</artifactId>
-    </dependency>	
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
