@@ -50,13 +50,23 @@ import static org.junit.Assert.*;
  */
 public class JaxbInsertTest {
 
-    private ProducerTemplate template;       
     private StatefulKnowledgeSession ksession;
-    
+    private ProducerTemplate template;
+
     @Before
     public void setUp() throws Exception {
-        ksession = getKbase().newStatefulKnowledgeSession();
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        ksession = kbuilder.newKnowledgeBase().newStatefulKnowledgeSession();
         initializeTemplate(ksession);
+    }
+
+    /**
+     * camel context startup and template creation
+     */
+    private void initializeTemplate(StatefulKnowledgeSession session) throws Exception {
+        CamelContext context = configure(session);
+        this.template = context.createProducerTemplate();
+        context.start();
     }
     
     /**
@@ -66,7 +76,6 @@ public class JaxbInsertTest {
      * 3) marshalling route (enables creating commands through API and converting to XML)
      */
     private CamelContext configure(StatefulKnowledgeSession session) throws Exception {
-
         GridImpl grid = new GridImpl(new HashMap<String, Object>());        
         GridNode node = grid.createGridNode("testnode");
 
@@ -89,23 +98,6 @@ public class JaxbInsertTest {
         });
         
         return camelContext;
-    } 
-    
-    /**
-     * camel context startup and template creation
-     */
-    private void initializeTemplate(StatefulKnowledgeSession session) throws Exception {
-        CamelContext context = configure(session);
-        this.template = context.createProducerTemplate();
-        context.start();
-    }
-
-    /**
-     * creates empty knowledge base
-     */
-    private KnowledgeBase getKbase() {
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        return kbuilder.newKnowledgeBase();
     }
     
     /**
@@ -115,7 +107,6 @@ public class JaxbInsertTest {
      */
     @Test
     public void testInsert() throws Exception {
-      
         Person p = new Person("Alice", "spicy meals", 30);
         List<Command> commands = new ArrayList<Command>();
         commands.add(CommandFactory.newInsert(p, "tempPerson"));
