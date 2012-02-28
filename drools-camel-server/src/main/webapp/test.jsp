@@ -1,3 +1,4 @@
+<%@ page import="org.drools.server.CamelServerApp" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <html>
   <head>
@@ -6,7 +7,7 @@
   <body>
     <h1>Sending Test Message</h1>
     <%
-        org.drools.server.Test test = new org.drools.server.Test();
+        CamelServerApp test = new CamelServerApp();
         String msg = request.getParameter("msg");
 
         if ( msg == null ) {

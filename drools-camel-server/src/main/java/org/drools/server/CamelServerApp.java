@@ -26,14 +26,14 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.camel.CamelContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class Test {
+public class CamelServerApp {
 
     public static void main(String[] args) {
         String msg = "Hello World";
 
         System.out.println( "Sending Message:\n"  + msg);
 
-        Test test = new Test();
+        CamelServerApp test = new CamelServerApp();
         String response = test.send( msg );
 
         System.out.println( );
@@ -54,7 +54,7 @@ public class Test {
         batch += "</batch-execution>\n";
 
 
-        Test test = new Test();
+        CamelServerApp test = new CamelServerApp();
         String response = test.execute( batch,
                 ( CamelContext ) springContext.getBean( "camel" ) );
 

@@ -51,7 +51,7 @@ public class CxfSoapClientServerTest {
 
         body.addTextNode( cmd );
 
-        Test test = new Test();
+        CamelServerApp test = new CamelServerApp();
         String response = test.execute( soapMessage,
                                         (CamelContext) springContext.getBean( "camel-client-ctx" ) );
 

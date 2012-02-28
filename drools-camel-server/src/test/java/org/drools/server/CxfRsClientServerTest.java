@@ -36,7 +36,7 @@ public class CxfRsClientServerTest {
         cmd += "   </insert>\n";
         cmd += "</batch-execution>\n";
 
-        Test test = new Test();
+        CamelServerApp test = new CamelServerApp();
         String response = test.execute( cmd,
                                         (CamelContext) springContext.getBean( "camel-client-ctx" ) );
 
