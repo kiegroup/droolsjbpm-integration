@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.4.0.xsd
+                           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/sample.drl"/>
+      
+    <drools:kbase id="kbase">
+        <drools:resources>
+            <drools:resource ref="resource1"/>
+        </drools:resources>
+       
+    </drools:kbase>
+
+<!--
+    Inappropriate order of listeners; required order is:
+    1) agenda
+    2) process
+    3) working memory
+    
+    But when configured this way, order does not matter:
+    
+    <drools:eventListeners id="listeners">
+        <drools:agendaEventListener>
+            <bean class="org.drools.container.spring.MockAgendaEventListener"/>
+        </drools:agendaEventListener>      
+        <drools:workingMemoryEventListener>
+            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener" />
+        </drools:workingMemoryEventListener>  
+        <drools:processEventListener>
+            <bean class="org.drools.container.spring.MockProcessEventListener" />
+        </drools:processEventListener>
+    </drools:eventListeners>
+    
+    <drools:ksession id="session2" type="stateful" listeners="listeners" kbase="kbase"/>
+    
+    This behavior should be united.
+-->
+    <drools:ksession id="session2" type="stateful" kbase="kbase">
+        <drools:agendaEventListener>
+            <bean class="org.drools.container.spring.MockAgendaEventListener"/>
+        </drools:agendaEventListener>      
+        <drools:workingMemoryEventListener>
+            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener" />
+        </drools:workingMemoryEventListener>  
+        <drools:processEventListener>
+            <bean class="org.drools.container.spring.MockProcessEventListener" />
+        </drools:processEventListener>
+    </drools:ksession>
+
+</beans>
