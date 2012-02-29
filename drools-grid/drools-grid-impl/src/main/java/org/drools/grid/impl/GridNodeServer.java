@@ -46,6 +46,8 @@ public class GridNodeServer
     // This map keeps the relationship between the clientSessionid and the Session name
     // Example: <UUID-SessionId>, session1
     private Map<String, String> clientSessions = new HashMap<String, String>();
+    
+    private Map<String, String> internalSessionsExposed = new HashMap<String, String>();
     private static Logger logger = LoggerFactory.getLogger(GridNodeServer.class);
 
     public GridNodeServer(GridNode gnode,
@@ -103,12 +105,17 @@ public class GridNodeServer
                                     if( logger.isTraceEnabled()){
                                         logger.trace(" ### GridNodeServer(execute): sessions mappings: =" + sessions.keySet());
                                         logger.trace(" ### GridNodeServer(execute): client sessions mappings: =" + clientSessions.keySet());
+                                        logger.trace(" ### GridNodeServer(execute): internal sessions exposed mappings: =" + internalSessionsExposed.keySet());
                                         logger.trace(" ### GridNodeServer(execute): sessions mappings values: =" + sessions.values());
                                         logger.trace(" ### GridNodeServer(execute): client sessions mappings values: =" + clientSessions.values());
+                                        logger.trace(" ### GridNodeServer(execute): internal sessions exposed mappings values: =" + internalSessionsExposed.values());
                                     }
                                     
 
                                     String sessionName = clientSessions.get(instanceId);
+                                    if(sessionName == null || sessionName.equals("")){
+                                        sessionName = internalSessionsExposed.get(instanceId);
+                                    }
                                     StatefulKnowledgeSession ksession = gnode.get(sessionName, StatefulKnowledgeSession.class);
                                     if (logger.isDebugEnabled()) {
                                         logger.debug(" ### GridNodeServer(execute): Looking for id: =" + instanceId + " inside (sessionName = " + sessionName + ")cached client sessions - result: " + ksession);
@@ -189,9 +196,12 @@ public class GridNodeServer
                                 if (logger.isDebugEnabled()) {
                                     logger.debug(" ### GridNodeServer (lookupKsession): The session is in the local context: " + gnode.get(sessionName, String.class));
                                     logger.debug(" ### GridNodeServer (lookupKsession): I'm inside the node =" + gnode.getId() + " instance: " + gnode);
+                                    
                                 }
                                 clientSessionId = gnode.get(sessionName, String.class);
-                                clientSessions.put( clientSessionId, sessionName);
+                                logger.debug(" ### GridNodeServer (lookupKsession): Registering internal Session Id into internalSessionExposed with sessionId: =" + clientSessionId + " for session name: " + sessionName);
+                                internalSessionsExposed.put( clientSessionId, sessionName);
+                                
                             }
 
                             if (logger.isDebugEnabled()) {
@@ -223,11 +233,21 @@ public class GridNodeServer
                             if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
                                 for(String key : clientSessions.keySet()){
                                     if(clientSessions.get(key).equals(sessionId)){
-                                        gnodeInternalSessionId = key;
+                                            gnodeInternalSessionId = key;
                                     }
                                 }
                                 if (logger.isDebugEnabled()) {
-                                    logger.debug(" ### GridNodeServer (lookupKsessionId): gnodeInternalSessionId found using reverse lookup: " + gnodeInternalSessionId);
+                                    logger.debug(" ### GridNodeServer (lookupKsessionId): gnodeInternalSessionId found using reverse lookup: " + gnodeInternalSessionId );
+                                }
+                            }
+                            if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
+                                for(String key : internalSessionsExposed.keySet()){
+                                    if(internalSessionsExposed.get(key).equals(sessionId)){
+                                            gnodeInternalSessionId = key;
+                                    }
+                                }
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(" ### GridNodeServer (lookupKsessionId): gnodeInternalSessionId found using reverse lookup in internalSessionExposed: " + gnodeInternalSessionId );
                                 }
                             }
                             if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
