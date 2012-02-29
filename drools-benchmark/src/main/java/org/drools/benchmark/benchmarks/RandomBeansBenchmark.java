@@ -3,38 +3,39 @@ package org.drools.benchmark.benchmarks;
 import org.drools.KnowledgeBase;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.Bean;
-import org.drools.benchmark.model.Fire;
-import org.drools.benchmark.model.Room;
-import org.drools.benchmark.model.Sprinkler;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 
-import java.util.Random;
-
-public class JoinBenchmark extends AbstractBenchmark {
+public class RandomBeansBenchmark extends AbstractBenchmark {
     private final int beansNumber;
 
-    private String[] drlFile;
+    private KnowledgeBase kbase;
 
     private StatefulKnowledgeSession ksession;
 
     private Bean[] beans;
+    private FactHandle[] factHandles;
 
-    public JoinBenchmark(int beansNumber, String drlFile) {
+    public RandomBeansBenchmark(int beansNumber, String drlFile) {
         this.beansNumber = beansNumber;
-        this.drlFile = drlFile.split(",");
+        kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile.split(",")));
     }
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
         ksession = kbase.newStatefulKnowledgeSession();
         beans = Bean.generateRandomBeans(beansNumber);
+        factHandles = new FactHandle[beans.length];
     }
 
     public void execute(int repNr) {
+        int i = 0;
         for (Bean bean : beans) {
-            ksession.insert(bean);
+            factHandles[i++] = ksession.insert(bean);
+        }
+        ksession.fireAllRules();
+        for (FactHandle factHandle : factHandles) {
+            ksession.retract(factHandle);
         }
         ksession.fireAllRules();
     }
