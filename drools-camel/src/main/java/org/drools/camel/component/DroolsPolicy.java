@@ -101,21 +101,21 @@ public class DroolsPolicy implements Policy {
                     ToDefinition to = (ToDefinition) child;
                     if ( to.getUri().startsWith( "cxfrs" ) && !visited.contains( to ) ) {
                         BeanDefinition beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PreCxfrs.class );
+                        beanDef.setBeanType( PreCxfrs.class.getName() );
                         outputs.add( i,
                                      beanDef ); // insert before cxfrs
                         beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PostCxfrs.class );
+                        beanDef.setBeanType( PostCxfrs.class.getName() );
                         outputs.add( i + 2,
                                      beanDef ); // insert after cxfrs
                         i = i + 2;// adjust for the two inserts
                     } else if ( to.getUri().startsWith( "cxf" ) && !visited.contains( to ) ) {
                         BeanDefinition beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PreCxfSoapProcessor.class );
+                        beanDef.setBeanType( PreCxfSoapProcessor.class.getName() );
                         outputs.add( i,
                                      beanDef ); // insert before cxf
                         beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PostCxfSoapProcessor.class );
+                        beanDef.setBeanType( PostCxfSoapProcessor.class.getName() );
                         outputs.add( i + 2,
                                      beanDef ); // insert after cxf
                         i = i + 2;// adjust for the two inserts

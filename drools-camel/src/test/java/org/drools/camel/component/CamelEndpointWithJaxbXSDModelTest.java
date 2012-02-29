@@ -173,8 +173,6 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
 
                 jaxbContext = jaxbDataformat.getContext();
-            } catch ( JAXBException e ) {
-                throw new RuntimeException( e );
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
             }

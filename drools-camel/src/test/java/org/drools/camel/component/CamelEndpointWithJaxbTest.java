@@ -58,6 +58,7 @@ import org.drools.runtime.rule.impl.FlatQueryResults;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
+import org.drools.xml.jaxb.util.DroolsJaxbContextHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -394,8 +395,6 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
 
                 jaxbContext = jaxbDataformat.getContext();
-            } catch ( JAXBException e ) {
-                throw new RuntimeException( e );
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
             }
