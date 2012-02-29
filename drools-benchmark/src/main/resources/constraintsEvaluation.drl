@@ -1,0 +1,11 @@
+dialect "java"
+
+import org.drools.benchmark.model.*
+
+rule "Join"
+when
+    $b1 : Bean(s != "aaa")
+    $b2 : Bean(s != $b1.s, date != $b1.date, isEnabled($b1))
+then
+//    System.out.println($b2);
+end

@@ -1,5 +1,6 @@
 package org.drools.benchmark.model;
 
+import java.util.Date;
 import java.util.Random;
 
 public class Bean {
@@ -9,6 +10,7 @@ public class Bean {
     private long l;
     private double d;
     private boolean b;
+    private Date date;
 
     public String getS() {
         return s;
@@ -45,6 +47,17 @@ public class Bean {
         this.b = b;
     }
 
+    public Date getDate() {
+        return date;
+    }
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public boolean isEnabled(Bean bean) {
+        return false;
+    }
+
     public static Bean[] generateRandomBeans(int nr) {
         Bean[] beans = new Bean[nr];
         Random random = new Random(nr);
@@ -56,8 +69,10 @@ public class Bean {
             beans[i].setL(random.nextLong());
             beans[i].setD(random.nextDouble());
             beans[i].setB(random.nextBoolean());
+            beans[i].setDate(new Date(random.nextLong()));
         }
 
         return beans;
     }
+
 }

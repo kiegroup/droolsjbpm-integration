@@ -1,4 +1,4 @@
-<benchmarks delay="0" repetitions="3">
+<benchmarks delay="10" repetitions="1">
 
   <!-- Runtime -->
 
@@ -119,15 +119,22 @@
   </benchmark>
 
   <benchmark description="Waltz"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.WaltzBenchmark">
   </benchmark>
 
   <benchmark description="Join"
              warmups="1" repetitions="1" enabled="false"
-             classname="org.drools.benchmark.benchmarks.JoinBenchmark">
-    <arg>5000</arg>
+             classname="org.drools.benchmark.benchmarks.RandomBeansBenchmark">
+    <arg>10000</arg>
     <arg>joins.drl</arg>
+  </benchmark>
+
+  <benchmark description="Constraints Evaluation"
+             warmups="1" repetitions="20" enabled="true"
+             classname="org.drools.benchmark.benchmarks.RandomBeansBenchmark">
+    <arg>2000</arg>
+    <arg>constraintsEvaluation.drl</arg>
   </benchmark>
 
   <!-- Compile-time -->
