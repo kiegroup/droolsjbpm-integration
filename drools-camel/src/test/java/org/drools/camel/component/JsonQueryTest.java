@@ -36,6 +36,7 @@ import org.drools.grid.impl.GridImpl;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -96,7 +97,7 @@ public class JsonQueryTest {
     /**
      * insert 2 facts into session, then launch query command with one argument
      */
-    @Test
+    @Test @Ignore("TODO FIXME bz771193, bz771203 and bz771209")
     public void testQuery() throws Exception {
         StatefulKnowledgeSession session = getKbase().newStatefulKnowledgeSession();
         

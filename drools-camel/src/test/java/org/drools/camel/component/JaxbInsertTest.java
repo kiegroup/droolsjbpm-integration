@@ -17,9 +17,12 @@ package org.drools.camel.component;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.naming.Context;
+import javax.xml.bind.Marshaller;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -39,6 +42,7 @@ import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -82,7 +86,7 @@ public class JaxbInsertTest {
         Context context = new JndiContext();
         context.bind("testnode", node);
         node.set("ksession", session);
-        
+
         CamelContext camelContext = new DefaultCamelContext(context);
         camelContext.addRoutes(new RouteBuilder() {
             @Override
@@ -91,9 +95,14 @@ public class JaxbInsertTest {
                 jdf.setContextPath("org.drools");
                 jdf.setPrettyPrint(true);
 
-                from("direct:test-session").policy(new DroolsPolicy()).unmarshal(jdf).to("drools://testnode/ksession").marshal(jdf);
-                from("direct:unmarshall").policy(new DroolsPolicy()).unmarshal(jdf);
-                from("direct:marshall").policy(new DroolsPolicy()).marshal(jdf);
+                from("direct:test-session").policy(new DroolsPolicy())
+                        .unmarshal(jdf)
+                        .to("drools://testnode/ksession")
+                        .marshal(jdf);
+                from("direct:unmarshall").policy(new DroolsPolicy())
+                        .unmarshal(jdf);
+                from("direct:marshall").policy(new DroolsPolicy())
+                        .marshal(jdf);
             }
         });
         
@@ -105,7 +114,7 @@ public class JaxbInsertTest {
      * creates batch-execution command with insert. Marshalls it to XML 
      * and send to drools
      */
-    @Test
+    @Test @Ignore("TODO FIXME bz771193, bz771203 and bz771209")
     public void testInsert() throws Exception {
         Person p = new Person("Alice", "spicy meals", 30);
         List<Command> commands = new ArrayList<Command>();
@@ -120,7 +129,7 @@ public class JaxbInsertTest {
         assertTrue("returned String instead of FactHandle instance", o instanceof FactHandle);       
     }
     
-    @Test
+    @Test @Ignore("TODO FIXME bz771193, bz771203 and bz771209")
     public void testInsertElements() {
         List<Person> persons = new ArrayList<Person>();
         persons.add(new Person("John", "nobody", 50));
@@ -139,7 +148,7 @@ public class JaxbInsertTest {
                 + "      <age>" + p.getAge() + "</age>\n"
                 + "      <likes>" + p.getLikes() + "</likes>\n"
                 + "      <name>" + p.getName() + "</name>\n"
-                + "    </objects>\n";    
+                + "    </objects>\n";
         }
         insertElements += 
             "  </insert-elements>\n"
