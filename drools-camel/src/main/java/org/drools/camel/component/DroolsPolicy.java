@@ -39,21 +39,6 @@ import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.apache.camel.spi.Policy;
 import org.apache.camel.spi.RouteContext;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.GetGlobalCommand;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.process.AbortWorkItemCommand;
-import org.drools.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.command.runtime.process.SignalEventCommand;
-import org.drools.command.runtime.process.StartProcessCommand;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
-import org.drools.command.runtime.rule.GetObjectsCommand;
-import org.drools.command.runtime.rule.InsertElementsCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.command.runtime.rule.ModifyCommand;
-import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
-import org.drools.command.runtime.rule.QueryCommand;
-import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.core.util.StringUtils;
 import org.drools.jax.soap.PostCxfSoapProcessor;
@@ -63,11 +48,11 @@ import org.drools.jax.soap.PreCxfTransportSoapProcessor;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
+import org.drools.xml.jaxb.util.DroolsJaxbContextHelper;
 import org.drools.xml.jaxb.util.JaxbListWrapper;
 
-public class DroolsPolicy
-    implements
-    Policy {
+public class DroolsPolicy implements Policy {
+
     private static boolean augmented;
 
     public void beforeWrap(RouteContext routeContext,
@@ -116,21 +101,21 @@ public class DroolsPolicy
                     ToDefinition to = (ToDefinition) child;
                     if ( to.getUri().startsWith( "cxfrs" ) && !visited.contains( to ) ) {
                         BeanDefinition beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PreCxfrs.class );
+                        beanDef.setBeanType( PreCxfrs.class.getName() );
                         outputs.add( i,
                                      beanDef ); // insert before cxfrs
                         beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PostCxfrs.class );
+                        beanDef.setBeanType( PostCxfrs.class.getName() );
                         outputs.add( i + 2,
                                      beanDef ); // insert after cxfrs
                         i = i + 2;// adjust for the two inserts
                     } else if ( to.getUri().startsWith( "cxf" ) && !visited.contains( to ) ) {
                         BeanDefinition beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PreCxfSoapProcessor.class );
+                        beanDef.setBeanType( PreCxfSoapProcessor.class.getName() );
                         outputs.add( i,
                                      beanDef ); // insert before cxf
                         beanDef = new BeanDefinition();
-                        beanDef.setBeanType( PostCxfSoapProcessor.class );
+                        beanDef.setBeanType( PostCxfSoapProcessor.class.getName() );
                         outputs.add( i + 2,
                                      beanDef ); // insert after cxf
                         i = i + 2;// adjust for the two inserts
@@ -220,7 +205,7 @@ public class DroolsPolicy
     public static JaxbDataFormat augmentJaxbDataFormatDefinition(JaxbDataFormat jaxbDataFormat) {
         Set<String> set = new HashSet<String>();
 
-        for ( String clsName : JAXB_ANNOTATED_CMD ) {
+        for ( String clsName : DroolsJaxbContextHelper.JAXB_ANNOTATED_CMD ) {
             set.add( clsName.substring( 0,
                                         clsName.lastIndexOf( '.' ) ) );
         }
@@ -350,11 +335,5 @@ public class DroolsPolicy
             }
         }
     }
-
-    public static final String[] JAXB_ANNOTATED_CMD = {BatchExecutionCommandImpl.class.getName(), SetGlobalCommand.class.getName(), GetGlobalCommand.class.getName(), FireAllRulesCommand.class.getName(), InsertElementsCommand.class.getName(),
-                                                    InsertObjectCommand.class.getName(), ModifyCommand.class.getName(), SetterImpl.class.getName(), QueryCommand.class.getName(), RetractCommand.class.getName(), AbortWorkItemCommand.class.getName(),
-            SignalEventCommand.class.getName(),
-                                                    StartProcessCommand.class.getName(), BatchExecutionCommandImpl.class.getName(), ExecutionResultImpl.class.getName(), DefaultFactHandle.class.getName(), JaxbListWrapper.class.getName(),
-                                                    FlatQueryResults.class.getName(), CompleteWorkItemCommand.class.getName(), GetObjectsCommand.class.getName()};
 
 }
