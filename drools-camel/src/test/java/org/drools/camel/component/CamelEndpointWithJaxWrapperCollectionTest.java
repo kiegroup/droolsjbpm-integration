@@ -183,7 +183,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+            // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
+            def.setContextPath( "org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -211,7 +212,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint( true );
-                def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+                // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
+                def.setContextPath( "org.drools.pipeline.camel" );
 
                 from( "direct:test-with-session" ).policy( new DroolsPolicy() ).
                         unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );

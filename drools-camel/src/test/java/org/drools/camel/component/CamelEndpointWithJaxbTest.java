@@ -368,7 +368,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint( true );
-                // TODO was def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+                // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
                 def.setContextPath( "org.drools.pipeline.camel" );
 
                 from( "direct:test-with-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
@@ -381,7 +381,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            // TODO was def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+            // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
             def.setContextPath( "org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
