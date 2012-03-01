@@ -47,8 +47,8 @@ import org.drools.jax.soap.PreCxfSoapProcessor;
 import org.drools.jax.soap.PreCxfTransportSoapProcessor;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
+import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
-import org.drools.xml.jaxb.util.DroolsJaxbContextHelper;
 import org.drools.xml.jaxb.util.JaxbListWrapper;
 
 public class DroolsPolicy implements Policy {
@@ -205,7 +205,7 @@ public class DroolsPolicy implements Policy {
     public static JaxbDataFormat augmentJaxbDataFormatDefinition(JaxbDataFormat jaxbDataFormat) {
         Set<String> set = new HashSet<String>();
 
-        for ( String clsName : DroolsJaxbContextHelper.JAXB_ANNOTATED_CMD ) {
+        for ( String clsName : DroolsJaxbHelperProviderImpl.JAXB_ANNOTATED_CMD ) {
             set.add( clsName.substring( 0,
                                         clsName.lastIndexOf( '.' ) ) );
         }

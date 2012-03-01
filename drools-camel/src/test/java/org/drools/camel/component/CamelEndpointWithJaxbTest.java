@@ -58,7 +58,6 @@ import org.drools.runtime.rule.impl.FlatQueryResults;
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
 
-import org.drools.xml.jaxb.util.DroolsJaxbContextHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

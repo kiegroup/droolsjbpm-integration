@@ -30,8 +30,6 @@
     </listitem>
   </itemizedlist>
 
-  <para></para>
-
   <section>
     <title>XStream</title>
 
@@ -52,8 +50,6 @@
         <para>BatchExecutionHelperProviderImpl.newXStreamMarshaller().fromXML(xml)</para>
       </listitem>
     </itemizedlist>
-
-    <para></para>
   </section>
 
   <section>
@@ -75,8 +71,6 @@
         <para>BatchExecutionHelper.newJSonMarshaller().fromXML(xml)</para>
       </listitem>
     </itemizedlist>
-
-    <para></para>
   </section>
 
   <section>
@@ -88,8 +82,6 @@
     use Drools Helper classes. Once you have the JAXBContext you need to
     create the Unmarshaller/Marshaller as needed.</para>
 
-    <para></para>
-
     <section>
       <title>Using an XSD file to define the model</title>
 
@@ -99,8 +91,6 @@
       <para>To do this, the XSD file must be added as a XSD ResourceType into
       the KnowledgeBuilder. Finally you can create the JAXBContext using the
       KnowledgeBase created with the KnowledgeBuilder  </para>
-
-      <para></para>
 
       <programlisting language="java">Options xjcOpts = new Options();
 xjcOpts.setSchemaLanguage(Language.XMLSCHEMA);
@@ -117,10 +107,8 @@ JAXBContext jaxbContext = KnowledgeBuilderHelper.newJAXBContext(classesName.toAr
     <section>
       <title>Using a POJO model</title>
 
-      <para>In this case you need to use DroolsJaxbContextHelper to create the
+      <para>In this case you need to use DroolsJaxbHelperProviderImpl to create the
       JAXBContext. This class has two parameters:</para>
-
-      <para></para>
 
       <orderedlist>
         <listitem>
@@ -133,14 +121,11 @@ JAXBContext jaxbContext = KnowledgeBuilderHelper.newJAXBContext(classesName.toAr
         </listitem>
       </orderedlist>
 
-      <para></para>
-
       <programlisting language="java">List&lt;String&gt; classNames = new ArrayList&lt;String&gt;();
 classNames.add("org.drools.test.Person");
-JAXBContext jaxbContext = DroolsJaxbContextHelper.createDroolsJaxbContext(classNames, null);
+JAXBContext jaxbContext = DroolsJaxbHelperProviderImpl.createDroolsJaxbContext(classNames, null);
 Marshaller marshaller = jaxbContext.createMarshaller();</programlisting>
 
-      <para></para>
     </section>
   </section>
 </section>
