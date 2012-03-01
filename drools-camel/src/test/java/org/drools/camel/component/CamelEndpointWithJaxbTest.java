@@ -368,7 +368,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint( true );
-                def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+                // TODO was def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+                def.setContextPath( "org.drools.pipeline.camel" );
 
                 from( "direct:test-with-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
                 from( "direct:test-no-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node" ).marshal( def );
@@ -380,7 +381,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+            // TODO was def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
+            def.setContextPath( "org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -471,7 +473,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process1 += "\n";
         process1 += "  <header>\n";
         process1 += "    <imports>\n";
-        process1 += "      <import name=\"org.drools.model.Person\" />\n";
+        process1 += "      <import name=\"org.drools.camel.testdomain.Person\" />\n";
         process1 += "    </imports>\n";
         process1 += "    <globals>\n";
         process1 += "      <global identifier=\"list\" type=\"java.util.List\" />\n";
