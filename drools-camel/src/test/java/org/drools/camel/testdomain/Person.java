@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools;
+package org.drools.camel.testdomain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -42,7 +42,7 @@ public class Person
 
     private String            status;
 
-    private Cheese            cheese;
+    private Cheese cheese;
 
     private List              addresses        = new ArrayList();
 
@@ -114,28 +114,28 @@ public class Person
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getStatus()
+     * @see org.drools.camel.testdomain.PersonInterface#getStatus()
      */
     public String getStatus() {
         return this.status;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#setStatus(java.lang.String)
+     * @see org.drools.camel.testdomain.PersonInterface#setStatus(java.lang.String)
      */
     public void setStatus(final String status) {
         this.status = status;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getLikes()
+     * @see org.drools.camel.testdomain.PersonInterface#getLikes()
      */
     public String getLikes() {
         return this.likes;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getName()
+     * @see org.drools.camel.testdomain.PersonInterface#getName()
      */
     public String getName() {
         return this.name;
@@ -146,7 +146,7 @@ public class Person
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getAge()
+     * @see org.drools.camel.testdomain.PersonInterface#getAge()
      */
     public int getAge() {
         return this.age;
@@ -157,28 +157,28 @@ public class Person
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#isAlive()
+     * @see org.drools.camel.testdomain.PersonInterface#isAlive()
      */
     public boolean isAlive() {
         return this.alive;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#setAlive(boolean)
+     * @see org.drools.camel.testdomain.PersonInterface#setAlive(boolean)
      */
     public void setAlive(final boolean alive) {
         this.alive = alive;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getSex()
+     * @see org.drools.camel.testdomain.PersonInterface#getSex()
      */
     public char getSex() {
         return this.sex;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#setSex(char)
+     * @see org.drools.camel.testdomain.PersonInterface#setSex(char)
      */
     public void setSex(final char sex) {
         this.sex = sex;
@@ -243,28 +243,28 @@ public class Person
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getBigDecimal()
+     * @see org.drools.camel.testdomain.PersonInterface#getBigDecimal()
      */
     public BigDecimal getBigDecimal() {
         return this.bigDecimal;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#setBigDecimal(java.math.BigDecimal)
+     * @see org.drools.camel.testdomain.PersonInterface#setBigDecimal(java.math.BigDecimal)
      */
     public void setBigDecimal(final BigDecimal bigDecimal) {
         this.bigDecimal = bigDecimal;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#getBigInteger()
+     * @see org.drools.camel.testdomain.PersonInterface#getBigInteger()
      */
     public BigInteger getBigInteger() {
         return this.bigInteger;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.PersonInterface#setBigInteger(java.math.BigInteger)
+     * @see org.drools.camel.testdomain.PersonInterface#setBigInteger(java.math.BigInteger)
      */
     public void setBigInteger(final BigInteger bigInteger) {
         this.bigInteger = bigInteger;

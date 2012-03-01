@@ -36,7 +36,7 @@ public class JSonBatchExecutionTest extends BatchTest {//extends ContextTestSupp
     //    public void testVsmPipeline() throws Exception {
     //        String str = "";
     //        str += "package org.drools \n";
-    //        str += "import org.drools.Cheese \n";
+    //        str += "import org.drools.camel.testdomain.Cheese \n";
     //        str += "rule rule1 \n";
     //        str += "  when \n";
     //        str += "    $c : Cheese() \n";
@@ -47,7 +47,7 @@ public class JSonBatchExecutionTest extends BatchTest {//extends ContextTestSupp
     //
     //        String inXml = "";
     //        inXml += "{\"batch-execution\":{\"lookup\":\"ksession1\", \"commands\":[";
-    //        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+    //        inXml += "{\"insert\":{\"object\":{\"org.drools.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
     //        inXml += ", {\"fire-all-rules\":\"\"}";
     //        inXml += "]}}";
     //        inXml = roundTripFromXml( inXml );
@@ -82,11 +82,11 @@ public class JSonBatchExecutionTest extends BatchTest {//extends ContextTestSupp
     ////        String expectedXml = "";
     ////        expectedXml += "<execution-results>\n";
     ////        expectedXml += "  <result identifier=\"outStilton\">\n";
-    ////        expectedXml += "    <org.drools.Cheese>\n";
+    ////        expectedXml += "    <org.drools.camel.testdomain.Cheese>\n";
     ////        expectedXml += "      <type>stilton</type>\n";
     ////        expectedXml += "      <oldPrice>0</oldPrice>\n";
     ////        expectedXml += "      <price>30</price>\n";
-    ////        expectedXml += "    </org.drools.Cheese>\n";
+    ////        expectedXml += "    </org.drools.camel.testdomain.Cheese>\n";
     ////        expectedXml += "  </result>\n";
     ////        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
     ////        expectedXml += "</execution-results>\n";

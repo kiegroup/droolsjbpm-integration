@@ -1,6 +1,6 @@
 package org.drools.camel.component
 
-import org.drools.Person;
+import org.drools.camel.testdomain.Person;
 
 rule "getOlder rule"
     no-loop

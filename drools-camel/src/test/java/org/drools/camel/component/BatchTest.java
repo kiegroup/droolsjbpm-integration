@@ -28,14 +28,14 @@ import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.drools.ChangeCollector;
-import org.drools.Cheese;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.Person;
+import org.drools.camel.testdomain.ChangeCollector;
+import org.drools.camel.testdomain.Cheese;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.camel.testdomain.Person;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
@@ -86,7 +86,7 @@ public abstract class BatchTest extends ContextTestSupport {
         return new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat jaxbDf = new JaxbDataFormat();
-                jaxbDf.setContextPath( "org.drools" );
+                jaxbDf.setContextPath( "org.drools.camel.testdomain" );
 
                 from( "direct:exec" ).policy( new DroolsPolicy() ).unmarshal( dataformat ).to( "drools://node/ksession1" ).marshal( dataformat );
                 from( "direct:execWithLookup" ).policy( new DroolsPolicy() ).unmarshal( dataformat ).to( "drools://node" ).marshal( dataformat );
@@ -320,9 +320,9 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testListenForChanges() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
-        str += "import org.drools.ChangeCollector \n";
+        str += "package org.drools.camel.testdomain \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "import org.drools.camel.testdomain.ChangeCollector \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese(price==25) \n";
@@ -401,7 +401,7 @@ public abstract class BatchTest extends ContextTestSupport {
 
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -438,7 +438,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -465,7 +465,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testFactHandleReturn() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -508,7 +508,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testGetObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -541,7 +541,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testRetractObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -575,7 +575,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testModifyObject() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -642,7 +642,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testInsertElements() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -681,7 +681,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -735,7 +735,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testSetGlobal() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "global java.util.List list2 \n";
         str += "global java.util.List list3 \n";
@@ -784,7 +784,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testGetGlobal() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -819,7 +819,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testGetObjects() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -831,8 +831,8 @@ public abstract class BatchTest extends ContextTestSupport {
         String inXml = "";
         inXml = "{\"batch-execution\":{\"commands\":[";
         inXml += "  {\"insert-elements\":{\"objects\":[";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
+        inXml += "   {   \"org.drools.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
+        inXml += "   {   \"org.drools.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
         inXml += ",  {\"get-objects\":{\"out-identifier\":\"list1\"}}";
         inXml += "]}}";
@@ -867,7 +867,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testQuery() throws Exception {
         String str = "";
         str += "package org.drools.test  \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "query cheeses \n";
         str += "    stilton : Cheese(type == 'stilton') \n";
         str += "    cheddar : Cheese(type == 'cheddar', price == stilton.price) \n";
@@ -930,7 +930,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testManualFireAllRules() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -988,7 +988,7 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "\n";
         str += "  <header>\n";
         str += "    <imports>\n";
-        str += "      <import name=\"org.drools.TestVariable\" />\n";
+        str += "      <import name=\"org.drools.camel.testdomain.TestVariable\" />\n";
         str += "    </imports>\n";
         str += "    <globals>\n";
         str += "      <global identifier=\"list1\" type=\"java.util.List\" />\n";
@@ -1184,7 +1184,7 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
         str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
@@ -1343,7 +1343,7 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
         str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
@@ -1515,7 +1515,7 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testExecutionNodeLookup() throws Exception {
         String str = "";
         str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";

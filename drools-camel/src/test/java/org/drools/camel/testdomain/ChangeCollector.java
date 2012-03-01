@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools;
+package org.drools.camel.testdomain;
 
 import java.util.ArrayList;
 import java.util.List;

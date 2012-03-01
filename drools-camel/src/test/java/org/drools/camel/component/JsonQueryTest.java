@@ -25,7 +25,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.util.jndi.JndiContext;
 import org.drools.KnowledgeBase;
-import org.drools.Person;
+import org.drools.camel.testdomain.Person;
 import org.drools.QueryResults;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;

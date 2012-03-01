@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools;
+package org.drools.camel.testdomain;
 
 import java.io.Serializable;
 import java.util.Date;

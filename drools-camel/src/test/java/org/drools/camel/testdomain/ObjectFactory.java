@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-package org.drools;
+package org.drools.camel.testdomain;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlRegistry;
 
+@XmlRegistry
+public class ObjectFactory {
 
-@XmlRootElement
-public class TestVariable {
-
-    private String name;
-
-    public TestVariable() {
-
+    public ChangeCollector createChangeCollector() {
+        return new ChangeCollector();
     }
 
-    public TestVariable(String name) {
-        this.name = name;
+    public Cheese createCheese() {
+        return new Cheese();
     }
 
-    public String getName() {
-        return name;
+    public Person createPerson() {
+        return new Person();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public TestVariable createTestVariable() {
+        return new TestVariable();
     }
 
 }
