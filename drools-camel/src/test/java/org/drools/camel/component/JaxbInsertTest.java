@@ -126,7 +126,7 @@ public class JaxbInsertTest {
         assertTrue("returned String instead of FactHandle instance", o instanceof FactHandle);       
     }
     
-    @Test @Ignore("TODO FIXME bz771193, bz771203 and bz771209")
+    @Test
     public void testInsertElements() {
         List<Person> persons = new ArrayList<Person>();
         persons.add(new Person("John", "nobody", 50));
@@ -139,16 +139,18 @@ public class JaxbInsertTest {
     private void insertElements(List<Person> objects) {
         String insertElements = 
             "<batch-execution>\n"
-            + "  <insert-elements return-objects=\"true\">\n";
+            + "  <insert-elements return-objects=\"true\">\n"
+            + "    <list>\n";
         for(Person p : objects) {
-            insertElements += "    <objects xsi:type=\"person\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
-                + "      <age>" + p.getAge() + "</age>\n"
-                + "      <likes>" + p.getLikes() + "</likes>\n"
-                + "      <name>" + p.getName() + "</name>\n"
-                + "    </objects>\n";
+            insertElements += "      <element xsi:type=\"person\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                + "        <age>" + p.getAge() + "</age>\n"
+                + "        <likes>" + p.getLikes() + "</likes>\n"
+                + "        <name>" + p.getName() + "</name>\n"
+                + "      </element>\n";
         }
-        insertElements += 
-            "  </insert-elements>\n"
+        insertElements +=
+            "    </list>\n"
+            + "  </insert-elements>\n"
             + "</batch-execution>";
         template.requestBody("direct:test-session", insertElements, String.class);
     }
