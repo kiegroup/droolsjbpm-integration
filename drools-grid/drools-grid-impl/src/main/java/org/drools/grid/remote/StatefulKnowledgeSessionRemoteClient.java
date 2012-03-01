@@ -44,6 +44,7 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.remote.command.AsyncBatchExecutionCommandImpl;
 import org.drools.grid.remote.command.GetWorkingMemoryEntryPointRemoteCommand;
 import org.drools.grid.remote.command.QueryRemoteCommand;
 import org.drools.runtime.Calendars;
@@ -184,20 +185,36 @@ public class StatefulKnowledgeSessionRemoteClient
         if(logger.isDebugEnabled()){
             logger.debug(" ### Calling Execute from the SKS Remote Client with instanceId: "+this.instanceId);
         }
-        CommandImpl cmd = new CommandImpl( "execute",
+       
+        Object result = null;
+        if(command instanceof AsyncBatchExecutionCommandImpl){
+             CommandImpl cmd = new CommandImpl( "execute",
+                                           Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new ExecuteCommand( command , false),
+                                                                                                                      null,
+                                                                                                                      null,
+                                                                                                                      this.instanceId,
+                                                                                                                      kresultsId ),this.instanceId} ) );
+            ConversationUtil.sendAsyncMessage( this.cm,
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+            // Result must be null if it's async
+        }else{
+             CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new ExecuteCommand( command , true),
                                                                                                                       null,
                                                                                                                       null,
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId ),this.instanceId} ) );
-
-        Object result = ConversationUtil.sendMessage( this.cm,
+            result = ConversationUtil.sendMessage( this.cm,
                                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
                                                       this.gsd.getId(),
                                                       cmd );
-        if(logger.isDebugEnabled()){
-            logger.debug(" ### Execute Method Returns: "+result);
+            if(logger.isDebugEnabled()){
+             logger.debug(" ### Execute Method Returns: "+result);
+            }
         }
+        
         return (T) result;
 
     }

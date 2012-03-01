@@ -7,11 +7,8 @@
             <param name="ConversionPattern" value="%-4r %-5p %x- %m%n"/>
         </layout>
     </appender>
-   <logger name="org.drools.agent">
-        <level value="DEBUG"/>
-    </logger>
     <logger name="org.drools.grid">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     <root> 
         <priority value ="ERROR" /> 

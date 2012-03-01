@@ -18,14 +18,20 @@ package org.drools.grid.remote.commands;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.builder.ResourceType;
+import org.drools.command.*;
+import org.drools.command.impl.GenericCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.common.DefaultFactHandle;
+
 import org.drools.grid.NodeTests.MyObject;
 import org.drools.grid.helper.GridHelper;
 import org.drools.grid.remote.InternalQueryResultsClient;
@@ -42,6 +48,9 @@ import org.drools.runtime.rule.QueryResultsRow;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.drools.runtime.ExecutionResults;
+import org.drools.command.CommandFactory;
+import org.drools.grid.remote.command.AsyncBatchExecutionCommandImpl;
 
 public class RemoteSessionCommandTest extends BaseRemoteTest {
 
@@ -308,5 +317,52 @@ public class RemoteSessionCommandTest extends BaseRemoteTest {
 
     }
     
-  
+    @Test
+    public void executeBatchTest() {
+        StatefulKnowledgeSession ksession = createSession();
+
+        List<GenericCommand<?>> cmds = new ArrayList<GenericCommand<?>>();
+        cmds.add((GenericCommand<?>)CommandFactory.newSetGlobal("myGlobalObj", new MyObject("myglobalObj")));
+        cmds.add((GenericCommand<?>)CommandFactory.newInsert(new MyObject("obj1"), "myObject1"));
+        cmds.add((GenericCommand<?>)CommandFactory.newFireAllRules());
+        BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl(cmds, "out");
+        
+        ExecutionResults results = ksession.execute(batch);
+        
+       
+        System.out.println("Results = "+results);
+        Assert.assertNotNull(results);
+        Assert.assertEquals(1, results.getIdentifiers().size());
+        Assert.assertEquals("myObject1", results.getIdentifiers().iterator().next());
+
+
+    }
+    
+    @Test
+    public void executeAsyncBatchTest() throws InterruptedException {
+        StatefulKnowledgeSession ksession = createSession();
+
+        List<Command> cmds = new ArrayList<Command>();
+        cmds.add(CommandFactory.newSetGlobal("myGlobalObj", new MyObject("myglobalObj")));
+
+        MyObject myObject = new MyObject("obj1");
+        cmds.add(CommandFactory.newInsert(myObject));
+        cmds.add(CommandFactory.newFireAllRules());
+        AsyncBatchExecutionCommandImpl batch = new AsyncBatchExecutionCommandImpl(cmds);
+        
+        ExecutionResults results = ksession.execute(batch);
+        
+       
+        
+        Assert.assertNull(results);
+        
+        Thread.sleep(2000);
+        
+        FactHandle handle = ksession.getFactHandle(myObject);
+        Assert.assertNotNull(handle);
+        
+        
+
+    }
+
 }

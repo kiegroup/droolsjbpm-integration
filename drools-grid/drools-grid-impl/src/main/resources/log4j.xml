@@ -9,11 +9,9 @@
     </appender>
    
     <logger name="org.drools.grid">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
-    <logger name="org.drools.agent">
-        <level value="DEBUG"/>
-    </logger>
+    
     <root> 
         <priority value ="ERROR" /> 
         <appender-ref ref="console" /> 

@@ -22,6 +22,8 @@ import org.drools.conf.AssertBehaviorOption;
 import org.drools.KnowledgeBaseConfiguration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.Persistence;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactoryService;
@@ -180,7 +182,7 @@ public abstract class BaseRemoteTest {
 
         kbuilder.add( new ByteArrayResource( rule.getBytes() ),
                       ResourceType.DRL );
-
+      
         KnowledgeBuilderErrors errors = kbuilder.getErrors();
         if ( errors != null && errors.size() > 0 ) {
             for ( KnowledgeBuilderError error : errors ) {
@@ -235,7 +237,7 @@ public abstract class BaseRemoteTest {
          
         kbuilder.add( new ByteArrayResource( process.getBytes() ),
                       ResourceType.BPMN2 );
-
+        
         KnowledgeBuilderErrors errors = kbuilder.getErrors();
         if ( errors != null && errors.size() > 0 ) {
             for ( KnowledgeBuilderError error : errors ) {
