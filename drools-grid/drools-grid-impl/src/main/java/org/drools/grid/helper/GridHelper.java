@@ -129,4 +129,14 @@ public class GridHelper {
         GridServiceDescription<GridNode> nGsd = getGrid().get(WhitePages.class).lookup(name);
         return nGsd;
     }
+    
+    public static StatefulKnowledgeSession getStatefulKnowledgeSession(String nodeId, String sessionId){
+        GridNode node = GridHelper.getGridNode(nodeId);
+        logger.error(" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node );
+        if (logger.isDebugEnabled()) {
+            logger.debug(" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node);
+        }
+        StatefulKnowledgeSession kSession = node.get(sessionId, StatefulKnowledgeSession.class);
+        return kSession;
+    }
 }
