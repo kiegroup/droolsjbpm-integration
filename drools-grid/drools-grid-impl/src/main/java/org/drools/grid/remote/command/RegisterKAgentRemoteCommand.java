@@ -42,11 +42,11 @@ public class RegisterKAgentRemoteCommand
         
     }
 
-    public KnowledgeAgent execute(Context context) {
-        KnowledgeBase kbase = ((KnowledgeCommandContext) context).getKnowledgeBase();
+    public KnowledgeAgent execute( Context context ) {
+        KnowledgeBase kbase = ( (KnowledgeCommandContext) context ).getKnowledgeBase();
         KnowledgeAgentConfiguration kaConfig = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-        kaConfig.setProperty("drools.agent.newInstance", "false");
-        KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent(this.kAgentId, kbase, kaConfig);
+            kaConfig.setProperty( "drools.agent.newInstance", "false" );
+        KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.kAgentId, kbase, kaConfig );
         SystemEventListener systemEventListener = new SystemEventListener() {
 
             public void info(String string) {
@@ -82,7 +82,7 @@ public class RegisterKAgentRemoteCommand
             }
         };
         
-        kagent.setSystemEventListener(systemEventListener);
+        kagent.setSystemEventListener( systemEventListener );
         return kagent;
     }
 
