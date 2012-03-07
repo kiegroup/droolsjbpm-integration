@@ -1,6 +1,6 @@
 import org.drools.benchmark.model.*
 
-rule "Join"
+rule "Join" @activationListener('direct')
 when
     $b1 : Bean()
     $b2 : Bean(s != $b1.s, i < $b1.i, l > $b1.l, b != $b1.b, d < $b1.d)
