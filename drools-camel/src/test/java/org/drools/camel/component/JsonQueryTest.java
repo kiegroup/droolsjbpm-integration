@@ -26,10 +26,11 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.util.jndi.JndiContext;
 import org.drools.KnowledgeBase;
 import org.drools.camel.testdomain.Person;
-import org.drools.QueryResults;
+import org.drools.runtime.rule.QueryResults;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.command.Command;
 import org.drools.command.CommandFactory;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
@@ -97,7 +98,7 @@ public class JsonQueryTest {
     /**
      * insert 2 facts into session, then launch query command with one argument
      */
-    @Test @Ignore("TODO FIXME bz771193, bz771203 and bz771209")
+    @Test
     public void testQuery() throws Exception {
         StatefulKnowledgeSession session = getKbase().newStatefulKnowledgeSession();
         
@@ -117,8 +118,9 @@ public class JsonQueryTest {
     /**
      * build json query command and send it to drools
      */
-    private QueryResults query(String queryName, Object[] args) {           
-        String queryStr = template.requestBody("direct:marshall", CommandFactory.newQuery("persons", queryName, args), String.class);
+    private QueryResults query(String queryName, Object[] args) {
+        Command command = CommandFactory.newQuery("persons", queryName, args);
+        String queryStr = template.requestBody("direct:marshall", command, String.class);
 
         String json = template.requestBody("direct:test-session", queryStr, String.class);
         ExecutionResults res = (ExecutionResults) template.requestBody("direct:unmarshall", json);
