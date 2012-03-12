@@ -68,6 +68,11 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     private String      handle;
     private JAXBContext jaxbContext;
+    private RouteBuilder routeBuilder;
+
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void testSessionInsert() throws Exception {
@@ -364,17 +369,18 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
+        routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint( true );
+                def.setPrettyPrint(true);
                 // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
-                def.setContextPath( "org.drools.pipeline.camel" );
+                def.setContextPath("org.drools.pipeline.camel");
 
-                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
-                from( "direct:test-no-session" ).policy( new DroolsPolicy() ).unmarshal( def ).to( "drools:node" ).marshal( def );
+                from("direct:test-with-session").policy(new DroolsPolicy()).unmarshal(def).to("drools:node/ksession1").marshal(def);
+                from("direct:test-no-session").policy(new DroolsPolicy()).unmarshal(def).to("drools:node").marshal(def);
             }
         };
+        return routeBuilder;
     }
 
     public JAXBContext getJaxbContext() {
@@ -395,6 +401,12 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
 
+                jaxbDataformat.setCamelContext(routeBuilder.getContext());
+                try {
+                    jaxbDataformat.start();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
                 jaxbContext = jaxbDataformat.getContext();
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );

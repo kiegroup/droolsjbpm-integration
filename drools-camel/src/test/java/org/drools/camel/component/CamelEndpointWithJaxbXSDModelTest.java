@@ -60,6 +60,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
     private JAXBContext                jaxbContext;
     private CompositeClassLoader    classLoader;
+    private RouteBuilder routeBuilder;
 
     @Test
     public void testSessionInsert() throws Exception {
@@ -173,6 +174,12 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
 
+                jaxbDataformat.setCamelContext(routeBuilder.getContext());
+                try {
+                    jaxbDataformat.start();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
                 jaxbContext = jaxbDataformat.getContext();
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
@@ -184,16 +191,17 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
+        routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint( true );
-                def.setContextPath( "org.drools.pipeline.camel" );
+                def.setPrettyPrint(true);
+                def.setContextPath("org.drools.pipeline.camel");
 
-                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).
-                        unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
+                from("direct:test-with-session").policy(new DroolsPolicy()).
+                        unmarshal(def).to("drools:node/ksession1").marshal(def);
             }
         };
+        return routeBuilder;
     }
 
     @Override

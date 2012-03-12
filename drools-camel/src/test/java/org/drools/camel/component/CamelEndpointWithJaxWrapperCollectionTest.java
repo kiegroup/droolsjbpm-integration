@@ -64,6 +64,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 
     private String      handle;
     private JAXBContext jaxbContext;
+    private RouteBuilder routeBuilder;
 
     @Test
     public void testWorkingSetGlobalTestSessionSetAndGetGlobal() throws Exception {
@@ -197,6 +198,12 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
 
+                jaxbDataformat.setCamelContext(routeBuilder.getContext());
+                try {
+                    jaxbDataformat.start();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
                 jaxbContext = jaxbDataformat.getContext();
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
@@ -208,16 +215,17 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
+        routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint( true );
+                def.setPrettyPrint(true);
                 // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
-                def.setContextPath( "org.drools.pipeline.camel" );
+                def.setContextPath("org.drools.pipeline.camel");
 
-                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).
-                        unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
+                from("direct:test-with-session").policy(new DroolsPolicy()).
+                        unmarshal(def).to("drools:node/ksession1").marshal(def);
             }
         };
+        return routeBuilder;
     }
 }
