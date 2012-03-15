@@ -42,7 +42,6 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

@@ -2,10 +2,10 @@ dialect "java"
 
 import org.drools.benchmark.model.*
 
-rule "Join"
+rule "Join" @activationListener('direct')
 when
     $b1 : Bean(s != "aaa")
-    $b2 : Bean(s != $b1.s, date != $b1.date, isEnabled($b1))
+    $b2 : Bean(s > $b1.s, date > $b1.date, i > $b1.i)
 then
 //    System.out.println($b2);
 end

@@ -32,32 +32,27 @@ import java.util.regex.*;
 
 public class WaltzBenchmark extends AbstractBenchmark {
 
-    private StatefulSession session;
+    private RuleBase ruleBase;
     private List<Line> lines = new ArrayList<Line>();
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        final RuleBase ruleBase;
         try {
             ruleBase = readRule();
-            session = ruleBase.newStatefulSession();
-            loadLines(session, "/waltz50.dat");
+            loadLines("/waltz50.dat");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public void execute(int repNr) {
+        StatefulSession session = ruleBase.newStatefulSession();
         for (Line l : lines) {
             session.insert( l );
         }
         session.insert( new Stage( Stage.DUPLICATE ) );
         session.fireAllRules();
-    }
-
-    @Override
-    public void terminate() {
-        session.dispose(); // Stateful rule session must always be disposed when finished
+        session.dispose();
     }
 
     private RuleBase readRule() throws Exception,
@@ -81,7 +76,7 @@ public class WaltzBenchmark extends AbstractBenchmark {
         return ruleBase;
     }
 
-    private void loadLines(final WorkingMemory wm, final String filename) throws IOException {
+    private void loadLines(final String filename) throws IOException {
         if (!lines.isEmpty()) {
             return;
         }

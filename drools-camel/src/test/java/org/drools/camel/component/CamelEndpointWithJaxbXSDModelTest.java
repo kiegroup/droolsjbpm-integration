@@ -60,12 +60,14 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
     private JAXBContext                jaxbContext;
     private CompositeClassLoader    classLoader;
+    private RouteBuilder routeBuilder;
 
     @Test
     public void testSessionInsert() throws Exception {
-        Class< ? > personClass = classLoader.loadClass( "org.drools.camel.testdomain.Person" );
+        // These 2 classes around defined by person.xsd, not as a class file
+        Class< ? > personClass = classLoader.loadClass( "org.drools.model.Person" );
         assertNotNull( personClass.getPackage() );
-        Class< ? > addressClass = classLoader.loadClass( "org.drools.camel.testdomain.AddressType" );
+        Class< ? > addressClass = classLoader.loadClass( "org.drools.model.AddressType" );
         assertNotNull( addressClass.getPackage() );
         Object baunax = personClass.newInstance();
         Object lucaz = personClass.newInstance();
@@ -159,8 +161,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
-            def.setContextPath( "org.drools.pipeline.camel" );
+            def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -173,6 +174,12 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
 
+                jaxbDataformat.setCamelContext(routeBuilder.getContext());
+                try {
+                    jaxbDataformat.start();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
                 jaxbContext = jaxbDataformat.getContext();
             } finally {
                 Thread.currentThread().setContextClassLoader( originalCl );
@@ -184,24 +191,24 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
+        routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint( true );
-                // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
-                def.setContextPath( "org.drools.pipeline.camel" );
+                def.setPrettyPrint(true);
+                def.setContextPath("org.drools.pipeline.camel");
 
-                from( "direct:test-with-session" ).policy( new DroolsPolicy() ).
-                        unmarshal( def ).to( "drools:node/ksession1" ).marshal( def );
+                from("direct:test-with-session").policy(new DroolsPolicy()).
+                        unmarshal(def).to("drools:node/ksession1").marshal(def);
             }
         };
+        return routeBuilder;
     }
 
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
         rule += "package org.drools.pipeline.camel.test \n";
-        rule += "import org.drools.camel.testdomain.Person \n";
+        rule += "import org.drools.model.Person \n";
         rule += "global java.util.List list \n";
         rule += "query persons \n";
         rule += "   $p : Person(name != null) \n";

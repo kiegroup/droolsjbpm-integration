@@ -16,11 +16,18 @@
 package org.drools.grid.remote;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import org.drools.ChangeSet;
 import org.drools.KnowledgeBase;
 import org.drools.SystemEventListener;
 import org.drools.agent.KnowledgeAgent;
+import org.drools.command.BatchExecutionCommand;
+import org.drools.command.Command;
+import org.drools.command.CommandFactory;
+import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.event.knowledgeagent.KnowledgeAgentEventListener;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -75,19 +82,49 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void applyChangeSet(Resource rsrc) {
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{new ApplyChangeSetRemoteCommand(this.id, rsrc)}));
+    public void applyChangeSet( Resource rsrc ) {
+        
+        
+        
+        List<Command> commands = new ArrayList<Command>();
+            commands.add( new ApplyChangeSetRemoteCommand( this.id, rsrc ) );
+            commands.add( CommandFactory.newFireAllRules() );
+        BatchExecutionCommand batch = CommandFactory.newBatchExecution( commands );
 
+        Command c = new KnowledgeContextResolveFromContextCommand( batch,
+                null,
+                null,
+                id,
+                "" );
+        
+        
+        CommandImpl cmd = new CommandImpl( "execute",
+                    Arrays.asList( new Object[] { c, id } )
+                );
+        
+        
         ConversationUtil.sendAsyncMessage(this.cm,
                 (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
                 this.gsd.getId(),
                 cmd);
     }
 
-    public void applyChangeSet(ChangeSet cs) {
-        CommandImpl cmd = new CommandImpl("execute",
-                Arrays.asList(new Object[]{new ApplyChangeSetRemoteCommand(this.id, cs)}));
+    public void applyChangeSet( ChangeSet cs ) {
+        List<Command> commands = new ArrayList<Command>();
+            commands.add( new ApplyChangeSetRemoteCommand( this.id, cs ) );
+            commands.add( CommandFactory.newFireAllRules() );
+        BatchExecutionCommand batch = CommandFactory.newBatchExecution( commands );
+
+        Command c = new KnowledgeContextResolveFromContextCommand( batch,
+                        null,
+                        null,
+                        id,
+                        "" );
+
+
+        CommandImpl cmd = new CommandImpl( "execute",
+                    Arrays.asList( new Object[] { c, id } )
+                );
 
         ConversationUtil.sendAsyncMessage(this.cm,
                 (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),

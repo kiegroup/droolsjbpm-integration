@@ -30,7 +30,7 @@ public class RuleFlowDelegate implements ConwayRuleDelegate {
     public RuleFlowDelegate() {
         try {
             KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-            kbuilder.add( ResourceFactory.newClassPathResource( "conway-ruleflow.drl",getClass()), ResourceType.DRL );
+            kbuilder.add( ResourceFactory.newClassPathResource( "ruleflow/conway-ruleflow.drl",getClass()), ResourceType.DRL );
             kbuilder.add( ResourceFactory.newClassPathResource( "generation.rf",getClass()), ResourceType.DRF );
             kbuilder.add( ResourceFactory.newClassPathResource( "killAll.rf",getClass()), ResourceType.DRF );
             kbuilder.add( ResourceFactory.newClassPathResource( "registerNeighbor.rf",getClass()), ResourceType.DRF );

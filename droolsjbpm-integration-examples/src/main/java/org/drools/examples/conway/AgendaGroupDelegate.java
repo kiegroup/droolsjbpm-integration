@@ -32,7 +32,7 @@ public class AgendaGroupDelegate
     public AgendaGroupDelegate() {
         try {
             KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-            kbuilder.add( ResourceFactory.newClassPathResource( "conway-agendagroup.drl",
+            kbuilder.add( ResourceFactory.newClassPathResource( "agendagroup/conway-agendagroup.drl",
                                                                         getClass() ),
                                   ResourceType.DRL );
 
