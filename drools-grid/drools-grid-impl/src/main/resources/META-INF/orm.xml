@@ -7,8 +7,7 @@
       <table name="Address"/>
 
       <attributes>
-          <id name="id">
-              <generated-value strategy="AUTO"/>
+          <id name="addressId">
           </id>
           <many-to-one name="gridServiceDescription" target-entity="org.drools.grid.service.directory.impl.GridServiceDescriptionImpl" />
       </attributes>
@@ -18,7 +17,7 @@
       <table name="GridServiceDescription"/>
 
       <attributes>
-          <id name="id" />        
+          <id name="descId" />        
           <one-to-many name="addresses" mapped-by="gridServiceDescription" target-entity="org.drools.grid.service.directory.impl.AddressImpl" fetch="EAGER" >
               <map-key name="transport" /> 
               <cascade>
@@ -33,7 +32,7 @@
       <table name="ScheduledJob"/>
 
       <attributes>
-          <id name="id" />        
+          <id name="jobId" />        
           <transient name="jobHandle" />                      
       </attributes>
   </entity>    

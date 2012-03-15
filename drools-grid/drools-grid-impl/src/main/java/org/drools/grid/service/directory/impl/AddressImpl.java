@@ -1,6 +1,7 @@
 package org.drools.grid.service.directory.impl;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.service.directory.Address;
@@ -9,13 +10,14 @@ public class AddressImpl
     implements
     Address,
     Serializable {
-    private String                 id;
+    
+    private String                 addressId;
 
     private GridServiceDescription gridServiceDescription;
 
     private String                 transport;
 
-    private Serializable           object;
+    private Serializable           addressObject;
 
     public AddressImpl() {
 
@@ -26,15 +28,16 @@ public class AddressImpl
                        Serializable object) {
         this.gridServiceDescription = gridServiceDescription;
         this.transport = transport;
-        this.object = object;
+        this.addressObject = object;
+        this.addressId = UUID.randomUUID().toString()+"-address";
     }
-
+    
     public String getId() {
-        return id;
+        return addressId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.addressId = id;
     }
 
     public GridServiceDescription getGridServiceDescription() {
@@ -46,11 +49,11 @@ public class AddressImpl
     }
 
     public Serializable getObject() {
-        return object;
+        return addressObject;
     }
 
     public void setObject(Object object) {
-        this.object = (Serializable) object;
+        this.addressObject = (Serializable) object;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class AddressImpl
         int result = 1;
         result = prime * result
                  + ((gridServiceDescription == null) ? 0 : gridServiceDescription.getId().hashCode());
-        result = prime * result + ((object == null) ? 0 : object.hashCode());
+        result = prime * result + ((addressObject == null) ? 0 : addressObject.hashCode());
         result = prime * result
                  + ((transport == null) ? 0 : transport.hashCode());
         return result;
@@ -74,9 +77,9 @@ public class AddressImpl
         if ( gridServiceDescription == null ) {
             if ( other.gridServiceDescription != null ) return false;
         } else if ( !gridServiceDescription.getId().equals( other.gridServiceDescription.getId() ) ) return false;
-        if ( object == null ) {
-            if ( other.object != null ) return false;
-        } else if ( !object.equals( other.object ) ) return false;
+        if ( addressObject == null ) {
+            if ( other.addressObject != null ) return false;
+        } else if ( !addressObject.equals( other.addressObject ) ) return false;
         if ( transport == null ) {
             if ( other.transport != null ) return false;
         } else if ( !transport.equals( other.transport ) ) return false;
@@ -84,7 +87,7 @@ public class AddressImpl
     }
 
     public String toString() {
-        return "Address id=" + id + " tranport=" + transport + " object=" + object;
+        return "Address id=" + addressId + " tranport=" + transport + " object=" + addressObject;
     }
 
 }

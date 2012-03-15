@@ -156,6 +156,10 @@ public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable{
         hash = 19 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
     }
+
+    public boolean isComposite() {
+        return false;
+    }
     
     
 }

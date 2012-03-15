@@ -17,11 +17,11 @@ public class ScheduledJob
     implements
     Externalizable {
     private static final long         serialVersionUID = 510l;
-
-    private String                    id;
+    
+    private String                    jobId;
     private UuidJobHandle             jobHandle;
     private Class                     jobClass;
-    private Serializable              trigger;
+    private Serializable              jobtrigger;
     private Date                      nextFireTime;
     private ScheduledJobConfiguration configuration;
     private Serializable              ctx;
@@ -35,10 +35,10 @@ public class ScheduledJob
                         final JobContext context,
                         final Trigger trigger) {
         this.jobHandle = jobHandle;
-        this.id = jobHandle.getUuid().toString();
+        this.jobId = jobHandle.getUuid().toString();
         this.jobClass = job.getClass();
         this.ctx = (Serializable) context;
-        this.trigger = (Serializable) trigger;
+        this.jobtrigger = (Serializable) trigger;
         this.nextFireTime = trigger.hasNextFireTime();
 
     }
@@ -64,7 +64,7 @@ public class ScheduledJob
     public JobHandle getJobHandle() {
         if ( this.jobHandle == null ) {
             // it's transient on persistence, so restore on demand
-            this.jobHandle = new UuidJobHandle( UUID.fromString( this.id ) );
+            this.jobHandle = new UuidJobHandle( UUID.fromString( this.jobId ) );
         }
         return this.jobHandle;
     }
@@ -78,7 +78,7 @@ public class ScheduledJob
     }
 
     public String getId() {
-        return this.id;
+        return this.jobId;
     }
 
     public Date getNextFireTime() {
@@ -86,7 +86,7 @@ public class ScheduledJob
     }
 
     public Trigger getTrigger() {
-        return (Trigger) trigger;
+        return (Trigger) jobtrigger;
     }
 
     public JobContext getJobContext() {
@@ -102,13 +102,13 @@ public class ScheduledJob
     }
 
     public String toString() {
-        return "ScheduledJob( job=" + jobClass.getName() + " trigger=" + trigger + " context=" + ctx + " )";
+        return "ScheduledJob( job=" + jobClass.getName() + " trigger=" + jobtrigger + " context=" + ctx + " )";
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeUTF( this.id );
+        out.writeUTF( this.jobId );
         out.writeUTF( this.jobClass.getCanonicalName() );
-        out.writeObject( this.trigger );
+        out.writeObject( this.jobtrigger );
         out.writeLong( this.nextFireTime.getTime() );
         out.writeObject( this.ctx );
         out.writeObject( this.configuration );
@@ -116,9 +116,9 @@ public class ScheduledJob
 
     public void readExternal(ObjectInput in) throws IOException,
                                             ClassNotFoundException {
-        this.id = in.readUTF();
+        this.jobId = in.readUTF();
         this.jobClass = (Class) Class.forName( in.readUTF() );
-        this.trigger = (Serializable) in.readObject();
+        this.jobtrigger = (Serializable) in.readObject();
         this.nextFireTime = new Date( in.readLong() );
         this.ctx = (Serializable) in.readObject();
         this.configuration = (ScheduledJobConfiguration) in.readObject();

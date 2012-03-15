@@ -67,6 +67,7 @@ public abstract class BaseRemoteTest {
     protected Grid grid1;
     
     protected GridNode remoteN1;
+    protected GridServiceDescription gsdN1;
     private Server server;
     
     @Before
@@ -85,18 +86,24 @@ public abstract class BaseRemoteTest {
         System.out.println("DB for white pages started! ");
 
         this.coreServicesMap = new HashMap();
-        createRemoteNode();
+        gsdN1 = createRemoteNode();
     }
 
     @After
     public void tearDown() {
+        
+        
         remoteN1.dispose();
+        
+        grid1.removeGridNode( gsdN1.getId() );
+        
         grid1.get(SocketService.class).close();
+        
         server.stop();
         
     }
     
-    private void createRemoteNode(){
+    private GridServiceDescription createRemoteNode(){
         grid1 = new GridImpl("peer1", new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
@@ -114,7 +121,7 @@ public abstract class BaseRemoteTest {
         GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
         remoteN1 = conn.connect();
         
-        
+        return n1Gsd;
     
     }
     

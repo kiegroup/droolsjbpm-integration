@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.persistence.Id;
 
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.service.directory.Address;
@@ -14,14 +15,14 @@ public class GridServiceDescriptionImpl
     implements
     GridServiceDescription,
     Serializable {
-
-    private String               id;
+    
+    private String               descId;
 
     private Class                serviceInterface;
 
     private Map<String, Address> addresses = new HashMap<String, Address>();
 
-    private Serializable         data;
+    private Serializable         descdata;
 
     public GridServiceDescriptionImpl() {
 
@@ -29,19 +30,20 @@ public class GridServiceDescriptionImpl
 
     public GridServiceDescriptionImpl(Class cls) {
         this.serviceInterface = cls;
-        this.id = cls.getName();
+        this.descId = cls.getName();
     }
 
     public GridServiceDescriptionImpl(String id) {
-        this.id = id;
+        this.descId = id;
     }
 
+    
     public String getId() {
-        return id;
+        return descId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.descId = id;
     }
 
     public Class getServiceInterface() {
@@ -74,7 +76,7 @@ public class GridServiceDescriptionImpl
         final int prime = 31;
         int result = 1;
         result = prime * result + ((addresses == null) ? 0 : addresses.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((descId == null) ? 0 : descId.hashCode());
         return result;
     }
 
@@ -90,7 +92,7 @@ public class GridServiceDescriptionImpl
 
     @Override
     public String toString() {
-        String result = id + "@";
+        String result = descId + "@";
 
         Set<String> keys = addresses.keySet();
         for ( String key : keys ) {
@@ -103,11 +105,11 @@ public class GridServiceDescriptionImpl
     }
 
     public Serializable getData() {
-        return data;
+        return descdata;
     }
 
     public void setData(Serializable data) {
-        this.data = data;
+        this.descdata = data;
     }
 
 }

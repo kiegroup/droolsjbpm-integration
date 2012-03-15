@@ -96,5 +96,7 @@ public interface ResourceDescriptor extends Serializable{
      * @return the version of the Resource
      */
     public String getVersion();
+    
+    public boolean isComposite();
 
 }

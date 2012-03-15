@@ -34,4 +34,9 @@ public class CompositeResourceDescriptorImpl extends ResourceDescriptorImpl impl
         this.internalResources = internalResources;
     }
     
+    @Override
+    public boolean isComposite(){
+        return true;
+    }
+    
 }
