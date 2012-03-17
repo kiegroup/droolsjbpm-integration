@@ -19,14 +19,17 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Date;
 import java.util.Set;
+
+import org.drools.builder.ResourceType;
 import org.drools.grid.api.ResourceDescriptor;
 
 
 /**
  * Agnostic description of a Resource
  */
-public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable{
-    private String type;
+public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable {
+
+    private ResourceType type;
     private URL resourceURL;
     private String version;
     private String status;
@@ -38,6 +41,7 @@ public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable{
     private String author;
     private Date creationTime;
     private Date lastModificationTime;
+    private boolean loaded;
 
     public String getAuthor() {
         return author;
@@ -119,11 +123,11 @@ public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable{
         this.status = status;
     }
 
-    public String getType() {
+    public ResourceType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType( ResourceType type ) {
         this.type = type;
     }
 
@@ -133,6 +137,14 @@ public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable{
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
     }
 
     @Override
@@ -160,6 +172,5 @@ public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable{
     public boolean isComposite() {
         return false;
     }
-    
     
 }

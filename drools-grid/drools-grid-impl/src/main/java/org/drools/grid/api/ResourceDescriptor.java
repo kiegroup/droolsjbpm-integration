@@ -15,6 +15,8 @@
  */
 package org.drools.grid.api;
 
+import org.drools.builder.ResourceType;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Date;
@@ -89,7 +91,7 @@ public interface ResourceDescriptor extends Serializable{
      * Returns the type of the Resource.
      * @return the type of the Resource
      */
-    public String getType();
+    public ResourceType getType();
 
     /**
      * Returns the version of the Resource.
