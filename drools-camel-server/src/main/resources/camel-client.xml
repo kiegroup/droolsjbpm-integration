@@ -33,12 +33,19 @@
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
       
     <route>
-       <from uri="direct://kservice"/>
+       <from uri="direct://kservice/rest"/>
        <policy ref="droolsPolicy"> 
-         <to uri="cxfrs://http://localhost:8080/drools-server-app/kservice/rest"/>
+         <to uri="cxfrs://http://localhost:8080/drools-server/kservice/rest"/>
        </policy>
-    </route>     
-        
+    </route>
+
+    <route>
+      <from uri="direct://kservice/soap"/>
+      <policy ref="droolsPolicy">
+        <to uri="cxfrs://http://localhost:8080/drools-server/kservice/soap"/>
+      </policy>
+    </route>
+
   </camelContext>
   
 </beans>
