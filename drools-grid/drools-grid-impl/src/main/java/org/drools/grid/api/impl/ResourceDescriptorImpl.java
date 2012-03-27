@@ -172,5 +172,24 @@ public class ResourceDescriptorImpl implements ResourceDescriptor, Serializable 
     public boolean isComposite() {
         return false;
     }
-    
+
+
+    @Override
+    public String toString() {
+        return "ResourceDescriptorImpl{" +
+                "type=" + type +
+                ", resourceURL=" + resourceURL +
+                ", version='" + version + '\'' +
+                ", status='" + status + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id='" + id + '\'' +
+                ", documentation=" + documentation +
+                ", categories=" + categories +
+                ", author='" + author + '\'' +
+                ", creationTime=" + creationTime +
+                ", lastModificationTime=" + lastModificationTime +
+                ", loaded=" + loaded +
+                '}';
+    }
 }

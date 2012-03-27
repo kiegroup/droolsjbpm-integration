@@ -32,54 +32,72 @@ public interface ResourceDescriptor extends Serializable{
      * @return the author of the Resource
      */
     public String getAuthor();
+    
+    public void setAuthor( String author );
 
     /**
      * Returns the List of categories associated with the Resource.
      * @return the List of categories associated with the Resource
      */
     public Set<String> getCategories();
+    
+    public void setCategories( Set<String> categories );
 
     /**
      * Returns the creation date of the Resource.
      * @return the creation date of the Resource
      */
     public Date getCreationTime();
+    
+    public void setCreationTime( Date creationTime );
 
     /**
      * Returns the description of the Resource.
      * @return the description of the Resource
      */
     public String getDescription();
+    
+    public void setDescription( String description );
 
     /**
      * Returns the URL of the documentation associated with the Resource.
      * @return the URL of the documentation associated with the Resource
      */
     public URL getDocumentation();
+    
+    public void setDocumentation( URL documentation );
 
     /**
      * Returns the id of the Resource.
      * @return the id of the Resource
      */
     public String getId();
+    
+    public void setId( String id );
 
     /**
      * Returns the date when the Resource was last modified.
      * @return the date when the Resource was last modified
      */
     public Date getLastModificationTime();
+    
+    public void setLastModificationTime( Date lastModifcationTime );
 
     /**
      * Returns the name of the Resource.
      * @return the name of the Resource
      */
     public String getName();
+    
+    public void setName( String name );
 
     /**
      * Returns the URL that can be used to get the Resource this descriptor points at.
      * @return the URL that can be used to get the Resource this descriptor points at
      */
     public URL getResourceURL();
+    
+    public void setResourceURL( URL resourceUrl );
 
     /**
      * Returns the status of the Resource.
@@ -87,11 +105,15 @@ public interface ResourceDescriptor extends Serializable{
      */
     public String getStatus();
 
+    public void setStatus( String status );
+    
     /**
      * Returns the type of the Resource.
      * @return the type of the Resource
      */
     public ResourceType getType();
+    
+    public void setType( ResourceType type );
 
     /**
      * Returns the version of the Resource.
@@ -99,6 +121,16 @@ public interface ResourceDescriptor extends Serializable{
      */
     public String getVersion();
     
+    public void setVersion( String version );
+
+
+
     public boolean isComposite();
+
+
+
+    public boolean isLoaded();
+
+    public void setLoaded( boolean loaded );
 
 }
