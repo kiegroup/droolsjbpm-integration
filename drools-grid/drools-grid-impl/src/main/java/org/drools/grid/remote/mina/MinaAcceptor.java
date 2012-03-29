@@ -36,11 +36,11 @@ public class MinaAcceptor
     public synchronized void open(InetSocketAddress address,
                                   MessageReceiverHandler handler,
                                   SystemEventListener systemEventListener) {
-        if(logger.isTraceEnabled()){
-            logger.trace(" ### Binding a new SocketAcceptor to "+address.getHostName()+":"+address.getPort());
+        if ( logger.isTraceEnabled() ){
+            logger.trace("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Binding a new SocketAcceptor to "+address.getHostName()+":"+address.getPort());
         }
         if ( this.acceptor == null ) {
-            acceptor = new NioSocketAcceptor();
+            acceptor = new NioSocketAcceptor( 16 );
 
             acceptor.getFilterChain().addLast( "codec",
                                                new ProtocolCodecFilter( new ObjectSerializationCodecFactory() ) );
@@ -56,7 +56,7 @@ public class MinaAcceptor
         try {
             acceptor.bind( address );
         } catch ( IOException e ) {
-            throw new RuntimeException( "Unable to bind Mina Acceptor",
+            throw new RuntimeException( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"Unable to bind Mina Acceptor",
                                         e );
         }
     }
