@@ -34,10 +34,14 @@ import org.drools.grid.service.directory.Address;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.util.ServiceRegistry;
 import org.drools.util.ServiceRegistryImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GridNodeRemoteClient<T>
-    implements
-    GridNode {
+        implements
+        GridNode {
+
+    private static Logger logger = LoggerFactory.getLogger(GridNodeRemoteClient.class);
 
     private GridServiceDescription    gsd;
     private Grid                      grid;
@@ -57,26 +61,41 @@ public class GridNodeRemoteClient<T>
         //@TODO: this was done just as a hack to have the information ready, requires review and refactoring
         if(cls.isAssignableFrom(String.class)){
             CommandImpl cmd = new CommandImpl( "lookupKsessionId",
-                                               Arrays.asList( new Object[]{identifier} ) );
+                    Arrays.asList( new Object[]{identifier} ) );
 
             ConversationManager connm = this.grid.get( ConversationManager.class );
             Object result = ConversationUtil.sendMessage( connm,
-                                          (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
-                                          this.gsd.getId(),
-                                          cmd );
+                    (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                    this.gsd.getId(),
+                    cmd );
             return (T)result;
         }
         if(cls.isAssignableFrom(StatefulKnowledgeSession.class) ){
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC I'm now trying to locate a happy SKS..." + identifier );
+            }
             CommandImpl cmd = new CommandImpl( "lookupKsession",
-                                               Arrays.asList( new Object[]{identifier} ) );
+                    Arrays.asList( new Object[]{identifier} ) );
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC I have the command ready" );
+            }
 
             ConversationManager connm = this.grid.get( ConversationManager.class );
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC I have the convo manager ready" );
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC Sending to " + ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject() );
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC The gsd, whatever it is " + this.gsd.getId() );
+            }
+
             Object result = ConversationUtil.sendMessage( connm,
-                                          (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
-                                          this.gsd.getId(),
-                                          cmd );
-            
-            
+                    (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                    this.gsd.getId(),
+                    cmd );
+
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC Ready to send it back" );
+            }
+
             return (T)new StatefulKnowledgeSessionRemoteClient((String)result, gsd, connm);
         }
         T service = (T) localContext.get( identifier );
@@ -89,30 +108,30 @@ public class GridNodeRemoteClient<T>
 
     public <T> T get(Class<T> serviceClass) {
         return get( serviceClass.getName(),
-                    serviceClass );
+                serviceClass );
     }
 
     public void set(String identifier,
                     Object object) {
-       //We need a way to do it more generic, so we can set whatever we want.
-        
-       if(object instanceof StatefulKnowledgeSessionRemoteClient){
+        //We need a way to do it more generic, so we can set whatever we want.
+
+        if(object instanceof StatefulKnowledgeSessionRemoteClient){
             String localId = UUID.randomUUID().toString();
 
             CommandImpl cmd = new CommandImpl( "registerKsession",
-                                               Arrays.asList( new Object[]{identifier, ((StatefulKnowledgeSessionRemoteClient)object).getInstanceId()} ) );
+                    Arrays.asList( new Object[]{identifier, ((StatefulKnowledgeSessionRemoteClient)object).getInstanceId()} ) );
 
             ConversationManager connm = this.grid.get( ConversationManager.class );
             ConversationUtil.sendMessage( connm,
-                                          (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
-                                          this.gsd.getId(),
-                                          cmd );
-       } else{
-            
-           throw new UnsupportedOperationException( "Not supported yet." );
-       }
+                    (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                    this.gsd.getId(),
+                    cmd );
+        } else{
 
-        
+            throw new UnsupportedOperationException( "Not supported yet." );
+        }
+
+
     }
 
     public String getId() {
@@ -122,11 +141,11 @@ public class GridNodeRemoteClient<T>
     public void init(Object context) {
 
         this.localContext.put( KnowledgeBuilderFactoryService.class.getName(),
-                               new KnowledgeBuilderProviderRemoteClient( this.grid,
-                                                                         gsd ) );
+                new KnowledgeBuilderProviderRemoteClient( this.grid,
+                        gsd ) );
         this.localContext.put( KnowledgeBaseFactoryService.class.getName(),
-                               new KnowledgeBaseProviderRemoteClient( this.grid,
-                                                                      gsd ) );
+                new KnowledgeBaseProviderRemoteClient( this.grid,
+                        gsd ) );
 
     }
 

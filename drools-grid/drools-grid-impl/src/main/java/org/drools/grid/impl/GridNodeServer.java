@@ -46,12 +46,12 @@ public class GridNodeServer
     // This map keeps the relationship between the clientSessionid and the Session name
     // Example: <UUID-SessionId>, session1
     private Map<String, String> clientSessions = new HashMap<String, String>();
-    
+
     private Map<String, String> internalSessionsExposed = new HashMap<String, String>();
     private static Logger logger = LoggerFactory.getLogger(GridNodeServer.class);
 
     public GridNodeServer(GridNode gnode,
-            NodeData data) {
+                          NodeData data) {
         if (logger.isDebugEnabled()) {
             logger.debug(" ### GridNodeServer: Creating GridNodeServer for node: " + gnode.getId());
         }
@@ -60,7 +60,7 @@ public class GridNodeServer
     }
 
     public void messageReceived(Conversation conversation,
-            Message msg) {
+                                Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
         this.execs.get(cmd.getName()).execute(gnode,
                 conversation,
@@ -74,9 +74,9 @@ public class GridNodeServer
                     new Exec() {
 
                         public void execute(Object object,
-                                Conversation con,
-                                Message msg,
-                                CommandImpl cmd) {
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
 
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
@@ -100,7 +100,7 @@ public class GridNodeServer
 //                                  
                                     if (logger.isDebugEnabled()) {
                                         logger.debug(" ### GridNodeServer(execute): Looking for id: =" + instanceId + " inside gnode");
-                                        
+
                                     }
                                     if( logger.isTraceEnabled()){
                                         logger.trace(" ### GridNodeServer(execute): sessions mappings: =" + sessions.keySet());
@@ -110,7 +110,7 @@ public class GridNodeServer
                                         logger.trace(" ### GridNodeServer(execute): client sessions mappings values: =" + clientSessions.values());
                                         logger.trace(" ### GridNodeServer(execute): internal sessions exposed mappings values: =" + internalSessionsExposed.values());
                                     }
-                                    
+
 
                                     String sessionName = clientSessions.get(instanceId);
                                     if(sessionName == null || sessionName.equals("")){
@@ -142,9 +142,9 @@ public class GridNodeServer
                     new Exec() {
 
                         public void execute(Object object,
-                                Conversation con,
-                                Message msg,
-                                CommandImpl cmd) {
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
                             String sessionName = (String) list.get(0);
@@ -176,36 +176,38 @@ public class GridNodeServer
                     new Exec() {
 
                         public void execute(Object object,
-                                Conversation con,
-                                Message msg,
-                                CommandImpl cmd) {
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
                             String sessionName = (String) list.get(0);
                             if (logger.isDebugEnabled()) {
-                                logger.debug(" ### GridNodeServer (lookupKsession):  node: (" + gnode.getId() + ") - sessionname: (" + sessionName + ")");
-                                
+                                logger.debug("(" + Thread.currentThread().getId() + ")"+ Thread.currentThread().getName() +" ### GridNodeServer (lookupKsession):  node: (" + gnode.getId() + ") - sessionname: (" + sessionName + ")");
+
                             }
                             if( logger.isTraceEnabled()){
-                                logger.trace(" ### GridNodeServer (lookupKsession):  \t available client sessions: " + clientSessions.keySet());
-                                logger.trace(" ### GridNodeServer (lookupKsession):  \t available cached sessions: " + sessions.keySet());
+                                logger.trace("(" + Thread.currentThread().getId() + ")"+ Thread.currentThread().getName() +" ### GridNodeServer (lookupKsession):  \t available client sessions: " + clientSessions.keySet());
+                                logger.trace("(" + Thread.currentThread().getId() + ")"+ Thread.currentThread().getName() +" ### GridNodeServer (lookupKsession):  \t available cached sessions: " + sessions.keySet());
                             }
                             String clientSessionId = clientSessions.get(sessionName);
 
                             if (clientSessionId == null || clientSessionId.equals("")) {
                                 if (logger.isDebugEnabled()) {
-                                    logger.debug(" ### GridNodeServer (lookupKsession): The session is in the local context: " + gnode.get(sessionName, String.class));
+                                    logger.debug("(" + Thread.currentThread().getId() + ")"+ Thread.currentThread().getName() +" ### GridNodeServer (lookupKsession): The session is in the local context: " + gnode.get(sessionName, String.class));
                                     logger.debug(" ### GridNodeServer (lookupKsession): I'm inside the node =" + gnode.getId() + " instance: " + gnode);
-                                    
+
                                 }
                                 clientSessionId = gnode.get(sessionName, String.class);
-                                logger.debug(" ### GridNodeServer (lookupKsession): Registering internal Session Id into internalSessionExposed with sessionId: =" + clientSessionId + " for session name: " + sessionName);
+                                if ( logger.isDebugEnabled() ) {
+                                    logger.debug("(" + Thread.currentThread().getId() + ")"+ Thread.currentThread().getName() +" ### GridNodeServer (lookupKsession): Registering internal Session Id into internalSessionExposed with sessionId: =" + clientSessionId + " for session name: " + sessionName);
+                                }
                                 internalSessionsExposed.put( clientSessionId, sessionName);
-                                
+
                             }
 
                             if (logger.isDebugEnabled()) {
-                                logger.debug(" ### GridNodeServer (lookupKsession):  return =" + clientSessionId);
+                                logger.debug("(" + Thread.currentThread().getId() + ")"+ Thread.currentThread().getName() +" ### GridNodeServer (lookupKsession):  return =" + clientSessionId);
 
                             }
                             con.respond(clientSessionId);
@@ -215,9 +217,9 @@ public class GridNodeServer
                     new Exec() {
 
                         public void execute(Object object,
-                                Conversation con,
-                                Message msg,
-                                CommandImpl cmd) {
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
                             GridNode gnode = (GridNode) object;
                             List list = cmd.getArguments();
                             String sessionId = (String) list.get(0);
@@ -233,7 +235,7 @@ public class GridNodeServer
                             if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
                                 for(String key : clientSessions.keySet()){
                                     if(clientSessions.get(key).equals(sessionId)){
-                                            gnodeInternalSessionId = key;
+                                        gnodeInternalSessionId = key;
                                     }
                                 }
                                 if (logger.isDebugEnabled()) {
@@ -243,7 +245,7 @@ public class GridNodeServer
                             if (gnodeInternalSessionId == null || gnodeInternalSessionId.equals("")) {
                                 for(String key : internalSessionsExposed.keySet()){
                                     if(internalSessionsExposed.get(key).equals(sessionId)){
-                                            gnodeInternalSessionId = key;
+                                        gnodeInternalSessionId = key;
                                     }
                                 }
                                 if (logger.isDebugEnabled()) {
@@ -270,9 +272,9 @@ public class GridNodeServer
     public static interface Exec {
 
         void execute(Object object,
-                Conversation con,
-                Message msg,
-                CommandImpl cmd);
+                     Conversation con,
+                     Message msg,
+                     CommandImpl cmd);
     }
 
     public NodeData getData() {
