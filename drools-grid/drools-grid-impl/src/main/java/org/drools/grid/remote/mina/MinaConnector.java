@@ -84,7 +84,7 @@ public class MinaConnector
             logger.trace(" ### Connecting with "+address.getHostName()+":"+address.getPort());
         }                                              
         ConnectFuture future1 = this.connector.connect( address );
-        future1.join();
+        future1.awaitUninterruptibly();
         if ( !future1.isConnected() ) {
             throw new IllegalStateException( "Unnable to connect to " + address );
         }
@@ -99,11 +99,13 @@ public class MinaConnector
         if ( this.writer != null ) {
             IoSession session = this.writer.getIoSession();
             if ( session != null && session.isConnected() ) {
-                session.close();
-                session.getCloseFuture().join();
+                session.close( true ).awaitUninterruptibly();
             }
             this.writer.dispose();
             this.writer = null;
+        }
+        if ( this.connector != null && this.connector.isActive() ) {
+            this.connector.dispose();
             this.connector = null;
         }
     }
