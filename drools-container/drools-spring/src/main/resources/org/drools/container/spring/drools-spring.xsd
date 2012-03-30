@@ -232,11 +232,13 @@
   <xsd:element name="ksession">
     <xsd:complexType>
       <xsd:sequence>
-        <!-- additions for JIRA JBRULES-3076 -->
-        <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
-        <!-- end of additions for JIRA JBRULES-3076 -->
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <!-- additions for JIRA JBRULES-3076 -->
+          <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- end of additions for JIRA JBRULES-3076 -->
+        </xsd:sequence>
         <xsd:choice minOccurs="0" maxOccurs="1">
           <xsd:element name="batch" minOccurs="0" maxOccurs="1">
             <xsd:complexType>
