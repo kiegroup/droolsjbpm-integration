@@ -16,6 +16,7 @@
 package org.drools.grid.helper;
 
 import java.util.HashMap;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.grid.*;
@@ -38,12 +39,21 @@ import org.slf4j.LoggerFactory;
  */
 public class GridHelper {
 
-    private static Grid gridHelper;
     public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
+
+    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+
+    public static void reset() {
+        if ( emf != null && emf.isOpen() ) {
+            emf.close();
+        }
+        emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+
+    }
 
     public static Grid getGrid() {
 
-        gridHelper = new GridImpl(new HashMap<String, Object>());
+        Grid gridHelper = new GridImpl(new HashMap<String, Object>());
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
@@ -51,7 +61,7 @@ public class GridHelper {
         //Configuring the a local WhitePages service that is being shared with all the grid peers
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
 
-        wplConf.setWhitePages(new JpaWhitePages(Persistence.createEntityManagerFactory("org.drools.grid")));
+        wplConf.setWhitePages( new JpaWhitePages( emf ) );
         conf.addConfiguration(wplConf);
 
         conf.configure(gridHelper);
