@@ -63,7 +63,7 @@ public class MinaAcceptor
 
     public synchronized void close() {
         acceptor.unbind();
-        acceptor.dispose();
+        acceptor.dispose( true );
         this.acceptor = null;
     }
 

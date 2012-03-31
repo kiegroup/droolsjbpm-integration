@@ -99,7 +99,7 @@ public class MinaConnector
         if ( this.writer != null ) {
             IoSession session = this.writer.getIoSession();
             if ( session != null && session.isConnected() ) {
-                session.close( true ).awaitUninterruptibly();
+                session.close( false ).awaitUninterruptibly();
             }
             this.writer.dispose();
             this.writer = null;
