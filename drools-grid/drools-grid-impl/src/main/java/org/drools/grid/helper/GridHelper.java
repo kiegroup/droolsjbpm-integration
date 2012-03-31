@@ -39,14 +39,21 @@ import org.slf4j.LoggerFactory;
  */
 public class GridHelper {
 
-    private static Grid gridHelper;
     public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
 
     private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
 
+    public static void reset() {
+        if ( emf != null && emf.isOpen() ) {
+            emf.close();
+        }
+        emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+
+    }
+
     public static Grid getGrid() {
 
-        gridHelper = new GridImpl(new HashMap<String, Object>());
+        Grid gridHelper = new GridImpl(new HashMap<String, Object>());
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
