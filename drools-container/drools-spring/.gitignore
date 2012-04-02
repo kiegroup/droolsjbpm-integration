@@ -9,3 +9,6 @@
 /*.iws
 /*.iml
 /bin/*
+
+# Test files
+/DroolsFlow.h2.db
