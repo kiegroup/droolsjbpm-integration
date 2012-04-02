@@ -604,6 +604,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         processInstance = service.getProcessInstance( procId );
         log.info( "---> GetProcessInstanceCommand id: " + procId );
         assertNotNull( processInstance );
+
+        Thread.sleep( 1000 );
         log.info( "---> session disposed" );
         service.dispose();
 
