@@ -60,4 +60,7 @@ public class SpringTransactionSynchronizationAdapter
     public void suspend() {
     }
 
+    public void flush() {
+    }
+
 }
