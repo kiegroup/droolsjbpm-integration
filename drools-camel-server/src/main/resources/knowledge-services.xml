@@ -24,8 +24,8 @@
   <drools:grid-node id="node1"/>
 
   <drools:kbase id="kbase1" node="node1">
-      <drools:resources>
-            <drools:resource  type="DRL" source="classpath:test.drl"/>
+    <drools:resources>
+      <drools:resource  type="DRL" source="classpath:test.drl"/>
     </drools:resources>
   </drools:kbase>
 
