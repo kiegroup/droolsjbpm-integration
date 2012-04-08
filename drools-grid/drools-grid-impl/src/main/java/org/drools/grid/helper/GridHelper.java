@@ -16,6 +16,7 @@
 package org.drools.grid.helper;
 
 import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import org.drools.agent.KnowledgeAgent;
@@ -42,13 +43,14 @@ public class GridHelper {
     public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
 
     private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+    private static JpaWhitePages whitePages = new JpaWhitePages( emf );
 
     public static void reset() {
         if ( emf != null && emf.isOpen() ) {
             emf.close();
         }
         emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
-
+        whitePages = new JpaWhitePages( emf );
     }
 
     public static Grid getGrid() {
@@ -61,7 +63,7 @@ public class GridHelper {
         //Configuring the a local WhitePages service that is being shared with all the grid peers
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
 
-        wplConf.setWhitePages( new JpaWhitePages( emf ) );
+        wplConf.setWhitePages( whitePages );
         conf.addConfiguration(wplConf);
 
         conf.configure(gridHelper);
@@ -70,10 +72,19 @@ public class GridHelper {
         return gridHelper;
 
     }
+    
+    
+    private static Map<String, GridNode> nodeCache = new HashMap<String, GridNode>();
 
     public static synchronized GridNode getGridNode(String name) {
+
         if (logger.isDebugEnabled()) {
             logger.debug(" ### Grid Helper trying to locate GridNode: " + name);
+        }
+
+        if ( nodeCache.containsKey( name ) ) {
+            logger.debug(" ### Grid Helper found node " + name + " in cache" );
+            return nodeCache.get( name );
         }
 
         GridServiceDescription<GridNode> nGsd = getGrid().get(WhitePages.class).lookup(name);
@@ -104,8 +115,10 @@ public class GridHelper {
         if (logger.isDebugEnabled()) {
             logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper found GridNode: (" + name + ") -> " + node);
         }
-        return node;
 
+        nodeCache.put( name, node );
+
+        return node;
     }
 
     public static QueryResultsRemoteClient getQueryResultRemoteClient(String nodeId, String sessionId, String queryName, String remoteResultsId) {
