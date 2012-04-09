@@ -90,7 +90,10 @@ public class ConversationImpl
     }
 
     public void endConversation() {
-        this.conn.close();
+        if ( conn != null && conn.isOpen() ) {
+            conn.close();
+        }
     }
+
 
 }

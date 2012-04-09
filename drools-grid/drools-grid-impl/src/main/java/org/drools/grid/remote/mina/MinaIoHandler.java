@@ -1,5 +1,8 @@
 package org.drools.grid.remote.mina;
 
+import org.apache.mina.core.future.CloseFuture;
+import org.apache.mina.core.future.IoFuture;
+import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -63,9 +66,23 @@ public class MinaIoHandler extends IoHandlerAdapter {
                                                           msg,
                                                           new MinaIoWriter( session ),
                                                           null );
-
         this.messageHandler.messageReceived( conversation,
                                              msg );
+
+        conversation.endConversation();
+
+        disposeSession( session );
+    }
+
+    private void disposeSession( IoSession session ) {
+        CloseFuture cf  = session.getCloseFuture();
+        cf.addListener( new IoFutureListener() {
+            public void operationComplete(IoFuture future) {
+                if ( future.getSession().isConnected() ) {
+                    future.getSession().close( false );
+                }
+            }
+        });
     }
 
     @Override
