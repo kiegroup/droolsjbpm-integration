@@ -62,12 +62,12 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-camel-server</artifactId>
+      <artifactId>drools-camel-server-example</artifactId>
       <type>war</type>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-camel-server</artifactId>
+      <artifactId>drools-camel-server-example</artifactId>
       <classifier>sources</classifier>
     </dependency>
     <dependency>

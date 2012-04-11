@@ -9,7 +9,7 @@
     <version>5.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-camel-server</artifactId>
+  <artifactId>drools-camel-server-example</artifactId>
   <packaging>war</packaging>
   
   <name>Drools Camel server</name>
