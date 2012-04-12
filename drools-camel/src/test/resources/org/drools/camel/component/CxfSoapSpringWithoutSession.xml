@@ -59,7 +59,7 @@
   </drools:ksession>
 
   <cxf:cxfEndpoint id="soapServer"
-             address="http://localhost:9002/soap"
+             address="http://localhost:58002/soap"
              serviceName="ns:CommandExecutor"
              endpointName="ns:CommandExecutorPort"
           wsdlURL="src/test/resources/org/drools/camel/component/soap.wsdl"

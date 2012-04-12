@@ -47,7 +47,7 @@
          
   <!-- Defined the server endpoint to create the cxf-rs consumer --> 
   <cxf:rsServer id="rsServer" 
-          address="http://localhost:9002/rest"
+          address="http://localhost:58001/rest"
                 serviceClass="org.drools.jax.rs.CommandExecutorImpl">
        <cxf:providers>
            <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
@@ -70,7 +70,7 @@
     <route id="x1">
        <from uri="direct://http"/>
        <policy ref="droolsPolicy">
-         <to uri="cxfrs://http://localhost:9002/rest"/>
+         <to uri="cxfrs://http://localhost:58001/rest"/>
        </policy> 
     </route> 
         
