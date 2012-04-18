@@ -146,6 +146,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!--
+       When deploying to EAP 5.1 with the CXF extension installed,
+       the following jars must be added too (without transitive dependencies):
+       cxf-rt-transports-jms
+       cxf-rt-management (is a dependency of cxf-rt-transports-jms)
+       cxf-rt-bindings-corba
+     -->
 
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
