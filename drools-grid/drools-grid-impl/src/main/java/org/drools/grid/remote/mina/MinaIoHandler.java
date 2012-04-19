@@ -69,21 +69,10 @@ public class MinaIoHandler extends IoHandlerAdapter {
         this.messageHandler.messageReceived( conversation,
                                              msg );
 
-        conversation.endConversation();
-
-        disposeSession( session );
+       
     }
 
-    private void disposeSession( IoSession session ) {
-        CloseFuture cf  = session.getCloseFuture();
-        cf.addListener( new IoFutureListener() {
-            public void operationComplete(IoFuture future) {
-                if ( future.getSession().isConnected() ) {
-                    future.getSession().close( false );
-                }
-            }
-        });
-    }
+   
 
     @Override
     public void sessionIdle(IoSession session,
