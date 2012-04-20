@@ -25,15 +25,21 @@ import org.w3c.dom.Element;
 
 public class ResourceChangeScannerDefinitionParser extends AbstractBeanDefinitionParser {
 
+    private static final String ID = "id";
     private static final String INTERVAL = "interval";
+    private static final String ENABLED = "enabled";
 
     protected AbstractBeanDefinition parseInternal(Element element,
                                                    ParserContext parserContext) {
 
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition( ResourceChangeScannerBeanFactory.class );
 
+        factory.addPropertyValue( ID,
+                                  element.getAttribute( ID ) );
         factory.addPropertyValue( INTERVAL,
                                   element.getAttribute( INTERVAL ) );
+        factory.addPropertyValue( ENABLED,
+                                  element.getAttribute( ENABLED ) );
 
         return factory.getBeanDefinition();
     }
