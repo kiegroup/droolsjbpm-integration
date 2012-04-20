@@ -23,6 +23,7 @@
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
       <xsd:attribute name="interval" use="optional" type="xsd:integer"/>
+      <xsd:attribute name="enabled" use="optional" type="xsd:boolean"/>
     </xsd:complexType>
   </xsd:element>
 

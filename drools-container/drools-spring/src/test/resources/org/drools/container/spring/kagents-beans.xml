@@ -6,7 +6,7 @@
                            http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.3.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-  <drools:resource-change-scanner id="s1" interval="5" />
+  <drools:resource-change-scanner id="s1" interval="5" enabled="true" />
 
   <drools:grid-node id="node1" />
 
