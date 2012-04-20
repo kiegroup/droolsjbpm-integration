@@ -28,6 +28,7 @@ public class ResourceChangeScannerBeanFactory
 
     private String id;
     private int    interval;
+    private String enabled;
 
     public Object getObject() throws Exception {
         return ResourceFactory.getResourceChangeScannerService();
@@ -43,6 +44,10 @@ public class ResourceChangeScannerBeanFactory
 
     public void afterPropertiesSet() throws Exception {
         ResourceFactory.getResourceChangeScannerService().setInterval( this.interval );
+        if (enabled != null && enabled.equalsIgnoreCase("true")) {
+            ResourceFactory.getResourceChangeNotifierService().start();
+            ResourceFactory.getResourceChangeScannerService().start();
+        }
     }
 
     public void setId(String id) {
@@ -61,4 +66,11 @@ public class ResourceChangeScannerBeanFactory
         this.interval = interval;
     }
 
+    public String getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(String enabled) {
+        this.enabled = enabled;
+    }
 }
