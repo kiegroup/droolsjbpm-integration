@@ -111,7 +111,7 @@ public class JaxbInsertTest {
      * creates batch-execution command with insert. Marshalls it to XML 
      * and send to drools
      */
-    @Test @Ignore("TODO FIXME bz771193, bz771203 and bz771209")
+    @Test
     public void testInsert() throws Exception {
         Person p = new Person("Alice", "spicy meals", 30);
         List<Command> commands = new ArrayList<Command>();
