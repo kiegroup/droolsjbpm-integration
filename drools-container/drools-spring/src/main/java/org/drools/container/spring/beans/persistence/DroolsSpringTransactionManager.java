@@ -117,9 +117,13 @@ public class DroolsSpringTransactionManager
                     }
                     return TransactionManager.STATUS_COMMITTED;
                 } else {
-                    if ( transaction.isRollbackOnly() ) {
-                        return TransactionManager.STATUS_ROLLEDBACK;
-                    }
+                    // Using the commented-out code in means that if rollback with this manager,
+                    //  I always have to catch and check the exception 
+                    //  because ROLLEDBACK can mean both "rolled back" and "rollback only".
+                    // if ( transaction.isRollbackOnly() ) {
+                    //     return TransactionManager.STATUS_ROLLEDBACK;
+                    // }
+                    
                     return TransactionManager.STATUS_ACTIVE;
                 }
             } finally {
