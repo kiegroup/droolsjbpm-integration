@@ -17,7 +17,7 @@
     <section>
       <title>Define a Resource</title>
 
-      <para>Execution nodes are a context to regsiter ksessions and kbases
+      <para>Execution nodes are a context to register ksessions and kbases
       against for lookup.</para>
 
       <section>
@@ -194,7 +194,7 @@
           <title>&lt;drools:kbase&gt;'s parameters as nested elements:</title>
 
           <para>A Knowledge Base has a 0..n resources. Has two nested
-          elements, resources and configuratoins. Thoe resources can be inner
+          elements, resources and configurations. Those resources can be inner
           elements or references, using the "ref" attribute.</para>
 
           <example>
@@ -588,7 +588,7 @@
           </figure>
 
           <example>
-            <title>ksession JPA configuraiton example</title>
+            <title>ksession JPA configuration example</title>
 
             <programlisting language="xml">&lt;drools:kstore id="kstore" /&gt; &lt;!-- provides KnowledgeStoreService implementation --&gt;
 
@@ -871,7 +871,7 @@
         particularly useful when you define a set of listeners and want to
         attach them to multiple sessions. The grouping feature is also very
         useful, when we define a set of listeners for 'testing' and then want
-        to swtich them for 'production' use.</para>
+        to switch them for 'production' use.</para>
 
        <section>
           <title>Attributes:</title>

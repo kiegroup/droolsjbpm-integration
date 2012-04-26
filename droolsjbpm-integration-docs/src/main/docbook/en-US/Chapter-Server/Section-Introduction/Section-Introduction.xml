@@ -13,6 +13,6 @@
   can deploy to execute KnowledgeBases remotely for any sort of client
   application. This is not limited to JVM application clients, but any
   technology that can use HTTP, through a REST interface. This version of the
-  execution server supports stateless and statefull sessions in a native
+  execution server supports stateless and stateful sessions in a native
   way.</para>
 </section>

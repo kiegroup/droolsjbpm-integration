@@ -9,7 +9,7 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Camel</title>
 
-  <para>Camel provides a light weight bus framework for geting information
+  <para>Camel provides a light weight bus framework for getting information
   into and out of Drools.</para>
 
   <para>Drools introduces two elements to make easy integration.</para>
@@ -21,7 +21,7 @@
       <para>Augments any JAXB or XStream data loaders. For JAXB it adds drools
       related paths ot the contextpath, for XStream it adds custom converters
       and aliases for Drools classes. It also handles setting the ClassLoader
-      to the targetted ksession.</para>
+      to the targeted ksession.</para>
     </listitem>
 
     <listitem>
@@ -56,7 +56,7 @@
   policy will check either the header field "DroolsLookup" for the named
   session to execute and if that isn't specified it'll check the "lookup"
   attribute on the incoming payload. It then attempts to "lookup" the session
-  fron the execution-node context and execute against it.</para>
+  from the execution-node context and execute against it.</para>
 
   <example>
     <title>Drools EndPoint configured with the CXFRS producer</title>
