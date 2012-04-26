@@ -21,8 +21,8 @@
 
     <para>To enable JMX monitoring in a Drools application, it is necessary to
     enable remote monitoring in the JVM. There are several tutorials on how to
-    do that in the internet, but we recomend that you check the documentation
-    of your specific JVM. Using the Oracla/Sun JVM, it can be as simple as
+    do that in the internet, but we recommend that you check the documentation
+    of your specific JVM. Using the Oracle/Sun JVM, it can be as simple as
     running the engine with a few command line system properties.</para>
 
     <para>For instance, to enable remote monitoring on port 19988 with

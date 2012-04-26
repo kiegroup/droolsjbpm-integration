@@ -14,7 +14,7 @@
   xlink:href="http://camel.apache.org/component.html">Components</link>
   provided by Camel to build pipelines. If you check the Camel Components you
   can see how many integration possibilities are added now to Camel, and if
-  this component doesn’t exists you can create this by your own.</para>
+  this component doesn't exists you can create this by your own.</para>
 
   <note>
     <para>A Camel Component is a factory of Endpoint instances</para>
