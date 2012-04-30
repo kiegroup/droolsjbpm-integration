@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0"
+<chapter id="ch.spring"
+         version="5.0"
          xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd http://www.w3.org/1999/xlink http://www.docbook.org/xml/5.0/xsd/xlink.xsd"
          xml:base="../" xmlns="http://docbook.org/ns/docbook"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -946,12 +947,90 @@
     &lt;drools:processEventListener/&gt;
     &lt;drools:workingMemoryEventListener/&gt;
   &lt;/drools:eventListeners&gt;
-
-
 </programlisting>
         </example>
 		</section>
       </section>
     </section>
+  </section>
+  
+  <section>
+    <title>Integration with jBPM Human Task</title>
+
+  <para>This chapter describes the infrastructure used when configuring a human task
+  server with Spring as well as a little bit about the infrastructure used when 
+  doing this.</para>
+
+  <section>
+    <title>How to configure Spring with jBPM Human task</title>
+
+  <para>The jBPM human task server can be configured to use Spring persistence. 
+  <xref linkend="spring-human-task-example"/> is an example of this which uses 
+  local transactions and Spring's thread-safe EntityManager proxy.</para>
+  
+  <para>The following diagram shows the dependency graph used
+  in <xref linkend="spring-human-task-example"/>.</para>
+
+  <figure>
+    <title>Spring Human Task integration injection dependencies</title>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/ht-spring-deps.png" format="PNG" 
+                   align="center" width="100%" scalefit="1" />
+      </imageobject>
+    </mediaobject>
+  </figure>
+
+  <para>A <code>TaskService</code> instance is dependent on two other bean types: 
+  a drools <code>SystemEventListener</code> bean as well as a 
+  <code>TaskSessionSpringFactoryImpl</code> bean. The 
+  <code>TaskSessionSpringFactoryImpl</code> bean is howerver <emphasis>not</emphasis> 
+  injected into the <code>TaskService</code> bean because this would cause a 
+  circular dependency. To solve this problem, when the <code>TaskService</code> 
+  bean is injected into the <code>TaskSessionSpringFactoryImpl</code> bean, 
+  the setter method used secretly injects the <code>TaskSessionSpringFactoryImpl</code> 
+  instance back into the <code>TaskService</code> bean and initializes the 
+  <code>TaskService</code> bean as well.</para>
+ 
+  <para>The <code>TaskSessionSpringFactoryImpl</code> bean is responsible for 
+  creating all the internal instances in human task that deal with transactions 
+  and persistence context management. Besides a <code>TaskService</code> instance, 
+  this bean also requires a transaction manager and a persistence context to 
+  be injected. Specifically, it requires an instance of a 
+  <code>HumanTaskSpringTransactionManager</code> bean (as a transaction manager) 
+  and an instance of a <code>SharedEntityManagerBean</code> bean (as a persistence 
+  context instance).</para> 
+
+  <para> We also use some of the standard Spring beans in order to configure 
+  persistence: there's a bean to hold the <code>EntityManagerFactory</code> 
+  instance as well as the <code>SharedEntityManagerBean</code> instance. The 
+  <code>SharedEntityManagerBean</code> provides a shared, thread-safe proxy 
+  for the actual <code>EntityManager</code>.</para>
+
+  <para>The <code>HumanTaskSpringTransactionManager</code> bean serves as a 
+  wrapper around the Spring transaction manager, in this case the 
+  <code>JpaTransactionManager</code>. An instance of a
+  <code>JpaTransactionManager</code> bean is also instantiated because of this.</para> 
+
+   <example xml:id="spring-human-task-example">
+     <title>Configuring Human Task with Spring</title>
+     <programlisting language="xml"><xi:include href="Chapter-Spring/extras/spring-human-task.xml" parse="text" /></programlisting>
+   </example>
+
+  <para>When using the <code>SharedEntityManagerBean</code> instance, it's important
+  to configure the Spring transaction manager to use nested transactions. This is 
+  because the <code>SharedEntityManagerBean</code> is a <emphasis>transactional</emphasis>
+  persistence context and will close the persistence context after every operation. 
+  However, the human task server needs to be able to access (persisted) entities
+  after operations. Nested transactions allow us to still have access to entities
+  that otherwise would have been detached and are no longer accessible, especially 
+  when using an ORM framework that uses lazy-initialization of entities. </para>
+
+  <para>Also, while the <code>TaskSessionSpringFactoryImpl</code> bean takes
+  an <quote>useJTA</quote> parameter, at the moment, JTA transactions with 
+  Spring have not yet been fully tested.</para>
+
+  </section>
+
   </section>
 </chapter>
