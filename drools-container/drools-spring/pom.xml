@@ -131,7 +131,45 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr-runtime</artifactId>
       <scope>test</scope>
-    </dependency>   
+    </dependency>
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+          <instructions>
+            <Bundle-SymbolicName>org.drools.spring;singleton:=true</Bundle-SymbolicName>
+            <_removeheaders>Ignore-Package</_removeheaders>
+            <Require-Bundle>org.drools.core;bundle-version="${drools.osgi.version}"</Require-Bundle>
+            <Import-Package>!org.drools.*, *</Import-Package>
+            <Export-Package>
+              org.drools.grid,org.drools.grid.impl,org.drools.container.spring
+            </Export-Package>
+            <DynamicImport-Package>org.drools.*</DynamicImport-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
