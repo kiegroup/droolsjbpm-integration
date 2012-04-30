@@ -65,8 +65,6 @@
     </listitem>
   </itemizedlist>
 
-  <para></para>
-
   <section>
     <title>REST/Camel Services configuration</title>
 
@@ -244,8 +242,6 @@
       The kbase itself consists of 2 knowledge definitions, a drl and an xsd.
       The Spring documentation contains a lot more information on configuring
       these knowledge services.</para>
-
-      <para></para>
     </section>
 
     <section>
