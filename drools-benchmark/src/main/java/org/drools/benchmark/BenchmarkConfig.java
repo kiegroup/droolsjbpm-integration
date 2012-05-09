@@ -85,6 +85,7 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
                 .setDescription(description)
                 .setRepetitions(getAttributeValueAsInt(element, "repetitions", 1))
                 .setWarmups(getAttributeValueAsInt(element, "warmups", 0))
+                .setThreadNr(getAttributeValueAsInt(element, "parallel-threads", 0))
                 .setEnabled(enabled);
     }
 

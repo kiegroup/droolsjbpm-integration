@@ -36,4 +36,8 @@ public abstract class AbstractBenchmark implements Benchmark {
     protected final KnowledgeBase createKnowledgeBase(KnowledgeBuilder kbuilder) {
         return DroolsUtil.createKnowledgeBase(kbuilder);
     }
+
+    public Benchmark clone() {
+        throw new UnsupportedOperationException("Override clone() to allow to run this benchmark in parallel");
+    }
 }

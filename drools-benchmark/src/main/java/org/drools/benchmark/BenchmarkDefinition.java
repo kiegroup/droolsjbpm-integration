@@ -25,6 +25,7 @@ public class BenchmarkDefinition {
     private String description;
     private int repetitions;
     private int warmups;
+    private int threadNr;
     private boolean enabled = true;
 
     public BenchmarkDefinition(Constructor<?> constructor, Object[] args) {
@@ -56,6 +57,17 @@ public class BenchmarkDefinition {
         return this;
     }
 
+    public int getThreadNr() {
+        return threadNr;
+    }
+    public BenchmarkDefinition setThreadNr(int threadNr) {
+        this.threadNr = threadNr;
+        return this;
+    }
+    public boolean isParallel() {
+        return threadNr > 1;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -72,5 +84,10 @@ public class BenchmarkDefinition {
             throw new RuntimeException(e);
         }
         return benchmark;
+    }
+
+    @Override
+    public String toString() {
+        return getDescription() + (isParallel() ? " (" + threadNr + " parallel threads)" : "");
     }
 }

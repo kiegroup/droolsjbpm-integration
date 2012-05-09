@@ -6,14 +6,29 @@ import org.drools.runtime.StatefulKnowledgeSession;
 
 public class StatefulSessionCreation extends AbstractBenchmark {
 
-    private KnowledgeBase kbase;
+    private final StatefulKnowledgeSession[] kSessions;
+    private static KnowledgeBase kbase;
 
-    public void init(BenchmarkDefinition definition) {
-        kbase = createKnowledgeBase(createKnowledgeBuilder("licenseApplication.drl"));
+    public StatefulSessionCreation(int sessionNumber) {
+        this.kSessions = new StatefulKnowledgeSession[sessionNumber];
+    }
+
+    public synchronized void init(BenchmarkDefinition definition) {
+        if (kbase == null) {
+            kbase = createKnowledgeBase(createKnowledgeBuilder("licenseApplication.drl"));
+        }
     }
 
     public void execute(int repNr) {
-        StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+        for (int i = 0; i < kSessions.length; i++) {
+            kSessions[i] = kbase.newStatefulKnowledgeSession();
+        }
+        for (int i = 0; i < kSessions.length; i++) {
+            kSessions[i].dispose();
+        }
     }
 
+    public StatefulSessionCreation clone() {
+        return new StatefulSessionCreation(kSessions.length);
+    }
 }

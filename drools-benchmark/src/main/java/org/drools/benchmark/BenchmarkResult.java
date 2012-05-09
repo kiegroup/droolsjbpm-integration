@@ -19,7 +19,7 @@ package org.drools.benchmark;
 public class BenchmarkResult {
 
     private final BenchmarkDefinition definition;
-    private double duration;
+    private long duration;
     private long usedMemoryBeforeStart;
     private long usedMemoryAfterEnd;
     private long usedMemoryAfterGC;
@@ -28,10 +28,10 @@ public class BenchmarkResult {
         this.definition = definition;
     }
 
-    public double getDuration() {
+    public long getDuration() {
         return duration;
     }
-    public void setDuration(double duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 

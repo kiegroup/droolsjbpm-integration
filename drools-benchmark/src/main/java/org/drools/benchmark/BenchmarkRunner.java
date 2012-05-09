@@ -16,7 +16,14 @@
 
 package org.drools.benchmark;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import static java.lang.System.*;
 import static org.drools.benchmark.util.MemoryUtil.aggressiveGC;
@@ -26,17 +33,27 @@ public class BenchmarkRunner {
 
     private static final String CONFIG_FILE = "benchmark.xml";
 
+    private final Executor executor = Executors.newCachedThreadPool(new ThreadFactory() {
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        }
+    });
+
     public static void main(String[] args) {
         new BenchmarkRunner().run();
     }
 
     private void run() {
-        long start = currentTimeMillis();
+        long start = nanoTime();
         BenchmarkConfig config = new BenchmarkConfig(CONFIG_FILE);
         List<List<BenchmarkResult>> results = new ArrayList<List<BenchmarkResult>>();
-        for (int i = 0; i < config.getRepetitions(); i++) results.add(executeAll(config, i));
+        for (int i = 0; i < config.getRepetitions(); i++) {
+            results.add(executeAll(config, i));
+        }
         printResults(accumulateResults(results));
-        System.out.println("\nDone in " + (currentTimeMillis() - start) + " msecs");
+        System.out.println("\nDone in " + ((nanoTime() - start) / 1000000) + " msecs");
     }
 
     private void printResults(List<ResultsAccumulator> results) {
@@ -78,11 +95,9 @@ public class BenchmarkRunner {
         aggressiveGC(config.getDelay());
         result.setUsedMemoryBeforeStart(usedMemory());
         Benchmark benchmark = definition.instance();
-        out.println("Executing: " + definition.getDescription());
-        benchmark.init(definition);
+        out.println("Executing: " + definition);
 
         result.setDuration(executeBenchmark(definition, benchmark));
-        benchmark.terminate();
         aggressiveGC(config.getDelay());
         result.setUsedMemoryAfterEnd(usedMemory());
         benchmark = null; // destroy the benchmark in order to allow GC to free the memory allocated by it
@@ -102,9 +117,51 @@ public class BenchmarkRunner {
         aggressiveGC(config.getDelay());
     }
 
-    private double executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
+    private long executeBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
+        return definition.isParallel() ?
+                executeMultiThreadedBenchmark(definition, benchmark) :
+                executeSingleThreadedBenchmark(definition, benchmark);
+    }
+
+    private long executeSingleThreadedBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
+        benchmark.init(definition);
         long start = nanoTime();
         for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
-        return ((nanoTime() - start) / 1000) / 1000.0;
+        long end = nanoTime();
+        benchmark.terminate();
+        return (end - start) / 1000000;
+    }
+
+    private long executeMultiThreadedBenchmark(final BenchmarkDefinition definition, Benchmark benchmark) {
+        final Benchmark[] benchmarks = new Benchmark[definition.getThreadNr()];
+        for (int i = 0; i < definition.getThreadNr(); i++) {
+            benchmarks[i] = benchmark.clone();
+            benchmarks[i].init(definition);
+        }
+
+        CompletionService<Long> ecs = new ExecutorCompletionService<Long>(executor);
+        for (int i = 0; i < definition.getThreadNr(); i++) {
+            final Benchmark b = benchmarks[i];
+            ecs.submit(new Callable<Long>() {
+                public Long call() throws Exception {
+                    return executeSingleThreadedBenchmark(definition, b);
+                }
+            });
+        }
+
+        long result = 0L;
+        for (int i = 0; i < definition.getThreadNr(); i++) {
+            try {
+                result += ecs.take().get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (int i = 0; i < definition.getThreadNr(); i++) {
+            benchmarks[i].terminate();
+        }
+
+        return result / definition.getThreadNr();
     }
 }

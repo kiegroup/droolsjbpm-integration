@@ -2,9 +2,10 @@
 
   <!-- Runtime -->
 
-  <benchmark description="Create a stateful session"
-             warmups="10000" repetitions="10000" enabled="false"
+  <benchmark description="Create and dispose stateful sessions"
+             warmups="1" repetitions="1" parallel-threads="4" enabled="true"
              classname="org.drools.benchmark.benchmarks.StatefulSessionCreation">
+    <arg>10000</arg>
   </benchmark>
 
   <benchmark description="Execute stateless session executing one rule on one object"
@@ -119,19 +120,19 @@
   </benchmark>
 
   <benchmark description="Waltz"
-             warmups="1" repetitions="10" enabled="true"
+             warmups="1" repetitions="10" enabled="false"
              classname="org.drools.benchmark.benchmarks.WaltzBenchmark">
   </benchmark>
 
   <benchmark description="Join"
-             warmups="1" repetitions="10" enabled="true"
+             warmups="1" repetitions="10" enabled="false"
              classname="org.drools.benchmark.benchmarks.RandomBeansBenchmark">
     <arg>2000</arg>
     <arg>joins.drl</arg>
   </benchmark>
 
   <benchmark description="Constraints Evaluation"
-             warmups="1" repetitions="10" enabled="true"
+             warmups="1" repetitions="10" enabled="false"
              classname="org.drools.benchmark.benchmarks.RandomBeansBenchmark">
     <arg>2000</arg>
     <arg>constraintsEvaluation.drl</arg>

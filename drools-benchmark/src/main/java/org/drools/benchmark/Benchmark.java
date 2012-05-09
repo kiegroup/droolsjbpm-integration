@@ -16,8 +16,9 @@
 
 package org.drools.benchmark;
 
-public interface Benchmark {
+public interface Benchmark extends Cloneable {
     void init(BenchmarkDefinition definition);
     void execute(int repNr);
     void terminate();
+    Benchmark clone();
 }

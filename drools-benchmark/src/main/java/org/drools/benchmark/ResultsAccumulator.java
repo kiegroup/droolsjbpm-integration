@@ -20,9 +20,9 @@ public class ResultsAccumulator {
     private String benchmarkDescription;
     private int resultsCounter = 0;
 
-    private double minDuration = Double.MAX_VALUE;
-    private double maxDuration = 0.0;
-    private double totalDuration = 0.0;
+    private long minDuration = Long.MAX_VALUE;
+    private long maxDuration = 0L;
+    private long totalDuration = 0L;
 
     private long minUsedMemory = Long.MAX_VALUE;
     private long maxUsedMemory = 0L;
