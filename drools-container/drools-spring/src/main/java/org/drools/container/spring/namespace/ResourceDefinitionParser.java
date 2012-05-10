@@ -87,11 +87,11 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
         
         String name = element.getAttribute( NAME );
         factory.addPropertyValue( "name",
-                                  name.isEmpty()? null : name );
+                                  name.length() == 0 ? null : name );
         
         String description = element.getAttribute( DESCRIPTION );
         factory.addPropertyValue( "description",
-                                  description.isEmpty()? null : description );
+                                  description.length() == 0 ? null : description );
         
 
         if ( "xsd".equals( resourceType.toLowerCase() ) ) {
