@@ -1,11 +1,17 @@
-<benchmarks delay="10" repetitions="10">
+<benchmarks delay="10" repetitions="1">
 
   <!-- Runtime -->
 
   <benchmark description="Create and dispose stateful sessions"
-             warmups="1" repetitions="1" parallel-threads="4" enabled="true"
+             warmups="2" repetitions="1" parallel-threads="4" enabled="false"
              classname="org.drools.benchmark.benchmarks.StatefulSessionCreation">
     <arg>10000</arg>
+  </benchmark>
+
+  <benchmark description="Create stateless sessions"
+             warmups="2" repetitions="1" parallel-threads="4" enabled="true"
+             classname="org.drools.benchmark.benchmarks.StatelessSessionCreation">
+    <arg>1000000</arg>
   </benchmark>
 
   <benchmark description="Execute stateless session executing one rule on one object"
