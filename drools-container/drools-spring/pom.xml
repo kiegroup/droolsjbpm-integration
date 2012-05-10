@@ -97,6 +97,13 @@
       <artifactId>persistence-api</artifactId>
       <optional>true</optional>
     </dependency>
+    
+    <!-- test -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
@@ -132,6 +139,19 @@
       <artifactId>antlr-runtime</artifactId>
       <scope>test</scope>
     </dependency>   
+    
+    <!-- human-task spring integration -->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
   </dependencies>
 
 </project>
