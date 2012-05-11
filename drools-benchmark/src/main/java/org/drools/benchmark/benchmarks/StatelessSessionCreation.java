@@ -13,8 +13,8 @@ public class StatelessSessionCreation extends AbstractBenchmark {
         this.sessionNumber = sessionNumber;
     }
 
-    public synchronized void init(BenchmarkDefinition definition) {
-        if (kbase == null) {
+    public void init(BenchmarkDefinition definition, boolean isFirst) {
+        if (isFirst) {
             kbase = createKnowledgeBase(createKnowledgeBuilder("licenseApplication.drl"));
         }
     }

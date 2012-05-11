@@ -26,8 +26,17 @@ public abstract class AbstractBenchmark implements Benchmark {
 
     protected final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    public void init(BenchmarkDefinition definition) { }
-    public void terminate() { }
+    public void init(BenchmarkDefinition definition) {
+        init(definition, true);
+    }
+
+    public void init(BenchmarkDefinition definition, boolean isFirst) { }
+
+    public void terminate() {
+        terminate(true);
+    }
+
+    public void terminate(boolean isLast) { }
 
     protected final KnowledgeBuilder createKnowledgeBuilder(String... drlFiles) {
         return DroolsUtil.createKnowledgeBuilder(this, drlFiles);

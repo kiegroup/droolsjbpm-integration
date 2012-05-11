@@ -68,11 +68,11 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
     private List<BenchmarkDefinition> parseBenchmarks(Element root) throws Exception {
         NodeList nodes = root.getElementsByTagName("benchmark");
         List<BenchmarkDefinition> bs = new ArrayList(nodes.getLength());
-        for (int i = 0; i < nodes.getLength(); i++) bs.add(parse((Element)nodes.item(i)));
+        for (int i = 0; i < nodes.getLength(); i++) bs.addAll(parse((Element) nodes.item(i)));
         return bs;
     }
 
-    private BenchmarkDefinition parse(Element element) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    private List<BenchmarkDefinition> parse(Element element) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException, InstantiationException {
         String className = element.getAttribute("classname");
         List<String> args = getTagValues(element, "arg");
         Constructor<?> constructor = getConstructorForArgs(className, args);
@@ -81,12 +81,17 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
         String en = element.getAttribute("enabled");
         boolean enabled = StringUtils.isEmpty(en) || !en.trim().toLowerCase().equals("false");
 
-        return new BenchmarkDefinition(constructor, toArgs(constructor.getParameterTypes(), args))
-                .setDescription(description)
-                .setRepetitions(getAttributeValueAsInt(element, "repetitions", 1))
-                .setWarmups(getAttributeValueAsInt(element, "warmups", 0))
-                .setThreadNr(getAttributeValueAsInt(element, "parallel-threads", 0))
-                .setEnabled(enabled);
+        int[] parallels = getAttributeValueAsIntArray(element, "parallel-threads", 1);
+        List<BenchmarkDefinition> benchmarks = new ArrayList<BenchmarkDefinition>(parallels.length);
+        for (int parallel : parallels) {
+            benchmarks.add( new BenchmarkDefinition(constructor, toArgs(constructor.getParameterTypes(), args))
+                    .setDescription(description)
+                    .setRepetitions(getAttributeValueAsInt(element, "repetitions", 1))
+                    .setWarmups(getAttributeValueAsInt(element, "warmups", 0))
+                    .setThreadNr(parallel)
+                    .setEnabled(enabled) );
+        }
+        return benchmarks;
     }
 
     private Constructor<?> getConstructorForArgs(String className, List<String> args) throws ClassNotFoundException {
@@ -122,5 +127,19 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
     private int getAttributeValueAsInt(Element elem, String name, int def) {
         String value = elem.getAttribute(name);
         return StringUtils.isEmpty(value) ? def : Integer.parseInt(value);
+    }
+
+    private int[] getAttributeValueAsIntArray(Element elem, String name, int def) {
+        String value = elem.getAttribute(name);
+        if (StringUtils.isEmpty(value)) {
+            return new int[] { def };
+        }
+        String[] values = value.split(",");
+        int[] array = new int[values.length];
+        int i = 0;
+        for (String v : values) {
+            array[i++] = Integer.parseInt(v);
+        }
+        return array;
     }
 }

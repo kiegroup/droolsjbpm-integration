@@ -31,7 +31,7 @@ import static org.drools.benchmark.util.MemoryUtil.usedMemory;
 
 public class BenchmarkRunner {
 
-    private static final String CONFIG_FILE = "benchmark.xml";
+    private static final String CONFIG_FILE = "benchmark-concurrency.xml";
 
     private final Executor executor = Executors.newCachedThreadPool(new ThreadFactory() {
         public Thread newThread(Runnable r) {
@@ -53,12 +53,12 @@ public class BenchmarkRunner {
             results.add(executeAll(config, i));
         }
         printResults(accumulateResults(results));
-        System.out.println("\nDone in " + ((nanoTime() - start) / 1000000) + " msecs");
+        out.println("\nDone in " + ((nanoTime() - start) / 1000000) + " msecs");
     }
 
     private void printResults(List<ResultsAccumulator> results) {
-        System.out.println(ResultsAccumulator.RESULTS_FORMAT);
-        for (ResultsAccumulator result : results) System.out.println(result);
+        out.println(ResultsAccumulator.RESULTS_FORMAT);
+        for (ResultsAccumulator result : results) out.println(result);
     }
 
     private List<ResultsAccumulator> accumulateResults(List<List<BenchmarkResult>> results) {
@@ -88,11 +88,10 @@ public class BenchmarkRunner {
     }
 
     private BenchmarkResult execute(BenchmarkConfig config, BenchmarkDefinition definition, boolean shouldWarmUp) {
-        BenchmarkResult result = new BenchmarkResult(definition);
-
         if (shouldWarmUp) warmUpExecution(config, definition);
-
         aggressiveGC(config.getDelay());
+
+        BenchmarkResult result = new BenchmarkResult(definition);
         result.setUsedMemoryBeforeStart(usedMemory());
         Benchmark benchmark = definition.instance();
         out.println("Executing: " + definition);
@@ -125,18 +124,16 @@ public class BenchmarkRunner {
 
     private long executeSingleThreadedBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
         benchmark.init(definition);
-        long start = nanoTime();
-        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
-        long end = nanoTime();
+        long elapsed = runBenchmark(definition, benchmark);
         benchmark.terminate();
-        return (end - start) / 1000000;
+        return elapsed;
     }
 
     private long executeMultiThreadedBenchmark(final BenchmarkDefinition definition, Benchmark benchmark) {
         final Benchmark[] benchmarks = new Benchmark[definition.getThreadNr()];
         for (int i = 0; i < definition.getThreadNr(); i++) {
             benchmarks[i] = benchmark.clone();
-            benchmarks[i].init(definition);
+            benchmarks[i].init(definition, i == 0);
         }
 
         CompletionService<Long> ecs = new ExecutorCompletionService<Long>(executor);
@@ -144,7 +141,7 @@ public class BenchmarkRunner {
             final Benchmark b = benchmarks[i];
             ecs.submit(new Callable<Long>() {
                 public Long call() throws Exception {
-                    return executeSingleThreadedBenchmark(definition, b);
+                    return runBenchmark(definition, b);
                 }
             });
         }
@@ -159,9 +156,15 @@ public class BenchmarkRunner {
         }
 
         for (int i = 0; i < definition.getThreadNr(); i++) {
-            benchmarks[i].terminate();
+            benchmarks[i].terminate(i == definition.getThreadNr() - 1);
         }
 
         return result / definition.getThreadNr();
+    }
+
+    private long runBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
+        long start = nanoTime();
+        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
+        return (nanoTime() - start) / 1000000;
     }
 }

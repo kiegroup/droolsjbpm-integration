@@ -29,7 +29,7 @@ public class InsertAllAndRetract extends AbstractBenchmark {
     private String[] drlFiles;
 
     private FactHandle[] facts;
-    private StatefulKnowledgeSession ksession;
+    private static StatefulKnowledgeSession ksession;
 
     public InsertAllAndRetract(int objectsNumber) {
         this.objectsNumber = objectsNumber;
@@ -41,9 +41,11 @@ public class InsertAllAndRetract extends AbstractBenchmark {
     }
 
     @Override
-    public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
-        ksession = kbase.newStatefulKnowledgeSession();
+    public void init(BenchmarkDefinition definition, boolean isFirst) {
+        if (isFirst) {
+            KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
+            ksession = kbase.newStatefulKnowledgeSession();
+        }
         facts = new FactHandle[objectsNumber];
     }
 
@@ -55,7 +57,15 @@ public class InsertAllAndRetract extends AbstractBenchmark {
     }
 
     @Override
-    public void terminate() {
-        ksession.dispose(); // Stateful rule session must always be disposed when finished
+    public synchronized void terminate(boolean isLast) {
+        if (isLast) {
+            ksession.dispose(); // Stateful rule session must always be disposed when finished
+        }
+    }
+
+    public InsertAllAndRetract clone() {
+        InsertAllAndRetract clone = new InsertAllAndRetract(objectsNumber);
+        clone.drlFiles = drlFiles;
+        return clone;
     }
 }

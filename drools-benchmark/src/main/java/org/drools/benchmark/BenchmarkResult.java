@@ -65,13 +65,13 @@ public class BenchmarkResult {
     }
 
     public String getDescription() {
-        return definition.getDescription();
+        return definition.toString();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("*** Execution of " + getDescription() + "\n");
+        sb.append("*** Execution of " + definition + "\n");
         sb.append("Done in " + duration + " msecs" + "\n");
         sb.append("Memory used by benchmark " + memoryUsedByBenchmark() + " bytes" + "\n");
         sb.append("Memory unfreed after benchmark run " + unfreedMemory() + " bytes" + "\n");
