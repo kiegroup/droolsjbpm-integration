@@ -1,0 +1,8 @@
+import org.drools.benchmark.model.DummyBean
+
+rule "TMS"
+when
+    $b : DummyBean( $s : seed < 1000000 )
+then
+    insertLogical( new DummyBean( $s + 1 ) );
+end

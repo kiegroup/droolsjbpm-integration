@@ -24,12 +24,12 @@ import org.drools.runtime.rule.FactHandle;
 
 public class InsertAllAndRetract extends AbstractBenchmark {
 
-    private final int objectsNumber;
+    private static StatefulKnowledgeSession ksession;
 
     private String[] drlFiles;
 
+    private final int objectsNumber;
     private FactHandle[] facts;
-    private static StatefulKnowledgeSession ksession;
 
     public InsertAllAndRetract(int objectsNumber) {
         this.objectsNumber = objectsNumber;
@@ -50,14 +50,18 @@ public class InsertAllAndRetract extends AbstractBenchmark {
     }
 
     public void execute(int repNr) {
-        for (int i = 0; i < objectsNumber; i++) facts[i] = ksession.insert(new DummyBean(i));
+        for (int i = 0; i < objectsNumber; i++) {
+            facts[i] = ksession.insert(new DummyBean(i));
+        }
         ksession.fireAllRules();
-        for (FactHandle fact : facts) ksession.retract(fact);
+        for (FactHandle fact : facts) {
+            ksession.retract(fact);
+        }
         ksession.fireAllRules();
     }
 
     @Override
-    public synchronized void terminate(boolean isLast) {
+    public void terminate(boolean isLast) {
         if (isLast) {
             ksession.dispose(); // Stateful rule session must always be disposed when finished
         }

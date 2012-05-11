@@ -25,31 +25,48 @@ import org.drools.runtime.rule.FactHandle;
 
 public class InsertAndRetractInTurn extends AbstractBenchmark {
 
-    private StatefulKnowledgeSession ksession;
+    private static StatefulKnowledgeSession ksession;
 
     private String[] drlFiles;
 
-    public InsertAndRetractInTurn() { }
+    private final int objectsNumber;
 
-    public InsertAndRetractInTurn(String drlFile) {
+    public InsertAndRetractInTurn(int objectsNumber) {
+        this.objectsNumber = objectsNumber;
+    }
+
+    public InsertAndRetractInTurn(int objectsNumber, String drlFile) {
+        this(objectsNumber);
         this.drlFiles = drlFile.split(",");
     }
 
     @Override
-    public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
-        ksession = kbase.newStatefulKnowledgeSession();
+    public void init(BenchmarkDefinition definition, boolean isFirst) {
+        if (isFirst) {
+            KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
+            ksession = kbase.newStatefulKnowledgeSession();
+        }
     }
 
     public void execute(int repNr) {
-        FactHandle fact = ksession.insert(new DummyBean(repNr));
-        ksession.fireAllRules();
-        ksession.retract(fact);
-        ksession.fireAllRules();
+        for (int i = 0; i < objectsNumber; i++) {
+            FactHandle fact = ksession.insert(new DummyBean(i));
+            ksession.fireAllRules();
+            ksession.retract(fact);
+            ksession.fireAllRules();
+        }
     }
 
     @Override
-    public void terminate() {
-        ksession.dispose(); // Stateful rule session must always be disposed when finished
+    public void terminate(boolean isLast) {
+        if (isLast) {
+            ksession.dispose(); // Stateful rule session must always be disposed when finished
+        }
+    }
+
+    public InsertAndRetractInTurn clone() {
+        InsertAndRetractInTurn clone = new InsertAndRetractInTurn(objectsNumber);
+        clone.drlFiles = drlFiles;
+        return clone;
     }
 }

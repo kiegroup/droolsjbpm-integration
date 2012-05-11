@@ -74,36 +74,42 @@
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 10K objects (no rules)"
-             warmups="1500" repetitions="10000" enabled="false"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>10000</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 10K objects with a single pattern of empty constraints"
-             warmups="1500" repetitions="10000" enabled="false"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>10000</arg>
     <arg>emptyConstraintRule.drl</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 10K objects with a firing rule having a simple literal constraint"
-             warmups="1500" repetitions="10000" enabled="false"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>10000</arg>
     <arg>literalConstraintFiringRule.drl</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 1M objects (no rules)"
-             warmups="1500" repetitions="1000000" enabled="false"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>1000000</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 1M objects with a single pattern of empty constraints"
-             warmups="1500" repetitions="1000000" enabled="false"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>1000000</arg>
     <arg>emptyConstraintRule.drl</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 1M objects  a firing rule having a simple literal constraint"
-             warmups="10000" repetitions="1000000" enabled="false"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
+    <arg>1000000</arg>
     <arg>literalConstraintFiringRule.drl</arg>
   </benchmark>
 
@@ -156,6 +162,11 @@
              classname="org.drools.benchmark.benchmarks.RandomBeansBenchmark">
     <arg>2000</arg>
     <arg>constraintsEvaluation.drl</arg>
+  </benchmark>
+
+  <benchmark description="TMS"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.TmsBenchmark">
   </benchmark>
 
   <!-- Compile-time -->

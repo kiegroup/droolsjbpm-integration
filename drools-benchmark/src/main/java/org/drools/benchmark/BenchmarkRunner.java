@@ -31,7 +31,7 @@ import static org.drools.benchmark.util.MemoryUtil.usedMemory;
 
 public class BenchmarkRunner {
 
-    private static final String CONFIG_FILE = "benchmark-concurrency.xml";
+    private static final String CONFIG_FILE = "benchmark.xml";
 
     private final Executor executor = Executors.newCachedThreadPool(new ThreadFactory() {
         public Thread newThread(Runnable r) {
