@@ -93,6 +93,9 @@
         <include>org.drools:droolsjbpm-integration-docs:jdocbook</include>
       </includes>
       <outputDirectory>reference_manual</outputDirectory>
+      <!-- Workaround for https://jira.codehaus.org/browse/MASSEMBLY-557 -->
+      <fileMode>755</fileMode>
+      <directoryMode>755</directoryMode>
       <unpack>true</unpack>
       <unpackOptions>
         <excludes>
