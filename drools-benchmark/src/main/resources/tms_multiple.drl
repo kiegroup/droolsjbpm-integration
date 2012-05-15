@@ -2,59 +2,78 @@ rule "TMS0" when
     Integer( $i : intValue < 1000000, intValue % 10 == 0 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS1" when
     Integer( $i : intValue < 1000000, intValue % 10 == 1 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS2" when
     Integer( $i : intValue < 1000000, intValue % 10 == 2 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS3" when
     Integer( $i : intValue < 1000000, intValue % 10 == 3 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS4" when
     Integer( $i : intValue < 1000000, intValue % 10 == 4 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS5" when
     Integer( $i : intValue < 1000000, intValue % 10 == 5 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS6" when
     Integer( $i : intValue < 1000000, intValue % 10 == 6 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS7" when
     Integer( $i : intValue < 1000000, intValue % 10 == 7 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS8" when
     Integer( $i : intValue < 1000000, intValue % 10 == 8 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
 
 rule "TMS9" when
     Integer( $i : intValue < 1000000, intValue % 10 == 9 )
 then
     insertLogical( new Integer( $i + 1 ) );
+    insertLogical( new Integer( $i + 2 ) );
+    insertLogical( new Integer( $i + 3 ) );
 end
-

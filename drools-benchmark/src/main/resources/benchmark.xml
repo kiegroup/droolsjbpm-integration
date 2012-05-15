@@ -1,4 +1,4 @@
-<benchmarks delay="10" repetitions="1">
+<benchmarks delay="10" repetitions="10">
 
   <!-- Runtime -->
 
@@ -164,9 +164,16 @@
     <arg>constraintsEvaluation.drl</arg>
   </benchmark>
 
-  <benchmark description="TMS"
-             warmups="1" repetitions="1" enabled="true"
+  <benchmark description="TMS - 1M logical facts"
+             warmups="10" repetitions="1" enabled="true"
              classname="org.drools.benchmark.benchmarks.TmsBenchmark">
+    <arg>tms1M.drl</arg>
+  </benchmark>
+
+  <benchmark description="TMS - 1M logical facts with 3 activations justifying it"
+             warmups="10" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.TmsBenchmark">
+    <arg>tms_multiple.drl</arg>
   </benchmark>
 
   <!-- Compile-time -->

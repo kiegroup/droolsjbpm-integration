@@ -12,10 +12,6 @@ public class TmsBenchmark extends AbstractBenchmark {
 
     private StatefulKnowledgeSession ksession;
 
-    public TmsBenchmark() {
-        this("tms1M.drl");
-    }
-
     public TmsBenchmark(String drlFile) {
         this.drlFile = drlFile;
     }
@@ -27,7 +23,7 @@ public class TmsBenchmark extends AbstractBenchmark {
     }
 
     public void execute(int repNr) {
-        FactHandle fact = ksession.insert(new DummyBean(0));
+        FactHandle fact = ksession.insert(new Integer(0));
         ksession.fireAllRules();
         ksession.retract(fact);
         ksession.fireAllRules();
@@ -35,6 +31,9 @@ public class TmsBenchmark extends AbstractBenchmark {
 
     @Override
     public void terminate() {
+        if (ksession.getFactCount() > 0L) {
+            throw new RuntimeException("Still " + ksession.getFactCount() + " facts");
+        }
         ksession.dispose(); // Stateful rule session must always be disposed when finished
     }
 }
