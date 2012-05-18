@@ -2,7 +2,7 @@ import org.drools.benchmark.model.*
 
 rule "Dummy rule with simple literal constraint"
 when
-    $a : DummyBean( seed != -1 )
+    $a : Integer( intValue != -1 )
 then
 //    System.out.println( $a );
 end

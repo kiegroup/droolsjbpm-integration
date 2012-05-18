@@ -88,12 +88,12 @@ public class BenchmarkRunner {
     }
 
     private BenchmarkResult execute(BenchmarkConfig config, BenchmarkDefinition definition, boolean shouldWarmUp) {
-        if (shouldWarmUp) warmUpExecution(config, definition);
+        Benchmark benchmark = definition.instance();
+        warmUpExecution(config, definition, benchmark, shouldWarmUp);
         aggressiveGC(config.getDelay());
 
         BenchmarkResult result = new BenchmarkResult(definition);
         result.setUsedMemoryBeforeStart(usedMemory());
-        Benchmark benchmark = definition.instance();
         out.println("Executing: " + definition);
 
         result.setDuration(executeBenchmark(definition, benchmark));
@@ -106,12 +106,14 @@ public class BenchmarkRunner {
         return result;
     }
 
-    private void warmUpExecution(BenchmarkConfig config, BenchmarkDefinition definition) {
-        if (definition.getWarmups() < 1) return;
+    private void warmUpExecution(BenchmarkConfig config, BenchmarkDefinition definition, Benchmark benchmark, boolean shouldWarmUp) {
+        int warmups = shouldWarmUp ? definition.getWarmups() : (definition.isForceWarmup() ? 1 : 0);
+        if (warmups < 1) return;
         out.println("Warming up: " + definition.getDescription());
-        Benchmark benchmark = definition.instance();
         benchmark.init(definition);
-        for (int i = 0; i < definition.getWarmups(); i++) benchmark.execute(0);
+        for (int i = 0; i < warmups; i++) {
+            benchmark.execute(0);
+        }
         benchmark.terminate();
         aggressiveGC(config.getDelay());
     }
@@ -164,7 +166,9 @@ public class BenchmarkRunner {
 
     private long runBenchmark(BenchmarkDefinition definition, Benchmark benchmark) {
         long start = nanoTime();
-        for (int i = 0; i < definition.getRepetitions(); i++) benchmark.execute(i);
+        for (int i = 0; i < definition.getRepetitions(); i++) {
+            benchmark.execute(i);
+        }
         return (nanoTime() - start) / 1000000;
     }
 }

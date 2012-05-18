@@ -2,7 +2,6 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.KnowledgeBase;
 import org.drools.benchmark.BenchmarkDefinition;
-import org.drools.benchmark.model.DummyBean;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 

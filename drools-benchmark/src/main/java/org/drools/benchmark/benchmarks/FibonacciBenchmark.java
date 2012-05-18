@@ -41,10 +41,10 @@ public class FibonacciBenchmark extends AbstractBenchmark {
     public void init(BenchmarkDefinition definition) {
         KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
         ksession = kbase.newStatefulKnowledgeSession();
-        ksession.insert(new Fibonacci(number));
     }
 
     public void execute(int repNr) {
+        ksession.insert(new Fibonacci(number));
         ksession.fireAllRules();
     }
 

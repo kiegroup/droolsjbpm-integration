@@ -77,19 +77,16 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
         List<String> args = getTagValues(element, "arg");
         Constructor<?> constructor = getConstructorForArgs(className, args);
 
-        String description = element.getAttribute("description");
-        String en = element.getAttribute("enabled");
-        boolean enabled = StringUtils.isEmpty(en) || !en.trim().toLowerCase().equals("false");
-
         int[] parallels = getAttributeValueAsIntArray(element, "parallel-threads", 1);
         List<BenchmarkDefinition> benchmarks = new ArrayList<BenchmarkDefinition>(parallels.length);
         for (int parallel : parallels) {
             benchmarks.add( new BenchmarkDefinition(constructor, toArgs(constructor.getParameterTypes(), args))
-                    .setDescription(description)
+                    .setDescription(element.getAttribute("description"))
                     .setRepetitions(getAttributeValueAsInt(element, "repetitions", 1))
                     .setWarmups(getAttributeValueAsInt(element, "warmups", 0))
                     .setThreadNr(parallel)
-                    .setEnabled(enabled) );
+                    .setForceWarmup(getAttributeValueAsBoolean(element, "force-warmup", false))
+                    .setEnabled(getAttributeValueAsBoolean(element, "enabled", true)) );
         }
         return benchmarks;
     }
@@ -122,6 +119,11 @@ public class BenchmarkConfig implements Iterable<BenchmarkDefinition> {
             values.add(children.item(i).getFirstChild().getNodeValue());
         }
         return values;
+    }
+
+    private boolean getAttributeValueAsBoolean(Element elem, String name, boolean def) {
+        String en = elem.getAttribute(name);
+        return StringUtils.isEmpty(en) ? def : !en.trim().toLowerCase().equals("false");
     }
 
     private int getAttributeValueAsInt(Element elem, String name, int def) {

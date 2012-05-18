@@ -46,7 +46,19 @@ public abstract class AbstractBenchmark implements Benchmark {
         return DroolsUtil.createKnowledgeBase(kbuilder);
     }
 
+    protected final KnowledgeBase createKnowledgeBase(String drl) {
+        return DroolsUtil.createKnowledgeBase(drl);
+    }
+
     public Benchmark clone() {
         throw new UnsupportedOperationException("Override clone() to allow to run this benchmark in parallel");
+    }
+
+    protected final String repeatPatternString(String pattern, int times) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            sb.append(pattern.replaceAll("%i", "" + i));
+        }
+        return sb.toString();
     }
 }

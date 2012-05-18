@@ -16,11 +16,9 @@
 
 package org.drools.benchmark.benchmarks;
 
-import org.drools.*;
-import org.drools.benchmark.*;
-import org.drools.benchmark.model.*;
-import org.drools.runtime.*;
-import org.drools.runtime.rule.*;
+import org.drools.KnowledgeBase;
+import org.drools.benchmark.BenchmarkDefinition;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 
 public class InsertAndRetractInTurn extends AbstractBenchmark {
@@ -50,7 +48,7 @@ public class InsertAndRetractInTurn extends AbstractBenchmark {
 
     public void execute(int repNr) {
         for (int i = 0; i < objectsNumber; i++) {
-            FactHandle fact = ksession.insert(new DummyBean(i));
+            FactHandle fact = ksession.insert(new Integer(i));
             ksession.fireAllRules();
             ksession.retract(fact);
             ksession.fireAllRules();

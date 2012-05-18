@@ -27,6 +27,9 @@ public class BenchmarkDefinition {
     private int warmups;
     private int threadNr;
     private boolean enabled = true;
+    private boolean forceWarmup = false;
+
+    private Benchmark benchmark;
 
     public BenchmarkDefinition(Constructor<?> constructor, Object[] args) {
         this.constructor = constructor;
@@ -73,6 +76,14 @@ public class BenchmarkDefinition {
     }
     public BenchmarkDefinition setEnabled(boolean enabled) {
         this.enabled = enabled;
+        return this;
+    }
+
+    public boolean isForceWarmup() {
+        return forceWarmup;
+    }
+    public BenchmarkDefinition setForceWarmup(boolean forceWarmup) {
+        this.forceWarmup = forceWarmup;
         return this;
     }
 
