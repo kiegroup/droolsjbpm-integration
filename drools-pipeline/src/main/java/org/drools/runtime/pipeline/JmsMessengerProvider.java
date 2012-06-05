@@ -28,5 +28,12 @@ public interface JmsMessengerProvider {
                             String destinationName,
                             ResultHandlerFactory resultHandlerFactory);
 
+    Service newJmsMessenger(Pipeline pipeline,
+                            Properties properties,
+                            String connectionFactoryName,
+                            boolean useSecurityPrincipalForConnection,
+                            String destinationName,
+                            ResultHandlerFactory resultHandlerFactory);
+
     Action newJmsUnwrapMessageObject();
 }
