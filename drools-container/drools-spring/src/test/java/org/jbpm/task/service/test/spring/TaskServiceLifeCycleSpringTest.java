@@ -1,6 +1,6 @@
 package org.jbpm.task.service.test.spring;
 
-import static org.jbpm.task.service.TaskServiceLifeCycleBaseTest.*;
+import static org.jbpm.task.service.base.async.TaskServiceLifeCycleBaseAsyncTest.*;
 
 import org.junit.Test;
 

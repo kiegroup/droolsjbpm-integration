@@ -1,6 +1,6 @@
 package org.jbpm.task.service.test.spring;
 
-import static org.jbpm.task.service.TaskServiceBaseUserGroupCallbackTest.*;
+import static org.jbpm.task.service.base.async.TaskServiceBaseUserGroupCallbackAsyncTest.*;
 
 import org.junit.Test;
 public class TaskServiceBaseUserGroupCallbackSpringTest extends BaseSpringNoUserGroupSetupTest {
