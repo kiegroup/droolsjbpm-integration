@@ -402,22 +402,8 @@
     </xsd:sequence>
   </xsd:complexType>
 
-  <xsd:complexType name="persisterType">
-    <xsd:attribute name="for-class" use="required" type="xsd:string"/>
-    <xsd:attribute name="implementation" use="required" type="xsd:string"/>
-  </xsd:complexType>
-
-  <xsd:complexType name="variablePersistersType">
-    <xsd:sequence>
-      <xsd:element name="persister" type="persisterType" minOccurs="1" maxOccurs="unbounded"/>
-    </xsd:sequence>
-  </xsd:complexType>
-
   <xsd:element name="jpaSessionServiceFactory">
     <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element name="variablePersisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
-      </xsd:sequence>
       <xsd:attribute name="id" use="optional" type="xsd:ID"/>
       <xsd:attribute name="kbase" use="required" type="xsd:string"/>
       <xsd:attribute name="entityManagerFactory" use="required" type="xsd:string"/>
@@ -436,7 +422,6 @@
       <xsd:complexContent>
       <xsd:extension base="persistenceType">
         <xsd:all>
-          <xsd:element name="variable-persisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
           <xsd:element name="transaction-manager" minOccurs="0" maxOccurs="1">
             <xsd:complexType>
               <xsd:attribute name="ref" use="optional" type="xsd:string"/>

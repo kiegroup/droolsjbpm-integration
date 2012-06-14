@@ -473,20 +473,6 @@
                       </listitem>
                     </itemizedlist>
                   </listitem>
-
-                  <listitem>
-                    <para>variable-persisters</para>
-
-                    <itemizedlist>
-                      <listitem>
-                        <para>for-class = String</para>
-                      </listitem>
-
-                      <listitem>
-                        <para>implementation = String</para>
-                      </listitem>
-                    </itemizedlist>
-                  </listitem>
                 </itemizedlist>
               </listitem>
             </itemizedlist>
