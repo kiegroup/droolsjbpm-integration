@@ -246,7 +246,7 @@
               <xsd:element ref="fileLogger" minOccurs="0" maxOccurs="unbounded"/>
               <!-- end of additions for kloggers -->
           </xsd:sequence>
-        <xsd:choice minOccurs="0" maxOccurs="1">
+          <xsd:choice minOccurs="0" maxOccurs="1">
           <xsd:element name="batch" minOccurs="0" maxOccurs="1">
             <xsd:complexType>
               <xsd:sequence>
