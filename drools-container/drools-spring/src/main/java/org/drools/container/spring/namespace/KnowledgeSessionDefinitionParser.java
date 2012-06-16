@@ -18,7 +18,6 @@ package org.drools.container.spring.namespace;
 
 import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.ClockType;
@@ -33,12 +32,8 @@ import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
 import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
-import org.drools.event.DebugProcessEventListener;
-import org.drools.event.rule.DebugAgendaEventListener;
-import org.drools.event.rule.DebugWorkingMemoryEventListener;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -64,6 +59,7 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
     private static final String GRID_NODE_ATTRIBUTE = "node";
     private static final String TYPE_ATTRIBUTE = "type";
     private static final String LISTENERS_ATTRIBUTE = "listeners";
+    private static final String LOGGERS_ATTRIBUTE = "loggerAdaptors";
 
     private static final String KEEP_REFERENCE = "keep-reference";
     private static final String CLOCK_TYPE = "clock-type";
@@ -114,6 +110,10 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         }
         EventListenersUtil.parseEventListeners(parserContext, factory, element);
         // End of Additions for JIRA JBRULES-3076
+
+        // Additions for klogger
+        KnowledgeLoggerUtil.parseRuntimeLoggers(parserContext, factory, element);
+        // end of Additions for klogger
 
         Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
         if (ksessionConf != null) {

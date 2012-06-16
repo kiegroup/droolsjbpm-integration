@@ -51,6 +51,12 @@ public class SpringDroolsHandler extends NamespaceHandlerSupport {
 
         registerBeanDefinitionParser( "eventListeners",
                                       new EventListenersDefinitionParser() );
+
+        registerBeanDefinitionParser( "fileLogger",
+                                      new KnowledgeLoggerDefinitionParser() );
+
+        registerBeanDefinitionParser( "consoleLogger",
+                                      new KnowledgeLoggerDefinitionParser() );
     }
 
 }
