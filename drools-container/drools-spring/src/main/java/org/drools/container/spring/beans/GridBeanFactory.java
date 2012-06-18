@@ -78,8 +78,8 @@ public class GridBeanFactory
 //        }
 //
 //        GridPeerConfiguration conf = new GridPeerConfiguration();
-//        GridPeerServiceConfiguration coreSeviceLookupConf = new CoreServicesLookupConfiguration( this.coreServices );
-//        conf.addConfiguration( coreSeviceLookupConf );
+//        GridPeerServiceConfiguration coreServiceLookupConf = new CoreServicesLookupConfiguration( this.coreServices );
+//        conf.addConfiguration( coreServiceLookupConf );
 //
 //        //Configuring the WhitePages 
 //        if ( this.whitePages != null ) {
