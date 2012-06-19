@@ -1,6 +1,7 @@
 package org.jbpm.task.service.test.spring;
 
 import static org.jbpm.task.service.base.async.TaskServiceBaseAsyncTest.*;
+import org.junit.Ignore;
 
 import org.junit.Test;
 
@@ -12,11 +13,13 @@ public class TaskServiceSpringTest extends BaseSpringTest {
     }
     
     @Test
+    @Ignore
     public void testPotentialOwnerQueries() throws Exception { 
         runTestPotentialOwnerQueries(client, users, groups);
     }
     
     @Test
+    @Ignore
     public void testPeopleAssignmentQueries() throws Exception { 
         runTestPeopleAssignmentQueries(client, taskSession, users, groups);
     }
