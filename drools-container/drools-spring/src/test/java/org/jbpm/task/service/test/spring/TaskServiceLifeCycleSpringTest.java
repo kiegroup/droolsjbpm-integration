@@ -1,7 +1,6 @@
 package org.jbpm.task.service.test.spring;
 
 import static org.jbpm.task.service.base.async.TaskServiceLifeCycleBaseAsyncTest.*;
-import org.junit.Ignore;
 
 import org.junit.Test;
 
@@ -259,7 +258,6 @@ public class TaskServiceLifeCycleSpringTest extends BaseSpringTest {
     }
 
     @Test
-    @Ignore
     public void testExitNotAvailableToUsers() {
         runTestExitNotAvailableToUsers(client, users, groups);
     }
