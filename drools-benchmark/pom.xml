@@ -7,7 +7,7 @@
   <parent>
     <artifactId>droolsjbpm-integration</artifactId>
     <groupId>org.drools</groupId>
-    <version>5.3.2-SNAPSHOT</version>
+    <version>5.3.2.Final</version>
   </parent>
 
   <artifactId>drools-benchmark</artifactId>
