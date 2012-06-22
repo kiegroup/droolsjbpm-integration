@@ -21,10 +21,13 @@ import java.util.*;
 import org.drools.KnowledgeBase;
 import org.drools.command.Command;
 import org.drools.container.spring.namespace.EventListenersUtil;
+import org.drools.event.KnowledgeRuntimeEventManager;
 import org.drools.event.process.ProcessEventListener;
 import org.drools.event.rule.AgendaEventListener;
 import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.grid.GridNode;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.process.WorkItemHandler;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NamedBean;
+import org.springframework.beans.factory.support.ManagedList;
 
 public abstract class AbstractKnowledgeSessionBeanFactory
         implements
@@ -55,6 +59,8 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     protected List<WorkingMemoryEventListener> workingMemoryEventListeners;
     protected List<Object> groupedListeners = new ArrayList<Object>();
     // End of additions for JIRA JBRULES-3076
+
+    protected ManagedList<KnowledgeLoggerAdaptor> loggerAdaptors = new ManagedList<KnowledgeLoggerAdaptor>();
 
     public AbstractKnowledgeSessionBeanFactory() {
         super();
@@ -221,4 +227,34 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     }
 
     // End of Changes for JIRA JBRULES-3076
+
+    public List<KnowledgeLoggerAdaptor> getKnowledgeRuntimeLoggers() {
+        return loggerAdaptors;
+    }
+
+    public void setKnowledgeRuntimeLoggers(List<KnowledgeLoggerAdaptor> loggers) {
+        this.loggerAdaptors.addAll(loggers);
+    }
+
+    protected void attachLoggers(KnowledgeRuntimeEventManager ksession){
+        if ( loggerAdaptors != null && loggerAdaptors.size() > 0){
+            for ( KnowledgeLoggerAdaptor adaptor : loggerAdaptors) {
+                KnowledgeRuntimeLogger runtimeLogger;
+                switch (adaptor.getLoggerType()) {
+                    case LOGGER_TYPE_FILE :
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, adaptor.getFile());
+                        adaptor.setRuntimeLogger(runtimeLogger);
+                        break;
+                    case LOGGER_TYPE_THREADED_FILE:
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(ksession, adaptor.getFile(), adaptor.getInterval());
+                        adaptor.setRuntimeLogger(runtimeLogger);
+                        break;
+                    case LOGGER_TYPE_CONSOLE:
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+                        adaptor.setRuntimeLogger(runtimeLogger);
+                        break;
+                }
+            }
+        }
+    }
 }

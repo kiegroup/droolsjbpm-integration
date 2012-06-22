@@ -113,6 +113,7 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
         }
 
         // End of Additions for JIRA JBRULES-3076
+        attachLoggers(ksession);
     }
 
     public static class JpaConfiguration {

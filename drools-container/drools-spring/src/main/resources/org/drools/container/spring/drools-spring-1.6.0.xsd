@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://drools.org/schema/drools-spring"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:spring="http://www.springframework.org/schema/beans"
-  targetNamespace="http://drools.org/schema/drools-spring"
-  elementFormDefault="qualified"
-  attributeFormDefault="unqualified">
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://drools.org/schema/drools-spring"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
 
   <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
 
@@ -102,11 +102,11 @@
       <xsd:complexContent>
         <xsd:extension base="resourceType">
           <xsd:attribute name="id" use="optional" type="xsd:ID"/>
-                    <xsd:attribute name="basic-authentication" use="optional" type="enabledDisabledEnum"/>
-                    <xsd:attribute name="username" use="optional" type="xsd:string"/>
-                    <xsd:attribute name="password" use="optional" type="xsd:string"/>
-                    <xsd:attribute name="name" use="optional" type="xsd:string"/>
-                    <xsd:attribute name="description" use="optional" type="xsd:string"/>
+          <xsd:attribute name="basic-authentication" use="optional" type="enabledDisabledEnum"/>
+          <xsd:attribute name="username" use="optional" type="xsd:string"/>
+          <xsd:attribute name="password" use="optional" type="xsd:string"/>
+          <xsd:attribute name="name" use="optional" type="xsd:string"/>
+          <xsd:attribute name="description" use="optional" type="xsd:string"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
@@ -178,7 +178,7 @@
                 </xsd:complexType>
               </xsd:element>
 
-                <xsd:element name="consequenceExceptionHandler" minOccurs="0">
+              <xsd:element name="consequenceExceptionHandler" minOccurs="0">
                 <xsd:complexType>
                   <xsd:attribute name="handler" type="xsd:string"/>
                 </xsd:complexType>
@@ -208,10 +208,10 @@
 
   <!-- additions for JIRA JBRULES-3076 -->
   <xsd:complexType name="eventListener">
-      <xsd:choice minOccurs="0" maxOccurs="unbounded">
-          <xsd:element ref="spring:bean"/>
-      </xsd:choice>
-      <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element ref="spring:bean"/>
+    </xsd:choice>
+    <xsd:attribute name="ref" use="optional" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:element name="agendaEventListener" type="eventListener"/>
@@ -239,6 +239,10 @@
           <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
           <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
           <!-- end of additions for JIRA JBRULES-3076 -->
+        </xsd:sequence>
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element ref="consoleLogger" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element ref="fileLogger" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:choice minOccurs="0" maxOccurs="1">
           <xsd:element name="batch" minOccurs="0" maxOccurs="1">
@@ -348,7 +352,7 @@
     </xsd:restriction>
   </xsd:simpleType>
 
-    <xsd:simpleType name="enabledDisabledEnum">
+  <xsd:simpleType name="enabledDisabledEnum">
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="enabled" />
       <xsd:enumeration value="disabled" />
@@ -402,8 +406,22 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:complexType name="persisterType">
+    <xsd:attribute name="for-class" use="required" type="xsd:string"/>
+    <xsd:attribute name="implementation" use="required" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="variablePersistersType">
+    <xsd:sequence>
+      <xsd:element name="persister" type="persisterType" minOccurs="1" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:element name="jpaSessionServiceFactory">
     <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="variablePersisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
       <xsd:attribute name="id" use="optional" type="xsd:ID"/>
       <xsd:attribute name="kbase" use="required" type="xsd:string"/>
       <xsd:attribute name="entityManagerFactory" use="required" type="xsd:string"/>
@@ -420,21 +438,22 @@
   <xsd:element name="jpa-persistence"  substitutionGroup="persistence" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="persistenceType">
-        <xsd:all>
-          <xsd:element name="transaction-manager" minOccurs="0" maxOccurs="1">
-            <xsd:complexType>
-              <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="entity-manager-factory" minOccurs="1" maxOccurs="1">
-            <xsd:complexType>
-              <xsd:attribute name="ref" use="required" type="xsd:string"/>
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:all>
-        <xsd:attribute name="load" use="optional" type="xsd:integer"/>
-      </xsd:extension>
+        <xsd:extension base="persistenceType">
+          <xsd:all>
+            <xsd:element name="variable-persisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="transaction-manager" minOccurs="0" maxOccurs="1">
+              <xsd:complexType>
+                <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="entity-manager-factory" minOccurs="1" maxOccurs="1">
+              <xsd:complexType>
+                <xsd:attribute name="ref" use="required" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+          <xsd:attribute name="load" use="optional" type="xsd:integer"/>
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
@@ -448,20 +467,20 @@
   <xsd:element name="insert-object"  substitutionGroup="command" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="commandType">
-                <xsd:choice minOccurs="0" maxOccurs="1">
-                 <xsd:element ref="spring:bean"/>
-               <xsd:element ref="spring:ref"/>
-               <xsd:element ref="spring:idref"/>
-               <xsd:element ref="spring:value"/>
-               <xsd:element ref="spring:null"/>
-               <xsd:element ref="spring:list"/>
-               <xsd:element ref="spring:set"/>
-               <xsd:element ref="spring:map"/>
-               <xsd:element ref="spring:props"/>
-            </xsd:choice>
-        <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-      </xsd:extension>
+        <xsd:extension base="commandType">
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="spring:bean"/>
+            <xsd:element ref="spring:ref"/>
+            <xsd:element ref="spring:idref"/>
+            <xsd:element ref="spring:value"/>
+            <xsd:element ref="spring:null"/>
+            <xsd:element ref="spring:list"/>
+            <xsd:element ref="spring:set"/>
+            <xsd:element ref="spring:map"/>
+            <xsd:element ref="spring:props"/>
+          </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
@@ -469,21 +488,21 @@
   <xsd:element name="set-global"  substitutionGroup="command" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="commandType">
-                <xsd:choice minOccurs="0" maxOccurs="1">
-                 <xsd:element ref="spring:bean"/>
-               <xsd:element ref="spring:ref"/>
-               <xsd:element ref="spring:idref"/>
-               <xsd:element ref="spring:value"/>
-               <xsd:element ref="spring:null"/>
-               <xsd:element ref="spring:list"/>
-               <xsd:element ref="spring:set"/>
-               <xsd:element ref="spring:map"/>
-               <xsd:element ref="spring:props"/>
-            </xsd:choice>
-        <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-        <xsd:attribute name="identifier" use="required" type="xsd:string"/>
-      </xsd:extension>
+        <xsd:extension base="commandType">
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="spring:bean"/>
+            <xsd:element ref="spring:ref"/>
+            <xsd:element ref="spring:idref"/>
+            <xsd:element ref="spring:value"/>
+            <xsd:element ref="spring:null"/>
+            <xsd:element ref="spring:list"/>
+            <xsd:element ref="spring:set"/>
+            <xsd:element ref="spring:map"/>
+            <xsd:element ref="spring:props"/>
+          </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+          <xsd:attribute name="identifier" use="required" type="xsd:string"/>
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
@@ -491,9 +510,9 @@
   <xsd:element name="fire-all-rules"  substitutionGroup="command" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="commandType">
-        <xsd:attribute name="max" use="optional" type="xsd:integer"/>
-      </xsd:extension>
+        <xsd:extension base="commandType">
+          <xsd:attribute name="max" use="optional" type="xsd:integer"/>
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
@@ -501,8 +520,8 @@
   <xsd:element name="fire-until-halt"  substitutionGroup="command" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="commandType">
-      </xsd:extension>
+        <xsd:extension base="commandType">
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
@@ -510,26 +529,26 @@
   <xsd:element name="start-process"  substitutionGroup="command" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="commandType">
-        <xsd:sequence>
-          <xsd:element name="parameter" minOccurs="0" maxOccurs="unbounded">
+        <xsd:extension base="commandType">
+          <xsd:sequence>
+            <xsd:element name="parameter" minOccurs="0" maxOccurs="unbounded">
               <xsd:complexType>
-                  <xsd:choice minOccurs="0" maxOccurs="1">
-                   <xsd:element ref="spring:bean"/>
-                 <xsd:element ref="spring:ref"/>
-                 <xsd:element ref="spring:idref"/>
-                 <xsd:element ref="spring:value"/>
-                 <xsd:element ref="spring:null"/>
-                 <xsd:element ref="spring:list"/>
-                 <xsd:element ref="spring:set"/>
-                 <xsd:element ref="spring:map"/>
-                 <xsd:element ref="spring:props"/>
-              </xsd:choice>
-                       </xsd:complexType>
-          </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="process-id" use="required" type="xsd:string"/>
-      </xsd:extension>
+                <xsd:choice minOccurs="0" maxOccurs="1">
+                  <xsd:element ref="spring:bean"/>
+                  <xsd:element ref="spring:ref"/>
+                  <xsd:element ref="spring:idref"/>
+                  <xsd:element ref="spring:value"/>
+                  <xsd:element ref="spring:null"/>
+                  <xsd:element ref="spring:list"/>
+                  <xsd:element ref="spring:set"/>
+                  <xsd:element ref="spring:map"/>
+                  <xsd:element ref="spring:props"/>
+                </xsd:choice>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="process-id" use="required" type="xsd:string"/>
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
@@ -537,23 +556,39 @@
   <xsd:element name="signal-event"  substitutionGroup="command" >
     <xsd:complexType>
       <xsd:complexContent>
-      <xsd:extension base="commandType">
-                <xsd:choice minOccurs="0" maxOccurs="1">
-                 <xsd:element ref="spring:bean"/>
-               <xsd:element ref="spring:ref"/>
-               <xsd:element ref="spring:idref"/>
-               <xsd:element ref="spring:value"/>
-               <xsd:element ref="spring:null"/>
-               <xsd:element ref="spring:list"/>
-               <xsd:element ref="spring:set"/>
-               <xsd:element ref="spring:map"/>
-               <xsd:element ref="spring:props"/>
-            </xsd:choice>
-        <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-        <xsd:attribute name="event-type" use="required" type="xsd:string"/>
-        <xsd:attribute name="process-instance-id" use="optional" type="xsd:integer"/>
-      </xsd:extension>
+        <xsd:extension base="commandType">
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="spring:bean"/>
+            <xsd:element ref="spring:ref"/>
+            <xsd:element ref="spring:idref"/>
+            <xsd:element ref="spring:value"/>
+            <xsd:element ref="spring:null"/>
+            <xsd:element ref="spring:list"/>
+            <xsd:element ref="spring:set"/>
+            <xsd:element ref="spring:map"/>
+            <xsd:element ref="spring:props"/>
+          </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+          <xsd:attribute name="event-type" use="required" type="xsd:string"/>
+          <xsd:attribute name="process-instance-id" use="optional" type="xsd:integer"/>
+        </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
+
+  <xsd:element name="consoleLogger">
+    <xsd:complexType>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="fileLogger">
+    <xsd:complexType>
+      <xsd:attribute name="file" use="required" type="xsd:string"/>
+      <xsd:attribute name="threaded" use="optional" type="xsd:boolean" default="false"/>
+      <xsd:attribute name="interval" use="optional" type="xsd:int" default="30"/>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
 </xsd:schema>
