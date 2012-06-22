@@ -115,6 +115,8 @@ public class KnowledgeSessionDefinitionParser extends AbstractBeanDefinitionPars
         EventListenersUtil.parseEventListeners(parserContext, factory, element);
         // End of Additions for JIRA JBRULES-3076
 
+        KnowledgeLoggerUtil.parseRuntimeLoggers(parserContext, factory, element);
+
         Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
         if (ksessionConf != null) {
             Element persistenceElm = DomUtils.getChildElementByTagName(ksessionConf,

@@ -1,5 +1,5 @@
 /*
-* Copyright 2011 JBoss Inc
+* Copyright 2012 JBoss Inc
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,27 +15,18 @@
 */
 package org.drools.container.spring.beans;
 
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.NamedBean;
+import org.springframework.beans.factory.*;
+import static org.drools.container.spring.beans.KnowledgeLoggerAdaptor.*;
 
 public class KnowledgeLoggerBeanFactory implements
-        FactoryBean, InitializingBean, BeanNameAware, NamedBean {
+        FactoryBean<KnowledgeLoggerAdaptor>, InitializingBean, BeanNameAware, NamedBean, DisposableBean {
 
-    public static enum KNOWLEDGE_LOGGER_TYPE {
-        LOGGER_TYPE_FILE, LOGGER_TYPES_CONSOLE, LOGGER_TYPE_THREADED_FILE
-    };
-    
+    protected KnowledgeLoggerAdaptor logger = null;
     private String name;
     private String beanName;
-    private StatefulKnowledgeSession ksession;
-    KnowledgeRuntimeLogger logger;
     String file;
-    KNOWLEDGE_LOGGER_TYPE loggerType;
+    int interval;
+    KNOWLEDGE_LOGGER_TYPE loggerType = KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_CONSOLE;
 
     public KNOWLEDGE_LOGGER_TYPE getLoggerType() {
         return loggerType;
@@ -45,8 +36,20 @@ public class KnowledgeLoggerBeanFactory implements
         this.loggerType = loggerType;
     }
 
-    public void setLoggerType(String loggerType) {
-        this.loggerType = KNOWLEDGE_LOGGER_TYPE.valueOf(loggerType);
+    public int getInterval() {
+        return interval;
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 
     public String getName() {
@@ -65,56 +68,32 @@ public class KnowledgeLoggerBeanFactory implements
         return beanName;
     }
 
-    public StatefulKnowledgeSession getKsession() {
-        return ksession;
-    }
-
-    public void setKsession(StatefulKnowledgeSession ksession) {
-        this.ksession = ksession;
-    }
-
     public void afterPropertiesSet() throws Exception {
-        if ( ksession == null ) {
-            throw new IllegalArgumentException( "ksession property is mandatory" );
+        logger = new KnowledgeLoggerAdaptor(loggerType);
+        if ( loggerType != KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_CONSOLE) {
+            logger.setFile(file);
+            logger.setInterval(interval);
         }
-        if ( name == null ) {
-            name = beanName;
-        }
-        //System.out.println("KnowledgeLoggerBeanFactory::afterPropertiesSet - "+ksession);
-        internalAfterPropertiesSet();
     }
 
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
-    public Object getObject() throws Exception {
+    public KnowledgeLoggerAdaptor getObject() throws Exception {
         return logger;
     }
 
     public Class getObjectType() {
-        return KnowledgeRuntimeLogger.class;
+        return KnowledgeLoggerAdaptor.class;
     }
 
     public boolean isSingleton() {
         return true;
     }
 
-    protected void internalAfterPropertiesSet() throws Exception {
-        switch (loggerType) {
-            case LOGGER_TYPE_FILE :
-                logger = KnowledgeRuntimeLoggerFactory.newFileLogger(getKsession(), getFile());
-                break;
-            case LOGGER_TYPE_THREADED_FILE:
-                logger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(getKsession(), getFile(), 30);
-                break;
-            case LOGGER_TYPES_CONSOLE:
-                logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(getKsession());
-                break;
+    public void destroy() throws Exception {
+        try {
+            logger.close();
+        } catch(IllegalStateException ise) {
+            //logger has been closed by the user...
+            //ignore exception
         }
     }
 

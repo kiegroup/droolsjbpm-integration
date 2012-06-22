@@ -78,5 +78,7 @@ public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessi
             ksession.addEventListener(workingMemoryEventListener);
         }
         // End of Additions for JIRA JBRULES-3076
+
+        attachLoggers(ksession);
     }
 }
