@@ -241,10 +241,8 @@
           <!-- end of additions for JIRA JBRULES-3076 -->
         </xsd:sequence>
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-          <!-- additions for kloggers -->
           <xsd:element ref="consoleLogger" minOccurs="0" maxOccurs="unbounded"/>
           <xsd:element ref="fileLogger" minOccurs="0" maxOccurs="unbounded"/>
-          <!-- end of additions for kloggers -->
         </xsd:sequence>
         <xsd:choice minOccurs="0" maxOccurs="1">
           <xsd:element name="batch" minOccurs="0" maxOccurs="1">
@@ -577,7 +575,6 @@
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
-
 
   <xsd:element name="consoleLogger">
     <xsd:complexType>
