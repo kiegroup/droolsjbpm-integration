@@ -41,7 +41,7 @@ public class GridNodeRemoteClient<T>
         implements
         GridNode {
 
-    private static Logger logger = LoggerFactory.getLogger(GridNodeRemoteClient.class);
+    private static Logger logger = LoggerFactory.getLogger( GridNodeRemoteClient.class );
 
     private GridServiceDescription    gsd;
     private Grid                      grid;
@@ -49,46 +49,46 @@ public class GridNodeRemoteClient<T>
     private final ServiceRegistry     serviceRegistry = ServiceRegistryImpl.getInstance();
     private MinaConnector             connector       = new MinaConnector();
 
-    public GridNodeRemoteClient(Grid grid,
-                                GridServiceDescription gsd) {
+    public GridNodeRemoteClient( Grid grid,
+                                 GridServiceDescription gsd ) {
         this.gsd = gsd;
         this.grid = grid;
         init( this.localContext );
     }
 
-    public <T> T get(String identifier,
-                     Class<T> cls) {
+    public <T> T get( String identifier,
+                      Class<T> cls ) {
         //@TODO: this was done just as a hack to have the information ready, requires review and refactoring
-        if(cls.isAssignableFrom(String.class)){
+        if( cls.isAssignableFrom( String.class ) ) {
             CommandImpl cmd = new CommandImpl( "lookupKsessionId",
-                    Arrays.asList( new Object[]{identifier} ) );
+                    Arrays.asList( new Object[] { identifier } ) );
 
             ConversationManager connm = this.grid.get( ConversationManager.class );
             Object result = ConversationUtil.sendMessage( connm,
                     (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
                     this.gsd.getId(),
                     cmd );
-            return (T)result;
+            return (T) result;
         }
-        if(cls.isAssignableFrom(StatefulKnowledgeSession.class) ){
+        if( cls.isAssignableFrom( StatefulKnowledgeSession.class ) ){
             if ( logger.isDebugEnabled() ) {
-                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC I'm now trying to locate a happy SKS..." + identifier );
+                logger.debug( "(" + Thread.currentThread().getId() + ")" + Thread.currentThread().getName() +" GNRC I'm now trying to locate a happy SKS... " + identifier );
             }
             CommandImpl cmd = new CommandImpl( "lookupKsession",
                     Arrays.asList( new Object[]{identifier} ) );
             if ( logger.isDebugEnabled() ) {
-                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC I have the command ready" );
+                logger.debug( "(" + Thread.currentThread().getId() + ")" + Thread.currentThread().getName() +" GNRC I have the command ready" );
             }
 
             ConversationManager connm = this.grid.get( ConversationManager.class );
             if ( logger.isDebugEnabled() ) {
-                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC I have the convo manager ready" );
-                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC Sending to " + ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject() );
-                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC The gsd, whatever it is " + this.gsd.getId() );
+                logger.debug( "(" + Thread.currentThread().getId() + ")" + Thread.currentThread().getName() +" GNRC I have the convo manager ready" );
+                logger.debug( "(" + Thread.currentThread().getId() + ")" + Thread.currentThread().getName() +" GNRC Sending to " + ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject() );
+                logger.debug( "(" + Thread.currentThread().getId() + ")" + Thread.currentThread().getName() +" GNRC The gsd, whatever it is " + this.gsd.getId() );
             }
 
             Object result = ConversationUtil.sendMessage( connm,
-                    (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+                    (InetSocketAddress) ( (Map<String, Address>) this.gsd.getAddresses() ).get( "socket" ).getObject(),
                     this.gsd.getId(),
                     cmd );
 
@@ -96,7 +96,7 @@ public class GridNodeRemoteClient<T>
                 logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC Ready to send it back" );
             }
 
-            return (T)new StatefulKnowledgeSessionRemoteClient((String)result, gsd, connm);
+            return (T) new StatefulKnowledgeSessionRemoteClient( (String) result, gsd, connm );
         }
         T service = (T) localContext.get( identifier );
         if ( service == null ) {
@@ -106,16 +106,16 @@ public class GridNodeRemoteClient<T>
         return service;
     }
 
-    public <T> T get(Class<T> serviceClass) {
+    public <T> T get( Class<T> serviceClass ) {
         return get( serviceClass.getName(),
-                serviceClass );
+                    serviceClass );
     }
 
-    public void set(String identifier,
-                    Object object) {
+    public void set( String identifier,
+                     Object object ) {
         //We need a way to do it more generic, so we can set whatever we want.
 
-        if(object instanceof StatefulKnowledgeSessionRemoteClient){
+        if( object instanceof StatefulKnowledgeSessionRemoteClient ){
             String localId = UUID.randomUUID().toString();
 
             CommandImpl cmd = new CommandImpl( "registerKsession",
@@ -138,7 +138,7 @@ public class GridNodeRemoteClient<T>
         return gsd.getId();
     }
 
-    public void init(Object context) {
+    public void init( Object context ) {
 
         this.localContext.put( KnowledgeBuilderFactoryService.class.getName(),
                 new KnowledgeBuilderProviderRemoteClient( this.grid,
@@ -151,6 +151,10 @@ public class GridNodeRemoteClient<T>
 
     public void dispose() {
         connector.close();
+    }
+
+    public boolean isRemote() {
+        return true;
     }
 
 }

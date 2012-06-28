@@ -36,8 +36,8 @@ public class MinaAcceptor
     public synchronized void open(InetSocketAddress address,
                                   MessageReceiverHandler handler,
                                   SystemEventListener systemEventListener) {
-        if ( logger.isTraceEnabled() ){
-            logger.trace("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Binding a new SocketAcceptor to "+address.getHostName()+":"+address.getPort());
+        if ( logger.isInfoEnabled() ){
+            logger.info("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Binding a new SocketAcceptor to "+address.getHostName()+":"+address.getPort());
         }
         if ( this.acceptor == null ) {
             acceptor = new NioSocketAcceptor( 16 );

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class MultiplexSocket
     implements
     MessageReceiverHandler {
-    private static Logger logger = LoggerFactory.getLogger(MultiplexSocket.class);
+    private static Logger logger = LoggerFactory.getLogger( MultiplexSocket.class );
     
     private Map<String, MessageReceiverHandler> handlers;
 
@@ -24,14 +24,19 @@ public class MultiplexSocket
         return this.handlers;
     }
 
-    public void messageReceived(Conversation conversation,
-                                Message msg) {
-        if(logger.isTraceEnabled()){
-            logger.trace(" --- MSG Recieved: "+msg);
-            logger.trace(" \t --- Available Handlers: "+handlers.keySet());
+    public void messageReceived( Conversation conversation,
+                                 Message msg ) {
+        if( logger.isTraceEnabled() ) {
+            logger.trace( " --- MSG Received: " + msg );
+            logger.trace( " \t --- Available Handlers: " + handlers.keySet() );
         }
-        this.handlers.get( msg.getRecipientId() ).messageReceived( conversation,
-                                                                   msg );
+        if ( this.handlers.containsKey( msg.getRecipientId() ) ) {
+            this.handlers.get( msg.getRecipientId() ).messageReceived( conversation, msg );
+        } else {
+            logger.error( " \t --- No handler available for message recipient: " + msg.getRecipientId() );
+            conversation.respond( null );
+        }
+
     }
 
 }

@@ -79,4 +79,9 @@ public class MinaIoWriter
         this.session.write( msg );
     }
 
+    public String toString() {
+        return "MinaIoWriter{" +
+                "session=" + session +
+                '}';
+    }
 }

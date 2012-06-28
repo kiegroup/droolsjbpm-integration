@@ -18,23 +18,29 @@ public class GridServiceDescriptionImpl
     
     private String               descId;
 
+    private String               ownerGridId;
+
     private Class                serviceInterface;
 
     private Map<String, Address> addresses = new HashMap<String, Address>();
 
     private Serializable         descdata;
+    
+
 
     public GridServiceDescriptionImpl() {
 
     }
 
-    public GridServiceDescriptionImpl(Class cls) {
+    public GridServiceDescriptionImpl( Class cls, String ownerGridId ) {
         this.serviceInterface = cls;
         this.descId = cls.getName();
+        this.ownerGridId = ownerGridId;
     }
 
-    public GridServiceDescriptionImpl(String id) {
+    public GridServiceDescriptionImpl( String id, String ownerGridId ) {
         this.descId = id;
+        this.ownerGridId = ownerGridId;
     }
 
     
@@ -45,6 +51,15 @@ public class GridServiceDescriptionImpl
     public void setId(String id) {
         this.descId = id;
     }
+
+    public String getOwnerGridId() {
+        return ownerGridId;
+    }
+
+    public void setOwnerGridId( String id ) {
+        ownerGridId = id;
+    }
+
 
     public Class getServiceInterface() {
         return this.serviceInterface;
@@ -111,5 +126,6 @@ public class GridServiceDescriptionImpl
     public void setData(Serializable data) {
         this.descdata = data;
     }
+
 
 }

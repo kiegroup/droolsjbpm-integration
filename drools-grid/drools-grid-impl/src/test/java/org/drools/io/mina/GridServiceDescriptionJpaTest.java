@@ -55,7 +55,7 @@ public class GridServiceDescriptionJpaTest {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new WhitePagesImpl();
 
-        GridServiceDescription<WhitePages> gsd1 = wp.create( WhitePages.class.getName() );
+        GridServiceDescription<WhitePages> gsd1 = wp.create( WhitePages.class.getName(), "grid0" );
         gsd1.setServiceInterface(  WhitePages.class );
         gsd1.addAddress( "socket" ).setObject( new InetSocketAddress( "127.0.0.1",
                                                                       8010 ) );
@@ -67,7 +67,7 @@ public class GridServiceDescriptionJpaTest {
         em.getTransaction().commit();
         em.close();
 
-        GridServiceDescriptionImpl gsd2 = new GridServiceDescriptionImpl( "s1" );
+        GridServiceDescriptionImpl gsd2 = new GridServiceDescriptionImpl( "s1", "grid0" );
         gsd2.setServiceInterface( WhitePages.class );
         gsd2.addAddress( "socket" ).setObject( new InetSocketAddress( "127.0.0.1",
                                                                       8000 ) );

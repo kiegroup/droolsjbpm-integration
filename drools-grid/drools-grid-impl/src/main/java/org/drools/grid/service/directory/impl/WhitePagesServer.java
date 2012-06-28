@@ -17,7 +17,7 @@ public class WhitePagesServer
     MessageReceiverHandler {
     private WhitePages whitePages;
 
-    public WhitePagesServer(WhitePages whitePages) {
+    public WhitePagesServer( WhitePages whitePages ) {
         this.whitePages = whitePages;
     }
 
@@ -40,7 +40,7 @@ public class WhitePagesServer
                                                                          CommandImpl cmd) {
                                                          WhitePages whitePages = (WhitePages) object;
                                                          final List list = cmd.getArguments();
-                                                         GridServiceDescription gsd = whitePages.create( (String) list.get( 0 ) );
+                                                         GridServiceDescription gsd = whitePages.create( (String) list.get( 0 ), (String) list.get( 1 ) );
                                                          con.respond( gsd );
                                                      }
                                                  } );

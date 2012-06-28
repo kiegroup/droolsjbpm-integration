@@ -28,4 +28,10 @@ public class CommandImpl
         return arguments;
     }
 
+    public String toString() {
+        return "CommandImpl{" +
+                "name='" + name + '\'' +
+                ", arguments=" + arguments +
+                '}';
+    }
 }

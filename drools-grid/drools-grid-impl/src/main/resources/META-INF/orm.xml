@@ -17,14 +17,15 @@
       <table name="GridServiceDescription"/>
 
       <attributes>
-          <id name="descId" />        
+          <id name="descId" />
+          <basic name="ownerGridId" />
           <one-to-many name="addresses" mapped-by="gridServiceDescription" target-entity="org.drools.grid.service.directory.impl.AddressImpl" fetch="EAGER" >
               <map-key name="transport" /> 
               <cascade>
                   <cascade-all/>
               </cascade>
           </one-to-many>     
-        
+
       </attributes>
   </entity>  
   

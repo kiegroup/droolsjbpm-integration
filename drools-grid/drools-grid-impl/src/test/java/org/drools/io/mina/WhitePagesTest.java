@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -17,19 +15,12 @@ import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
-import org.drools.grid.io.Connector;
-import org.drools.grid.io.ConnectorFactoryService;
-import org.drools.grid.io.ConversationManager;
-import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
-import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
+import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaConnector;
-import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
-import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
 import org.drools.time.SchedulerService;
 
@@ -48,7 +39,7 @@ public class WhitePagesTest {
         GridPeerServiceConfiguration coreSeviceConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
-        MultiplexSocketServiceCongifuration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
+        MultiplexSocketServiceConfiguration socketConf = new MultiplexSocketServiceConfiguration( new MultiplexSocketServerImpl( "127.0.0.1",
                                                                                                                           new MinaAcceptorFactoryService(),
                                                                                                                           l,
                                                                                                                           grid1) );
@@ -75,7 +66,7 @@ public class WhitePagesTest {
 
         WhitePages wpClient = grid2.get( WhitePages.class );
 
-        GridServiceDescription test1Gsd = wpClient.create( "test:string@domain1" );
+        GridServiceDescription test1Gsd = wpClient.create( "test:string@domain1", "grid0" );
 
         GridServiceDescription testGsd_2 = wpClient.lookup( "test:string@domain1" );
         assertEquals( test1Gsd,

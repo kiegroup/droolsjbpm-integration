@@ -53,9 +53,9 @@ public class GridHelper {
         whitePages = new JpaWhitePages( emf );
     }
 
-    public static Grid getGrid() {
+    public static Grid createGrid() {
 
-        Grid gridHelper = new GridImpl(new HashMap<String, Object>());
+        Grid gridHelper = new GridImpl( new HashMap<String, Object>() );
         //Local Grid Configuration, for our client
         GridPeerConfiguration conf = new GridPeerConfiguration();
 
@@ -64,10 +64,9 @@ public class GridHelper {
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
 
         wplConf.setWhitePages( whitePages );
-        conf.addConfiguration(wplConf);
+        conf.addConfiguration( wplConf );
 
-        conf.configure(gridHelper);
-
+        conf.configure( gridHelper );
 
         return gridHelper;
 
@@ -76,9 +75,9 @@ public class GridHelper {
     
     private static Map<String, GridNode> nodeCache = new HashMap<String, GridNode>();
 
-    public static synchronized GridNode getGridNode(String name) {
+    public static synchronized GridNode getGridNode( String name, Grid grid, boolean forceRemote ) {
 
-        if (logger.isDebugEnabled()) {
+        if ( logger.isDebugEnabled() ) {
             logger.debug(" ### Grid Helper trying to locate GridNode: " + name);
         }
 
@@ -87,33 +86,41 @@ public class GridHelper {
             return nodeCache.get( name );
         }
 
-        GridServiceDescription<GridNode> nGsd = getGrid().get(WhitePages.class).lookup(name);
+        GridServiceDescription<GridNode> nGsd = grid.get( WhitePages.class ).lookup( name );
 
-        if (nGsd == null) {
-            if (logger.isDebugEnabled()) {
-                logger.error("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper DOES NOT Found a Node Descriptor for: " + name);
+        if ( nGsd == null ) {
+            if ( logger.isDebugEnabled() ) {
+                logger.error( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper DOES NOT Found a Node Descriptor for: " + name );
             }
             return null;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper Found Node Descriptor: " + nGsd);
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t id: " + nGsd.getId());
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t Address size: " + nGsd.getAddresses().size());
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t Addresses: " + nGsd.getAddresses());
-            for (String key : nGsd.getAddresses().keySet()) {
-                logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" \t ### Address: " + nGsd.getAddresses().get(key));
+        if ( logger.isDebugEnabled() ) {
+
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper Found Node Descriptor: " + nGsd );
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t id: " + nGsd.getId() );
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t Address size: " + nGsd.getAddresses().size() );
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t Addresses: " + nGsd.getAddresses() );
+            for ( String key : nGsd.getAddresses().keySet() ) {
+                logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" \t ### Address: " + nGsd.getAddresses().get(key) );
             }
 
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t Interface: " + nGsd.getServiceInterface());
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t DATA: " + nGsd.getData());
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t Interface: " + nGsd.getServiceInterface() );
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### \t DATA: " + nGsd.getData() );
         }
-        GridConnection<GridNode> conn = getGrid().get(ConnectionFactoryService.class).createConnection(nGsd);
-        if (logger.isDebugEnabled()) {
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper Create a Conection: " + name);
+
+        ConnectionFactoryService csf = grid.get( ConnectionFactoryService.class );
+        boolean allowsLocal = csf.isLocalAllowed();
+        csf.setLocalAllowed( ! forceRemote );
+        GridConnection<GridNode> conn = csf.createConnection( nGsd );
+        csf.setLocalAllowed( allowsLocal );
+
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper Create a Conection: " + name );
         }
         GridNode node = conn.connect();
-        if (logger.isDebugEnabled()) {
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper found GridNode: (" + name + ") -> " + node);
+
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper found GridNode: (" + name + ") -> " + node );
         }
 
         nodeCache.put( name, node );
@@ -121,45 +128,45 @@ public class GridHelper {
         return node;
     }
 
-    public static QueryResultsRemoteClient getQueryResultRemoteClient(String nodeId, String sessionId, String queryName, String remoteResultsId) {
+    public static QueryResultsRemoteClient getQueryResultRemoteClient( Grid grid, String nodeId, String sessionId, String queryName, String remoteResultsId ) {
 
-        GridServiceDescription<GridNode> gsd = getGridServiceDescriptor(nodeId);
-        GridNode node = getGridNode(nodeId);
-        String reverseId = node.get(sessionId, String.class);
-        return new QueryResultsRemoteClient(queryName, reverseId, remoteResultsId, gsd, getGrid().get(ConversationManager.class));
+        GridServiceDescription<GridNode> gsd = getGridServiceDescriptor( grid, nodeId );
+        GridNode node = getGridNode( nodeId, grid, false );
+        String reverseId = node.get( sessionId, String.class );
+        return new QueryResultsRemoteClient( queryName, reverseId, remoteResultsId, gsd, grid.get( ConversationManager.class ) ) ;
     }
     
     
-    public static KnowledgeAgent getKnowledgeAgentRemoteClient(String nodeId, String sessionId){
-        GridServiceDescription<GridNode> gsd = getGridServiceDescriptor(nodeId);
-        GridNode node = getGridNode(nodeId);
-        String reverseId = node.get(sessionId, String.class);
-        if (logger.isDebugEnabled()) {
-            logger.debug(" ### Grid Helper: Creating KnowledgeAgent Client for: reverseId: " + reverseId +" - session-id: "+sessionId);
+    public static KnowledgeAgent getKnowledgeAgentRemoteClient( Grid grid, String nodeId, String sessionId ) {
+        GridServiceDescription<GridNode> gsd = getGridServiceDescriptor( grid, nodeId );
+        GridNode node = getGridNode( nodeId, grid, false );
+        String reverseId = node.get( sessionId, String.class );
+        if ( logger.isDebugEnabled() ) {
+            logger.debug(" ### Grid Helper: Creating KnowledgeAgent Client for: reverseId: " + reverseId +" - session-id: "+sessionId );
         }
-        return new KnowledgeAgentRemoteClient(reverseId, gsd, getGrid().get(ConversationManager.class));
+        return new KnowledgeAgentRemoteClient( reverseId, gsd, grid.get( ConversationManager.class ) );
     }
 
-    private static GridServiceDescription<GridNode> getGridServiceDescriptor(String name) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper trying to locate GridNode: " + name);
+    private static GridServiceDescription<GridNode> getGridServiceDescriptor( Grid grid, String name ) {
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper trying to locate GridNode: " + name );
         }
 
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper Looking up: " + name);
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper Looking up: " + name );
         }
-        GridServiceDescription<GridNode> nGsd = getGrid().get(WhitePages.class).lookup(name);
+        GridServiceDescription<GridNode> nGsd = grid.get( WhitePages.class ).lookup( name );
         return nGsd;
     }
     
-    public static StatefulKnowledgeSession getStatefulKnowledgeSession(String nodeId, String sessionId){
-        GridNode node = GridHelper.getGridNode(nodeId);
-        logger.error("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node );
-        if (logger.isDebugEnabled()) {
-            logger.debug("(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node);
+    public static StatefulKnowledgeSession getStatefulKnowledgeSession( Grid grid, String nodeId, String sessionId, boolean forceRemote ) {
+        GridNode node = GridHelper.getGridNode( nodeId, grid, forceRemote );
+        logger.error( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node );
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node );
         }
-        StatefulKnowledgeSession kSession = node.get(sessionId, StatefulKnowledgeSession.class);
+        StatefulKnowledgeSession kSession = node.get( sessionId, StatefulKnowledgeSession.class );
         return kSession;
     }
 }

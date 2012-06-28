@@ -43,7 +43,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
-import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
+import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;

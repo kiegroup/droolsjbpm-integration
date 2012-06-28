@@ -76,7 +76,7 @@ public class SchedulerImpl
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
         if ( gsd == null ) {
-            gsd = new GridServiceDescriptionImpl( WhitePages.class );
+            gsd = new GridServiceDescriptionImpl( WhitePages.class, grid.getId() );
         }
 
         GridServiceDescription<WhitePages> service = coreServicesWP.getServices().get( SchedulerService.class.getName() );

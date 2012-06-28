@@ -48,4 +48,10 @@ public class AddressJpa
     private Object readResolve() throws ObjectStreamException {
         return this.detached;
     }
+
+    public String toString() {
+        return "AddressJpa{" +
+                "detached=" + detached +
+                '}';
+    }
 }

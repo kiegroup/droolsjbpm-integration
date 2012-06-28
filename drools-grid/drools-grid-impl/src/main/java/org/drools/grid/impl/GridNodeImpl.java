@@ -195,13 +195,15 @@ public class GridNodeImpl
         GridServiceDescription<GridNode> gsd = wp.lookup(id);
         if (gsd
                 == null) {
-            gsd = wp.create(id);
+            gsd = wp.create( id, grid.getId() );
         }
 
         gsd.setServiceInterface(GridNode.class);
 
-        gsd.addAddress(
-                "socket").setObject(new InetSocketAddress(ip,
-                port));
+        gsd.addAddress( "socket" ).setObject( new InetSocketAddress( ip, port ) );
+    }
+
+    public boolean isRemote() {
+        return false;
     }
 }

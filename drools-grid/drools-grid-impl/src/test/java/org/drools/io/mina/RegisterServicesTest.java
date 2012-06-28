@@ -31,7 +31,7 @@ import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.Connector;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.ConversationManagerImpl;
-import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
+import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.WhitePages;

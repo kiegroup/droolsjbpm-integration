@@ -97,7 +97,7 @@ public class QueryRemoteCommand implements GenericCommand<QueryResults> {
         this.arguments = arguments;
     }
 
-    public QueryResults execute(Context context) {
+    public QueryResults execute( Context context ) {
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
 
         if (this.arguments == null || this.arguments.isEmpty()) {
@@ -120,7 +120,7 @@ public class QueryRemoteCommand implements GenericCommand<QueryResults> {
             if (((StatefulKnowledgeSessionImpl) ksession).session.getExecutionResult() != null && this.disconnected) {
                 QueryResultsDescriptor disconnectedResults = new QueryResultsDescriptor(this.name, this.outIdentifier, results.size());
                 ((StatefulKnowledgeSessionImpl) ksession).session.getExecutionResult().getResults().put(this.outIdentifier, disconnectedResults);
-                context.getContextManager().getContext( "__TEMP__" ).set(this.outIdentifier, results);
+                context.getContextManager().getContext( "__TEMP__" ).set( this.outIdentifier, results );
                 return disconnectedResults;
             }
         }

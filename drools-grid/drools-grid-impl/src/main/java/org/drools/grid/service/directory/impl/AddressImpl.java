@@ -86,8 +86,13 @@ public class AddressImpl
         return true;
     }
 
+    @Override
     public String toString() {
-        return "Address id=" + addressId + " tranport=" + transport + " object=" + addressObject;
+        return "AddressImpl{" +
+                "addressId='" + addressId + '\'' +
+                ", gridServiceDescription=" + gridServiceDescription +
+                ", transport='" + transport + '\'' +
+                ", addressObject=" + addressObject +
+                '}';
     }
-
 }

@@ -33,7 +33,7 @@ public class WhitePagesSocketConfiguration
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( WhitePages.class );
             if ( gsd == null ) {
-                gsd = new GridServiceDescriptionImpl( WhitePages.class );
+                gsd = new GridServiceDescriptionImpl( WhitePages.class, grid.getId() );
             }
 
             SocketService mss = grid.get( SocketService.class );

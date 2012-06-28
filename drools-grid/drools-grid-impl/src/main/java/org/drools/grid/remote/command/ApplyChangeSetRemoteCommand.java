@@ -26,34 +26,33 @@ public class ApplyChangeSetRemoteCommand
     implements
     GenericCommand<Void> {
 
-    
-    
+
+
     private String kbaseKagentId;
     private ChangeSet cs;
     private Resource res;
     
-    public ApplyChangeSetRemoteCommand( String kbaseKagentId, ChangeSet cs) { 
+    public ApplyChangeSetRemoteCommand( String kbaseKagentId, ChangeSet cs ) {
         this.kbaseKagentId = kbaseKagentId;
         this.cs = cs;
     }
     
-    public ApplyChangeSetRemoteCommand( String kbaseKagentId, Resource res) { 
+    public ApplyChangeSetRemoteCommand( String kbaseKagentId, Resource res ) {
         this.kbaseKagentId = kbaseKagentId;
         this.res = res;
     }
     
 
     public Void execute(Context context) {
-        
-        
-        KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext("__TEMP__").get(kbaseKagentId+"_kAgent");
-        if(this.res != null){
+
+        KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext("__TEMP__").get( kbaseKagentId+"_kAgent" );
+        if( this.res != null ) {
             System.out.println("Applying Resource: "+this.res);
-            agent.applyChangeSet(this.res);
+            agent.applyChangeSet( this.res );
         }
-        if(this.cs != null){
-            System.out.println("Applying Change-set: "+this.cs);
-            agent.applyChangeSet(this.cs);
+        if( this.cs != null ) {
+            System.out.println( "Applying Change-set: "+this.cs);
+            agent.applyChangeSet( this.cs );
         }
         return null;
     }

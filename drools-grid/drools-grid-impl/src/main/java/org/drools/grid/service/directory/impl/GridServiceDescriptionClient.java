@@ -32,6 +32,8 @@ public class GridServiceDescriptionClient
     private Map<String, Address> addresses = new HashMap<String, Address>();
 
     private Serializable         data;
+    
+    private String               ownerGridId;
 
     public GridServiceDescriptionClient(GridServiceDescription gsd,
                                         GridServiceDescription whitePagesGsd,
@@ -142,4 +144,11 @@ public class GridServiceDescriptionClient
 
     }
 
+    public String getOwnerGridId() {
+        return ownerGridId;
+    }
+
+    public void setOwnerGridId(String ownerGridId) {
+        this.ownerGridId = ownerGridId;
+    }
 }
