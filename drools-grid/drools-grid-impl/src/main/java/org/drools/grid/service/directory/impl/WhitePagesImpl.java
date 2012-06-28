@@ -20,8 +20,8 @@ public class WhitePagesImpl
     MessageReceiverHandlerFactoryService {
     private Map<String, GridServiceDescription> directory = new ConcurrentHashMap<String, GridServiceDescription>();
 
-    public GridServiceDescription create(String serviceDescriptionId) {
-        GridServiceDescription gsd = new GridServiceDescriptionImpl(serviceDescriptionId);
+    public GridServiceDescription create( String serviceDescriptionId, String ownerGridId ) {
+        GridServiceDescription gsd = new GridServiceDescriptionImpl( serviceDescriptionId, ownerGridId );
         this.directory.put( gsd.getId(),
                             gsd );
         return gsd;
@@ -43,12 +43,12 @@ public class WhitePagesImpl
         doRegisterSocketService(grid, id, ip, port);
     }
     
-    public static void doRegisterSocketService(Grid grid, String id, String ip, int port) {
+    public static void doRegisterSocketService( Grid grid, String id, String ip, int port ) {
         CoreServicesLookupImpl coreServicesWP = (CoreServicesLookupImpl) grid.get( CoreServicesLookup.class );
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( WhitePages.class );
         if ( gsd == null ) {
-            gsd = new GridServiceDescriptionImpl( WhitePages.class );
+            gsd = new GridServiceDescriptionImpl( WhitePages.class, grid.getId() );
         }
 
         GridServiceDescription<WhitePages> service = coreServicesWP.getServices().get( WhitePages.class.getName() );

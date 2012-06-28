@@ -21,10 +21,10 @@ public class JpaWhitePages
         this.emf = emf;
     }
 
-    public GridServiceDescription create(String serviceDescriptionId) {
+    public GridServiceDescription create( String serviceDescriptionId, String ownerGridId ) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        GridServiceDescription gsd = new GridServiceDescriptionImpl( serviceDescriptionId );
+        GridServiceDescription gsd = new GridServiceDescriptionImpl( serviceDescriptionId, ownerGridId );
         em.persist( gsd );
         em.getTransaction().commit();
         em.close();
@@ -32,20 +32,20 @@ public class JpaWhitePages
                                               emf );
     }
 
-    public GridServiceDescription lookup(String serviceDescriptionId) {
+    public GridServiceDescription lookup( String serviceDescriptionId ) {
         EntityManager em = this.emf.createEntityManager();
         GridServiceDescription gsd = em.find( GridServiceDescriptionImpl.class,
                                                                           serviceDescriptionId );
         em.close();
-        return (gsd == null) ? null : new GridServiceDescriptionJpa( gsd,
-                                                                     emf );
+        return ( gsd == null ) ? null : new GridServiceDescriptionJpa( gsd,
+                                                                       emf );
     }
 
-    public void remove(String serviceDescriptionId) {
+    public void remove( String serviceDescriptionId ) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         GridServiceDescription<WhitePages> gsd = em.find( GridServiceDescriptionImpl.class,
-                                              serviceDescriptionId );
+                                                          serviceDescriptionId );
         for ( Address address : gsd.getAddresses().values() ) { // because JPA won't cascade delete to orphans
             em.remove( address );
         }
@@ -62,7 +62,7 @@ public class JpaWhitePages
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void registerSocketService(Grid grid, String id, String ip, int port) {
+    public void registerSocketService( Grid grid, String id, String ip, int port ) {
         WhitePagesImpl.doRegisterSocketService(grid, id, ip, port);
     }
 }

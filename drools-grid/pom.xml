@@ -12,8 +12,7 @@
   <artifactId>drools-grid</artifactId>
   <packaging>pom</packaging>
 
-  <name>Drools grid</name>
-  <description>TODO Cloud and multi agent things?</description>
+  <name>Drools Grid</name>
 
   <dependencies>
     <dependency>

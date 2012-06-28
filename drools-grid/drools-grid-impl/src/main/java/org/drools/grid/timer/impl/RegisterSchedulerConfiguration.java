@@ -38,7 +38,7 @@ public class RegisterSchedulerConfiguration
 
         GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( SchedulerService.class );
         if ( gsd == null ) {
-            gsd = new GridServiceDescriptionImpl( SchedulerService.class );
+            gsd = new GridServiceDescriptionImpl( SchedulerService.class, grid.getId() );
         }
 
         SocketService mss = grid.get( SocketService.class );

@@ -11,6 +11,7 @@ import org.drools.SystemEventListenerFactory;
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
+import org.drools.grid.SocketService;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.io.AcceptorFactoryService;
@@ -30,22 +31,22 @@ public class GridImpl implements Grid {
     private Map<String, Object> services;
     private Map<String, GridNode> localNodes = new HashMap<String, GridNode>();
     private Map<String, GridPeerServiceConfiguration> serviceConfigurators = new HashMap();
-    private static Logger logger = LoggerFactory.getLogger(GridImpl.class);
+    private static Logger logger = LoggerFactory.getLogger( GridImpl.class );
 
     public GridImpl() {
-        this(UUID.randomUUID().toString(), null);
+        this( UUID.randomUUID().toString(), null );
     }
 
-    public GridImpl(String id) {
-        this(id, null);
+    public GridImpl( String id ) {
+        this( id, null );
     }
 
-    public GridImpl(Map<String, Object> services) {
-        this(UUID.randomUUID().toString(), services);
+    public GridImpl( Map<String, Object> services ) {
+        this( UUID.randomUUID().toString(), services );
     }
 
-    public GridImpl(String id, Map<String, Object> services) {
-        if (services == null) {
+    public GridImpl( String id, Map<String, Object> services ) {
+        if ( services == null ) {
             this.services = new ConcurrentHashMap<String, Object>();
         } else {
             this.services = services;
@@ -58,67 +59,112 @@ public class GridImpl implements Grid {
     private void init() {
         // TODO hardcoding these for now, should probably be configured
         SystemEventListener listener = SystemEventListenerFactory.getSystemEventListener();
-        this.services.put(SystemEventListener.class.getName(), listener);
-        this.services.put(AcceptorFactoryService.class.getName(), new MinaAcceptorFactoryService());
-        this.services.put(ConnectorFactoryService.class.getName(), new MinaConnectorFactoryService());
-        this.services.put(ConversationManager.class.getName(), new ConversationManagerImpl(this, listener));
 
-        ConnectionFactoryService conn = new ConnectionFactoryServiceImpl(this);
-        this.services.put(ConnectionFactoryService.class.getName(), conn);
+        addService( SystemEventListener.class, listener );
+        addService( AcceptorFactoryService.class, new MinaAcceptorFactoryService() );
+        addService( ConnectorFactoryService.class, new MinaConnectorFactoryService() );
+        addService( ConversationManager.class, new ConversationManagerImpl( this, listener ) );
+        addService( ConnectionFactoryService.class.getName(), new ConnectionFactoryServiceImpl( this ) );
 
-        this.serviceConfigurators.put(WhitePages.class.getName(), new WhitePagesRemoteConfiguration());
+        this.serviceConfigurators.put( WhitePages.class.getName(), new WhitePagesRemoteConfiguration() );
     }
 
-    public Object get(String str) {
-        return this.services.get(str);
+    public void dispose() {
+
+        if ( logger.isInfoEnabled() ) {
+            logger.info( " Shutting down GRID! " + id );
+        }
+
+        WhitePages wp = get( WhitePages.class, false );
+        if ( wp != null ) {
+            for ( String nodeId : localNodes.keySet() ) {
+                wp.remove( nodeId );
+            }
+        }
+
+        SocketService socketService = get( SocketService.class );
+            socketService.close();
+
+//        SystemEventListener listener = get( SystemEventListener.class, false );
+//
+//        AcceptorFactoryService acceptor = get( AcceptorFactoryService.class, false );
+//
+//        ConnectorFactoryService connector = get( ConnectorFactoryService.class, false );
+//
+//        ConversationManager orator = get( ConversationManager.class, false );
+//
+//        ConnectionFactoryService connecter = get( ConnectionFactoryService.class, false );
+
+        if ( logger.isInfoEnabled() ) {
+            logger.info( " GRID shut down ! " + id );
+        }
+
     }
 
-    public <T> T get(Class<T> serviceClass) {
-        T service = (T) this.services.get(serviceClass.getName());
+    public Object get( String str ) {
+        return this.services.get( str );
+    }
 
-        if (service == null) {
+
+    public <T> T get( Class<T> serviceClass ) {
+        return get( serviceClass, false );
+    }
+
+    public <T> T get( Class<T> serviceClass, boolean lazyInit ) {
+        T service = (T) this.services.get( serviceClass.getName() );
+
+        if ( lazyInit && service == null ) {
             // If the service does not exist, it'll lazily create it
-            GridPeerServiceConfiguration configurator = this.serviceConfigurators.get(serviceClass.getName());
+            GridPeerServiceConfiguration configurator = this.serviceConfigurators.get( serviceClass.getName() );
             if (configurator != null) {
-                configurator.configureService(this);
-                service = (T) this.services.get(serviceClass.getName());
+                configurator.configureService( this );
+                service = (T) this.services.get( serviceClass.getName() );
             }
         }
         return service;
     }
 
-    public void addService(Class cls,
-            Object service) {
-        addService(cls.getName(),
-                service);
+    public void addService( Class cls, Object service ) {
+        addService( cls.getName(), service );
     }
 
-    public void addService(String id,
-            Object service) {
-        this.services.put(id,
-                service);
+    public void addService( String id, Object service ) {
+        this.services.put( id, service );
     }
 
-    public GridNode createGridNode(String id) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(" ### GridImpl: Registering in white pages (grid = " + getId() + ") new node = " + id);
+    public GridNode createGridNode( String id ) {
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( " ### GridImpl: Registering in white pages (grid = " + getId() + ") new node = " + id );
         }
-        WhitePages wp = get(WhitePages.class);
-        GridServiceDescription gsd = wp.create(id );
-        gsd.setServiceInterface(GridNode.class);
-        GridNode node = new GridNodeImpl(id);
-        this.localNodes.put(id , node);
+        WhitePages wp = get( WhitePages.class );
+        GridServiceDescription gsd = wp.create( id, this.id );
+        gsd.setServiceInterface( GridNode.class );
+        GridNode node = new GridNodeImpl( id );
+        this.localNodes.put( id , node );
         return node;
     }
 
-    public void removeGridNode(String id) {
-        WhitePages wp = get(WhitePages.class);
-        wp.remove(id);
-        this.localNodes.remove(id);
+    public GridNode claimGridNode( String id ) {
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( " ### GridImpl: Claiming orphan node " + id + " found in white pages (grid = " + getId() + ") " );
+        }
+        WhitePages wp = get( WhitePages.class );
+        wp.remove( id );
+        GridServiceDescription gsd = wp.create( id, this.id );
+        gsd.setServiceInterface( GridNode.class );
+        GridNode node = new GridNodeImpl( id );
+        this.localNodes.put( id , node );
+        return node;
     }
 
-    public GridNode getGridNode(String id) {
-        return this.localNodes.get(id);
+    public void removeGridNode( String id ) {
+        WhitePages wp = get( WhitePages.class );
+        wp.remove( id );
+        this.localNodes.remove( id );
+    }
+
+    public GridNode getGridNode( String id ) {
+        return this.localNodes.get( id );
     }
 
     public String getId() {

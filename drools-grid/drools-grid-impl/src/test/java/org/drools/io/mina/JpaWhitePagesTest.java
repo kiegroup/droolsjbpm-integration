@@ -34,7 +34,7 @@ public class JpaWhitePagesTest {
             System.out.println("ERROR: "+ex.getMessage());
             
         }
-        System.out.println("DB for white pages started! ");
+        System.out.println( "DB for white pages started! " );
 
        
     }
@@ -50,9 +50,9 @@ public class JpaWhitePagesTest {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new JpaWhitePages( emf );
 
-        wp.create( "s1" );
-        wp.create( "s2" );
-        wp.create( "s3" );
+        wp.create( "s1", "grid0" );
+        wp.create( "s2", "grid0" );
+        wp.create( "s3", "grid0" );
 
         GridServiceDescription<String> gs1 = wp.lookup( "s1" );
 

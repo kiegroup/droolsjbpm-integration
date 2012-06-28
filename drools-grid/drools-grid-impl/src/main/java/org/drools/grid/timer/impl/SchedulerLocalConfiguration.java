@@ -27,7 +27,7 @@ public class SchedulerLocalConfiguration
         ((GridImpl) grid).addService( SchedulerService.class,
                                       getSchedulerService() );
         
-        wp.create( "scheduler:" + this.id + SchedulerService.class.getName() );
+        wp.create( "scheduler:" + this.id + SchedulerService.class.getName(), grid.getId() );
 
     }
     

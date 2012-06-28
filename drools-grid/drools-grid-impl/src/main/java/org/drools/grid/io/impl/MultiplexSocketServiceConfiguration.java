@@ -12,14 +12,14 @@ import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 
-public class MultiplexSocketServiceCongifuration
+public class MultiplexSocketServiceConfiguration
     implements
     GridPeerServiceConfiguration {
     private SocketService     service;
 
     private List<SocketEntry> services;
 
-    public MultiplexSocketServiceCongifuration(SocketService service) {
+    public MultiplexSocketServiceConfiguration(SocketService service) {
         this.service = service;
         this.services = new ArrayList<SocketEntry>();
     }

@@ -77,7 +77,7 @@ public class LocalGridNodeTest {
         GridNode gnode = grid.createGridNode( "test1@local" );
 
         WhitePages pages = grid.get( WhitePages.class );
-        GridServiceDescription<GridNode> gsd = pages.create( "test1@local");
+        GridServiceDescription<GridNode> gsd = pages.create( "test1@local", "grid0" );
         
         GridServiceDescription<GridNode> serviceDescription = pages.lookup( "test1@local" );
 

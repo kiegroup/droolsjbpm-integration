@@ -20,12 +20,12 @@ public class MessageImpl
         
     }
     
-    public MessageImpl(String conversationId,
-                       String senderId,
-                       String recipientId,
-                       int requestId,
-                       int responseId,
-                       Object body) {
+    public MessageImpl( String conversationId,
+                        String senderId,
+                        String recipientId,
+                        int requestId,
+                        int responseId,
+                        Object body ) {
         this.conversationId = conversationId;
         this.requestId = requestId;
         this.recipientId = recipientId;

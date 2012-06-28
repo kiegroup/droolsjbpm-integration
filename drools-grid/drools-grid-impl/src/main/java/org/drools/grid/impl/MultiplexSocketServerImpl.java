@@ -34,10 +34,10 @@ public class MultiplexSocketServerImpl
     
     private static Logger logger = LoggerFactory.getLogger(MultiplexSocketServerImpl.class);
 
-    public MultiplexSocketServerImpl(String ip,
-                                     AcceptorFactoryService factory,
-                                     SystemEventListener l,
-                                     Grid grid) {
+    public MultiplexSocketServerImpl( String ip,
+                                      AcceptorFactoryService factory,
+                                      SystemEventListener l,
+                                      Grid grid ) {
         this.factory = factory;
         this.ip = ip;
         this.l = l;
@@ -48,27 +48,36 @@ public class MultiplexSocketServerImpl
     /* (non-Javadoc)
      * @see org.drools.grid.impl.SocketServer#addService(int, java.lang.String, org.drools.grid.io.MessageReceiverHandler)
      */
-    public synchronized void addService(String id,
-                                        int port,
-                                        Object object) {
+    public synchronized void addService( String id,
+                                         int port,
+                                         Object object ) {
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( " ### Trying to add a service -> " + id + " @ " + this.ip + ":" + port + " >> " + object + " [[ " + (object instanceof MessageReceiverHandlerFactoryService ));
+        }
         MessageReceiverHandlerFactoryService handlerFactory = ( MessageReceiverHandlerFactoryService ) object;
         Acceptor acc = this.acceptors.get( port );
 
         MessageReceiverHandler h = handlerFactory.getMessageReceiverHandler();
-        
+
         if ( acc == null ) {
             acc = factory.newAcceptor();
 
             MultiplexSocket ms = new MultiplexSocket();
-            if(logger.isTraceEnabled()){
-                    logger.trace(" ### Opening Acceptor: "+port);
-                }
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( " ### Opening new Acceptor for -> " + this.ip + ":" + port + " >> " + object );
+            }
             acc.open( new InetSocketAddress( this.ip,
                                              port ),
                                              ms,
                                              this.l );
+
+
             this.acceptors.put( port,
                                 acc );
+        } else {
+            if ( logger.isDebugEnabled() ) {
+                logger.debug( " ### Found existing Acceptor: " + this.ip + ":" + port + " >> " + object );
+            }
         }
 
         MultiplexSocket ms = (MultiplexSocket) acc.getMessageReceiverHandler();
@@ -95,12 +104,12 @@ public class MultiplexSocketServerImpl
     public void close() {
         for ( Acceptor acc : this.acceptors.values() ) {
             if ( acc.isOpen() ) {
-                if(logger.isTraceEnabled()){
-                    logger.trace(" ### Closing Acceptor: "+acc.isOpen());
+                if( logger.isTraceEnabled() ) {
+                    logger.trace( " ### Closing Acceptor: " + acc.isOpen() );
                 }
                 acc.close();
-                if(logger.isTraceEnabled()){
-                    logger.trace(" ### Acceptor Closed: "+acc.isOpen());
+                if( logger.isTraceEnabled() ) {
+                    logger.trace( " ### Acceptor Closed: " + acc.isOpen() );
                 }
             }
 

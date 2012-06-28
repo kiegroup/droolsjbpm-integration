@@ -30,7 +30,7 @@ public class GridNodeSocketConfiguration
 
             GridServiceDescriptionImpl gsd = (GridServiceDescriptionImpl) coreServicesWP.lookup( GridNode.class );
             if ( gsd == null ) {
-                gsd = new GridServiceDescriptionImpl( GridNode.class );
+                gsd = new GridServiceDescriptionImpl( GridNode.class, grid.getId() );
             }
 
             SocketService mss = grid.get( SocketService.class );

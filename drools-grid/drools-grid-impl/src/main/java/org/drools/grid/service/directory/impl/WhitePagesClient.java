@@ -76,11 +76,11 @@ public class WhitePagesClient
         }
     }
 
-    public GridServiceDescription create(String serviceDescriptionId) {
+    public GridServiceDescription create( String serviceDescriptionId, String ownerId ) {
         GridServiceDescription<WhitePages> wpGsd = getGsd();
         InetSocketAddress[] sockets = (InetSocketAddress[]) ((Address) wpGsd.getAddresses().get( "socket" )).getObject();
         CommandImpl cmd = new CommandImpl( "WhitePages.create",
-                                           Arrays.asList( new Object[]{serviceDescriptionId} ) );
+                                           Arrays.asList( new Object[]{serviceDescriptionId, ownerId} ) );
         ConversationManager convm = this.grid.get( ConversationManager.class );
         GridServiceDescription gsd = (GridServiceDescription) sendMessage( convm,
                                                                            sockets,

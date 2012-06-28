@@ -21,6 +21,6 @@ public class CoreServicesSchedulerConfiguration
         ((GridImpl) grid).addService( CoreServicesScheduler.class,
                                       new CoreServicesSchedulerImpl( new SchedulerImpl( "scheduler:core" ) ) );
         wp.getServices().put( CoreServicesScheduler.class.getName(),
-                              new GridServiceDescriptionImpl( CoreServicesScheduler.class ) );
+                              new GridServiceDescriptionImpl( CoreServicesScheduler.class, grid.getId() ) );
     }
 }

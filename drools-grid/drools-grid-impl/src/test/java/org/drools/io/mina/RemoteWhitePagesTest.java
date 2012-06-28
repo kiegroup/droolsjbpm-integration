@@ -20,18 +20,13 @@ import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
-import org.drools.grid.io.Connector;
-import org.drools.grid.io.ConversationManager;
-import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
-import org.drools.grid.io.impl.MultiplexSocketServiceCongifuration;
+import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
-import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 
@@ -78,7 +73,7 @@ public class RemoteWhitePagesTest {
         GridPeerServiceConfiguration coreSeviceConf = new CoreServicesLookupConfiguration( coreServicesMap );
         conf.addConfiguration( coreSeviceConf );
 
-        MultiplexSocketServiceCongifuration socketConf = new MultiplexSocketServiceCongifuration( new MultiplexSocketServerImpl( "127.0.0.1",
+        MultiplexSocketServiceConfiguration socketConf = new MultiplexSocketServiceConfiguration( new MultiplexSocketServerImpl( "127.0.0.1",
                                                                                                                           new MinaAcceptorFactoryService(),
                                                                                                                           l,
                                                                                                                           grid1 ) );
@@ -106,9 +101,9 @@ public class RemoteWhitePagesTest {
 
         WhitePages wp = grid2.get( WhitePages.class );
 
-        wp.create( "s1" );
-        wp.create( "s2" );
-        wp.create( "s3" );
+        wp.create( "s1", "grid0" );
+        wp.create( "s2", "grid0" );
+        wp.create( "s3", "grid0" );
 
         GridServiceDescription<String> gs1 = wp.lookup( "s1" );
 

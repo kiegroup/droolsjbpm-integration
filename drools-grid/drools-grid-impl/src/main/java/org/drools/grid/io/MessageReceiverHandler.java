@@ -4,7 +4,7 @@ import org.drools.grid.Grid;
 
 public interface MessageReceiverHandler {
 
-    public void messageReceived(Conversation conversation,
-                                Message msg);
+    public void messageReceived( Conversation conversation,
+                                 Message msg );
 
 }

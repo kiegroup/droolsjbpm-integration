@@ -72,6 +72,14 @@ public class GridServiceDescriptionJpa<T>
         return this.detached.getServiceInterface();
     }
 
+    public String getOwnerGridId() {
+        return this.detached.getOwnerGridId();
+    }
+
+    public void setOwnerGridId( String id ) {
+        this.detached.setOwnerGridId( id );
+    }
+
     public void setServiceInterface(Class cls) {
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
@@ -124,4 +132,10 @@ public class GridServiceDescriptionJpa<T>
         em.close();
     }
 
+    @Override
+    public String toString() {
+        return "GridServiceDescriptionJpa{" +
+                "detached=" + detached +
+                '}';
+    }
 }

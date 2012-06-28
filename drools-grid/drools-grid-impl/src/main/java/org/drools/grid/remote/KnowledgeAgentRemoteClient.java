@@ -83,26 +83,25 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent {
     }
 
     public void applyChangeSet( Resource rsrc ) {
-        
-        
-        
         List<Command> commands = new ArrayList<Command>();
             commands.add( new ApplyChangeSetRemoteCommand( this.id, rsrc ) );
             commands.add( CommandFactory.newFireAllRules() );
         BatchExecutionCommand batch = CommandFactory.newBatchExecution( commands );
 
-        Command c = new KnowledgeContextResolveFromContextCommand( batch,
+        dispatch( batch );
+    }
+
+    private void dispatch( Command command ) {
+        Command c = new KnowledgeContextResolveFromContextCommand( command,
                 null,
                 null,
                 id,
                 "" );
-        
-        
+
         CommandImpl cmd = new CommandImpl( "execute",
                     Arrays.asList( new Object[] { c, id } )
                 );
-        
-        
+
         ConversationUtil.sendAsyncMessage(this.cm,
                 (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
                 this.gsd.getId(),
@@ -115,21 +114,7 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent {
             commands.add( CommandFactory.newFireAllRules() );
         BatchExecutionCommand batch = CommandFactory.newBatchExecution( commands );
 
-        Command c = new KnowledgeContextResolveFromContextCommand( batch,
-                        null,
-                        null,
-                        id,
-                        "" );
-
-
-        CommandImpl cmd = new CommandImpl( "execute",
-                    Arrays.asList( new Object[] { c, id } )
-                );
-
-        ConversationUtil.sendAsyncMessage(this.cm,
-                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
-                this.gsd.getId(),
-                cmd);
+        dispatch( batch );
     }
 
     public void setSystemEventListener(SystemEventListener sl) {

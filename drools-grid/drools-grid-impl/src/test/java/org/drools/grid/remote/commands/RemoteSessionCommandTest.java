@@ -267,7 +267,7 @@ public class RemoteSessionCommandTest extends BaseRemoteTest {
         //changeSet.setResourcesAdded(Arrays.asList(res));
         //@TODO: for some reason the Classpath resource when is sent to the grid node is loosing the
         // ResourceType, so I need to fix that. 
-        KnowledgeAgent kAgent = GridHelper.getKnowledgeAgentRemoteClient(remoteN1.getId(), "ksession-rules");
+        KnowledgeAgent kAgent = GridHelper.getKnowledgeAgentRemoteClient( GridHelper.createGrid(), remoteN1.getId(), "ksession-rules" );
         kAgent.applyChangeSet(res);
 
 
@@ -303,7 +303,7 @@ public class RemoteSessionCommandTest extends BaseRemoteTest {
         
         
         
-        KnowledgeAgent kAgent = GridHelper.getKnowledgeAgentRemoteClient(remoteN1.getId(), "ksession-rules");
+        KnowledgeAgent kAgent = GridHelper.getKnowledgeAgentRemoteClient(  GridHelper.createGrid(), remoteN1.getId(), "ksession-rules" );
         kAgent.applyChangeSet(changeSetRes);
 
         Thread.sleep(5000);
