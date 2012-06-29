@@ -75,15 +75,19 @@ public class GridImpl implements Grid {
             logger.info( " Shutting down GRID! " + id );
         }
 
-        WhitePages wp = get( WhitePages.class, false );
-        if ( wp != null ) {
-            for ( String nodeId : localNodes.keySet() ) {
-                wp.remove( nodeId );
+        try {
+            WhitePages wp = get( WhitePages.class, false );
+            if ( wp != null ) {
+                for ( String nodeId : localNodes.keySet() ) {
+                    wp.remove( nodeId );
+                }
             }
-        }
-
-        SocketService socketService = get( SocketService.class );
+        } catch ( Throwable t ) {
+            logger.error( " Grid couldn't unregister all local nodes " + t.getMessage(), t );
+        } finally {
+            SocketService socketService = get( SocketService.class );
             socketService.close();
+        }
 
 //        SystemEventListener listener = get( SystemEventListener.class, false );
 //
