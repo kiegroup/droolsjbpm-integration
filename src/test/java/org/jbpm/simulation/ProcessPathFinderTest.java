@@ -131,6 +131,22 @@ public class ProcessPathFinderTest {
         printOutPaths(paths);
     }
     
+    
+    @Test
+    public void testEmbeddedSubProcessWithExclusiveSplit() throws IOException {
+        
+        ProcessPathFinder finder = new ProcessPathFinder();
+        
+        finder.finPath("/BPMN2-EmbeddedSubProcessWithExclusiveSplit.bpmn2");
+        
+        List<PathContext> paths = finder.getCompletePaths();
+        
+        assertNotNull(paths);
+        assertEquals(2, paths.size());
+        
+        printOutPaths(paths);
+    }
+    
     private void printOutPaths(List<PathContext> paths) {
         for (PathContext context : paths) {
             System.out.println("#####################################################");

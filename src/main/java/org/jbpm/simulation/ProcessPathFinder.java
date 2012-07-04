@@ -1,5 +1,6 @@
 package org.jbpm.simulation;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.SignalEventDefinition;
 import org.eclipse.bpmn2.StartEvent;
+import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.bpmn2.util.Bpmn2Resource;
 import org.eclipse.bpmn2.util.Bpmn2ResourceFactoryImpl;
 import org.eclipse.emf.common.util.EList;
@@ -43,11 +45,12 @@ public class ProcessPathFinder {
     private List<PathContext> completePaths = new ArrayList<PathContext>();
 
     private Stack<PathContext> paths = new Stack<PathContext>();
+    private Bpmn2Resource bpmn2Resource = null;
     
     public void finPath(String bpmn2) throws IOException {
         
         
-        Bpmn2Resource bpmn2Resource = (Bpmn2Resource) new Bpmn2ResourceFactoryImpl().createResource(URI.createURI("virtual.bpmn2"));
+        bpmn2Resource = (Bpmn2Resource) new Bpmn2ResourceFactoryImpl().createResource(URI.createURI("virtual.bpmn2"));
         
         bpmn2Resource.load(this.getClass().getResourceAsStream(bpmn2), null);
         
@@ -132,7 +135,26 @@ public class ProcessPathFinder {
             
             outgoing = ((StartEvent) startAt).getOutgoing();
             
-        } else if (startAt instanceof Event) {
+        } else if (startAt instanceof SubProcess) {
+            SubProcess subProcess = ((SubProcess) startAt);
+            
+            // process internal nodes of the sub process
+            List<FlowElement> sbElements = subProcess.getFlowElements();
+            StartEvent start = null;
+            for (FlowElement sbElement : sbElements) {
+                
+                if (sbElement instanceof StartEvent) {
+                    start = (StartEvent) sbElement;
+                    break;
+                }
+            }
+            boolean canBeFinsihed = getContextFromStack().isCanBeFinished();
+            getContextFromStack().setCanBeFinished(false);
+            traverseGraph(start);
+            getContextFromStack().setCanBeFinished(canBeFinsihed);
+            
+            outgoing = subProcess.getOutgoing();
+         } else if (startAt instanceof Event) {
             
             outgoing = ((Event) startAt).getOutgoing();
         } else if (startAt instanceof Activity) {
@@ -355,8 +377,6 @@ public class ProcessPathFinder {
         } else {
             handleSimpleNode(outgoing);
         }
-        
-        
-        
+
     }
 }
