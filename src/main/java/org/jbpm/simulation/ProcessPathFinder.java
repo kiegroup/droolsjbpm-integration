@@ -269,7 +269,7 @@ public class ProcessPathFinder {
             
             PathContext separatePath = context.cloneGiven(context);
             this.paths.push(separatePath);
-            
+            addToPath(seqFlow, separatePath);
             traverseGraph(target);
             separatePath.setLocked(true);
             
@@ -285,7 +285,7 @@ public class ProcessPathFinder {
     protected void handleSimpleNode(List<SequenceFlow> outgoing) {
         for (SequenceFlow seqFlow : outgoing) {
             FlowElement target = seqFlow.getTargetRef();
-            
+            addToPath(seqFlow, getContextFromStack());
             traverseGraph(target);
         }
     }
@@ -335,6 +335,7 @@ public class ProcessPathFinder {
             if (counter == outgoing.size()) {
                 context.setCanBeFinished(true);
             }
+            addToPath(seqFlow, context);
             traverseGraph(target);
         }
     }
