@@ -52,10 +52,13 @@ public class ProcessPathFinder {
 	private Map<String, FlowElement> catchingEvents = new HashMap<String, FlowElement>();
 	private List<PathContext> completePaths = new ArrayList<PathContext>();
 	private Stack<PathContext> paths = new Stack<PathContext>();
+	
+	public void findPath(String bpmn2) throws IOException {
+		findPath(getDefinitions(streamToString(this.getClass()
+				.getResourceAsStream(bpmn2))));
+	}
 
-	public void finPath(String bpmn2) throws IOException {
-		Definitions def = getDefinitions(streamToString(this.getClass()
-				.getResourceAsStream(bpmn2)));
+	public void findPath(Definitions def) throws IOException {
 		List<RootElement> rootElements = def.getRootElements();
 		for (RootElement root : rootElements) {
 			if (root instanceof Process) {

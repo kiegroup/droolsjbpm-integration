@@ -16,7 +16,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-UserTask.bpmn2");
+        finder.findPath("/BPMN2-UserTask.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -31,7 +31,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-ExclusiveSplit.bpmn2");
+        finder.findPath("/BPMN2-ExclusiveSplit.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -46,7 +46,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-InclusiveSplit.bpmn2");
+        finder.findPath("/BPMN2-InclusiveSplit.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -61,7 +61,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-ParallelSplit.bpmn2");
+        finder.findPath("/BPMN2-ParallelSplit.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -76,7 +76,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-ParallelAndExclusiveSplit.bpmn2");
+        finder.findPath("/BPMN2-ParallelAndExclusiveSplit.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -91,7 +91,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-MultipleStartEventProcess.bpmn2");
+        finder.findPath("/BPMN2-MultipleStartEventProcess.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -106,7 +106,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-BoundaryMessageEventOnTask.bpmn2");
+        finder.findPath("/BPMN2-BoundaryMessageEventOnTask.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -121,7 +121,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-IntermediateCatchEventSignal.bpmn2");
+        finder.findPath("/BPMN2-IntermediateCatchEventSignal.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
@@ -137,7 +137,7 @@ public class ProcessPathFinderTest {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
-        finder.finPath("/BPMN2-EmbeddedSubProcessWithExclusiveSplit.bpmn2");
+        finder.findPath("/BPMN2-EmbeddedSubProcessWithExclusiveSplit.bpmn2");
         
         List<PathContext> paths = finder.getCompletePaths();
         
