@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>jbpm</artifactId>
+    <groupId>org.jbpm</groupId>
+    <version>5.4.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>jbpm-simulation</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>jBPM :: Simulation</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>knowledge-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow-builder</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-bpmn2</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.jbpm</groupId>
+        <artifactId>jbpm-bpmn2-emfextmodel</artifactId>
+        <version>5.4.0-SNAPSHOT</version>
+      </dependency>
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>org.eclipse.bpmn2</artifactId>
+      <version>0.7.0.010</version>
+    </dependency>
+  </dependencies>
+</project>
