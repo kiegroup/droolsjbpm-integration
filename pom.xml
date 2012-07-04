@@ -17,6 +17,7 @@
 	<properties>
 		<jbpm.version>5.4.0-SNAPSHOT</jbpm.version>
 		<eclipse.bpmn2.version>0.7.0.010</eclipse.bpmn2.version>
+		<json.version>20090211</json.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -49,6 +50,11 @@
 			<artifactId>org.eclipse.bpmn2</artifactId>
 			<version>${eclipse.bpmn2.version}</version>
 		</dependency>
+		<dependency>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+          <version>${json.version}</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>

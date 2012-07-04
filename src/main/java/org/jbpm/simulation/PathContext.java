@@ -2,6 +2,7 @@ package org.jbpm.simulation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.eclipse.bpmn2.FlowElement;
 
@@ -16,12 +17,15 @@ public class PathContext {
     private Type type;
     private boolean canBeFinished = true;
     private boolean locked = false;
+    private String id; 
     
     public PathContext() {
-        this.setType(Type.ROOT);
+    	this.id = String.valueOf(UUID.randomUUID());
+    	this.setType(Type.ROOT);
     }
     
     public PathContext(Type type) {
+    	this.id = String.valueOf(UUID.randomUUID());
         this.setType(type);
     }
     
@@ -81,5 +85,9 @@ public class PathContext {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+    
+    public String getId() {
+    	return this.id;
     }
 }

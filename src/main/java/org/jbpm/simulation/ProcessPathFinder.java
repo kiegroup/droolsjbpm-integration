@@ -47,6 +47,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.jbpm.simulation.PathContext.Type;
 import org.jbpm.simulation.util.JBPMBpmn2ResourceFactoryImpl;
 import org.jbpm.simulation.util.JBPMBpmn2ResourceImpl;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ProcessPathFinder {
 
@@ -263,6 +265,25 @@ public class ProcessPathFinder {
 	public List<PathContext> getCompletePaths() {
 		return completePaths;
 	}
+	
+	public JSONObject getCompletePathsAsJSONObject() {
+		JSONObject jsonObject = new JSONObject();
+		try {
+			if(completePaths != null && completePaths.size() > 0) {
+				for(PathContext pc : completePaths) {
+					jsonObject.put(pc.getId(), getPathFlowElementsAsString(pc.getPathElements()));
+				}
+			}
+		} catch (JSONException e) {
+			// TODO need logging
+			e.printStackTrace();
+		}
+		return jsonObject;
+	}
+	
+	public String getCompletePathsASJSONString() {
+		return getCompletePathsAsJSONObject().toString();
+	}
 
 	protected void handleExclusiveGateway(List<SequenceFlow> outgoing) {
 		List<PathContext> locked = new ArrayList<PathContext>();
@@ -434,5 +455,16 @@ public class ProcessPathFinder {
 		} catch (Exception e) {
 			return "";
 		}
+	}
+	
+	private String getPathFlowElementsAsString(List<FlowElement> flowElements) {
+		String ret = "";
+		if(flowElements != null && flowElements.size() > 0) {
+			for(FlowElement fe : flowElements) {
+				ret += fe.getId();
+				ret += "|";
+			}
+		}
+		return ret.endsWith("|") ? ret.substring(0, ret.length() - 1) : ret;
 	}
 }

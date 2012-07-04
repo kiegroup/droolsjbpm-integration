@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.json.JSONObject;
 import org.junit.Test;
 
 public class ProcessPathFinderTest {
@@ -23,7 +24,12 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(1, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(1, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
+        
     }
 
     @Test
@@ -38,7 +44,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(2, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     @Test
@@ -53,7 +63,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(7, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(7, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     @Test
@@ -68,7 +82,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(1, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(1, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     @Test
@@ -83,7 +101,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(2, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     @Test
@@ -98,7 +120,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(2, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     @Test
@@ -113,7 +139,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(3, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(3, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     @Test
@@ -128,7 +158,11 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(1, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(1, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
     
@@ -144,15 +178,22 @@ public class ProcessPathFinderTest {
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        printOutPaths(paths);
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        assertEquals(2, jsonPaths.length());
+        
+        printOutPaths(paths, jsonPaths);
     }
     
-    private void printOutPaths(List<PathContext> paths) {
+    private void printOutPaths(List<PathContext> paths, JSONObject jsonPaths) {
         for (PathContext context : paths) {
             System.out.println("#####################################################");
+            System.out.println("## AS TEXT:");
             for (FlowElement fe : context.getPathElements()) {
-                System.out.println(fe.getName() + " " + fe.eClass().getName());
+                System.out.println(fe.getName() + "  - " + fe.eClass().getName());
             }
+            System.out.println("## AS JSON:");
+            System.out.println(jsonPaths.toString());
             System.out.println("#####################################################");
         }
     }
