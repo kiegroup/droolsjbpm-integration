@@ -34,7 +34,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testSinglePath");
         
     }
 
@@ -58,7 +58,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testExclusiveSplit");
     }
     
     @Test
@@ -81,7 +81,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testInclusiveSplit");
     }
     
     @Test
@@ -104,7 +104,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testParallelGateway");
     }
     
     @Test
@@ -127,7 +127,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testParallelAndExclusiveGateway");
     }
     
     @Test
@@ -150,7 +150,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testMultipleStartEvents");
     }
     
     @Test
@@ -173,7 +173,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
     }
     
     @Test
@@ -196,7 +196,7 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testSignalThrowEndEventWithCatch");
     }
     
     
@@ -220,19 +220,41 @@ public class ProcessPathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths);
+        printOutPaths(paths, jsonPaths, "testEmbeddedSubProcessWithExclusiveSplit");
     }
     
-    private void printOutPaths(List<PathContext> paths, JSONObject jsonPaths) {
+    @Test
+    public void testAdHocProcess() throws IOException {
+    	ProcessPathFinder finder = new ProcessPathFinder();
+        finder.findPath("/BPMN2-AdHocProcess.bpmn2");
+        List<PathContext> paths = finder.getCompletePaths();
+        
+        assertNotNull(paths);
+        assertEquals(5, paths.size());
+        
+        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        assertNotNull(jsonPaths);
+        try {
+			assertEquals(5, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
+        
+        printOutPaths(paths, jsonPaths, "testAdHocProcess");
+    }
+    
+    private void printOutPaths(List<PathContext> paths, JSONObject jsonPaths, String name) {
+    	System.out.println("###################" + name + "###################");
         for (PathContext context : paths) {
-            System.out.println("#####################################################");
-            System.out.println("## AS TEXT:");
+            System.out.println("$$$$$$$$ PATH: " + context.getId());
+            System.out.println("$$$ AS TEXT:");
             for (FlowElement fe : context.getPathElements()) {
                 System.out.println(fe.getName() + "  - " + fe.eClass().getName());
             }
-            System.out.println("## AS JSON:");
-            System.out.println(jsonPaths.toString());
-            System.out.println("#####################################################");
         }
+        System.out.println("$$$ AS JSON:");
+        System.out.println(jsonPaths.toString());
+        System.out.println("$$$$$$$$");
+        System.out.println("#####################################################");
     }
 }

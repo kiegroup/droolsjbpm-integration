@@ -52,7 +52,7 @@ import org.json.JSONObject;
 
 public class ProcessPathFinder {
 
-	private List<FlowElement> processElements = new ArrayList<FlowElement>();
+	private List<FlowElement> triggerElements = new ArrayList<FlowElement>();
 	private Map<String, FlowElement> catchingEvents = new HashMap<String, FlowElement>();
 	private List<PathContext> completePaths = new ArrayList<PathContext>();
 	private Stack<PathContext> paths = new Stack<PathContext>();
@@ -71,7 +71,12 @@ public class ProcessPathFinder {
 				List<FlowElement> flowElements = process.getFlowElements();
 				for (FlowElement fElement : flowElements) {
 					if (fElement instanceof StartEvent) {
-						processElements.add(0, fElement);
+						triggerElements.add(0, fElement);
+					} else if((fElement instanceof Activity) && isAdHocProcess(process)) {
+						Activity act = (Activity) fElement;
+						if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+							triggerElements.add(0, fElement);
+						}
 					} else if (fElement instanceof IntermediateCatchEvent) {
 						String key = null;
 						List<EventDefinition> eventDefinitions = ((IntermediateCatchEvent) fElement)
@@ -100,8 +105,8 @@ public class ProcessPathFinder {
 			}
 		}
 		// show what was found
-		for (FlowElement fe : processElements) {
-			if (fe instanceof StartEvent) {
+		for (FlowElement fe : triggerElements) {
+			if (fe instanceof StartEvent || fe instanceof Activity) {
 				traverseGraph(fe);
 			}
 		}
@@ -126,7 +131,6 @@ public class ProcessPathFinder {
             List<FlowElement> sbElements = subProcess.getFlowElements();
             StartEvent start = null;
             for (FlowElement sbElement : sbElements) {
-                
                 if (sbElement instanceof StartEvent) {
                     start = (StartEvent) sbElement;
                     break;
@@ -139,13 +143,11 @@ public class ProcessPathFinder {
             
             outgoing = subProcess.getOutgoing();
 		} else if (startAt instanceof Event) {
-
 			outgoing = ((Event) startAt).getOutgoing();
 		} else if (startAt instanceof Activity) {
 
 			outgoing = ((Activity) startAt).getOutgoing();
 		} else if (startAt instanceof EndEvent) {
-
 			outgoing = ((EndEvent) startAt).getOutgoing();
 		} else if (startAt instanceof Gateway) {
 			Gateway gateway = ((Gateway) startAt);
@@ -153,35 +155,26 @@ public class ProcessPathFinder {
 		}
 
 		if (outgoing != null && !outgoing.isEmpty()) {
-
 			if (startAt instanceof Gateway) {
 				Gateway gateway = ((Gateway) startAt);
-
 				if (gateway.getGatewayDirection() == GatewayDirection.DIVERGING) {
-
 					if (gateway instanceof ExclusiveGateway) {
-
 						handleExclusiveGateway(outgoing);
 					} else if (gateway instanceof ParallelGateway) {
-
 						handleParallelGateway(outgoing);
 					} else if (gateway instanceof InclusiveGateway) {
-
 						handleInclusiveGateway(outgoing);
 					}
 				} else {
 					handleSimpleNode(outgoing);
 				}
 			} else if (startAt instanceof Activity) {
-
 				handleBoundaryEvent(startAt);
 			} else {
-
 				handleSimpleNode(outgoing);
 			}
 		} else {
 			List<EventDefinition> throwDefinitions = getEventDefinitions(startAt);
-
 			if (throwDefinitions != null && throwDefinitions.size() > 0) {
 				for (EventDefinition def : throwDefinitions) {
 					String key = "";
@@ -198,7 +191,6 @@ public class ProcessPathFinder {
 					}
 
 					FlowElement catchEvent = this.catchingEvents.get(key);
-
 					if (catchEvent != null) {
 						traverseGraph(catchEvent);
 					} else {
