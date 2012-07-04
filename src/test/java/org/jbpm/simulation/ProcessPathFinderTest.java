@@ -102,7 +102,7 @@ public class ProcessPathFinderTest {
     }
     
     @Test
-    public void testBoundaryEvenOnTask() throws IOException {
+    public void testBoundaryEventOnTask() throws IOException {
         
         ProcessPathFinder finder = new ProcessPathFinder();
         
@@ -116,10 +116,24 @@ public class ProcessPathFinderTest {
         printOutPaths(paths);
     }
     
+    @Test
+    public void testSignalThrowEndEventWithCatch() throws IOException {
+        
+        ProcessPathFinder finder = new ProcessPathFinder();
+        
+        finder.finPath("/BPMN2-IntermediateCatchEventSignal.bpmn2");
+        
+        List<PathContext> paths = finder.getCompletePaths();
+        
+        assertNotNull(paths);
+        assertEquals(1, paths.size());
+        
+        printOutPaths(paths);
+    }
+    
     private void printOutPaths(List<PathContext> paths) {
         for (PathContext context : paths) {
             System.out.println("#####################################################");
-            System.out.println("Type " + context.getType());
             for (FlowElement fe : context.getPathElements()) {
                 System.out.println(fe.getName() + " " + fe.eClass().getName());
             }

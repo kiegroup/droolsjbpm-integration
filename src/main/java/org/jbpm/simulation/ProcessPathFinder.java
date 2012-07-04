@@ -2,24 +2,32 @@ package org.jbpm.simulation;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.CompensateEventDefinition;
 import org.eclipse.bpmn2.Definitions;
 import org.eclipse.bpmn2.DocumentRoot;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.Event;
+import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.GatewayDirection;
 import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.ItemDefinition;
+import org.eclipse.bpmn2.IntermediateCatchEvent;
+import org.eclipse.bpmn2.IntermediateThrowEvent;
+import org.eclipse.bpmn2.LinkEventDefinition;
+import org.eclipse.bpmn2.MessageEventDefinition;
 import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.SequenceFlow;
+import org.eclipse.bpmn2.SignalEventDefinition;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.util.Bpmn2Resource;
 import org.eclipse.bpmn2.util.Bpmn2ResourceFactoryImpl;
@@ -31,6 +39,7 @@ import org.jbpm.simulation.PathContext.Type;
 public class ProcessPathFinder {
 
     private List<FlowElement> processElements = new ArrayList<FlowElement>();
+    private Map<String, FlowElement> catchingEvents = new HashMap<String, FlowElement>();
     private List<PathContext> completePaths = new ArrayList<PathContext>();
 
     private Stack<PathContext> paths = new Stack<PathContext>();
@@ -55,31 +64,42 @@ public class ProcessPathFinder {
                 
                 for (EObject defelement : defcontent) {
                     
-                    if (defelement instanceof ItemDefinition) {
-//                        System.out.println("Found item def: " + ((ItemDefinition) defelement).getId());
-                    } else if (defelement instanceof Process) {
+                    if (defelement instanceof Process) {
                         Process process = ((Process) defelement);
                         
                         System.out.println("Found process : " + process.getId());
-                        
-                        // TODO use properties for tests later on
-//                        List<Property> properties = process.getProperties();
-//                        
-//                        for (Property prop : properties) {
-//                            System.out.println("Property: " + prop.getId());
-//                        }
                         
                         // find flow elements and traverse it find path
                         
                         List<FlowElement> flowElements = process.getFlowElements();
                        
                         for (FlowElement fElement : flowElements) {
-                       
-                            
-                            
+
                             if (fElement instanceof StartEvent) {
                             
                                 processElements.add(0, fElement);
+                            } else if (fElement instanceof IntermediateCatchEvent) {
+                                String key = null;
+                                List<EventDefinition> eventDefinitions = ((IntermediateCatchEvent) fElement).getEventDefinitions();
+                                
+                                if (eventDefinitions != null) {
+                                    for (EventDefinition def : eventDefinitions) {
+                                        if (def instanceof SignalEventDefinition) {
+                                            key = ((SignalEventDefinition) def).getSignalRef();
+                                        } else if (def instanceof MessageEventDefinition) {
+                                            key = ((MessageEventDefinition) def).getMessageRef().getId();
+                                        } else if (def instanceof LinkEventDefinition) {
+                                            key = ((LinkEventDefinition) def).getName();
+                                        } else if (def instanceof CompensateEventDefinition) {
+                                            key = ((CompensateEventDefinition) def).getActivityRef().getId();
+                                        }
+                                            
+                                        if (key != null) {
+                                            catchingEvents.put(key, fElement);
+                                        }
+                                    }
+                                }
+                                
                             }
                         }
                     }
@@ -95,18 +115,12 @@ public class ProcessPathFinder {
                 traverseGraph(fe);
             }
         }
-//        // handle single path scnario
-//        if (this.paths.size() == 1 && this.completePaths.isEmpty()) {
-//            this.completePaths.add(this.paths.pop());
-//        } else {
-        // handle multi path scenario
             for (PathContext context : this.paths) {
                 if (context.getType() != PathContext.Type.ROOT) {
                     this.completePaths.add(context);
                 }
             }
         }
-//    }
 
     protected void traverseGraph(FlowElement startAt) {
         
@@ -160,11 +174,53 @@ public class ProcessPathFinder {
                 handleSimpleNode(outgoing);
             }
         } else {
-            finalizePath();
+            List<EventDefinition> throwDefinitions = getEventDefinitions(startAt);
+            
+            if (throwDefinitions != null && throwDefinitions.size() > 0) {
+               for (EventDefinition def : throwDefinitions) { 
+                   String key = "";
+                   if (def instanceof SignalEventDefinition) {
+                       key = ((SignalEventDefinition) def).getSignalRef();
+                   } else if (def instanceof MessageEventDefinition) {
+                       key = ((MessageEventDefinition) def).getMessageRef().getId();
+                   } else if (def instanceof LinkEventDefinition) {
+                       key = ((LinkEventDefinition) def).getName();
+                   } else if (def instanceof CompensateEventDefinition) {
+                       key = ((CompensateEventDefinition) def).getActivityRef().getId();
+                   }
+                   
+                   FlowElement catchEvent = this.catchingEvents.get(key);
+                   
+                   if (catchEvent != null) {
+                       traverseGraph(catchEvent);
+                   } else {
+                       
+                       // not supported event definition
+                       finalizePath();
+                   }
+               }
+            } else {
+                finalizePath();
+            }
             
         }
         
         
+    }
+    
+    protected List<EventDefinition> getEventDefinitions(FlowElement startAt) {
+        List<EventDefinition> throwDefinitions = null;
+        
+        if (startAt instanceof IntermediateThrowEvent) {
+           throwDefinitions = ((IntermediateThrowEvent) startAt).getEventDefinitions();
+           
+        } else if (startAt instanceof EndEvent) {
+           EndEvent end = (EndEvent) startAt;
+            
+           throwDefinitions = end.getEventDefinitions();
+        }
+        
+        return throwDefinitions;
     }
     
     protected void addToPath(FlowElement element, PathContext context) {
