@@ -2,11 +2,13 @@ package org.jbpm.simulation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -26,7 +28,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(1, jsonPaths.length());
+        try {
+			assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
         
@@ -46,7 +52,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(2, jsonPaths.length());
+        try {
+			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -65,7 +75,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(7, jsonPaths.length());
+        try {
+			assertEquals(7, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -84,7 +98,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(1, jsonPaths.length());
+        try {
+			assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -103,7 +121,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(2, jsonPaths.length());
+        try {
+			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -122,7 +144,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(2, jsonPaths.length());
+        try {
+			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -141,7 +167,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(3, jsonPaths.length());
+        try {
+			assertEquals(3, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -160,7 +190,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(1, jsonPaths.length());
+        try {
+			assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }
@@ -180,7 +214,11 @@ public class ProcessPathFinderTest {
         
         JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
         assertNotNull(jsonPaths);
-        assertEquals(2, jsonPaths.length());
+        try {
+			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+		} catch (JSONException e) {
+			fail(e.getMessage());
+		}
         
         printOutPaths(paths, jsonPaths);
     }

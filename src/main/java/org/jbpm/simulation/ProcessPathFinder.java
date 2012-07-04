@@ -267,18 +267,20 @@ public class ProcessPathFinder {
 	}
 	
 	public JSONObject getCompletePathsAsJSONObject() {
-		JSONObject jsonObject = new JSONObject();
+		JSONObject parent = new JSONObject();
+		JSONObject paths = new JSONObject();
 		try {
 			if(completePaths != null && completePaths.size() > 0) {
 				for(PathContext pc : completePaths) {
-					jsonObject.put(pc.getId(), getPathFlowElementsAsString(pc.getPathElements()));
+					paths.put(pc.getId(), getPathFlowElementsAsString(pc.getPathElements()));
 				}
 			}
+			parent.put("paths", paths);
 		} catch (JSONException e) {
 			// TODO need logging
 			e.printStackTrace();
 		}
-		return jsonObject;
+		return parent;
 	}
 	
 	public String getCompletePathsASJSONString() {
