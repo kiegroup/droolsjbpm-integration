@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -42,6 +43,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.FeatureMap;
 import org.jbpm.simulation.PathContext.Type;
 import org.jbpm.simulation.util.JBPMBpmn2ResourceFactoryImpl;
 import org.jbpm.simulation.util.JBPMBpmn2ResourceImpl;
@@ -406,8 +408,19 @@ public class ProcessPathFinder {
 			return null;
 		}
 	}
+	
+	private static boolean isAdHocProcess(Process process) {
+        Iterator<FeatureMap.Entry> iter = process.getAnyAttribute().iterator();
+        while(iter.hasNext()) {
+            FeatureMap.Entry entry = iter.next();
+            if(entry.getEStructuralFeature().getName().equals("adHoc")) {
+            	return Boolean.parseBoolean(((String)entry.getValue()).trim());
+            }
+        }
+        return false;
+    }
 
-	public static String streamToString(InputStream is) {
+	private static String streamToString(InputStream is) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					is, "UTF-8"));
