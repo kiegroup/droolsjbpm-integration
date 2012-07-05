@@ -17,15 +17,18 @@ public class ActivityElementHandler extends MainElementHandler {
         List<SequenceFlow> outgoing = getOutgoing(element);
         List<BoundaryEvent> bEvents = ((Activity) element).getBoundaryEventRefs();
         if (bEvents != null && bEvents.size() > 0) {
-
+            boolean cancelActivity = false;
             for (BoundaryEvent bEvent : bEvents) {
                 manager.addToPath(bEvent, context);
                 outgoing.addAll(bEvent.getOutgoing());
-
+                cancelActivity = bEvent.isCancelActivity();
+            
+                handleSeparatePaths(outgoing, manager);
+                handleCombinedPaths(outgoing, manager);
+                if (!cancelActivity) {
+                    handleAllPaths(outgoing, manager);
+                }
             }
-            handleSeparatePaths(outgoing, manager);
-            handleCombinedPaths(outgoing, manager);
-            handleAllPaths(outgoing, manager);
         } else {
             HandlerRegistry.getHandler().handle(element, manager);
         }
