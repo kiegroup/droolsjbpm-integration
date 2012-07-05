@@ -8,31 +8,30 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.jbpm.simulation.converter.JSONPathFormatConverter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-public class ProcessPathFinderTest {
+public class PathFinderTest {
     
     @Test
     public void testSinglePath() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-UserTask.bpmn2"));
         
-        finder.findPath("/BPMN2-UserTask.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
+        List<PathContext> paths = finder.findPaths();
         
         assertNotNull(paths);
         assertEquals(1, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
-			assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
-		} catch (JSONException e) {
-			fail(e.getMessage());
-		}
+            assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
         
         printOutPaths(paths, jsonPaths, "testSinglePath");
         
@@ -41,39 +40,34 @@ public class ProcessPathFinderTest {
     @Test
     public void testExclusiveSplit() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ExclusiveSplit.bpmn2"));
         
-        finder.findPath("/BPMN2-ExclusiveSplit.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
+        List<PathContext> paths = finder.findPaths();
         
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
-			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
-		} catch (JSONException e) {
-			fail(e.getMessage());
-		}
+            assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
         
         printOutPaths(paths, jsonPaths, "testExclusiveSplit");
     }
     
     @Test
     public void testInclusiveSplit() throws IOException {
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-InclusiveSplit.bpmn2"));
         
-        ProcessPathFinder finder = new ProcessPathFinder();
-        
-        finder.findPath("/BPMN2-InclusiveSplit.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
-        
+        List<PathContext> paths = finder.findPaths();
+
         assertNotNull(paths);
         assertEquals(7, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(7, ((JSONObject)jsonPaths.get("paths")).length());
@@ -87,16 +81,14 @@ public class ProcessPathFinderTest {
     @Test
     public void testParallelGateway() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ParallelSplit.bpmn2"));
         
-        finder.findPath("/BPMN2-ParallelSplit.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
-        
+        List<PathContext> paths = finder.findPaths();
+ 
         assertNotNull(paths);
         assertEquals(1, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
@@ -110,16 +102,14 @@ public class ProcessPathFinderTest {
     @Test
     public void testParallelAndExclusiveGateway() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ParallelAndExclusiveSplit.bpmn2"));
         
-        finder.findPath("/BPMN2-ParallelAndExclusiveSplit.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
-        
+        List<PathContext> paths = finder.findPaths();
+
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
@@ -133,16 +123,14 @@ public class ProcessPathFinderTest {
     @Test
     public void testMultipleStartEvents() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-MultipleStartEventProcess.bpmn2"));
         
-        finder.findPath("/BPMN2-MultipleStartEventProcess.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
-        
+        List<PathContext> paths = finder.findPaths();
+
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
@@ -156,16 +144,14 @@ public class ProcessPathFinderTest {
     @Test
     public void testBoundaryEventOnTask() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-BoundaryMessageEventOnTask.bpmn2"));
         
-        finder.findPath("/BPMN2-BoundaryMessageEventOnTask.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
-        
+        List<PathContext> paths = finder.findPaths();
+
         assertNotNull(paths);
         assertEquals(3, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(3, ((JSONObject)jsonPaths.get("paths")).length());
@@ -179,16 +165,14 @@ public class ProcessPathFinderTest {
     @Test
     public void testSignalThrowEndEventWithCatch() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-IntermediateCatchEventSignal.bpmn2"));
         
-        finder.findPath("/BPMN2-IntermediateCatchEventSignal.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
+        List<PathContext> paths = finder.findPaths();
         
         assertNotNull(paths);
         assertEquals(1, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
@@ -203,16 +187,14 @@ public class ProcessPathFinderTest {
     @Test
     public void testEmbeddedSubProcessWithExclusiveSplit() throws IOException {
         
-        ProcessPathFinder finder = new ProcessPathFinder();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-EmbeddedSubProcessWithExclusiveSplit.bpmn2"));
         
-        finder.findPath("/BPMN2-EmbeddedSubProcessWithExclusiveSplit.bpmn2");
-        
-        List<PathContext> paths = finder.getCompletePaths();
-        
+        List<PathContext> paths = finder.findPaths();
+
         assertNotNull(paths);
         assertEquals(2, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
@@ -225,14 +207,14 @@ public class ProcessPathFinderTest {
     
     @Test
     public void testAdHocProcess() throws IOException {
-    	ProcessPathFinder finder = new ProcessPathFinder();
-        finder.findPath("/BPMN2-AdHocProcess.bpmn2");
-        List<PathContext> paths = finder.getCompletePaths();
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-AdHocProcess.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
         
         assertNotNull(paths);
         assertEquals(5, paths.size());
         
-        JSONObject jsonPaths = finder.getCompletePathsAsJSONObject();
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
         try {
 			assertEquals(5, ((JSONObject)jsonPaths.get("paths")).length());
