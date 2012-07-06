@@ -5,5 +5,5 @@ import org.jbpm.simulation.PathContextManager;
 
 public interface ElementHandler {
 
-    void handle(FlowElement element, PathContextManager manager);
+    boolean handle(FlowElement element, PathContextManager manager);
 }

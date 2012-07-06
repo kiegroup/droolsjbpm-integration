@@ -15,19 +15,19 @@ public class GatewayElementHandler extends MainElementHandler {
     
     private PathContextManager manager;
 
-    public void handle(FlowElement element, PathContextManager manager) {
+    public boolean handle(FlowElement element, PathContextManager manager) {
         
         this.manager = manager;
         
         if (element instanceof ExclusiveGateway) {
             handleExclusiveGateway(getOutgoing(element));
-            
+            return true;
         } else if (element instanceof InclusiveGateway) {
             handleInclusiveGateway(getOutgoing(element));
-            
+            return true;
         } else if (element instanceof ParallelGateway) {
             handleParallelGateway(getOutgoing(element));
-            
+            return true;
         } else {
             throw new UnsupportedOperationException("Not supported element to handle " + element.eClass().getName());
         }

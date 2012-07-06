@@ -2,6 +2,7 @@ package org.jbpm.simulation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.bpmn2.FlowElement;
@@ -12,6 +13,16 @@ public class PathContextManager {
 
     private Stack<PathContext> paths = new Stack<PathContext>();
     private List<PathContext> completePaths = new ArrayList<PathContext>();
+    
+    protected Map<String, FlowElement> catchingEvents = null;
+
+    public Map<String, FlowElement> getCatchingEvents() {
+        return catchingEvents;
+    }
+
+    public void setCatchingEvents(Map<String, FlowElement> catchingEvents) {
+        this.catchingEvents = catchingEvents;
+    }
     
     public PathContext getContextFromStack() {
         if (this.paths.isEmpty()) {
@@ -70,6 +81,10 @@ public class PathContextManager {
             PathContext completePath = this.paths.pop();
             this.completePaths.add(completePath);
         }
+    }
+    
+    public void clearCurrentContext() {
+        this.paths.pop();
     }
     
     public void complete() {

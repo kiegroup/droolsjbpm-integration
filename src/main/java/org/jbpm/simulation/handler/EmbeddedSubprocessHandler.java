@@ -11,7 +11,7 @@ import org.jbpm.simulation.PathContextManager;
 public class EmbeddedSubprocessHandler extends MainElementHandler {
 
     
-    public void handle(FlowElement element, PathContextManager manager) {
+    public boolean handle(FlowElement element, PathContextManager manager) {
         SubProcess subProcess = ((SubProcess) element);
         
         // process internal nodes of the sub process
@@ -34,6 +34,8 @@ public class EmbeddedSubprocessHandler extends MainElementHandler {
             super.handle(flow.getTargetRef(), manager);
         }
         manager.getContextFromStack().setCanBeFinished(canBeFinsihed);
+        
+        return true;
     }
 
 }

@@ -12,9 +12,14 @@ import org.jbpm.simulation.PathContextManager;
 
 public class ActivityElementHandler extends MainElementHandler {
 
-    public void handle(FlowElement element, PathContextManager manager) {
-        PathContext context = manager.getContextFromStack();
+    public boolean handle(FlowElement element, PathContextManager manager) {
         List<SequenceFlow> outgoing = getOutgoing(element);
+        if (outgoing.size() == 0) {
+            return false;
+        }
+        
+        PathContext context = manager.getContextFromStack();
+        
         List<BoundaryEvent> bEvents = ((Activity) element).getBoundaryEventRefs();
         if (bEvents != null && bEvents.size() > 0) {
             boolean cancelActivity = false;
@@ -29,9 +34,12 @@ public class ActivityElementHandler extends MainElementHandler {
                     handleAllPaths(outgoing, manager);
                 }
             }
+            return true;
         } else {
             HandlerRegistry.getHandler().handle(element, manager);
+            return false;
         }
+        
     }
 
     protected void handleSeparatePaths(List<SequenceFlow> outgoing, PathContextManager manager) {

@@ -50,7 +50,7 @@ public class BPMN2PathFinderImpl implements PathFinder {
     private Definitions definitions;
     
     private List<FlowElement> triggerElements = new ArrayList<FlowElement>();
-    private Map<String, FlowElement> catchingEvents = new HashMap<String, FlowElement>();
+    
 
 
     public BPMN2PathFinderImpl(String bpmn2xml) {
@@ -86,6 +86,7 @@ public class BPMN2PathFinderImpl implements PathFinder {
     }
 
     public List<PathContext> findPaths() {
+        Map<String, FlowElement> catchingEvents = new HashMap<String, FlowElement>();
         List<RootElement> rootElements = definitions.getRootElements();
         for (RootElement root : rootElements) {
             if (root instanceof Process) {
@@ -127,6 +128,7 @@ public class BPMN2PathFinderImpl implements PathFinder {
                 }
             }
         }
+        manager.setCatchingEvents(catchingEvents);
         ElementHandler handler = HandlerRegistry.getMainHandler();
         // show what was found
         for (FlowElement fe : triggerElements) {

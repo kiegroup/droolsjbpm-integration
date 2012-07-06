@@ -1,7 +1,10 @@
 package org.jbpm.simulation.handler;
 
 import org.eclipse.bpmn2.Activity;
+import org.eclipse.bpmn2.AdHocSubProcess;
+import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.Gateway;
+import org.eclipse.bpmn2.IntermediateThrowEvent;
 import org.eclipse.bpmn2.SubProcess;
 
 public class HandlerRegistry {
@@ -11,12 +14,18 @@ public class HandlerRegistry {
         if (flowElement instanceof Gateway) {
             
            return new GatewayElementHandler();
+        }  else if (flowElement instanceof AdHocSubProcess) {
+            
+            return new AdHocSubProcessElementHandler();
         } else if (flowElement instanceof SubProcess) {
             
             return new EmbeddedSubprocessHandler();
         } else if (flowElement instanceof Activity) {
             
             return new ActivityElementHandler();
+        } else if (flowElement instanceof IntermediateThrowEvent || flowElement instanceof EndEvent) {
+            
+            return new EventElementHandler();
         }
         return null;
     }
