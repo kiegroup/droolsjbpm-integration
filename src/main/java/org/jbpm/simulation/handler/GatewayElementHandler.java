@@ -91,6 +91,7 @@ public class GatewayElementHandler extends MainElementHandler {
     protected void handleParallelGateway(List<SequenceFlow> outgoing) {
         PathContext context = manager.getContextFromStack();
         context.setCanBeFinished(false);
+        manager.addAllToPath(outgoing, context);
         int counter = 0;
         for (SequenceFlow seqFlow : outgoing) {
             counter++;
@@ -99,7 +100,7 @@ public class GatewayElementHandler extends MainElementHandler {
             if (counter == outgoing.size()) {
                 context.setCanBeFinished(true);
             }
-            manager.addToPath(seqFlow, context);
+            
             super.handle(target, manager);
         }
     }

@@ -28,14 +28,11 @@ public class MainElementHandler implements ElementHandler {
 
     public void handle(FlowElement element, PathContextManager manager) {
         PathContext context = manager.getContextFromStack();
-        manager.addToPath(element, context);
+        if (!(element instanceof SubProcess)) {
+            manager.addToPath(element, context);
+        }
         
         List<SequenceFlow> outgoing = getOutgoing(element);
-        
-        if (element instanceof SubProcess) {
-            SubProcess subProcess = ((SubProcess) element);
-            HandlerRegistry.getHandler(subProcess).handle(subProcess, manager);
-        } 
 
         if (outgoing != null && !outgoing.isEmpty()) {
             if (element instanceof Gateway) {

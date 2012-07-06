@@ -11,12 +11,12 @@ public class HandlerRegistry {
         if (flowElement instanceof Gateway) {
             
            return new GatewayElementHandler();
-        } else if (flowElement instanceof Activity) {
-            
-            return new ActivityElementHandler();
         } else if (flowElement instanceof SubProcess) {
             
             return new EmbeddedSubprocessHandler();
+        } else if (flowElement instanceof Activity) {
+            
+            return new ActivityElementHandler();
         }
         return null;
     }

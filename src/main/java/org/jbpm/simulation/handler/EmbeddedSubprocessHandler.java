@@ -3,6 +3,7 @@ package org.jbpm.simulation.handler;
 import java.util.List;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
 import org.jbpm.simulation.PathContextManager;
@@ -25,8 +26,14 @@ public class EmbeddedSubprocessHandler extends MainElementHandler {
         boolean canBeFinsihed = manager.getContextFromStack().isCanBeFinished();
         manager.getContextFromStack().setCanBeFinished(false);
         super.handle(start, manager);
+       
+        
+        List<SequenceFlow> out = getOutgoing(element);
+        for (SequenceFlow flow : out) {
+            manager.addToPath(flow, manager.getContextFromStack());
+            super.handle(flow.getTargetRef(), manager);
+        }
         manager.getContextFromStack().setCanBeFinished(canBeFinsihed);
-
     }
 
 }

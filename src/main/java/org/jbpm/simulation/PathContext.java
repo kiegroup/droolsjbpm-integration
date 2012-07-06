@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.SequenceFlow;
 
 public class PathContext {
     
@@ -32,6 +33,12 @@ public class PathContext {
     public void addPathElement(FlowElement element) {
         if (!locked) {
             this.pathElements.add(element);
+        }
+    }
+    
+    public void addAllPathElement(List<SequenceFlow> elements) {
+        if (!locked) {
+            this.pathElements.addAll(elements);
         }
     }
     

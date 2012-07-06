@@ -246,6 +246,27 @@ public class PathFinderTest {
         printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
     }
     
+    @Test
+    public void testParallelAndExclusiveWithTimer() throws IOException {
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ParallelAndExclusiveWithTimer.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(2, paths.size());
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
+    }
+    
     private void printOutPaths(List<PathContext> paths, JSONObject jsonPaths, String name) {
     	System.out.println("###################" + name + "###################");
         for (PathContext context : paths) {

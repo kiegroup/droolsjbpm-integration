@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.SequenceFlow;
 import org.jbpm.simulation.PathContext.Type;
 
 public class PathContextManager {
@@ -28,6 +29,19 @@ public class PathContextManager {
             for (PathContext ctx : this.paths) {
                 if (ctx.getType() != PathContext.Type.ROOT) {
                     ctx.addPathElement(element);
+                }
+            }
+        }
+    }
+    
+    public void addAllToPath(List<SequenceFlow> elements, PathContext context) {
+        if (context.getType() == Type.ROOT) {
+            context.addAllPathElement(elements);
+        } else {
+            // add nodes to all active contexts
+            for (PathContext ctx : this.paths) {
+                if (ctx.getType() != PathContext.Type.ROOT) {
+                    ctx.addAllPathElement(elements);
                 }
             }
         }

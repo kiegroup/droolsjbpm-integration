@@ -24,8 +24,8 @@
       <incoming>_4-_6</incoming>
     </endEvent>
     <sequenceFlow id="_1-_2" sourceRef="_1" targetRef="_2"/>
-    <sequenceFlow id="_2-_3" sourceRef="_2" targetRef="_3"/>
-    <sequenceFlow id="_2-_4" sourceRef="_2" targetRef="_4"/>
+    <sequenceFlow id="_2-_3" name="qaaaaa" sourceRef="_2" targetRef="_3"/>
+    <sequenceFlow id="_2-_4" name="kkkrrr" sourceRef="_2" targetRef="_4"/>
     <sequenceFlow id="_3-_5" sourceRef="_3" targetRef="_5"/>
     <sequenceFlow id="_4-_6" sourceRef="_4" targetRef="_6"/>
     <endEvent id="_5" name="End">
