@@ -7,7 +7,7 @@
 		<version>5.4.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>jbpm-simulation</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>jBPM :: Simulation</name>
 	<scm>
 		<connection>scm:git:git@github.com:mswiderski/jbpm-simulation.git</connection>
