@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 
 import org.eclipse.bpmn2.Definitions;
+import org.eclipse.bpmn2.FlowElementsContainer;
 import org.jbpm.simulation.impl.BPMN2PathFinderImpl;
 
 public class PathFinderFactory {
@@ -22,5 +23,9 @@ public class PathFinderFactory {
     
     public static PathFinder getInstance(InputStream bpmn2Stream) {
         return new BPMN2PathFinderImpl(bpmn2Stream);
+    }
+    
+    public static PathFinder getInstance(FlowElementsContainer bpmn2Container) {
+        return new BPMN2PathFinderImpl(bpmn2Container);
     }
 }

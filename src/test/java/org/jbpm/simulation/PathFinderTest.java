@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.bpmn2.FlowElement;
 import org.jbpm.simulation.converter.JSONPathFormatConverter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
-
+@SuppressWarnings("unchecked")
 public class PathFinderTest {
+    
     
     @Test
     public void testSinglePath() throws IOException {
@@ -32,7 +32,7 @@ public class PathFinderTest {
         
         assertNotNull(paths);
         assertEquals(1, paths.size());
-        assertTrue(matchExpected(paths, expectedIds));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -42,7 +42,7 @@ public class PathFinderTest {
             fail(e.getMessage());
         }
         
-        printOutPaths(paths, jsonPaths, "testSinglePath");
+        TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
        
     }
 
@@ -83,7 +83,7 @@ public class PathFinderTest {
         
         assertNotNull(paths);
         assertEquals(2, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -93,7 +93,7 @@ public class PathFinderTest {
             fail(e.getMessage());
         }
         
-        printOutPaths(paths, jsonPaths, "testExclusiveSplit");
+        TestUtils.printOutPaths(paths, jsonPaths, "testExclusiveSplit");
        
     }
     
@@ -193,7 +193,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(7, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2, expectedIds3, expectedIds4, expectedIds5, expectedIds6, expectedIds7));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2, expectedIds3, expectedIds4, expectedIds5, expectedIds6, expectedIds7));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -203,7 +203,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testInclusiveSplit");
+        TestUtils.printOutPaths(paths, jsonPaths, "testInclusiveSplit");
     }
     
     @Test
@@ -227,7 +227,7 @@ public class PathFinderTest {
  
         assertNotNull(paths);
         assertEquals(1, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -237,7 +237,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testParallelGateway");
+        TestUtils.printOutPaths(paths, jsonPaths, "testParallelGateway");
         
     }
     
@@ -284,7 +284,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(2, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -294,7 +294,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testParallelAndExclusiveGateway");
+        TestUtils.printOutPaths(paths, jsonPaths, "testParallelAndExclusiveGateway");
     }
     
     @Test
@@ -324,7 +324,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(2, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -334,7 +334,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testMultipleStartEvents");
+        TestUtils.printOutPaths(paths, jsonPaths, "testMultipleStartEvents");
     }
     
     @Test
@@ -380,7 +380,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(3, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2, expectedIds3));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2, expectedIds3));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -390,7 +390,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
+        TestUtils.printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
     }
     
     @Test
@@ -412,7 +412,7 @@ public class PathFinderTest {
         
         assertNotNull(paths);
         assertEquals(1, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -422,7 +422,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testSignalThrowEndEventWithCatch");
+        TestUtils.printOutPaths(paths, jsonPaths, "testSignalThrowEndEventWithCatch");
     }
     
     
@@ -465,7 +465,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(2, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -476,7 +476,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testEmbeddedSubProcessWithExclusiveSplit");
+        TestUtils.printOutPaths(paths, jsonPaths, "testEmbeddedSubProcessWithExclusiveSplit");
     }
     
     @Test
@@ -515,7 +515,7 @@ public class PathFinderTest {
         
         assertNotNull(paths);
         assertEquals(5, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2, expectedIds3, expectedIds4, expectedIds5));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2, expectedIds3, expectedIds4, expectedIds5));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -525,7 +525,7 @@ public class PathFinderTest {
 			fail(e.getMessage());
 		}
         
-        printOutPaths(paths, jsonPaths, "testAdHocProcess");
+        TestUtils.printOutPaths(paths, jsonPaths, "testAdHocProcess");
     }
     
     @Test
@@ -557,7 +557,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(2, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -567,7 +567,7 @@ public class PathFinderTest {
             fail(e.getMessage());
         }
         
-        printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
+        TestUtils.printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
     }
     
     @Test
@@ -617,7 +617,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(2, paths.size());
-        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -627,7 +627,7 @@ public class PathFinderTest {
             fail(e.getMessage());
         }
         
-        printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
+        TestUtils.printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
     }
     
     @Test
@@ -647,6 +647,7 @@ public class PathFinderTest {
         expectedIds2.add("_1-_2");
         expectedIds2.add("_2-2");
         expectedIds2.add("_2-2-_2-3");
+        expectedIds2.add("_2-3");
         expectedIds2.add("_2-_3");
         expectedIds2.add("_3");
         expectedIds2.add("_3-_4");
@@ -658,7 +659,7 @@ public class PathFinderTest {
 
         assertNotNull(paths);
         assertEquals(2, paths.size());
-//        assertTrue(matchExpected(paths, expectedIds1, expectedIds2));
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
         
         JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
         assertNotNull(jsonPaths);
@@ -668,54 +669,10 @@ public class PathFinderTest {
             fail(e.getMessage());
         }
         
-        printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
+        TestUtils.printOutPaths(paths, jsonPaths, "testBoundaryEventOnTask");
     }
     
-    private void printOutPaths(List<PathContext> paths, JSONObject jsonPaths, String name) {
-    	System.out.println("###################" + name + "###################");
-        for (PathContext context : paths) {
-            System.out.println("$$$$$$$$ PATH: " + context.getId());
-            System.out.println("$$$ AS TEXT:");
-            for (FlowElement fe : context.getPathElements()) {
-                System.out.println(fe.getName() + "  - " + fe.eClass().getName());
-            }
-        }
-        System.out.println("$$$ AS JSON:");
-        System.out.println(jsonPaths.toString());
-        System.out.println("$$$$$$$$");
-        System.out.println("#####################################################");
-    }
+   
     
-    private boolean matchExpected(List<PathContext> paths, List<String>... expectedIds) {
-        
-        for (PathContext context : paths) {
-            List<FlowElement> elements = context.getPathElements();
-            boolean match = false;
-            for (int i = 0; i < expectedIds.length; i++) {
-                List<String> expected = expectedIds[i];
-                
-                if (expected != null && elements.size() == expected.size()) {
-                    
-                    for (FlowElement fe : elements) {
-                        if (!expected.contains(fe.getId())) {
-                            System.err.println("Following element not matched: " + fe.getId() + " " + fe.getName());
-                            match = false;
-                            break;
-                        } 
-                        match = true;
-                    }
-                    if (match) {
-                        expectedIds[i] = null;
-                        break;
-                    }
-                }
-            }
-            
-            if (!match) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
+    
 }
