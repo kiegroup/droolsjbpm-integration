@@ -673,6 +673,74 @@ public class PathFinderTest {
     }
     
    
+    @Test
+    public void testSimpleEmbeddedSubprocessPAth() throws IOException {
+        List<String> expectedIds = new ArrayList<String>();
+        expectedIds.add("StartEvent_1");
+        expectedIds.add("SequenceFlow_2");
+        expectedIds.add("StartEvent_2");
+        expectedIds.add("SequenceFlow_3");
+        expectedIds.add("ScriptTask_1");
+        expectedIds.add("SequenceFlow_4");
+        expectedIds.add("EndEvent_2");
+        expectedIds.add("SequenceFlow_1");
+        expectedIds.add("EndEvent_1");
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-SimpleEmbeddedSubprocess.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+        
+        assertNotNull(paths);
+        assertEquals(1, paths.size());
+        assertTrue(TestUtils.matchExpected(paths, expectedIds));
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
+       
+    }
     
+    @Test
+    public void testNestedEmbeddedSubprocessPAth() throws IOException {
+        List<String> expectedIds = new ArrayList<String>();
+        expectedIds.add("StartEvent_1");
+        expectedIds.add("SequenceFlow_2");
+        expectedIds.add("StartEvent_2");
+        expectedIds.add("SequenceFlow_3");
+        expectedIds.add("StartEvent_3");
+        expectedIds.add("SequenceFlow_5");
+        expectedIds.add("ScriptTask_1");
+        expectedIds.add("SequenceFlow_6");
+        expectedIds.add("EndEvent_3");
+        expectedIds.add("SequenceFlow_4");
+        expectedIds.add("EndEvent_2");
+        expectedIds.add("SequenceFlow_1");
+        expectedIds.add("EndEvent_1");
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-NestedEmbeddedSubprocess.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+        
+        assertNotNull(paths);
+        assertEquals(1, paths.size());
+        assertTrue(TestUtils.matchExpected(paths, expectedIds));
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(1, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
+       
+    }
     
 }

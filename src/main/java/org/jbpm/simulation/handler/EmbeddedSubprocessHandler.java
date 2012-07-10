@@ -27,13 +27,13 @@ public class EmbeddedSubprocessHandler extends MainElementHandler {
         manager.getContextFromStack().setCanBeFinished(false);
         super.handle(start, manager);
        
-        
+        manager.getContextFromStack().setCanBeFinished(canBeFinsihed);
         List<SequenceFlow> out = getOutgoing(element);
         for (SequenceFlow flow : out) {
             manager.addToPath(flow, manager.getContextFromStack());
             super.handle(flow.getTargetRef(), manager);
         }
-        manager.getContextFromStack().setCanBeFinished(canBeFinsihed);
+        
         
         return true;
     }
