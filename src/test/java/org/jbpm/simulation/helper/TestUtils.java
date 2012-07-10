@@ -1,8 +1,9 @@
-package org.jbpm.simulation;
+package org.jbpm.simulation.helper;
 
 import java.util.List;
 
 import org.eclipse.bpmn2.FlowElement;
+import org.jbpm.simulation.PathContext;
 import org.json.JSONObject;
 
 public class TestUtils {

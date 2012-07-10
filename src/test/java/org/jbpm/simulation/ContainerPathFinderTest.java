@@ -15,6 +15,7 @@ import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.RootElement;
 import org.eclipse.bpmn2.SubProcess;
+import org.jbpm.simulation.helper.TestUtils;
 import org.jbpm.simulation.util.BPMN2Utils;
 import org.junit.Test;
 

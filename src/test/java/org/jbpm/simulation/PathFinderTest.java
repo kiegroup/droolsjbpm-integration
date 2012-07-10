@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbpm.simulation.converter.JSONPathFormatConverter;
+import org.jbpm.simulation.helper.TestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
