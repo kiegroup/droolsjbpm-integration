@@ -14,10 +14,6 @@
   
   <name>Drools Camel server</name>
   <description>A webapp that runs the Drools Camel integration.</description>
-  
-  <build>
-    <finalName>drools-server</finalName>
-  </build>
 
   <dependencies>
     <!-- Drools -->
