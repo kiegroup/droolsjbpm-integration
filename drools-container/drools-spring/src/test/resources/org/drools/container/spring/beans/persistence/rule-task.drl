@@ -1,0 +1,32 @@
+package org.drools.container.spring.beans.persistence;
+
+global java.util.List executed;
+
+rule firstRule
+    ruleflow-group "rule-task-group"
+    when
+    then
+        executed.add("firstRule");
+end;
+
+rule secondRule
+    ruleflow-group "rule-task-group"
+    when
+    then
+        insert(new String("activateThird"));
+        executed.add("secondRule");
+end;
+
+rule thirdRule
+    when
+        str : String(this == "activateThird")
+    then
+        executed.add("thirdRule");
+end;
+
+rule fourthRule
+    ruleflow-group "different-rule-group"
+    when
+    then
+        executed.add("fourthRule");
+end;
