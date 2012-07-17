@@ -75,6 +75,7 @@ public class PolicyRequestFraudDetectionRulesTest {
             .insert(realMini).set("realMini")
             .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
             .fireAllRules()
+            .assertRuleFired("lyingAboutAge", 0)
             .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
             .end()
         .newStep(5000)
@@ -83,6 +84,7 @@ public class PolicyRequestFraudDetectionRulesTest {
             .insert(fakeMini).set("fakeMini")
             .insert(fakeJohnMiniPolicyRequest).set("fakeJohnMiniPolicyRequest")
             .fireAllRules()
+            .assertRuleFired("lyingAboutAge", 1)
             .test("fakeJohnMiniPolicyRequest.requiresManualApproval == true")
             .end()
         .runSimulation();
@@ -128,6 +130,7 @@ public class PolicyRequestFraudDetectionRulesTest {
             .insert(realMini).set("realMini")
             .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
             .fireAllRules()
+            .assertRuleFired("lyingAboutAge", 0)
             .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
             .end()
         .newStep(2L * 60L * 60L * 1000L)
@@ -136,6 +139,7 @@ public class PolicyRequestFraudDetectionRulesTest {
             .insert(otherMini).set("otherMini")
             .insert(otherJohnMiniPolicyRequest).set("otherJohnMiniPolicyRequest")
             .fireAllRules()
+            .assertRuleFired("lyingAboutAge", 0)
             .test("otherJohnMiniPolicyRequest.requiresManualApproval == false")
             .end()
         .runSimulation();
