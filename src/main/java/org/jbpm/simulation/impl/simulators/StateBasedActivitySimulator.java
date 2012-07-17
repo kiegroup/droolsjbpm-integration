@@ -25,7 +25,7 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
        String bpmn2NodeId = (String) metadata.get("UniqueId");
        SimulationDataProvider provider = context.getDataProvider();
        
-       TimeGenerator timeGenerator=TimeGeneratorFactory.newTimeGenerator(provider.getSimulationDataForNode(pi.getProcessId(), bpmn2NodeId));
+       TimeGenerator timeGenerator=TimeGeneratorFactory.newTimeGenerator(provider.getSimulationDataForNode(pi.getProcessId(), node));
        long duration = timeGenerator.generateTime();
        
        // TODO calculate duration based on various strategies
