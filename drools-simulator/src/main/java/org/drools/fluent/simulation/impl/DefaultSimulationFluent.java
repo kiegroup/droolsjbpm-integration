@@ -105,6 +105,10 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         }
     }
 
+    public SimulationPath getActivePath() {
+        return activePath;
+    }
+
     public SimulationFluent newStep(long distanceMillis) {
         assureActivePath();
         activeStep = new SimulationStepImpl(activePath, distanceMillis);
@@ -132,6 +136,10 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         if (activeStep == null) {
             newStep(0L);
         }
+    }
+
+    public SimulationStep getActiveStep() {
+        return activeStep;
     }
 
     public SimulationFluent addCommand(Command command) {

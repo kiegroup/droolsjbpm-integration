@@ -63,11 +63,6 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         return this;
     }
 
-    public FluentBatchExecution fireAllRules() {
-        addCommand(new FireAllRulesCommand());
-        return this;
-    }
-
     public FluentBatchExecution insert(Object object) {
         lastAddedCommand = new InsertObjectCommand(object);
         addCommand(lastAddedCommand);
@@ -84,6 +79,21 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         lastAddedCommand = new RetractCommand(handle);
         addCommand(lastAddedCommand);
         return this;
+    }
+
+    public FluentBatchExecution fireAllRules() {
+        addCommand(new FireAllRulesCommand());
+        return this;
+    }
+
+    public FluentBatchExecution assertRuleFired(String ruleName) {
+        throw new UnsupportedOperationException(
+                "FluentBatchExecutionImpl duplicates DefaultStatefulKnowledgeSessionSimFluent");
+    }
+
+    public FluentBatchExecution assertRuleFired(String ruleName, int fireCount) {
+        throw new UnsupportedOperationException(
+                "FluentBatchExecutionImpl duplicates DefaultStatefulKnowledgeSessionSimFluent");
     }
 
     public FluentBatchExecution setGlobal(String identifier, Object object) {

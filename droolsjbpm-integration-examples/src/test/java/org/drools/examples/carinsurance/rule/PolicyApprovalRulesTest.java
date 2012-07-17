@@ -93,6 +93,7 @@ public class PolicyApprovalRulesTest {
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
             .fireAllRules()
+            .assertRuleFired("rejectMinors")
             .test("johnMiniPolicyRequest.automaticallyRejected == true")
             .test("johnMiniPolicyRequest.rejectedMessageList.size() == 1")
             .end()

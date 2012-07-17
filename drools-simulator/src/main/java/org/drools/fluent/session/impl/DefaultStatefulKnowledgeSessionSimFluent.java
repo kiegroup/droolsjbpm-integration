@@ -16,12 +16,17 @@
 
 package org.drools.fluent.session.impl;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.command.Command;
 import org.drools.command.GetVariableCommand;
+import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
+import org.drools.command.runtime.AddEventListenerCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.process.CreateProcessInstanceCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
@@ -33,9 +38,13 @@ import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
+import org.drools.simulation.SimulationStep;
+import org.drools.simulation.impl.command.AssertRulesFiredCommand;
+import org.drools.simulation.impl.command.FiredRuleCounter;
 
 public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFluent<StatefulKnowledgeSessionSimFluent>
         implements StatefulKnowledgeSessionSimFluent {
@@ -77,6 +86,39 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
     public StatefulKnowledgeSessionSimFluent fireAllRules() {
         addCommand(new FireAllRulesCommand());
         return this;
+    }
+
+    public StatefulKnowledgeSessionSimFluent assertRuleFired(String ruleName) {
+        return assertRuleFired(ruleName, 1);
+    }
+
+    public StatefulKnowledgeSessionSimFluent assertRuleFired(String ruleName, int fireCount) {
+        SimulationStep activeStep = ((DefaultSimulationFluent) simulationFluent).getActiveStep();
+        FiredRuleCounter firedRuleCounter = new FiredRuleCounter();
+        firedRuleCounter.setInclusiveRuleNameList(Collections.singletonList(ruleName));
+        insertFireRuleCounter(activeStep, firedRuleCounter);
+        AssertRulesFiredCommand assertRulesFiredCommand = new AssertRulesFiredCommand(firedRuleCounter);
+        assertRulesFiredCommand.addAssertRuleFired(ruleName, fireCount);
+        addCommand(assertRulesFiredCommand);
+        return this;
+    }
+
+    private void insertFireRuleCounter(SimulationStep activeStep, FiredRuleCounter firedRuleCounter) {
+        // Add the EventListener just before the last FireAllRules in this step
+        int lastFireAllRulesIndex = -1;
+        List<Command> commands = activeStep.getCommands();
+        for (ListIterator<Command> it = commands.listIterator(); it.hasNext();) {
+            int i = it.nextIndex();
+            Command command = it.next();
+            if (command instanceof FireAllRulesCommand) {
+                lastFireAllRulesIndex = i;
+            }
+        }
+        if (lastFireAllRulesIndex < 0) {
+            throw new IllegalArgumentException(
+                    "Cannot assertRuleFired, because in this step, fireAllRules() hasn't been called yet.");
+        }
+        commands.add(lastFireAllRulesIndex, new AddEventListenerCommand(firedRuleCounter));
     }
 
     public String getActiveKnowledgeSessionId() {

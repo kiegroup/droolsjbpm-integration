@@ -19,21 +19,32 @@ package org.drools.fluent.session;
 import org.drools.runtime.rule.FactHandle;
 
 public interface StatefulRuleSessionFluent<T> {
-            
-    T fireAllRules();
+
+    T setGlobal( String identifier, Object object );
     
     T insert(Object object);  
     
     T update( FactHandle handle, Object object );  
     
     T retract(FactHandle handle);
-    
-    T setGlobal( String identifier, Object object );
+
+    T fireAllRules();
+
+    T assertRuleFired(String ruleName);
+
+    /**
+     * Only applies to the last {@link #fireAllRules()} in this step.
+     * @param ruleName never null
+     * @param fireCount at least 0
+     * @return this
+     * throws IllegalArgumentException if {@link #fireAllRules()} has not been called in this step yet.
+     */
+    T assertRuleFired(String ruleName, int fireCount);
      
     /**
      * The last executed command, if it returns a value, is set to a name in this executings context
      * @param name
-     * @return
+     * @return this
      */
     T set(String name);
 
