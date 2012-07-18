@@ -44,10 +44,18 @@ public class DroolsSpringJpaManager
     private EntityManager        appScopedEntityManager;
 
     private boolean              internalAppScopedEntityManager;
+    
+    private boolean isJTA;
 
     public DroolsSpringJpaManager(Environment env) {
         this.env = env;
         this.emf = (EntityManagerFactory) env.get( EnvironmentName.ENTITY_MANAGER_FACTORY );
+        
+        isJTA = true;
+        Boolean bool = (Boolean) env.get("IS_JTA_TRANSACTION");
+        if (bool != null) {
+        	isJTA = bool.booleanValue();
+        }
 
         getApplicationScopedPersistenceContext(); // we create this on initialisation so that we own the EMF reference
                                                   // otherwise Spring will close it after the transaction finishes
@@ -77,14 +85,14 @@ public class DroolsSpringJpaManager
                               emHolder.getEntityManager() );
             }
         }
-        if ( TransactionSynchronizationManager.isActualTransactionActive() ) {
+        if ( TransactionSynchronizationManager.isActualTransactionActive() && isJTA) {
             this.appScopedEntityManager.joinTransaction();
         }
-        return new JpaPersistenceContext( this.appScopedEntityManager );
+        return new JpaPersistenceContext( this.appScopedEntityManager, isJTA );
     }
 
     public PersistenceContext getCommandScopedPersistenceContext() {
-        return  new JpaPersistenceContext( (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER ) );
+        return  new JpaPersistenceContext( (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER ), isJTA );
     }
 
     public void beginCommandScopedEntityManager() {
@@ -104,9 +112,10 @@ public class DroolsSpringJpaManager
                           em );
         }
 
-        this.getCommandScopedPersistenceContext().joinTransaction();
-        this.appScopedEntityManager.joinTransaction();
-
+        if (isJTA) {
+	        this.getCommandScopedPersistenceContext().joinTransaction();
+	        this.appScopedEntityManager.joinTransaction();
+        }
     }
 
     public void endCommandScopedEntityManager() {
