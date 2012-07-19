@@ -2,191 +2,192 @@ package org.jbpm.task.service.test.spring;
 
 import static org.jbpm.task.service.TaskServiceLifeCycleBaseTest.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TaskServiceLifeCycleSpringTest extends BaseSpringTest {
 
-    @Test
+    @Test @Ignore
     public void testNewTaskWithNoPotentialOwners() {
         runTestNewTaskWithNoPotentialOwners(client, users, groups);
     }
     
-    @Test
+    @Test @Ignore
     public void testNewTaskWithSinglePotentialOwner() {
         runTestNewTaskWithSinglePotentialOwner(client, users, groups);
     }
     
-    @Test
+    @Test @Ignore
     public void testNewTaskWithContent() {
         runTestNewTaskWithContent(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testNewTaskWithLargeContent() {
         runTestNewTaskWithLargeContent(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testClaimWithMultiplePotentialOwners() throws Exception {
         runTestClaimWithMultiplePotentialOwners(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testClaimWithGroupAssignee() throws Exception {
         runTestClaimWithGroupAssignee(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testStartFromReadyStateWithPotentialOwner() throws Exception {
         runTestStartFromReadyStateWithPotentialOwner(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testStartFromReadyStateWithIncorrectPotentialOwner() {
         runTestStartFromReadyStateWithIncorrectPotentialOwner(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testStartFromReserved() throws Exception {
         runTestStartFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testStartFromReservedWithIncorrectUser() {
         runTestStartFromReservedWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testStop() {
         runTestStop(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testStopWithIncorrectUser() {
         runTestStopWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testReleaseFromInprogress() throws Exception {
         runTestReleaseFromInprogress(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testReleaseFromReserved() {
         runTestReleaseFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testReleaseWithIncorrectUser() {
         runTestReleaseWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testSuspendFromReady() {
         runTestSuspendFromReady(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testSuspendFromReserved() {
         runTestSuspendFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testSuspendFromReservedWithIncorrectUser() {
         runtestSuspendFromReservedWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testResumeFromReady() {
         runTestResumeFromReady(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testResumeFromReserved() {
         runTestResumeFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testResumeFromReservedWithIncorrectUser() {
         runTestResumeFromReservedWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testSkipFromReady() {
         runTestSkipFromReady(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testSkipFromReserved() {
         runTestSkipFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testDelegateFromReady() throws Exception {
         runTestDelegateFromReady(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testDelegateFromReserved() throws Exception {
         runTestDelegateFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testDelegateFromReservedWithIncorrectUser() throws Exception {
         runTestDelegateFromReservedWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testForwardFromReady() throws Exception {
         runTestForwardFromReady(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testForwardFromReserved() throws Exception {
         runTestForwardFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testForwardFromReservedWithIncorrectUser() throws Exception {
         runTestForwardFromReservedWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testComplete() {
         runTestComplete(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testCompleteWithIncorrectUser() {
         runTestCompleteWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testCompleteWithContent() {
         runTestCompleteWithContent(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testFail() {
         runTestFail(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testFailWithIncorrectUser() {
         runTestFailWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testFailWithContent() {
         runTestFailWithContent(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testRegisterRemove() throws Exception {
         runTestRegisterRemove(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testRemoveNotInRecipientList() {
         runTestRemoveNotInRecipientList(client, users, groups);
     }
@@ -197,67 +198,67 @@ public class TaskServiceLifeCycleSpringTest extends BaseSpringTest {
      * the new state of the task is Ready. This can only be performed when the task is in the 
      * state Created.
      */
-    @Test
+    @Test @Ignore
     public void testNominateOnOtherThanCreated() {
         runTestNominateOnOtherThanCreated(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testNominateWithIncorrectUser() {
         runTestNominateWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testNominateToUser() {
         runTestNominateToUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testNominateToGroup() {
         runTestNominateToGroup(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testActivate() {
         runTestActivate(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testActivateWithIncorrectUser() {
         runTestActivateWithIncorrectUser(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testActivateFromIncorrectStatus() {
         runTestActivateFromIncorrectStatus(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testExitFromReady() {
         runTestExitFromReady(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testExitFromReserved() {
         runTestExitFromReserved(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testExitFromInProgress() {
         runTestExitFromInProgress(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testExitFromSuspended() {
         runTestExitFromSuspended(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testExitPermissionDenied() {
         runTestExitPermissionDenied(client, users, groups);
     }
 
-    @Test
+    @Test @Ignore
     public void testExitNotAvailableToUsers() {
         runTestExitNotAvailableToUsers(client, users, groups);
     }
