@@ -114,13 +114,13 @@
   </benchmark>
 
   <benchmark description="Fibonacci calculator (use index)"
-             warmups="1" enabled="false"
+             warmups="2" repetitions="10" enabled="false"
              classname="org.drools.benchmark.benchmarks.FibonacciBenchmark">
     <arg>2000</arg>
   </benchmark>
 
   <benchmark description="Fibonacci calculator (don't use index - fan out literal values)"
-             warmups="1" enabled="false"
+             warmups="2" repetitions="10" enabled="false"
              classname="org.drools.benchmark.benchmarks.FibonacciBenchmark">
     <arg>2000</arg>
     <arg>fibonacci_no_index.drl</arg>
@@ -141,12 +141,12 @@
   </benchmark>
 
   <benchmark description="Manners"
-             warmups="0" repetitions="1" enabled="false"
+             warmups="2" repetitions="3" enabled="false"
              classname="org.drools.benchmark.benchmarks.MannersBenchmark">
   </benchmark>
 
   <benchmark description="Waltz"
-             warmups="1" repetitions="10" enabled="false"
+             warmups="2" repetitions="3" enabled="false"
              classname="org.drools.benchmark.benchmarks.WaltzBenchmark">
   </benchmark>
 
@@ -162,6 +162,48 @@
              classname="org.drools.benchmark.benchmarks.RandomBeansBenchmark">
     <arg>2000</arg>
     <arg>constraintsEvaluation.drl</arg>
+  </benchmark>
+
+  <!-- Index -->
+
+  <benchmark description="CompareIndex LeftModify NoMatch 1 Right"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.CompareIndexLeftModifyNoMatchOneRight">
+    <arg>10000</arg>
+    <arg>1000</arg>
+    <arg>compareIndexLeftModifyNoMatch.drl</arg>
+  </benchmark>
+
+  <benchmark description="CompareIndex LeftModify NoMatch ManyRights"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.CompareIndexLeftModifyNoMatchManyRight">
+    <arg>10000</arg>
+    <arg>1000</arg>
+    <arg>compareIndexLeftModifyNoMatch.drl</arg>
+  </benchmark>
+
+  <benchmark description="CompareIndex RightModify NoMatch 1 Left"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.CompareIndexRightModifyNoMatchOneLeft">
+    <arg>10000</arg>
+    <arg>1000</arg>
+    <arg>compareIndexRightModifyNoMatch.drl</arg>
+  </benchmark>
+
+  <benchmark description="CompareIndex RightModify NoMatch ManyLeft"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.CompareIndexRightModifyNoMatchManyLeft">
+    <arg>10000</arg>
+    <arg>1000</arg>
+    <arg>compareIndexRightModifyNoMatch.drl</arg>
+  </benchmark>
+
+  <benchmark description="CompareIndex CrossProductNoMatch"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.CompareIndexCrossProductNoMatch">
+    <arg>10000</arg>
+    <arg>1000</arg>
+    <arg>compareIndexLeftRightModifyNoMatch.drl</arg>
   </benchmark>
 
   <!-- TMS -->
@@ -181,19 +223,19 @@
   <!-- Agenda -->
 
   <benchmark description="Insert 10K objects fire and update them on 10K rules with different salience"
-             warmups="10" repetitions="10" force-warmup="true" enabled="true"
+             warmups="10" repetitions="10" force-warmup="false" enabled="false"
              classname="org.drools.benchmark.benchmarks.AgendaInsertUpdateBenchmark">
     <arg>10000</arg>
   </benchmark>
 
   <benchmark description="Insert 10K objects and retract them (no fire) on 10K rules with different salience"
-             warmups="10" repetitions="10" force-warmup="true" enabled="true"
+             warmups="10" repetitions="10" force-warmup="false" enabled="false"
              classname="org.drools.benchmark.benchmarks.AgendaInsertRetractBenchmark">
     <arg>10000</arg>
   </benchmark>
 
   <benchmark description="Insert 10K objects fire and retract them on 10K rules with different salience"
-             warmups="10" repetitions="10" force-warmup="true" enabled="true"
+             warmups="10" repetitions="10" force-warmup="false" enabled="false"
              classname="org.drools.benchmark.benchmarks.AgendaInsertFireRetractBenchmark">
     <arg>10000</arg>
   </benchmark>

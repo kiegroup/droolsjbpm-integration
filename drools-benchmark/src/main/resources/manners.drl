@@ -64,7 +64,7 @@ rule findSeating
        Chosen chosen = new Chosen( seatId, $g2.getName(), $g1.getHobby() );
        insert( chosen  );
 
-       System.err.println( "find seating : " + seating + " : " + path + " : " + chosen);
+//System.err.println( "find seating : " + seating + " : " + path + " : " + chosen);
 
        modify( count ) {setValue(  countValue + 1 )}        
        modify( context ) {setState( Context.MAKE_PATH )} 
@@ -75,7 +75,7 @@ rule pathDone
         context : Context( state == Context.MAKE_PATH ) 
         seating : Seating( pathDone == false ) 
     then
-System.out.println("fire rule pathDone");
+//System.out.println("fire rule pathDone");
         modify( seating ) {setPathDone( true )}
         
         modify( context ) {setState( Context.CHECK_DONE)}
@@ -88,7 +88,7 @@ rule makePath
         Path( id == seatingPid, pathGuestName:guestName, pathSeat:seat )
         not Path( id == seatingId, guestName == pathGuestName )
     then
-System.out.println("fire rule makePath");
+//System.out.println("fire rule makePath");
         insert( new Path( seatingId, pathSeat, pathGuestName ) );
 end 
 
@@ -96,7 +96,7 @@ rule continue
     when
         context : Context( state == Context.CHECK_DONE ) 
     then
-System.out.println("fire rule continue");
+//System.out.println("fire rule continue");
         modify( context ) {setState( Context.ASSIGN_SEATS )}
 end
 
@@ -106,7 +106,7 @@ rule areWeDone
         LastSeat( lastSeat: seat )
         Seating( rightSeat == lastSeat ) 
     then
-System.out.println("fire rule areWeDone");
+//System.out.println("fire rule areWeDone");
         modify( context ) {setState(Context.PRINT_RESULTS )}
 end
 
@@ -116,7 +116,7 @@ rule allDone
     when
         context : Context( state == Context.PRINT_RESULTS ) 
     then
-System.out.println("fire rule allDone");
+//System.out.println("fire rule allDone");
         System.out.println( "All Done" );
 end
 

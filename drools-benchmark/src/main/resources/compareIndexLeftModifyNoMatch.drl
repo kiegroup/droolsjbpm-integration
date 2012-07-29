@@ -1,0 +1,14 @@
+import org.drools.benchmark.model.*
+
+rule R1 salience 1 when
+    $a : A( $i : i < j )
+then
+    modify($a) { setI($i + 1) };
+end
+
+rule R2 salience 2 when
+    A( $a_i : i )
+    exists B( i < $a_i )
+then
+    throw new RuntimeException("This rule should not fire!");
+end
