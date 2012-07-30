@@ -11,6 +11,8 @@ public interface Grid {
     public void removeGridNode( String id );
 
     public GridNode getGridNode( String id );
+
+    public GridNode asRemoteNode( GridNode node );
     
     public String getId();
 

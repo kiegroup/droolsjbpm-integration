@@ -8,11 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
-import org.drools.grid.ConnectionFactoryService;
-import org.drools.grid.Grid;
-import org.drools.grid.GridNode;
-import org.drools.grid.SocketService;
-import org.drools.grid.GridServiceDescription;
+import org.drools.grid.*;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.io.AcceptorFactoryService;
 import org.drools.grid.io.ConnectorFactoryService;
@@ -169,6 +165,23 @@ public class GridImpl implements Grid {
 
     public GridNode getGridNode( String id ) {
         return this.localNodes.get( id );
+    }
+
+    public GridNode asRemoteNode( GridNode node ) {
+        if  ( node.isRemote() ) {
+            return node;
+        }
+        GridServiceDescription<GridNode> nGsd = this.get( WhitePages.class ).lookup( node.getId() );
+        ConnectionFactoryService cfs = get( ConnectionFactoryService.class );
+        boolean allowsLocal = cfs.isLocalAllowed();
+        cfs.setLocalAllowed( false );
+        GridConnection<GridNode> conn = cfs.createConnection( nGsd );
+        if ( logger.isDebugEnabled() ) {
+            logger.debug( "  ### Session Manager: Opened connection to node: " + conn );
+        }
+        // forcing a remote connection to the node
+        cfs.setLocalAllowed( allowsLocal );
+        return conn.connect();
     }
 
     public String getId() {
