@@ -166,8 +166,15 @@
 
   <!-- Index -->
 
+  <benchmark description="CompareIndex WorstCase"
+             warmups="1" repetitions="1" enabled="false"
+             classname="org.drools.benchmark.benchmarks.CompareIndexWorstCase">
+    <arg>1000000</arg>
+    <arg>compareIndexWorstCase.drl</arg>
+  </benchmark>
+
   <benchmark description="CompareIndex LeftModify NoMatch 1 Right"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.CompareIndexLeftModifyNoMatchOneRight">
     <arg>10000</arg>
     <arg>1000</arg>
@@ -175,7 +182,7 @@
   </benchmark>
 
   <benchmark description="CompareIndex LeftModify NoMatch ManyRights"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.CompareIndexLeftModifyNoMatchManyRight">
     <arg>10000</arg>
     <arg>1000</arg>
@@ -183,7 +190,7 @@
   </benchmark>
 
   <benchmark description="CompareIndex RightModify NoMatch 1 Left"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.CompareIndexRightModifyNoMatchOneLeft">
     <arg>10000</arg>
     <arg>1000</arg>
@@ -191,7 +198,7 @@
   </benchmark>
 
   <benchmark description="CompareIndex RightModify NoMatch ManyLeft"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.CompareIndexRightModifyNoMatchManyLeft">
     <arg>10000</arg>
     <arg>1000</arg>
@@ -199,11 +206,27 @@
   </benchmark>
 
   <benchmark description="CompareIndex CrossProductNoMatch"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.CompareIndexCrossProductNoMatch">
     <arg>10000</arg>
     <arg>1000</arg>
     <arg>compareIndexLeftRightModifyNoMatch.drl</arg>
+  </benchmark>
+
+  <benchmark description="RangeIndex LeftModify NoMatch ManyRights"
+             warmups="1" repetitions="1" enabled="false"
+             classname="org.drools.benchmark.benchmarks.RangeIndexLeftModifyNoMatch">
+    <arg>10000</arg>
+    <arg>1000</arg>
+    <arg>rangeIndexLeftModifyNoMatch.drl</arg>
+  </benchmark>
+
+  <benchmark description="RangeIndex CrossProductNoMatch"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.RangeIndexCrossProductNoMatch">
+    <arg>1000</arg>
+    <arg>1000</arg>
+    <arg>rangeIndexLeftRightModifyNoMatch.drl</arg>
   </benchmark>
 
   <!-- TMS -->

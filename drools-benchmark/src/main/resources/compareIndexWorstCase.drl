@@ -1,0 +1,15 @@
+import org.drools.benchmark.model.*
+
+rule R1 salience 1 when
+    $b1 : B( i < 2, $j1 : j < 1000, $bool1 : b == false )
+    $b2 : B( i < 2, $j2 : j < 1000, $bool2 : b == true )
+then
+    modify($b1) { setJ($j1 + 1), setB(!$bool1) };
+    modify($b2) { setJ($j2 + 1), setB(!$bool2) };
+end
+
+rule R2 salience 2 when
+    A( $a_i : i, $a_b : b )
+    not B( i < $a_i, b == $a_b )
+then
+end
