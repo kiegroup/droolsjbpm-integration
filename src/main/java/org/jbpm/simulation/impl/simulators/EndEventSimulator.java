@@ -14,7 +14,7 @@ public class EndEventSimulator implements ActivitySimulator {
         
         ProcessInstance pi = nodeInstance.getProcessInstance();
         
-        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), context.getStartTime(), context.getCurrentTime());
+        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), context.getStartTime(), context.getClock().getCurrentTime());
     }
 
 }

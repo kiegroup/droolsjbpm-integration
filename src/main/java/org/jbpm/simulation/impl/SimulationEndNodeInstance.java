@@ -13,7 +13,6 @@ public class SimulationEndNodeInstance extends EndNodeInstance {
 
     @Override
     public void internalTrigger(NodeInstance from, String type) {
-        System.out.println("Triggered " + getNode().getName() + " id " + getNode().getMetaData().get("UniqueId"));
         SimulationContext context = SimulationContext.getContext();
         
         ActivitySimulator simulator = context.getRegistry().getSimulator(getNode());

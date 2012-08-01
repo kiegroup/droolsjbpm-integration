@@ -67,6 +67,10 @@
       <scope>test</scope>
       <type>jar</type>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-simulator</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

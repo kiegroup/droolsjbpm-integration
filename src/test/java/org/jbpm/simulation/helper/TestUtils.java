@@ -3,11 +3,17 @@ package org.jbpm.simulation.helper;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.SessionConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.conf.Option;
+import org.drools.impl.EnvironmentFactory;
 import org.drools.io.ResourceFactory;
+import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.conf.ClockTypeOption;
 import org.eclipse.bpmn2.FlowElement;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.impl.SimulationEndNodeInstance;
@@ -110,8 +116,9 @@ public class TestUtils {
         builder.add(ResourceFactory.newClassPathResource(process), ResourceType.BPMN2);
         
         KnowledgeBase kbase = builder.newKnowledgeBase();
-        
-        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+        KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        config.setOption(ClockTypeOption.get("pseudo") );
+        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession(config, EnvironmentFactory.newEnvironment());
         NodeInstanceFactoryRegistry n = NodeInstanceFactoryRegistry.INSTANCE;
         
         n.register( RuleSetNode.class,

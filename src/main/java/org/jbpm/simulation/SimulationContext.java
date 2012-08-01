@@ -2,6 +2,8 @@ package org.jbpm.simulation;
 
 import java.util.List;
 
+import org.drools.time.SessionPseudoClock;
+
 public class SimulationContext {
 
     protected static InheritableThreadLocal<SimulationContext> simulationContextThreadLocal = new InheritableThreadLocal<SimulationContext>();
@@ -11,7 +13,7 @@ public class SimulationContext {
     private SimulationDataProvider dataProvider;
     private List<String> currentPath;
     private long startTime;
-    private long currentTime;
+    private SessionPseudoClock clock;
     
     public static SimulationContext getContext() {
         return simulationContextThreadLocal.get();
@@ -53,19 +55,19 @@ public class SimulationContext {
         this.startTime = startTime;
     }
 
-    public long getCurrentTime() {
-        return currentTime;
-    }
-
-    public void setCurrentTime(long currentTime) {
-        this.currentTime = currentTime;
-    }
-
     public SimulationDataProvider getDataProvider() {
         return dataProvider;
     }
 
     public void setDataProvider(SimulationDataProvider dataProvider) {
         this.dataProvider = dataProvider;
+    }
+
+    public SessionPseudoClock getClock() {
+        return clock;
+    }
+
+    public void setClock(SessionPseudoClock clock) {
+        this.clock = clock;
     }
 }

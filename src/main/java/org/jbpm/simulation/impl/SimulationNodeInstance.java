@@ -1,6 +1,7 @@
 package org.jbpm.simulation.impl;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.drools.definition.process.Connection;
 import org.drools.runtime.process.NodeInstance;
@@ -16,7 +17,6 @@ public class SimulationNodeInstance extends NodeInstanceImpl {
 
     @Override
     public void internalTrigger(NodeInstance from, String type) {
-        System.out.println("Triggered " + getNode().getName() + " id " + getNode().getMetaData().get("UniqueId") + this.toString());
         
         SimulationContext context = SimulationContext.getContext();
        
@@ -24,14 +24,15 @@ public class SimulationNodeInstance extends NodeInstanceImpl {
         SimulationEvent event = simulator.simulate(this, context);
         
         context.getRepository().storeEvent(event);
-        long thisNodeCurrentTime = context.getCurrentTime();
+        long thisNodeCurrentTime = context.getClock().getCurrentTime();
         
         List<Connection> outgoing = getNode().getOutgoingConnections().get(Node.CONNECTION_DEFAULT_TYPE);
         for (Connection conn : outgoing) {
             if (context.getCurrentPath().contains(conn.getMetaData().get("UniqueId"))) {
                 
                 triggerConnection(conn);
-                context.setCurrentTime(thisNodeCurrentTime);
+                // reset clock to the value of this node
+                context.getClock().advanceTime((thisNodeCurrentTime - context.getClock().getCurrentTime()), TimeUnit.MILLISECONDS);
             }
         }
     }

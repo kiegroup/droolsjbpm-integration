@@ -1,6 +1,7 @@
 package org.jbpm.simulation.impl.simulators;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.drools.definition.process.Node;
 import org.drools.runtime.process.NodeInstance;
@@ -29,8 +30,7 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
        long duration = timeGenerator.generateTime();
        
        // TODO calculate duration based on various strategies
-       
-       context.setCurrentTime(context.getCurrentTime() + duration);
+       context.getClock().advanceTime(duration, TimeUnit.MILLISECONDS);
        
        return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration);
     }

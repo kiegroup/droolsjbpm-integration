@@ -1,8 +1,10 @@
 package org.jbpm.simulation;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.time.SessionPseudoClock;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.helper.TestUtils;
@@ -19,12 +21,14 @@ public class SimulationTest {
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
         
         SimulationContext context = SimulationContextFactory.newContext(new HardCodedSimulationDataProvider());
-        context.setStartTime(System.currentTimeMillis());
         
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path.getSequenceFlowsIds());
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ParallelSplit.bpmn2");
+            context.setClock((SessionPseudoClock) session.getSessionClock());
+            // set start date to current time
+            context.getClock().advanceTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             
             session.startProcess("com.sample.test");
             System.out.println("#####################################");
@@ -37,12 +41,16 @@ public class SimulationTest {
         
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
         SimulationContext context = SimulationContextFactory.newContext(new HardCodedSimulationDataProvider());
-        context.setStartTime(System.currentTimeMillis());
+        
         
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path.getSequenceFlowsIds());
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
+            
+            context.setClock((SessionPseudoClock) session.getSessionClock());
+            // set start date to current time
+            context.getClock().advanceTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             
             session.startProcess("com.sample.test");
             System.out.println("#####################################");
