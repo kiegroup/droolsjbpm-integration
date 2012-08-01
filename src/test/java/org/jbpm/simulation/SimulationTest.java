@@ -57,5 +57,26 @@ public class SimulationTest {
         }
     }
     
+    @Test
+    public void testUserTaskProcessSimulation() {
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-UserTask.bpmn2"));
+        
+        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
+        SimulationContext context = SimulationContextFactory.newContext(new HardCodedSimulationDataProvider());
+        
+        
+        for (SimulationPath path : paths) {
+            
+            context.setCurrentPath(path.getSequenceFlowsIds());
+            StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
+            
+            context.setClock((SessionPseudoClock) session.getSessionClock());
+            // set start date to current time
+            context.getClock().advanceTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+            
+            session.startProcess("UserTask");
+            System.out.println("#####################################");
+        }
+    }
     
 }

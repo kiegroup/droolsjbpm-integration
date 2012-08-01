@@ -15,7 +15,12 @@ public class HardCodedSimulationDataProvider implements SimulationDataProvider {
         
         String nodeId = (String) node.getMetaData().get("UniqueId");
         
-        if ("_3".equals(nodeId)) {
+        if ("_2".equals(nodeId)) {
+            data.put("duration", new Long(21*60*1000));
+            data.put("poolSize", new Integer(3));
+            data.put("workinHours", new Integer(1));
+            data.put("resourceCost", new Double(45));
+        } else if ("_3".equals(nodeId)) {
             data.put("duration", new Long(37000));
         } else if ("_4".equals(nodeId)) {
             data.put("duration", new Long(23000));

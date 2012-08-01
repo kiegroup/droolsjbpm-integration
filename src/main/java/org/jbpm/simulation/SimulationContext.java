@@ -3,6 +3,7 @@ package org.jbpm.simulation;
 import java.util.List;
 
 import org.drools.time.SessionPseudoClock;
+import org.jbpm.simulation.impl.ht.StaffPoolManager;
 
 public class SimulationContext {
 
@@ -14,6 +15,7 @@ public class SimulationContext {
     private List<String> currentPath;
     private long startTime;
     private SessionPseudoClock clock;
+    private StaffPoolManager staffPoolManager;
     
     public static SimulationContext getContext() {
         return simulationContextThreadLocal.get();
@@ -69,5 +71,13 @@ public class SimulationContext {
 
     public void setClock(SessionPseudoClock clock) {
         this.clock = clock;
+    }
+
+    public StaffPoolManager getStaffPoolManager() {
+        return staffPoolManager;
+    }
+
+    public void setStaffPoolManager(StaffPoolManager staffPoolManager) {
+        this.staffPoolManager = staffPoolManager;
     }
 }

@@ -1,6 +1,7 @@
 package org.jbpm.simulation;
 
 import org.jbpm.simulation.impl.InMemorySimulationRepository;
+import org.jbpm.simulation.impl.ht.StaffPoolManagerImpl;
 
 public class SimulationContextFactory {
 
@@ -11,6 +12,7 @@ public class SimulationContextFactory {
         context.setDataProvider(dataProvider);
         context.setRegistry(new SimulationRegistry());
         context.setRepository(new InMemorySimulationRepository());
+        context.setStaffPoolManager(new StaffPoolManagerImpl());
         
         return context;
     }
@@ -22,6 +24,7 @@ public class SimulationContextFactory {
         context.setDataProvider(dataProvider);
         context.setRegistry(new SimulationRegistry());
         context.setRepository(repository);
+        context.setStaffPoolManager(new StaffPoolManagerImpl());
         
         return context;
     }
@@ -33,6 +36,7 @@ public class SimulationContextFactory {
         context.setDataProvider(dataProvider);
         context.setRegistry(registry);
         context.setRepository(repository);
+        context.setStaffPoolManager(new StaffPoolManagerImpl());
         
         return context;
     }

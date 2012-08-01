@@ -71,6 +71,10 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-simulator</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

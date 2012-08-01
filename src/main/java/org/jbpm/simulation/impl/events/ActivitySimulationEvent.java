@@ -34,7 +34,8 @@ public class ActivitySimulationEvent extends GenericSimulationEvent {
     @Override
     public String toString() {
         
-        return "ActivitySimulationEvent[process=" + processId + ", instance=" + processInstanceId + ", activity=" + activityName + ", duration=" + duration/1000+" seconds]";
+        return "ActivitySimulationEvent[process=" + processId + ", instance=" 
+        + processInstanceId + ", activity=" + activityName + ", duration=" + duration/1000+" seconds]";
     }
     
     

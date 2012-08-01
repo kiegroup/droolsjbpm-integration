@@ -7,7 +7,9 @@ import org.drools.definition.process.Node;
 import org.jbpm.simulation.impl.simulators.EndEventSimulator;
 import org.jbpm.simulation.impl.simulators.StartEventSimulator;
 import org.jbpm.simulation.impl.simulators.StateBasedActivitySimulator;
+import org.jbpm.simulation.impl.simulators.HumanTaskActivitySimulator;
 import org.jbpm.workflow.core.node.EndNode;
+import org.jbpm.workflow.core.node.HumanTaskNode;
 import org.jbpm.workflow.core.node.StartNode;
 
 
@@ -21,6 +23,7 @@ public class SimulationRegistry {
     protected SimulationRegistry() {
         simulators.put(StartNode.class, new StartEventSimulator());
         simulators.put(EndNode.class, new EndEventSimulator());
+        simulators.put(HumanTaskNode.class, new HumanTaskActivitySimulator());
     }
     
     public static SimulationRegistry getInstance() {

@@ -49,4 +49,52 @@ public class SimulationFluentTest {
         .runSimulation();
         // @formatter:on
     }
+    
+    @Test
+    public void testSimulationFluentWithUserTask() {
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-UserTask.bpmn2"));
+        
+        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
+        SimulationContext context = SimulationContextFactory.newContext(new HardCodedSimulationDataProvider());
+        
+        SimulationFluent f = new DefaultSimulationFluent();
+        // @formatter:off
+        f.newKnowledgeBuilder()
+        .add( ResourceFactory.newClassPathResource("BPMN2-UserTask.bpmn2"),
+                ResourceType.BPMN2 )
+          .end(World.ROOT, KnowledgeBuilder.class.getName() )
+        .newKnowledgeBase()
+          .addKnowledgePackages()
+          .end(World.ROOT, KnowledgeBase.class.getName() )
+        .newPath("path1")
+            .newStep( 0 )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                .addCommand(new SimulateProcessPathCommand("UserTask", context, paths.get(0)))
+            .newStep( 5, TimeUnit.MINUTES )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                    .addCommand(new SimulateProcessPathCommand("UserTask", context, paths.get(0)))
+            .newStep( 10, TimeUnit.MINUTES )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                    .addCommand(new SimulateProcessPathCommand("UserTask", context, paths.get(0)))
+            .newStep( 15, TimeUnit.MINUTES )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                .addCommand(new SimulateProcessPathCommand("UserTask", context, paths.get(0)))
+            .newStep( 20, TimeUnit.MINUTES )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                .addCommand(new SimulateProcessPathCommand("UserTask", context, paths.get(0)))
+            .newStep( 25, TimeUnit.MINUTES )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                .addCommand(new SimulateProcessPathCommand("UserTask", context, paths.get(0)))
+        .runSimulation();
+        // @formatter:on
+        
+        System.out.println("Resource utilization for UserTask Hello: " + context.getStaffPoolManager().getActivityPool("Hello").getResourceUtilization());
+    }
 }
