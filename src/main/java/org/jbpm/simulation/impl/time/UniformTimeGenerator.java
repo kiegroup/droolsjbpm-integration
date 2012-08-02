@@ -5,6 +5,8 @@ import java.util.Map;
 import org.apache.commons.math.random.RandomData;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.jbpm.simulation.TimeGenerator;
+import org.jbpm.simulation.util.SimulationConstants;
+import org.jbpm.simulation.util.SimulationUtils;
 
 public class UniformTimeGenerator implements TimeGenerator {
 
@@ -18,8 +20,8 @@ public class UniformTimeGenerator implements TimeGenerator {
     
     public long generateTime() {
 
-        long value = (Long) data.get("duration");
-        long range = (Long) data.get("range");
+        long value = SimulationUtils.asLong(data.get(SimulationConstants.DURATION));
+        long range = SimulationUtils.asLong(data.get(SimulationConstants.RANGE));
        
         return  (long) generator.nextUniform(value-range, value+range);
     }

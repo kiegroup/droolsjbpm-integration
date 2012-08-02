@@ -7,13 +7,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 
-public class SimulatiorUtils {
+public class SimulationUtils {
 	
 	public static final double HUNDRED = 100;
 	public static final  NumberFormat formatter = new DecimalFormat("#0.00");
-	
-	
-	public static final String EXECUTED_INSTANCES = "executed.instances";
 
 	public static int asInt(Object value) {
 		if (value == null) {
@@ -41,7 +38,7 @@ public class SimulatiorUtils {
 	
 	
 	public static TimeUnit getTimeUnit(Map<String, Object> element) {
-		String timeUnitStr = (String) element.get("");
+		String timeUnitStr = (String) element.get(SimulationConstants.TIMEUNIT);
 		if (timeUnitStr != null) {
 			try {
 				TimeUnit durationTimeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());

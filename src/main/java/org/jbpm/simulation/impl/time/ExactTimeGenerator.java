@@ -3,6 +3,8 @@ package org.jbpm.simulation.impl.time;
 import java.util.Map;
 
 import org.jbpm.simulation.TimeGenerator;
+import org.jbpm.simulation.util.SimulationConstants;
+import org.jbpm.simulation.util.SimulationUtils;
 
 public class ExactTimeGenerator implements TimeGenerator {
 
@@ -14,7 +16,7 @@ public class ExactTimeGenerator implements TimeGenerator {
 
     public long generateTime() {
         
-        return (Long) data.get("duration");
+        return SimulationUtils.asLong(data.get(SimulationConstants.DURATION));
     }
 
 }

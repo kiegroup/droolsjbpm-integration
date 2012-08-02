@@ -11,7 +11,8 @@ import org.apache.commons.math.random.RandomDataImpl;
 import org.drools.definition.process.Node;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationDataProvider;
-import org.jbpm.simulation.util.SimulatiorUtils;
+import org.jbpm.simulation.util.SimulationConstants;
+import org.jbpm.simulation.util.SimulationUtils;
 
 public class StaffPoolImpl implements StaffPool {
     
@@ -22,7 +23,7 @@ public class StaffPoolImpl implements StaffPool {
 	private long duration;
 	private List<Long> allocatedTill = new ArrayList<Long>();
 	private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-	//default working hours set to eight hour
+	//default working hours set to eight hours
 	private long workingHours = ( 8 * 60 * 60 * 1000);
 	private long poolCapacity = 0;
 	
@@ -45,12 +46,12 @@ public class StaffPoolImpl implements StaffPool {
 	    
 	    properties = provider.getSimulationDataForNode(processId, element);
 		
-		this.elementTimeUnit = SimulatiorUtils.getTimeUnit(properties);
-		this.distibutionType = (String) properties.get("distributionType");
-		this.poolSize = SimulatiorUtils.asInt(properties.get("poolSize"));
-		this.duration = timeUnit.convert(SimulatiorUtils.asLong(properties.get("duration")), this.elementTimeUnit);
+		this.elementTimeUnit = SimulationUtils.getTimeUnit(properties);
+		this.distibutionType = (String) properties.get(SimulationConstants.DISTRIBUTION_TYPE);
+		this.poolSize = SimulationUtils.asInt(properties.get(SimulationConstants.STAFF_AVAILABILITY));
+		this.duration = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.DURATION)), this.elementTimeUnit);
 		
-		long workingHoursOpt = SimulatiorUtils.asLong(properties.get("workinHours"));
+		long workingHoursOpt = SimulationUtils.asLong(properties.get(SimulationConstants.WORKING_HOURS));
 		if (workingHoursOpt > 0) {
 			this.workingHours = timeUnit.convert(workingHoursOpt, TimeUnit.HOURS);
 		}
@@ -61,10 +62,10 @@ public class StaffPoolImpl implements StaffPool {
 			this.poolCapacity = (long) (this.poolCapacity * simulationDuration);
 		}
 		
-		this.range = timeUnit.convert(SimulatiorUtils.asLong(properties.get("range")), this.elementTimeUnit);
-		this.standadDeviation = timeUnit.convert(SimulatiorUtils.asLong(properties.get("std.deviation")), this.elementTimeUnit);
+		this.range = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.RANGE)), this.elementTimeUnit);
+		this.standadDeviation = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.STANDARD_DEVIATION)), this.elementTimeUnit);
 		
-		this.resourceCost = SimulatiorUtils.asDouble(properties.get("resourceCost"));
+		this.resourceCost = SimulationUtils.asDouble(properties.get(SimulationConstants.COST_PER_TIME_UNIT));
 		
 		
 	}
@@ -105,11 +106,11 @@ public class StaffPoolImpl implements StaffPool {
 	
 	public long allocate(long startTime, Node element) {
 
-		String distibutionType = (String) properties.get("distributionType");
-		long duration = timeUnit.convert(SimulatiorUtils.asLong(properties.get("duration")), this.elementTimeUnit);
+		String distibutionType = (String) properties.get(SimulationConstants.DISTRIBUTION_TYPE);
+		long duration = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.DURATION)), this.elementTimeUnit);
 		
-		double range = timeUnit.convert(SimulatiorUtils.asLong(properties.get("range")), this.elementTimeUnit);
-		double standadDeviation = timeUnit.convert(SimulatiorUtils.asLong(properties.get("std.deviation")), this.elementTimeUnit);
+		double range = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.RANGE)), this.elementTimeUnit);
+		double standadDeviation = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.STANDARD_DEVIATION)), this.elementTimeUnit);
 		
 		return allocate(startTime, distibutionType, duration, range, standadDeviation);
 	}

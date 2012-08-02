@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.jbpm.simulation.impl.time.RandomTimeGenerator;
+import org.jbpm.simulation.util.SimulationConstants;
 import org.junit.Test;
 
 public class TimeGeneratorTest {
@@ -20,9 +21,9 @@ public class TimeGeneratorTest {
         System.out.println(p.evaluate(5));
         
         Map<String, Object> data = new HashMap<String, Object>();
-        data.put("distributionType", "random");
-        data.put("range", 500L);
-        data.put("duration", 40000L);
+        data.put(SimulationConstants.DISTRIBUTION_TYPE, "random");
+        data.put(SimulationConstants.RANGE, 500L);
+        data.put(SimulationConstants.DURATION, 40000L);
         
         TimeGenerator generator = TimeGeneratorFactory.newTimeGenerator(data);
         assertNotNull(generator);

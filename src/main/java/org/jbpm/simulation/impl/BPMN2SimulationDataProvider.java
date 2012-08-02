@@ -8,12 +8,16 @@ import java.util.Map;
 import org.drools.definition.process.Node;
 import org.eclipse.bpmn2.Definitions;
 import org.eclipse.bpmn2.ExtensionAttributeValue;
-import org.eclipse.bpmn2.ExtensionDefinition;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.RootElement;
-import org.jbpm.simulation.PathContextManager;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.FeatureMap;
+import org.eclipse.emf.ecore.util.FeatureMapUtil.FeatureEList;
+import org.jboss.drools.DroolsPackage;
+import org.jboss.drools.MetadataType;
+import org.jboss.drools.MetaentryType;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.util.BPMN2Utils;
 
@@ -49,13 +53,49 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
             foundElement = findElementInContainer(container, nodeId);
             localCache.put(nodeId, foundElement);
         }
-        
+        Map<String, Object> properties = new HashMap<String, Object>();
         // extract required properties from flow element and put them into a map
         List<ExtensionAttributeValue> extensions = foundElement.getExtensionValues();
         for (ExtensionAttributeValue extAttrValue : extensions) {
+            FeatureMap extensionElements = extAttrValue.getValue();
+           
             
+            @SuppressWarnings("unchecked")
+            
+            FeatureEList<MetadataType> metadataTypeExtensions = (FeatureEList<MetadataType>) extensionElements
+                                                 .get(DroolsPackage.Literals.DOCUMENT_ROOT__METADATA, true);
+            if(metadataTypeExtensions != null && metadataTypeExtensions.size() > 0) {
+             MetadataType metaType = metadataTypeExtensions.get(0);
+             for(Object metaEntryObj : metaType.getMetaentry()) {
+                 MetaentryType entry = (MetaentryType) metaEntryObj;
+                 if(entry.getName() != null && entry.getName().equals("staffavailability")) {
+                     properties.put("staffavailability", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("workinghours")) {
+                     properties.put("workinghours", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("costpertimeunit")) {
+                     properties.put("costpertimeunit", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("duration")) {
+                     properties.put("duration", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("timeunit")) {
+                     properties.put("timeunit", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("range")) {
+                     properties.put("range", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("standarddeviation")) {
+                     properties.put("standarddeviation", entry.getValue());
+                 }
+                 if(entry.getName() != null && entry.getName().equals("distributiontype")) {
+                     properties.put("distributiontype", entry.getValue());
+                 }
+             }
+            }
         }
-        return null;
+        return properties;
     }
 
     protected FlowElement findElementInContainer(FlowElementsContainer container, String id) {
