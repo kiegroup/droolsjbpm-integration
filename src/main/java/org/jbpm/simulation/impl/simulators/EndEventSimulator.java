@@ -11,10 +11,10 @@ public class EndEventSimulator implements ActivitySimulator {
 
     public SimulationEvent simulate(Object activity, SimulationContext context) {
         NodeInstance nodeInstance = (NodeInstance) activity;
-        
+        long startTime = context.getClock().getCurrentTime();
         ProcessInstance pi = nodeInstance.getProcessInstance();
         
-        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), context.getStartTime(), context.getClock().getCurrentTime());
+        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), startTime, context.getClock().getCurrentTime(), context.getStartTime());
     }
 
 }

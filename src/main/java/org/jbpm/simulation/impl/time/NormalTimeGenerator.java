@@ -1,6 +1,7 @@
 package org.jbpm.simulation.impl.time;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math.random.RandomData;
 import org.apache.commons.math.random.RandomDataImpl;
@@ -12,7 +13,7 @@ public class NormalTimeGenerator implements TimeGenerator {
 
     private Map<String, Object> data;
     private static RandomData generator = new RandomDataImpl();
-    
+    private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
     
     public NormalTimeGenerator(Map<String, Object> data) {
         this.data = data;
@@ -21,10 +22,13 @@ public class NormalTimeGenerator implements TimeGenerator {
 
 
     public long generateTime() {
-
+        TimeUnit tu = SimulationUtils.getTimeUnit(data);
         long mean = SimulationUtils.asLong(data.get(SimulationConstants.DURATION));
+        mean = timeUnit.convert(mean, tu);
+        
         long sdv = SimulationUtils.asLong(data.get(SimulationConstants.STANDARD_DEVIATION));
-       
+        sdv = timeUnit.convert(sdv, tu);
+        
         return  (long) generator.nextGaussian(mean, sdv);
     }
 

@@ -7,9 +7,9 @@ public class HumanTaskActivitySimulationEvent extends ActivitySimulationEvent {
     
     public HumanTaskActivitySimulationEvent(String processId,
             long processInstanceId, String activityName, String activityId,
-            long duration, long waitTime, double resourceCost) {
+            long duration, long waitTime, double resourceCost, long startTime, long endTime) {
         
-        super(processId, processInstanceId, activityName, activityId, duration);
+        super(processId, processInstanceId, activityName, activityId, duration, startTime, endTime);
         this.waitTime = waitTime;
         this.resourceCost = resourceCost;
 

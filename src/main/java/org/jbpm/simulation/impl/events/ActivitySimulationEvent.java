@@ -10,8 +10,8 @@ public class ActivitySimulationEvent extends GenericSimulationEvent {
     
     
     public ActivitySimulationEvent(String processId, long processInstanceId,
-            String activityName, String activityId, long duration) {
-        super(processId, processInstanceId);
+            String activityName, String activityId, long duration, long startTime, long endTime) {
+        super(processId, processInstanceId, startTime, endTime);
         this.activityName = activityName;
         this.activityId = activityId;
         this.duration = duration;

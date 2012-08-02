@@ -18,7 +18,7 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
 
     public SimulationEvent simulate(Object activity, SimulationContext context) {
        NodeInstance stateNode = (NodeInstance) activity;
-       
+       long startTime = context.getClock().getCurrentTime();
        Map<String, Object> metadata = stateNode.getNode().getMetaData();
        
        ProcessInstance pi = stateNode.getProcessInstance();
@@ -32,7 +32,7 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
        // TODO calculate duration based on various strategies
        context.getClock().advanceTime(duration, TimeUnit.MILLISECONDS);
        
-       return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration);
+       return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration, startTime, context.getClock().getCurrentTime());
     }
 
 }

@@ -1,0 +1,49 @@
+//created on: Aug 2, 2012
+package simulation
+
+//list any import classes here.
+import org.jbpm.simulation.impl.events.*;
+import java.util.Date;
+
+
+//declare any global variables here
+declare ActivitySimulationEvent 
+    @role(event)
+end
+declare ActivityName
+    name : String
+end 
+
+rule "Insert activity names"
+no-loop
+salience 1
+    when
+        ActivitySimulationEvent( $name : activityName )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name ) );
+
+end
+
+rule "Calculate average duration for activity"
+salience 2
+no-loop
+    when
+        ActivityName($name : name)
+        $avg : Double()
+        from accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        average( $duration ) )
+        $min : Double()
+        from accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        min( $duration ) )
+        $max : Double()
+        from accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        max( $duration ) )
+    then
+        System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+
+end
+

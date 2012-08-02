@@ -5,12 +5,10 @@ import java.util.Date;
 public class EndSimulationEvent extends GenericSimulationEvent {
 
     private long processDuration;
-    private long endTime;
     
-    public EndSimulationEvent(String processId, long processInstanceId, long startTime, long endTime) {
-        super(processId, processInstanceId);
-        this.setEndTime(endTime);
-        this.setProcessDuration(endTime - startTime);
+    public EndSimulationEvent(String processId, long processInstanceId, long startTime, long endTime, long proceesStartTime) {
+        super(processId, processInstanceId, startTime, endTime);
+        this.setProcessDuration(endTime - proceesStartTime);
     }
 
     public long getProcessDuration() {

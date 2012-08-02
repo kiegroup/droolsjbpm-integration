@@ -5,19 +5,10 @@ import java.util.Date;
 
 public class StartSimulationEvent extends GenericSimulationEvent {
 
-    private long startTime;
     
-    public StartSimulationEvent(String processId, long processInstanceId, long startTime) {
-        super(processId, processInstanceId);
-        this.setStartTime(startTime);
-    }
+    public StartSimulationEvent(String processId, long processInstanceId, long startTime, long endTime) {
+        super(processId, processInstanceId, startTime, endTime);
 
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
     }
 
     @Override

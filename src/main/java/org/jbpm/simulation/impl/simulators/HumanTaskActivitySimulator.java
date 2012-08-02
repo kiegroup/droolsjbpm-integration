@@ -18,7 +18,7 @@ import org.jbpm.simulation.impl.ht.StaffPool;
 public class HumanTaskActivitySimulator implements ActivitySimulator {
 
     public SimulationEvent simulate(Object activity, SimulationContext context) {
-        
+        long startTime = context.getClock().getCurrentTime();
         NodeInstance stateNode = (NodeInstance) activity;
         
         Map<String, Object> metadata = stateNode.getNode().getMetaData();
@@ -39,7 +39,8 @@ public class HumanTaskActivitySimulator implements ActivitySimulator {
         
         context.getClock().advanceTime((duration + waitTime), TimeUnit.MILLISECONDS);
         
-        return new HumanTaskActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration, waitTime, resourceCost);
+        return new HumanTaskActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(),
+                bpmn2NodeId, duration, waitTime, resourceCost, startTime, context.getClock().getCurrentTime());
     }
 
 }
