@@ -9,6 +9,7 @@ import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.jbpm.simulation.PathContext;
+import org.jbpm.simulation.PathContext.Type;
 import org.jbpm.simulation.PathContextManager;
 
 public class GatewayElementHandler extends MainElementHandler {
@@ -37,10 +38,12 @@ public class GatewayElementHandler extends MainElementHandler {
     protected void handleExclusiveGateway(List<SequenceFlow> outgoing) {
         List<PathContext> locked = new ArrayList<PathContext>();
         PathContext context = manager.getContextFromStack();
+        PathContext contextAtThisNode = manager.cloneGivenWithoutPush(context);
+
         for (SequenceFlow seqFlow : outgoing) {
             FlowElement target = seqFlow.getTargetRef();
 
-            PathContext separatePath = manager.cloneGiven(context);
+            PathContext separatePath = manager.cloneGiven(contextAtThisNode);
             manager.addToPath(seqFlow, separatePath);
             super.handle(target, manager);
             separatePath.setLocked(true);
@@ -58,6 +61,8 @@ public class GatewayElementHandler extends MainElementHandler {
         // firstly cover simple xor based - number of paths is equal to number
         // of outgoing
         handleExclusiveGateway(outgoing);
+        Type currentType = manager.getContextFromStack().getType();
+        manager.getContextFromStack().setType(Type.ROOT);
 
         // next cover all combinations of paths
         if (outgoing.size() > 2) {
@@ -68,9 +73,9 @@ public class GatewayElementHandler extends MainElementHandler {
                 // first remove one that we currently processing as that is not
                 // a combination
                 copy.remove(flow);
-
+                PathContext contextAtThisNode = manager.cloneGivenWithoutPush(manager.getContextFromStack());
                 for (SequenceFlow copyFlow : copy) {
-                    manager.cloneGiven(manager.getContextFromStack());
+                    manager.cloneGiven(contextAtThisNode);
 
 
                     andCombination = new ArrayList<SequenceFlow>();
@@ -81,10 +86,11 @@ public class GatewayElementHandler extends MainElementHandler {
                 }
             }
         }
-
+        manager.getContextFromStack().setType(Type.ROOT);
         // lastly cover and based - is single path that goes through all at the
         // same time
         handleParallelGateway(outgoing);
+        manager.getContextFromStack().setType(currentType);
 
     }
 

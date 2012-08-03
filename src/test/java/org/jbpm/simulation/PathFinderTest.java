@@ -744,4 +744,67 @@ public class PathFinderTest {
        
     }
     
+    @Test
+    public void testTwoExclusiveGatewaysPaths() throws IOException {
+        List<String> expectedIds = new ArrayList<String>();
+        expectedIds.add("_35CEB9B5-9B97-4A03-9CC0-F0F2B75CC48F");
+        expectedIds.add("_019AADF3-AEC3-465E-8F42-978F9514D812");
+        expectedIds.add("_FC54B299-1A2A-424A-9DD9-71EF90B0C6FB");
+        expectedIds.add("_01AB999E-6125-40A0-A075-F4934A2C6E26");
+        expectedIds.add("_D25548C4-7489-4490-A11F-C77D266B0839");
+        expectedIds.add("_BCA17BDF-6A4D-4280-A7DB-C1F789276DEB");
+        expectedIds.add("_B74E134D-94B9-43FE-B676-AC66FDD7ACEC");
+        expectedIds.add("_27A5ADFE-AE4D-4CA9-938F-8D312E71C7CF");
+        expectedIds.add("_E78D4D9E-D6B3-4505-933D-7F1E56C6C35A");
+        
+        List<String> expectedIds2 = new ArrayList<String>();
+        expectedIds2.add("_35CEB9B5-9B97-4A03-9CC0-F0F2B75CC48F");
+        expectedIds2.add("_019AADF3-AEC3-465E-8F42-978F9514D812");
+        expectedIds2.add("_FC54B299-1A2A-424A-9DD9-71EF90B0C6FB");
+        expectedIds2.add("_01AB999E-6125-40A0-A075-F4934A2C6E26");
+        expectedIds2.add("_D25548C4-7489-4490-A11F-C77D266B0839");
+        expectedIds2.add("_740577B7-4823-492A-ABB8-7A529934B73E");
+        expectedIds2.add("_35E32997-CCDC-4DCA-8D29-94A7EEEF7BD9");
+        expectedIds2.add("_EB6847DE-9A18-489B-A538-F579FC8660E2");
+        expectedIds2.add("_AC1EC569-62BB-4DC3-8904-D4534E81AE53");
+        expectedIds2.add("_7D91D063-9E35-458E-BD75-DEC26A34A86D");
+        expectedIds2.add("_F2BF3F10-2A9B-4A62-9644-987A57ECFB0D");
+        expectedIds2.add("_FA2FB700-8DF7-464B-B245-386072170925");
+        expectedIds2.add("_87E15B98-AA2B-44EE-A22F-73B1E2B18F0C");
+        
+        List<String> expectedIds3 = new ArrayList<String>();
+        expectedIds3.add("_35CEB9B5-9B97-4A03-9CC0-F0F2B75CC48F");
+        expectedIds3.add("_019AADF3-AEC3-465E-8F42-978F9514D812");
+        expectedIds3.add("_FC54B299-1A2A-424A-9DD9-71EF90B0C6FB");
+        expectedIds3.add("_01AB999E-6125-40A0-A075-F4934A2C6E26");
+        expectedIds3.add("_D25548C4-7489-4490-A11F-C77D266B0839");
+        expectedIds3.add("_740577B7-4823-492A-ABB8-7A529934B73E");
+        expectedIds3.add("_35E32997-CCDC-4DCA-8D29-94A7EEEF7BD9");
+        expectedIds3.add("_EB6847DE-9A18-489B-A538-F579FC8660E2");
+        expectedIds3.add("_AC1EC569-62BB-4DC3-8904-D4534E81AE53");
+        expectedIds3.add("_105D5A6B-F81F-4A97-A63E-9AA675780762");
+        expectedIds3.add("_EA95786A-6513-4CF6-8391-C6D5F03E2A95");
+        expectedIds3.add("_122FE6F7-4116-45D0-97F1-8EDAEB5FBBD5");
+        expectedIds3.add("_DE403D12-FF83-47C3-AB97-92D16199262F");
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-TwoExclusiveGateways.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+        
+        assertNotNull(paths);
+        assertEquals(3, paths.size());
+        assertTrue("Found activities do not match expected", TestUtils.matchExpected(paths, expectedIds, expectedIds2, expectedIds3));
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(3, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
+        
+    }
+    
 }

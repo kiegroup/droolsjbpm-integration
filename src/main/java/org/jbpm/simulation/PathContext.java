@@ -9,9 +9,11 @@ import org.eclipse.bpmn2.SequenceFlow;
 
 public class PathContext {
     
-    enum Type {
+    public enum Type {
         ROOT,
-        ACTIVE;
+        ACTIVE,
+        COMPLETED,
+        TEMP;
     }
 
     private List<FlowElement> pathElements = new ArrayList<FlowElement>();
@@ -48,26 +50,6 @@ public class PathContext {
 
     public void setPathElements(List<FlowElement> pathElements) {
         this.pathElements = pathElements;
-    }
-    
-    public PathContext cloneCurrent() {
-        
-        PathContext clone = new PathContext(Type.ACTIVE);
-        clone.setCanBeFinished(this.isCanBeFinished());
-        
-        clone.setPathElements(new ArrayList<FlowElement>(getPathElements()));
-        
-        return clone;
-    }
-    
-    public PathContext cloneGiven(PathContext toclone) {
-        
-        PathContext clone = new PathContext(Type.ACTIVE);
-        clone.setCanBeFinished(toclone.isCanBeFinished());
-        
-        clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
-        
-        return clone;
     }
 
     public boolean isCanBeFinished() {

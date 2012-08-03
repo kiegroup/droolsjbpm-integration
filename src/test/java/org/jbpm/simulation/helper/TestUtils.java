@@ -97,15 +97,17 @@ public class TestUtils {
         if (!"true".equalsIgnoreCase(System.getProperty("test.debug.off"))) {
             System.out.println("###################" + name + "###################");
             for (PathContext context : paths) {
-                System.out.println("$$$$$$$$ PATH: " + context.getId());
+                System.out.println("$$$$$$$$ PATH: " + context.getId() + " " + context.getType());
                 System.out.println("$$$ AS TEXT:");
                 for (FlowElement fe : context.getPathElements()) {
                     System.out.println(fe.getName() + "  - " + fe.eClass().getName());
                 }
             }
-            System.out.println("$$$ AS JSON:");
-            System.out.println(jsonPaths.toString());
-            System.out.println("$$$$$$$$");
+            if (jsonPaths != null) {
+                System.out.println("$$$ AS JSON:");
+                System.out.println(jsonPaths.toString());
+                System.out.println("$$$$$$$$");
+            }
             System.out.println("#####################################################");
         }
     }

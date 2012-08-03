@@ -38,7 +38,7 @@ public class PathContextManager {
         } else {
             // add nodes to all active contexts
             for (PathContext ctx : this.paths) {
-                if (ctx.getType() != PathContext.Type.ROOT) {
+                if (ctx.getType() == PathContext.Type.ACTIVE) {
                     ctx.addPathElement(element);
                 }
             }
@@ -51,7 +51,7 @@ public class PathContextManager {
         } else {
             // add nodes to all active contexts
             for (PathContext ctx : this.paths) {
-                if (ctx.getType() != PathContext.Type.ROOT) {
+                if (ctx.getType() == PathContext.Type.ACTIVE) {
                     ctx.addAllPathElement(elements);
                 }
             }
@@ -69,16 +69,28 @@ public class PathContextManager {
         return clone;
     }
     
+    public PathContext cloneGivenWithoutPush(PathContext toclone) {
+        
+        PathContext clone = new PathContext(Type.ACTIVE);
+        clone.setCanBeFinished(toclone.isCanBeFinished());
+        
+        clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
+        toclone.setType(Type.TEMP);
+        return clone;
+    }
+    
     public Stack<PathContext> getPaths() {
         return this.paths;
     }
     
     public void finalizePath() {
         PathContext context = getContextFromStack();
-
+        
         if (context.isCanBeFinished()) {
+            
             // no outgoing sequence flow means end of path
             PathContext completePath = this.paths.pop();
+            completePath.setType(Type.COMPLETED);
             this.completePaths.add(completePath);
         }
     }
@@ -89,7 +101,8 @@ public class PathContextManager {
     
     public void complete() {
         for (PathContext context : this.paths) {
-            if (context.getType() != PathContext.Type.ROOT) {
+            
+            if (context.getType() != PathContext.Type.ROOT && context.getType() != PathContext.Type.TEMP) {
                 this.completePaths.add(context);
             }
         }
