@@ -24,10 +24,10 @@ public class EmbeddedSubprocessHandler extends MainElementHandler {
             }
         }
         boolean canBeFinsihed = manager.getContextFromStack().isCanBeFinished();
-        manager.getContextFromStack().setCanBeFinished(false);
+        manager.getContextFromStack().setCanBeFinishedNoIncrement(false);
         super.handle(start, manager);
        
-        manager.getContextFromStack().setCanBeFinished(canBeFinsihed);
+        manager.getContextFromStack().setCanBeFinishedNoIncrement(canBeFinsihed);
         List<SequenceFlow> out = getOutgoing(element);
         for (SequenceFlow flow : out) {
             manager.addToPath(flow, manager.getContextFromStack());

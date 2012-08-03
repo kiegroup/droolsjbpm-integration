@@ -1,14 +1,15 @@
 package org.jbpm.simulation.helper;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.SessionConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
-import org.drools.conf.Option;
 import org.drools.impl.EnvironmentFactory;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
@@ -49,7 +50,7 @@ public class TestUtils {
     public static boolean matchExpected(List<PathContext> paths, List<String>... expectedIds) {
         
         for (PathContext context : paths) {
-            List<FlowElement> elements = context.getPathElements();
+            List<FlowElement> elements = removeDuplicates(context.getPathElements());
             boolean match = false;
             for (int i = 0; i < expectedIds.length; i++) {
                 List<String> expected = expectedIds[i];
@@ -165,5 +166,20 @@ public class TestUtils {
         n.register(ThrowLinkNode.class, new CreateNewNodeFactory(
                 SimulationNodeInstance.class));
         return session;
+    }
+    
+    public static List<FlowElement> removeDuplicates(List<FlowElement> orig) {
+        
+        Set<String> uniqueIds = new HashSet<String>();
+        List<FlowElement> unique = new ArrayList<FlowElement>();
+        
+        for (FlowElement fElement : orig) {
+            if (!uniqueIds.contains(fElement.getId())) {
+                uniqueIds.add(fElement.getId());
+                unique.add(fElement);
+            }
+        }
+        System.out.println("Size of flow elements after removing duplicates " + unique.size());
+        return unique;
     }
 }

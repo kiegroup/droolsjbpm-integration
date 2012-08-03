@@ -21,6 +21,7 @@ public class PathContext {
     private boolean canBeFinished = true;
     private boolean locked = false;
     private String id; 
+    private int canBeFinishedCounter = 0;
     
     public PathContext() {
     	this.id = String.valueOf(UUID.randomUUID());
@@ -55,9 +56,26 @@ public class PathContext {
     public boolean isCanBeFinished() {
         return canBeFinished;
     }
+    
+    public void setCanBeFinishedNoIncrement(boolean canBeFinished) {
+        this.canBeFinished = canBeFinished;
+    }
 
     public void setCanBeFinished(boolean canBeFinished) {
-        this.canBeFinished = canBeFinished;
+        if (canBeFinished) {
+            
+            if (canBeFinishedCounter == 1) {
+                this.canBeFinished = true;
+            }
+            canBeFinishedCounter--;
+        } else {
+
+            if (canBeFinishedCounter == 0) {
+                this.canBeFinished = false;
+            } 
+            canBeFinishedCounter++;
+            
+        }
     }
 
     public Type getType() {

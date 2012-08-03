@@ -61,7 +61,7 @@ public class PathContextManager {
     public PathContext cloneGiven(PathContext toclone) {
         
         PathContext clone = new PathContext(Type.ACTIVE);
-        clone.setCanBeFinished(toclone.isCanBeFinished());
+        clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
         
         clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
         
@@ -72,7 +72,7 @@ public class PathContextManager {
     public PathContext cloneGivenWithoutPush(PathContext toclone) {
         
         PathContext clone = new PathContext(Type.ACTIVE);
-        clone.setCanBeFinished(toclone.isCanBeFinished());
+        clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
         
         clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
         toclone.setType(Type.TEMP);
