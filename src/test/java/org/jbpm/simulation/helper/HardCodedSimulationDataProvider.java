@@ -5,11 +5,12 @@ import java.util.Map;
 
 import org.drools.definition.process.Node;
 import org.jbpm.simulation.SimulationDataProvider;
+import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.util.SimulationConstants;
 
 public class HardCodedSimulationDataProvider implements SimulationDataProvider {
 
-    public Map<String, Object> getSimulationDataForNode(String processId, Node node) {
+    public Map<String, Object> getSimulationDataForNode(Node node) {
         Map<String, Object> data = new HashMap<String, Object>();
         
         String nodeId = (String) node.getMetaData().get("UniqueId");
@@ -31,5 +32,12 @@ public class HardCodedSimulationDataProvider implements SimulationDataProvider {
         }
         return data;
     }
+
+    public double calculatePathProbability(SimulationPath path) {
+        // not supported
+        return 100;
+    }
+    
+    
 
 }

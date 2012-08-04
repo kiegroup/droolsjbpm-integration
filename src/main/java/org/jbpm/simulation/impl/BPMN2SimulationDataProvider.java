@@ -12,7 +12,6 @@ import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.RootElement;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMapUtil.FeatureEList;
 import org.jboss.drools.DroolsPackage;
@@ -20,6 +19,8 @@ import org.jboss.drools.MetadataType;
 import org.jboss.drools.MetaentryType;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.util.BPMN2Utils;
+import org.jbpm.simulation.util.SimulationConstants;
+import org.jbpm.simulation.util.SimulationUtils;
 
 public class BPMN2SimulationDataProvider implements SimulationDataProvider {
 
@@ -42,10 +43,14 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
             }
         }
     }
-    
-    public Map<String, Object> getSimulationDataForNode(String processId,
-            Node node) {
+    public Map<String, Object> getSimulationDataForNode(Node node) {
         String nodeId = (String) node.getMetaData().get("UniqueId");
+        
+        return getSimulationDataForNode(nodeId);
+    }
+    public Map<String, Object> getSimulationDataForNode(
+            String nodeId) {
+        
         FlowElement foundElement = null;
         if (localCache.containsKey(nodeId)) {
             foundElement = localCache.get(nodeId);
@@ -92,6 +97,9 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                  if(entry.getName() != null && entry.getName().equals("distributiontype")) {
                      properties.put("distributiontype", entry.getValue());
                  }
+                 if(entry.getName() != null && entry.getName().equals("probability")) {
+                     properties.put("probability", entry.getValue());
+                 }
              }
             }
         }
@@ -113,5 +121,23 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         }
         
         return null;
+    }
+    
+    public double calculatePathProbability(SimulationPath path) {
+        double probability = 100;
+        for (String sequenceFlowId : path.getSequenceFlowsIds()) {
+            String probabilityFromElement = (String) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
+            if (probabilityFromElement != null) {
+                double transitionProbability = SimulationUtils.asDouble(probabilityFromElement);
+                if (transitionProbability > 0) {
+                    probability = probability * (transitionProbability / 100);
+                }
+            }
+        }
+        double result = probability / 100;
+        
+        path.setProbability(result);
+        
+        return result;
     }
 }

@@ -1,0 +1,80 @@
+package org.jbpm.simulation;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.drools.KnowledgeBase;
+import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.ResourceType;
+import org.drools.command.World;
+import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.io.ResourceFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
+import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
+import org.jbpm.simulation.impl.SimulateProcessPathCommand;
+import org.jbpm.simulation.impl.SimulationPath;
+import org.junit.Test;
+
+public class SimulateProcessTest {
+
+    @Test
+    public void testSimpleExclusiveGatewayTest() {
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
+        
+        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
+        assertEquals(2, paths.size());
+        
+        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2")));
+        
+        
+        SimulationDataProvider provider = context.getDataProvider();
+        
+        SimulationFluent f = new DefaultSimulationFluent();
+        // @formatter:off
+        // FIXME why building knowledge base on this level does not work??
+//        f.newKnowledgeBuilder()
+//                .add( ResourceFactory.newClassPathResource("BPMN-SimpleExclusiveGatewayProcess.bpmn2"),
+//                        ResourceType.BPMN2 )
+//                  .end(World.ROOT, KnowledgeBuilder.class.getName() )
+//                .newKnowledgeBase()
+//                  .addKnowledgePackages()
+//                  .end(World.ROOT, KnowledgeBase.class.getName() );
+        
+        int numberOfAllInstances = 10;
+        int counter = 0;
+        // default interval 2 seconds, meaning each step in a path will be started after 2 seconds
+        long interval = 2*1000*60;
+        for (SimulationPath path : paths) {
+            
+            double probability = provider.calculatePathProbability(path);
+            f.newPath("path" + counter);
+
+            f.newKnowledgeBuilder().add( ResourceFactory.newClassPathResource("BPMN-SimpleExclusiveGatewayProcess.bpmn2"),
+                    ResourceType.BPMN2 )
+              .end(World.ROOT, KnowledgeBuilder.class.getName() )
+            .newKnowledgeBase()
+              .addKnowledgePackages()
+              .end(World.ROOT, KnowledgeBase.class.getName() );
+            
+            // count how many instances/steps should current path have
+            int instancesOfPath = (int) (numberOfAllInstances * probability);
+            
+            for (int i = 0; i < instancesOfPath; i++) {
+                f.newStep( interval * i )
+                    .newStatefulKnowledgeSession()
+                        .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                    .addCommand(new SimulateProcessPathCommand("defaultPackage.test", context, path));
+            }
+            
+            counter++;
+        }
+        f.runSimulation();
+        // @formatter:on
+        
+    }
+
+}

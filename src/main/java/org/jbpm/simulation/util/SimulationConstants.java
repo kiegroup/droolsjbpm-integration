@@ -10,4 +10,5 @@ public class SimulationConstants {
     public static final String RANGE = "range";
     public static final String STANDARD_DEVIATION = "standarddeviation";
     public static final String DISTRIBUTION_TYPE = "distributiontype";
+    public static final String PROBABILITY = "probability";
 }

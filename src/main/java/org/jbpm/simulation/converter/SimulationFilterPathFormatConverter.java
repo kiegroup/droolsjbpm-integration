@@ -8,6 +8,7 @@ import org.eclipse.bpmn2.SequenceFlow;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathFormatConverter;
 import org.jbpm.simulation.impl.SimulationPath;
+import org.jbpm.simulation.util.SimulationUtils;
 
 public class SimulationFilterPathFormatConverter implements
         PathFormatConverter<List<SimulationPath>> {
@@ -29,5 +30,4 @@ public class SimulationFilterPathFormatConverter implements
         }
         return allPaths;
     }
-
 }

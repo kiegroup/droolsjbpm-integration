@@ -11,6 +11,14 @@ public class SimulationPath {
     private List<String> activityIds = new ArrayList<String>();
     private List<PathContext> origPaths = new ArrayList<PathContext>();
     
+    private double probability;
+    
+    public double getProbability() {
+        return probability;
+    }
+    public void setProbability(double probability) {
+        this.probability = probability;
+    }
     public void addSequenceFlow(String id) {
         this.sequenceFlowsIds.add(id);
     }

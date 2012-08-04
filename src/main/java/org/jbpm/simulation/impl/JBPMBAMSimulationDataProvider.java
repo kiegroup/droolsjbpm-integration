@@ -24,6 +24,8 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
     private boolean processLoaded = false;
     private Map<String, Map<String, Object>> processStatistics = new HashMap<String, Map<String, Object>>();
     
+    private String processId;
+    
     private static final String GET_PROCESS_INFO_QUERY = 
             "select nodeid, count(processinstanceid), min(log_date), max(log_date) from nodeinstancelog where processid = ? and type = ? group by nodeid;";
     
@@ -33,7 +35,7 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
     private static final String PROCESS_INSTANCE_COUNT_FOR_PATH_QUERY = 
             "select count(processinstanceid) from nodeinstancelog where processid = ? and nodeid in (@1) group by processinstanceid;";
     
-    public JBPMBAMSimulationDataProvider(String bamDataSource) {
+    public JBPMBAMSimulationDataProvider(String bamDataSource, String processId) {
         try {
             InitialContext ctx = new InitialContext();
             this.bamDataSource = (DataSource) ctx.lookup(bamDataSource);
@@ -41,15 +43,16 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to get data source: " + bamDataSource, e);
         }
+        this.processId = processId;
     }
 
-    public JBPMBAMSimulationDataProvider(DataSource bamDataSource) {
+    public JBPMBAMSimulationDataProvider(DataSource bamDataSource, String processId) {
         this.bamDataSource = bamDataSource;
+        this.processId = processId;
     }
 
 
-    public Map<String, Object> getSimulationDataForNode(String processId,
-            Node node) {
+    public Map<String, Object> getSimulationDataForNode(Node node) {
         
         if (!processLoaded) {
             loadProcessInfo(processId);
@@ -182,7 +185,7 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
     /*
      * Experimental  - not really working yet....
      */
-    public double calculatePathProbability(String processId, List<String> path) {
+    public double calculatePathProbability(SimulationPath path) {
         
         Connection connection = null;
         PreparedStatement pstmt = null;
@@ -201,13 +204,13 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
                 instanceCount = rs.getInt(1);
             }
             
-            String parameters = buildParameterPlaceHolder(path.size());
+            String parameters = buildParameterPlaceHolder(path.getActivityIds().size());
             String query = PROCESS_INSTANCE_COUNT_FOR_PATH_QUERY.replaceFirst("@1", parameters);
             pstmt = connection.prepareStatement(query);
             pstmt.setString(1, processId);
             int parameterIndex = 2;
             
-            for (String node : path) {
+            for (String node : path.getActivityIds()) {
                 pstmt.setString(parameterIndex, node.replaceFirst("_", ""));
                 parameterIndex++;
             }
@@ -218,7 +221,11 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
                 pathcount = rs.getInt(1)/2;
             }
             
-            return (100 * pathcount) / instanceCount;
+            double result = (100 * pathcount) / instanceCount;
+            
+            path.setProbability(result);
+            
+            return result;
             
         } catch (SQLException e) {
             e.printStackTrace();

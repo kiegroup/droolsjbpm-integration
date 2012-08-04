@@ -44,7 +44,7 @@ public class StaffPoolImpl implements StaffPool {
 	    
 	    SimulationDataProvider provider = SimulationContext.getContext().getDataProvider();
 	    
-	    properties = provider.getSimulationDataForNode(processId, element);
+	    properties = provider.getSimulationDataForNode(element);
 		
 		this.elementTimeUnit = SimulationUtils.getTimeUnit(properties);
 		this.distibutionType = (String) properties.get(SimulationConstants.DISTRIBUTION_TYPE);

@@ -43,7 +43,7 @@ public class JBPMBamSimulationDataProviderTest {
     
     @Test
     public void testLoadData() {
-        SimulationDataProvider provider = new JBPMBAMSimulationDataProvider("jdbc/jbpm-ds");
+        SimulationDataProvider provider = new JBPMBAMSimulationDataProvider("jdbc/jbpm-ds", "com.sample.test");
         Node node = new NodeImpl() {
 
             @Override
@@ -52,7 +52,7 @@ public class JBPMBamSimulationDataProviderTest {
             }
             
         };
-        Map<String, Object> data = provider.getSimulationDataForNode("com.sample.test", node);
+        Map<String, Object> data = provider.getSimulationDataForNode(node);
         assertNotNull(data);
     }
     
@@ -61,7 +61,7 @@ public class JBPMBamSimulationDataProviderTest {
         PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ExclusiveSplit.bpmn2"));
         
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
-        JBPMBAMSimulationDataProvider provider = new JBPMBAMSimulationDataProvider("jdbc/jbpm-ds");
+        JBPMBAMSimulationDataProvider provider = new JBPMBAMSimulationDataProvider("jdbc/jbpm-ds", "com.sample.test");
         SimulationContext context = SimulationContextFactory.newContext(provider);
         context.setStartTime(System.currentTimeMillis());
         
@@ -71,7 +71,7 @@ public class JBPMBamSimulationDataProviderTest {
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
             
             session.startProcess("com.sample.test");
-            double probability = provider.calculatePathProbability("com.sample.test", path.getActivityIds());
+            double probability = provider.calculatePathProbability(path);
             System.out.println("Path probability is " + probability);
             System.out.println("#####################################");
         }
