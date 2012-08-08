@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 import org.drools.examples.broker.BrokerExample;
 import org.drools.examples.conway.ui.ConwayGUI;
 import org.drools.examples.numberguess.NumberGuessExample;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DroolsJbpmIntegrationExamplesApp extends JFrame {
 
@@ -37,10 +39,13 @@ public class DroolsJbpmIntegrationExamplesApp extends JFrame {
         droolsJbpmIntegrationExamplesApp.setVisible(true);
     }
 
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+
     public DroolsJbpmIntegrationExamplesApp() {
         super("Drools and jBPM integration examples");
         setContentPane(createContentPane());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        logger.info("DroolsJbpmIntegrationExamplesApp started.");
     }
 
     private Container createContentPane() {

@@ -95,12 +95,22 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
-    
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
     <!-- Examples only dependencies. -->
     <!--
       WARNING: every examples only dependency must be properly dealt with in
       droolsjbpm-integration-distribution/src/main/assembly/assembly-droolsjbpm-integration.xml
     -->
+    <dependency><!-- For example app logging: configure in src/java/resources/logback.xml -->
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
   </dependencies>
 
   <profiles>

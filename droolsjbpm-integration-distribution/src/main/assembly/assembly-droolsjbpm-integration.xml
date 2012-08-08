@@ -62,8 +62,10 @@
     <dependencySet>
       <excludes>
         <exclude>org.drools:droolsjbpm-integration-examples</exclude>
+        <exclude>ch.qos.logback:logback-core</exclude><!-- Examples dependency -->
+        <exclude>ch.qos.logback:logback-classic</exclude><!-- Examples dependency -->
         <exclude>org.drools:droolsjbpm-integration-docs</exclude>
-        <!--<exclude>*:javadoc</exclude>-->
+        <!--<exclude>*:*:jar:javadoc</exclude>-->
         <exclude>*:sources</exclude>
       </excludes>
       <outputDirectory>binaries</outputDirectory>
@@ -72,6 +74,8 @@
     <dependencySet>
       <includes>
         <include>org.drools:droolsjbpm-integration-examples:jar</include>
+        <include>ch.qos.logback:logback-core</include><!-- Examples dependency -->
+        <include>ch.qos.logback:logback-classic</include><!-- Examples dependency -->
       </includes>
       <excludes>
         <exclude>org.drools:droolsjbpm-integration-examples:jar:sources</exclude>
