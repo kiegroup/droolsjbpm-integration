@@ -85,6 +85,7 @@ no-loop
         from accumulate(
         HumanTaskActivitySimulationEvent($waitTime : waitTime, activityName == $name ) over window:length( 100 ),
         max( $waitTime ) )
+        
         $avg : Double()
         from accumulate(
         HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
@@ -97,9 +98,24 @@ no-loop
         from accumulate(
         HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
         max( $duration ) )
+        
+        $avgru : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($resourceUtilization : resourceUtilization, activityName == $name ) over window:length( 100 ),
+        average( $resourceUtilization ) )
+        $minru : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($resourceUtilization : resourceUtilization, activityName == $name ) over window:length( 100 ),
+        min( $resourceUtilization ) )
+        $maxru : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($resourceUtilization : resourceUtilization, activityName == $name ) over window:length( 100 ),
+        max( $resourceUtilization ) )
     then
-        System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt);
-        simulation.add(new HTAggregatedSimulationEvent($name, "", $min, $avg, $max, $minwt, $avgwt, $maxwt, 0));
+        System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
+        + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
+         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru);
+        simulation.add(new HTAggregatedSimulationEvent($name, "", $min, $avg, $max, $minwt, $avgwt, $maxwt, $minru, $avgru, $maxru));
 
 end
 

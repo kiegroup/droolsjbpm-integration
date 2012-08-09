@@ -5,14 +5,17 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
     public HTAggregatedSimulationEvent(String activityName, String activityId,
             double minExecutionTime, double avgExecutionTime,
             double maxExecutionTime, double minWaitTime, double avgWaitTime,
-            double maxWaitTime, double resourceUtilization) {
+            double maxWaitTime, double minResourceUtilization, double avgResourceUtilization, double maxResourceUtilization) {
         
         super(activityName, activityId, minExecutionTime, avgExecutionTime,
                 maxExecutionTime);
         this.minWaitTime = minWaitTime;
         this.avgWaitTime = avgWaitTime;
         this.maxWaitTime = maxWaitTime;
-        this.resourceUtilization = resourceUtilization;
+        
+        this.minResourceUtilization = minResourceUtilization;
+        this.avgResourceUtilization = avgResourceUtilization;
+        this.maxResourceUtilization = maxResourceUtilization;
     }
 
 
@@ -20,9 +23,11 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
     private double avgWaitTime;
     private double maxWaitTime;
     
+    private double minResourceUtilization;
+    private double avgResourceUtilization;
+    private double maxResourceUtilization;
     
     
-    private double resourceUtilization;
 
     public double getMinWaitTime() {
         return minWaitTime;
@@ -48,13 +53,29 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
         this.maxWaitTime = maxWaitTime;
     }
 
-    public double getResourceUtilization() {
-        return resourceUtilization;
+    public double getMinResourceUtilization() {
+        return minResourceUtilization;
     }
 
-    public void setResourceUtilization(double resourceUtilization) {
-        this.resourceUtilization = resourceUtilization;
+    public void setMinResourceUtilization(double minResourceUtilization) {
+        this.minResourceUtilization = minResourceUtilization;
     }
-    
+
+    public double getAvgResourceUtilization() {
+        return avgResourceUtilization;
+    }
+
+    public void setAvgResourceUtilization(double avgResourceUtilization) {
+        this.avgResourceUtilization = avgResourceUtilization;
+    }
+
+    public double getMaxResourceUtilization() {
+        return maxResourceUtilization;
+    }
+
+    public void setMaxResourceUtilization(double maxResourceUtilization) {
+        this.maxResourceUtilization = maxResourceUtilization;
+    }
+
     
 }

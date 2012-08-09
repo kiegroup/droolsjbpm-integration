@@ -8,6 +8,7 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.jbpm.simulation.AggregatedSimulationEvent;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 
@@ -61,7 +62,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
         return this.ksession;
     }
     
-    public List<AggregatedActivitySimulationEvent> getAggregatedEvents() {
-        return (List<AggregatedActivitySimulationEvent>) this.ksession.getGlobal("simulation");
+    public List<AggregatedSimulationEvent> getAggregatedEvents() {
+        return (List<AggregatedSimulationEvent>) this.ksession.getGlobal("simulation");
     }
 }

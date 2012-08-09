@@ -35,12 +35,14 @@ public class HumanTaskActivitySimulator implements ActivitySimulator {
         StaffPool pool = context.getStaffPoolManager().getActivityPool(node.getName());
         
         long waitTime = pool.allocate(context.getClock().getCurrentTime());
-        double resourceCost = 2.5;
+        double resourceCost = pool.getResourceCost();
+        double resourceUtilization = pool.getResourceUtilization();
         
         context.getClock().advanceTime((duration + waitTime), TimeUnit.MILLISECONDS);
         
         return new HumanTaskActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(),
-                bpmn2NodeId, duration, waitTime, resourceCost, startTime, context.getClock().getCurrentTime());
+                bpmn2NodeId, duration, waitTime, resourceCost, startTime, 
+                context.getClock().getCurrentTime(), resourceUtilization);
     }
 
 }

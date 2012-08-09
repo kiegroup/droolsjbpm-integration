@@ -14,8 +14,6 @@ import org.jbpm.simulation.helper.TestUtils;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
-import org.jbpm.simulation.impl.events.ActivitySimulationEvent;
-import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 import org.junit.Test;
 
 public class WorkingMemorySimulationRepositoryTest {
@@ -70,7 +68,7 @@ public class WorkingMemorySimulationRepositoryTest {
             }
         }
         ((WorkingMemorySimulationRepository) context.getRepository()).fireAllRules();
-        List<AggregatedActivitySimulationEvent> results = ((WorkingMemorySimulationRepository) context.getRepository()).getAggregatedEvents();
+        List<AggregatedSimulationEvent> results = ((WorkingMemorySimulationRepository) context.getRepository()).getAggregatedEvents();
         
         assertNotNull(results);
         assertEquals(3, results.size());

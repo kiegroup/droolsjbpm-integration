@@ -7,10 +7,11 @@ public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
     protected String activityName;
     protected String activityId;
     protected long duration;
-    
+    private double resourceUtilization;
+
     public HumanTaskActivitySimulationEvent(String processId,
             long processInstanceId, String activityName, String activityId,
-            long duration, long waitTime, double resourceCost, long startTime, long endTime) {
+            long duration, long waitTime, double resourceCost, long startTime, long endTime, double resourceUtilization) {
         
         super(processId, processInstanceId, startTime, endTime);
         this.duration = duration;
@@ -18,6 +19,7 @@ public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
         this.activityName = activityName;
         this.waitTime = waitTime;
         this.resourceCost = resourceCost;
+        this.resourceUtilization = resourceUtilization;
 
     }
 
@@ -61,11 +63,20 @@ public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
         this.duration = duration;
     }
 
+    public double getResourceUtilization() {
+        return resourceUtilization;
+    }
+
+    public void setResourceUtilization(double resourceUtilization) {
+        this.resourceUtilization = resourceUtilization;
+    }
+    
     @Override
     public String toString() {
         
         return "UserTaskActivitySimulationEvent[process=" + processId + ", instance=" 
         + processInstanceId + ", activity=" + activityName + ", duration=" + duration/1000+" seconds" +
-        		", wait time=" + waitTime/1000 + " seconds , resource cost=" +resourceCost +"]";
+        		", wait time=" + waitTime/1000 + " seconds , resource cost=" +resourceCost +
+        		", resource utilization=" +resourceUtilization +"]";
     }
 }
