@@ -17,7 +17,7 @@
           </tns:metaentry>
           <tns:metaentry>
             <tns:name>timeunit</tns:name>
-            <tns:value>miliseconds</tns:value>
+            <tns:value>minutes</tns:value>
           </tns:metaentry>
           <tns:metaentry>
             <tns:name>standarddeviation</tns:name>
@@ -54,7 +54,7 @@
           </tns:metaentry>
           <tns:metaentry>
             <tns:name>timeunit</tns:name>
-            <tns:value>miliseconds</tns:value>
+            <tns:value>minutes</tns:value>
           </tns:metaentry>
           <tns:metaentry>
             <tns:name>standarddeviation</tns:name>

@@ -16,7 +16,6 @@ public class SimulationStartNodeInstance extends StartNodeInstance {
 
     @Override
     public void internalTrigger(NodeInstance from, String type) {
-        System.out.println("Triggered " + getNode().getName() + " id " + getNode().getMetaData().get("UniqueId") + this.toString());
         
         SimulationContext context = SimulationContext.getContext();
 

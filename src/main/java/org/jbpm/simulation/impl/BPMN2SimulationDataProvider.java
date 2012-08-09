@@ -1,6 +1,8 @@
 package org.jbpm.simulation.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,12 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     
     public BPMN2SimulationDataProvider(FlowElementsContainer container) {
         this.container = container;
+    }
+    
+    public BPMN2SimulationDataProvider(String bpmn2xml) {
+
+        this(new ByteArrayInputStream(getBytes(bpmn2xml)));
+
     }
     
     public BPMN2SimulationDataProvider(InputStream bpmn2Stream) {
@@ -139,5 +147,13 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         path.setProbability(result);
         
         return result;
+    }
+    
+    private static byte[] getBytes(String string) {
+        try {
+            return string.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 }

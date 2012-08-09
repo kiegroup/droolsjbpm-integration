@@ -1,0 +1,126 @@
+//created on: Aug 2, 2012
+package simulation
+
+//list any import classes here.
+import org.jbpm.simulation.impl.events.*;
+import java.util.Date;
+
+
+//declare any global variables here
+global java.util.List simulation;
+
+declare ActivitySimulationEvent 
+    @role(event)
+end
+declare HumanTaskActivitySimulationEvent 
+    @role(event)
+end
+declare EndSimulationEvent 
+    @role(event)
+end
+declare ActivityName
+    name : String
+    type : String
+end 
+
+rule "Insert activity names"
+no-loop
+salience 10
+    when
+        ActivitySimulationEvent( $name : activityName )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name, "abstract" ) );
+
+end
+
+rule "Insert activity names for ht"
+no-loop
+salience 10
+    when
+        HumanTaskActivitySimulationEvent( $name : activityName )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name, "ht" ) );
+
+end
+
+rule "Calculate average duration for activity"
+salience 20
+no-loop
+    when
+        ActivityName($name : name, type=="abstract")
+        $avg : Double()
+        from accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        average( $duration ) )
+        $min : Double()
+        from accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        min( $duration ) )
+        $max : Double()
+        from accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        max( $duration ) )
+    then
+        System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+        simulation.add(new AggregatedActivitySimulationEvent($name, "", $min, $avg, $max));
+
+end
+
+rule "Calculate average duration for human activity"
+salience 20
+no-loop
+    when
+        ActivityName($name : name, type == "ht")
+        $avgwt : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($waitTime : waitTime, activityName == $name ) over window:length( 100 ),
+        average( $waitTime ) )
+        $minwt : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($waitTime : waitTime, activityName == $name ) over window:length( 100 ),
+        min( $waitTime ) )
+        $maxwt : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($waitTime : waitTime, activityName == $name ) over window:length( 100 ),
+        max( $waitTime ) )
+        $avg : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        average( $duration ) )
+        $min : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        min( $duration ) )
+        $max : Double()
+        from accumulate(
+        HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        max( $duration ) )
+    then
+        System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt);
+        simulation.add(new HTAggregatedSimulationEvent($name, "", $min, $avg, $max, $minwt, $avgwt, $maxwt, 0));
+
+end
+
+rule "Calculate average duration for process"
+salience 3
+no-loop
+    when
+        $avg : Double()
+        from accumulate(
+        EndSimulationEvent($duration : processDuration) over window:length( 100 ),
+        average( $duration ) )
+        $min : Double()
+        from accumulate(
+        EndSimulationEvent($duration : processDuration) over window:length( 100 ),
+        min( $duration ) )
+        $max : Double()
+        from accumulate(
+        EndSimulationEvent($duration : processDuration) over window:length( 100 ),
+        max( $duration ) )
+    then
+        System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+        simulation.add(new AggregatedProcessSimulationEvent($min, $avg, $max));
+
+end

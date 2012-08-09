@@ -1,5 +1,8 @@
 package org.jbpm.simulation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -12,6 +15,7 @@ import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.jbpm.simulation.impl.events.ActivitySimulationEvent;
+import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 import org.junit.Test;
 
 public class WorkingMemorySimulationRepositoryTest {
@@ -23,7 +27,7 @@ public class WorkingMemorySimulationRepositoryTest {
         
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
         SimulationContext context = SimulationContextFactory.newContext(new HardCodedSimulationDataProvider()
-        , new WorkingMemorySimulationRepository("printOutRule.drl"));
+        , new WorkingMemorySimulationRepository(true, "printOutRule.drl"));
         
         
         for (SimulationPath path : paths) {
@@ -47,7 +51,7 @@ public class WorkingMemorySimulationRepositoryTest {
         
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
         SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn"))
-        , new WorkingMemorySimulationRepository("cepRules.drl"));
+        , new WorkingMemorySimulationRepository("default.simulation.rules.drl"));
 
         
         for (int i =0; i < 5; i++ ){
@@ -66,5 +70,9 @@ public class WorkingMemorySimulationRepositoryTest {
             }
         }
         ((WorkingMemorySimulationRepository) context.getRepository()).fireAllRules();
+        List<AggregatedActivitySimulationEvent> results = ((WorkingMemorySimulationRepository) context.getRepository()).getAggregatedEvents();
+        
+        assertNotNull(results);
+        assertEquals(3, results.size());
     }
 }

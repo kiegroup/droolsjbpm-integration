@@ -15,16 +15,16 @@ import org.eclipse.bpmn2.Process;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.FeatureMap;
-import org.jboss.drools.DroolsPackage;
+import org.jboss.drools.impl.DroolsPackageImpl;
 
 public class BPMN2Utils {
 
     public static Definitions getDefinitions(InputStream is) {
-
+        DroolsPackageImpl.init();
         try {
             ResourceSet resourceSet = new ResourceSetImpl();
             resourceSet
@@ -35,8 +35,8 @@ public class BPMN2Utils {
             resourceSet.getPackageRegistry().put(
                     "http://www.omg.org/spec/BPMN/20100524/MODEL",
                     Bpmn2Package.eINSTANCE);
-            resourceSet.getPackageRegistry().put(DroolsPackage.eNS_URI, 
-                    DroolsPackage.eINSTANCE);
+//            resourceSet.getPackageRegistry().put(DroolsPackage.eNS_URI, 
+//                    DroolsPackage.eINSTANCE);
             JBPMBpmn2ResourceImpl resource = (JBPMBpmn2ResourceImpl) resourceSet
                     .createResource(URI
                             .createURI("inputStream://dummyUriWithValidSuffix.xml"));

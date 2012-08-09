@@ -8,12 +8,14 @@ import org.jbpm.simulation.SimulationRepository;
 
 public class InMemorySimulationRepository implements SimulationRepository {
 
-    public List<SimulationEvent> events = new ArrayList<SimulationEvent>();
+    protected List<SimulationEvent> events = new ArrayList<SimulationEvent>();
     
     public void storeEvent(SimulationEvent event) {
         this.events.add(event);
-        System.out.println("Event added: " + event);
 
     }
 
+    public List<SimulationEvent> getEvents() {
+        return this.events;
+    }
 }

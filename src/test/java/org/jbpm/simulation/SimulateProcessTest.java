@@ -1,7 +1,11 @@
 package org.jbpm.simulation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
@@ -16,6 +20,7 @@ import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
+import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.junit.Test;
 
 public class SimulateProcessTest {
@@ -36,14 +41,6 @@ public class SimulateProcessTest {
         SimulationFluent f = new DefaultSimulationFluent();
         // @formatter:off
         // FIXME why building knowledge base on this level does not work??
-//        f.newKnowledgeBuilder()
-//                .add( ResourceFactory.newClassPathResource("BPMN-SimpleExclusiveGatewayProcess.bpmn2"),
-//                        ResourceType.BPMN2 )
-//                  .end(World.ROOT, KnowledgeBuilder.class.getName() )
-//                .newKnowledgeBase()
-//                  .addKnowledgePackages()
-//                  .end(World.ROOT, KnowledgeBase.class.getName() );
-        
         int numberOfAllInstances = 10;
         int counter = 0;
         // default interval 2 seconds, meaning each step in a path will be started after 2 seconds
@@ -74,6 +71,29 @@ public class SimulateProcessTest {
         }
         f.runSimulation();
         // @formatter:on
+        
+    }
+    
+    @Test
+    public void testSimulationRunner() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("BPMN2-TwoUserTasks", out, 10, 2000, "default.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+        wmRepo.fireAllRules();
+        
+        assertEquals(3, wmRepo.getAggregatedEvents().size());
+        assertEquals(40, wmRepo.getEvents().size());
         
     }
 
