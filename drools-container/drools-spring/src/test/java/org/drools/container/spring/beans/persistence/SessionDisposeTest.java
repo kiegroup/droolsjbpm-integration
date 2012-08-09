@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * bz839630 reproducer. Exception "Entity manager is closed" is thrown when sessions are being disposed.
+ * bz846981 reproducer.
  * @author rsynek
  */
 public class SessionDisposeTest {
@@ -104,11 +104,8 @@ public class SessionDisposeTest {
 
     @AfterClass
     public static void dispose() {
-        Iterator<StatefulKnowledgeSession> it = sessions.iterator();
-        while (it.hasNext()) {
-            it.next().dispose();          
-            it.remove();
-        }
+        sessions.get(1).dispose();
+        sessions.get(0).dispose();
     }
 
     @BeforeClass
@@ -129,7 +126,7 @@ public class SessionDisposeTest {
 
     private Environment getEnvironment() {
         Environment env = KnowledgeBaseFactory.newEnvironment();
-        
+        env.set("IS_JTA_TRANSACTION", false);
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER, ctx.getBean("txManager"));
         return env;
