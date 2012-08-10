@@ -6,6 +6,8 @@ import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
+import org.jbpm.simulation.PathContext;
+import org.jbpm.simulation.PathContext.Type;
 import org.jbpm.simulation.PathContextManager;
 
 public class EmbeddedSubprocessHandler extends MainElementHandler {
@@ -32,6 +34,21 @@ public class EmbeddedSubprocessHandler extends MainElementHandler {
         for (SequenceFlow flow : out) {
             manager.addToPath(flow, manager.getContextFromStack());
             super.handle(flow.getTargetRef(), manager);
+        }
+        
+        if (canBeFinsihed) {
+            
+            boolean goOn = true;
+            while (goOn) {
+                PathContext context = manager.getContextFromStack();
+                
+                if (context.getType() == Type.ACTIVE) {
+                    context.setCanBeFinishedNoIncrement(canBeFinsihed);
+                    manager.finalizePath();
+                } else {
+                    break;
+                }
+            }
         }
         
         
