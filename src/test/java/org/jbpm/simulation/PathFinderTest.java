@@ -891,4 +891,51 @@ public class PathFinderTest {
         
     }
     
+    
+    @Test
+    public void testExclusiveGatewayLoop() throws IOException {
+        
+        List<String> expectedIds1 = new ArrayList<String>();
+        expectedIds1.add("_1513E9B5-1FB8-45D7-8D04-F2AD2AA7848E");
+        expectedIds1.add("_CCE6EF6C-BC9B-43A8-BCFE-50262AB1A20E");
+        expectedIds1.add("_F8ABE422-3DB4-426C-BD31-0F8392BB0792");
+        expectedIds1.add("_6984B84F-2993-4D56-A67E-F263E779A542");
+        expectedIds1.add("_27E3C08E-D2EB-4DFF-B8F2-509B23511377");
+        expectedIds1.add("_A51F590A-454C-4710-ADEC-7DC3D4BEA4D1");    
+        expectedIds1.add("_C78A23B2-CFEB-469B-840C-1DEAA149FA44");
+        expectedIds1.add("_E2F40D66-5CF2-412F-A743-03F8885CF1F4");    
+        expectedIds1.add("_E6A42A45-171E-4B9A-BE03-DA2748ED2DC7");
+        
+        List<String> expectedIds2 = new ArrayList<String>();
+        expectedIds2.add("_1513E9B5-1FB8-45D7-8D04-F2AD2AA7848E");
+        expectedIds2.add("_CCE6EF6C-BC9B-43A8-BCFE-50262AB1A20E");
+        expectedIds2.add("_F8ABE422-3DB4-426C-BD31-0F8392BB0792");
+        expectedIds2.add("_6984B84F-2993-4D56-A67E-F263E779A542");
+        expectedIds2.add("_27E3C08E-D2EB-4DFF-B8F2-509B23511377");
+        expectedIds2.add("_A51F590A-454C-4710-ADEC-7DC3D4BEA4D1");
+        expectedIds2.add("_C78A23B2-CFEB-469B-840C-1DEAA149FA44");
+        expectedIds2.add("_8449063D-4DAB-4E8C-A926-26F823FB903F");
+        expectedIds2.add("_BBD03DEE-845F-4050-9269-A02D40973297");
+        expectedIds2.add("_28A7898F-3EC5-488B-8E0B-439134824D4A");    
+        expectedIds2.add("_E2F40D66-5CF2-412F-A743-03F8885CF1F4");    
+        expectedIds2.add("_E6A42A45-171E-4B9A-BE03-DA2748ED2DC7");
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ExclusiveGatewayLoop.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(2, paths.size());
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        TestUtils.printOutPaths(paths, jsonPaths, "testExclusiveGatewayLoop");
+    }
 }

@@ -42,13 +42,15 @@ public class GatewayElementHandler extends MainElementHandler {
 
         for (SequenceFlow seqFlow : outgoing) {
             FlowElement target = seqFlow.getTargetRef();
-
-            PathContext separatePath = manager.cloneGiven(contextAtThisNode);
-            manager.addToPath(seqFlow, separatePath);
-            super.handle(target, manager);
-            separatePath.setLocked(true);
-
-            locked.add(separatePath);
+            
+            if (!context.getPathElements().contains(target)) {
+                PathContext separatePath = manager.cloneGiven(contextAtThisNode);
+                manager.addToPath(seqFlow, separatePath);
+                super.handle(target, manager);
+                separatePath.setLocked(true);
+    
+                locked.add(separatePath);
+            }
         }
 
         // unlock
