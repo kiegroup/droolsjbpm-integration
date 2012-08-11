@@ -1,7 +1,9 @@
 package org.jbpm.simulation.impl.events;
 
+import org.jbpm.simulation.AggregatedSimulationEvent;
 
-public class AggregatedActivitySimulationEvent {
+
+public class AggregatedActivitySimulationEvent implements AggregatedSimulationEvent {
 
     protected String activityName;
     protected String activityId;
@@ -51,6 +53,26 @@ public class AggregatedActivitySimulationEvent {
     }
     public void setActivityId(String activityId) {
         this.activityId = activityId;
+    }
+    public Object getProperty(String name) {
+        if ("activityId".equalsIgnoreCase(name)) {
+         
+            return activityId;
+        } else if ("activityName".equalsIgnoreCase(name)) {
+            
+            return activityName;
+        } else if ("minExecutionTime".equalsIgnoreCase(name)) {
+            
+            return minExecutionTime;
+        } else if ("avgExecutionTime".equalsIgnoreCase(name)) {
+         
+            return avgExecutionTime;
+        } else if ("maxExecutionTime".equalsIgnoreCase(name)) {
+         
+            return maxExecutionTime;
+        }
+        
+        return null;
     }
     
     

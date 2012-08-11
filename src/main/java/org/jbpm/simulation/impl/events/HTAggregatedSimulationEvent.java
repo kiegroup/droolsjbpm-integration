@@ -77,5 +77,36 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
         this.maxResourceUtilization = maxResourceUtilization;
     }
 
+    @Override
+    public Object getProperty(String name) {
+        
+        Object value = super.getProperty(name);
+        
+        if (value != null) {
+            return value;
+        }
+        
+        if ("minWaitTime".equalsIgnoreCase(name)) {
+         
+            return minWaitTime;
+        } else if ("avgWaitTime".equalsIgnoreCase(name)) {
+            
+            return avgWaitTime;
+        } else if ("maxWaitTime".equalsIgnoreCase(name)) {
+            
+            return maxWaitTime;
+        } else if ("minResourceUtilization".equalsIgnoreCase(name)) {
+         
+            return minResourceUtilization;
+        } else if ("avgResourceUtilization".equalsIgnoreCase(name)) {
+            
+            return avgResourceUtilization;
+        } else if ("maxResourceUtilization".equalsIgnoreCase(name)) {
+            
+            return maxResourceUtilization;
+        }
+        return null;
+    }
+
     
 }
