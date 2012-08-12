@@ -23,6 +23,14 @@ public class PathContext {
     private String id; 
     private int canBeFinishedCounter = 0;
     
+    protected int getCanBeFinishedCounter() {
+        return canBeFinishedCounter;
+    }
+
+    protected void setCanBeFinishedCounter(int canBeFinishedCounter) {
+        this.canBeFinishedCounter = canBeFinishedCounter;
+    }
+
     public PathContext() {
     	this.id = String.valueOf(UUID.randomUUID());
     	this.setType(Type.ROOT);

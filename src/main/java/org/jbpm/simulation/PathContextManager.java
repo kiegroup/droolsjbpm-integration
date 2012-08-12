@@ -62,6 +62,7 @@ public class PathContextManager {
         
         PathContext clone = new PathContext(Type.ACTIVE);
         clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
+        clone.setCanBeFinishedCounter(toclone.getCanBeFinishedCounter());
         
         clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
         
@@ -73,6 +74,7 @@ public class PathContextManager {
         
         PathContext clone = new PathContext(Type.ACTIVE);
         clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
+        clone.setCanBeFinishedCounter(toclone.getCanBeFinishedCounter());
         
         clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
         toclone.setType(Type.TEMP);
@@ -94,6 +96,16 @@ public class PathContextManager {
             this.completePaths.add(completePath);
         }
     }
+    
+    public void finalizePath(PathContext context) {
+        
+        if (context.isCanBeFinished()) {
+
+            context.setType(Type.COMPLETED);
+            this.completePaths.add(context);
+        }
+    }
+
     
     public void clearCurrentContext() {
         this.paths.pop();

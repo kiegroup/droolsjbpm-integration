@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.bpmn2.Activity;
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.CompensateEventDefinition;
 import org.eclipse.bpmn2.Definitions;
+import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowElementsContainer;
@@ -144,27 +146,40 @@ public class BPMN2PathFinderImpl implements PathFinder {
                     triggerElements.add(0, fElement);
                 }
             } else if (fElement instanceof IntermediateCatchEvent) {
-                String key = null;
+                
                 List<EventDefinition> eventDefinitions = ((IntermediateCatchEvent) fElement)
                         .getEventDefinitions();
-                if (eventDefinitions != null) {
-                    for (EventDefinition edef : eventDefinitions) {
-                        if (edef instanceof SignalEventDefinition) {
-                            key = ((SignalEventDefinition) edef)
-                                    .getSignalRef();
-                        } else if (edef instanceof MessageEventDefinition) {
-                            key = ((MessageEventDefinition) edef)
-                                    .getMessageRef().getId();
-                        } else if (edef instanceof LinkEventDefinition) {
-                            key = ((LinkEventDefinition) edef).getName();
-                        } else if (edef instanceof CompensateEventDefinition) {
-                            key = ((CompensateEventDefinition) edef)
-                                    .getActivityRef().getId();
-                        }
-                        if (key != null) {
-                            catchingEvents.put(key, fElement);
-                        }
-                    }
+                processEventDefinitions(fElement, eventDefinitions, catchingEvents);
+                
+            } else if (fElement instanceof BoundaryEvent) {
+                List<EventDefinition> eventDefinitions = ((BoundaryEvent) fElement).getEventDefinitions();
+                
+                processEventDefinitions(fElement, eventDefinitions, catchingEvents);
+            }
+        }
+    }
+    
+    protected void processEventDefinitions(FlowElement fElement, List<EventDefinition> eventDefinitions, Map<String, FlowElement> catchingEvents) {
+        String key = null;
+        if (eventDefinitions != null) {
+            for (EventDefinition edef : eventDefinitions) {
+                if (edef instanceof SignalEventDefinition) {
+                    key = ((SignalEventDefinition) edef)
+                            .getSignalRef();
+                } else if (edef instanceof MessageEventDefinition) {
+                    key = ((MessageEventDefinition) edef)
+                            .getMessageRef().getId();
+                } else if (edef instanceof LinkEventDefinition) {
+                    key = ((LinkEventDefinition) edef).getName();
+                } else if (edef instanceof CompensateEventDefinition) {
+                    key = ((CompensateEventDefinition) edef)
+                            .getActivityRef().getId();
+                } else if (edef instanceof ErrorEventDefinition) {
+                    key = ((ErrorEventDefinition) edef)
+                            .getErrorRef().getId();
+                }
+                if (key != null) {
+                    catchingEvents.put(key, fElement);
                 }
             }
         }

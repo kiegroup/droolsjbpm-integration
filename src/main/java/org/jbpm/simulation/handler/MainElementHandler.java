@@ -10,6 +10,7 @@ import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.GatewayDirection;
 import org.eclipse.bpmn2.IntermediateThrowEvent;
+import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
@@ -37,7 +38,11 @@ public class MainElementHandler implements ElementHandler {
                     
                     handled = HandlerRegistry.getHandler(element).handle(element, manager);
                 } else {
-                    handled = HandlerRegistry.getHandler().handle(element, manager);
+                    if (gateway instanceof ParallelGateway) {
+                        handled = HandlerRegistry.getHandler(element).handle(element, manager);
+                    } else {
+                        handled = HandlerRegistry.getHandler().handle(element, manager);
+                    }
                 }
             } else if (element instanceof Activity) {
                 handled = HandlerRegistry.getHandler(element).handle(element, manager);

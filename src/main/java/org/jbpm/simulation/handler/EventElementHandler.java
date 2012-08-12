@@ -3,6 +3,7 @@ package org.jbpm.simulation.handler;
 import java.util.List;
 
 import org.eclipse.bpmn2.CompensateEventDefinition;
+import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.LinkEventDefinition;
@@ -29,6 +30,9 @@ public class EventElementHandler extends MainElementHandler {
                 } else if (def instanceof CompensateEventDefinition) {
                     key = ((CompensateEventDefinition) def)
                             .getActivityRef().getId();
+                } else if (def instanceof ErrorEventDefinition) {
+                    key = ((ErrorEventDefinition) def)
+                            .getErrorRef().getId();
                 }
 
                 FlowElement catchEvent = manager.getCatchingEvents().get(key);

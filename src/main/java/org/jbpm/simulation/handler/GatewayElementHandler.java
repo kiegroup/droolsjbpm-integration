@@ -107,6 +107,7 @@ public class GatewayElementHandler extends MainElementHandler {
             FlowElement target = seqFlow.getTargetRef();
 
             if (counter == outgoing.size()) {
+                context = manager.getContextFromStack();
                 context.setCanBeFinished(canBeFinished);
             }
             

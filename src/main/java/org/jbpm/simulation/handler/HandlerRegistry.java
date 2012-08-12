@@ -4,6 +4,7 @@ import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.AdHocSubProcess;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.Gateway;
+import org.eclipse.bpmn2.GatewayDirection;
 import org.eclipse.bpmn2.IntermediateThrowEvent;
 import org.eclipse.bpmn2.SubProcess;
 
@@ -12,8 +13,11 @@ public class HandlerRegistry {
     public static ElementHandler getHandler(Object flowElement) {
         
         if (flowElement instanceof Gateway) {
-            
-           return new GatewayElementHandler();
+            if (((Gateway) flowElement).getGatewayDirection() == GatewayDirection.CONVERGING) {
+                return new ConvergingGatewayElementHandler();
+            } else {
+                return new GatewayElementHandler();
+            }
         }  else if (flowElement instanceof AdHocSubProcess) {
             
             return new AdHocSubProcessElementHandler();

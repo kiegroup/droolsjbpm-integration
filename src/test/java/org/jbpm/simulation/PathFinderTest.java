@@ -1129,4 +1129,205 @@ public class PathFinderTest {
         
         TestUtils.printOutPaths(paths, jsonPaths, "testEmbeddedSubProcessWithParallelSplitBefore");
     }
+    
+    @Test
+    public void testSubProcessWithBoundaryEvent() throws IOException {
+       
+        List<String> expectedIds1 = new ArrayList<String>();
+        expectedIds1.add("_9702F903-708E-4AF0-B6BC-354C07E0EAD8");
+        expectedIds1.add("_C4EBB271-64BA-4277-9348-6FA2946BAA55");
+        expectedIds1.add("_0B710E93-DE1D-4A8E-8BE4-B64A1CF91CD4");
+        expectedIds1.add("_5D42DB79-E3E7-4FFD-9ADB-930D78656C86");
+        expectedIds1.add("_E86EA3BC-8DA9-40B3-9F1C-AC41B75EEF1B");
+        expectedIds1.add("_2B980AFC-6DD0-4800-9B13-5645164E437C");
+        expectedIds1.add("_5E7D3CD2-9B5E-4A7B-A606-D4CD6F254749");
+        expectedIds1.add("_CDDF978C-581C-4FFE-B969-8A43792D282D");
+        expectedIds1.add("_DA684429-3A24-4F6F-BE90-84B8FD889F85");
+        expectedIds1.add("_53D08245-8898-4F65-BB62-51665D25B70F");
+        expectedIds1.add("_4CA8C6F4-A379-4436-A2FF-6C3E42DAE8B7");
+        expectedIds1.add("_F49B932C-6A43-47B7-8128-613A0F7D92C2");
+        expectedIds1.add("_FA9369F5-53EA-438B-9C53-DE66A4070C36");
+        expectedIds1.add("_9D709F13-1F60-40EC-94B3-119899E6FB99");
+        expectedIds1.add("_7D1C6264-25B2-4B8C-B811-AFF19FA180BA");
+        expectedIds1.add("_B5A58927-0861-4BE1-98B8-1AFAEB376709");
+        expectedIds1.add("_672CECB9-DE07-4FC6-92D3-4D89220BD4A5");
+        expectedIds1.add("_1E638332-CC28-4860-8A76-57176630CD0E");
+        expectedIds1.add("_54C8700A-063C-48F8-BCF6-8F2DB960B2E1");
+        
+        List<String> expectedIds2 = new ArrayList<String>();
+        expectedIds2.add("_9702F903-708E-4AF0-B6BC-354C07E0EAD8");
+        expectedIds2.add("_C4EBB271-64BA-4277-9348-6FA2946BAA55");
+        expectedIds2.add("_0B710E93-DE1D-4A8E-8BE4-B64A1CF91CD4");
+        expectedIds2.add("_5D42DB79-E3E7-4FFD-9ADB-930D78656C86");
+        expectedIds2.add("_E86EA3BC-8DA9-40B3-9F1C-AC41B75EEF1B");
+        expectedIds2.add("_2B980AFC-6DD0-4800-9B13-5645164E437C");
+        expectedIds2.add("_5E7D3CD2-9B5E-4A7B-A606-D4CD6F254749");
+        expectedIds2.add("_CDDF978C-581C-4FFE-B969-8A43792D282D");
+        expectedIds2.add("_DA684429-3A24-4F6F-BE90-84B8FD889F85");
+        expectedIds2.add("_53D08245-8898-4F65-BB62-51665D25B70F");
+        expectedIds2.add("_4CA8C6F4-A379-4436-A2FF-6C3E42DAE8B7");
+        expectedIds2.add("_F49B932C-6A43-47B7-8128-613A0F7D92C2");
+        expectedIds2.add("_FA9369F5-53EA-438B-9C53-DE66A4070C36");
+        expectedIds2.add("_EBE8BD00-9D9D-479F-86ED-A9C373C06D4E");
+        expectedIds2.add("_736CFB13-8AEC-49C0-B724-C9EBF0CFC5C1");
+        expectedIds2.add("_B5A58927-0861-4BE1-98B8-1AFAEB376709");
+        expectedIds2.add("_672CECB9-DE07-4FC6-92D3-4D89220BD4A5");
+        expectedIds2.add("_1E638332-CC28-4860-8A76-57176630CD0E");
+        expectedIds2.add("_54C8700A-063C-48F8-BCF6-8F2DB960B2E1");
+        expectedIds2.add("_C5FBAEC2-B88A-4905-8157-E93AA0EEDC1E");
+        expectedIds2.add("_4B8EBADA-8A63-4201-866B-AC940A574E78");
+        expectedIds2.add("_4A20BD0E-E24C-4DC4-9BD2-30D12B957260");
+        expectedIds2.add("_90DF896C-95A5-403B-83B8-032873663AD3");
+        expectedIds2.add("_6F87EF2A-8C69-4F37-B9C5-6BB3AF86DC9F");
+        expectedIds2.add("_34353A7C-0AAE-495E-948E-56D60DCC08A9");
+        expectedIds2.add("_F1B53178-97DE-4E39-AD8D-4DBA8E19AE1D");
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-SubProcessWithBoundaryEvent.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(2, paths.size());
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2));
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(2, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        TestUtils.printOutPaths(paths, jsonPaths, "testSubProcessWithBoundaryEvent");
+    }
+    
+    
+    @Test
+    public void testExlusiveParallelSubProcessExclusive() throws IOException {
+        List<String> expectedIds1 = new ArrayList<String>();
+        expectedIds1.add("_B10F37EB-AD37-43AF-8415-C64D08FE77BB");
+        expectedIds1.add("_426FBE47-2884-4FF2-B3B5-FCEE3724DD35");
+        expectedIds1.add("_5A0E343E-C04E-4224-86B8-795F8AE7A0CD");
+        
+        expectedIds1.add("_09DFCF76-949C-47A1-96A4-C473B1DE0B8E");
+        expectedIds1.add("_E7288559-2673-4149-8CB8-B78D243574EA");
+        expectedIds1.add("_6E733C7F-A931-4B0C-965C-23F27E8AEC19");
+        
+        expectedIds1.add("_07421479-3F76-4B7B-BF38-96E8FB3CD63C");
+        expectedIds1.add("_EC402AA3-C268-46B1-8A8A-2DBDE9DE38DF");
+        expectedIds1.add("_CA7F0E1C-F4B1-4071-B7EC-9307469F9EA2");
+        expectedIds1.add("_6566807C-4CF4-424A-91EA-FC8CA4F4CAAB");
+        expectedIds1.add("_1901EC20-BEB8-4339-875E-50BDB9009899");
+        expectedIds1.add("_AE148F1D-5419-488A-838B-EEC4B2308E0F");
+        expectedIds1.add("_C87C951E-FAD0-45E7-9504-D1FF2134AFA6");
+        expectedIds1.add("_417DC32E-BD5A-479C-863C-320D0D1D5718");
+        expectedIds1.add("_FC4F745C-65BA-4D68-B08C-ECCD657537EC");
+        expectedIds1.add("_A468752D-76DA-458E-AACA-D174D61C2B9A");
+        expectedIds1.add("_00F715EB-4C13-44DC-A8C5-A3FEB38EC5FD");
+        expectedIds1.add("_B1482DDF-5FDD-4C57-BA2D-0E7089A1C6AB");
+        expectedIds1.add("_944EFC7C-CBF4-43CC-A28B-C4F470EE2AE9");
+        
+        List<String> expectedIds2 = new ArrayList<String>();
+        expectedIds2.add("_B10F37EB-AD37-43AF-8415-C64D08FE77BB");
+        expectedIds2.add("_426FBE47-2884-4FF2-B3B5-FCEE3724DD35");
+        expectedIds2.add("_5A0E343E-C04E-4224-86B8-795F8AE7A0CD");
+        
+        expectedIds2.add("_09DFCF76-949C-47A1-96A4-C473B1DE0B8E");
+        expectedIds2.add("_E7288559-2673-4149-8CB8-B78D243574EA");
+        expectedIds2.add("_6E733C7F-A931-4B0C-965C-23F27E8AEC19");
+        
+        expectedIds2.add("_07421479-3F76-4B7B-BF38-96E8FB3CD63C");
+        expectedIds2.add("_EC402AA3-C268-46B1-8A8A-2DBDE9DE38DF");
+        expectedIds2.add("_CA7F0E1C-F4B1-4071-B7EC-9307469F9EA2");
+        expectedIds2.add("_6566807C-4CF4-424A-91EA-FC8CA4F4CAAB");
+        expectedIds2.add("_1901EC20-BEB8-4339-875E-50BDB9009899");
+        expectedIds2.add("_A79E067D-3043-4E9D-A2C3-A29F5A2918F5");
+        expectedIds2.add("_5B50E403-A638-49E2-BE07-B1CF946E8C21");
+        expectedIds2.add("_DD981784-D31E-435A-B67E-6B667D729F77");
+        expectedIds2.add("_FC4F745C-65BA-4D68-B08C-ECCD657537EC");
+        expectedIds2.add("_A468752D-76DA-458E-AACA-D174D61C2B9A");
+        expectedIds2.add("_00F715EB-4C13-44DC-A8C5-A3FEB38EC5FD");
+        expectedIds2.add("_B1482DDF-5FDD-4C57-BA2D-0E7089A1C6AB");
+        expectedIds2.add("_944EFC7C-CBF4-43CC-A28B-C4F470EE2AE9");
+        
+        
+        List<String> expectedIds3 = new ArrayList<String>();
+        expectedIds3.add("_B10F37EB-AD37-43AF-8415-C64D08FE77BB");
+        expectedIds3.add("_426FBE47-2884-4FF2-B3B5-FCEE3724DD35");
+        expectedIds3.add("_5A0E343E-C04E-4224-86B8-795F8AE7A0CD");
+        expectedIds3.add("_8C7DD40D-A944-4CC9-A1BD-3D82ADF2BF96");
+        expectedIds3.add("_B27DBB14-06C6-49AB-8DC6-1BB6B2870B28");
+        expectedIds3.add("_73482304-1EB9-4F7C-917F-0F2A46DAA74B");
+        expectedIds3.add("_156CD440-31A5-4158-BCD8-295F9498BB03");
+        expectedIds3.add("_9F1DA348-B7E5-4732-84A3-01A424DAA069");
+        expectedIds3.add("_946AE4E8-BE8D-4326-AE78-A863C2B844B4");
+        expectedIds3.add("_E1A21E1E-4980-4896-86B3-772C136E1DE4");
+        expectedIds3.add("_B0CA5F2E-406F-4D6B-A5D0-FAFD84BDA045");
+        expectedIds3.add("_00B619E5-1BE6-47D5-A493-9F497F1AF344");
+        expectedIds3.add("_1411BEC5-0255-4AAE-85BB-D7DCB417965D");
+        expectedIds3.add("_0F571919-2049-4CB5-9600-133209B0F804");
+        expectedIds3.add("_AF54CBA5-7E7F-454A-A0F9-AF871972F3F5");
+        expectedIds3.add("_07421479-3F76-4B7B-BF38-96E8FB3CD63C");
+        expectedIds3.add("_EC402AA3-C268-46B1-8A8A-2DBDE9DE38DF");
+        expectedIds3.add("_CA7F0E1C-F4B1-4071-B7EC-9307469F9EA2");
+        expectedIds3.add("_6566807C-4CF4-424A-91EA-FC8CA4F4CAAB");
+        expectedIds3.add("_1901EC20-BEB8-4339-875E-50BDB9009899");
+        expectedIds3.add("_AE148F1D-5419-488A-838B-EEC4B2308E0F");
+        expectedIds3.add("_C87C951E-FAD0-45E7-9504-D1FF2134AFA6");
+        expectedIds3.add("_417DC32E-BD5A-479C-863C-320D0D1D5718");
+        expectedIds3.add("_FC4F745C-65BA-4D68-B08C-ECCD657537EC");
+        expectedIds3.add("_A468752D-76DA-458E-AACA-D174D61C2B9A");
+        expectedIds3.add("_00F715EB-4C13-44DC-A8C5-A3FEB38EC5FD");
+        expectedIds3.add("_B1482DDF-5FDD-4C57-BA2D-0E7089A1C6AB");
+        expectedIds3.add("_944EFC7C-CBF4-43CC-A28B-C4F470EE2AE9");
+        
+        
+        List<String> expectedIds4 = new ArrayList<String>();
+        expectedIds4.add("_B10F37EB-AD37-43AF-8415-C64D08FE77BB");
+        expectedIds4.add("_426FBE47-2884-4FF2-B3B5-FCEE3724DD35");
+        expectedIds4.add("_5A0E343E-C04E-4224-86B8-795F8AE7A0CD");
+        expectedIds4.add("_8C7DD40D-A944-4CC9-A1BD-3D82ADF2BF96");
+        expectedIds4.add("_B27DBB14-06C6-49AB-8DC6-1BB6B2870B28");
+        expectedIds4.add("_73482304-1EB9-4F7C-917F-0F2A46DAA74B");
+        expectedIds4.add("_156CD440-31A5-4158-BCD8-295F9498BB03");
+        expectedIds4.add("_9F1DA348-B7E5-4732-84A3-01A424DAA069");
+        expectedIds4.add("_946AE4E8-BE8D-4326-AE78-A863C2B844B4");
+        expectedIds4.add("_E1A21E1E-4980-4896-86B3-772C136E1DE4");
+        expectedIds4.add("_B0CA5F2E-406F-4D6B-A5D0-FAFD84BDA045");
+        expectedIds4.add("_00B619E5-1BE6-47D5-A493-9F497F1AF344");
+        expectedIds4.add("_1411BEC5-0255-4AAE-85BB-D7DCB417965D");
+        expectedIds4.add("_0F571919-2049-4CB5-9600-133209B0F804");
+        expectedIds4.add("_AF54CBA5-7E7F-454A-A0F9-AF871972F3F5");
+        expectedIds4.add("_07421479-3F76-4B7B-BF38-96E8FB3CD63C");
+        expectedIds4.add("_EC402AA3-C268-46B1-8A8A-2DBDE9DE38DF");
+        expectedIds4.add("_CA7F0E1C-F4B1-4071-B7EC-9307469F9EA2");
+        expectedIds4.add("_6566807C-4CF4-424A-91EA-FC8CA4F4CAAB");
+        expectedIds4.add("_1901EC20-BEB8-4339-875E-50BDB9009899");
+        expectedIds4.add("_A79E067D-3043-4E9D-A2C3-A29F5A2918F5");
+        expectedIds4.add("_5B50E403-A638-49E2-BE07-B1CF946E8C21");
+        expectedIds4.add("_DD981784-D31E-435A-B67E-6B667D729F77");
+        expectedIds4.add("_FC4F745C-65BA-4D68-B08C-ECCD657537EC");
+        expectedIds4.add("_A468752D-76DA-458E-AACA-D174D61C2B9A");
+        expectedIds4.add("_00F715EB-4C13-44DC-A8C5-A3FEB38EC5FD");
+        expectedIds4.add("_B1482DDF-5FDD-4C57-BA2D-0E7089A1C6AB");
+        expectedIds4.add("_944EFC7C-CBF4-43CC-A28B-C4F470EE2AE9");
+        
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ExlusiveParallelSubProcessExclusive.bpmn2"));
+        
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(4, paths.size());
+        assertTrue(TestUtils.matchExpected(paths, expectedIds1, expectedIds2, expectedIds3, expectedIds4));
+        
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(4, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+        
+        TestUtils.printOutPaths(paths, null, "testExlusiveParallelSubProcessExclusive");
+    }
 }
