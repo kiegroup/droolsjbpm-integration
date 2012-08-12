@@ -21,16 +21,17 @@ end
 declare ActivityName
     name : String
     type : String
+    id : String
 end 
 
 rule "Insert activity names"
 no-loop
 salience 10
     when
-        ActivitySimulationEvent( $name : activityName )
+        ActivitySimulationEvent( $name : activityName, $id : activityId )
         not ActivityName( name == $name )
     then
-        insert( new ActivityName( $name, "abstract" ) );
+        insert( new ActivityName( $name, "abstract", $id ) );
 
 end
 
@@ -38,10 +39,10 @@ rule "Insert activity names for ht"
 no-loop
 salience 10
     when
-        HumanTaskActivitySimulationEvent( $name : activityName )
+        HumanTaskActivitySimulationEvent( $name : activityName, $id : activityId )
         not ActivityName( name == $name )
     then
-        insert( new ActivityName( $name, "ht" ) );
+        insert( new ActivityName( $name, "ht", $id ) );
 
 end
 
@@ -49,7 +50,7 @@ rule "Calculate average duration for activity"
 salience 20
 no-loop
     when
-        ActivityName($name : name, type=="abstract")
+        ActivityName($name : name, type=="abstract", $id : id)
         $avg : Double()
         from accumulate(
         ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
@@ -64,7 +65,7 @@ no-loop
         max( $duration ) )
     then
         System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
-        simulation.add(new AggregatedActivitySimulationEvent($name, "", $min, $avg, $max));
+        simulation.add(new AggregatedActivitySimulationEvent($name, $id, $min, $avg, $max));
 
 end
 
@@ -72,7 +73,7 @@ rule "Calculate average duration for human activity"
 salience 20
 no-loop
     when
-        ActivityName($name : name, type == "ht")
+        ActivityName($name : name, type == "ht", $id : id)
         $avgwt : Double()
         from accumulate(
         HumanTaskActivitySimulationEvent($waitTime : waitTime, activityName == $name ) over window:length( 100 ),
@@ -115,7 +116,7 @@ no-loop
         System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
          + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru);
-        simulation.add(new HTAggregatedSimulationEvent($name, "", $min, $avg, $max, $minwt, $avgwt, $maxwt, $minru, $avgru, $maxru));
+        simulation.add(new HTAggregatedSimulationEvent($name, $id, $min, $avg, $max, $minwt, $avgwt, $maxwt, $minru, $avgru, $maxru));
 
 end
 

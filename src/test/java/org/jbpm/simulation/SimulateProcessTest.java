@@ -1,6 +1,7 @@
 package org.jbpm.simulation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
@@ -97,10 +98,12 @@ public class SimulateProcessTest {
         
         AggregatedSimulationEvent event = wmRepo.getAggregatedEvents().get(0);
         assertNotNull(event.getProperty("minExecutionTime"));
+        assertFalse(event.getProperty("activityId").equals(""));
         event = wmRepo.getAggregatedEvents().get(1);
         assertNotNull(event.getProperty("minExecutionTime"));
         event = wmRepo.getAggregatedEvents().get(2);
         assertNotNull(event.getProperty("minExecutionTime"));
+        
         
     }
 
