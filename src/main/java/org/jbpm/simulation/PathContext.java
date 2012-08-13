@@ -1,7 +1,9 @@
 package org.jbpm.simulation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.bpmn2.FlowElement;
@@ -16,7 +18,7 @@ public class PathContext {
         TEMP;
     }
 
-    private List<FlowElement> pathElements = new ArrayList<FlowElement>();
+    private Set<FlowElement> pathElements = new HashSet<FlowElement>();
     private Type type;
     private boolean canBeFinished = true;
     private boolean locked = false;
@@ -53,11 +55,11 @@ public class PathContext {
         }
     }
     
-    public List<FlowElement> getPathElements() {
+    public Set<FlowElement> getPathElements() {
         return this.pathElements;
     }
 
-    public void setPathElements(List<FlowElement> pathElements) {
+    public void setPathElements(Set<FlowElement> pathElements) {
         this.pathElements = pathElements;
     }
 

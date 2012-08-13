@@ -1,6 +1,7 @@
 package org.jbpm.simulation.converter;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.bpmn2.FlowElement;
 import org.jbpm.simulation.PathContext;
@@ -27,7 +28,7 @@ public class JSONPathFormatConverter implements PathFormatConverter<JSONObject> 
         return parent;
     }
     
-    private String getPathFlowElementsAsString(List<FlowElement> flowElements) {
+    private String getPathFlowElementsAsString(Set<FlowElement> flowElements) {
         String ret = "";
         if(flowElements != null && flowElements.size() > 0) {
             for(FlowElement fe : flowElements) {

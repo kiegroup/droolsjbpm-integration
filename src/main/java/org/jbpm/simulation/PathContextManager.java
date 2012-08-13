@@ -1,6 +1,7 @@
 package org.jbpm.simulation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -64,7 +65,7 @@ public class PathContextManager {
         clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
         clone.setCanBeFinishedCounter(toclone.getCanBeFinishedCounter());
         
-        clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
+        clone.setPathElements(new HashSet<FlowElement>(toclone.getPathElements()));
         
         this.paths.push(clone);
         return clone;
@@ -76,7 +77,7 @@ public class PathContextManager {
         clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
         clone.setCanBeFinishedCounter(toclone.getCanBeFinishedCounter());
         
-        clone.setPathElements(new ArrayList<FlowElement>(toclone.getPathElements()));
+        clone.setPathElements(new HashSet<FlowElement>(toclone.getPathElements()));
         toclone.setType(Type.TEMP);
         return clone;
     }

@@ -168,7 +168,7 @@ public class TestUtils {
         return session;
     }
     
-    public static List<FlowElement> removeDuplicates(List<FlowElement> orig) {
+    public static List<FlowElement> removeDuplicates(Set<FlowElement> orig) {
         
         Set<String> uniqueIds = new HashSet<String>();
         List<FlowElement> unique = new ArrayList<FlowElement>();

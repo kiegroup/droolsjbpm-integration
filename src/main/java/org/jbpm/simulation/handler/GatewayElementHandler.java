@@ -1,6 +1,7 @@
 package org.jbpm.simulation.handler;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.bpmn2.ExclusiveGateway;
@@ -112,6 +113,26 @@ public class GatewayElementHandler extends MainElementHandler {
             }
             
             super.handle(target, manager);
+        }
+        // finalize paths if there are any to cover scenario when there was not converging parallel gateway
+        if (canBeFinished) {
+
+            for (SequenceFlow seqFlow : outgoing) {
+                manager.addToPath(seqFlow, context);
+                manager.addToPath(seqFlow.getTargetRef(), context);
+            }
+            
+            Iterator<PathContext> it = manager.getPaths().iterator();
+            
+            while (it.hasNext()) {
+                PathContext pathContext = (PathContext) it.next();
+                if (pathContext.getType() == Type.ACTIVE) {
+                    pathContext.setCanBeFinishedNoIncrement(canBeFinished);
+                    manager.finalizePath(pathContext);
+                    it.remove();
+                }
+            }
+            
         }
     }
 }
