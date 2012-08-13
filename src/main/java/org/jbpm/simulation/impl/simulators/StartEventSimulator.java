@@ -1,5 +1,6 @@
 package org.jbpm.simulation.impl.simulators;
 
+import org.drools.definition.process.Node;
 import org.drools.runtime.process.NodeInstance;
 import org.drools.runtime.process.ProcessInstance;
 import org.jbpm.simulation.ActivitySimulator;
@@ -15,8 +16,10 @@ public class StartEventSimulator implements ActivitySimulator {
         ProcessInstance pi = nodeInstance.getProcessInstance();
 
         context.setStartTime(context.getClock().getCurrentTime());
+        Node node = nodeInstance.getNode();
+        String bpmn2NodeId = (String) node.getMetaData().get("UniqueId");
         
-        return new StartSimulationEvent(pi.getProcessId(), pi.getId(), context.getStartTime(), context.getClock().getCurrentTime());
+        return new StartSimulationEvent(pi.getProcessId(), pi.getId(), context.getStartTime(), context.getClock().getCurrentTime(), bpmn2NodeId, node.getName());
     }
 
 }

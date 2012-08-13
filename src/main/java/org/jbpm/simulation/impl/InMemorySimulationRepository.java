@@ -18,4 +18,8 @@ public class InMemorySimulationRepository implements SimulationRepository {
     public List<SimulationEvent> getEvents() {
         return this.events;
     }
+    
+    public void close() {
+        this.events.clear();
+    }
 }

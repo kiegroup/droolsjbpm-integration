@@ -1,5 +1,6 @@
 package org.jbpm.simulation.impl.simulators;
 
+import org.drools.definition.process.Node;
 import org.drools.runtime.process.NodeInstance;
 import org.drools.runtime.process.ProcessInstance;
 import org.jbpm.simulation.ActivitySimulator;
@@ -14,7 +15,10 @@ public class EndEventSimulator implements ActivitySimulator {
         long startTime = context.getClock().getCurrentTime();
         ProcessInstance pi = nodeInstance.getProcessInstance();
         
-        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), startTime, context.getClock().getCurrentTime(), context.getStartTime());
+        Node node = nodeInstance.getNode();
+        String bpmn2NodeId = (String) node.getMetaData().get("UniqueId");
+        
+        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), startTime, context.getClock().getCurrentTime(), context.getStartTime(), bpmn2NodeId, node.getName());
     }
 
 }

@@ -21,7 +21,7 @@
       <bpmn2:outgoing>_11DCC171-F6DE-46D1-B2CF-1155834954E3</bpmn2:outgoing>
     </bpmn2:scriptTask>
     <bpmn2:sequenceFlow id="_9ADB8165-6CD0-4BD7-B785-74D1580443FC" drools:bgcolor="#000000" drools:selectable="true" sourceRef="_F155FEBC-2F22-4343-97A2-0C5C792D37A2" targetRef="_7D917D0A-E0A9-4DCE-ADAF-6AA8DDB274CA"/>
-    <bpmn2:exclusiveGateway id="_C7CBC8D5-890E-4E66-88B7-82129162FFE9" drools:bgcolor="#f0e68c" drools:selectable="true" drools:bordercolor="#a67f00" drools:dg="" name="" gatewayDirection="Diverging">
+    <bpmn2:exclusiveGateway id="_C7CBC8D5-890E-4E66-88B7-82129162FFE9" drools:bgcolor="#f0e68c" drools:selectable="true" drools:bordercolor="#a67f00" drools:dg="" name="split" gatewayDirection="Diverging">
       <bpmn2:incoming>_11DCC171-F6DE-46D1-B2CF-1155834954E3</bpmn2:incoming>
       <bpmn2:outgoing>_8FD2A84B-97AC-44CB-AC9A-05AB0A37FB19</bpmn2:outgoing>
       <bpmn2:outgoing>_F4D58DCD-ABA9-483D-8D8C-7DC296702259</bpmn2:outgoing>
@@ -97,7 +97,7 @@
       </bpmn2:extensionElements>
       <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" id="_TLoeMd4-EeGQ3uE666udTg" language="http://www.java.com/java"><![CDATA[return false;]]></bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
-    <bpmn2:exclusiveGateway id="_99DD4242-5DC1-4F70-A85A-317981BD8679" drools:bgcolor="#f0e68c" drools:selectable="true" drools:bordercolor="#a67f00" drools:dg="" name="" gatewayDirection="Converging">
+    <bpmn2:exclusiveGateway id="_99DD4242-5DC1-4F70-A85A-317981BD8679" drools:bgcolor="#f0e68c" drools:selectable="true" drools:bordercolor="#a67f00" drools:dg="" name="join" gatewayDirection="Converging">
       <bpmn2:incoming>_98B5F477-AF59-4B6B-BE37-4A8DE5FC4229</bpmn2:incoming>
       <bpmn2:incoming>_CC0B50F7-1771-4E55-8D63-577C7E6EAA37</bpmn2:incoming>
       <bpmn2:outgoing>_47E77EBF-B20B-40EC-B494-830AF8588AF1</bpmn2:outgoing>

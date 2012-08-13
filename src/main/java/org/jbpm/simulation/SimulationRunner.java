@@ -9,6 +9,7 @@ import org.drools.builder.ResourceType;
 import org.drools.command.World;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
@@ -20,6 +21,16 @@ import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 public class SimulationRunner {
 
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, String... rules) {
+        
+        Resource[] resources = new Resource[rules.length];
+        for (int i = 0; i < rules.length; i++) {
+            resources[i] = ResourceFactory.newClassPathResource(rules[i]);
+        }
+        
+        return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, resources);
+    }
+    
+    public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, Resource... rules) {
         
         PathFinder finder = PathFinderFactory.getInstance(bpmn2Container);
         

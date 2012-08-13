@@ -5,11 +5,14 @@ import java.util.Map;
 
 import org.drools.definition.process.Node;
 import org.jbpm.simulation.impl.simulators.EndEventSimulator;
+import org.jbpm.simulation.impl.simulators.GatewaySimulator;
 import org.jbpm.simulation.impl.simulators.StartEventSimulator;
 import org.jbpm.simulation.impl.simulators.StateBasedActivitySimulator;
 import org.jbpm.simulation.impl.simulators.HumanTaskActivitySimulator;
 import org.jbpm.workflow.core.node.EndNode;
 import org.jbpm.workflow.core.node.HumanTaskNode;
+import org.jbpm.workflow.core.node.Join;
+import org.jbpm.workflow.core.node.Split;
 import org.jbpm.workflow.core.node.StartNode;
 
 
@@ -24,6 +27,8 @@ public class SimulationRegistry {
         simulators.put(StartNode.class, new StartEventSimulator());
         simulators.put(EndNode.class, new EndEventSimulator());
         simulators.put(HumanTaskNode.class, new HumanTaskActivitySimulator());
+        simulators.put(Split.class, new GatewaySimulator());
+        simulators.put(Join.class, new GatewaySimulator());
     }
     
     public static SimulationRegistry getInstance() {
