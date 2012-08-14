@@ -7,6 +7,7 @@ import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceType;
 import org.drools.command.World;
+import org.drools.command.runtime.DisposeCommand;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.io.Resource;
@@ -32,15 +33,13 @@ public class SimulationRunner {
     
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, Resource... rules) {
         
+        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(rules));
+        SimulationDataProvider provider = context.getDataProvider();
+        
         PathFinder finder = PathFinderFactory.getInstance(bpmn2Container);
         
-        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
+        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter(provider));
         
-        
-        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(rules));
-        
-        
-        SimulationDataProvider provider = context.getDataProvider();
         
         SimulationFluent f = new DefaultSimulationFluent();
         // @formatter:off        
@@ -56,15 +55,23 @@ public class SimulationRunner {
             .newKnowledgeBase()
               .addKnowledgePackages()
               .end(World.ROOT, KnowledgeBase.class.getName() );
-            
+            int instancesOfPath = 1;
             // count how many instances/steps should current path have
-            int instancesOfPath = (int) (numberOfAllInstances * probability);
+            if (numberOfAllInstances > 1) {
+                instancesOfPath = (int) (numberOfAllInstances * probability);
             
-            for (int i = 0; i < instancesOfPath; i++) {
-                f.newStep( interval * i )
-                    .newStatefulKnowledgeSession()
-                        .end(World.ROOT, StatefulKnowledgeSession.class.getName())
-                    .addCommand(new SimulateProcessPathCommand(processId, context, path));
+                for (int i = 0; i < instancesOfPath; i++) {
+                    f.newStep( interval * i )
+                        .newStatefulKnowledgeSession()
+                            .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                        .addCommand(new SimulateProcessPathCommand(processId, context, path));
+                }
+            } else {
+                f.newStep( interval )
+                .newStatefulKnowledgeSession()
+                    .end(World.ROOT, StatefulKnowledgeSession.class.getName())
+                .addCommand(new SimulateProcessPathCommand(processId, context, path));
+                break;
             }
             
             counter++;

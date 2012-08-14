@@ -132,4 +132,27 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
 
+    @Test
+    public void testSimulationRunnerWithGatewaySingleInstance() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("defaultPackage.test", out, 1, 2000, "default.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+        wmRepo.fireAllRules();
+        
+        assertEquals(3, wmRepo.getAggregatedEvents().size());
+        assertEquals(6, wmRepo.getEvents().size());
+        
+        wmRepo.close();
+    }
 }
