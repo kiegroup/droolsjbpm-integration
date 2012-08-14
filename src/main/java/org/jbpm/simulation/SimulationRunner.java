@@ -58,7 +58,7 @@ public class SimulationRunner {
             int instancesOfPath = 1;
             // count how many instances/steps should current path have
             if (numberOfAllInstances > 1) {
-                instancesOfPath = (int) (numberOfAllInstances * probability);
+                instancesOfPath = (int) Math.round((numberOfAllInstances * probability));
             
                 for (int i = 0; i < instancesOfPath; i++) {
                     f.newStep( interval * i )
