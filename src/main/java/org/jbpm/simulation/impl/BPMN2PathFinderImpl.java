@@ -102,7 +102,7 @@ public class BPMN2PathFinderImpl implements PathFinder {
         ElementHandler handler = HandlerRegistry.getMainHandler();
         // show what was found
         for (FlowElement fe : triggerElements) {
-            if (fe instanceof StartEvent || fe instanceof Activity) {
+            if (fe instanceof StartEvent || fe instanceof Activity || fe instanceof IntermediateCatchEvent) {
                 handler.handle(fe, manager);
             }
         }
@@ -147,9 +147,15 @@ public class BPMN2PathFinderImpl implements PathFinder {
                 }
             } else if (fElement instanceof IntermediateCatchEvent) {
                 
+                IntermediateCatchEvent act = (IntermediateCatchEvent) fElement;
+                if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                    triggerElements.add(0, fElement);
+                } 
+                
                 List<EventDefinition> eventDefinitions = ((IntermediateCatchEvent) fElement)
                         .getEventDefinitions();
                 processEventDefinitions(fElement, eventDefinitions, catchingEvents);
+                
                 
             } else if (fElement instanceof BoundaryEvent) {
                 List<EventDefinition> eventDefinitions = ((BoundaryEvent) fElement).getEventDefinitions();

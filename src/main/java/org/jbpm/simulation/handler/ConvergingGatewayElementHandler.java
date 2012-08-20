@@ -38,7 +38,7 @@ public class ConvergingGatewayElementHandler extends DefaultElementHandler {
         PathContext context = manager.getContextFromStack();
         boolean canBeFinished = context.isCanBeFinished();
         
-        if (canBeFinished) {
+        if (canBeFinished && context.getType() != Type.ROOT) {
 
             for (SequenceFlow seqFlow : outgoing) {
                 manager.addToPath(seqFlow, context);
