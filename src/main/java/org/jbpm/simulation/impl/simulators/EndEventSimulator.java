@@ -18,7 +18,13 @@ public class EndEventSimulator implements ActivitySimulator {
         Node node = nodeInstance.getNode();
         String bpmn2NodeId = (String) node.getMetaData().get("UniqueId");
         
-        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), startTime, context.getClock().getCurrentTime(), context.getStartTime(), bpmn2NodeId, node.getName());
+        String processName = pi.getProcessName();
+        String processVer = pi.getProcess().getVersion();
+        if (processVer == null) {
+            processVer = "";
+        }
+        
+        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), startTime, context.getClock().getCurrentTime(), context.getStartTime(), bpmn2NodeId, node.getName(), processName, processVer);
     }
 
 }
