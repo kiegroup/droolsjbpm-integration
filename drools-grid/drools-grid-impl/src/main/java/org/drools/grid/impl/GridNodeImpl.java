@@ -206,4 +206,8 @@ public class GridNodeImpl
     public boolean isRemote() {
         return false;
     }
+
+    public boolean isLocalProxy() {
+        return false;
+    }
 }

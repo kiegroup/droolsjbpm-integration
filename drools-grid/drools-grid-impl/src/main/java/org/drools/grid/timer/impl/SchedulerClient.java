@@ -97,6 +97,8 @@ public class SchedulerClient
         }
         try {
             return handler.getMessage().getBody();
+        } catch (Throwable t){
+            throw new RuntimeException(t);
         } finally {
             conv.endConversation();
         }

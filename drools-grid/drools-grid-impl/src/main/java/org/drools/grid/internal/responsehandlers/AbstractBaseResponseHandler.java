@@ -1,8 +1,10 @@
 package org.drools.grid.internal.responsehandlers;
 
 import java.lang.reflect.Constructor;
+import org.drools.grid.io.Conversation;
 
 import org.drools.grid.io.MessageReceiverHandler;
+import org.drools.grid.io.impl.ExceptionMessage;
 
 /**
  * Abstract base class for client ResponseHandlers. Provides synchonized access to <field>done</field> which represents
@@ -17,17 +19,23 @@ public abstract class AbstractBaseResponseHandler
     implements
     MessageReceiverHandler {
     private volatile boolean done;
-    private RuntimeException error;
+    private Throwable error;
 
+    public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
+        this.setError(msg.getBody());
+    }
+
+    
+    
     public synchronized boolean hasError() {
         return this.error != null;
     }
 
-    public synchronized RuntimeException getError() {
+    public synchronized Throwable getError() {
         return this.error;
     }
 
-    public synchronized void setError(RuntimeException error) {
+    public synchronized void setError(Throwable error) {
         this.error = error;
         notifyAll();
     }
@@ -49,6 +57,7 @@ public abstract class AbstractBaseResponseHandler
      * @param serverSideException exception used to create client side exception
      * @return client side exception
      */
+    /*
     protected static RuntimeException createSideException(RuntimeException serverSideException) {
         RuntimeException clientSideException;
 
@@ -64,4 +73,5 @@ public abstract class AbstractBaseResponseHandler
 
         return clientSideException;
     }
+    */
 }

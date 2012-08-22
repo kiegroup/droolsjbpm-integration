@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.grid.io.Conversation;
-import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 
@@ -28,8 +27,14 @@ public class RequestResponseDispatchListener
                                 Message msg) {
         MessageReceiverHandler msgRecHandler = this.msgRecHandlers.remove( msg.getResponseId() );
         if ( msgRecHandler != null ) {
-            msgRecHandler.messageReceived( conversation,
-                                           msg );
+                msgRecHandler.messageReceived( conversation, msg );
+        }
+    }
+
+    public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
+        MessageReceiverHandler msgRecHandler = this.msgRecHandlers.remove( msg.getResponseId() );
+        if ( msgRecHandler != null ) {
+                msgRecHandler.exceptionReceived(conversation, msg);
         }
     }
 
