@@ -104,7 +104,6 @@ public class SimulateProcessTest {
         event = wmRepo.getAggregatedEvents().get(2);
         assertNotNull(event.getProperty("minExecutionTime"));
         wmRepo.close();
-        wmRepo.clearEvents();
         
     }
     
@@ -128,7 +127,6 @@ public class SimulateProcessTest {
         assertEquals(4, wmRepo.getAggregatedEvents().size());
         assertEquals(60, wmRepo.getEvents().size());
         wmRepo.close();
-        wmRepo.clearEvents();
     }
 
     @Test
@@ -151,7 +149,6 @@ public class SimulateProcessTest {
         assertEquals(3, wmRepo.getAggregatedEvents().size());
         assertEquals(6, wmRepo.getEvents().size());
         wmRepo.close();
-        wmRepo.clearEvents();
     }
     
     @Test
@@ -174,6 +171,5 @@ public class SimulateProcessTest {
         assertEquals(4, wmRepo.getAggregatedEvents().size());
         assertEquals(12, wmRepo.getEvents().size());
         wmRepo.close();
-        wmRepo.clearEvents();
     }
 }
