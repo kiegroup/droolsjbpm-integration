@@ -28,12 +28,12 @@ public class AbstractRunConway {
     public static final int AGENDAGROUP = 0;
     public static final int RULEFLOWGROUP = 1;
     
-    public static void start(final int executionControl) {
+    public void start(final int executionControl, boolean exitOnClose) {
         final ConwayGUI gui = new ConwayGUI(executionControl);
         final String appTitle = ConwayApplicationProperties.getProperty( "app.title" );
         final JFrame f = new JFrame( appTitle );
         f.setResizable( false );
-        f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+        f.setDefaultCloseOperation(exitOnClose ? JFrame.EXIT_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE);
         f.getContentPane().add( BorderLayout.CENTER,
                                 gui );
 
@@ -43,6 +43,7 @@ public class AbstractRunConway {
             }
         } );
         f.pack();
+        f.setLocationRelativeTo(null); // Center in screen
         f.setVisible( true );
     }
 }

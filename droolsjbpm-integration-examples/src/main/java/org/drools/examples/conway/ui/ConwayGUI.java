@@ -136,6 +136,9 @@ public class ConwayGUI extends JPanel {
     }
 
     public void dispose() {
+        if (timer.isRunning()) {
+            stopTimer();
+        }
         this.grid.dispose();
     }
     private void populatePatternSelector() {
@@ -236,21 +239,4 @@ public class ConwayGUI extends JPanel {
         return controlPanel;
     }
 
-    public static void main(final String[] args) {
-        final ConwayGUI gui = new ConwayGUI( AbstractRunConway.RULEFLOWGROUP );
-        final String appTitle = ConwayApplicationProperties.getProperty( "app.title" );
-        final JFrame f = new JFrame( appTitle );
-        f.setResizable( false );
-        f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        f.getContentPane().add( BorderLayout.CENTER,
-                                gui );
-
-        f.addWindowListener( new WindowAdapter() {
-            public void windowClosing(WindowEvent we) {
-                gui.dispose();
-            }
-        } );
-        f.pack();
-        f.setVisible( true );
-    }
 }
