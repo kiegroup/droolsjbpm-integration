@@ -7,4 +7,8 @@ public interface SimulationEvent {
     long getProcessInstanceId();
     
     String getMetric(String name);
+    
+    long getStartTime();
+
+    long getEndTime();
 }

@@ -13,7 +13,6 @@ public class GenericSimulationEvent implements SimulationEvent {
     protected long startTime;
     protected long endTime;
     
-    
     public long getStartTime() {
         return startTime;
     }
