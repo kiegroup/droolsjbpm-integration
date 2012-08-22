@@ -19,6 +19,7 @@ package org.drools.grid.remote;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
+import org.drools.grid.TimeoutException;
 import org.drools.grid.internal.responsehandlers.AsyncMessageResponseHandler;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Conversation;
@@ -94,7 +95,9 @@ public class ConversationUtil {
         }
         try {
             return handler.getMessage().getBody();
-        } finally {
+        } catch (TimeoutException e){
+            throw new RuntimeException(e);
+        }finally {
             conv.endConversation();
         }
     }

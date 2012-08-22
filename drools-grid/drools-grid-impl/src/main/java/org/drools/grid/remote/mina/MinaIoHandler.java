@@ -1,8 +1,5 @@
 package org.drools.grid.remote.mina;
 
-import org.apache.mina.core.future.CloseFuture;
-import org.apache.mina.core.future.IoFuture;
-import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -11,7 +8,7 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.ConversationImpl;
-import org.drools.grid.io.impl.MessageIoReceiverImpl;
+import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.grid.io.impl.RequestResponseDispatchListener;
 
 public class MinaIoHandler extends IoHandlerAdapter {
@@ -35,8 +32,6 @@ public class MinaIoHandler extends IoHandlerAdapter {
     public MinaIoHandler(SystemEventListener systemEventListener,
                          MessageReceiverHandler messageHandler) {
         this.systemEventListener = systemEventListener;
-        //        this.messageHandler = new MessageIoReceiverImpl( handler,
-        //                                                         systemEventListener );
         this.messageHandler = messageHandler;
 
     }
@@ -66,9 +61,13 @@ public class MinaIoHandler extends IoHandlerAdapter {
                                                           msg,
                                                           new MinaIoWriter( session ),
                                                           null );
-        this.messageHandler.messageReceived( conversation,
+        if (msg instanceof ExceptionMessage){
+            this.messageHandler.exceptionReceived( conversation,
+                                             (ExceptionMessage) msg );
+        } else{
+            this.messageHandler.messageReceived( conversation,
                                              msg );
-
+        }
        
     }
 

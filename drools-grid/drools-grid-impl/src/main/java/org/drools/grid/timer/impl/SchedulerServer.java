@@ -14,7 +14,6 @@
  * limitations under the License.
  * under the License.
  */
-
 package org.drools.grid.timer.impl;
 
 import java.util.HashMap;
@@ -24,11 +23,17 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.time.SchedulerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SchedulerServer
-    implements
-    MessageReceiverHandler {
+        implements
+        MessageReceiverHandler {
+
+     private static Logger logger = LoggerFactory.getLogger(SchedulerServer.class);
+    
     private SchedulerService scheduler = null;
 
     public SchedulerServer(SchedulerService scheduler) {
@@ -36,38 +41,46 @@ public class SchedulerServer
     }
 
     public void messageReceived(Conversation conversation,
-                                Message msg) {
+            Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
-        this.execs.get( cmd.getName() ).execute( scheduler,
-                                                 conversation,
-                                                 msg,
-                                                 cmd );
-    }
 
+        try {
+            this.execs.get(cmd.getName()).execute(scheduler,
+                    conversation,
+                    msg,
+                    cmd);
+        } catch (Throwable t) {
+            conversation.respondError(t);
+        }
+    }
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
-                                        {
-                                            put( "Scheduler.scheduleJob",
-                                                 new Exec() {
-                                                     public void execute(Object object,
-                                                                         Conversation con,
-                                                                         Message msg,
-                                                                         CommandImpl cmd) {
-                                                         SchedulerService scheduler = (SchedulerService) object;
-                                                         final List list = cmd.getArguments();
-                                                         scheduler.scheduleJob( ((ScheduledJob) list.get( 0 )).getJob(),
-                                                                                ((ScheduledJob) list.get( 0 )).getJobContext(),
-                                                                                ((ScheduledJob) list.get( 0 )).getTrigger() );
-                                                         con.respond( ((ScheduledJob) list.get( 0 )).getJobHandle() );
-                                                     }
-                                                 } );
-                                        }
-                                    };
+        {
+            put("Scheduler.scheduleJob",
+                    new Exec() {
+                        public void execute(Object object,
+                                Conversation con,
+                                Message msg,
+                                CommandImpl cmd) {
+                            SchedulerService scheduler = (SchedulerService) object;
+                            final List list = cmd.getArguments();
+                            scheduler.scheduleJob(((ScheduledJob) list.get(0)).getJob(),
+                                    ((ScheduledJob) list.get(0)).getJobContext(),
+                                    ((ScheduledJob) list.get(0)).getTrigger());
+                            con.respond(((ScheduledJob) list.get(0)).getJobHandle());
+                        }
+                    });
+        }
+    };
+
+    public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
+        logger.error("SchedulerServer received and exception when it shouldn't");
+    }
 
     public static interface Exec {
-        void execute(Object object,
-                     Conversation con,
-                     Message msg,
-                     CommandImpl cmd);
-    }
 
+        void execute(Object object,
+                Conversation con,
+                Message msg,
+                CommandImpl cmd);
+    }
 }

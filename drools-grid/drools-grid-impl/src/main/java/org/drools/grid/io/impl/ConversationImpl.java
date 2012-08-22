@@ -70,6 +70,17 @@ public class ConversationImpl
 
         writer.write( msg );
     }
+    
+    public void respondError(Throwable throwable) {
+        Message msg = new ExceptionMessage( this.conversationId,
+                                       this.senderId,
+                                       recipientId,
+                                       -1,
+                                       receivedMessage.getRequestId(),
+                                       throwable );
+
+        writer.write( msg );
+    }
 
     public void sendMessage(Object body,
                                 MessageReceiverHandler handler) {
