@@ -20,6 +20,9 @@ public class InMemorySimulationRepository implements SimulationRepository {
     }
     
     public void close() {
-        this.events.clear();
+    }
+    
+    public void clearEvents() {
+    	this.events.clear();
     }
 }
