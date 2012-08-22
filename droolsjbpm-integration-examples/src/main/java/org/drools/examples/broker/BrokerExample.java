@@ -34,15 +34,18 @@ import org.drools.time.impl.JDKTimerService;
  */
 public class BrokerExample {
 
-    /**
-     * @param args
-     * @throws UnsupportedLookAndFeelException 
-     */
     public static void main(String[] args) {
+        new BrokerExample().init(true);
+    }
+
+    public BrokerExample() {
+    }
+
+    public void init(boolean exitOnClose) {
         // set up and show main window
         Locale.setDefault( Locale.US );
         CompanyRegistry registry = new CompanyRegistry();
-        BrokerWindow window = new BrokerWindow( registry.getCompanies() );
+        BrokerWindow window = new BrokerWindow( registry.getCompanies(), exitOnClose );
         window.show();
         //Thread.sleep( 10000 );
         Broker broker = new Broker( window, registry );
