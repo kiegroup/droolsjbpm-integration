@@ -6,6 +6,7 @@ import org.apache.mina.util.CopyOnWriteMap;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
+import org.drools.grid.io.impl.ExceptionMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,10 @@ public class MultiplexSocket
             conversation.respond( null );
         }
 
+    }
+
+    public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
+        logger.error("MultiplexSocket received and exception when it shouldn't");
     }
 
 }

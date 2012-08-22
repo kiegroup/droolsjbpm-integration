@@ -28,6 +28,7 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -62,10 +63,15 @@ public class GridNodeServer
     public void messageReceived(Conversation conversation,
                                 Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
-        this.execs.get(cmd.getName()).execute(gnode,
-                conversation,
-                msg,
-                cmd);
+        
+        try{
+            this.execs.get(cmd.getName()).execute(gnode,
+                    conversation,
+                    msg,
+                    cmd);
+        } catch(Throwable t){
+            conversation.respondError(t);
+        }
     }
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
 
@@ -268,6 +274,10 @@ public class GridNodeServer
 
         }
     };
+
+    public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
+        logger.error("GridNodeServer received and exception when it shouldn't");
+    }
 
     public static interface Exec {
 

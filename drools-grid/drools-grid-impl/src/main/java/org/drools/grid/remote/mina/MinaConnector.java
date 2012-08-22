@@ -104,9 +104,11 @@ public class MinaConnector
             this.writer.dispose();
             this.writer = null;
         }
-        if ( this.connector != null && this.connector.isActive() ) {
-            this.connector.dispose();
-            this.connector = null;
+        if ( this.connector != null )       {
+//            if ( this.connector.isActive() ) {
+                this.connector.dispose();
+                this.connector = null;
+//            }
         }
     }
 

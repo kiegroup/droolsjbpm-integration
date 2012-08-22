@@ -46,7 +46,10 @@ public class RetractFromObjectCommand
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
         System.out.println("OBJECT INSIDE THE COMMAND: "+this.object);
         FactHandle handle = ksession.getFactHandle(this.object);
-        ksession.getWorkingMemoryEntryPoint( ((InternalFactHandle)handle).getEntryPoint().getEntryPointId() ).retract( handle );
+        if ( handle != null ) {
+            // objects may not be in the WM (anymore). The remote client is not guaranteed to have up-to-date information
+            ksession.getWorkingMemoryEntryPoint( ((InternalFactHandle)handle).getEntryPoint().getEntryPointId() ).retract( handle );
+        }
         return null;
     }
 

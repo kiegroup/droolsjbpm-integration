@@ -47,6 +47,19 @@ public class RemoteProcessCommandTest extends BaseRemoteTest{
      }
      
      @Test
+     public void startUnexistingProcessTest() {
+        StatefulKnowledgeSession ksession = createProcessSession();
+        
+        try{
+            ProcessInstance processInstance = ksession.startProcess("Minimal NO EXISTS");
+            Assert.fail("Exception expected");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        
+     }
+     
+     @Test
      public void startProcessWithParametersTest() {
         StatefulKnowledgeSession ksession = createProcessSession();
         Map<String, Object> parameters = new HashMap<String, Object>();

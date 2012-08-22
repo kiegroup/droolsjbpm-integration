@@ -14,6 +14,7 @@ import org.drools.grid.io.AcceptorFactoryService;
 import org.drools.grid.io.ConnectorFactoryService;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.ConversationManagerImpl;
+import org.drools.grid.remote.GridNodeRemoteClient;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
@@ -75,7 +76,11 @@ public class GridImpl implements Grid {
             WhitePages wp = get( WhitePages.class, false );
             if ( wp != null ) {
                 for ( String nodeId : localNodes.keySet() ) {
-                    wp.remove( nodeId );
+                    GridNode node = localNodes.get( nodeId );
+                    if( ! node.isLocalProxy() ) {
+                        wp.remove( nodeId );
+                    }
+                    node.dispose();
                 }
             }
         } catch ( Throwable t ) {
@@ -181,7 +186,10 @@ public class GridImpl implements Grid {
         }
         // forcing a remote connection to the node
         cfs.setLocalAllowed( allowsLocal );
-        return conn.connect();
+        GridNodeRemoteClient rem = (GridNodeRemoteClient) conn.connect();
+        rem.setLocalProxy( true );
+        this.localNodes.put( node.getId() + "$$LocalProxy", rem );
+        return rem;
     }
 
     public String getId() {

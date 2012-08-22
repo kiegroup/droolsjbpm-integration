@@ -9,12 +9,18 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
+import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WhitePagesServer
     implements
     MessageReceiverHandler {
+    
+    private static Logger logger = LoggerFactory.getLogger(WhitePagesServer.class);
+    
     private WhitePages whitePages;
 
     public WhitePagesServer( WhitePages whitePages ) {
@@ -24,10 +30,14 @@ public class WhitePagesServer
     public void messageReceived(Conversation conversation,
                                 Message msg) {
         final CommandImpl cmd = (CommandImpl) msg.getBody();
-        this.execs.get( cmd.getName() ).execute( whitePages,
+        try{
+            this.execs.get( cmd.getName() ).execute( whitePages,
                                                  conversation,
                                                  msg,
                                                  cmd );
+        } catch (Throwable t){
+            conversation.respondError(t);
+        }
     }
 
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
@@ -126,6 +136,10 @@ public class WhitePagesServer
                                                  } );
                                         }
                                     };
+
+    public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
+        logger.error("WhitePagesServer received and exception when it shouldn't");
+    }
 
     public static interface Exec {
         void execute(Object object,
