@@ -49,6 +49,8 @@ public class GridNodeRemoteClient<T>
     private final ServiceRegistry     serviceRegistry = ServiceRegistryImpl.getInstance();
     private MinaConnector             connector       = new MinaConnector();
 
+    private boolean                   localProxy      = false;
+
     public GridNodeRemoteClient( Grid grid,
                                  GridServiceDescription gsd ) {
         this.gsd = gsd;
@@ -155,6 +157,14 @@ public class GridNodeRemoteClient<T>
 
     public boolean isRemote() {
         return true;
+    }
+
+    public boolean isLocalProxy() {
+        return localProxy;
+    }
+
+    public void setLocalProxy( boolean proxy ) {
+        localProxy = proxy;
     }
 
 }

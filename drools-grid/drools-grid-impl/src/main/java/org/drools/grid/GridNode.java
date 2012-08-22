@@ -14,4 +14,6 @@ public interface GridNode
 
     public boolean isRemote();
 
+    public boolean isLocalProxy();
+
 }

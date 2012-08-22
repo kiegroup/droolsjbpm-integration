@@ -20,6 +20,8 @@ import org.drools.KnowledgeBase;
 import org.drools.SystemEventListener;
 import org.drools.SystemEventListenerFactory;
 import org.drools.SystemEventListenerService;
+import org.drools.agent.conf.NewInstanceOption;
+import org.drools.agent.conf.UseKnowledgeBaseClassloaderOption;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.runtime.Environment;
@@ -45,7 +47,8 @@ public class RegisterKAgentRemoteCommand
     public KnowledgeAgent execute( Context context ) {
         KnowledgeBase kbase = ( (KnowledgeCommandContext) context ).getKnowledgeBase();
         KnowledgeAgentConfiguration kaConfig = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-            kaConfig.setProperty( "drools.agent.newInstance", "false" );
+        kaConfig.setProperty( NewInstanceOption.PROPERTY_NAME, "false" );
+        kaConfig.setProperty( UseKnowledgeBaseClassloaderOption.PROPERTY_NAME, "true" );
         KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( this.kAgentId, kbase, kaConfig );
         SystemEventListener systemEventListener = new SystemEventListener() {
 
