@@ -41,14 +41,14 @@ public class BrokerWindow {
     private final LogPanel logPanel;
     private final ScrollingBanner           banner;
 
-    public BrokerWindow(final Collection<Company> companies) {
+    public BrokerWindow(final Collection<Company> companies, boolean exitOnClose) {
         this.logPanel = new LogPanel();
         this.banner = new ScrollingBanner();
         this.companies = new HashMap<String, CompanyPanel>();
-        this.frame = buildFrame( companies );
+        this.frame = buildFrame( companies, exitOnClose );
     }
 
-    private JFrame buildFrame(final Collection<Company> companies) {
+    private JFrame buildFrame(final Collection<Company> companies, boolean exitOnClose) {
         JPanel contentPanel = new JPanel(new BorderLayout());
 
         JPanel companyListPanel = new JPanel(new GridLayout(0, 2));
@@ -64,14 +64,12 @@ public class BrokerWindow {
 
         JFrame frame = new JFrame();
         frame.setContentPane(contentPanel);
-        
-        frame.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
+
+        frame.setDefaultCloseOperation(exitOnClose ? JFrame.EXIT_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE);
         frame.setTitle( "Drools Fusion Example: Simple Broker" );
         frame.setResizable( true );
         frame.pack();
-        
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation( (screen.width-frame.getWidth())/2, (screen.height-frame.getHeight())/2 );
+        frame.setLocationRelativeTo(null); // Center in screen
         
         Thread bannerThread = new Thread( banner );
         bannerThread.setPriority( bannerThread.getPriority()-1 );
