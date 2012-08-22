@@ -41,7 +41,7 @@ public class MultiplexSocket
     }
 
     public void exceptionReceived(Conversation conversation, ExceptionMessage msg) {
-        throw new AssertionError();
+        logger.error("MultiplexSocket received and exception when it shouldn't");
     }
 
 }

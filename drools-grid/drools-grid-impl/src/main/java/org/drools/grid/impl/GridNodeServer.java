@@ -70,7 +70,6 @@ public class GridNodeServer
                     msg,
                     cmd);
         } catch(Throwable t){
-            System.out.println("\n\n\tCatched "+t+"\n\n");
             conversation.respondError(t);
         }
     }
