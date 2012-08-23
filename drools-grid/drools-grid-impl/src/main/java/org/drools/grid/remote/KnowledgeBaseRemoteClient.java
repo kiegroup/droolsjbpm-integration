@@ -165,10 +165,15 @@ public class KnowledgeBaseRemoteClient
         
         this.sendMessage(registerKAgentCmd);
         
+        String ksessionConfId = null;
+        if (conf != null){
+            ((KnowledgeSessionConfigurationRemoteClient)conf).getId();
+        }
+         
         CommandImpl newSessionCmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionFromKAgentRemoteCommand( conf , environment, localId),
+                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionFromKAgentRemoteCommand( ksessionConfId , environment, localId),
                                                                                                                                                null,
                                                                                                                                                this.instanceId,
                                                                                                                                                null,
@@ -178,7 +183,8 @@ public class KnowledgeBaseRemoteClient
 
         return new StatefulKnowledgeSessionRemoteClient( localId,
                                                          this.gsd,
-                                                         this.cm );
+                                                         this.cm,
+                                                         (KnowledgeSessionConfigurationRemoteClient)conf);
 
     }
 

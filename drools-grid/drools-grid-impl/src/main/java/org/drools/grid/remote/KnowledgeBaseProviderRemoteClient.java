@@ -24,12 +24,12 @@ import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.SessionConfiguration;
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommands;
+import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.Environment;
@@ -78,7 +78,22 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeSessionConfiguration newKnowledgeSessionConfiguration() {
-        return new SessionConfiguration();
+        String localId = UUID.randomUUID().toString();
+        logger.info("This InstanceId (just generated) = "+localId);
+        CommandImpl cmd = new CommandImpl("execute", Arrays.asList(
+            new Object[]{
+                new KnowledgeSessionConfigurationRemoteCommands.NewKnowledgeSessionConfigurationRemoteCommand(localId)
+            }
+        ));
+        
+        ConversationManager connm = this.grid.get( ConversationManager.class );
+        ConversationUtil.sendMessage( connm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
+
+        return new KnowledgeSessionConfigurationRemoteClient(localId, grid, gsd);
+        
     }
 
     public KnowledgeSessionConfiguration newKnowledgeSessionConfiguration(Properties properties) {

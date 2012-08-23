@@ -71,16 +71,39 @@ import org.slf4j.LoggerFactory;
 public class StatefulKnowledgeSessionRemoteClient
     implements
     StatefulKnowledgeSession {
+    
+    private static Logger logger = LoggerFactory.getLogger(StatefulKnowledgeSessionRemoteClient.class);
+    
     private String                           instanceId;
     private GridServiceDescription<GridNode> gsd;
     private ConversationManager              cm;
-    private static Logger logger = LoggerFactory.getLogger(StatefulKnowledgeSessionRemoteClient.class);
+    private KnowledgeSessionConfigurationRemoteClient conf;
+    
+    private Long timeout;
+    private Long minWaitTime;
+    
+    
     public StatefulKnowledgeSessionRemoteClient(String localId,
                                                 GridServiceDescription gsd,
-                                                ConversationManager cm) {
+                                                ConversationManager cm,
+                                                KnowledgeSessionConfigurationRemoteClient conf) {
         this.instanceId = localId;
         this.gsd = gsd;
         this.cm = cm;
+        this.conf = conf;
+        
+        //Configure timeouts
+        if (this.conf != null){
+            String configuredTimeout = this.conf.getProperty(KnowledgeSessionConfigurationRemoteClient.PROPERTY_MESSAGE_TIMEOUT);
+            if (configuredTimeout != null){
+                timeout = Long.parseLong(configuredTimeout);
+            }
+            String configuredMinWaitTime = this.conf.getProperty(KnowledgeSessionConfigurationRemoteClient.PROPERTY_MESSAGE_MINIMUM_WAIT_TIME);
+            if (configuredMinWaitTime != null){
+                minWaitTime = Long.parseLong(configuredMinWaitTime);
+            }
+        }
+        
     }
 
     public int getId() {
@@ -96,10 +119,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId ), this.instanceId} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public int fireAllRules() {
@@ -116,12 +136,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        return (Integer)this.sendMessage(cmd);
 
-        return (Integer) result;
     }
 
     public int fireAllRules(AgendaFilter agendaFilter) {
@@ -133,12 +149,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
-
-        return (Integer) result;
+        return (Integer) this.sendMessage(cmd);
     }
 
     public int fireAllRules(AgendaFilter agendaFilter,
@@ -152,12 +163,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
-
-        return (Integer) result;
+        return (Integer) this.sendMessage(cmd);
     }
 
     public void fireUntilHalt() {
@@ -173,10 +179,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public <T> T execute(Command<T> command) {
@@ -206,10 +209,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       null,
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId ),this.instanceId} ) );
-            result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+            result = this.sendMessage(cmd);
+            
             if(logger.isDebugEnabled()){
              logger.debug(" ### Execute Method Returns: "+result);
             }
@@ -228,10 +229,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
+        
         return (T) result;
     }
 
@@ -246,10 +245,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public Object getGlobal(String identifier) {
@@ -261,10 +257,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return result;
     }
@@ -278,10 +271,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (Globals) result;
     }
@@ -333,10 +323,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public Agenda getAgenda() {
@@ -353,10 +340,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       name,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
 
         return new WorkingMemoryEntryPointRemoteClient( this.instanceId,
                                                         name,
@@ -384,11 +368,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                                                          null,
                                                                                                                                                         this.instanceId,
                                                                                                                                                          kresultsId ))  } ) );
-         
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+
+        this.sendMessage(cmd);
 
         return new QueryResultsRemoteClient( query,
                                              this.instanceId,
@@ -419,10 +400,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (FactHandle) result;
     }
@@ -436,10 +414,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public void update(FactHandle handle,
@@ -453,10 +428,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public FactHandle getFactHandle(Object object) {
@@ -469,10 +441,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (FactHandle) result;
     }
@@ -486,10 +455,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return result;
     }
@@ -507,10 +473,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (Collection<Object>) result;
     }
@@ -529,11 +492,8 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
-
+        Object result = this.sendMessage(cmd);
+        
         return (Collection<T>) result;
     }
 
@@ -546,10 +506,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (Long) result;
     }
@@ -570,10 +527,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (ProcessInstance) result;
     }
@@ -589,10 +543,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (ProcessInstance) result;
     }
@@ -606,10 +557,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (ProcessInstance) result;
     }
@@ -625,10 +573,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public void signalEvent(String type,
@@ -643,10 +588,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
     }
 
     public Collection<ProcessInstance> getProcessInstances() {
@@ -658,10 +600,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (Collection<ProcessInstance>) result;
     }
@@ -675,10 +614,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (ProcessInstance) result;
     }
@@ -695,10 +631,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       this.instanceId,
                                                                                                                       kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        this.sendMessage(cmd);
 
     }
 
@@ -710,6 +643,19 @@ public class StatefulKnowledgeSessionRemoteClient
 
     }
 
+    private Object sendMessage(Object body){
+        
+        //send the message
+        return ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                body,
+                minWaitTime,
+                timeout);
+        
+        
+    }
+    
     public void addEventListener(WorkingMemoryEventListener listener) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
