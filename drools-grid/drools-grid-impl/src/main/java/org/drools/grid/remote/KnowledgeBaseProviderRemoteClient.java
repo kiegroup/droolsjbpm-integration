@@ -24,23 +24,25 @@ import java.util.UUID;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
-import org.drools.RuleBaseConfiguration;
 import org.drools.SessionConfiguration;
-import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.SetVariableCommandFromCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KnowledgeBaseProviderRemoteClient
     implements
     KnowledgeBaseFactoryService {
 
+    private static Logger logger = LoggerFactory.getLogger(KnowledgeBaseProviderRemoteClient.class);
+    
     private Grid                             grid;
     private GridServiceDescription<GridNode> gsd;
 
@@ -51,7 +53,23 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration() {
-        return new RuleBaseConfiguration();
+        
+        String localId = UUID.randomUUID().toString();
+        logger.info("This InstanceId (just generated) = "+localId);
+        CommandImpl cmd = new CommandImpl("execute", Arrays.asList(
+            new Object[]{
+                new KnowledgeBaseConfigurationRemoteCommands.NewKnowledgeBaseConfigurationRemoteCommand(localId)
+            }
+        ));
+        
+        ConversationManager connm = this.grid.get( ConversationManager.class );
+        ConversationUtil.sendMessage( connm,
+                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                      this.gsd.getId(),
+                                      cmd );
+
+        return new KnowledgeBaseConfigurationRemoteClient(localId, grid, gsd);
+        
     }
 
     public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
@@ -91,11 +109,14 @@ public class KnowledgeBaseProviderRemoteClient
         } else {
             localId = kbaseId;
         }
+        
+        String kbaseConfId = ((KnowledgeBaseConfigurationRemoteClient)conf).getId();
+        
 
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new NewKnowledgeBaseCommand( conf ) )} ) );
+                                                                                                new NewKnowledgeBaseRemoteCommand( kbaseConfId ) )} ) );
         ConversationManager connm = this.grid.get( ConversationManager.class );
         ConversationUtil.sendMessage( connm,
                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
@@ -104,7 +125,8 @@ public class KnowledgeBaseProviderRemoteClient
 
         return new KnowledgeBaseRemoteClient( localId,
                                               this.gsd,
-                                              connm );
+                                              connm,
+                                              (KnowledgeBaseConfigurationRemoteClient)conf);
     }
 
     public Environment newEnvironment() {

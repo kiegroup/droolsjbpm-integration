@@ -51,13 +51,16 @@ public class KnowledgeBaseRemoteClient
     private String                           instanceId;
     private ConversationManager              cm;
     private GridServiceDescription<GridNode> gsd;
+    private KnowledgeBaseConfigurationRemoteClient conf;
 
     public KnowledgeBaseRemoteClient(String localId,
                                      GridServiceDescription gsd,
-                                     ConversationManager cm) {
+                                     ConversationManager cm,
+                                     KnowledgeBaseConfigurationRemoteClient conf) {
         this.instanceId = localId;
         this.cm = cm;
         this.gsd = gsd;
+        this.conf = conf;
     }
 
     public void addKnowledgePackages(Collection<KnowledgePackage> kpackages) {
@@ -72,11 +75,8 @@ public class KnowledgeBaseRemoteClient
                                                                                                                        null,
                                                                                                                        kresultsId )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
-
+        this.sendMessage(cmd);
+        
     }
 
     public Collection<KnowledgePackage> getKnowledgePackages() {
@@ -146,10 +146,8 @@ public class KnowledgeBaseRemoteClient
                                                                                                                                                this.instanceId,
                                                                                                                                                null,
                                                                                                                                                kresultsId ) )} ) );
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      registerKAgentCmd );
+        
+        this.sendMessage(registerKAgentCmd);
         
         CommandImpl newSessionCmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
@@ -160,10 +158,7 @@ public class KnowledgeBaseRemoteClient
                                                                                                                                                null,
                                                                                                                                                kresultsId ) )} ) );
 
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      newSessionCmd );
+        this.sendMessage(newSessionCmd);
 
         return new StatefulKnowledgeSessionRemoteClient( localId,
                                                          this.gsd,
@@ -202,6 +197,33 @@ public class KnowledgeBaseRemoteClient
 
     public Set<String> getEntryPointIds() {
         throw new UnsupportedOperationException( "Not supported yet." );
+    }
+    
+    private Object sendMessage(Object body){
+        //Configure timeouts
+        Long timeout = null;
+        Long minWaitTime = null;
+        
+        if (this.conf != null){
+            String configuredTimeout = this.conf.getProperty(KnowledgeBaseConfigurationRemoteClient.PROPERTY_MESSAGE_TIMEOUT);
+            if (configuredTimeout != null){
+                timeout = Long.parseLong(configuredTimeout);
+            }
+            String configuredMinWaitTime = this.conf.getProperty(KnowledgeBaseConfigurationRemoteClient.PROPERTY_MESSAGE_MINIMUM_WAIT_TIME);
+            if (configuredMinWaitTime != null){
+                minWaitTime = Long.parseLong(configuredMinWaitTime);
+            }
+        }
+        
+        //send the message
+        return ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                body,
+                minWaitTime,
+                timeout);
+        
+        
     }
 
 }
