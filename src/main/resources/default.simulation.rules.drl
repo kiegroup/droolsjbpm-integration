@@ -103,8 +103,9 @@ no-loop
         $avg : average( $duration ),
         $max : max( $duration ),
         $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
+        eval($processSet.size() > 0)
     then
         System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
         simulation.add(new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max));
-
+       
 end

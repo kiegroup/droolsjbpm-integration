@@ -25,7 +25,7 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
     }
     
     protected void setProcessInfoValues(Object processInfo) {
-        if (processInfo instanceof Set) {
+        if (processInfo instanceof Set && !((Set) processInfo).isEmpty()) {
             
             String values = (String) ((Set) processInfo).toArray()[0];
             String[] splitValues = values.split("@");

@@ -23,17 +23,23 @@ public class SimulationRunner {
 
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, String... rules) {
         
+        
+        return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, false, rules);
+    }
+    
+    public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, String... rules) {
+        
         Resource[] resources = new Resource[rules.length];
         for (int i = 0; i < rules.length; i++) {
             resources[i] = ResourceFactory.newClassPathResource(rules[i]);
         }
         
-        return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, resources);
+        return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, runRules, resources);
     }
     
-    public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, Resource... rules) {
+    public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, Resource... rules) {
         
-        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(rules));
+        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(runRules, rules));
         SimulationDataProvider provider = context.getDataProvider();
         
         PathFinder finder = PathFinderFactory.getInstance(bpmn2Container);
@@ -44,7 +50,7 @@ public class SimulationRunner {
         SimulationFluent f = new DefaultSimulationFluent();
         // @formatter:off        
         int counter = 0;
-        
+        int remainingInstances = numberOfAllInstances;
         for (SimulationPath path : paths) {
             
             double probability = provider.calculatePathProbability(path);
@@ -59,7 +65,14 @@ public class SimulationRunner {
             // count how many instances/steps should current path have
             if (numberOfAllInstances > 1) {
                 instancesOfPath = (int) Math.round((numberOfAllInstances * probability));
-            
+                
+                // ensure that we won't exceed total number of instance due to rounding
+                if (instancesOfPath > remainingInstances) {
+                    instancesOfPath = remainingInstances;
+                }
+                
+                remainingInstances -= instancesOfPath;
+                        
                 for (int i = 0; i < instancesOfPath; i++) {
                     f.newStep( interval * i )
                         .newStatefulKnowledgeSession()
