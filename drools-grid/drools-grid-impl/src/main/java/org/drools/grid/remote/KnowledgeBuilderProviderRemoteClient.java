@@ -27,19 +27,22 @@ import org.drools.builder.JaxbConfiguration;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.command.CommandFactory;
 import org.drools.command.SetVariableCommandFromCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KnowledgeBuilderProviderRemoteClient
     implements
     KnowledgeBuilderFactoryService {
 
+    private static Logger logger = LoggerFactory.getLogger(KnowledgeBaseProviderRemoteClient.class);
+    
     private Grid                             grid;
     private GridServiceDescription<GridNode> gsd;
 
@@ -51,9 +54,15 @@ public class KnowledgeBuilderProviderRemoteClient
 
     public KnowledgeBuilderConfiguration newKnowledgeBuilderConfiguration() {
         String localId = UUID.randomUUID().toString();
-        System.out.println("This InstanceId (just generated) = "+localId);
-        CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{ CommandFactory.newNewKnowledgeBuilderConfigurationCommand( localId ) } ) );
+        logger.info("This InstanceId (just generated) = "+localId);
+        CommandImpl cmd = new CommandImpl("execute", Arrays.asList(
+            new Object[]{
+                new KnowledgeBuilderConfigurationRemoteCommands.NewKnowledgeBuilderConfigurationRemoteCommand(localId)
+            }
+        ));
+        
+        
+        
 
         ConversationManager connm = this.grid.get( ConversationManager.class );
         ConversationUtil.sendMessage( connm,
@@ -109,7 +118,8 @@ public class KnowledgeBuilderProviderRemoteClient
 
         return new KnowledgeBuilderRemoteClient( localId,
                                                  this.gsd,
-                                                 connm );
+                                                 connm,
+                                                 (KnowledgeBuilderConfigurationRemoteClient)conf );
     }
 
     public JaxbConfiguration newJaxbConfiguration(Options xjcOpts,

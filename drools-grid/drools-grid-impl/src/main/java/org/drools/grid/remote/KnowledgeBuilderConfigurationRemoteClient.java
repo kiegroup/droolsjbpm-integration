@@ -26,17 +26,28 @@ import org.drools.builder.conf.KnowledgeBuilderOption;
 import org.drools.builder.conf.MultiValueKnowledgeBuilderOption;
 import org.drools.builder.conf.SingleValueKnowledgeBuilderOption;
 import org.drools.command.CommandFactory;
+import org.drools.command.Context;
+import org.drools.command.impl.GenericCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author salaboy
  */
 public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuilderConfiguration, Serializable{
+    
+    public final static String PROPERTY_MESSAGE_TIMEOUT = "grid.kbuilder.message.timeout";
+    public final static String PROPERTY_MESSAGE_MINIMUM_WAIT_TIME = "grid.kbuilder.message.min.wait";
+    
+    private static Logger logger = LoggerFactory.getLogger(KnowledgeBuilderConfigurationRemoteClient.class);
+    
     private String instanceId;
     private GridServiceDescription<GridNode> gsd;
     private Grid  grid;
@@ -47,10 +58,15 @@ public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuild
         this.grid = grid;
     }
 
-    public void setProperty(String name, String value) {
-        System.out.println("This InstanceId (ConfRemoteClient) = "+instanceId);
+    public void setProperty(final String name, final String value) {
+        logger.info("This InstanceId (ConfRemoteClient) = "+instanceId);
+        
+        
+        
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{CommandFactory.newKBuilderSetPropertyCommand(instanceId, name, value)} ) );
+            Arrays.asList( new Object[]{
+                new KnowledgeBuilderConfigurationRemoteCommands.SetPropertyRemoteCommand(instanceId, name, value)
+        } ) );
 
         ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
                                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
@@ -60,13 +76,22 @@ public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuild
 
     }
 
-    public String getProperty(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String getProperty(final String name) {
+        
+        CommandImpl cmd = new CommandImpl( "execute",
+            Arrays.asList( new Object[]{
+                new KnowledgeBuilderConfigurationRemoteCommands.GetPropertyRemoteCommand(instanceId, name)
+        } ) );
+
+        return (String) ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
     }
 
     public <T extends KnowledgeBuilderOption> void setOption(T option) {
         CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{CommandFactory.newKBuilderSetPropertyCommand(instanceId, option.getPropertyName(), ((AccumulateFunctionOption)option).getFunction().getClass().getCanonicalName())} ) );
+                                           Arrays.asList( new Object[]{CommandFactory.newKnowledgeBuilderSetPropertyCommand(instanceId, option.getPropertyName(), ((AccumulateFunctionOption)option).getFunction().getClass().getCanonicalName())} ) );
         
         ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
                                                       (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
