@@ -6,8 +6,10 @@ import org.drools.grid.io.Message;
 
 public class BlockingMessageResponseHandler extends AbstractBaseResponseHandler {
 
-    private static final int TIMEOUT = 6000;
-    public static final long INITIAL_WAIT_TIME = 50;
+    private long timeout = 6000;
+    public long initialWaitTime = 50;
+    
+    
     
     private volatile Message message;
 
@@ -18,11 +20,19 @@ public class BlockingMessageResponseHandler extends AbstractBaseResponseHandler 
     }
 
     public Message getMessage() throws RuntimeException, TimeoutException {
-        return getMessage(INITIAL_WAIT_TIME, TIMEOUT);
+        return getMessage(initialWaitTime, timeout);
     }
 
     public Message getMessage(long initialWaitTime, long timeout) throws RuntimeException, TimeoutException {
         return waitForResponse(initialWaitTime, timeout);
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    public void setInitialWaitTime(long initialWaitTime) {
+        this.initialWaitTime = initialWaitTime;
     }
     
     private synchronized Message waitForResponse(long initialWaitTime, long timeout) throws RuntimeException, TimeoutException {

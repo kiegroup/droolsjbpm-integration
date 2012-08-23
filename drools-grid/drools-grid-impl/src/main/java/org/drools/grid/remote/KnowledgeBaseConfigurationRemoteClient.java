@@ -19,19 +19,14 @@ package org.drools.grid.remote;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.Set;
-import org.drools.builder.KnowledgeBuilderConfiguration;
-import org.drools.builder.conf.AccumulateFunctionOption;
-import org.drools.builder.conf.KnowledgeBuilderOption;
-import org.drools.builder.conf.MultiValueKnowledgeBuilderOption;
-import org.drools.builder.conf.SingleValueKnowledgeBuilderOption;
-import org.drools.command.CommandFactory;
-import org.drools.command.Context;
-import org.drools.command.impl.GenericCommand;
+import org.drools.KnowledgeBaseConfiguration;
+import org.drools.conf.KnowledgeBaseOption;
+import org.drools.conf.MultiValueKnowledgeBaseOption;
+import org.drools.conf.SingleValueKnowledgeBaseOption;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteCommands;
+import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.slf4j.Logger;
@@ -39,20 +34,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author salaboy
  */
-public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuilderConfiguration, Serializable{
+public class KnowledgeBaseConfigurationRemoteClient implements KnowledgeBaseConfiguration, Serializable{
     
-    public final static String PROPERTY_MESSAGE_TIMEOUT = "grid.kbuilder.message.timeout";
-    public final static String PROPERTY_MESSAGE_MINIMUM_WAIT_TIME = "grid.kbuilder.message.min.wait";
+    public final static String PROPERTY_MESSAGE_TIMEOUT = "grid.kbase.message.timeout";
+    public final static String PROPERTY_MESSAGE_MINIMUM_WAIT_TIME = "grid.kbase.message.min.wait";
     
-    private static Logger logger = LoggerFactory.getLogger(KnowledgeBuilderConfigurationRemoteClient.class);
+    private static Logger logger = LoggerFactory.getLogger(KnowledgeBaseConfigurationRemoteClient.class);
     
     private String instanceId;
     private GridServiceDescription<GridNode> gsd;
     private Grid  grid;
     
-    KnowledgeBuilderConfigurationRemoteClient(String instanceId, Grid grid, GridServiceDescription<GridNode> gsd) {
+    KnowledgeBaseConfigurationRemoteClient(String instanceId, Grid grid, GridServiceDescription<GridNode> gsd) {
         this.instanceId = instanceId;
         this.gsd = gsd;
         this.grid = grid;
@@ -65,7 +59,7 @@ public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuild
         
         CommandImpl cmd = new CommandImpl( "execute",
             Arrays.asList( new Object[]{
-                new KnowledgeBuilderConfigurationRemoteCommands.SetPropertyRemoteCommand(instanceId, name, value)
+                new KnowledgeBaseConfigurationRemoteCommands.SetPropertyRemoteCommand(instanceId, name, value)
         } ) );
 
         ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
@@ -80,7 +74,7 @@ public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuild
         
         CommandImpl cmd = new CommandImpl( "execute",
             Arrays.asList( new Object[]{
-                new KnowledgeBuilderConfigurationRemoteCommands.GetPropertyRemoteCommand(instanceId, name)
+                new KnowledgeBaseConfigurationRemoteCommands.GetPropertyRemoteCommand(instanceId, name)
         } ) );
 
         return (String) ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
@@ -89,34 +83,32 @@ public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuild
                                                       cmd );
     }
 
-    public <T extends KnowledgeBuilderOption> void setOption(T option) {
-        CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{CommandFactory.newKnowledgeBuilderSetPropertyCommand(instanceId, option.getPropertyName(), ((AccumulateFunctionOption)option).getFunction().getClass().getCanonicalName())} ) );
-        
-        ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
-    }
-
-    public <T extends SingleValueKnowledgeBuilderOption> T getOption(Class<T> option) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public <T extends MultiValueKnowledgeBuilderOption> T getOption(Class<T> option, String key) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public <T extends MultiValueKnowledgeBuilderOption> Set<String> getOptionKeys(Class<T> option) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public String getId() {
         return instanceId;
     }
 
     public void setId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public <T extends KnowledgeBaseOption> void setOption(T option) {
+        CommandImpl cmd = new CommandImpl( "execute",
+            Arrays.asList( new Object[]{
+                new KnowledgeBaseConfigurationRemoteCommands.SetOptionRemoteCommand(instanceId, option)
+        } ) );
+
+        ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
+                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+                                                      this.gsd.getId(),
+                                                      cmd );
+    }
+
+    public <T extends SingleValueKnowledgeBaseOption> T getOption(Class<T> option) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public <T extends MultiValueKnowledgeBaseOption> T getOption(Class<T> option, String key) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     

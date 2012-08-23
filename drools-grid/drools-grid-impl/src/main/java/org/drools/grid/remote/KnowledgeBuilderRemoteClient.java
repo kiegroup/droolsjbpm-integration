@@ -41,13 +41,31 @@ public class KnowledgeBuilderRemoteClient
     private String                           instanceId;
     private ConversationManager              cm;
     private GridServiceDescription<GridNode> gsd;
+    private KnowledgeBuilderConfigurationRemoteClient conf;
+    
+    private Long timeout;
+    private Long minWaitTime;
 
     public KnowledgeBuilderRemoteClient(String localId,
                                         GridServiceDescription gsd,
-                                        ConversationManager cm) {
+                                        ConversationManager cm,
+                                        KnowledgeBuilderConfigurationRemoteClient conf) {
         this.instanceId = localId;
         this.gsd = gsd;
         this.cm = cm;
+        this.conf = conf;
+        
+        //Configure timeouts
+        if (this.conf != null){
+            String configuredTimeout = this.conf.getProperty(KnowledgeBuilderConfigurationRemoteClient.PROPERTY_MESSAGE_TIMEOUT);
+            if (configuredTimeout != null){
+                timeout = Long.parseLong(configuredTimeout);
+            }
+            String configuredMinWaitTime = this.conf.getProperty(KnowledgeBuilderConfigurationRemoteClient.PROPERTY_MESSAGE_MINIMUM_WAIT_TIME);
+            if (configuredMinWaitTime != null){
+                minWaitTime = Long.parseLong(configuredMinWaitTime);
+            }
+        }
     }
 
     public void add(Resource resource,
@@ -72,11 +90,8 @@ public class KnowledgeBuilderRemoteClient
                                                                                                                        null,
                                                                                                                        null,
                                                                                                                        null )} ) );
-
-        ConversationUtil.sendMessage( this.cm,
-                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                      this.gsd.getId(),
-                                      cmd );
+        
+        this.sendMessage(cmd);
 
     }
 
@@ -104,15 +119,25 @@ public class KnowledgeBuilderRemoteClient
                                                                                                                        null,
                                                                                                                        kresultsId )} ) );
 
-        Object result = ConversationUtil.sendMessage( this.cm,
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+        Object result = this.sendMessage(cmd);
 
         return (KnowledgeBuilderErrors) result;
 
     }
 
+    private Object sendMessage(Object body){
+        
+        //send the message
+        return ConversationUtil.sendMessage(this.cm,
+                (InetSocketAddress) this.gsd.getAddresses().get("socket").getObject(),
+                this.gsd.getId(),
+                body,
+                minWaitTime,
+                timeout);
+        
+        
+    }
+    
     public KnowledgeBuilderResults getResults( ResultSeverity... severities ) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }

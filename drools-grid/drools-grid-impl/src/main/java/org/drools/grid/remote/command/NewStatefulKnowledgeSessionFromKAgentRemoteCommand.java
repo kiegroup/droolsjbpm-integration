@@ -27,17 +27,18 @@ public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
     implements
     GenericCommand<StatefulKnowledgeSession> {
 
-    private KnowledgeSessionConfiguration ksessionConf;
+    private String ksessionConfId;
     private Environment environment;
     private String kbaseKagentId;
-    public NewStatefulKnowledgeSessionFromKAgentRemoteCommand(KnowledgeSessionConfiguration ksessionConf) {
-        this.ksessionConf = ksessionConf;
+    
+    public NewStatefulKnowledgeSessionFromKAgentRemoteCommand(String ksessionConfId) {
+        this.ksessionConfId = ksessionConfId;
         
     }
     
-    public NewStatefulKnowledgeSessionFromKAgentRemoteCommand(KnowledgeSessionConfiguration ksessionConf,
+    public NewStatefulKnowledgeSessionFromKAgentRemoteCommand(String ksessionConfId,
                                                 Environment env, String kbaseKagentId) { 
-        this(ksessionConf);
+        this(ksessionConfId);
         this.environment = env;
         this.kbaseKagentId = kbaseKagentId;
         
@@ -46,9 +47,15 @@ public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
 
     public StatefulKnowledgeSession execute(Context context) {
         
+        KnowledgeSessionConfiguration kconf = null;
+        if (ksessionConfId != null){
+            kconf = (KnowledgeSessionConfiguration) context.getContextManager().getContext("__TEMP__").get(ksessionConfId);
+        }
+        
         KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext("__TEMP__").get(kbaseKagentId+"_kAgent");
+        
         if(agent != null){
-            return agent.getKnowledgeBase().newStatefulKnowledgeSession(ksessionConf, environment);
+            return agent.getKnowledgeBase().newStatefulKnowledgeSession(kconf, environment);
         }
         return null;
     }
