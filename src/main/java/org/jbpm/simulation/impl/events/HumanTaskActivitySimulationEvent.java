@@ -74,7 +74,7 @@ public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
     @Override
     public String toString() {
         
-        return "UserTaskActivitySimulationEvent[process=" + processId + ", instance=" 
+        return "HumanTaskActivitySimulationEvent[process=" + processId + ", instance=" 
         + processInstanceId + ", activity=" + activityName + ", duration=" + duration/1000+" seconds" +
         		", wait time=" + waitTime/1000 + " seconds , resource cost=" +resourceCost +
         		", resource utilization=" +resourceUtilization +"]";

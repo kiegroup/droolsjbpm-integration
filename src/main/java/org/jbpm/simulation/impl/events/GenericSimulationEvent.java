@@ -1,6 +1,7 @@
 package org.jbpm.simulation.impl.events;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jbpm.simulation.SimulationEvent;
@@ -12,6 +13,8 @@ public class GenericSimulationEvent implements SimulationEvent {
     protected Map<String, Object> customMetrics = new ConcurrentHashMap<String, Object>();
     protected long startTime;
     protected long endTime;
+    protected UUID uuid;
+    
     
     public long getStartTime() {
         return startTime;
@@ -27,6 +30,7 @@ public class GenericSimulationEvent implements SimulationEvent {
         this.processInstanceId = processInstanceId;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.uuid = UUID.randomUUID();
     }
 
     
@@ -56,8 +60,7 @@ public class GenericSimulationEvent implements SimulationEvent {
 
     @Override
     public String toString() {
-        
-        return "GenericSimulationEvent[process=" + processId + ", instance=" + processInstanceId + "]";
+        return "GenericSimulationEvent[process=" + processId + ", instance=" + processInstanceId + ", uuid=" + uuid + "]";
     }
     
     
