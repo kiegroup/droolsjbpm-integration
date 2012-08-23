@@ -42,6 +42,9 @@ public class KnowledgeBuilderRemoteClient
     private ConversationManager              cm;
     private GridServiceDescription<GridNode> gsd;
     private KnowledgeBuilderConfigurationRemoteClient conf;
+    
+    private Long timeout;
+    private Long minWaitTime;
 
     public KnowledgeBuilderRemoteClient(String localId,
                                         GridServiceDescription gsd,
@@ -51,6 +54,18 @@ public class KnowledgeBuilderRemoteClient
         this.gsd = gsd;
         this.cm = cm;
         this.conf = conf;
+        
+        //Configure timeouts
+        if (this.conf != null){
+            String configuredTimeout = this.conf.getProperty(KnowledgeBuilderConfigurationRemoteClient.PROPERTY_MESSAGE_TIMEOUT);
+            if (configuredTimeout != null){
+                timeout = Long.parseLong(configuredTimeout);
+            }
+            String configuredMinWaitTime = this.conf.getProperty(KnowledgeBuilderConfigurationRemoteClient.PROPERTY_MESSAGE_MINIMUM_WAIT_TIME);
+            if (configuredMinWaitTime != null){
+                minWaitTime = Long.parseLong(configuredMinWaitTime);
+            }
+        }
     }
 
     public void add(Resource resource,
@@ -111,20 +126,6 @@ public class KnowledgeBuilderRemoteClient
     }
 
     private Object sendMessage(Object body){
-        //Configure timeouts
-        Long timeout = null;
-        Long minWaitTime = null;
-        
-        if (this.conf != null){
-            String configuredTimeout = this.conf.getProperty(KnowledgeBuilderConfigurationRemoteClient.PROPERTY_MESSAGE_TIMEOUT);
-            if (configuredTimeout != null){
-                timeout = Long.parseLong(configuredTimeout);
-            }
-            String configuredMinWaitTime = this.conf.getProperty(KnowledgeBuilderConfigurationRemoteClient.PROPERTY_MESSAGE_MINIMUM_WAIT_TIME);
-            if (configuredMinWaitTime != null){
-                minWaitTime = Long.parseLong(configuredMinWaitTime);
-            }
-        }
         
         //send the message
         return ConversationUtil.sendMessage(this.cm,
