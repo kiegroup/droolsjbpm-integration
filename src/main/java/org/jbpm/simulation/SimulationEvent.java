@@ -1,5 +1,7 @@
 package org.jbpm.simulation;
 
+import java.util.UUID;
+
 public interface SimulationEvent {
 
     String getProcessId();
@@ -11,4 +13,6 @@ public interface SimulationEvent {
     long getStartTime();
 
     long getEndTime();
+    
+    UUID getUUID();
 }

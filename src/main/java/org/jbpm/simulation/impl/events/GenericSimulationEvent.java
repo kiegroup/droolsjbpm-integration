@@ -44,6 +44,9 @@ public class GenericSimulationEvent implements SimulationEvent {
         return processInstanceId;
     }
 
+    public UUID getUUID() {
+    	return this.uuid;
+    }
     
 
     public String getMetric(String name) {
