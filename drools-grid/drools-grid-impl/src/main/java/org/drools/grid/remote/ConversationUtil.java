@@ -40,6 +40,23 @@ public class ConversationUtil {
                             body );
 
     }
+    
+    public static Object sendMessage(ConversationManager conversationManager,
+                                     Serializable addr,
+                                     String id,
+                                     Object body,
+                                     Long initialWaitTime,
+                                     Long timeout) {
+        // This method was added to provide a level of backwards compatability
+        // until we have a correct way of setting senderId
+        return sendMessage( conversationManager,
+                            "",
+                            addr,
+                            id,
+                            body, initialWaitTime, timeout );
+
+    }
+    
     public static void sendAsyncMessage(ConversationManager conversationManager,
                                      Serializable addr,
                                      String id,
@@ -53,12 +70,23 @@ public class ConversationUtil {
                             body );
 
     }
-
+    
     public static Object sendMessage(ConversationManager conversationManager,
                                      String senderId,
                                      Serializable addr,
                                      String id,
                                      Object body) {
+        return sendMessage(conversationManager, senderId, addr, id, body, null, null);
+        
+    }
+
+    public static Object sendMessage(ConversationManager conversationManager,
+                                     String senderId,
+                                     Serializable addr,
+                                     String id,
+                                     Object body,
+                                     Long initialWaitTime,
+                                     Long timeout) {
 
         InetSocketAddress[] sockets = null;
         if ( addr instanceof InetSocketAddress[] ) {
@@ -69,6 +97,15 @@ public class ConversationUtil {
         }
 
         BlockingMessageResponseHandler handler = new BlockingMessageResponseHandler();
+        
+        if (initialWaitTime != null){
+            handler.setInitialWaitTime(initialWaitTime);
+        }
+        
+        if (timeout != null){
+            handler.setTimeout(timeout);
+        }
+        
         Exception exception = null;
         Conversation conv = null;
         for ( InetSocketAddress socket : sockets ) {

@@ -98,7 +98,7 @@ public class GridNodeRemoteClient<T>
                 logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +"GNRC Ready to send it back" );
             }
 
-            return (T) new StatefulKnowledgeSessionRemoteClient( (String) result, gsd, connm );
+            return (T) new StatefulKnowledgeSessionRemoteClient( (String) result, gsd, connm, null );
         }
         T service = (T) localContext.get( identifier );
         if ( service == null ) {
