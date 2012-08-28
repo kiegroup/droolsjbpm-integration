@@ -148,4 +148,14 @@ public class DroolsSpringJpaManager
         return new JpaProcessPersistenceContext( appScopedEntityManager );
     }
 
+    public void clearPersistenceContext() {
+        if ( TransactionSynchronizationManager.hasResource( "cmdEM" ) ) {
+            EntityManager cmdScopedEntityManager = (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER );
+            if ( cmdScopedEntityManager != null ) {
+                cmdScopedEntityManager.clear();
+            }
+
+        }
+    }
+
 }
