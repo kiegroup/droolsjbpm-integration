@@ -1,0 +1,132 @@
+//created on: Aug 2, 2012
+package simulation
+
+//list any import classes here.
+import org.jbpm.simulation.impl.events.*;
+import java.util.Date;
+
+
+//declare any global variables here
+global java.util.List simulation;
+
+declare ActivitySimulationEvent 
+    @role(event)
+end
+declare HumanTaskActivitySimulationEvent 
+    @role(event)
+end
+declare EndSimulationEvent 
+    @role(event)
+end
+declare ActivityName
+    name : String
+    type : String
+    id : String
+end 
+
+rule "Insert activity names"
+no-loop
+salience 10
+    when
+        ActivitySimulationEvent( $name : activityName, $id : activityId )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name, "abstract", $id ) );
+
+end
+
+rule "Insert activity names for ht"
+no-loop
+salience 10
+    when
+        HumanTaskActivitySimulationEvent( $name : activityName, $id : activityId )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name, "ht", $id ) );
+
+end
+
+rule "Calculate average duration for activity"
+salience 20
+no-loop
+    when
+        ActivityName($name : name, type=="abstract", $id : id)
+        $event : ActivitySimulationEvent()
+        accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        $min : min( $duration ),
+        $avg : average( $duration ),
+        $max : max( $duration ) )
+        eval($event.isUsed() == false)
+    then
+        System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max);
+        simulation.add(aggEvent);
+        modify ($event) {
+            setAggregatedEvent(aggEvent),
+            setUsed(true)
+        }
+
+end
+
+rule "Calculate average duration for human activity"
+salience 20
+no-loop
+    when
+        ActivityName($name : name, type == "ht", $id : id)
+        $event : HumanTaskActivitySimulationEvent(activityId == $id)
+        accumulate(
+        HumanTaskActivitySimulationEvent($waitTime : waitTime, activityName == $name ) over window:length( 100 ),
+        $minwt : min( $waitTime ),
+        $avgwt : average( $waitTime ),
+        $maxwt : max( $waitTime ) )
+        
+        accumulate(
+        HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        $min : min( $duration ),
+        $avg : average( $duration ),
+        $max : max( $duration ) )
+        
+        accumulate(
+        HumanTaskActivitySimulationEvent($resourceUtilization : resourceUtilization, activityName == $name ) over window:length( 100 ),
+        $minru : min( $resourceUtilization ),
+        $avgru : average( $resourceUtilization ),
+        $maxru : max( $resourceUtilization ) )
+        eval($event.isUsed() == false)
+        
+    then
+        System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
+        + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
+         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru);
+        HTAggregatedSimulationEvent aggEvent = new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru);
+        simulation.add(aggEvent);
+        modify ($event) {
+            setAggregatedEvent(aggEvent),
+            setUsed(true)
+        }
+
+end
+
+rule "Calculate average duration for process"
+salience 3
+no-loop
+    when
+        $event : EndSimulationEvent()
+        accumulate(
+        EndSimulationEvent($duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
+        $min : min( $duration ),
+        $avg : average( $duration ),
+        $max : max( $duration ),
+        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
+        eval($processSet.size() > 0)
+        eval($event.isUsed() == false)
+    then
+        System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
+        AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
+        simulation.add(aggEvent);
+        modify ($event) {
+            setAggregatedEvent(aggEvent),
+            setUsed(true)
+        }
+       
+end

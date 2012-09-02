@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jbpm.simulation.AggregatedSimulationEvent;
 import org.jbpm.simulation.SimulationEvent;
 
 public class GenericSimulationEvent implements SimulationEvent {
@@ -15,7 +16,27 @@ public class GenericSimulationEvent implements SimulationEvent {
     protected long endTime;
     protected UUID uuid;
     
+    protected AggregatedSimulationEvent aggregatedEvent;
+    protected boolean used; 
     
+    
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
+
+    public AggregatedSimulationEvent getAggregatedEvent() {
+        return aggregatedEvent;
+    }
+
+    public void setAggregatedEvent(AggregatedSimulationEvent aggregatedEvent) {
+        this.aggregatedEvent = aggregatedEvent;
+
+    }
+
     public long getStartTime() {
         return startTime;
     }

@@ -22,6 +22,9 @@ import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
+import org.jbpm.simulation.impl.events.ActivitySimulationEvent;
+import org.jbpm.simulation.impl.events.EndSimulationEvent;
+import org.jbpm.simulation.impl.events.GenericSimulationEvent;
 import org.junit.Test;
 
 public class SimulateProcessTest {
@@ -192,6 +195,34 @@ public class SimulateProcessTest {
 
         assertEquals(15, wmRepo.getAggregatedEvents().size());
         assertEquals(30, wmRepo.getEvents().size());
+        wmRepo.close();
+    }
+    
+    @Test
+    public void testSimulationRunnerWithRunRulesOnEveryEvent() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("defaultPackage.test", out, 5, 2000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(15, wmRepo.getAggregatedEvents().size());
+        assertEquals(30, wmRepo.getEvents().size());
+        
+        for (SimulationEvent event : wmRepo.getEvents()) {
+            if ((event instanceof EndSimulationEvent) || (event instanceof ActivitySimulationEvent)) {
+                assertNotNull(((GenericSimulationEvent) event).getAggregatedEvent());
+            }
+        }
         wmRepo.close();
     }
 }
