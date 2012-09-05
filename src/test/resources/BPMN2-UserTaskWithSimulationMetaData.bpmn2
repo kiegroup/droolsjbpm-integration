@@ -1,104 +1,93 @@
-<?xml version="1.0" encoding="UTF-8"?> 
-<definitions id="Definition"
-             targetNamespace="http://www.example.org/MinimalExample"
-             typeLanguage="http://www.java.com/javaTypes"
-             expressionLanguage="http://www.mvel.org/2.0"
-             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
-             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-             xmlns:tns="http://www.jboss.org/drools">
-
-  <process processType="Private" isExecutable="true" id="UserTask" name="User Task" >
-
-    <!-- nodes -->
-    <startEvent id="_1" name="StartProcess" >
-      <outgoing>_1-_2</outgoing>
-    </startEvent>
-    <userTask id="_2" name="Hello" >
-    <extensionElements>
-        <tns:metadata>
-          <tns:metaentry>
-            <tns:name>duration</tns:name>
-            <tns:value>21</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>timeunit</tns:name>
-            <tns:value>minutes</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>range</tns:name>
-            <tns:value>5</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>standarddeviation</tns:name>
-            <tns:value>12</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>distributiontype</tns:name>
-            <tns:value>exact</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>staffavailability</tns:name>
-            <tns:value>3</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>workinghours</tns:name>
-            <tns:value>1</tns:value>
-          </tns:metaentry>
-          <tns:metaentry>
-            <tns:name>costpertimeunit</tns:name>
-            <tns:value>45</tns:value>
-          </tns:metaentry>
-        </tns:metadata>
-      </extensionElements>
-      <incoming>_1-_2</incoming>
-      <outgoing>_2-_3</outgoing>
-      <ioSpecification>
-        <inputSet>
-        </inputSet>
-        <outputSet>
-        </outputSet>
-      </ioSpecification>
-      <potentialOwner>
-        <resourceAssignmentExpression>
-          <formalExpression>john</formalExpression>
-        </resourceAssignmentExpression>
-      </potentialOwner>
-    </userTask>
-    <endEvent id="_3" name="EndProcess" >
-        <incoming>_2-_3</incoming>
-        <terminateEventDefinition/>
-    </endEvent>
-
-    <!-- connections -->
-    <sequenceFlow id="_1-_2" sourceRef="_1" targetRef="_2" />
-    <sequenceFlow id="_2-_3" sourceRef="_2" targetRef="_3" />
-
-  </process>
-
-  <bpmndi:BPMNDiagram>
-    <bpmndi:BPMNPlane bpmnElement="UserTask" >
-      <bpmndi:BPMNShape bpmnElement="_1" >
-        <dc:Bounds x="16" y="16" width="48" height="48" />
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_TEnqoPeBEeGKWqHRrzBUaw" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.omg.org/bpmn20" typeLanguage="http://www.java.com/javaTypes">
+  <bpmn2:process id="UserTask" drools:packageName="defaultPackage" name="User Task" isExecutable="true">
+    <bpmn2:startEvent id="_69FD4992-429F-4AD0-B126-85435C2D1A45" drools:bgcolor="#f5deb3" drools:selectable="true" name="StartProcess">
+      <bpmn2:outgoing>_D9988BD7-9459-49E4-9C20-7201B47127B9</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:userTask id="_2B5B707D-3458-475C-943D-74F20B13AF20" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" name="Hello">
+      <bpmn2:incoming>_D9988BD7-9459-49E4-9C20-7201B47127B9</bpmn2:incoming>
+      <bpmn2:outgoing>_E97DF689-7C76-4DDE-8D08-DBE4C33553C2</bpmn2:outgoing>
+      <bpmn2:potentialOwner id="_TEnqofeBEeGKWqHRrzBUaw">
+        <bpmn2:resourceAssignmentExpression id="_TEnqoveBEeGKWqHRrzBUaw">
+          <bpmn2:formalExpression id="_TEoRsPeBEeGKWqHRrzBUaw">john</bpmn2:formalExpression>
+        </bpmn2:resourceAssignmentExpression>
+      </bpmn2:potentialOwner>
+    </bpmn2:userTask>
+    <bpmn2:endEvent id="_84B9E4C8-FC83-4130-8BD4-9038CBADCBAE" drools:bgcolor="#f5deb3" drools:selectable="true" name="EndProcess">
+      <bpmn2:incoming>_E97DF689-7C76-4DDE-8D08-DBE4C33553C2</bpmn2:incoming>
+      <bpmn2:terminateEventDefinition id="_TEoRsfeBEeGKWqHRrzBUaw"/>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="_D9988BD7-9459-49E4-9C20-7201B47127B9" drools:bgcolor="#000000" drools:selectable="true" sourceRef="_69FD4992-429F-4AD0-B126-85435C2D1A45" targetRef="_2B5B707D-3458-475C-943D-74F20B13AF20"/>
+    <bpmn2:sequenceFlow id="_E97DF689-7C76-4DDE-8D08-DBE4C33553C2" drools:bgcolor="#000000" drools:selectable="true" sourceRef="_2B5B707D-3458-475C-943D-74F20B13AF20" targetRef="_84B9E4C8-FC83-4130-8BD4-9038CBADCBAE"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="_TEoRsveBEeGKWqHRrzBUaw">
+    <bpmndi:BPMNPlane id="_TEoRs_eBEeGKWqHRrzBUaw" bpmnElement="UserTask">
+      <bpmndi:BPMNShape id="_TEoRtPeBEeGKWqHRrzBUaw" bpmnElement="_69FD4992-429F-4AD0-B126-85435C2D1A45">
+        <dc:Bounds height="30.0" width="30.0" x="375.0" y="234.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_2" >
-        <dc:Bounds x="96" y="16" width="100" height="48" />
+      <bpmndi:BPMNShape id="_TEoRtfeBEeGKWqHRrzBUaw" bpmnElement="_2B5B707D-3458-475C-943D-74F20B13AF20">
+        <dc:Bounds height="48.0" width="100.0" x="435.0" y="225.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_3" >
-        <dc:Bounds x="228" y="16" width="48" height="48" />
+      <bpmndi:BPMNShape id="_TEoRtveBEeGKWqHRrzBUaw" bpmnElement="_84B9E4C8-FC83-4130-8BD4-9038CBADCBAE">
+        <dc:Bounds height="28.0" width="28.0" x="587.0" y="234.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="_1-_2" >
-        <di:waypoint x="40" y="40" />
-        <di:waypoint x="146" y="40" />
+      <bpmndi:BPMNEdge id="_TEoRt_eBEeGKWqHRrzBUaw" bpmnElement="_D9988BD7-9459-49E4-9C20-7201B47127B9">
+        <di:waypoint xsi:type="dc:Point" x="390.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="485.0" y="249.0"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_2-_3" >
-        <di:waypoint x="146" y="40" />
-        <di:waypoint x="252" y="40" />
+      <bpmndi:BPMNEdge id="_TEoRuPeBEeGKWqHRrzBUaw" bpmnElement="_E97DF689-7C76-4DDE-8D08-DBE4C33553C2">
+        <di:waypoint xsi:type="dc:Point" x="485.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="561.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="561.0" y="248.0"/>
+        <di:waypoint xsi:type="dc:Point" x="601.0" y="248.0"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-
-</definitions>
+  <bpmn2:relationship id="_TEoRufeBEeGKWqHRrzBUaw">
+    <bpmn2:extensionElements>
+      <drools:ProcessAnalysisData>
+        <drools:Scenario xsi:type="drools:Scenario" id="default" name="Simulationscenario">
+          <drools:ScenarioParameters xsi:type="drools:ScenarioParameters_._type" baseCurrencyUnit="USD" baseTimeUnit="min"/>
+          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_D9988BD7-9459-49E4-9C20-7201B47127B9" id="_TEoRuveBEeGKWqHRrzBUaw">
+            <drools:ControlParameters xsi:type="drools:ControlParameters">
+              <drools:Probability xsi:type="drools:Parameter">
+                <drools:FloatingParameter value="100.0"/>
+              </drools:Probability>
+            </drools:ControlParameters>
+          </drools:ElementParameters>
+          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_2B5B707D-3458-475C-943D-74F20B13AF20" id="_TEoRu_eBEeGKWqHRrzBUaw">
+            <drools:TimeParameters xsi:type="drools:TimeParameters">
+              <drools:ProcessingTime xsi:type="drools:Parameter">
+                <drools:NormalDistribution mean="21.0" standardDeviation="12.0"/>
+              </drools:ProcessingTime>
+              <drools:TimeUnit>min</drools:TimeUnit>
+            </drools:TimeParameters>
+            <drools:ResourceParameters xsi:type="drools:ResourceParameters">
+              <drools:Quantity xsi:type="drools:Parameter">
+                <drools:FloatingParameter value="3.0"/>
+              </drools:Quantity>
+              <drools:Workinghours xsi:type="drools:Parameter">
+                <drools:FloatingParameter value="1.0"/>
+              </drools:Workinghours>
+            </drools:ResourceParameters>
+            <drools:CostParameters xsi:type="drools:CostParameters">
+              <drools:UnitCost xsi:type="drools:Parameter">
+                <drools:DecimalParameter value="45"/>
+              </drools:UnitCost>
+              <drools:CurrencyUnit>USD</drools:CurrencyUnit>
+            </drools:CostParameters>
+          </drools:ElementParameters>
+          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_E97DF689-7C76-4DDE-8D08-DBE4C33553C2" id="_TEoRvPeBEeGKWqHRrzBUaw">
+            <drools:ControlParameters xsi:type="drools:ControlParameters">
+              <drools:Probability xsi:type="drools:Parameter">
+                <drools:FloatingParameter value="100.0"/>
+              </drools:Probability>
+            </drools:ControlParameters>
+          </drools:ElementParameters>
+        </drools:Scenario>
+      </drools:ProcessAnalysisData>
+    </bpmn2:extensionElements>
+    <bpmn2:source>_TEnqoPeBEeGKWqHRrzBUaw</bpmn2:source>
+    <bpmn2:target>_TEnqoPeBEeGKWqHRrzBUaw</bpmn2:target>
+  </bpmn2:relationship>
+</bpmn2:definitions>
