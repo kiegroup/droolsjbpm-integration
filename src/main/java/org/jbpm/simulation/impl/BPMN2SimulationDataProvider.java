@@ -22,6 +22,7 @@ import org.jboss.drools.FloatingParameterType;
 import org.jboss.drools.NormalDistributionType;
 import org.jboss.drools.Parameter;
 import org.jboss.drools.ParameterValue;
+import org.jboss.drools.PoissonDistributionType;
 import org.jboss.drools.ProcessAnalysisDataType;
 import org.jboss.drools.RandomDistributionType;
 import org.jboss.drools.ResourceParameters;
@@ -76,6 +77,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                     			ParameterValue paramValue =  processingTime.getParameterValue().get(0);
                     			if(paramValue instanceof NormalDistributionType) {
                     				NormalDistributionType ndt = (NormalDistributionType) paramValue;
+                    				properties.put("mean", ndt.getMean());
                     				properties.put("standarddeviation", ndt.getStandardDeviation());
                     				properties.put("distributiontype", "normal");
                     			} else if(paramValue instanceof UniformDistributionType) {
@@ -88,6 +90,10 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                     				properties.put("max", rdt.getMax());
                     				properties.put("min", rdt.getMin());
                     				properties.put("distributiontype", "random");
+                    			} else if(paramValue instanceof PoissonDistributionType) {
+                    				PoissonDistributionType pdt = (PoissonDistributionType) paramValue;
+                    				properties.put("mean", pdt.getMean());
+                    				properties.put("distributiontype", "poisson");
                     			}
                     			if(eleType.getTimeParameters().getTimeUnit() != null) {
                     				properties.put("timeunit", eleType.getTimeParameters().getTimeUnit().getName());
