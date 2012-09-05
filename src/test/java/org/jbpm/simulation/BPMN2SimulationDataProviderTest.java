@@ -48,7 +48,7 @@ public class BPMN2SimulationDataProviderTest {
             
             public Map<String, Object> getMetaData() {
                 Map<String, Object> metaData = new HashMap<String, Object>();
-                metaData.put("UniqueId", "_2");
+                metaData.put("UniqueId", "_2B5B707D-3458-475C-943D-74F20B13AF20");
                 return metaData;
             }
             
@@ -69,8 +69,8 @@ public class BPMN2SimulationDataProviderTest {
         assertEquals(8, data.size());
         assertTrue(data.containsKey(SimulationConstants.COST_PER_TIME_UNIT));
         assertTrue(data.containsKey(SimulationConstants.DISTRIBUTION_TYPE));
-        assertTrue(data.containsKey(SimulationConstants.MIN));
-        assertTrue(data.containsKey(SimulationConstants.MAX));
+        assertTrue(data.containsKey(SimulationConstants.STANDARD_DEVIATION));
+        assertTrue(data.containsKey(SimulationConstants.MEAN));
         assertTrue(data.containsKey(SimulationConstants.STAFF_AVAILABILITY));
         assertTrue(data.containsKey(SimulationConstants.STANDARD_DEVIATION));
         assertTrue(data.containsKey(SimulationConstants.TIMEUNIT));
@@ -105,7 +105,7 @@ public class BPMN2SimulationDataProviderTest {
             
             public Map<String, Object> getMetaData() {
                 Map<String, Object> metaData = new HashMap<String, Object>();
-                metaData.put("UniqueId", "_2-_3");
+                metaData.put("UniqueId", "_575A78C8-C34A-445E-8B2F-BB990B513A03");
                 return metaData;
             }
             

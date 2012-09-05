@@ -23,10 +23,10 @@ public class NormalTimeGenerator implements TimeGenerator {
 
     public long generateTime() {
         TimeUnit tu = SimulationUtils.getTimeUnit(data);
-        long mean = SimulationUtils.asLong(data.get(SimulationConstants.MEAN));
+        long mean = (long)SimulationUtils.asDouble(data.get(SimulationConstants.MEAN));
         mean = timeUnit.convert(mean, tu);
         
-        long sdv = SimulationUtils.asLong(data.get(SimulationConstants.STANDARD_DEVIATION));
+        long sdv = (long)SimulationUtils.asDouble(data.get(SimulationConstants.STANDARD_DEVIATION));
         sdv = timeUnit.convert(sdv, tu);
         
         return  (long) generator.nextGaussian(mean, sdv);

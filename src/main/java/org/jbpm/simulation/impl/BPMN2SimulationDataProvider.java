@@ -148,12 +148,9 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     public double calculatePathProbability(SimulationPath path) {
         double probability = 100;
         for (String sequenceFlowId : path.getSequenceFlowsIds()) {
-            String probabilityFromElement = (String) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
-            if (probabilityFromElement != null) {
-                double transitionProbability = SimulationUtils.asDouble(probabilityFromElement);
-                if (transitionProbability > 0) {
-                    probability = probability * (transitionProbability / 100);
-                }
+            double transitionProbability = (Double) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
+            if (transitionProbability > 0) {
+                probability = probability * (transitionProbability / 100);
             }
         }
         double result = probability / 100;

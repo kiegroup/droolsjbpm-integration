@@ -48,11 +48,11 @@ public class StaffPoolImpl implements StaffPool {
 	    timeGenerator=TimeGeneratorFactory.newTimeGenerator(properties);
 		
 		this.elementTimeUnit = SimulationUtils.getTimeUnit(properties);
-		this.poolSize = SimulationUtils.asInt(properties.get(SimulationConstants.STAFF_AVAILABILITY));
+		this.poolSize = (int)SimulationUtils.asDouble(properties.get(SimulationConstants.STAFF_AVAILABILITY));
 		
 		this.duration = timeGenerator.generateTime();
 		
-		long workingHoursOpt = SimulationUtils.asLong(properties.get(SimulationConstants.WORKING_HOURS));
+		long workingHoursOpt = (long)SimulationUtils.asDouble(properties.get(SimulationConstants.WORKING_HOURS));
 		if (workingHoursOpt > 0) {
 			this.workingHours = timeUnit.convert(workingHoursOpt, TimeUnit.HOURS);
 		}

@@ -23,10 +23,10 @@ public class RandomTimeGenerator implements TimeGenerator {
         
         TimeUnit tu = SimulationUtils.getTimeUnit(data);
         
-        long min = SimulationUtils.asLong(data.get(SimulationConstants.MIN));
+        long min = (long)SimulationUtils.asDouble(data.get(SimulationConstants.MIN));
         min = timeUnit.convert(min, tu);
         
-        long max = SimulationUtils.asLong(data.get(SimulationConstants.MAX));
+        long max = (long)SimulationUtils.asDouble(data.get(SimulationConstants.MAX));
         max = timeUnit.convert(max, tu);
        
         return  (long) generator.nextLong(min, max);
