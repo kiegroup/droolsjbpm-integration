@@ -57,7 +57,7 @@ public class WorkingMemorySimulationRepositoryTest {
             for (SimulationPath path : paths) {
                 
                 context.setCurrentPath(path.getSequenceFlowsIds());
-                StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-TwoUserTasks.bpmn");
+                StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-TwoUserTasks.bpmn2");
                 
                 context.setClock((SessionPseudoClock) session.getSessionClock());
                 // set start date to current time
