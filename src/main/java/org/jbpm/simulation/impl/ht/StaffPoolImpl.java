@@ -11,6 +11,8 @@ import org.apache.commons.math.random.RandomDataImpl;
 import org.drools.definition.process.Node;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationDataProvider;
+import org.jbpm.simulation.TimeGenerator;
+import org.jbpm.simulation.TimeGeneratorFactory;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.simulation.util.SimulationUtils;
 
@@ -18,7 +20,6 @@ public class StaffPoolImpl implements StaffPool {
     
     private Map<String, Object> properties;
 
-	private String distibutionType;
 	private int poolSize;
 	private long duration;
 	private List<Long> allocatedTill = new ArrayList<Long>();
@@ -31,13 +32,11 @@ public class StaffPoolImpl implements StaffPool {
 	
 	private RandomData randomizer = new RandomDataImpl();
 	
-	// optional properties that depends on selected distribution
-	private double range;
-	private double standadDeviation;
-	
 	private double resourceCost;
 	
 	private TimeUnit elementTimeUnit;
+	
+	private TimeGenerator timeGenerator;
 
 
 	public StaffPoolImpl(String processId, Node element, double simulationDuration) {
@@ -45,11 +44,13 @@ public class StaffPoolImpl implements StaffPool {
 	    SimulationDataProvider provider = SimulationContext.getContext().getDataProvider();
 	    
 	    properties = provider.getSimulationDataForNode(element);
+	    
+	    timeGenerator=TimeGeneratorFactory.newTimeGenerator(properties);
 		
 		this.elementTimeUnit = SimulationUtils.getTimeUnit(properties);
-		this.distibutionType = (String) properties.get(SimulationConstants.DISTRIBUTION_TYPE);
 		this.poolSize = SimulationUtils.asInt(properties.get(SimulationConstants.STAFF_AVAILABILITY));
-		this.duration = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.DURATION)), this.elementTimeUnit);
+		
+		this.duration = timeGenerator.generateTime();
 		
 		long workingHoursOpt = SimulationUtils.asLong(properties.get(SimulationConstants.WORKING_HOURS));
 		if (workingHoursOpt > 0) {
@@ -62,23 +63,18 @@ public class StaffPoolImpl implements StaffPool {
 			this.poolCapacity = (long) (this.poolCapacity * simulationDuration);
 		}
 		
-		this.range = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.RANGE)), this.elementTimeUnit);
-		this.standadDeviation = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.STANDARD_DEVIATION)), this.elementTimeUnit);
-		
 		this.resourceCost = SimulationUtils.asDouble(properties.get(SimulationConstants.COST_PER_TIME_UNIT));
 		
 		
 	}
 	
 	
-	protected long allocate(long startTime, String distribution, long duration, double range, double sdv) {
+	protected long allocate(long startTime, long duration) {
 		long waitTime = 0;
-		// calculate duration based on distribution type
-		long instanceDuration = calculateDuration(distribution, duration, range, sdv);
-		performedWork += instanceDuration;
+		performedWork += duration;
 		if(allocatedTill.size() < poolSize) {
 		
-			allocatedTill.add(startTime + instanceDuration);
+			allocatedTill.add(startTime + duration);
 		
 			return waitTime;
 		 } else {
@@ -87,10 +83,10 @@ public class StaffPoolImpl implements StaffPool {
 			 long allocated = allocatedTill.get(0);
 			 if (allocated >= startTime) {
 				 waitTime = allocated - startTime;
-				 allocated += instanceDuration;
+				 allocated += duration;
 		
 			 } else {
-				 allocated = startTime + instanceDuration;
+				 allocated = startTime + duration;
 			 }
 			 allocatedTill.set(0, allocated);
 		
@@ -101,32 +97,18 @@ public class StaffPoolImpl implements StaffPool {
 
 	public long allocate(long startTime) {
 		
-		return allocate(startTime, this.distibutionType, this.duration, this.range, this.standadDeviation);
+		return allocate(startTime, this.duration);
 	}
 	
 	public long allocate(long startTime, Node element) {
 
-		String distibutionType = (String) properties.get(SimulationConstants.DISTRIBUTION_TYPE);
-		long duration = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.DURATION)), this.elementTimeUnit);
+		long duration = this.duration = timeGenerator.generateTime();
 		
-		double range = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.RANGE)), this.elementTimeUnit);
-		double standadDeviation = timeUnit.convert(SimulationUtils.asLong(properties.get(SimulationConstants.STANDARD_DEVIATION)), this.elementTimeUnit);
-		
-		return allocate(startTime, distibutionType, duration, range, standadDeviation);
+		return allocate(startTime, duration);
 	}
 	
 	public double getResourceUtilization() {
 		return performedWork * 100 / poolCapacity;
-	}
-	
-	protected long calculateDuration(String distibutionType, long duration, double range, double standardDeviation) {
-		if ("uniform".equalsIgnoreCase(distibutionType)) {
-			return (long) randomizer.nextUniform((duration-range), (duration+range));
-		} else if ("normal".equalsIgnoreCase(distibutionType)) {
-			return (long) randomizer.nextGaussian(duration, standardDeviation);
-		} else {
-			return duration;
-		}
 	}
 
 	/* (non-Javadoc)

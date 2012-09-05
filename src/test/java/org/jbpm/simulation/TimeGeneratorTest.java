@@ -22,8 +22,8 @@ public class TimeGeneratorTest {
         
         Map<String, Object> data = new HashMap<String, Object>();
         data.put(SimulationConstants.DISTRIBUTION_TYPE, "random");
-        data.put(SimulationConstants.RANGE, 500L);
-        data.put(SimulationConstants.DURATION, 40000L);
+        data.put(SimulationConstants.MIN, 500L);
+        data.put(SimulationConstants.MAX, 40000L);
         
         TimeGenerator generator = TimeGeneratorFactory.newTimeGenerator(data);
         assertNotNull(generator);

@@ -69,8 +69,8 @@ public class BPMN2SimulationDataProviderTest {
         assertEquals(8, data.size());
         assertTrue(data.containsKey(SimulationConstants.COST_PER_TIME_UNIT));
         assertTrue(data.containsKey(SimulationConstants.DISTRIBUTION_TYPE));
-        assertTrue(data.containsKey(SimulationConstants.DURATION));
-        assertTrue(data.containsKey(SimulationConstants.RANGE));
+        assertTrue(data.containsKey(SimulationConstants.MIN));
+        assertTrue(data.containsKey(SimulationConstants.MAX));
         assertTrue(data.containsKey(SimulationConstants.STAFF_AVAILABILITY));
         assertTrue(data.containsKey(SimulationConstants.STANDARD_DEVIATION));
         assertTrue(data.containsKey(SimulationConstants.TIMEUNIT));

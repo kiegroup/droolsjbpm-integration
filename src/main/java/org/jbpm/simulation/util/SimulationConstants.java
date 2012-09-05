@@ -2,15 +2,17 @@ package org.jbpm.simulation.util;
 
 public class SimulationConstants {
 
-    public static final String STAFF_AVAILABILITY = "staffavailability";
+    public static final String STAFF_AVAILABILITY = "quantity";
     public static final String WORKING_HOURS = "workinghours";
-    public static final String COST_PER_TIME_UNIT = "costpertimeunit";
-    public static final String DURATION = "duration";
+    public static final String COST_PER_TIME_UNIT = "unitcost";
     public static final String TIMEUNIT = "timeunit";
-    public static final String RANGE = "range";
     public static final String STANDARD_DEVIATION = "standarddeviation";
     public static final String DISTRIBUTION_TYPE = "distributiontype";
     public static final String PROBABILITY = "probability";
+    public static final String MIN = "min";
+    public static final String MAX = "max";
+    public static final String MEAN = "mean";
+    public static final String CURRENCY = "currency";
     
     public static final String ACTIVITY_ID = "activityId";
     public static final String ACTIVITY_NAME = "activityName";

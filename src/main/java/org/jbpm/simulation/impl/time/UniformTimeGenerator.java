@@ -23,13 +23,13 @@ public class UniformTimeGenerator implements TimeGenerator {
 
         TimeUnit tu = SimulationUtils.getTimeUnit(data);
         
-        long value = SimulationUtils.asLong(data.get(SimulationConstants.DURATION));
-        value = timeUnit.convert(value, tu);
+        long min = SimulationUtils.asLong(data.get(SimulationConstants.MIN));
+        min = timeUnit.convert(min, tu);
         
-        long range = SimulationUtils.asLong(data.get(SimulationConstants.RANGE));
-        range = timeUnit.convert(range, tu);
+        long max = SimulationUtils.asLong(data.get(SimulationConstants.MAX));
+        max = timeUnit.convert(max, tu);
        
-        return  (long) generator.nextUniform(value-range, value+range);
+        return  (long) generator.nextUniform(min, max);
     }
 
 }
