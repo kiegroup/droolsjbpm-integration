@@ -150,7 +150,7 @@ public class SimulationFluentTest {
 //    @Test
 //    public void testSimulationFluent() {
 //        
-//        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn"));
+//        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn2"));
 //        
 //        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
 //        SimulationContext context = SimulationContextFactory.newContext(new HardCodedSimulationDataProvider());
@@ -158,7 +158,7 @@ public class SimulationFluentTest {
 //        SimulationFluent f = new DefaultSimulationFluent();
 //        // @formatter:off
 //        f.newKnowledgeBuilder()
-//        .add( ResourceFactory.newClassPathResource("BPMN2-TwoUserTasks.bpmn"),
+//        .add( ResourceFactory.newClassPathResource("BPMN2-TwoUserTasks.bpmn2"),
 //                ResourceType.BPMN2 )
 //          .end(World.ROOT, KnowledgeBuilder.class.getName() )
 //        .newKnowledgeBase()

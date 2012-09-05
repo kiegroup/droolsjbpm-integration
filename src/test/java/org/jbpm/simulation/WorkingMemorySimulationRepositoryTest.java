@@ -45,10 +45,10 @@ public class WorkingMemorySimulationRepositoryTest {
     @Test
     public void testWorkingMemorySimulationRepositoryCEPRule() {
         
-        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn"));
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn2"));
         
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
-        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn"))
+        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn2"))
         , new WorkingMemorySimulationRepository("default.simulation.rules.drl"));
 
         

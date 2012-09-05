@@ -81,7 +81,7 @@ public class SimulateProcessTest {
     @Test
     public void testSimulationRunner() throws IOException {
         
-        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn"));
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-TwoUserTasks.bpmn2"));
         
         String out = new String();
         BufferedReader br = new BufferedReader(in);
