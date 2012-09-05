@@ -1,6 +1,7 @@
 package org.jbpm.simulation.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,10 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     public BPMN2SimulationDataProvider(String bpmn2xml) {
     	this.def = BPMN2Utils.getDefinitions(new ByteArrayInputStream(getBytes(bpmn2xml)));
     }
+    
+	public BPMN2SimulationDataProvider(InputStream bpmn2Stream) {
+		this.def = BPMN2Utils.getDefinitions(bpmn2Stream);
+	}
     
     public Map<String, Object> getSimulationDataForNode(Node node) {
         String nodeId = (String) node.getMetaData().get("UniqueId");
