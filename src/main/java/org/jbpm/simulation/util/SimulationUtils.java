@@ -2,6 +2,7 @@ package org.jbpm.simulation.util;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +12,17 @@ public class SimulationUtils {
 	
 	public static final double HUNDRED = 100;
 	public static final  NumberFormat formatter = new DecimalFormat("#0.00");
+	
+	public static HashMap<String, String> timeUnitMapping = new HashMap<String, String>();
+	
+	static {
+	    timeUnitMapping.put("ms", "milliseconds");
+	    timeUnitMapping.put("min", "minutes");
+	    timeUnitMapping.put("s", "seconds");
+	    timeUnitMapping.put("hour", "hours");
+	    timeUnitMapping.put("day", "days");
+	    timeUnitMapping.put("year", "years");
+	}
 
 	public static int asInt(Object value) {
 		if (value == null) {
@@ -38,7 +50,8 @@ public class SimulationUtils {
 	
 	
 	public static TimeUnit getTimeUnit(Map<String, Object> element) {
-		String timeUnitStr = (String) element.get(SimulationConstants.TIMEUNIT);
+		String timeUnitStr = timeUnitMapping.get((String) element.get(SimulationConstants.TIMEUNIT));
+		
 		if (timeUnitStr != null) {
 			try {
 				TimeUnit durationTimeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
