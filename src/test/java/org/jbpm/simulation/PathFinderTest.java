@@ -1473,41 +1473,41 @@ public class PathFinderTest {
     @Test
     public void testExlusiveGatewayWithSignal() throws IOException {
         List<String> expectedIds = new ArrayList<String>();
-        expectedIds.add("_50A658D4-5DC8-42A3-9737-BAB80C79FD58");
-        expectedIds.add("_1A538B49-5857-42DE-AEA2-1697D09CB9DD");
-        expectedIds.add("_3B9CBCFA-5B9D-40E6-AA47-41C5B1C43593");
-        expectedIds.add("_00459EDA-8073-4769-979B-42AA2B598DA7");
-        expectedIds.add("_D003B8DB-05B0-4974-B22F-A74BC7B8D139");
-        expectedIds.add("_7AC32274-CD94-4555-991F-3CBFDA183F1D");
-        expectedIds.add("_56D5F3EB-8A58-4C8D-96EF-FA3E578B9A03");
-        expectedIds.add("_A4C6D771-0948-4D80-AFD2-1EF917A75200");
-        expectedIds.add("_C2B480CA-8F45-4575-9BD8-D8CC5E73BBA3");
-        expectedIds.add("_5C6E2A79-9002-4A2B-B4A8-CD2F2C5DECEF");
-        expectedIds.add("_B770B6C2-2289-413B-BC1B-1CD33A841FEE");
+        expectedIds.add("_FE412B85-210C-4D30-83DE-11AF100F948D");
+        expectedIds.add("_09718EFF-A759-4DB0-BED8-98B88603E187");
+        expectedIds.add("_E70BDC6E-AB67-4AC2-8344-BF2E93A9FE38");
+        expectedIds.add("_046EB3A3-B7AA-462B-8F04-A81DB310090C");
+        expectedIds.add("_36816347-36DB-4DA7-AAA3-E8EC30349856");
+        expectedIds.add("_BD2F426B-4EF6-4527-9E99-DDF265C5E3BD");
+        expectedIds.add("_93144E8A-6FDD-4563-86E5-BBB48D8176D9");
+        expectedIds.add("_A1F56E5D-2DD9-490F-A855-8A73F553E31D");
+        expectedIds.add("_A3A4D425-38FC-4CFF-AA48-D67FD31778F1");
+        expectedIds.add("_89B3D7B3-C5B6-42DD-B24D-90600A2B43D3");
+        expectedIds.add("_8D87C582-C894-4A46-B8E0-0B13B2F9FD3A");
         
         List<String> expectedIds2 = new ArrayList<String>();
-        expectedIds2.add("_50A658D4-5DC8-42A3-9737-BAB80C79FD58");
-        expectedIds2.add("_1A538B49-5857-42DE-AEA2-1697D09CB9DD");
-        expectedIds2.add("_3B9CBCFA-5B9D-40E6-AA47-41C5B1C43593");
-        expectedIds2.add("_15E89DDD-B1D3-46FB-BA4E-4BAE41749C10");
-        expectedIds2.add("_CF99DB7F-F3E9-4E84-86E0-066670B5A906");
-        expectedIds2.add("_10924438-C94E-4503-AEAC-F26E927B3CC7");
-        expectedIds2.add("_56D5F3EB-8A58-4C8D-96EF-FA3E578B9A03");
-        expectedIds2.add("_A4C6D771-0948-4D80-AFD2-1EF917A75200");
-        expectedIds2.add("_C2B480CA-8F45-4575-9BD8-D8CC5E73BBA3");
-        expectedIds2.add("_5C6E2A79-9002-4A2B-B4A8-CD2F2C5DECEF");
-        expectedIds2.add("_B770B6C2-2289-413B-BC1B-1CD33A841FEE");
+        expectedIds2.add("_FE412B85-210C-4D30-83DE-11AF100F948D");
+        expectedIds2.add("_09718EFF-A759-4DB0-BED8-98B88603E187");
+        expectedIds2.add("_E70BDC6E-AB67-4AC2-8344-BF2E93A9FE38");
+        expectedIds2.add("_F0F4D63E-0AEA-48E7-B82F-C0A09BCC19E8");
+        expectedIds2.add("_84244E83-F053-41B5-8620-B087710EA7F3");
+        expectedIds2.add("_3A124926-839D-44C0-A360-95AE9A7DB3D0");
+        expectedIds2.add("_93144E8A-6FDD-4563-86E5-BBB48D8176D9");
+        expectedIds2.add("_A1F56E5D-2DD9-490F-A855-8A73F553E31D");
+        expectedIds2.add("_A3A4D425-38FC-4CFF-AA48-D67FD31778F1");
+        expectedIds2.add("_89B3D7B3-C5B6-42DD-B24D-90600A2B43D3");
+        expectedIds2.add("_8D87C582-C894-4A46-B8E0-0B13B2F9FD3A");
         
         List<String> expectedIds3 = new ArrayList<String>();
-        expectedIds3.add("_13AF5F2F-DE5A-417E-B64C-0C7646DC3348");
-        expectedIds3.add("_806C74EE-F217-484F-9D8C-D5181B62293E");
-        expectedIds3.add("_12CB0873-43EF-4687-87F1-617028517470");
-        expectedIds3.add("_9CCC4052-2C48-4ADC-83D2-3EC91A7852A3");
-        expectedIds3.add("_56D5F3EB-8A58-4C8D-96EF-FA3E578B9A03");
-        expectedIds3.add("_A4C6D771-0948-4D80-AFD2-1EF917A75200");
-        expectedIds3.add("_C2B480CA-8F45-4575-9BD8-D8CC5E73BBA3");
-        expectedIds3.add("_5C6E2A79-9002-4A2B-B4A8-CD2F2C5DECEF");
-        expectedIds3.add("_B770B6C2-2289-413B-BC1B-1CD33A841FEE");
+        expectedIds3.add("_5E99421F-F4D4-4E15-9CCB-5E43AD43312A");
+        expectedIds3.add("_555C6DE6-A561-4216-8203-82E3780314C4");
+        expectedIds3.add("_E725BBAF-CB6D-4E75-8F15-C4C41B565C06");
+        expectedIds3.add("_A443D34E-318F-427A-96A5-50EA05DFC5FF");
+        expectedIds3.add("_93144E8A-6FDD-4563-86E5-BBB48D8176D9");
+        expectedIds3.add("_A1F56E5D-2DD9-490F-A855-8A73F553E31D");
+        expectedIds3.add("_A3A4D425-38FC-4CFF-AA48-D67FD31778F1");
+        expectedIds3.add("_89B3D7B3-C5B6-42DD-B24D-90600A2B43D3");
+        expectedIds3.add("_8D87C582-C894-4A46-B8E0-0B13B2F9FD3A");
         
         PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ExclusiveGatewayWithSignalEvent.bpmn2"));
         
@@ -1532,22 +1532,22 @@ public class PathFinderTest {
     @Test
     public void testParallelGatewayWithSignal() throws IOException {
         List<String> expectedIds = new ArrayList<String>();
-        expectedIds.add("_F7290B42-CF93-4810-9134-0254F6B4CDB4");
-        expectedIds.add("_4DB7114F-37BA-407F-9D8D-0D6BC95B2500");
-        expectedIds.add("_48CA882E-0744-4304-81BF-AE40E04B54CB");
-        expectedIds.add("_E5E1F8D0-20DB-4EFF-B55B-37AFB1A15C2E");
-        expectedIds.add("_EDCB24CC-5B98-4CAB-BF80-CA16B530BCD4");
-        expectedIds.add("_816CACFF-5B60-48EF-884F-5BD593BCA30A");
-        expectedIds.add("_5538B6F7-BC30-470A-8474-1A1DFD61A052");
+        expectedIds.add("_923B69FA-1902-4EEB-893B-49FBA178FE41");
+        expectedIds.add("_7C94ADF3-D1D1-478B-8A9F-DE7410FB0FD7");
+        expectedIds.add("_FD7820A8-AA84-4E94-A340-39F02E62819E");
+        expectedIds.add("_0A40774B-A058-4688-A8CC-B830B5D4A0BA");
+        expectedIds.add("_49643815-E0D9-4463-AFEF-667C6CD7BFDE");
+        expectedIds.add("_E95C2CAF-4A0C-43AD-8C3C-25575605754B");
+        expectedIds.add("_60AAE88C-51BD-456D-A358-86D8D6F56EFC");
         
         List<String> expectedIds2 = new ArrayList<String>();
-        expectedIds2.add("_760D9D6F-D01C-47C8-867B-B8A30E291A38");
-        expectedIds2.add("_AD501A14-FF0B-4011-A16C-D216F8FFA98C");
-        expectedIds2.add("_5DF159CA-619E-4AD9-B9E4-C51357CD90D6");
-        expectedIds2.add("_CDB0D201-680F-4746-9606-4CDAB827F6CB");
-        expectedIds2.add("_EDCB24CC-5B98-4CAB-BF80-CA16B530BCD4");
-        expectedIds2.add("_816CACFF-5B60-48EF-884F-5BD593BCA30A");
-        expectedIds2.add("_5538B6F7-BC30-470A-8474-1A1DFD61A052");
+        expectedIds2.add("_06465A9A-5FD0-4B16-84CA-2FC4EAA62C4F");
+        expectedIds2.add("_E83A0C9A-5E92-445F-8AA4-FA2FBE473B50");
+        expectedIds2.add("_ABA6B22E-5B5F-4380-B54D-61B0A1AB3699");
+        expectedIds2.add("_05BF26D9-E95E-4941-A6B1-8D274290443C");
+        expectedIds2.add("_49643815-E0D9-4463-AFEF-667C6CD7BFDE");
+        expectedIds2.add("_E95C2CAF-4A0C-43AD-8C3C-25575605754B");
+        expectedIds2.add("_60AAE88C-51BD-456D-A358-86D8D6F56EFC");
         
         PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ParallelGatewayWithSignal.bpmn2"));
         
