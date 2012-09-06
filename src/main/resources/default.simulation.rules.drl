@@ -55,10 +55,11 @@ no-loop
         ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
         $min : min( $duration ),
         $avg : average( $duration ),
-        $max : max( $duration ) )
+        $max : max( $duration ),
+        $count : count( $duration ) )
     then
-        System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
-        simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max));
+        System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
+        simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count));
 
 end
 
@@ -77,7 +78,8 @@ no-loop
         HumanTaskActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
         $min : min( $duration ),
         $avg : average( $duration ),
-        $max : max( $duration ) )
+        $max : max( $duration ),
+        $count : count( $duration ) )
         
         accumulate(
         HumanTaskActivitySimulationEvent($resourceUtilization : resourceUtilization, activityName == $name ) over window:length( 100 ),
@@ -88,8 +90,8 @@ no-loop
     then
         System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
-         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru);
-        simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru));
+         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count);
+        simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count));
 
 end
 

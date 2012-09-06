@@ -141,7 +141,7 @@
           <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_51027F4A-9265-4C80-A52C-3EC3B4E5B4F3" id="_Y4kGlfd-EeGKWqHRrzBUaw">
             <drools:TimeParameters xsi:type="drools:TimeParameters">
               <drools:ProcessingTime xsi:type="drools:Parameter">
-                <drools:RandomDistribution max="10.0" min="0.0"/>
+                <drools:RandomDistribution max="10.0" min="8.0"/>
               </drools:ProcessingTime>
               <drools:TimeUnit>min</drools:TimeUnit>
             </drools:TimeParameters>
@@ -177,13 +177,13 @@
           <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_A4D84613-3E98-4B2F-BF27-4E604A0934E8" id="_Y4kGmPd-EeGKWqHRrzBUaw">
             <drools:TimeParameters xsi:type="drools:TimeParameters">
               <drools:ProcessingTime xsi:type="drools:Parameter">
-                <drools:RandomDistribution max="3.0" min="0.0"/>
+                <drools:RandomDistribution max="30.0" min="20.0"/>
               </drools:ProcessingTime>
               <drools:TimeUnit>min</drools:TimeUnit>
             </drools:TimeParameters>
             <drools:ResourceParameters xsi:type="drools:ResourceParameters">
               <drools:Quantity xsi:type="drools:Parameter">
-                <drools:FloatingParameter value="1.0"/>
+                <drools:FloatingParameter value="4.0"/>
               </drools:Quantity>
               <drools:Workinghours xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="4.0"/>

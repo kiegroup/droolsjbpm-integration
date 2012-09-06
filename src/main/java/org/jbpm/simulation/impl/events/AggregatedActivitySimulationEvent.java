@@ -12,17 +12,19 @@ public class AggregatedActivitySimulationEvent implements AggregatedSimulationEv
     protected double avgExecutionTime;
     protected double maxExecutionTime;
     
+    protected long numberOfInstances; 
     
     
     public AggregatedActivitySimulationEvent(String activityName, String activityId,
             double minExecutionTime, double avgExecutionTime,
-            double maxExecutionTime) {
+            double maxExecutionTime, long numberOfInstances) {
         super();
         this.activityName = activityName;
         this.activityId = activityId;
         this.minExecutionTime = minExecutionTime;
         this.avgExecutionTime = avgExecutionTime;
         this.maxExecutionTime = maxExecutionTime;
+        this.numberOfInstances = numberOfInstances;
     }
     public double getMinExecutionTime() {
         return minExecutionTime;
@@ -73,6 +75,12 @@ public class AggregatedActivitySimulationEvent implements AggregatedSimulationEv
         }
         
         return null;
+    }
+    public long getNumberOfInstances() {
+        return numberOfInstances;
+    }
+    public void setNumberOfInstances(long numberOfInstances) {
+        this.numberOfInstances = numberOfInstances;
     }
     
     
