@@ -6,7 +6,7 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
             double minExecutionTime, double avgExecutionTime,
             double maxExecutionTime, double minWaitTime, double avgWaitTime,
             double maxWaitTime, double minResourceUtilization, double avgResourceUtilization, 
-            double maxResourceUtilization, long numberOfInstances, double avgResourceCost) {
+            double maxResourceUtilization, long numberOfInstances, double avgResourceCost, double minResourceCost, double maxResourceCost) {
         
         super(activityName, activityId, minExecutionTime, avgExecutionTime,
                 maxExecutionTime, numberOfInstances);
@@ -18,7 +18,9 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
         this.avgResourceUtilization = avgResourceUtilization;
         this.maxResourceUtilization = maxResourceUtilization;
         
+        this.minResourceCost = minResourceCost;
         this.avgResourceCost = avgResourceCost;
+        this.maxResourceCost = maxResourceCost;
     }
 
 
@@ -30,7 +32,9 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
     private double avgResourceUtilization;
     private double maxResourceUtilization;
     
+    private double minResourceCost;
     private double avgResourceCost;
+    private double maxResourceCost;
 
     public double getMinWaitTime() {
         return minWaitTime;
@@ -117,6 +121,22 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
 
     public void setAvgResourceCost(double avgResourceCost) {
         this.avgResourceCost = avgResourceCost;
+    }
+
+    public double getMinResourceCost() {
+        return minResourceCost;
+    }
+
+    public void setMinResourceCost(double minResourceCost) {
+        this.minResourceCost = minResourceCost;
+    }
+
+    public double getMaxResourceCost() {
+        return maxResourceCost;
+    }
+
+    public void setMaxResourceCost(double maxResourceCost) {
+        this.maxResourceCost = maxResourceCost;
     }
 
     
