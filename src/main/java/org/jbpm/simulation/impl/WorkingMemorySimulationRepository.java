@@ -3,16 +3,21 @@ package org.jbpm.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.drools.base.RuleNameEqualsAgendaFilter;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
+import org.drools.rule.Rule;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.Activation;
+import org.drools.runtime.rule.AgendaFilter;
 import org.jbpm.simulation.AggregatedSimulationEvent;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
+import org.jbpm.simulation.impl.events.GenericSimulationEvent;
 
 public class WorkingMemorySimulationRepository extends InMemorySimulationRepository {
 
@@ -47,6 +52,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
         try {
             // register global for aggregated events
             ksession.setGlobal("simulation", new ArrayList<AggregatedActivitySimulationEvent>());
+            ksession.setGlobal("summary", new ArrayList<AggregatedActivitySimulationEvent>());
             AggregatedProcessSimulationEvent init = new AggregatedProcessSimulationEvent("", 0, 0, 0);
             List processOnlyList = new ArrayList<AggregatedSimulationEvent>();
             processOnlyList.add(init);
@@ -95,6 +101,10 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
     
     public List<AggregatedSimulationEvent> getAggregatedEvents() {
         return (List<AggregatedSimulationEvent>) this.ksession.getGlobal("simulation");
+    }
+    
+    public Object getGlobal(String globalName) {
+        return  this.ksession.getGlobal(globalName);
     }
 
     @Override

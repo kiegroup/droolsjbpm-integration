@@ -8,12 +8,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.List;
 
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.ResourceType;
 import org.drools.command.World;
+import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.io.ResourceFactory;
@@ -226,6 +228,11 @@ public class SimulateProcessTest {
                 assertTrue(((GenericSimulationEvent) event).getAggregatedEvent() instanceof AggregatedProcessSimulationEvent);
             }
         }
+        wmRepo.getSession().execute(new InsertElementsCommand((Collection)wmRepo.getAggregatedEvents()));
+        wmRepo.fireAllRules();
+        List<AggregatedSimulationEvent> summary = (List<AggregatedSimulationEvent>) wmRepo.getGlobal("summary");
+        assertNotNull(summary);
+        assertEquals(4, summary.size());
         wmRepo.close();
     }
 }

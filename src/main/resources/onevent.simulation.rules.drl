@@ -9,6 +9,7 @@ import org.jbpm.simulation.AggregatedSimulationEvent;
 
 //declare any global variables here
 global java.util.List simulation;
+global java.util.List summary;
 global java.util.List processEventsOnly;
 
 
@@ -21,6 +22,18 @@ end
 declare EndSimulationEvent 
     @role(event)
 end
+declare AggregatedProcessSimulationEvent 
+    @role(event)
+end
+
+declare HTAggregatedSimulationEvent
+    @role(event)
+end
+
+declare AggregatedActivitySimulationEvent
+    @role(event)
+end
+
 declare ActivityName
     name : String
     type : String
@@ -70,6 +83,7 @@ no-loop
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
             setUsed(true)
         }
+
 
 end
 
@@ -134,5 +148,76 @@ no-loop
             setAggregatedEvent(aggEvent),
             setUsed(true)
         }
-       
+
+end
+
+rule "Calculate process summary" 
+salience 100
+no-loop
+    when
+        accumulate(
+        AggregatedProcessSimulationEvent($minExecutionTime : minExecutionTime, $avgExecutionTime : avgExecutionTime, $maxExecutionTime : maxExecutionTime, 
+        $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
+        $min : min( $minExecutionTime ),
+        $avg : average( $avgExecutionTime ),
+        $max : max( $maxExecutionTime ),
+        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
+        eval($processSet.size() > 0)
+    then
+        System.out.println("SUMMARY: Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
+        AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
+        summary.add(aggEvent);
+        
+end
+
+rule "Calculate human activity summary"
+salience 200
+no-loop
+    when
+        ActivityName($name : name, type == "ht", $id : id)
+        accumulate(
+        HTAggregatedSimulationEvent($numberOfInstances: numberOfInstances, $minExecutionTime : minExecutionTime, $avgExecutionTime : avgExecutionTime, $maxExecutionTime : maxExecutionTime,
+        $minWaitTime : minWaitTime, $avgWaitTime : avgWaitTime, $maxWaitTime : maxWaitTime,
+        $minResourceUtilization : minResourceUtilization, $avgResourceUtilization : avgResourceUtilization, $maxResourceUtilization : maxResourceUtilization,
+        activityName == $name ) over window:length( 100 ),
+        $minwt : min( $minWaitTime ),
+        $avgwt : average( $avgWaitTime ),
+        $maxwt : max( $maxWaitTime ),
+        $min : min( $minExecutionTime ),
+        $avg : average( $avgExecutionTime ),
+        $max : max( $maxExecutionTime ),
+        $count : max( $numberOfInstances ),
+        $minru : min( $minResourceUtilization ),
+        $avgru : average( $avgResourceUtilization ),
+        $maxru : max( $maxResourceUtilization ) )
+        eval(((Double)$count).intValue() > 0)
+        
+    then
+        System.out.println("SUMMARY Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
+        + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
+         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count);
+        HTAggregatedSimulationEvent aggEvent = new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru, ((Double)$count).longValue());
+        summary.add(aggEvent);
+
+end
+
+rule "Calculate activity summary"
+salience 200
+no-loop
+    when
+        ActivityName($name : name, type=="abstract", $id : id)
+        accumulate(
+        AggregatedActivitySimulationEvent($numberOfInstances: numberOfInstances, $minExecutionTime : minExecutionTime, $avgExecutionTime : avgExecutionTime, $maxExecutionTime : maxExecutionTime,
+        activityName == $name ) over window:length( 100 ),
+        $min : min( $minExecutionTime ),
+        $avg : average( $avgExecutionTime ),
+        $max : max( $maxExecutionTime ),
+        $count : max( $numberOfInstances ) )
+        eval(((Double)$count).intValue() > 0)
+        
+    then
+        System.out.println("SUMMARY Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
+        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue());
+        summary.add(aggEvent);
+
 end
