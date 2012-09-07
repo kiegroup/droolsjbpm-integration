@@ -6,7 +6,7 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
             double minExecutionTime, double avgExecutionTime,
             double maxExecutionTime, double minWaitTime, double avgWaitTime,
             double maxWaitTime, double minResourceUtilization, double avgResourceUtilization, 
-            double maxResourceUtilization, long numberOfInstances) {
+            double maxResourceUtilization, long numberOfInstances, double avgResourceCost) {
         
         super(activityName, activityId, minExecutionTime, avgExecutionTime,
                 maxExecutionTime, numberOfInstances);
@@ -17,6 +17,8 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
         this.minResourceUtilization = minResourceUtilization;
         this.avgResourceUtilization = avgResourceUtilization;
         this.maxResourceUtilization = maxResourceUtilization;
+        
+        this.avgResourceCost = avgResourceCost;
     }
 
 
@@ -28,7 +30,7 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
     private double avgResourceUtilization;
     private double maxResourceUtilization;
     
-    
+    private double avgResourceCost;
 
     public double getMinWaitTime() {
         return minWaitTime;
@@ -107,6 +109,14 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
             return maxResourceUtilization;
         }
         return null;
+    }
+
+    public double getAvgResourceCost() {
+        return avgResourceCost;
+    }
+
+    public void setAvgResourceCost(double avgResourceCost) {
+        this.avgResourceCost = avgResourceCost;
     }
 
     

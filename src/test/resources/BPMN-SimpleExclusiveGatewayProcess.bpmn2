@@ -155,7 +155,7 @@
             </drools:ResourceParameters>
             <drools:CostParameters xsi:type="drools:CostParameters">
               <drools:UnitCost xsi:type="drools:Parameter">
-                <drools:DecimalParameter value="0"/>
+                <drools:DecimalParameter value="50"/>
               </drools:UnitCost>
             </drools:CostParameters>
           </drools:ElementParameters>
@@ -191,7 +191,7 @@
             </drools:ResourceParameters>
             <drools:CostParameters xsi:type="drools:CostParameters">
               <drools:UnitCost xsi:type="drools:Parameter">
-                <drools:DecimalParameter value="0"/>
+                <drools:DecimalParameter value="90"/>
               </drools:UnitCost>
             </drools:CostParameters>
           </drools:ElementParameters>

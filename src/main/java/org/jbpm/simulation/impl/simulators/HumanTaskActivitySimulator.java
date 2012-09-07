@@ -14,6 +14,7 @@ import org.jbpm.simulation.TimeGenerator;
 import org.jbpm.simulation.TimeGeneratorFactory;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.ht.StaffPool;
+import org.jbpm.simulation.util.SimulationUtils;
 
 public class HumanTaskActivitySimulator implements ActivitySimulator {
 
@@ -27,18 +28,24 @@ public class HumanTaskActivitySimulator implements ActivitySimulator {
         Node node = stateNode.getNode();
         String bpmn2NodeId = (String) metadata.get("UniqueId");
         SimulationDataProvider provider = context.getDataProvider();
+        Map<String, Object> properties = provider.getSimulationDataForNode(node);
         
-        TimeGenerator timeGenerator=TimeGeneratorFactory.newTimeGenerator(provider.getSimulationDataForNode(node));
+        TimeGenerator timeGenerator=TimeGeneratorFactory.newTimeGenerator(properties);
         long duration = timeGenerator.generateTime();
         
         context.getStaffPoolManager().registerPool(pi.getProcessId(), node, 1);
         StaffPool pool = context.getStaffPoolManager().getActivityPool(node.getName());
         
         long waitTime = pool.allocate(context.getClock().getCurrentTime());
-        double resourceCost = pool.getResourceCost();
+        
+        
         double resourceUtilization = pool.getResourceUtilization();
         // ensure that duration will include wait time
         duration += waitTime;
+        
+        TimeUnit timeUnit = SimulationUtils.getTimeUnit(properties);
+        long durationInUnit = timeUnit.convert(duration, TimeUnit.MILLISECONDS);
+        double resourceCost = pool.getResourceCost() * durationInUnit;
         
         context.getClock().advanceTime((duration), TimeUnit.MILLISECONDS);
         

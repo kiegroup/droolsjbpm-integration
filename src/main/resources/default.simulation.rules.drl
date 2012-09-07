@@ -87,11 +87,16 @@ no-loop
         $avgru : average( $resourceUtilization ),
         $maxru : max( $resourceUtilization ) )
         
+        accumulate(
+        HumanTaskActivitySimulationEvent($resourceCost : resourceCost, activityName == $name ) over window:length( 100 ),
+        $avgrc : average( $resourceCost ) )
+        
     then
         System.out.println("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
-         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count);
-        simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count));
+         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count + " avg cost " + $avgrc);
+        simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, 
+        (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc));
 
 end
 
