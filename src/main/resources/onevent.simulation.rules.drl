@@ -4,10 +4,13 @@ package simulation
 //list any import classes here.
 import org.jbpm.simulation.impl.events.*;
 import java.util.Date;
+import org.jbpm.simulation.AggregatedSimulationEvent;
 
 
 //declare any global variables here
 global java.util.List simulation;
+global java.util.List processEventsOnly;
+
 
 declare ActivitySimulationEvent 
     @role(event)
@@ -64,7 +67,7 @@ no-loop
         AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
         simulation.add(aggEvent);
         modify ($event) {
-            setAggregatedEvent(aggEvent),
+            setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
             setUsed(true)
         }
 
@@ -103,7 +106,7 @@ no-loop
         HTAggregatedSimulationEvent aggEvent = new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count);
         simulation.add(aggEvent);
         modify ($event) {
-            setAggregatedEvent(aggEvent),
+            setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
             setUsed(true)
         }
 
@@ -126,6 +129,7 @@ no-loop
         System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
         AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
         simulation.add(aggEvent);
+        processEventsOnly.add(aggEvent);
         modify ($event) {
             setAggregatedEvent(aggEvent),
             setUsed(true)

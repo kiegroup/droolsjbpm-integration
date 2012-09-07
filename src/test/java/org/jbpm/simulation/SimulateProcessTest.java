@@ -3,6 +3,7 @@ package org.jbpm.simulation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.jbpm.simulation.impl.events.ActivitySimulationEvent;
+import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
 import org.jbpm.simulation.impl.events.EndSimulationEvent;
 import org.jbpm.simulation.impl.events.GenericSimulationEvent;
 import org.junit.Test;
@@ -221,6 +223,7 @@ public class SimulateProcessTest {
         for (SimulationEvent event : wmRepo.getEvents()) {
             if ((event instanceof EndSimulationEvent) || (event instanceof ActivitySimulationEvent)) {
                 assertNotNull(((GenericSimulationEvent) event).getAggregatedEvent());
+                assertTrue(((GenericSimulationEvent) event).getAggregatedEvent() instanceof AggregatedProcessSimulationEvent);
             }
         }
         wmRepo.close();
