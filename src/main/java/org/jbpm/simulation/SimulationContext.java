@@ -16,6 +16,7 @@ public class SimulationContext {
     private long startTime;
     private SessionPseudoClock clock;
     private StaffPoolManager staffPoolManager;
+    private long maxEndTime;
     
     public static SimulationContext getContext() {
         return simulationContextThreadLocal.get();
@@ -79,5 +80,15 @@ public class SimulationContext {
 
     public void setStaffPoolManager(StaffPoolManager staffPoolManager) {
         this.staffPoolManager = staffPoolManager;
+    }
+
+    public long getMaxEndTime() {
+        return maxEndTime;
+    }
+
+    public void setMaxEndTime(long maxEndTime) {
+        if (maxEndTime > this.maxEndTime) {
+            this.maxEndTime = maxEndTime;
+        }
     }
 }

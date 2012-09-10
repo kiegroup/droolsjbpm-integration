@@ -4,8 +4,10 @@ import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.process.ProcessInstance;
 import org.drools.time.SessionPseudoClock;
 import org.jbpm.simulation.SimulationContext;
+import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.jbpm.workflow.core.node.ActionNode;
 import org.jbpm.workflow.core.node.CatchLinkNode;
 import org.jbpm.workflow.core.node.CompositeContextNode;
@@ -93,7 +95,11 @@ public class SimulateProcessPathCommand implements GenericCommand<Void> {
         simContext.setClock((SessionPseudoClock) session.getSessionClock());
         simContext.setCurrentPath(path.getSequenceFlowsIds());
         
-        session.startProcess(processId);
+        ProcessInstance pi = session.startProcess(processId);
+        long instanceId = session.getId()+pi.getId();
+        simContext.getRepository().storeEvent(new ProcessInstanceEndSimulationEvent(processId, instanceId,
+                simContext.getStartTime(), simContext.getMaxEndTime(), path.getPathId(),
+                pi.getProcessName(), pi.getProcess().getVersion()));
         
         return null;
     }

@@ -1,9 +1,9 @@
 package org.jbpm.simulation;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.bpmn2.FlowElement;
@@ -18,12 +18,23 @@ public class PathContext {
         TEMP;
     }
 
-    private Set<FlowElement> pathElements = new HashSet<FlowElement>();
+    private Set<FlowElement> pathElements = new TreeSet<FlowElement>(new Comparator<FlowElement>() {
+
+        public int compare(FlowElement o1, FlowElement o2) {
+            if (o1.getId().hashCode() > o2.getId().hashCode()) {
+                return 1;
+            } else if (o1.getId().hashCode() < o2.getId().hashCode()) {
+                return -1;
+            }
+            return 0;
+        }
+    });
     private Type type;
     private boolean canBeFinished = true;
     private boolean locked = false;
     private String id; 
     private int canBeFinishedCounter = 0;
+    private String pathId;
     
     protected int getCanBeFinishedCounter() {
         return canBeFinishedCounter;
@@ -106,5 +117,13 @@ public class PathContext {
     
     public String getId() {
     	return this.id;
+    }
+
+    public String getPathId() {
+        return pathId;
+    }
+
+    public void setPathId(String pathId) {
+        this.pathId = pathId;
     }
 }

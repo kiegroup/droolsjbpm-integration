@@ -32,7 +32,7 @@ public class SimulationFilterPathFormatConverter implements
         
         for (PathContext context : paths) {
             SimulationPath simPath = new SimulationPath();
-
+            simPath.setPathId(context.getPathId());
             
             for (FlowElement fe : context.getPathElements()) {
                 if (fe instanceof SequenceFlow) {

@@ -3,6 +3,7 @@ package org.jbpm.simulation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -26,9 +27,12 @@ import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.jbpm.simulation.impl.events.ActivitySimulationEvent;
+import org.jbpm.simulation.impl.events.AggregatedEndEventSimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
 import org.jbpm.simulation.impl.events.EndSimulationEvent;
 import org.jbpm.simulation.impl.events.GenericSimulationEvent;
+import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
+import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.junit.Test;
 
 public class SimulateProcessTest {
@@ -100,15 +104,23 @@ public class SimulateProcessTest {
         WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
         wmRepo.fireAllRules();
         
-        assertEquals(3, wmRepo.getAggregatedEvents().size());
-        assertEquals(40, wmRepo.getEvents().size());
+        assertEquals(4, wmRepo.getAggregatedEvents().size());
+        assertEquals(50, wmRepo.getEvents().size());
         
         AggregatedSimulationEvent event = wmRepo.getAggregatedEvents().get(0);
-        assertNotNull(event.getProperty("minExecutionTime"));
-        assertFalse(event.getProperty("activityId").equals(""));
+        if (event instanceof AggregatedEndEventSimulationEvent) {
+            assertNotNull(event.getProperty("minProcessDuration"));
+            assertFalse(event.getProperty("activityId").equals(""));
+        } 
+        
         event = wmRepo.getAggregatedEvents().get(1);
+        assertFalse(event.getProperty("activityId").equals(""));
         assertNotNull(event.getProperty("minExecutionTime"));
         event = wmRepo.getAggregatedEvents().get(2);
+        assertFalse(event.getProperty("activityId").equals(""));
+        assertNotNull(event.getProperty("minExecutionTime"));
+        
+        event = wmRepo.getAggregatedEvents().get(3);
         assertNotNull(event.getProperty("minExecutionTime"));
         wmRepo.close();
         
@@ -131,8 +143,8 @@ public class SimulateProcessTest {
         
         WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
         wmRepo.fireAllRules();
-        assertEquals(4, wmRepo.getAggregatedEvents().size());
-        assertEquals(60, wmRepo.getEvents().size());
+        assertEquals(5, wmRepo.getAggregatedEvents().size());
+        assertEquals(70, wmRepo.getEvents().size());
         wmRepo.close();
     }
 
@@ -153,8 +165,8 @@ public class SimulateProcessTest {
         
         WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
         wmRepo.fireAllRules();
-        assertEquals(3, wmRepo.getAggregatedEvents().size());
-        assertEquals(6, wmRepo.getEvents().size());
+        assertEquals(4, wmRepo.getAggregatedEvents().size());
+        assertEquals(7, wmRepo.getEvents().size());
         wmRepo.close();
     }
     
@@ -175,8 +187,8 @@ public class SimulateProcessTest {
         
         WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
         wmRepo.fireAllRules();
-        assertEquals(4, wmRepo.getAggregatedEvents().size());
-        assertEquals(12, wmRepo.getEvents().size());
+        assertEquals(5, wmRepo.getAggregatedEvents().size());
+        assertEquals(14, wmRepo.getEvents().size());
         wmRepo.close();
     }
     
@@ -197,11 +209,12 @@ public class SimulateProcessTest {
         
         WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
 
-        assertEquals(15, wmRepo.getAggregatedEvents().size());
-        assertEquals(30, wmRepo.getEvents().size());
+        assertEquals(20, wmRepo.getAggregatedEvents().size());
+        assertEquals(35, wmRepo.getEvents().size());
         wmRepo.close();
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testSimulationRunnerWithRunRulesOnEveryEvent() throws IOException {
         
@@ -219,20 +232,22 @@ public class SimulateProcessTest {
         
         WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
 
-        assertEquals(15, wmRepo.getAggregatedEvents().size());
-        assertEquals(30, wmRepo.getEvents().size());
+        assertEquals(20, wmRepo.getAggregatedEvents().size());
+        assertEquals(35, wmRepo.getEvents().size());
         
         for (SimulationEvent event : wmRepo.getEvents()) {
-            if ((event instanceof EndSimulationEvent) || (event instanceof ActivitySimulationEvent)) {
+            if ((event instanceof EndSimulationEvent) || (event instanceof ActivitySimulationEvent)|| (event instanceof HumanTaskActivitySimulationEvent)) {
                 assertNotNull(((GenericSimulationEvent) event).getAggregatedEvent());
                 assertTrue(((GenericSimulationEvent) event).getAggregatedEvent() instanceof AggregatedProcessSimulationEvent);
+            } else if (event instanceof ProcessInstanceEndSimulationEvent) {
+                assertNull(((GenericSimulationEvent) event).getAggregatedEvent());
             }
         }
         wmRepo.getSession().execute(new InsertElementsCommand((Collection)wmRepo.getAggregatedEvents()));
         wmRepo.fireAllRules();
         List<AggregatedSimulationEvent> summary = (List<AggregatedSimulationEvent>) wmRepo.getGlobal("summary");
         assertNotNull(summary);
-        assertEquals(4, summary.size());
+        assertEquals(5, summary.size());
         wmRepo.close();
     }
 }

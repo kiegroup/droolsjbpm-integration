@@ -1,5 +1,8 @@
 package org.jbpm.simulation.impl.events;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jbpm.simulation.AggregatedSimulationEvent;
@@ -13,6 +16,8 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
     protected double minExecutionTime;
     protected double avgExecutionTime;
     protected double maxExecutionTime;
+    
+    protected Map<String, Integer> pathInstances = new HashMap<String, Integer>();
     
     public AggregatedProcessSimulationEvent(Object processInfo,
             double minExecutionTime, double avgExecutionTime, double maxExecutionTime) {
@@ -99,6 +104,16 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
     public void setProcessVersion(String processVersion) {
         this.processVersion = processVersion;
     }
-    
-    
+
+    public void calculatePaths(List<String> pathIds) {
+        for (String pathId : pathIds) {
+            Integer current = pathInstances.get(pathId);
+            if (current == null) {
+                current = 1;
+            } else {
+                current++;
+            }
+            pathInstances.put(pathId, current);
+        }
+    }
 }

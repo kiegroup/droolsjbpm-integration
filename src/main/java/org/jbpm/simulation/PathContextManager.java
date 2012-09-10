@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.UUID;
 
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -94,7 +95,7 @@ public class PathContextManager {
             // no outgoing sequence flow means end of path
             PathContext completePath = this.paths.pop();
             completePath.setType(Type.COMPLETED);
-            this.completePaths.add(completePath);
+            addToCompleted(completePath);
         }
     }
     
@@ -103,7 +104,7 @@ public class PathContextManager {
         if (context.isCanBeFinished()) {
 
             context.setType(Type.COMPLETED);
-            this.completePaths.add(context);
+            addToCompleted(context);
         }
     }
 
@@ -116,12 +117,25 @@ public class PathContextManager {
         for (PathContext context : this.paths) {
             
             if (context.getType() != PathContext.Type.ROOT && context.getType() != PathContext.Type.TEMP) {
-                this.completePaths.add(context);
+                addToCompleted(context);
             }
         }
     }
     
     public List<PathContext> getCompletePaths() {
         return completePaths;
+    }
+    
+    protected void addToCompleted(PathContext context) {
+        
+        //generate path id
+        StringBuffer pathIdElements = new StringBuffer();
+        
+        for (FlowElement fe : context.getPathElements()) {
+            pathIdElements.append(fe.getId());
+        }
+        context.setPathId("Path"+pathIdElements.toString().hashCode());
+
+        this.completePaths.add(context);
     }
 }

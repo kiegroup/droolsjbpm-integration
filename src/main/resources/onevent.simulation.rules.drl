@@ -33,6 +33,13 @@ end
 declare AggregatedActivitySimulationEvent
     @role(event)
 end
+declare ProcessInstanceEndSimulationEvent 
+    @role(event)
+end
+
+declare AggregatedEndEventSimulationEvent
+    @role(event)
+end
 
 declare ActivityName
     name : String
@@ -62,6 +69,40 @@ salience 10
 
 end
 
+rule "Insert event names"
+no-loop
+salience 10
+    when
+        EndSimulationEvent( $name : activityName, $id : activityId )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name, "event", $id ) );
+
+end
+
+rule "Calculate average duration for end event"
+salience 20
+no-loop
+    when
+        ActivityName($name : name, type=="abstract", $id : id)
+        $event : ActivitySimulationEvent()
+        accumulate(
+        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        $min : min( $duration ),
+        $avg : average( $duration ),
+        $max : max( $duration ),
+        $count : count( $duration ) )
+        eval($event.isUsed() == false)
+    then
+        System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
+        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        simulation.add(aggEvent);
+        modify ($event) {
+            setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
+            setUsed(true)
+        }
+end
+
 rule "Calculate average duration for activity"
 salience 20
 no-loop
@@ -83,8 +124,6 @@ no-loop
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
             setUsed(true)
         }
-
-
 end
 
 rule "Calculate average duration for human activity"
@@ -133,28 +172,46 @@ no-loop
 
 end
 
+rule "Calculate end event duration" 
+salience 100
+no-loop
+    when
+        ActivityName($name : name, type == "event", $id : id)
+        $event : EndSimulationEvent(activityId == $id)
+        accumulate(
+        EndSimulationEvent($processDuration : processDuration) over window:length( 100 ),
+        $min : min( $processDuration ),
+        $avg : average( $processDuration ),
+        $max : max( $processDuration ),
+        $count : count( $processDuration ) )
+        eval($event.isUsed() == false)
+    then
+        System.out.println("Duration for end event is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        simulation.add(aggEvent);
+        modify ($event) {
+            setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
+            setUsed(true)
+        }
+        
+end
+
 rule "Calculate average duration for process"
 salience 3
 no-loop
     when
-        $event : EndSimulationEvent()
         accumulate(
-        EndSimulationEvent($duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
+        ProcessInstanceEndSimulationEvent($duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
         $min : min( $duration ),
         $avg : average( $duration ),
         $max : max( $duration ),
         $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
         eval($processSet.size() > 0)
-        eval($event.isUsed() == false)
     then
         System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
         AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
         simulation.add(aggEvent);
         processEventsOnly.add(aggEvent);
-        modify ($event) {
-            setAggregatedEvent(aggEvent),
-            setUsed(true)
-        }
 
 end
 
@@ -229,6 +286,27 @@ no-loop
     then
         System.out.println("SUMMARY Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
         AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue());
+        summary.add(aggEvent);
+
+end
+
+rule "Calculate end event summary"
+salience 200
+no-loop
+    when
+        ActivityName($name : name, type=="event", $id : id)
+        accumulate(
+        AggregatedEndEventSimulationEvent($numberOfInstances: numberOfInstances, $minProcessDuration : minProcessDuration, $avgProcessDuration : avgProcessDuration, $maxProcessDuration : maxProcessDuration,
+        activityName == $name ) over window:length( 100 ),
+        $min : min( $minProcessDuration ),
+        $avg : average( $avgProcessDuration ),
+        $max : max( $maxProcessDuration ),
+        $count : max( $numberOfInstances ) )
+        eval(((Double)$count).intValue() > 0)
+        
+    then
+        System.out.println("SUMMARY Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue());
         summary.add(aggEvent);
 
 end

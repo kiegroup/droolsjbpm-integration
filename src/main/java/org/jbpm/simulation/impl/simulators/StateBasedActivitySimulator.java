@@ -31,7 +31,8 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
        
        // TODO calculate duration based on various strategies
        context.getClock().advanceTime(duration, TimeUnit.MILLISECONDS);
-       
+       // set end time for processinstance end time
+       context.setMaxEndTime(context.getClock().getCurrentTime());
        return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration, startTime, context.getClock().getCurrentTime());
     }
 

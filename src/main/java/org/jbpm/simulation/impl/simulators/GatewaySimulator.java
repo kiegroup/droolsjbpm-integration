@@ -28,6 +28,8 @@ public class GatewaySimulator implements ActivitySimulator {
         long endTime = startTime + duration;
 
         context.getClock().advanceTime(duration, TimeUnit.MILLISECONDS);
+        // set end time for processinstance end time
+        context.setMaxEndTime(context.getClock().getCurrentTime());
         return new GatewaySimulationEvent(pi.getProcessId(), pi.getId(), startTime, endTime, bpmn2NodeId, node.getName());
     }
     

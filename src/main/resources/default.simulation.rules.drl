@@ -4,6 +4,7 @@ package simulation
 //list any import classes here.
 import org.jbpm.simulation.impl.events.*;
 import java.util.Date;
+import org.jbpm.simulation.AggregatedSimulationEvent;
 
 
 //declare any global variables here
@@ -18,6 +19,14 @@ end
 declare EndSimulationEvent 
     @role(event)
 end
+declare ProcessInstanceEndSimulationEvent 
+    @role(event)
+end
+
+declare AggregatedEndEventSimulationEvent
+    @role(event)
+end
+
 declare ActivityName
     name : String
     type : String
@@ -43,6 +52,17 @@ salience 10
         not ActivityName( name == $name )
     then
         insert( new ActivityName( $name, "ht", $id ) );
+
+end
+
+rule "Insert event names"
+no-loop
+salience 10
+    when
+        EndSimulationEvent( $name : activityName, $id : activityId )
+        not ActivityName( name == $name )
+    then
+        insert( new ActivityName( $name, "event", $id ) );
 
 end
 
@@ -102,19 +122,39 @@ no-loop
 
 end
 
+rule "Calculate end event duration" 
+salience 100
+no-loop
+    when
+        ActivityName($name : name, type == "event", $id : id)
+        accumulate(
+        EndSimulationEvent($processDuration : processDuration) over window:length( 100 ),
+        $min : min( $processDuration ),
+        $avg : average( $processDuration ),
+        $max : max( $processDuration ),
+        $count : count( $processDuration ) )
+    then
+        System.out.println("Duration for end event is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        simulation.add(aggEvent);
+end
+
 rule "Calculate average duration for process"
 salience 3
 no-loop
     when
         accumulate(
-        EndSimulationEvent($duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
+        ProcessInstanceEndSimulationEvent($pathId : pathId, $duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
         $min : min( $duration ),
         $avg : average( $duration ),
         $max : max( $duration ),
-        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
+        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion),
+        $pathIds : collectList($pathId) )
         eval($processSet.size() > 0)
     then
         System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
-        simulation.add(new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max));
+        AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
+        aggEvent.calculatePaths($pathIds);
+        simulation.add(aggEvent);
        
 end

@@ -7,6 +7,7 @@ import org.jbpm.simulation.PathContext;
 
 public class SimulationPath {
 
+    private String pathId;
     private List<String> sequenceFlowsIds = new ArrayList<String>();
     private List<String> activityIds = new ArrayList<String>();
     private List<PathContext> origPaths = new ArrayList<PathContext>();
@@ -42,6 +43,12 @@ public class SimulationPath {
     }
     public void setOrigPaths(List<PathContext> origPaths) {
         this.origPaths = origPaths;
+    }
+    public String getPathId() {
+        return pathId;
+    }
+    public void setPathId(String pathId) {
+        this.pathId = pathId;
     }
     
     
