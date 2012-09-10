@@ -201,15 +201,17 @@ salience 3
 no-loop
     when
         accumulate(
-        ProcessInstanceEndSimulationEvent($duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
+        ProcessInstanceEndSimulationEvent($pathId : pathId, $duration : processDuration, $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
         $min : min( $duration ),
         $avg : average( $duration ),
         $max : max( $duration ),
-        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
+        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion),
+        $pathIds : collectList($pathId) )
         eval($processSet.size() > 0)
     then
         System.out.println("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
         AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
+        aggEvent.calculatePaths($pathIds);
         simulation.add(aggEvent);
         processEventsOnly.add(aggEvent);
 
@@ -220,16 +222,18 @@ salience 100
 no-loop
     when
         accumulate(
-        AggregatedProcessSimulationEvent($minExecutionTime : minExecutionTime, $avgExecutionTime : avgExecutionTime, $maxExecutionTime : maxExecutionTime, 
+        AggregatedProcessSimulationEvent($pathInfo : pathInfo, $minExecutionTime : minExecutionTime, $avgExecutionTime : avgExecutionTime, $maxExecutionTime : maxExecutionTime, 
         $processId : processId, $processName : processName, $processVersion : processVersion) over window:length( 100 ),
         $min : min( $minExecutionTime ),
         $avg : average( $avgExecutionTime ),
         $max : max( $maxExecutionTime ),
-        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion) )
+        $processSet : collectSet($processId+"@"+$processName+"@"+$processVersion),
+        $pathIds : collectList($pathInfo) )
         eval($processSet.size() > 0)
     then
         System.out.println("SUMMARY: Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
         AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
+        aggEvent.calculateAggregatedPaths($pathIds);
         summary.add(aggEvent);
         
 end

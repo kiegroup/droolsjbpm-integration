@@ -1,6 +1,8 @@
 package org.jbpm.simulation;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -130,12 +132,19 @@ public class PathContextManager {
         
         //generate path id
         StringBuffer pathIdElements = new StringBuffer();
+        List<FlowElement> list = new ArrayList<FlowElement>(context.getPathElements());
+        Collections.sort(list, new Comparator<FlowElement>() {
+    
+            public int compare(FlowElement o1, FlowElement o2) {
+                
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
         
-        for (FlowElement fe : context.getPathElements()) {
+        for (FlowElement fe : list) {
             pathIdElements.append(fe.getId());
         }
         context.setPathId("Path"+pathIdElements.toString().hashCode());
-
         this.completePaths.add(context);
     }
 }

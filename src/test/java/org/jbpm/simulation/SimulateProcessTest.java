@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.drools.KnowledgeBase;
 import org.drools.builder.KnowledgeBuilder;
@@ -145,6 +146,16 @@ public class SimulateProcessTest {
         wmRepo.fireAllRules();
         assertEquals(5, wmRepo.getAggregatedEvents().size());
         assertEquals(70, wmRepo.getEvents().size());
+        
+        List<AggregatedSimulationEvent> aggEvents = wmRepo.getAggregatedEvents();
+        for (AggregatedSimulationEvent event : aggEvents) {
+            if (event instanceof AggregatedProcessSimulationEvent) {
+                Map<String, Integer> numberOfInstancePerPath = ((AggregatedProcessSimulationEvent) event).getPathNumberOfInstances();
+                assertNotNull(numberOfInstancePerPath);
+                assertTrue(3 == numberOfInstancePerPath.get("Path800898475"));
+                assertTrue(7 == numberOfInstancePerPath.get("Path-960633761"));
+            }
+        }
         wmRepo.close();
     }
 
@@ -248,6 +259,14 @@ public class SimulateProcessTest {
         List<AggregatedSimulationEvent> summary = (List<AggregatedSimulationEvent>) wmRepo.getGlobal("summary");
         assertNotNull(summary);
         assertEquals(5, summary.size());
+        for (AggregatedSimulationEvent event : summary) {
+            if (event instanceof AggregatedProcessSimulationEvent) {
+                Map<String, Integer> numberOfInstancePerPath = ((AggregatedProcessSimulationEvent) event).getPathNumberOfInstances();
+                assertNotNull(numberOfInstancePerPath);
+                assertTrue(1 == numberOfInstancePerPath.get("Path800898475"));
+                assertTrue(4 == numberOfInstancePerPath.get("Path-960633761"));
+            }
+        }
         wmRepo.close();
     }
 }

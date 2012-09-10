@@ -3,6 +3,7 @@ package org.jbpm.simulation.impl.events;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jbpm.simulation.AggregatedSimulationEvent;
@@ -115,5 +116,34 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
             }
             pathInstances.put(pathId, current);
         }
+    }
+    
+    public void calculateAggregatedPaths(List<String> pathIds) {
+        for (String pathInfo : pathIds) {
+            String[] entires = pathInfo.split(";");
+            
+            for (String entry : entires) {
+                String[] keyValue = entry.split("=");
+                
+                pathInstances.put(keyValue[0], Integer.valueOf(keyValue[1]));
+            }
+        }
+    }
+    
+    public String getPathInfo() {
+        StringBuffer info = new StringBuffer();
+        for(Entry<String, Integer> entries : pathInstances.entrySet()) {
+            info.append(entries.getKey()+"="+entries.getValue()+";");
+        }
+        info.deleteCharAt(info.length()-1);
+        return info.toString();
+    }
+    
+    public Map<String, Integer> getPathNumberOfInstances() {
+        return this.pathInstances;
+    }
+    
+    public Integer getNumberOfInstancesPerPath(String pathId) {
+        return this.pathInstances.get(pathId);
     }
 }
