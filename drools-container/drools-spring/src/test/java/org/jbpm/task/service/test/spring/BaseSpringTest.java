@@ -45,13 +45,10 @@ public abstract class BaseSpringTest {
     protected Map<String, User> users;
     protected Map<String, Group> groups;
     
-    @BeforeClass
-    public static void beforeClass() { 
-        removeAllTasks();
-    }
-    
     @Before
     public void setUp() throws Exception {
+        removeAllTasks();
+        
         logger = LoggerFactory.getLogger(getClass());
         
         // Finish setting up the taskService to test
