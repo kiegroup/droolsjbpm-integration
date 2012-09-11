@@ -44,6 +44,8 @@ import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 import org.drools.simulation.impl.Simulator;
+import org.drools.simulation.impl.Simulator.CommandExecutionHandler;
+import org.drools.simulation.impl.Simulator.StepExecutionHandler;
 
 public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFluent>
         implements SimulationFluent {
@@ -62,6 +64,8 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     private int knowledgeBaseCounter = 0;
     private String activeKnowledgeSessionId = null;
     private int knowledgeSessionCounter = 0;
+    private StepExecutionHandler simulatorStepExecutionHandler;
+    private CommandExecutionHandler simulatorCommandExecutionHandler;
 
     public DefaultSimulationFluent() {
         super();
@@ -144,6 +148,16 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
 
     public SimulationFluent addCommand(Command command) {
         activeStep.getCommands().add(command);
+        return this;
+    }
+    
+    public SimulationFluent setSimulatorStepExecutionHandler(StepExecutionHandler stepExecutionHandler) {
+        this.simulatorStepExecutionHandler = stepExecutionHandler;
+        return this;
+    }
+
+    public SimulationFluent setSimulatorCommandExecutionHandler(CommandExecutionHandler commandExecutionHandler) {
+        this.simulatorCommandExecutionHandler = commandExecutionHandler;
         return this;
     }
 
@@ -278,6 +292,12 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
 
     public void runSimulation(long startTimeMillis) {
         Simulator simulator = new Simulator( simulation, startTimeMillis );
+        if (this.simulatorStepExecutionHandler != null){
+            simulator.setStepExecutionHandler(this.simulatorStepExecutionHandler);
+        }
+        if (this.simulatorCommandExecutionHandler != null){
+            simulator.setCommandExecutionHandler(this.simulatorCommandExecutionHandler);
+        }
         simulator.run();
     }
 

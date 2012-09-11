@@ -25,6 +25,7 @@ import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.simulation.Simulation;
 
 import java.util.concurrent.TimeUnit;
+import org.drools.simulation.impl.Simulator;
 
 public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationFluent> {
 
@@ -37,6 +38,9 @@ public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationF
     SimulationFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit);
 
     SimulationFluent addCommand(Command command);
+    
+    SimulationFluent setSimulatorStepExecutionHandler(Simulator.StepExecutionHandler stepExecutionHandler);
+    SimulationFluent setSimulatorCommandExecutionHandler(Simulator.CommandExecutionHandler commandExecutionHandler);
 
     String getActiveKnowledgeBuilderId();
     KnowledgeBuilderSimFluent newKnowledgeBuilder();
