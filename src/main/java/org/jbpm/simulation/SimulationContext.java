@@ -91,4 +91,8 @@ public class SimulationContext {
             this.maxEndTime = maxEndTime;
         }
     }
+    
+    public void resetMaxEndTime() {
+        this.maxEndTime = -1;
+    }
 }

@@ -17,7 +17,7 @@ public class JSONPathFormatConverter implements PathFormatConverter<JSONObject> 
         try {
             if(completePaths != null && completePaths.size() > 0) {
                 for(PathContext pc : completePaths) {
-                    paths.put(pc.getId(), getPathFlowElementsAsString(pc.getPathElements()));
+                    paths.put(pc.getPathId(), getPathFlowElementsAsString(pc.getPathElements()));
                 }
             }
             parent.put("paths", paths);

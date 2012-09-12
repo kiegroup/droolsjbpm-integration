@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbpm.simulation.SimulationEvent;
+import org.jbpm.simulation.SimulationInfo;
 import org.jbpm.simulation.SimulationRepository;
 
 public class InMemorySimulationRepository implements SimulationRepository {
 
     protected List<SimulationEvent> events = new ArrayList<SimulationEvent>();
     
+    protected SimulationInfo simulationInfo;
+    
     public void storeEvent(SimulationEvent event) {
         this.events.add(event);
-
     }
 
     public List<SimulationEvent> getEvents() {
@@ -21,5 +23,14 @@ public class InMemorySimulationRepository implements SimulationRepository {
     
     public void close() {
     	this.events.clear();
+    }
+
+    public SimulationInfo getSimulationInfo() {
+        return this.simulationInfo;
+    }
+
+    public void setSimulationInfo(SimulationInfo simInfo) {
+        this.simulationInfo = simInfo;
+        
     }
 }

@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -245,7 +246,7 @@ public class SimulateProcessTest {
 
         assertEquals(20, wmRepo.getAggregatedEvents().size());
         assertEquals(35, wmRepo.getEvents().size());
-        
+
         for (SimulationEvent event : wmRepo.getEvents()) {
             if ((event instanceof EndSimulationEvent) || (event instanceof ActivitySimulationEvent)|| (event instanceof HumanTaskActivitySimulationEvent)) {
                 assertNotNull(((GenericSimulationEvent) event).getAggregatedEvent());
@@ -267,6 +268,14 @@ public class SimulateProcessTest {
                 assertTrue(4 == numberOfInstancePerPath.get("Path-960633761"));
             }
         }
+        
+        SimulationInfo info = wmRepo.getSimulationInfo();
+        
+        assertNotNull(info);
+        assertEquals("defaultPackage.test", info.getProcessId());
+        assertEquals("test", info.getProcessName());
+        
+        System.out.println("Start date is " + new Date(info.getStartTime()) + " end date is " + new Date(info.getEndTime()));
         wmRepo.close();
     }
 }

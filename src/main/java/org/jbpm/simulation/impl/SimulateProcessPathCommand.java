@@ -7,6 +7,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.ProcessInstance;
 import org.drools.time.SessionPseudoClock;
 import org.jbpm.simulation.SimulationContext;
+import org.jbpm.simulation.SimulationInfo;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.jbpm.workflow.core.node.ActionNode;
 import org.jbpm.workflow.core.node.CatchLinkNode;
@@ -94,6 +95,13 @@ public class SimulateProcessPathCommand implements GenericCommand<Void> {
         StatefulKnowledgeSession session = ((KnowledgeCommandContext)context).getStatefulKnowledgesession();
         simContext.setClock((SessionPseudoClock) session.getSessionClock());
         simContext.setCurrentPath(path.getSequenceFlowsIds());
+        SimulationInfo simInfo = simContext.getRepository().getSimulationInfo();
+        if (simInfo != null) {
+            simInfo.setProcessName(session.getKnowledgeBase().getProcess(processId).getName());
+            simInfo.setProcessVersion(session.getKnowledgeBase().getProcess(processId).getVersion());
+        }
+        // reset max end time before starting new instance
+        simContext.resetMaxEndTime();
         
         ProcessInstance pi = session.startProcess(processId);
         long instanceId = session.getId()+pi.getId();
