@@ -34,7 +34,7 @@ import org.drools.simulation.SimulationStep;
 import org.drools.time.SessionPseudoClock;
 
 public class Simulator
-        implements World, GetDefaultValue {
+        implements World {
 
     private PriorityQueue<SimulationStep>           queue;
     private SimulationImpl                simulation;
@@ -48,7 +48,11 @@ public class Simulator
 
     private Set<StatefulKnowledgeSession> ksessions;
 
-    private CommandExecutionHandler       executionHandler = new DefaultCommandExecutionHandler();
+    private StepExecutionHandler          stepExecutionHandler = new DefaultStepExecutionHandler();
+    
+    private CommandExecutionHandler       commandExecutionHandler = new DefaultCommandExecutionHandler();
+    
+    private SimulatorContext              simulatorContext;
 
     private Object                        lastReturnValue;
 
@@ -63,13 +67,15 @@ public class Simulator
         this.root = new ContextImpl( ROOT,
                                      this );
         
-        this.root.set( "simulator", 
-                       this );
-
         this.contexts = new HashMap<String, Context>();
         this.contexts.put( ROOT,
                            this.root );
 
+        this.simulatorContext = new SimulatorContext(ksessions, startTime);
+        
+        this.root.set( "simulator", 
+                       this.simulatorContext );
+        
         Map<String, SimulationPath> paths = this.simulation.getPaths();
 
         // calculate capacity
@@ -96,8 +102,9 @@ public class Simulator
                                         } );
 
         for ( SimulationPath path : paths.values() ) {
-            for ( SimulationStep step : path.getSteps() )
+            for ( SimulationStep step : path.getSteps() ){
                 this.queue.add( step );
+            }
         }
     }
 
@@ -117,6 +124,10 @@ public class Simulator
 
         Context pathContext = new ResolvingKnowledgeCommandContext( this.contexts.get( path.getName() ) );
 
+        stepExecutionHandler.execute(this.simulatorContext, pathContext, path, step, commandExecutionHandler);
+
+        /****************************************************************
+        
         // increment the clock for all the registered ksessions
         for ( StatefulKnowledgeSession ksession : this.ksessions ) {
             SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
@@ -130,7 +141,7 @@ public class Simulator
         for ( Command cmd : step.getCommands() ) {
             if ( cmd instanceof NewStatefulKnowledgeSessionCommand ) {
                 // instantiate the ksession, set it's clock and register it
-                StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) executionHandler.execute( (GenericCommand) cmd,
+                StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) commandExecutionHandler.execute( (GenericCommand) cmd,
                                                                                                          pathContext );
                 if ( ksession != null ) {
                     SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
@@ -142,16 +153,22 @@ public class Simulator
                     this.lastReturnValue = ksession;
                 }
             } else if ( cmd instanceof GenericCommand ) {
-                this.lastReturnValue = executionHandler.execute( (GenericCommand) cmd,
+                this.lastReturnValue = commandExecutionHandler.execute( (GenericCommand) cmd,
                                                                  pathContext );
             }
         }
-
+        
+        /*****************************************************************/
+        
         return step;
     }
 
     public void setCommandExecutionHandler(CommandExecutionHandler executionHandler) {
-        this.executionHandler = executionHandler;
+        this.commandExecutionHandler = executionHandler;
+    }
+    
+    public void setStepExecutionHandler(StepExecutionHandler stepExecutionHandler) {
+        this.stepExecutionHandler = stepExecutionHandler;
     }
 
     public Context getContext(String identifier) {
@@ -174,6 +191,10 @@ public class Simulator
         public Object execute(GenericCommand command,
                               Context context);
     }
+    
+    public static interface StepExecutionHandler {
+        public Object execute(SimulatorContext simulatorContext, Context pathContext, SimulationPath path, SimulationStep step, CommandExecutionHandler executionHandler);
+    }
 
     public static class DefaultCommandExecutionHandler
         implements
@@ -184,10 +205,45 @@ public class Simulator
         }
     }
 
-    public Object getObject() {
-        return lastReturnValue;
-    }
+    public static class DefaultStepExecutionHandler
+        implements
+        StepExecutionHandler {
+        public Object execute(SimulatorContext simulatorContext, Context pathContext, SimulationPath path, SimulationStep step, CommandExecutionHandler executionHandler){
+            // increment the clock for all the registered ksessions
+            for ( StatefulKnowledgeSession ksession : simulatorContext.getKsessions() ) {
+                SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
+                long newTime = simulatorContext.getStartTime() + step.getDistanceMillis();
+                long currentTime = clock.getCurrentTime();
 
+                clock.advanceTime( newTime - currentTime,
+                                   TimeUnit.MILLISECONDS );
+            }
+
+            Object lastReturnValue = null;
+            for ( Command cmd : step.getCommands() ) {
+                if ( cmd instanceof NewStatefulKnowledgeSessionCommand ) {
+                    // instantiate the ksession, set it's clock and register it
+                    StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) executionHandler.execute( (GenericCommand) cmd,
+                                                                                                             pathContext );
+                    if ( ksession != null ) {
+                        SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
+                        long newTime = simulatorContext.getStartTime() + step.getDistanceMillis();
+                        long currentTime = clock.getCurrentTime();
+                        clock.advanceTime( newTime - currentTime,
+                                           TimeUnit.MILLISECONDS );
+                        simulatorContext.addKsession( ksession );
+                        simulatorContext.setLastReturnValue(ksession);
+                    }
+                } else if ( cmd instanceof GenericCommand ) {
+                    simulatorContext.setLastReturnValue(executionHandler.execute( (GenericCommand) cmd,
+                                                                     pathContext ));
+                }
+            }
+            
+            return lastReturnValue;
+        }
+    }
+    
 	public World getContextManager() {
 		return this;
 	}
