@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.drools.KnowledgeBase;
+import org.drools.definition.KnowledgePackage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +62,18 @@ public class SpringDroolsTest {
 
         GridNode node2 = (GridNode) context.getBean( "node2" );
         assertNotNull( node2 );
+    }
+
+    @Test
+    public void testEncoding() throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/resourceWithEncoding.xml" );
+
+        KnowledgeBase kbase = (KnowledgeBase) context.getBean("kbase");
+        assertNotNull( kbase );
+        for (KnowledgePackage pkg : kbase.getKnowledgePackages()) {
+            assertEquals("sample acçéntèd rule", pkg.getRules().iterator().next().getName());
+        }
+
     }
 
     @Test

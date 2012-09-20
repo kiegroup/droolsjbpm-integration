@@ -30,6 +30,8 @@ public class DroolsResourceAdapter
     private Resource              resource;
     private ResourceType          resourceType;
     private ResourceConfiguration resourceConfiguration;
+    private String                resourceName;
+    private String                encoding;
 
     public DroolsResourceAdapter() {
 
@@ -45,12 +47,22 @@ public class DroolsResourceAdapter
     }
 
     public void setResource(String resource) {
+        this.resourceName = resource;
         if ( resource.trim().startsWith( "classpath:" ) ) {
             this.resource = new ClassPathResource( resource.substring( resource.indexOf( ':' ) + 1 ),
+                                                   encoding,
                                                    ClassPathResource.class.getClassLoader() );
         } else {
             this.resource = new UrlResource( resource );
         }
+    }
+
+    public void setEncoding(String encoding) {
+        if ( !(resource instanceof ClassPathResource) ) {
+            throw new IllegalArgumentException( "Encoding attribute is only valid for classpath Resources" );
+        }
+        this.encoding = encoding;
+        setResource(resourceName);
     }
 
     public void setBasicAuthenticationEnabled(Boolean enabled) {
