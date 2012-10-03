@@ -1,0 +1,26 @@
+import org.drools.benchmark.model.cep.*
+
+declare Letter
+    @role( event )
+end
+
+declare Figure
+    @role( event )
+end
+
+declare window letters Letter( ) over window:length( 2600 ) end
+
+declare window figures Figure( ) over window:length( 2600 ) end
+
+rule "Join" when
+    $l : Letter( value == 'A' ) from window letters
+    $f : Figure( key == $l.key, value1 % 100 == 0 ) from window figures
+then
+    insert( new Match( $f, $l ) );
+end
+
+rule "Detect" when
+    $m : Match()
+then
+//    System.out.println( $m );
+end

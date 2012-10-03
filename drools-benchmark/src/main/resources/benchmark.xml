@@ -222,7 +222,7 @@
   </benchmark>
 
   <benchmark description="RangeIndex CrossProductNoMatch"
-             warmups="1" repetitions="1" enabled="true"
+             warmups="1" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.RangeIndexCrossProductNoMatch">
     <arg>1000</arg>
     <arg>1000</arg>
@@ -275,5 +275,13 @@
              warmups="1500" repetitions="1000" enabled="false"
              classname="org.drools.benchmark.benchmarks.RuleCompile">
     <arg>fireAlarmMvel.drl</arg>
+  </benchmark>
+
+  <!-- Fusion -->
+
+  <benchmark description="Complex Event Processing"
+             warmups="2" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.CepBenchmark">
+      <arg>1000000</arg>
   </benchmark>
 </benchmarks>
