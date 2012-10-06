@@ -100,6 +100,10 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                     			} else {
                     				properties.put("timeunit", baseTimeUnitValue);
                     			}
+                                if(eleType.getTimeParameters().getWaitTime() != null) {
+                                    FloatingParameterType waittimeType = (FloatingParameterType) eleType.getTimeParameters().getWaitTime().getParameterValue().get(0);
+                                    properties.put("waittime", waittimeType.getValue());
+                                }
         					}
         				}
         				if(eleType.getCostParameters() != null) {
