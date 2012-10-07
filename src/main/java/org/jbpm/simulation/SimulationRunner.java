@@ -47,7 +47,7 @@ public class SimulationRunner {
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter(provider));
         
         // TODO when introduced configurable start time that should be used instead of currentTimeMillis
-        context.getRepository().setSimulationInfo(new SimulationInfo(System.currentTimeMillis(), processId));
+        context.getRepository().setSimulationInfo(new SimulationInfo(System.currentTimeMillis(), processId, numberOfAllInstances));
         
         SimulationFluent f = new DefaultSimulationFluent();
         // @formatter:off        
