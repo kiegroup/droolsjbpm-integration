@@ -14,6 +14,10 @@ public class CepBenchmark extends AbstractBenchmark {
 
     private final int eventNr;
 
+    private int offset = 0;
+
+    private static KnowledgeBase kbase;
+
     private StatefulKnowledgeSession ksession;
 
     public CepBenchmark(int eventNr) {
@@ -21,17 +25,18 @@ public class CepBenchmark extends AbstractBenchmark {
     }
 
     @Override
-    public void init(BenchmarkDefinition definition) {
-        KnowledgeBuilder kbuilder = createKnowledgeBuilder("cep.drl");
+    public void init(BenchmarkDefinition definition, boolean isFirst) {
+        if (isFirst) {
+            KnowledgeBuilder kbuilder = createKnowledgeBuilder("cep.drl");
 
-        KnowledgeBaseConfiguration config = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
-        config.setOption( EventProcessingOption.STREAM );
+            KnowledgeBaseConfiguration config = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
+            config.setOption( EventProcessingOption.STREAM );
 
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(config);
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+            kbase = KnowledgeBaseFactory.newKnowledgeBase(config);
+            kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        }
 
         ksession = kbase.newStatefulKnowledgeSession();
-
         new Thread(new Runnable() {
             public void run() {
                 ksession.fireUntilHalt();
@@ -40,7 +45,7 @@ public class CepBenchmark extends AbstractBenchmark {
     }
 
     public void execute(int repNr) {
-        for (int key = 0; key < eventNr; key++) {
+        for (int key = offset; key < offset + eventNr; key++) {
             insertLetter(key);
             insertFigure(key);
         }
@@ -55,8 +60,18 @@ public class CepBenchmark extends AbstractBenchmark {
     }
 
     @Override
-    public void terminate() {
+    public void terminate(boolean isLast) {
         ksession.halt();
         ksession.dispose(); // Stateful rule session must always be disposed when finished
+    }
+
+    private int cloneCounter = 0;
+
+    @Override
+    public CepBenchmark clone() {
+        CepBenchmark clone = new CepBenchmark(eventNr);
+        clone.offset = eventNr * cloneCounter;
+        cloneCounter++;
+        return clone;
     }
 }
