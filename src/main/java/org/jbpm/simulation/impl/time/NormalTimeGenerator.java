@@ -29,7 +29,12 @@ public class NormalTimeGenerator implements TimeGenerator {
         long sdv = (long)SimulationUtils.asDouble(data.get(SimulationConstants.STANDARD_DEVIATION));
         sdv = timeUnit.convert(sdv, tu);
         
-        return  (long) generator.nextGaussian(mean, sdv);
+        if (sdv > 0) {
+        
+            return  (long) generator.nextGaussian(mean, sdv);
+        } else {
+            return 0;
+        }
     }
 
 }

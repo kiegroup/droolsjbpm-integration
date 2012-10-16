@@ -279,4 +279,26 @@ public class SimulateProcessTest {
         System.out.println("Start date is " + new Date(info.getStartTime()) + " end date is " + new Date(info.getEndTime()));
         wmRepo.close();
     }
+    
+    @Test
+    public void testSimulationRunnerWithSinglePath() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-UserTaskWithSimulationMetaData.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("UserTask", out, 5, 2000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(15, wmRepo.getAggregatedEvents().size());
+        assertEquals(20, wmRepo.getEvents().size());
+        wmRepo.close();
+    }
 }

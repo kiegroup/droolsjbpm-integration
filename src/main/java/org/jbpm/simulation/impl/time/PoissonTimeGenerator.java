@@ -25,8 +25,11 @@ public class PoissonTimeGenerator implements TimeGenerator {
         TimeUnit tu = SimulationUtils.getTimeUnit(data);
         long mean = (long)SimulationUtils.asDouble(data.get(SimulationConstants.MEAN));
         mean = timeUnit.convert(mean, tu);
-                
-        return  (long) generator.nextPoisson(mean);
+        if(mean > 0) {    
+            return  (long) generator.nextPoisson(mean);
+        } else {
+            return 0;
+        }
     }
 
 }

@@ -28,8 +28,11 @@ public class RandomTimeGenerator implements TimeGenerator {
         
         long max = (long)SimulationUtils.asDouble(data.get(SimulationConstants.MAX));
         max = timeUnit.convert(max, tu);
-       
-        return  (long) generator.nextLong(min, max);
+        if (max > min) {
+            return  (long) generator.nextLong(min, max);
+        } else {
+            return min;
+        }
     }
 
 }

@@ -28,8 +28,11 @@ public class UniformTimeGenerator implements TimeGenerator {
         
         long max = (long) SimulationUtils.asDouble(data.get(SimulationConstants.MAX));
         max = timeUnit.convert(max, tu);
-       
-        return  (long) generator.nextUniform(min, max);
+        if (max > min) {
+            return  (long) generator.nextUniform(min, max);
+        } else {
+            return min;
+        }
     }
 
 }
