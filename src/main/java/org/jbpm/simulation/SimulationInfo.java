@@ -8,11 +8,13 @@ public class SimulationInfo {
     private String processName;
     private String processVersion;
     private int numberOfExecutions;
-    
-    public SimulationInfo(long startTime, String processId, int numberOfExecutions) {
+    private long interval;
+
+    public SimulationInfo(long startTime, String processId, int numberOfExecutions, long interval) {
         this.startTime = startTime;
         this.processId = processId;
         this.numberOfExecutions = numberOfExecutions;
+        this.interval = interval;
     }
     
     public long getStartTime() {
@@ -53,6 +55,12 @@ public class SimulationInfo {
     public void setNumberOfExecutions(int numberOfExecutions) {
         this.numberOfExecutions = numberOfExecutions;
     }
-    
-    
+
+    public long getInterval() {
+        return interval;
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
 }

@@ -275,6 +275,7 @@ public class SimulateProcessTest {
         assertEquals("defaultPackage.test", info.getProcessId());
         assertEquals("test", info.getProcessName());
         assertEquals(5, info.getNumberOfExecutions());
+        assertEquals(2000, info.getInterval());
         
         System.out.println("Start date is " + new Date(info.getStartTime()) + " end date is " + new Date(info.getEndTime()));
         wmRepo.close();
