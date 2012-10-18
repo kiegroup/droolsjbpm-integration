@@ -302,4 +302,48 @@ public class SimulateProcessTest {
         assertEquals(20, wmRepo.getEvents().size());
         wmRepo.close();
     }
+    
+    @Test
+    public void testSimulationRunnerWithSinglePathAndCatchingEvent() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SinglePathWithCatchingEvent.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("defaultPackage.test", out, 5, 2000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(25, wmRepo.getAggregatedEvents().size());
+        assertEquals(30, wmRepo.getEvents().size());
+        wmRepo.close();
+    }
+    
+    @Test
+    public void testSimulationRunnerWithSinglePathAndThrowingEvent() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SinglePathWithThrowingEvent.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("defaultPackage.test", out, 5, 2000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(25, wmRepo.getAggregatedEvents().size());
+        assertEquals(30, wmRepo.getEvents().size());
+        wmRepo.close();
+    }
 }

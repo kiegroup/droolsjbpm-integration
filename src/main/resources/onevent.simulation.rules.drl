@@ -84,8 +84,8 @@ rule "Calculate average duration for end event"
 salience 20
 no-loop
     when
-        ActivityName($name : name, type=="abstract", $id : id)
-        $event : ActivitySimulationEvent()
+        $ac : ActivityName($name : name, type=="abstract", $id : id)
+        $event : ActivitySimulationEvent(activityId == $id)
         accumulate(
         ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
         $min : min( $duration ),
@@ -101,14 +101,15 @@ no-loop
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
             setUsed(true)
         }
+
 end
 
 rule "Calculate average duration for activity"
 salience 20
 no-loop
     when
-        ActivityName($name : name, type=="abstract", $id : id)
-        $event : ActivitySimulationEvent()
+        $ac : ActivityName($name : name, type=="abstract", $id : id)
+        $event : ActivitySimulationEvent(activityId == $id)
         accumulate(
         ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
         $min : min( $duration ),
@@ -124,6 +125,7 @@ no-loop
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
             setUsed(true)
         }
+
 end
 
 rule "Calculate average duration for human activity"
@@ -309,7 +311,7 @@ no-loop
         eval(((Double)$count).intValue() > 0)
         
     then
-        System.out.println("SUMMARY Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
+        System.out.println("SUMMARY Duration for end event " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
         AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue());
         summary.add(aggEvent);
 
