@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.jbpm.simulation.PathContext;
@@ -37,6 +38,8 @@ public class SimulationFilterPathFormatConverter implements
             for (FlowElement fe : context.getPathElements()) {
                 if (fe instanceof SequenceFlow) {
                     simPath.addSequenceFlow(fe.getId());
+                } else if (fe instanceof BoundaryEvent) {
+                  simPath.addBoundaryEventId(fe.getId());  
                 } else {
                     simPath.addActivity(fe.getId());
                 }

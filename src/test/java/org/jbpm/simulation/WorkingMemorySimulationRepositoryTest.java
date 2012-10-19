@@ -30,7 +30,7 @@ public class WorkingMemorySimulationRepositoryTest {
         
         for (SimulationPath path : paths) {
             
-            context.setCurrentPath(path.getSequenceFlowsIds());
+            context.setCurrentPath(path);
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
             
             context.setClock((SessionPseudoClock) session.getSessionClock());
@@ -56,7 +56,7 @@ public class WorkingMemorySimulationRepositoryTest {
 
             for (SimulationPath path : paths) {
                 
-                context.setCurrentPath(path.getSequenceFlowsIds());
+                context.setCurrentPath(path);
                 StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-TwoUserTasks.bpmn2");
                 
                 context.setClock((SessionPseudoClock) session.getSessionClock());

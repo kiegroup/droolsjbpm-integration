@@ -24,7 +24,7 @@ public class SimulationTest {
         
         for (SimulationPath path : paths) {
             
-            context.setCurrentPath(path.getSequenceFlowsIds());
+            context.setCurrentPath(path);
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ParallelSplit.bpmn2");
             context.setClock((SessionPseudoClock) session.getSessionClock());
             // set start date to current time
@@ -45,7 +45,7 @@ public class SimulationTest {
         
         for (SimulationPath path : paths) {
             
-            context.setCurrentPath(path.getSequenceFlowsIds());
+            context.setCurrentPath(path);
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
             
             context.setClock((SessionPseudoClock) session.getSessionClock());
@@ -67,7 +67,7 @@ public class SimulationTest {
         
         for (SimulationPath path : paths) {
             
-            context.setCurrentPath(path.getSequenceFlowsIds());
+            context.setCurrentPath(path);
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
             
             context.setClock((SessionPseudoClock) session.getSessionClock());

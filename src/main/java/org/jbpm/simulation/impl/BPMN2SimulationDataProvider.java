@@ -157,6 +157,13 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 probability = probability * (transitionProbability / 100);
             }
         }
+        // calculate probability based on boundary events
+        for (String sequenceFlowId : path.getBoundaryEventIds()) {
+            double transitionProbability = (Double) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
+            if (transitionProbability > 0) {
+                probability = probability * (transitionProbability / 100);
+            }
+        }
         double result = probability / 100;
         
         path.setProbability(result);

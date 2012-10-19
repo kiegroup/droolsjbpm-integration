@@ -13,7 +13,7 @@ import org.jbpm.simulation.PathContextManager;
 public class ActivityElementHandler extends MainElementHandler {
 
     public boolean handle(FlowElement element, PathContextManager manager) {
-        List<SequenceFlow> outgoing = getOutgoing(element);
+        List<SequenceFlow> outgoing = new ArrayList<SequenceFlow>(getOutgoing(element));
         if (outgoing.size() == 0) {
             return false;
         }
@@ -25,10 +25,11 @@ public class ActivityElementHandler extends MainElementHandler {
             boolean cancelActivity = false;
             for (BoundaryEvent bEvent : bEvents) {
                 manager.addToPath(bEvent, context);
-                outgoing.addAll(bEvent.getOutgoing());
+                List<SequenceFlow> bOut = bEvent.getOutgoing();
+                outgoing.addAll(bOut);
                 cancelActivity = bEvent.isCancelActivity();
             
-                handleSeparatePaths(outgoing, manager);
+                handleSeparatePaths(outgoing, manager, bEvent);
                 handleCombinedPaths(outgoing, manager);
                 if (!cancelActivity) {
                     handleAllPaths(outgoing, manager);
@@ -42,13 +43,18 @@ public class ActivityElementHandler extends MainElementHandler {
         
     }
 
-    protected void handleSeparatePaths(List<SequenceFlow> outgoing, PathContextManager manager) {
+    protected void handleSeparatePaths(List<SequenceFlow> outgoing, PathContextManager manager, BoundaryEvent bEvent) {
         List<PathContext> locked = new ArrayList<PathContext>();
         PathContext context = manager.getContextFromStack();
         for (SequenceFlow seqFlow : outgoing) {
+
             FlowElement target = seqFlow.getTargetRef();
 
             PathContext separatePath = manager.cloneGiven(context);
+            // remove boundary event if sequence flow does not go out if it
+            if (!seqFlow.getSourceRef().equals(bEvent)) {
+                separatePath.removePathElement(bEvent);
+            }
             manager.addToPath(seqFlow, separatePath);
             super.handle(target, manager);
             separatePath.setLocked(true);

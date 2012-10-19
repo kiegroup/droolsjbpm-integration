@@ -10,6 +10,7 @@ public class SimulationPath {
     private String pathId;
     private List<String> sequenceFlowsIds = new ArrayList<String>();
     private List<String> activityIds = new ArrayList<String>();
+    private List<String> boundaryEventIds = new ArrayList<String>();
     private List<PathContext> origPaths = new ArrayList<PathContext>();
     
     private double probability;
@@ -50,6 +51,14 @@ public class SimulationPath {
     public void setPathId(String pathId) {
         this.pathId = pathId;
     }
-    
+    public List<String> getBoundaryEventIds() {
+        return boundaryEventIds;
+    }
+    public void setBoundaryEventIds(List<String> boundaryEventIds) {
+        this.boundaryEventIds = boundaryEventIds;
+    }
+    public void addBoundaryEventId(String id) {
+        this.boundaryEventIds.add(id);
+    }
     
 }

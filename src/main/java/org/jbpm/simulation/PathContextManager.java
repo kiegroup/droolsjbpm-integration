@@ -49,6 +49,19 @@ public class PathContextManager {
         }
     }
     
+    public void removeFromPath(FlowElement element, PathContext context) {
+        if (context.getType() == Type.ROOT) {
+            context.removePathElement(element);
+        } else {
+            // add nodes to all active contexts
+            for (PathContext ctx : this.paths) {
+                if (ctx.getType() == PathContext.Type.ACTIVE) {
+                    ctx.removePathElement(element);
+                }
+            }
+        }
+    }
+    
     public void addAllToPath(List<SequenceFlow> elements, PathContext context) {
         if (context.getType() == Type.ROOT) {
             context.addAllPathElement(elements);

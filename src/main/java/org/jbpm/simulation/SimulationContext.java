@@ -3,6 +3,7 @@ package org.jbpm.simulation;
 import java.util.List;
 
 import org.drools.time.SessionPseudoClock;
+import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.ht.StaffPoolManager;
 
 public class SimulationContext {
@@ -12,7 +13,7 @@ public class SimulationContext {
     private SimulationRegistry registry;
     private SimulationRepository repository;
     private SimulationDataProvider dataProvider;
-    private List<String> currentPath;
+    private SimulationPath currentPath;
     private long startTime;
     private SessionPseudoClock clock;
     private StaffPoolManager staffPoolManager;
@@ -42,11 +43,11 @@ public class SimulationContext {
         this.registry = registry;
     }
 
-    public List<String> getCurrentPath() {
+    public SimulationPath getCurrentPath() {
         return currentPath;
     }
 
-    public void setCurrentPath(List<String> currentPath) {
+    public void setCurrentPath(SimulationPath currentPath) {
         this.currentPath = currentPath;
     }
 

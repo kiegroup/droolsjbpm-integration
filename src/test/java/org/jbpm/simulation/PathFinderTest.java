@@ -345,7 +345,6 @@ public class PathFinderTest {
         expectedIds1.add("_1");
         expectedIds1.add("SequenceFlow_1");
         expectedIds1.add("UserTask_1");
-        expectedIds1.add("BoundaryEvent_2");
         expectedIds1.add("SequenceFlow_2");
         expectedIds1.add("UserTask_2");
         expectedIds1.add("SequenceFlow_3");    
@@ -543,7 +542,6 @@ public class PathFinderTest {
         expectedIds1.add("_1");
         expectedIds1.add("SequenceFlow_1");
         expectedIds1.add("UserTask_1");
-        expectedIds1.add("BoundaryEvent_2");
         expectedIds1.add("SequenceFlow_2");
         expectedIds1.add("UserTask_2");
         expectedIds1.add("SequenceFlow_3");    

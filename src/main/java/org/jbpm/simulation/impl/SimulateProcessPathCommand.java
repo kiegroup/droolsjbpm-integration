@@ -94,7 +94,7 @@ public class SimulateProcessPathCommand implements GenericCommand<Void> {
         
         StatefulKnowledgeSession session = ((KnowledgeCommandContext)context).getStatefulKnowledgesession();
         simContext.setClock((SessionPseudoClock) session.getSessionClock());
-        simContext.setCurrentPath(path.getSequenceFlowsIds());
+        simContext.setCurrentPath(path);
         SimulationInfo simInfo = simContext.getRepository().getSimulationInfo();
         if (simInfo != null) {
             simInfo.setProcessName(session.getKnowledgeBase().getProcess(processId).getName());

@@ -188,7 +188,7 @@ no-loop
         $count : count( $processDuration ) )
         eval($event.isUsed() == false)
     then
-        System.out.println("Duration for end event is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+        System.out.println("Duration for end event " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
         AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
         simulation.add(aggEvent);
         modify ($event) {

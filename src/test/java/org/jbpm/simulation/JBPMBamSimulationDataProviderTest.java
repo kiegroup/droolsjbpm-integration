@@ -67,7 +67,7 @@ public class JBPMBamSimulationDataProviderTest {
         
         for (SimulationPath path : paths) {
             
-            context.setCurrentPath(path.getSequenceFlowsIds());
+            context.setCurrentPath(path);
             StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
             
             session.startProcess("com.sample.test");

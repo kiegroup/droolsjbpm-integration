@@ -27,7 +27,7 @@ public class SimulationStartNodeInstance extends StartNodeInstance {
         
         List<Connection> outgoing = getNode().getOutgoingConnections().get(Node.CONNECTION_DEFAULT_TYPE);
         for (Connection conn : outgoing) {
-            if (context.getCurrentPath().contains(conn.getMetaData().get("UniqueId"))) {
+            if (context.getCurrentPath().getSequenceFlowsIds().contains(conn.getMetaData().get("UniqueId"))) {
 
                 triggerConnection(conn);
             }

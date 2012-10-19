@@ -50,6 +50,12 @@ public class PathContext {
         }
     }
     
+    public void removePathElement(FlowElement element) {
+        if (!locked) {
+            this.pathElements.remove(element);
+        }
+    }
+    
     public void addAllPathElement(List<SequenceFlow> elements) {
         if (!locked) {
             this.pathElements.addAll(elements);
