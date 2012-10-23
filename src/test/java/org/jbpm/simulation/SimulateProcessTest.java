@@ -368,4 +368,33 @@ public class SimulateProcessTest {
         assertEquals(30, wmRepo.getEvents().size());
         wmRepo.close();
     }
+    
+    @Test
+    public void testSimulationRunnerWithScriptRuleXor() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-ScriptRuleXor.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("defaultPackage.demo", out, 5, 2000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(30, wmRepo.getAggregatedEvents().size());
+        assertEquals(45, wmRepo.getEvents().size());
+        
+        wmRepo.getSession().execute(new InsertElementsCommand((Collection)wmRepo.getAggregatedEvents()));
+        wmRepo.fireAllRules();
+        
+        List<AggregatedSimulationEvent> summary = (List<AggregatedSimulationEvent>) wmRepo.getGlobal("summary");
+        assertNotNull(summary);
+        assertEquals(7, summary.size());
+        wmRepo.close();
+    }
 }
