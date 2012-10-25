@@ -4,7 +4,9 @@ import org.jbpm.simulation.AggregatedSimulationEvent;
 
 public class AggregatedEndEventSimulationEvent implements
         AggregatedSimulationEvent {
-    
+
+    protected String type;
+
     protected String activityName;
     protected String activityId;
     
@@ -15,7 +17,7 @@ public class AggregatedEndEventSimulationEvent implements
     protected long numberOfInstances; 
     
     public AggregatedEndEventSimulationEvent(String activityName, String activityId, double minProcessDuration,
-            double avgProcessDuration, double maxProcessDuration, long numberOfInstances) {
+            double avgProcessDuration, double maxProcessDuration, long numberOfInstances, String type) {
         super();        
         this.activityName = activityName;
         this.activityId = activityId;
@@ -23,6 +25,7 @@ public class AggregatedEndEventSimulationEvent implements
         this.avgProcessDuration = avgProcessDuration;
         this.maxProcessDuration = maxProcessDuration;
         this.numberOfInstances = numberOfInstances;
+        this.type = type;
     }
 
     
@@ -47,6 +50,9 @@ public class AggregatedEndEventSimulationEvent implements
         return null;
     }
 
+    public String getType() {
+        return this.type;
+    }
 
 
     public String getActivityName() {

@@ -6,12 +6,12 @@ public class ActivitySimulationEvent extends GenericSimulationEvent {
     protected String activityName;
     protected String activityId;
     protected long duration;
-    
-    
+
+    protected String type;
     
     public ActivitySimulationEvent(String processId, long processInstanceId,
-            String activityName, String activityId, long duration, long startTime, long endTime) {
-        super(processId, processInstanceId, startTime, endTime);
+            String activityName, String activityId, long duration, long startTime, long endTime, String type) {
+        super(processId, processInstanceId, startTime, endTime, type);
         this.activityName = activityName;
         this.activityId = activityId;
         this.duration = duration;
@@ -34,10 +34,12 @@ public class ActivitySimulationEvent extends GenericSimulationEvent {
     @Override
     public String toString() {
         
-        return "ActivitySimulationEvent[process=" + processId + ", instance=" 
+        return "ActivitySimulationEvent[process=" + processId + ", type = " + type + " instance="
         + processInstanceId + ", activity=" + activityName + ", duration=" + duration/1000+" seconds]";
     }
-    
-    
 
+
+    public String getType() {
+        return this.type;
+    }
 }

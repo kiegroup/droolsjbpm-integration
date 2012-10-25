@@ -95,7 +95,7 @@ no-loop
         eval($event.isUsed() == false)
     then
         System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
-        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, $event.getType());
         simulation.add(aggEvent);
         modify ($event) {
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
@@ -119,7 +119,7 @@ no-loop
         eval($event.isUsed() == false)
     then
         System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
-        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, $event.getType());
         simulation.add(aggEvent);
         modify ($event) {
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
@@ -165,7 +165,7 @@ no-loop
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
          + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count + " avg cost " + $avgrc + " min cost " + $minrc + " max cost " + $maxrc );
         HTAggregatedSimulationEvent aggEvent = new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max,
-         (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc, (Double)$minrc, (Double)$maxrc);
+         (Double)$minwt, (Double)$avgwt, (Double)$maxwt, (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc, (Double)$minrc, (Double)$maxrc, $event.getType());
         simulation.add(aggEvent);
         modify ($event) {
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
@@ -189,7 +189,7 @@ no-loop
         eval($event.isUsed() == false)
     then
         System.out.println("Duration for end event " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max);
-        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, $event.getType());
         simulation.add(aggEvent);
         modify ($event) {
             setAggregatedEvent((AggregatedSimulationEvent)processEventsOnly.get(processEventsOnly.size()==0 ? 0: processEventsOnly.size()-1)),
@@ -270,7 +270,7 @@ no-loop
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
          + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count + " avg cost " + $avgrc + " min cost " + $minrc + " max cost " + $maxrc);
         HTAggregatedSimulationEvent aggEvent = new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, 
-        (Double)$minru, (Double)$avgru, (Double)$maxru, ((Double)$count).longValue(), (Double)$avgrc, (Double)$minrc, (Double)$maxrc);
+        (Double)$minru, (Double)$avgru, (Double)$maxru, ((Double)$count).longValue(), (Double)$avgrc, (Double)$minrc, (Double)$maxrc, "");
         summary.add(aggEvent);
 
 end
@@ -291,7 +291,7 @@ no-loop
         
     then
         System.out.println("SUMMARY Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
-        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue());
+        AggregatedActivitySimulationEvent aggEvent = new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue(), "");
         summary.add(aggEvent);
 
 end
@@ -312,7 +312,7 @@ no-loop
         
     then
         System.out.println("SUMMARY Duration for end event " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
-        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue());
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, ((Double)$count).longValue(), "");
         summary.add(aggEvent);
 
 end

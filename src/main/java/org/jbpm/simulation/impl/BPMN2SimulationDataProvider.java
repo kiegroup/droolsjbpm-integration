@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.definition.process.Node;
-import org.eclipse.bpmn2.Definitions;
-import org.eclipse.bpmn2.ExtensionAttributeValue;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.FlowElementsContainer;
-import org.eclipse.bpmn2.Relationship;
+import org.eclipse.bpmn2.*;
+import org.eclipse.bpmn2.Process;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.jboss.drools.CostParameters;
 import org.jboss.drools.DecimalParameterType;
@@ -170,7 +167,103 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         
         return result;
     }
-    
+
+    public Map<String, Object> getProcessDataForNode(Node node) {
+
+        Map<String, Object> nodeProperties = new HashMap<String, Object>();
+        FlowElement flowElement = null;
+                List<RootElement> rootElements = def.getRootElements();
+        for (RootElement root : rootElements) {
+            if (root instanceof Process) {
+                flowElement = findElementInContainer((FlowElementsContainer) root, (String) node.getMetaData().get("UniqueId"));
+                break;
+            }
+        }
+
+        if (flowElement != null) {
+            if (flowElement instanceof ScriptTask) {
+
+               nodeProperties.put("node.type", "ScriptTask");
+            } else if (flowElement instanceof BusinessRuleTask) {
+
+                nodeProperties.put("node.type", "BusinessRuleTask");
+            } else if (flowElement instanceof UserTask) {
+
+                nodeProperties.put("node.type", "UserTask");
+            } else if (flowElement instanceof SendTask) {
+
+                nodeProperties.put("node.type", "SendTask");
+            } else if (flowElement instanceof ServiceTask) {
+
+                nodeProperties.put("node.type", "ServiceTask");
+            } else if (flowElement instanceof ReceiveTask) {
+
+                nodeProperties.put("node.type", "ReceiveTask");
+            } else if (flowElement instanceof ManualTask) {
+
+                nodeProperties.put("node.type", "ManualTask");
+            } else if (flowElement instanceof InclusiveGateway) {
+
+                nodeProperties.put("node.type", "InclusiveGateway");
+            } else if (flowElement instanceof ExclusiveGateway) {
+
+                nodeProperties.put("node.type", "ExclusiveGateway");
+            } else if (flowElement instanceof ParallelGateway) {
+
+                nodeProperties.put("node.type", "ParallelGateway");
+            } else if (flowElement instanceof BoundaryEvent) {
+                BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+                List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
+                String eventDef = "";
+
+                if (defs != null && defs.size() > 0) {
+                    eventDef = getEventDefinitionAsString(defs.get(0));
+                }
+
+                nodeProperties.put("node.type", "BoundaryEvent:"+eventDef);
+            } else if (flowElement instanceof IntermediateCatchEvent) {
+                IntermediateCatchEvent boundaryEvent = (IntermediateCatchEvent) flowElement;
+                List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
+                String eventDef = "";
+
+                if (defs != null && defs.size() > 0) {
+                    eventDef = getEventDefinitionAsString(defs.get(0));
+                }
+                nodeProperties.put("node.type", "IntermediateCatchEvent:"+eventDef);
+            } else if (flowElement instanceof IntermediateThrowEvent) {
+                IntermediateThrowEvent boundaryEvent = (IntermediateThrowEvent) flowElement;
+                List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
+                String eventDef = "";
+
+                if (defs != null && defs.size() > 0) {
+                    eventDef = getEventDefinitionAsString(defs.get(0));
+                }
+                nodeProperties.put("node.type", "IntermediateThrowEvent:"+eventDef);
+            } else if (flowElement instanceof StartEvent) {
+                StartEvent boundaryEvent = (StartEvent) flowElement;
+                List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
+                String eventDef = "";
+
+                if (defs != null && defs.size() > 0) {
+                    eventDef = getEventDefinitionAsString(defs.get(0));
+                }
+                nodeProperties.put("node.type", "StartEvent:"+eventDef);
+            } else if (flowElement instanceof EndEvent) {
+                EndEvent boundaryEvent = (EndEvent) flowElement;
+                List<EventDefinition> defs = boundaryEvent.getEventDefinitions();
+                String eventDef = "";
+
+                if (defs != null && defs.size() > 0) {
+                    eventDef = getEventDefinitionAsString(defs.get(0));
+                }
+                nodeProperties.put("node.type", "EndEvent:"+eventDef);
+            }
+        } else {
+            nodeProperties.put("node.type", "unknown");
+        }
+        return nodeProperties;
+    }
+
     private static byte[] getBytes(String string) {
         try {
             return string.getBytes("UTF-8");
@@ -196,5 +289,27 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         	}
         }
     	return null;
+    }
+
+    protected String getEventDefinitionAsString(EventDefinition eventDefinition) {
+        if (eventDefinition instanceof SignalEventDefinition) {
+            return "signalEventDefinition";
+        } else if (eventDefinition instanceof MessageEventDefinition) {
+            return "messageEventDefinition";
+        } else if (eventDefinition instanceof LinkEventDefinition) {
+            return "linkEventDefinition";
+        } else if (eventDefinition instanceof CompensateEventDefinition) {
+            return "compensateEventDefinition";
+        } else if (eventDefinition instanceof ErrorEventDefinition) {
+            return "errorEventDefinition";
+        } else if (eventDefinition instanceof TimerEventDefinition) {
+            return "timerEventDefinition";
+        } else if (eventDefinition instanceof ConditionalEventDefinition) {
+            return "conditionalEventDefinition";
+        } else if (eventDefinition instanceof CancelEventDefinition) {
+            return "cancelEventDefinition";
+        }
+
+        return "unknown";
     }
 }

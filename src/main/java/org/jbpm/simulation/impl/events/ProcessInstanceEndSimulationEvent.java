@@ -12,7 +12,7 @@ public class ProcessInstanceEndSimulationEvent extends GenericSimulationEvent {
     public ProcessInstanceEndSimulationEvent(String processId,
             long processInstanceId, long startTime, long endTime, String pathId
             , String processName, String processVersion) {
-        super(processId, processInstanceId, startTime, endTime);
+        super(processId, processInstanceId, startTime, endTime, "process-instance");
         this.pathId = pathId;
         this.processDuration = endTime - startTime;
         this.processName = processName;

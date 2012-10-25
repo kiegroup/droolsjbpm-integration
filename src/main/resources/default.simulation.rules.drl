@@ -72,14 +72,14 @@ no-loop
     when
         ActivityName($name : name, type=="abstract", $id : id)
         accumulate(
-        ActivitySimulationEvent($duration : duration, activityName == $name ) over window:length( 100 ),
+        ActivitySimulationEvent($duration : duration, activityName == $name, $type : type ) over window:length( 100 ),
         $min : min( $duration ),
         $avg : average( $duration ),
         $max : max( $duration ),
         $count : count( $duration ) )
     then
         System.out.println("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
-        simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count));
+        simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, ""));
 
 end
 
@@ -118,7 +118,7 @@ no-loop
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
          + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count + " avg cost " + $avgrc + " min cost " + $minrc + " max cost " + $maxrc);
         simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, 
-        (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc, (Double)$minrc, (Double)$maxrc));
+        (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc, (Double)$minrc, (Double)$maxrc, "userTask"));
 
 end
 
@@ -135,7 +135,7 @@ no-loop
         $count : count( $processDuration ) )
     then
         System.out.println("Duration for end event is avg: " + $avg + "; min: " + $min + "; max:" + $max);
-        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count);
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, "endEvent");
         simulation.add(aggEvent);
 end
 

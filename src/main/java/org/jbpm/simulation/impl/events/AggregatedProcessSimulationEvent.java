@@ -10,6 +10,8 @@ import org.jbpm.simulation.AggregatedSimulationEvent;
 
 public class AggregatedProcessSimulationEvent implements AggregatedSimulationEvent {
 
+    protected String type;
+
     protected String processId;
     protected String processName;
     protected String processVersion;
@@ -28,6 +30,7 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
         this.minExecutionTime = minExecutionTime;
         this.avgExecutionTime = avgExecutionTime;
         this.maxExecutionTime = maxExecutionTime;
+        this.type = "process";
     }
     
     protected void setProcessInfoValues(Object processInfo) {
@@ -80,6 +83,10 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
             return maxExecutionTime;
         }
         return null;
+    }
+
+    public String getType() {
+        return this.type;
     }
 
     public String getProcessId() {

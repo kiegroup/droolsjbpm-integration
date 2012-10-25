@@ -5,6 +5,8 @@ import org.jbpm.simulation.AggregatedSimulationEvent;
 
 public class AggregatedActivitySimulationEvent implements AggregatedSimulationEvent {
 
+    protected String type;
+
     protected String activityName;
     protected String activityId;
     
@@ -17,7 +19,7 @@ public class AggregatedActivitySimulationEvent implements AggregatedSimulationEv
     
     public AggregatedActivitySimulationEvent(String activityName, String activityId,
             double minExecutionTime, double avgExecutionTime,
-            double maxExecutionTime, long numberOfInstances) {
+            double maxExecutionTime, long numberOfInstances, String type) {
         super();
         this.activityName = activityName;
         this.activityId = activityId;
@@ -25,6 +27,7 @@ public class AggregatedActivitySimulationEvent implements AggregatedSimulationEv
         this.avgExecutionTime = avgExecutionTime;
         this.maxExecutionTime = maxExecutionTime;
         this.numberOfInstances = numberOfInstances;
+        this.type = type;
     }
     public double getMinExecutionTime() {
         return minExecutionTime;
@@ -76,6 +79,11 @@ public class AggregatedActivitySimulationEvent implements AggregatedSimulationEv
         
         return null;
     }
+
+    public String getType() {
+        return this.type;
+    }
+
     public long getNumberOfInstances() {
         return numberOfInstances;
     }

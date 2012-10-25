@@ -9,8 +9,8 @@ public class GatewaySimulationEvent extends GenericSimulationEvent {
     
     public GatewaySimulationEvent(String processId, long processInstanceId,
             long startTime, long endTime, 
-            String activityId, String activityName) {
-        super(processId, processInstanceId, startTime, endTime);
+            String activityId, String activityName, String type) {
+        super(processId, processInstanceId, startTime, endTime, type);
         this.activityId = activityId;
         this.activityName = activityName;
     }

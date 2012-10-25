@@ -32,7 +32,11 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
        context.getClock().advanceTime(duration, TimeUnit.MILLISECONDS);
        // set end time for processinstance end time
        context.setMaxEndTime(context.getClock().getCurrentTime());
-       return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration, startTime, context.getClock().getCurrentTime());
+
+       String type = (String) provider.getProcessDataForNode(node).get("node.type");
+
+       return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration,
+               startTime, context.getClock().getCurrentTime(), type);
     }
 
 }

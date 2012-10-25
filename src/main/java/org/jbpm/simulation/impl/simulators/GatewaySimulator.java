@@ -8,6 +8,7 @@ import org.drools.runtime.process.NodeInstance;
 import org.drools.runtime.process.ProcessInstance;
 import org.jbpm.simulation.ActivitySimulator;
 import org.jbpm.simulation.SimulationContext;
+import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.simulation.impl.events.GatewaySimulationEvent;
 
@@ -30,7 +31,10 @@ public class GatewaySimulator implements ActivitySimulator {
         context.getClock().advanceTime(duration, TimeUnit.MILLISECONDS);
         // set end time for processinstance end time
         context.setMaxEndTime(context.getClock().getCurrentTime());
-        return new GatewaySimulationEvent(pi.getProcessId(), pi.getId(), startTime, endTime, bpmn2NodeId, node.getName());
+        SimulationDataProvider provider = context.getDataProvider();
+        String type = (String) provider.getProcessDataForNode(node).get("node.type");
+
+        return new GatewaySimulationEvent(pi.getProcessId(), pi.getId(), startTime, endTime, bpmn2NodeId, node.getName(), type);
     }
     
 }

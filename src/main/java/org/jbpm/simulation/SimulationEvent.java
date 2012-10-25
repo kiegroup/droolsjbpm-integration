@@ -15,4 +15,6 @@ public interface SimulationEvent {
     long getEndTime();
     
     UUID getUUID();
+
+    String getType();
 }

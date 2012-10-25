@@ -10,4 +10,6 @@ public interface SimulationDataProvider {
     Map<String, Object> getSimulationDataForNode(Node node);
     
     double calculatePathProbability(SimulationPath path);
+
+    Map<String, Object> getProcessDataForNode(Node node);
 }

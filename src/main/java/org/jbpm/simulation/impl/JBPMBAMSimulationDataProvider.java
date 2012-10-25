@@ -259,6 +259,10 @@ public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
         
     }
 
+    public Map<String, Object> getProcessDataForNode(Node node) {
+        return null;
+    }
+
     private String buildParameterPlaceHolder(int size) {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < size; i++) {

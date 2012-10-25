@@ -15,6 +15,8 @@ public class GenericSimulationEvent implements SimulationEvent {
     protected long startTime;
     protected long endTime;
     protected UUID uuid;
+
+    protected String type;
     
     protected AggregatedSimulationEvent aggregatedEvent;
     protected boolean used; 
@@ -45,13 +47,14 @@ public class GenericSimulationEvent implements SimulationEvent {
         return endTime;
     }
 
-    public GenericSimulationEvent(String processId, long processInstanceId, long startTime, long endTime) {
+    public GenericSimulationEvent(String processId, long processInstanceId, long startTime, long endTime, String type) {
         super();
         this.processId = processId;
         this.processInstanceId = processInstanceId;
         this.startTime = startTime;
         this.endTime = endTime;
         this.uuid = UUID.randomUUID();
+        this.type = type;
     }
 
     
@@ -68,7 +71,11 @@ public class GenericSimulationEvent implements SimulationEvent {
     public UUID getUUID() {
     	return this.uuid;
     }
-    
+
+    public String getType() {
+        return this.type;
+    }
+
 
     public String getMetric(String name) {
         Object metric = this.customMetrics.get(name);

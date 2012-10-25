@@ -42,7 +42,10 @@ public class HardCodedSimulationDataProvider implements SimulationDataProvider {
         // not supported
         return 100;
     }
-    
-    
+
+    public Map<String, Object> getProcessDataForNode(Node node) {
+        return new HashMap<String, Object>();
+    }
+
 
 }

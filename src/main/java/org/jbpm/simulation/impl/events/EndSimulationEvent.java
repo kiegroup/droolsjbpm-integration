@@ -13,7 +13,7 @@ public class EndSimulationEvent extends GenericSimulationEvent {
     
     public EndSimulationEvent(String processId, long processInstanceId, long startTime, long endTime, long proceesStartTime,
             String activityId, String activityName, String processName, String processVersion) {
-        super(processId, processInstanceId, startTime, endTime);
+        super(processId, processInstanceId, startTime, endTime, "endEvent");
         this.setProcessDuration(endTime - proceesStartTime);
         this.activityId = activityId;
         this.activityName = activityName;

@@ -13,7 +13,7 @@ public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
             long processInstanceId, String activityName, String activityId,
             long duration, long waitTime, double resourceCost, long startTime, long endTime, double resourceUtilization) {
         
-        super(processId, processInstanceId, startTime, endTime);
+        super(processId, processInstanceId, startTime, endTime, "userTask");
         this.duration = duration;
         this.activityId = activityId;
         this.activityName = activityName;

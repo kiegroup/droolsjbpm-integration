@@ -6,10 +6,11 @@ public class HTAggregatedSimulationEvent extends AggregatedActivitySimulationEve
             double minExecutionTime, double avgExecutionTime,
             double maxExecutionTime, double minWaitTime, double avgWaitTime,
             double maxWaitTime, double minResourceUtilization, double avgResourceUtilization, 
-            double maxResourceUtilization, long numberOfInstances, double avgResourceCost, double minResourceCost, double maxResourceCost) {
+            double maxResourceUtilization, long numberOfInstances, double avgResourceCost,
+            double minResourceCost, double maxResourceCost, String type) {
         
         super(activityName, activityId, minExecutionTime, avgExecutionTime,
-                maxExecutionTime, numberOfInstances);
+                maxExecutionTime, numberOfInstances, type);
         this.minWaitTime = minWaitTime;
         this.avgWaitTime = avgWaitTime;
         this.maxWaitTime = maxWaitTime;
