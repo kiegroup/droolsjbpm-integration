@@ -22,11 +22,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 import org.drools.KnowledgeBase;
-import org.drools.builder.DecisionTableConfiguration;
-import org.drools.builder.JaxbConfiguration;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderConfiguration;
-import org.drools.builder.KnowledgeBuilderFactoryService;
+import org.drools.builder.*;
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -86,6 +82,10 @@ public class KnowledgeBuilderProviderRemoteClient
         return newKnowledgeBuilder( null,
                                     null );
 
+    }
+
+    public KnowledgeJarBuilder newKnowledgeJarBuilder() {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
 
     public KnowledgeBuilder newKnowledgeBuilder(KnowledgeBuilderConfiguration conf) {

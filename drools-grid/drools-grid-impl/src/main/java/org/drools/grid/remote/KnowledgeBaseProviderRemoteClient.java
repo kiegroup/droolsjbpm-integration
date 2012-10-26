@@ -21,6 +21,8 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
+
+import org.drools.KBaseUnit;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactoryService;
@@ -34,6 +36,7 @@ import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,6 +148,18 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public Environment newEnvironment() {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public KnowledgeBase getKnowledgeBase(String kBaseName) {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public StatefulKnowledgeSession getStatefulKnowlegeSession(String kSessionName) {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public KBaseUnit getKBaseUnit(String kBaseName) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
