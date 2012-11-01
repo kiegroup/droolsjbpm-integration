@@ -1,7 +1,6 @@
 package org.drools.io.mina;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -11,7 +10,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.SocketService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.h2.tools.DeleteDbFiles;
@@ -23,7 +21,7 @@ public class JpaWhitePagesTest {
     
     @Before
     public void setUp() {
-         DeleteDbFiles.execute("~", "mydb", false);
+        DeleteDbFiles.execute("~", "mydb", false);
 
         System.out.println("Staring DB for white pages ...");
         
@@ -43,43 +41,42 @@ public class JpaWhitePagesTest {
     public void tearDown() {
         
         server.stop();
-        
     }
     @Test
     public void test1() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new JpaWhitePages( emf );
 
-        wp.create( "s1", "grid0" );
-        wp.create( "s2", "grid0" );
-        wp.create( "s3", "grid0" );
+        wp.create( "ss1", "grid0" );
+        wp.create( "ss2", "grid0" );
+        wp.create( "ss3", "grid0" );
 
-        GridServiceDescription<String> gs1 = wp.lookup( "s1" );
+        GridServiceDescription<String> gs1 = wp.lookup( "ss1" );
 
-        gs1.addAddress( "p1" ).setObject( "v1" );
-        gs1.addAddress( "p2" ).setObject( "v2" );
+        gs1.addAddress( "pp1" ).setObject( "v1" );
+        gs1.addAddress( "pp2" ).setObject( "v2" );
 
-        gs1 = wp.lookup( "s1" );
+        gs1 = wp.lookup( "ss1" );
         assertEquals( 2,
                       gs1.getAddresses().size() );
         assertEquals( "v1",
-                      gs1.getAddresses().get( "p1" ).getObject() );
+                      gs1.getAddresses().get( "pp1" ).getObject() );
         assertEquals( "v2",
-                      gs1.getAddresses().get( "p2" ).getObject() );
+                      gs1.getAddresses().get( "pp2" ).getObject() );
 
-        gs1.removeAddress( "p2" );
+        gs1.removeAddress( "pp2" );
 
-        gs1 = wp.lookup( "s1" );
+        gs1 = wp.lookup( "ss1" );
         assertEquals( 1,
                       gs1.getAddresses().size() );
         assertEquals( "v1",
-                      gs1.getAddresses().get( "p1" ).getObject() );
+                      gs1.getAddresses().get( "pp1" ).getObject() );
 
-        wp.remove( "s1" );
+        wp.remove( "ss1" );
 
-        assertNull( wp.lookup( "s1" ) );
+        assertNull( wp.lookup( "ss1" ) );
 
-        GridServiceDescription gs2 = wp.lookup( "s2" );
+        GridServiceDescription gs2 = wp.lookup( "ss2" );
         assertNotNull( gs2 );
 
     }

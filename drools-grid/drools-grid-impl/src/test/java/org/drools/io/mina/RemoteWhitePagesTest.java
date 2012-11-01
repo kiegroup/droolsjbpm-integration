@@ -101,36 +101,36 @@ public class RemoteWhitePagesTest {
 
         WhitePages wp = grid2.get( WhitePages.class );
 
-        wp.create( "s1", "grid0" );
-        wp.create( "s2", "grid0" );
-        wp.create( "s3", "grid0" );
+        wp.create( "sa1", "grid0" );
+        wp.create( "sa2", "grid0" );
+        wp.create( "sa3", "grid0" );
 
-        GridServiceDescription<String> gs1 = wp.lookup( "s1" );
+        GridServiceDescription<String> gs1 = wp.lookup( "sa1" );
 
-        gs1.addAddress( "p1" ).setObject( "v1" );
-        gs1.addAddress( "p2" ).setObject( "v2" );
+        gs1.addAddress( "pa1" ).setObject( "v1" );
+        gs1.addAddress( "pa2" ).setObject( "v2" );
 
-        gs1 = wp.lookup( "s1" );
+        gs1 = wp.lookup( "sa1" );
         assertEquals( 2,
                       gs1.getAddresses().size() );
         assertEquals( "v1",
-                      gs1.getAddresses().get( "p1" ).getObject() );
+                      gs1.getAddresses().get( "pa1" ).getObject() );
         assertEquals( "v2",
-                      gs1.getAddresses().get( "p2" ).getObject() );
+                      gs1.getAddresses().get( "pa2" ).getObject() );
 
-        gs1.removeAddress( "p2" );
+        gs1.removeAddress( "pa2" );
 
-        gs1 = wp.lookup( "s1" );
+        gs1 = wp.lookup( "sa1" );
         assertEquals( 1,
                       gs1.getAddresses().size() );
         assertEquals( "v1",
-                      gs1.getAddresses().get( "p1" ).getObject() );
+                      gs1.getAddresses().get( "pa1" ).getObject() );
 
-        wp.remove( "s1" );
+        wp.remove( "sa1" );
 
-        assertNull( wp.lookup( "s1" ) );
+        assertNull( wp.lookup( "sa1" ) );
 
-        GridServiceDescription gs2 = wp.lookup( "s2" );
+        GridServiceDescription gs2 = wp.lookup( "sa2" );
         assertNotNull( gs2 );
         grid1.get( SocketService.class ).close();
 

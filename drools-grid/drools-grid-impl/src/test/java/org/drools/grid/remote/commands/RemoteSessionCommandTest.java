@@ -17,14 +17,9 @@
 package org.drools.grid.remote.commands;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.builder.ResourceType;
 import org.drools.command.*;
@@ -38,7 +33,6 @@ import org.drools.grid.remote.InternalQueryResultsClient;
 import org.drools.grid.remote.QueryResultsRemoteClient;
 import org.drools.io.Resource;
 import org.drools.io.impl.ByteArrayResource;
-import org.drools.io.impl.ChangeSetImpl;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.io.internal.InternalResource;
 import org.drools.runtime.StatefulKnowledgeSession;
