@@ -12,7 +12,7 @@
   <artifactId>drools-camel-server-example</artifactId>
   <packaging>war</packaging>
   
-  <name>Drools Camel server</name>
+  <name>Drools Camel server example</name>
   <description>A webapp that runs the Drools Camel integration.</description>
 
   <dependencies>
