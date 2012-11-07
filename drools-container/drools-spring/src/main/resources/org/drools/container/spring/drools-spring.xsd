@@ -395,6 +395,7 @@
     <xsd:attribute name="source" use="optional" type="xsd:string"/>
     <xsd:attribute name="type" use="optional" type="resourceTypeEnum"/>
     <xsd:attribute name="ref"  use="optional" type="xsd:string"/>
+    <xsd:attribute name="encoding"  use="optional" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:complexType name="resourceRefType">
