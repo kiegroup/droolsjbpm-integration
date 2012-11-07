@@ -42,6 +42,7 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String REF                            = "ref";
     private static final String NAME                            = "name";
     private static final String DESCRIPTION                            = "description";
+    private static final String ENCODING                       = "encoding";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -84,11 +85,15 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
             factory.addPropertyValue( "basicAuthenticationPassword",
                                       password );
         }
-        
+
+        String encoding = element.getAttribute( ENCODING );
+        factory.addPropertyValue( "encoding",
+                                  org.drools.core.util.StringUtils.isEmpty(encoding) ? null : encoding);
+
         String name = element.getAttribute( NAME );
         factory.addPropertyValue( "name",
                                   org.drools.core.util.StringUtils.isEmpty(name) ? null : name);
-        
+
         String description = element.getAttribute( DESCRIPTION );
         factory.addPropertyValue( "description",
                                   org.drools.core.util.StringUtils.isEmpty(description) ? null : description);
