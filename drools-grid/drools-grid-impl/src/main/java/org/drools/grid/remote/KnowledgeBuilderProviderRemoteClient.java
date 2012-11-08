@@ -84,7 +84,11 @@ public class KnowledgeBuilderProviderRemoteClient
 
     }
 
-    public KnowledgeJarBuilder newKnowledgeJarBuilder() {
+    public KnowledgeContainer newKnowledgeContainer() {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public KnowledgeContainer newKnowledgeContainer(KnowledgeBuilderConfiguration conf) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
