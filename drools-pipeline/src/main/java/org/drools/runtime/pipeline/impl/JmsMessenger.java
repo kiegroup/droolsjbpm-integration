@@ -46,18 +46,34 @@ public class JmsMessenger extends BaseService
     private Thread               thread;
 
     private JmsMessengerRunner   jmsFeederRunner;
+    
+    private String connectionPrincipal;
+    private String connectionCredentials;
 
     public JmsMessenger(Pipeline pipeline,
                         Properties properties,
                         String destinationName,
                         ResultHandlerFactory resultHandlerFactory) {
+    	this(pipeline, properties, "ConnectionFactory", false, destinationName, resultHandlerFactory);
+    }
+    
+    public JmsMessenger(Pipeline pipeline,
+                Properties properties,
+                String connectionFactoryName,
+                boolean useSecurityPrincipalForConnection,
+                String destinationName,
+                ResultHandlerFactory resultHandlerFactory) {
         super();
         this.pipeline = pipeline;
         this.resultHandlerFactory = resultHandlerFactory;
+        if( useSecurityPrincipalForConnection ){
+        	this.connectionPrincipal = properties.getProperty("java.naming.security.principal");
+        	this.connectionCredentials = properties.getProperty("java.naming.security.credentials");
+        }
 
         try {
             InitialContext jndiContext = new InitialContext( properties );
-            this.connectionFactory = (ConnectionFactory) jndiContext.lookup( "ConnectionFactory" );
+            this.connectionFactory = (ConnectionFactory) jndiContext.lookup( connectionFactoryName );
             this.destination = (Destination) jndiContext.lookup( destinationName );
         } catch ( Exception e ) {
             throw new RuntimeException( "Unable to instantiate JmsFeeder",
@@ -67,7 +83,11 @@ public class JmsMessenger extends BaseService
 
     public void start() {
         try {
-            this.connection = this.connectionFactory.createConnection();
+        	if( connectionPrincipal != null ){
+        		this.connection = this.connectionFactory.createConnection(connectionPrincipal, connectionCredentials);
+        	} else {
+        		this.connection = this.connectionFactory.createConnection();
+        	}
             this.session = this.connection.createSession( false,
                                                           Session.AUTO_ACKNOWLEDGE );
             this.consumer = this.session.createConsumer( destination );

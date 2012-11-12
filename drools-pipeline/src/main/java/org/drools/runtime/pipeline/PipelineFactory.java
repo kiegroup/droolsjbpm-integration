@@ -402,6 +402,7 @@ public class PipelineFactory {
      * @param destinationName
      * @param resultHandlerFactory
      * @return
+     * @see #newJmsMessenger(Pipeline, Properties, String, boolean, String, ResultHandlerFactory)
      */
     public static Service newJmsMessenger(Pipeline pipeline,
                                           Properties properties,
@@ -409,6 +410,70 @@ public class PipelineFactory {
                                           ResultHandlerFactory resultHandlerFactory) {
         return getJmsMessengerProvider().newJmsMessenger( pipeline,
                                                           properties,
+                                                          destinationName,
+                                                          resultHandlerFactory );
+    }
+
+    /**
+     * Creates a new JmsMessenger which runs as a service in it's own thread. It expects an existing JNDI entry for connectionFactoryName
+     * Which will be used to create the MessageConsumer which will feed into the specified pipeline.
+     * 
+     * This method is more customizable then {@link #newJmsMessenger(Pipeline, Properties, String, ResultHandlerFactory)},
+     * Connection factory JNDI name is additional paramter and connection with principal may be configured. 
+     * E.g. for JBOSS AS 7.1 use: connectionFactoryName="jms/RemoteConnectionFactory", useSecurityPrincipalForConnection=true.
+     * 
+     * <pre>
+     * // as this is a service, it's more likely the results will be logged or sent as a return message 
+     * Action resultHandlerStage = PipelineFactory.newExecuteResultHandler();
+     *
+     * // Insert the transformed object into the session associated with the PipelineContext
+     * KnowledgeRuntimeCommand insertStage = PipelineFactory.newStatefulKnowledgeSessionInsert();
+     * insertStage.setReceiver( resultHandlerStage );
+     *
+     * // Create the transformer instance and create the Transformer stage, where we are going from Xml to Pojo. Jaxb needs an array of the available classes
+     * JAXBContext jaxbCtx = KnowledgeBuilderHelper.newJAXBContext( classNames,
+     *                                                              kbase );
+     * Unmarshaller unmarshaller = jaxbCtx.createUnmarshaller();
+     * Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
+     * transformer.setReceiver( insertStage );
+     *
+     * // payloads for JMS arrive in a Message wrapper, we need to unwrap this object
+     * Action unwrapObjectStage = PipelineFactory.newJmsUnwrapMessageObject();
+     * unwrapObjectStage.setReceiver( transformer );
+     *
+     * // Create the start adapter Pipeline for StatefulKnowledgeSessions
+     * Pipeline pipeline = PipelineFactory.newStatefulKnowledgeSessionPipeline( ksession );
+     * pipeline.setReceiver( unwrapObjectStage );
+     *
+     * // Services, like JmsMessenger take a ResultHandlerFactory implementation, this is because a result handler must be created for each incoming message.
+     * ResultHandleFactoryImpl factory = new ResultHandleFactoryImpl();
+     * Service messenger = PipelineFactory.newJmsMessenger( pipeline,
+     *                                                      props,
+     *                                                      "jms/RemoteConnectionFactory",
+     *                                                      true,
+     *                                                      destinationName,
+     *                                                      factory );
+     * messenger.start();
+     * </pre>
+     * @param pipeline
+     * @param properties
+     * @param connectionFactoryName
+     * @param useSecurityPrincipalForConnection
+     * @param destinationName
+     * @param resultHandlerFactory
+     * @return
+     * @see #newJmsMessenger(Pipeline, Properties, String, ResultHandlerFactory)
+     */
+    public static Service newJmsMessenger(Pipeline pipeline,
+                                          Properties properties,
+                                          String connectionFactoryName,
+                                          boolean useSecurityPrincipalForConnection,
+                                          String destinationName,
+                                          ResultHandlerFactory resultHandlerFactory) {
+        return getJmsMessengerProvider().newJmsMessenger( pipeline,
+                                                          properties,
+                                                          connectionFactoryName,
+                                                          useSecurityPrincipalForConnection,
                                                           destinationName,
                                                           resultHandlerFactory );
     }
