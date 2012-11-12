@@ -37,6 +37,20 @@ public class JmsMessengerProviderImpl
                                  resultHandlerFactory );
     }
 
+    public Service newJmsMessenger(Pipeline pipeline,
+                                   Properties properties,
+                                   String connectionFactoryName,
+                                   boolean useSecurityPrincipalForConnection,
+                                   String destinationName,
+                                   ResultHandlerFactory resultHandlerFactory) {
+        return new JmsMessenger( pipeline,
+                                 properties,
+                                 connectionFactoryName,
+                                 useSecurityPrincipalForConnection,
+                                 destinationName,
+                                 resultHandlerFactory );
+}
+
     public Action newJmsUnwrapMessageObject() {
         return new JmsUnwrapMessageObject();
     }
