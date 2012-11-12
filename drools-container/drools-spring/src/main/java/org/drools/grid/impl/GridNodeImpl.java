@@ -24,15 +24,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 /*
-import org.drools.grid.GridServiceDescription;
-import org.drools.grid.MessageReceiverHandlerFactoryService;
-import org.drools.grid.SocketService;
-import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.grid.io.impl.NodeData;
-import org.drools.grid.service.directory.WhitePages;
+import org.kie.grid.GridServiceDescription;
+import org.kie.grid.MessageReceiverHandlerFactoryService;
+import org.kie.grid.SocketService;
+import org.kie.grid.io.MessageReceiverHandler;
+import org.kie.grid.io.impl.NodeData;
+import org.kie.grid.service.directory.WhitePages;
 */
-import org.drools.util.ServiceRegistry;
-import org.drools.util.ServiceRegistryImpl;
+import org.kie.util.ServiceRegistry;
+import org.kie.util.ServiceRegistryImpl;
 
 public class GridNodeImpl
     implements
@@ -53,7 +53,7 @@ public class GridNodeImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.GridNode#get(java.lang.String, java.lang.Class)
+     * @see org.kie.grid.GridNode#get(java.lang.String, java.lang.Class)
      */
     public <T> T get(String identifier,
                      Class<T> cls) {
@@ -66,7 +66,7 @@ public class GridNodeImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.GridNode#get(java.lang.Class)
+     * @see org.kie.grid.GridNode#get(java.lang.Class)
      */
     public <T> T get(Class<T> serviceClass) {
         return get( serviceClass.getName(),
@@ -74,7 +74,7 @@ public class GridNodeImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.GridNode#set(java.lang.String, java.lang.Object)
+     * @see org.kie.grid.GridNode#set(java.lang.String, java.lang.Object)
      */
     public void set(String identifier,
                     Object object) {
@@ -83,7 +83,7 @@ public class GridNodeImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.GridNode#getId()
+     * @see org.kie.grid.GridNode#getId()
      */
     public String getId() {
         return id;

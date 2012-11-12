@@ -82,7 +82,7 @@ public class MessageImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.io.impl.Message#toString()
+     * @see org.kie.grid.io.impl.Message#toString()
      */
 
     @Override

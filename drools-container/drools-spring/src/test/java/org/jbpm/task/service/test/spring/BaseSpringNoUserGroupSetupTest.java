@@ -1,7 +1,8 @@
 package org.jbpm.task.service.test.spring;
 
 import static org.jbpm.task.BaseTest.fillUsersOrGroups;
-import static org.jbpm.task.service.test.impl.TestServerUtil.*;
+import static org.jbpm.task.service.test.impl.TestServerUtil.createTestTaskClientConnector;
+import static org.jbpm.task.service.test.impl.TestServerUtil.startServer;
 import static org.jbpm.task.service.test.spring.BaseSpringTest.removeAllTasks;
 
 import java.util.Map;
@@ -10,12 +11,12 @@ import org.h2.tools.Server;
 import org.jbpm.task.Group;
 import org.jbpm.task.MockUserInfo;
 import org.jbpm.task.User;
+import org.jbpm.task.identity.UserGroupCallbackManager;
+import org.jbpm.task.identity.UserGroupCallbackOneImpl;
 import org.jbpm.task.service.TaskClient;
 import org.jbpm.task.service.TaskServer;
 import org.jbpm.task.service.TaskService;
 import org.jbpm.task.service.TaskServiceSession;
-import org.jbpm.task.identity.UserGroupCallbackManager;
-import org.jbpm.task.identity.UserGroupCallbackOneImpl;
 import org.jbpm.task.service.test.impl.TestTaskServer;
 import org.junit.After;
 import org.junit.Before;

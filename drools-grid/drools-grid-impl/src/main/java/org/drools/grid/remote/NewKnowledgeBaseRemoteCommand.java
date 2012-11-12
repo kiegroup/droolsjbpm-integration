@@ -16,12 +16,12 @@
 
 package org.drools.grid.remote;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactory;
 import org.drools.command.Context;
 import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KnowledgeBaseFactory;
 
 public class NewKnowledgeBaseRemoteCommand
     implements

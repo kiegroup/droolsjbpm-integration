@@ -24,8 +24,8 @@ import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.command.GetFactHandleFromQueryResultsRowRemoteCommand;
 import org.drools.grid.remote.command.GetObjectFromQueryResultsRowRemoteCommand;
-import org.drools.runtime.rule.FactHandle;
-import org.drools.runtime.rule.QueryResultsRow;
+import org.kie.runtime.rule.FactHandle;
+import org.kie.runtime.rule.QueryResultsRow;
 
 /**
  *

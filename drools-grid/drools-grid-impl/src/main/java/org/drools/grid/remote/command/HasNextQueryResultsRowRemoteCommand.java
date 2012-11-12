@@ -20,7 +20,7 @@ import java.util.Iterator;
 import org.drools.command.Context;
 import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
-import org.drools.runtime.rule.QueryResultsRow;
+import org.kie.runtime.rule.QueryResultsRow;
 
 /**
  *

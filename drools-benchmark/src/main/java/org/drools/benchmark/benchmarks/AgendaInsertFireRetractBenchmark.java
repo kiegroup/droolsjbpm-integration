@@ -1,7 +1,7 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.common.DefaultFactHandle;
-import org.drools.runtime.rule.FactHandle;
+import org.kie.runtime.rule.FactHandle;
 
 public class AgendaInsertFireRetractBenchmark extends AgendaBenchmark {
 

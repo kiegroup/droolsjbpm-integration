@@ -8,9 +8,9 @@ import java.util.logging.Logger;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
-import org.drools.runtime.KnowledgeRuntime;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.process.WorkItemHandler;
+import org.kie.runtime.KnowledgeRuntime;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.process.WorkItemHandler;
 
 public class RegisterRemoteWorkItemHandlerCommand
     implements

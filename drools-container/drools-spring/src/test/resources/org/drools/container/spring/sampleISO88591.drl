@@ -1,6 +1,6 @@
-package org.drools.container.spring.i
+package org.kie.container.spring.i
 
-rule "sample acçéntèd rule"
+rule "sample acï¿½ï¿½ntï¿½d rule"
 	@output("\"Hello world!\"")
 	when
 	then

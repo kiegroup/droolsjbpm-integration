@@ -3,7 +3,6 @@ package org.drools.grid.io.impl;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.drools.SystemEventListener;
 import org.drools.grid.Grid;
 import org.drools.grid.io.Connector;
 import org.drools.grid.io.ConnectorFactoryService;
@@ -11,6 +10,7 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.MessageReceiverHandler;
+import org.kie.SystemEventListener;
 
 public class ConversationManagerImpl
     implements

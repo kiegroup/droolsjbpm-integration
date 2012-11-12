@@ -20,7 +20,7 @@ import org.drools.SessionConfiguration;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeSessionConfigurationRemoteClient;
-import org.drools.runtime.conf.KnowledgeSessionOption;
+import org.kie.runtime.conf.KnowledgeSessionOption;
 
 /**
  *

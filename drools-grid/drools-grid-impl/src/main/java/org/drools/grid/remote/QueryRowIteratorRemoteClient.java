@@ -16,7 +16,8 @@
 package org.drools.grid.remote;
 
 import java.util.Iterator;
-import org.drools.runtime.rule.QueryResultsRow;
+
+import org.kie.runtime.rule.QueryResultsRow;
 
 /**
  *

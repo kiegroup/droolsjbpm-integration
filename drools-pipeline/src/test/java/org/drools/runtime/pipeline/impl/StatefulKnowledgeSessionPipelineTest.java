@@ -23,15 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
@@ -40,6 +31,16 @@ import org.drools.runtime.pipeline.ResultHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderError;
+import org.kie.builder.KnowledgeBuilderErrors;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+
 import static org.junit.Assert.*;
 
 public class StatefulKnowledgeSessionPipelineTest {
@@ -95,7 +96,7 @@ public class StatefulKnowledgeSessionPipelineTest {
             "<process xmlns=\"http://drools.org/drools-5.0/process\"\n" +
             "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
             "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n" +
-            "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n" +
+            "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n" +
             "\n" +
             "  <header>\n" +
             "    <globals>\n" +
@@ -146,7 +147,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         Map vars = new HashMap();
         vars.put( "variable", "SomeText" );
         
-        StatefulKnowledgeSessionStartProcessStage startProcess = new StatefulKnowledgeSessionStartProcessStage("org.drools.actions");
+        StatefulKnowledgeSessionStartProcessStage startProcess = new StatefulKnowledgeSessionStartProcessStage("org.kie.actions");
         pipeline = new StatefulKnowledgeSessionPipelineImpl(ksession);
         pipeline.setReceiver( startProcess );
         pipeline.insert( vars, null );
@@ -163,7 +164,7 @@ public class StatefulKnowledgeSessionPipelineTest {
             "<process xmlns=\"http://drools.org/drools-5.0/process\"\n" +
             "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
             "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n" +
-            "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n" +
+            "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n" +
             "\n" +
             "  <header>\n" +
             "    <globals>\n" +
@@ -171,7 +172,7 @@ public class StatefulKnowledgeSessionPipelineTest {
             "    </globals>\n" +            
             "    <variables>\n" +
             "      <variable name=\"MyVar\" >\n" +
-            "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n" +
+            "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n" +
             "        <value>SomeText</value>\n" +
             "      </variable>\n" +
             "    </variables>\n" +
@@ -224,7 +225,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         pipeline.setReceiver( setGlobal );
         pipeline.insert( globals, null );
         
-        org.drools.runtime.process.ProcessInstance instance = ksession.startProcess("org.drools.event");
+        org.kie.runtime.process.ProcessInstance instance = ksession.startProcess("org.kie.event");
         
         StatefulKnowledgeSessionSignalEventStage signalEvent = new StatefulKnowledgeSessionSignalEventStage( "MyEvent",
                                                                                                               instance.getId());

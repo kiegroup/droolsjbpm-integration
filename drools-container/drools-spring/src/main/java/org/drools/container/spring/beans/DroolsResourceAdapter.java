@@ -16,12 +16,12 @@
 
 package org.drools.container.spring.beans;
 
-import org.drools.builder.ResourceConfiguration;
-import org.drools.builder.ResourceType;
-import org.drools.io.Resource;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.io.impl.UrlResource;
 import org.drools.io.internal.InternalResource;
+import org.kie.builder.ResourceConfiguration;
+import org.kie.builder.ResourceType;
+import org.kie.io.Resource;
 import org.springframework.beans.factory.InitializingBean;
 
 public class DroolsResourceAdapter

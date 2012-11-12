@@ -20,8 +20,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Set;
 
-import org.drools.builder.ResourceType;
 import org.drools.grid.api.ResourceDescriptor;
+import org.kie.builder.ResourceType;
 
 
 /**

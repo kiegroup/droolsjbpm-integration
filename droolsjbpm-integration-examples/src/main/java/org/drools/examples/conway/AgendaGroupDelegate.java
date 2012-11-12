@@ -16,13 +16,13 @@
 
 package org.drools.examples.conway;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class AgendaGroupDelegate
     implements
@@ -46,14 +46,14 @@ public class AgendaGroupDelegate
     }
 
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.ConwayRuleDelegate#getSession()
+     * @see org.kie.examples.conway.ConwayRuleDelegate#getSession()
      */
     public StatefulKnowledgeSession getSession() {
         return this.session;
     }
 
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.ConwayRuleDelegate#init()
+     * @see org.kie.examples.conway.ConwayRuleDelegate#init()
      */
     public void init() {
         this.session.getAgenda().getAgendaGroup( "register neighbor" ).setFocus();
@@ -62,10 +62,10 @@ public class AgendaGroupDelegate
     }
 
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.CellGrid#nextGeneration()
+     * @see org.kie.examples.conway.CellGrid#nextGeneration()
      */
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.ConwayRuleDelegate#nextGeneration()
+     * @see org.kie.examples.conway.ConwayRuleDelegate#nextGeneration()
      */
     public boolean nextGeneration() {
         // System.out.println( "next generation" );
@@ -80,10 +80,10 @@ public class AgendaGroupDelegate
     }
 
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.CellGrid#killAll()
+     * @see org.kie.examples.conway.CellGrid#killAll()
      */
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.ConwayRuleDelegate#killAll()
+     * @see org.kie.examples.conway.ConwayRuleDelegate#killAll()
      */
     public void killAll() {
         this.session.getAgenda().getAgendaGroup( "calculate" ).setFocus();

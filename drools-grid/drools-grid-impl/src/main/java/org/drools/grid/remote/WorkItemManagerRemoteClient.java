@@ -13,8 +13,8 @@ import org.drools.grid.internal.commands.RegisterWorkItemHandlerRemoteCommand;
 
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.runtime.process.WorkItemHandler;
-import org.drools.runtime.process.WorkItemManager;
+import org.kie.runtime.process.WorkItemHandler;
+import org.kie.runtime.process.WorkItemManager;
 
  public class WorkItemManagerRemoteClient
     implements

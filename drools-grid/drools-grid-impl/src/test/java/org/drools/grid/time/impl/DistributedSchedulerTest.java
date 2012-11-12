@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
@@ -36,6 +34,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
+
 import static org.junit.Assert.*;
 import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;

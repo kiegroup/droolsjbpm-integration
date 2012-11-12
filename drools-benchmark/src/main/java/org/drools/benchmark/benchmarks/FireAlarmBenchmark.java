@@ -16,12 +16,11 @@
 
 package org.drools.benchmark.benchmarks;
 
-import org.drools.*;
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
-import org.drools.runtime.*;
-import org.drools.runtime.*;
-import org.drools.runtime.rule.FactHandle;
+import org.kie.*;
+import org.kie.runtime.*;
+import org.kie.runtime.rule.FactHandle;
 
 import java.util.*;
 

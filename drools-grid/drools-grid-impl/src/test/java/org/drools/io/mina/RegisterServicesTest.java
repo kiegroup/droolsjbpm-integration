@@ -19,8 +19,6 @@ package org.drools.io.mina;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
@@ -54,6 +52,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
 
 public class RegisterServicesTest {
 

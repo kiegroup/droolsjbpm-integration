@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import org.drools.benchmark.model.manners.*
+import org.kie.benchmark.model.manners.*
 
 rule assignFirstSeat
     when

@@ -24,10 +24,10 @@ import java.util.List;
 import org.drools.container.spring.beans.GridBeanFactory;
 import org.drools.container.spring.beans.GridBeanFactory.SocketServiceConfiguration;
 /*
-import org.drools.grid.io.AcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.service.directory.impl.JpaWhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
+import org.kie.grid.io.AcceptorFactoryService;
+import org.kie.grid.remote.mina.MinaAcceptorFactoryService;
+import org.kie.grid.service.directory.impl.JpaWhitePages;
+import org.kie.grid.service.directory.impl.WhitePagesImpl;
 */
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

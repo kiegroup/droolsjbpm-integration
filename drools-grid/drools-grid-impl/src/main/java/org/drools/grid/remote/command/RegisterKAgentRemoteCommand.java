@@ -16,22 +16,22 @@
 
 package org.drools.grid.remote.command;
 
-import org.drools.KnowledgeBase;
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
-import org.drools.SystemEventListenerService;
-import org.drools.agent.conf.NewInstanceOption;
-import org.drools.agent.conf.UseKnowledgeBaseClassloaderOption;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
-import org.drools.runtime.Environment;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.agent.KnowledgeAgentConfiguration;
-import org.drools.agent.KnowledgeAgentFactory;
-import org.drools.agent.KnowledgeAgent;
 import org.drools.command.Context;
 import org.drools.impl.SystemEventListenerServiceImpl;
+import org.kie.KnowledgeBase;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
+import org.kie.SystemEventListenerService;
+import org.kie.agent.KnowledgeAgent;
+import org.kie.agent.KnowledgeAgentConfiguration;
+import org.kie.agent.KnowledgeAgentFactory;
+import org.kie.agent.conf.NewInstanceOption;
+import org.kie.agent.conf.UseKnowledgeBaseClassloaderOption;
+import org.kie.runtime.Environment;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatefulKnowledgeSession;
 public class RegisterKAgentRemoteCommand
     implements
     GenericCommand<KnowledgeAgent> {

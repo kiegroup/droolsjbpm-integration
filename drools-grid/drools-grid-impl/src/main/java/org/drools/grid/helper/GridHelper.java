@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import org.drools.agent.KnowledgeAgent;
 import org.drools.grid.*;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
@@ -30,7 +29,8 @@ import org.drools.grid.remote.StatefulKnowledgeSessionRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.agent.KnowledgeAgent;
+import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +42,14 @@ public class GridHelper {
 
     public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
 
-    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
     private static JpaWhitePages whitePages = new JpaWhitePages( emf );
 
     public static void reset() {
         if ( emf != null && emf.isOpen() ) {
             emf.close();
         }
-        emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+        emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
         whitePages = new JpaWhitePages( emf );
     }
 

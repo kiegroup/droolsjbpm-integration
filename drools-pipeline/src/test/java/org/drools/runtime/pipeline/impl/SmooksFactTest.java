@@ -23,33 +23,34 @@ import java.util.Map;
 import javax.xml.transform.stream.StreamSource;
 
 import org.custommonkey.xmlunit.Diff;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.rule.FactHandle;
 import org.junit.Ignore;
 import org.milyn.Smooks;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
+
 import static org.junit.Assert.*;
 
 public class SmooksFactTest {
 
     @Test @Ignore
     public void testFact() throws Exception {
-        String xml = "<org.drools.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><quantity>2</quantity><productId>111</productId></example.OrderItem><example.OrderItem><price>5.2</price><quantity>7</quantity><productId>222</productId></example.OrderItem></children></org.drools.runtime.pipeline.impl.Root>";
+        String xml = "<org.kie.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><quantity>2</quantity><productId>111</productId></example.OrderItem><example.OrderItem><price>5.2</price><quantity>7</quantity><productId>222</productId></example.OrderItem></children></org.kie.runtime.pipeline.impl.Root>";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 

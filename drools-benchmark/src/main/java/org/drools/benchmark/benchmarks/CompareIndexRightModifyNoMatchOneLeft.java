@@ -1,10 +1,10 @@
 package org.drools.benchmark.benchmarks;
 
-import org.drools.KnowledgeBase;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.A;
 import org.drools.benchmark.model.B;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.KnowledgeBase;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 import java.util.Random;
 

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.drools.command.*;
+import org.drools.command.IdentifiableResult;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.SetGlobalCommand;
@@ -34,7 +34,8 @@ import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.test.impl.MapVariableContext;
-import org.drools.runtime.rule.FactHandle;
+import org.kie.command.*;
+import org.kie.runtime.rule.FactHandle;
 
 // TODO Do we really want this as a separate class hierarchy just to do batches? Does this fit in with the SimulationFluent?
 public class FluentBatchExecutionImpl implements FluentBatchExecution {

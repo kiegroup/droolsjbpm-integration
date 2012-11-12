@@ -67,7 +67,7 @@ public class Cell {
 
     /**
      * @return this cell's current life state
-     * @see #queueNextCellState(org.drools.examples.conway.CellState)
+     * @see #queueNextCellState(org.kie.examples.conway.CellState)
      * @see CellState
      */
     public CellState getCellState() {

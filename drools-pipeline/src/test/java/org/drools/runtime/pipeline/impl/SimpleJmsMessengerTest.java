@@ -27,15 +27,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
+
 import static org.junit.Assert.*;
 
 import org.apache.activemq.broker.BrokerService;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
-import org.drools.runtime.rule.FactHandle;
 
 public class SimpleJmsMessengerTest {
 

@@ -17,9 +17,9 @@
 package org.drools.runtime.pipeline.impl;
 
 import org.drools.grid.GridNode;
-import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.impl.BasePipelineContext;
+import org.kie.runtime.CommandExecutor;
 
 public class ExecutionNodePipelineContextImpl extends BasePipelineContext {
 

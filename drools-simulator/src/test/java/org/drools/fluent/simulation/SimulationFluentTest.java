@@ -21,16 +21,16 @@ import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.ResourceType;
 import org.drools.command.World;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
-import org.drools.io.ResourceFactory;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
 
 public class SimulationFluentTest {
 
@@ -48,7 +48,7 @@ public class SimulationFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.drools.simulation.test\n" +
+        String str = "package org.kie.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
@@ -136,13 +136,13 @@ public class SimulationFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str1 = "package org.drools.simulation.test\n" +
+        String str1 = "package org.kie.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                      "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";        
 
-        String str2 = "package org.drools.simulation.test\n" +
+        String str2 = "package org.kie.simulation.test\n" +
                 "import " + Person.class.getName() + "\n" +
                 "global java.util.List list\n" +
                 "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
@@ -221,7 +221,7 @@ public class SimulationFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.drools.simulation.test\n" +
+        String str = "package org.kie.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +

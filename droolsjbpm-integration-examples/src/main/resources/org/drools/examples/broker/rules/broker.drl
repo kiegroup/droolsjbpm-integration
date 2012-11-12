@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.drools.examples.broker
+package org.kie.examples.broker
 
 // importing classes
-import org.drools.examples.broker.model.Company
-import org.drools.examples.broker.model.StockTick
-import org.drools.examples.broker.model.SuddenDropEvent
+import org.kie.examples.broker.model.Company
+import org.kie.examples.broker.model.StockTick
+import org.kie.examples.broker.model.SuddenDropEvent
 
 // it is possible to import static methods as functions for usage in the rules
-import org.drools.examples.broker.misc.BrokerUtils
+import org.kie.examples.broker.misc.BrokerUtils
 
 // a common pattern is to expose services to rules through
 // a helper service class
-global org.drools.examples.broker.BrokerServices services
+global org.kie.examples.broker.BrokerServices services
 
 // default dialect for the semantic code will be MVEL
 dialect "mvel"

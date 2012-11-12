@@ -16,7 +16,7 @@
 
 package org.drools.examples.conway;
 
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public interface ConwayRuleDelegate {
 
@@ -25,12 +25,12 @@ public interface ConwayRuleDelegate {
     public abstract void init();
 
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.CellGrid#nextGeneration()
+     * @see org.kie.examples.conway.CellGrid#nextGeneration()
      */
     public abstract boolean nextGeneration();
 
     /* (non-Javadoc)
-     * @see org.drools.examples.conway.CellGrid#killAll()
+     * @see org.kie.examples.conway.CellGrid#killAll()
      */
     public abstract void killAll();
 

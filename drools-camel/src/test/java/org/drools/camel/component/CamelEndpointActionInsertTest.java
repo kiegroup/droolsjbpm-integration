@@ -36,12 +36,7 @@ import javax.naming.Context;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
-import org.drools.event.rule.ActivationCreatedEvent;
-import org.drools.event.rule.AgendaEventListener;
-import org.drools.event.rule.ObjectInsertedEvent;
-import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.pipeline.camel.Person;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.mockito.ArgumentCaptor;
 
 import static org.mockito.Mockito.mock;
@@ -52,6 +47,11 @@ import static org.hamcrest.CoreMatchers.is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.event.rule.ActivationCreatedEvent;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.ObjectInsertedEvent;
+import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 import static org.junit.Assert.*;
 
@@ -143,7 +143,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
-        rule += "package org.drools.pipeline.camel \n";
+        rule += "package org.kie.pipeline.camel \n";
         rule += "import org.apache.camel.Exchange \n";
         rule += "import org.apache.camel.Message \n";
         rule += "rule rule1 \n";

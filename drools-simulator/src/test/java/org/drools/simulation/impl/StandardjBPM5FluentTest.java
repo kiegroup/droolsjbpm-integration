@@ -22,16 +22,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.ResourceType;
 import org.drools.command.World;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
-import org.drools.io.ResourceFactory;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
 
 public class StandardjBPM5FluentTest {
 
@@ -49,7 +49,7 @@ public class StandardjBPM5FluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.drools.simulation.test\n" +
+        String str = "package org.kie.simulation.test\n" +
                 "import " + Person.class.getName() + "\n" +
                 "global java.util.List list\n" +
                 "rule setTime\n" +

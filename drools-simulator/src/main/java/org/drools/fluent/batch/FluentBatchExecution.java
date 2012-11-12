@@ -17,9 +17,9 @@
 package org.drools.fluent.batch;
 
 
-import org.drools.command.BatchExecutionCommand;
 import org.drools.fluent.FluentRoot;
 import org.drools.fluent.session.StatefulRuleSessionFluent;
+import org.kie.command.BatchExecutionCommand;
 
 // TODO Do we really want this as a separate class hierarchy just to do batches? Does this fit in with the SimulationFluent?
 public interface FluentBatchExecution extends FluentRoot, StatefulRuleSessionFluent<FluentBatchExecution> {

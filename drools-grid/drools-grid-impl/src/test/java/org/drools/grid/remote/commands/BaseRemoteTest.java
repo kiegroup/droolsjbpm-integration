@@ -18,19 +18,9 @@
 package org.drools.grid.remote.commands;
 
 import java.sql.SQLException;
-import org.drools.conf.AssertBehaviorOption;
-import org.drools.KnowledgeBaseConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Persistence;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.SystemEventListenerFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
@@ -49,11 +39,21 @@ import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.io.impl.ByteArrayResource;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.After;
 import org.junit.Before;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.SystemEventListenerFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderError;
+import org.kie.builder.KnowledgeBuilderErrors;
+import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.builder.ResourceType;
+import org.kie.conf.AssertBehaviorOption;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 import static org.junit.Assert.*;
 
@@ -105,7 +105,7 @@ public abstract class BaseRemoteTest {
         grid1 = new GridImpl("peer1", new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
-                        new JpaWhitePages(Persistence.createEntityManagerFactory("org.drools.grid")) );
+                        new JpaWhitePages(Persistence.createEntityManagerFactory("org.kie.grid")) );
 
         Grid grid2 = new GridImpl("peer2", new HashMap<String, Object>() );
         configureGrid1( grid2,
@@ -172,7 +172,7 @@ public abstract class BaseRemoteTest {
         assertNotNull( kbuilder );
 
          String rule = "package test\n"
-                 + "import org.drools.grid.NodeTests.MyObject;\n"
+                 + "import org.kie.grid.NodeTests.MyObject;\n"
                  + "global MyObject myGlobalObj;\n"
                  + "query getMyObjects(String n)\n"
                  + "  $mo: MyObject(name == n)\n"

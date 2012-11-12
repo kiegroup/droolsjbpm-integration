@@ -28,8 +28,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.drools.command.Command;
 import org.drools.core.util.StringUtils;
+import org.kie.command.Command;
 
 @Consumes("text/plain")
 @Provider

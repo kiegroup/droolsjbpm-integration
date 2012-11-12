@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.drools.examples.broker
+package org.kie.examples.broker
 
-import org.drools.examples.broker.model.PortfolioAction
-import org.drools.runtime.rule.FactHandle
+import org.kie.examples.broker.model.PortfolioAction
+import org.kie.runtime.rule.FactHandle
 
 rule "Portfolio action no longer needed"
         dialect "mvel"

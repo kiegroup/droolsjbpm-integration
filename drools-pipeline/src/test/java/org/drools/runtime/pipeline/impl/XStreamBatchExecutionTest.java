@@ -16,6 +16,13 @@
 
 package org.drools.runtime.pipeline.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -28,56 +35,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.Cheese;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.KnowledgeBaseFactoryService;
 import org.drools.Person;
 import org.drools.TestVariable;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
-import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.help.BatchExecutionHelper;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.process.ProcessInstance;
-import org.drools.runtime.process.WorkItem;
-import org.drools.runtime.process.WorkItemHandler;
-import org.drools.runtime.process.WorkItemManager;
-import org.drools.runtime.process.WorkflowProcessInstance;
-import org.drools.runtime.rule.FactHandle;
-import org.drools.runtime.rule.QueryResultsRow;
 import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.builder.ResourceType;
+import org.kie.definition.KnowledgePackage;
+import org.kie.io.Resource;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.help.BatchExecutionHelper;
+import org.kie.runtime.process.ProcessInstance;
+import org.kie.runtime.process.WorkItem;
+import org.kie.runtime.process.WorkItemHandler;
+import org.kie.runtime.process.WorkItemManager;
+import org.kie.runtime.process.WorkflowProcessInstance;
+import org.kie.runtime.rule.FactHandle;
+import org.kie.runtime.rule.QueryResultsRow;
 import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
@@ -111,9 +115,9 @@ public class XStreamBatchExecutionTest {
     public void testListenForChanges() throws Exception {
 
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
-        str += "import org.drools.ChangeCollector \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
+        str += "import org.kie.ChangeCollector \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese(price==25) \n";
@@ -162,11 +166,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -179,12 +183,12 @@ public class XStreamBatchExecutionTest {
         inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='person'>";
-        inXml += "    <org.drools.Person>";
+        inXml += "    <org.kie.Person>";
         inXml += "      <name>mic</name>";
-        inXml += "    </org.drools.Person>";
+        inXml += "    </org.kie.Person>";
         inXml += "  </insert>";
         inXml += "  <insert out-identifier='changes'>";
-        inXml += "    <org.drools.ChangeCollector/>";
+        inXml += "    <org.kie.ChangeCollector/>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -199,12 +203,12 @@ public class XStreamBatchExecutionTest {
         inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='person'>";
-        inXml += "    <org.drools.Person>";
+        inXml += "    <org.kie.Person>";
         inXml += "      <name>mark</name>";
-        inXml += "    </org.drools.Person>";
+        inXml += "    </org.kie.Person>";
         inXml += "  </insert>";
         inXml += "  <insert out-identifier='changes'>";
-        inXml += "    <org.drools.ChangeCollector/>";
+        inXml += "    <org.kie.ChangeCollector/>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -221,8 +225,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testInsertWithDefaults() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -234,11 +238,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -262,11 +266,11 @@ public class XStreamBatchExecutionTest {
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "    <org.kie.Cheese>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "    </org.kie.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -278,8 +282,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -291,11 +295,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton' return-object='false'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -326,8 +330,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testGetObject() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -339,11 +343,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -376,8 +380,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testRetractObject() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -389,11 +393,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -431,8 +435,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testModifyObject() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -444,11 +448,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -469,11 +473,11 @@ public class XStreamBatchExecutionTest {
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "    <org.kie.Cheese>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "    </org.kie.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + factHandle.toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -521,8 +525,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testInsertElements() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -539,16 +543,16 @@ public class XStreamBatchExecutionTest {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "</batch-execution>";
 
@@ -562,16 +566,16 @@ public class XStreamBatchExecutionTest {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "</execution-results>\n";
@@ -598,8 +602,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testFactHandleReturn() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -642,8 +646,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -660,16 +664,16 @@ public class XStreamBatchExecutionTest {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements out-identifier='myfacts' return-objects='true'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "  <fire-all-rules/>";
         inXml += "</batch-execution>";
@@ -686,23 +690,23 @@ public class XStreamBatchExecutionTest {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
 
         expectedXml += "  <result identifier=\"myfacts\">\n";
         expectedXml += "  <list>\n";
-        expectedXml += "    <org.drools.Cheese reference=\"../../../result/list/org.drools.Cheese[2]\"/>\n";
-        expectedXml += "    <org.drools.Cheese reference=\"../../../result/list/org.drools.Cheese\"/>\n";
+        expectedXml += "    <org.kie.Cheese reference=\"../../../result/list/org.kie.Cheese[2]\"/>\n";
+        expectedXml += "    <org.kie.Cheese reference=\"../../../result/list/org.kie.Cheese\"/>\n";
         expectedXml += "  </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handles identifier=\"myfacts\">\n";
@@ -743,8 +747,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testSetGlobal() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "global java.util.List list2 \n";
         str += "global java.util.List list3 \n";
@@ -771,11 +775,11 @@ public class XStreamBatchExecutionTest {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>5</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "  </org.drools.Cheese>";
+        inXml += "  </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "</batch-execution>";
 
@@ -790,16 +794,16 @@ public class XStreamBatchExecutionTest {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list2'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <result identifier='outList3'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.drools.Cheese reference='../../../result/list/org.drools.Cheese'/>\n";
+        expectedXml += "      <org.kie.Cheese reference='../../../result/list/org.kie.Cheese'/>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "</execution-results>\n";
@@ -829,8 +833,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testGetGlobal() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -846,11 +850,11 @@ public class XStreamBatchExecutionTest {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <get-global identifier='list' out-identifier='out-list'/>";
         inXml += "</batch-execution>";
@@ -865,11 +869,11 @@ public class XStreamBatchExecutionTest {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"out-list\">\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>25</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "</execution-results>\n";
@@ -881,8 +885,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testGetObjects() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -894,16 +898,16 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert-elements>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "  <get-objects out-identifier='list' />";
         inXml += "</batch-execution>";
@@ -918,16 +922,16 @@ public class XStreamBatchExecutionTest {
         expectedXml += "<execution-results>";
         expectedXml += "  <result identifier='list'>";
         expectedXml += "    <list>";
-        expectedXml += "      <org.drools.Cheese>";
+        expectedXml += "      <org.kie.Cheese>";
         expectedXml += "        <type>stilton</type>";
         expectedXml += "        <price>30</price>";
         expectedXml += "        <oldPrice>0</oldPrice>";
-        expectedXml += "      </org.drools.Cheese>";
-        expectedXml += "      <org.drools.Cheese>";
+        expectedXml += "      </org.kie.Cheese>";
+        expectedXml += "      <org.kie.Cheese>";
         expectedXml += "        <type>stilton</type>";
         expectedXml += "        <price>35</price>";
         expectedXml += "        <oldPrice>0</oldPrice>";
-        expectedXml += "      </org.drools.Cheese>";
+        expectedXml += "      </org.kie.Cheese>";
         expectedXml += "    </list>";
         expectedXml += "  </result>";
         expectedXml += "</execution-results>";
@@ -954,8 +958,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void FIXME_testQuery() throws Exception {
         String str = "";
-        str += "package org.drools.test  \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie.test  \n";
+        str += "import org.kie.Cheese \n";
         str += "query cheeses \n";
         str += "    stilton : Cheese(type == 'stilton') \n";
         str += "    cheddar : Cheese(type == 'cheddar', price == stilton.price) \n";
@@ -968,32 +972,32 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>1</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <insert>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>2</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <insert>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>cheddar</type>";
         inXml += "      <price>1</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <insert>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>cheddar</type>";
         inXml += "      <price>2</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <query out-identifier='cheeses' name='cheeses'/>";
         inXml += "  <query out-identifier='cheeses2' name='cheesesWithParams'>";
@@ -1023,32 +1027,32 @@ public class XStreamBatchExecutionTest {
         expectedXml += "      </identifiers>\n";
         expectedXml += "      <row>\n";
         row = it1.next();
-        expectedXml += "        <org.drools.Cheese>\n";
+        expectedXml += "        <org.kie.Cheese>\n";
         expectedXml += "          <type>stilton</type>\n";
         expectedXml += "          <price>1</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.drools.Cheese>\n";
+        expectedXml += "        </org.kie.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.drools.Cheese>\n";
+        expectedXml += "        <org.kie.Cheese>\n";
         expectedXml += "          <type>cheddar</type>\n";
         expectedXml += "          <price>1</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.drools.Cheese>\n";
+        expectedXml += "        </org.kie.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "      <row>\n";
         row = it1.next();
-        expectedXml += "        <org.drools.Cheese>\n";
+        expectedXml += "        <org.kie.Cheese>\n";
         expectedXml += "          <type>stilton</type>\n";
         expectedXml += "          <price>2</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.drools.Cheese>\n";
+        expectedXml += "        </org.kie.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.drools.Cheese>\n";
+        expectedXml += "        <org.kie.Cheese>\n";
         expectedXml += "          <type>cheddar</type>\n";
         expectedXml += "          <price>2</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.drools.Cheese>\n";
+        expectedXml += "        </org.kie.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "    </query-results>\n";
@@ -1061,16 +1065,16 @@ public class XStreamBatchExecutionTest {
         expectedXml += "      </identifiers>\n";
         expectedXml += "      <row>\n";
         row = it2.next();
-        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row/org.drools.Cheese\"/>\n";
+        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row/org.kie.Cheese\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row/org.drools.Cheese[2]\"/>\n";
+        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row/org.kie.Cheese[2]\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "      <row>\n";
         row = it2.next();
-        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.Cheese\"/>\n";
+        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row[2]/org.kie.Cheese\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.Cheese[2]\"/>\n";
+        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row[2]/org.kie.Cheese[2]\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "    </query-results>\n";
@@ -1102,13 +1106,13 @@ public class XStreamBatchExecutionTest {
         list.add( cheddar2 );
         set.add( list );
 
-        org.drools.runtime.rule.QueryResults results = (org.drools.runtime.rule.QueryResults) batchResult.getValue( "cheeses" );
+        org.kie.runtime.rule.QueryResults results = (org.kie.runtime.rule.QueryResults) batchResult.getValue( "cheeses" );
         assertEquals( 2,
                       results.size() );
         assertEquals( 2,
                       results.getIdentifiers().length );
         Set newSet = new HashSet();
-        for ( org.drools.runtime.rule.QueryResultsRow result : results ) {
+        for ( org.kie.runtime.rule.QueryResultsRow result : results ) {
             list = new ArrayList();
             list.add( result.get( "stilton" ) );
             list.add( result.get( "cheddar" ) );
@@ -1121,8 +1125,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testManualFireAllRules() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -1139,24 +1143,24 @@ public class XStreamBatchExecutionTest {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "  <fire-all-rules />";
         inXml += "  <insert out-identifier='outBrie'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>brie</type>";
         inXml += "      <price>10</price>";
         inXml += "      <oldPrice>5</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "</batch-execution>";
 
@@ -1172,24 +1176,24 @@ public class XStreamBatchExecutionTest {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
-        expectedXml += "      <org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
+        expectedXml += "      <org.kie.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.drools.Cheese>\n";
+        expectedXml += "      </org.kie.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <result identifier='outBrie'>\n";
-        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "    <org.kie.Cheese>\n";
         expectedXml += "      <type>brie</type>\n";
         expectedXml += "      <price>10</price>\n";
         expectedXml += "      <oldPrice>5</oldPrice>\n";
-        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "    </org.kie.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outBrie\" external-form=\"" + factHandle.toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -1230,18 +1234,18 @@ public class XStreamBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <imports>\n";
-        str += "      <import name=\"org.drools.TestVariable\" />\n";
+        str += "      <import name=\"org.kie.TestVariable\" />\n";
         str += "    </imports>\n";
         str += "    <globals>\n";
         str += "      <global identifier=\"list\" type=\"java.util.List\" />\n";
         str += "    </globals>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1280,11 +1284,11 @@ public class XStreamBatchExecutionTest {
 
         String inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <start-process processId='org.drools.actions'>";
+        inXml += "  <start-process processId='org.kie.actions'>";
         inXml += "    <parameter identifier='person'>";
-        inXml += "       <org.drools.TestVariable>";
+        inXml += "       <org.kie.TestVariable>";
         inXml += "         <name>John Doe</name>";
-        inXml += "    </org.drools.TestVariable>";
+        inXml += "    </org.kie.TestVariable>";
         inXml += "    </parameter>";
         inXml += "  </start-process>";
         inXml += "  <get-global identifier='list' out-identifier='out-list'/>";
@@ -1321,12 +1325,12 @@ public class XStreamBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1359,7 +1363,7 @@ public class XStreamBatchExecutionTest {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.kie.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
@@ -1385,12 +1389,12 @@ public class XStreamBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1423,7 +1427,7 @@ public class XStreamBatchExecutionTest {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.kie.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
@@ -1450,22 +1454,22 @@ public class XStreamBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1475,25 +1479,25 @@ public class XStreamBatchExecutionTest {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1530,7 +1534,7 @@ public class XStreamBatchExecutionTest {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1566,7 +1570,7 @@ public class XStreamBatchExecutionTest {
         person.setName( "Jane Doe" );
         parameters.put( "Person",
                         person );
-        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
                                                                            parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1613,22 +1617,22 @@ public class XStreamBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1638,25 +1642,25 @@ public class XStreamBatchExecutionTest {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1693,7 +1697,7 @@ public class XStreamBatchExecutionTest {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1841,8 +1845,8 @@ public class XStreamBatchExecutionTest {
     @Test
     public void testVsmPipeline() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -1854,11 +1858,11 @@ public class XStreamBatchExecutionTest {
         String inXml = "";
         inXml += "<batch-execution lookup=\"ksession1\" >";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.drools.Cheese>";
+        inXml += "    <org.kie.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.drools.Cheese>";
+        inXml += "    </org.kie.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -1894,11 +1898,11 @@ public class XStreamBatchExecutionTest {
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.drools.Cheese>\n";
+        expectedXml += "    <org.kie.Cheese>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.drools.Cheese>\n";
+        expectedXml += "    </org.kie.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";

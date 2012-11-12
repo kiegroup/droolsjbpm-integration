@@ -15,7 +15,7 @@
 */
 package org.drools.container.spring.beans;
 
-import org.drools.logger.KnowledgeRuntimeLogger;
+import org.kie.logger.KnowledgeRuntimeLogger;
 
 import java.io.Serializable;
 

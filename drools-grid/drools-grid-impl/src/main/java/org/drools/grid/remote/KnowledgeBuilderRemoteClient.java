@@ -21,18 +21,18 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
-import org.drools.KnowledgeBase;
-import org.drools.builder.*;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
-import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.io.Resource;
+import org.kie.KnowledgeBase;
+import org.kie.builder.*;
+import org.kie.definition.KnowledgePackage;
+import org.kie.io.Resource;
 
 public class KnowledgeBuilderRemoteClient
     implements

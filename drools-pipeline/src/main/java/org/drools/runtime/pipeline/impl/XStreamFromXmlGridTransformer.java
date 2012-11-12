@@ -26,11 +26,11 @@ import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.io.Resource;
 import org.drools.reteoo.ReteooRuleBase;
-import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Transformer;
+import org.kie.io.Resource;
+import org.kie.runtime.CommandExecutor;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 

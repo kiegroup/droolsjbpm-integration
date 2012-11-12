@@ -16,18 +16,18 @@
 
 package org.drools.container.spring;
 
-import org.drools.marshalling.ObjectMarshallingStrategy;
 import org.drools.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
-import org.drools.runtime.Environment;
-import org.drools.runtime.EnvironmentName;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.marshalling.ObjectMarshallingStrategy;
+import org.kie.runtime.Environment;
+import org.kie.runtime.EnvironmentName;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static org.junit.Assert.*;
@@ -102,7 +102,7 @@ public class EnvironmentTest {
         assertNotNull(environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES));
         ObjectMarshallingStrategy[] objectMarshallingStrategies = (ObjectMarshallingStrategy[]) environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES);
         assertEquals(1, objectMarshallingStrategies.length);
-        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.drools.container.spring.MockObjectMarshallingStrategy");
+        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.kie.container.spring.MockObjectMarshallingStrategy");
     }
 
     @Test
@@ -112,7 +112,7 @@ public class EnvironmentTest {
 
         ObjectMarshallingStrategy[] objectMarshallingStrategies = (ObjectMarshallingStrategy[]) environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES);
         assertEquals(1, objectMarshallingStrategies.length);
-        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.drools.container.spring.MockObjectMarshallingStrategy");
+        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.kie.container.spring.MockObjectMarshallingStrategy");
     }
 
     @Test

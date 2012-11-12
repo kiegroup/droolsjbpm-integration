@@ -16,11 +16,11 @@
 
 package org.drools.benchmark.benchmarks;
 
-import org.drools.*;
 import org.drools.benchmark.*;
 import org.drools.benchmark.util.DroolsUtil;
-import org.drools.builder.*;
-import org.drools.io.*;
+import org.kie.*;
+import org.kie.builder.*;
+import org.kie.io.*;
 
 public abstract class AbstractBenchmark implements Benchmark {
 

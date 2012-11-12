@@ -18,15 +18,15 @@ package org.drools.examples.numberguess;
 
 import java.util.Random;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
+import org.kie.logger.KnowledgeRuntimeLogger;
+import org.kie.logger.KnowledgeRuntimeLoggerFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class NumberGuessExample {
 

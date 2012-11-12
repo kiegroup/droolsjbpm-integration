@@ -31,7 +31,7 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.runtime.impl.ExecutionResultImpl;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

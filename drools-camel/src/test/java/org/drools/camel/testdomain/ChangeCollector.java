@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.drools.event.rule.ObjectInsertedEvent;
-import org.drools.event.rule.ObjectRetractedEvent;
-import org.drools.event.rule.ObjectUpdatedEvent;
-import org.drools.event.rule.WorkingMemoryEventListener;
 import org.drools.xml.jaxb.util.JaxbListAdapter;
+import org.kie.event.rule.ObjectInsertedEvent;
+import org.kie.event.rule.ObjectRetractedEvent;
+import org.kie.event.rule.ObjectUpdatedEvent;
+import org.kie.event.rule.WorkingMemoryEventListener;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)

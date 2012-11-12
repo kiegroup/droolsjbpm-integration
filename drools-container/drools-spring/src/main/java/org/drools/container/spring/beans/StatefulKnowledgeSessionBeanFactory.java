@@ -20,21 +20,21 @@ import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.drools.KnowledgeBaseFactory;
 import org.drools.SessionConfiguration;
-import org.drools.command.Command;
-import org.drools.event.process.ProcessEventListener;
-import org.drools.event.rule.AgendaEventListener;
-import org.drools.event.rule.WorkingMemoryEventListener;
-import org.drools.marshalling.ObjectMarshallingStrategy;
 import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
-import org.drools.persistence.jpa.JPAKnowledgeService;
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.Environment;
-import org.drools.runtime.EnvironmentName;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.process.WorkItemHandler;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.command.Command;
+import org.kie.event.process.ProcessEventListener;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.marshalling.ObjectMarshallingStrategy;
+import org.kie.persistence.jpa.JPAKnowledgeService;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.Environment;
+import org.kie.runtime.EnvironmentName;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.process.WorkItemHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {

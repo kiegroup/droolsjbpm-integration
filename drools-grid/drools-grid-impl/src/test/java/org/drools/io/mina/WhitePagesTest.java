@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
+
 import static org.junit.Assert.*;
 
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;

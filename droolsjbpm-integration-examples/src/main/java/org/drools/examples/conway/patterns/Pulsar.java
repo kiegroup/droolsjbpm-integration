@@ -20,7 +20,7 @@ package org.drools.examples.conway.patterns;
  * The Pulsar <p/>
  * 
  * @see ConwayPattern
- * @see org.drools.examples.conway.CellGridImpl
+ * @see org.kie.examples.conway.CellGridImpl
  */
 public class Pulsar
     implements

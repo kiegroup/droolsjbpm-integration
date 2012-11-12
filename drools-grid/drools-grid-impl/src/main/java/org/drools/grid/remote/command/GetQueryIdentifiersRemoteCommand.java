@@ -19,7 +19,7 @@ package org.drools.grid.remote.command;
 import org.drools.command.Context;
 import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
-import org.drools.runtime.rule.QueryResults;
+import org.kie.runtime.rule.QueryResults;
 
 /**
  *

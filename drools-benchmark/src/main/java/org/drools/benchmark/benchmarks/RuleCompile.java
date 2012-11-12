@@ -17,8 +17,8 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.*;
-import org.drools.builder.*;
-import org.drools.io.*;
+import org.kie.builder.*;
+import org.kie.io.*;
 
 import java.io.*;
 import java.util.*;

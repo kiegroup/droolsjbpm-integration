@@ -20,13 +20,13 @@ import java.util.EventListener;
 import java.util.Map;
 
 import org.drools.SessionConfiguration;
-import org.drools.agent.KnowledgeAgent;
-import org.drools.event.process.ProcessEventListener;
-import org.drools.event.rule.AgendaEventListener;
-import org.drools.event.rule.WorkingMemoryEventListener;
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.process.WorkItemHandler;
+import org.kie.agent.KnowledgeAgent;
+import org.kie.event.process.ProcessEventListener;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.process.WorkItemHandler;
 
 public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {
     private StatelessKnowledgeSession ksession;

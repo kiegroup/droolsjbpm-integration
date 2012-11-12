@@ -31,17 +31,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.builder.help.KnowledgeBuilderHelper;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
+
 import static org.junit.Assert.*;
 
 import org.apache.activemq.broker.BrokerService;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.builder.help.KnowledgeBuilderHelper;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.Pipeline;
@@ -50,7 +52,6 @@ import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.ResultHandlerFactory;
 import org.drools.runtime.pipeline.Service;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.rule.FactHandle;
 import org.drools.core.util.StringUtils;
 
 import com.sun.tools.xjc.Language;

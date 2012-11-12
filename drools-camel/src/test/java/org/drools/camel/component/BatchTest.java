@@ -28,34 +28,16 @@ import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
 import org.drools.camel.testdomain.ChangeCollector;
 import org.drools.camel.testdomain.Cheese;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
 import org.drools.camel.testdomain.Person;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.core.util.StringUtils;
-import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.process.ProcessInstance;
-import org.drools.runtime.process.WorkItem;
-import org.drools.runtime.process.WorkItemHandler;
-import org.drools.runtime.process.WorkItemManager;
-import org.drools.runtime.process.WorkflowProcessInstance;
-import org.drools.runtime.rule.FactHandle;
 import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.After;
@@ -64,6 +46,24 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.definition.KnowledgePackage;
+import org.kie.io.Resource;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.process.ProcessInstance;
+import org.kie.runtime.process.WorkItem;
+import org.kie.runtime.process.WorkItemHandler;
+import org.kie.runtime.process.WorkItemManager;
+import org.kie.runtime.process.WorkflowProcessInstance;
+import org.kie.runtime.rule.FactHandle;
 import org.mvel2.templates.SimpleTemplateRegistry;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRegistry;
@@ -86,7 +86,7 @@ public abstract class BatchTest extends ContextTestSupport {
         return new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat jaxbDf = new JaxbDataFormat();
-                jaxbDf.setContextPath( "org.drools.camel.testdomain" );
+                jaxbDf.setContextPath( "org.kie.camel.testdomain" );
 
                 from( "direct:exec" ).policy( new DroolsPolicy() ).unmarshal( dataformat ).to( "drools://node/ksession1" ).marshal( dataformat );
                 from( "direct:execWithLookup" ).policy( new DroolsPolicy() ).unmarshal( dataformat ).to( "drools://node" ).marshal( dataformat );
@@ -320,9 +320,9 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testListenForChanges() throws Exception {
         String str = "";
-        str += "package org.drools.camel.testdomain \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
-        str += "import org.drools.camel.testdomain.ChangeCollector \n";
+        str += "package org.kie.camel.testdomain \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "import org.kie.camel.testdomain.ChangeCollector \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese(price==25) \n";
@@ -400,8 +400,8 @@ public abstract class BatchTest extends ContextTestSupport {
     public void testInsertWithDefaults() throws Exception {
 
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -437,8 +437,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -464,8 +464,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testFactHandleReturn() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -507,8 +507,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testGetObject() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -540,8 +540,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testRetractObject() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -574,8 +574,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testModifyObject() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -641,8 +641,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testInsertElements() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -680,8 +680,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -734,8 +734,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testSetGlobal() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "global java.util.List list2 \n";
         str += "global java.util.List list3 \n";
@@ -783,8 +783,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testGetGlobal() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -818,8 +818,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testGetObjects() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -831,8 +831,8 @@ public abstract class BatchTest extends ContextTestSupport {
         String inXml = "";
         inXml = "{\"batch-execution\":{\"commands\":[";
         inXml += "  {\"insert-elements\":{\"objects\":[";
-        inXml += "   {   \"org.drools.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.drools.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
+        inXml += "   {   \"org.kie.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
+        inXml += "   {   \"org.kie.camel.testdomain.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
         inXml += ",  {\"get-objects\":{\"out-identifier\":\"list1\"}}";
         inXml += "]}}";
@@ -866,8 +866,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testQuery() throws Exception {
         String str = "";
-        str += "package org.drools.test  \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie.test  \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "query cheeses \n";
         str += "    stilton : Cheese(type == 'stilton') \n";
         str += "    cheddar : Cheese(type == 'cheddar', price == stilton.price) \n";
@@ -910,13 +910,13 @@ public abstract class BatchTest extends ContextTestSupport {
         list.add( cheddar2 );
         set.add( list );
 
-        org.drools.runtime.rule.QueryResults results = (org.drools.runtime.rule.QueryResults) batchResult.getValue( "cheeses" );
+        org.kie.runtime.rule.QueryResults results = (org.kie.runtime.rule.QueryResults) batchResult.getValue( "cheeses" );
         assertEquals( 2,
                       results.size() );
         assertEquals( 2,
                       results.getIdentifiers().length );
         Set newSet = new HashSet();
-        for ( org.drools.runtime.rule.QueryResultsRow result : results ) {
+        for ( org.kie.runtime.rule.QueryResultsRow result : results ) {
             list = new ArrayList();
             list.add( result.get( "stilton" ) );
             list.add( result.get( "cheddar" ) );
@@ -929,8 +929,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testManualFireAllRules() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -984,18 +984,18 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <imports>\n";
-        str += "      <import name=\"org.drools.camel.testdomain.TestVariable\" />\n";
+        str += "      <import name=\"org.kie.camel.testdomain.TestVariable\" />\n";
         str += "    </imports>\n";
         str += "    <globals>\n";
         str += "      <global identifier=\"list1\" type=\"java.util.List\" />\n";
         str += "    </globals>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1056,12 +1056,12 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1095,7 +1095,7 @@ public abstract class BatchTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
         setExec( ksession );
 
-        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.kie.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
@@ -1115,12 +1115,12 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1154,7 +1154,7 @@ public abstract class BatchTest extends ContextTestSupport {
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
         setExec( ksession );
 
-        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.kie.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
@@ -1175,22 +1175,22 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1200,25 +1200,25 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1259,7 +1259,7 @@ public abstract class BatchTest extends ContextTestSupport {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1293,7 +1293,7 @@ public abstract class BatchTest extends ContextTestSupport {
         person.setName( "Jane Doe" );
         parameters.put( "Person",
                         person );
-        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
                                                                            parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1334,22 +1334,22 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1359,25 +1359,25 @@ public abstract class BatchTest extends ContextTestSupport {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1415,7 +1415,7 @@ public abstract class BatchTest extends ContextTestSupport {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1514,8 +1514,8 @@ public abstract class BatchTest extends ContextTestSupport {
     @Test
     public void testExecutionNodeLookup() throws Exception {
         String str = "";
-        str += "package org.drools \n";
-        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "package org.kie \n";
+        str += "import org.kie.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";

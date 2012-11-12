@@ -45,11 +45,11 @@ import org.drools.jax.soap.PostCxfSoapProcessor;
 import org.drools.jax.soap.PostCxfTransportSoapProcessor;
 import org.drools.jax.soap.PreCxfSoapProcessor;
 import org.drools.jax.soap.PreCxfTransportSoapProcessor;
-import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
 import org.drools.xml.jaxb.util.JaxbListWrapper;
+import org.kie.runtime.CommandExecutor;
 
 public class DroolsPolicy implements Policy {
 

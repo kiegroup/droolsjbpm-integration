@@ -22,7 +22,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.command.Command;
 import org.drools.command.GetVariableCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
@@ -40,11 +39,12 @@ import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.drools.simulation.SimulationStep;
 import org.drools.simulation.impl.command.AssertRulesFiredCommand;
 import org.drools.simulation.impl.command.FiredRuleCounter;
+import org.kie.command.Command;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFluent<StatefulKnowledgeSessionSimFluent>
         implements StatefulKnowledgeSessionSimFluent {

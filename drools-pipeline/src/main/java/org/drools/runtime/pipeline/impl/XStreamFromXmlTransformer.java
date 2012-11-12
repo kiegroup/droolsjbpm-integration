@@ -19,9 +19,9 @@ package org.drools.runtime.pipeline.impl;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.drools.io.Resource;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Transformer;
+import org.kie.io.Resource;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -24,13 +24,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.drools.builder.ResourceType;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.AssertThatImpl;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
-import org.drools.io.ResourceFactory;
 import org.hamcrest.Matcher;
 //import static org.hamsandwich.core.ReplayMatcher.on;
 //import static org.hamsandwich.core.ReplayMatcher.replayMatcher;
@@ -39,6 +37,8 @@ import org.hamcrest.Matcher;
 //import org.hamsandwich.core.HamSandwichFactory;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
 
 public class CompactFluentTest {
 
@@ -77,7 +77,7 @@ public class CompactFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.drools.simulation.test\n" +
+        String str = "package org.kie.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
@@ -145,7 +145,7 @@ public class CompactFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.drools.simulation.test\n" +
+        String str = "package org.kie.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
@@ -234,11 +234,11 @@ public class CompactFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str1 = "package org.drools.simulation.test\n" +
+        String str1 = "package org.kie.simulation.test\n" +
                       "import " + Person.class.getName() + "\n" +
                       "rule updateAge1 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
-        String str2 = "package org.drools.simulation.test\n" +
+        String str2 = "package org.kie.simulation.test\n" +
                       "import " + Person.class.getName() + "\n" +
                       "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";
 

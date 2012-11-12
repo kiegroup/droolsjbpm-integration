@@ -21,8 +21,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.drools.command.Command;
-import org.drools.runtime.CommandExecutor;
+import org.kie.command.Command;
+import org.kie.runtime.CommandExecutor;
 
 public class CommandExecutorImpl
     implements

@@ -19,11 +19,6 @@ package org.drools.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.ResourceType;
-import org.drools.command.Command;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
@@ -36,14 +31,19 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.conf.ClockTypeOption;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.ResourceType;
+import org.kie.command.Command;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.conf.ClockTypeOption;
 
 @RunWith(JUnitSimulationRunner.class)
 public class SimulationTest {
@@ -53,7 +53,7 @@ public class SimulationTest {
         Simulation simulation = new SimulationImpl();
 
         String str = "";
-        str += "package org.drools \n";
+        str += "package org.kie \n";
         str += "import " + Person.class.getName() + ";\n"; 
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
@@ -153,7 +153,7 @@ public class SimulationTest {
         Simulation simulation = new SimulationImpl();
 
         String str = "";
-        str += "package org.drools \n";
+        str += "package org.kie \n";
         str += "import " + Person.class.getName() + ";\n";     
         str += "global java.util.List list \n";
         str += "rule rule1 \n";

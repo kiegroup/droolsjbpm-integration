@@ -18,10 +18,10 @@ package org.drools.container.spring.namespace;
 
 import java.util.List;
 
-import org.drools.builder.DecisionTableInputType;
-import org.drools.builder.ResourceType;
 import org.drools.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
+import org.kie.builder.DecisionTableInputType;
+import org.kie.builder.ResourceType;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;

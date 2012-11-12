@@ -48,13 +48,13 @@
   <!-- Defined the server endpoint to create the cxf-rs consumer --> 
   <cxf:rsServer id="rsServer" 
           address="http://localhost:58001/rest"
-                serviceClass="org.drools.jax.rs.CommandExecutorImpl">
+                serviceClass="org.kie.jax.rs.CommandExecutorImpl">
        <cxf:providers>
-           <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
+           <bean class="org.kie.jax.rs.CommandMessageBodyReader"/>
        </cxf:providers>
   </cxf:rsServer>  
   
-  <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />  
+  <bean id="droolsPolicy" class="org.kie.camel.component.DroolsPolicy" />  
     
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
     

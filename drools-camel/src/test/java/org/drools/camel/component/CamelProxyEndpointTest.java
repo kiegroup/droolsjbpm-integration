@@ -36,18 +36,18 @@ import java.util.Arrays;
 import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.drools.command.CommandFactory;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.pipeline.camel.Person;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.command.CommandFactory;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 import static org.junit.Assert.*;
 

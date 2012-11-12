@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package  org.drools.springframework
+package  org.kie.springframework
 
-import org.drools.Person
+import org.kie.Person
 
 global java.util.List list;
 

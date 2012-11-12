@@ -19,9 +19,9 @@ package org.drools.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.command.Command;
 import org.drools.simulation.SimulationPath;
 import org.drools.simulation.SimulationStep;
+import org.kie.command.Command;
 
 public class SimulationStepImpl implements SimulationStep {
 

@@ -7,9 +7,6 @@ import java.util.HashMap;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
@@ -22,6 +19,9 @@ import org.drools.grid.impl.GridNodeImpl;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.junit.Ignore;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.builder.KnowledgeBuilderFactoryService;
 
 public class LocalGridNodeTest {
 

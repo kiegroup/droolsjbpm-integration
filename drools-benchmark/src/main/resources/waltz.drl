@@ -1,11 +1,11 @@
 //created on: 25/03/2006
 package org.benchmarks.waltz
 
-import org.drools.benchmark.model.waltz.Stage
-import org.drools.benchmark.model.waltz.Line
-import org.drools.benchmark.model.waltz.Edge
-import org.drools.benchmark.model.waltz.Junction
-import org.drools.benchmark.model.waltz.WaltzUtil
+import org.kie.benchmark.model.waltz.Stage
+import org.kie.benchmark.model.waltz.Line
+import org.kie.benchmark.model.waltz.Edge
+import org.kie.benchmark.model.waltz.Junction
+import org.kie.benchmark.model.waltz.WaltzUtil
 
 global java.io.PrintStream sysout;
 

@@ -16,10 +16,10 @@
 
 package org.drools.container.spring;
 
-import org.drools.event.rule.ObjectInsertedEvent;
-import org.drools.event.rule.ObjectRetractedEvent;
-import org.drools.event.rule.ObjectUpdatedEvent;
-import org.drools.event.rule.WorkingMemoryEventListener;
+import org.kie.event.rule.ObjectInsertedEvent;
+import org.kie.event.rule.ObjectRetractedEvent;
+import org.kie.event.rule.ObjectUpdatedEvent;
+import org.kie.event.rule.WorkingMemoryEventListener;
 
 public class MockWorkingMemoryEventListener implements WorkingMemoryEventListener {
     public void objectInserted(ObjectInsertedEvent objectInsertedEvent) {

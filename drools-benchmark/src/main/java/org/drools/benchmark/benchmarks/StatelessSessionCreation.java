@@ -1,8 +1,8 @@
 package org.drools.benchmark.benchmarks;
 
-import org.drools.KnowledgeBase;
 import org.drools.benchmark.BenchmarkDefinition;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.KnowledgeBase;
+import org.kie.runtime.StatelessKnowledgeSession;
 
 public class StatelessSessionCreation extends AbstractBenchmark {
 

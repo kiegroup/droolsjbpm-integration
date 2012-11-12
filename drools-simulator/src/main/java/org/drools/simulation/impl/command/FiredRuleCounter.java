@@ -16,15 +16,15 @@
 
 package org.drools.simulation.impl.command;
 
-import org.drools.event.rule.ActivationCancelledEvent;
-import org.drools.event.rule.ActivationCreatedEvent;
-import org.drools.event.rule.AfterActivationFiredEvent;
-import org.drools.event.rule.AgendaEventListener;
-import org.drools.event.rule.AgendaGroupPoppedEvent;
-import org.drools.event.rule.AgendaGroupPushedEvent;
-import org.drools.event.rule.BeforeActivationFiredEvent;
-import org.drools.event.rule.RuleFlowGroupActivatedEvent;
-import org.drools.event.rule.RuleFlowGroupDeactivatedEvent;
+import org.kie.event.rule.ActivationCancelledEvent;
+import org.kie.event.rule.ActivationCreatedEvent;
+import org.kie.event.rule.AfterActivationFiredEvent;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.AgendaGroupPoppedEvent;
+import org.kie.event.rule.AgendaGroupPushedEvent;
+import org.kie.event.rule.BeforeActivationFiredEvent;
+import org.kie.event.rule.RuleFlowGroupActivatedEvent;
+import org.kie.event.rule.RuleFlowGroupDeactivatedEvent;
 
 import java.util.HashMap;
 import java.util.List;

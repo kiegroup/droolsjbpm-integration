@@ -1,8 +1,8 @@
 package org.drools.container.spring;
 
-import org.drools.runtime.rule.Activation;
-import org.drools.runtime.rule.WorkingMemory;
 import org.drools.runtime.rule.impl.DefaultConsequenceExceptionHandler;
+import org.kie.runtime.rule.Activation;
+import org.kie.runtime.rule.WorkingMemory;
 
 public class MockConsequenceExceptionHandler extends DefaultConsequenceExceptionHandler {
 

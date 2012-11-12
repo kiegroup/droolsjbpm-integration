@@ -1,4 +1,4 @@
-import org.drools.benchmark.model.*
+import org.kie.benchmark.model.*
 
 rule "Dummy rule with simple literal constraint"
 when

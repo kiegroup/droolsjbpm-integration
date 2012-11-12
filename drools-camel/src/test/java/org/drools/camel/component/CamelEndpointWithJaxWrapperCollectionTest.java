@@ -29,12 +29,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
-import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.GetGlobalCommand;
@@ -43,13 +37,9 @@ import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.concurrent.CommandExecutor;
 import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.io.ResourceFactory;
 import org.drools.pipeline.camel.Person;
 import org.drools.pipeline.camel.WrappedList;
 import org.drools.reteoo.ReteooRuleBase;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
@@ -57,6 +47,16 @@ import com.sun.tools.xjc.Options;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.builder.ResourceType;
+import org.kie.builder.help.KnowledgeBuilderHelper;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 import static org.junit.Assert.*;
 
@@ -114,9 +114,9 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
         me.setName( "Hadrian" );
 
         String rule = "";
-        rule += "package org.drools.pipeline.camel \n";
-        rule += "import org.drools.pipeline.camel.Person\n";
-        rule += "import org.drools.pipeline.camel.WrappedList\n";
+        rule += "package org.kie.pipeline.camel \n";
+        rule += "import org.kie.pipeline.camel.Person\n";
+        rule += "import org.kie.pipeline.camel.WrappedList\n";
         rule += "global WrappedList list\n";
         rule += "rule rule1 \n";
         rule += "  when \n";
@@ -184,8 +184,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
-            def.setContextPath( "org.drools.pipeline.camel" );
+            // TODO does not work: def.setContextPath( "org.kie.camel.testdomain:org.kie.pipeline.camel" );
+            def.setContextPath( "org.kie.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -219,8 +219,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint(true);
-                // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
-                def.setContextPath("org.drools.pipeline.camel");
+                // TODO does not work: def.setContextPath( "org.kie.camel.testdomain:org.kie.pipeline.camel" );
+                def.setContextPath("org.kie.pipeline.camel");
 
                 from("direct:test-with-session").policy(new DroolsPolicy()).
                         unmarshal(def).to("drools:node/ksession1").marshal(def);

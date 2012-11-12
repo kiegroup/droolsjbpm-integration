@@ -36,11 +36,11 @@ import javax.naming.Context;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.drools.pipeline.camel.Person;
-import org.drools.runtime.StatefulKnowledgeSession;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 import static org.junit.Assert.*;
 
@@ -90,7 +90,7 @@ public class DroolsEndpointChannelTest extends DroolsCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
-        rule += "package org.drools.pipeline.camel \n";
+        rule += "package org.kie.pipeline.camel \n";
         rule += "rule rule1 \n";
         rule += "  when \n";
         rule += "    $p : Person( name == 'bob' ) \n";

@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.KnowledgeBase;
-import org.drools.definition.KnowledgePackage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,21 +32,23 @@ import org.drools.SessionConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.agent.impl.KnowledgeAgentImpl;
 import org.drools.common.InternalRuleBase;
-import org.drools.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
 import org.drools.io.impl.ResourceChangeScannerImpl;
 import org.drools.io.impl.UrlResource;
 import org.drools.io.internal.InternalResource;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.process.WorkItemHandler;
 import org.jbpm.process.instance.impl.humantask.HumanTaskHandler;
+import org.kie.KnowledgeBase;
+import org.kie.conf.EventProcessingOption;
+import org.kie.definition.KnowledgePackage;
+import org.kie.io.Resource;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.process.WorkItemHandler;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest {
@@ -219,7 +219,7 @@ public class SpringDroolsTest {
                       rconf.getEventProcessingMode() );
         assertEquals( AssertBehaviour.IDENTITY,
                       rconf.getAssertBehaviour() );
-        assertEquals( "org.drools.container.spring.MockConsequenceExceptionHandler",
+        assertEquals( "org.kie.container.spring.MockConsequenceExceptionHandler",
                       rconf.getConsequenceExceptionHandler() );
 
         KnowledgeBaseImpl kbase2 = (KnowledgeBaseImpl) context.getBean( "kbase2" );

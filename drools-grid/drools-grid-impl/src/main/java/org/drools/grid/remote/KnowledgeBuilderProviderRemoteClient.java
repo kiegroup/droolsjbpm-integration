@@ -21,8 +21,6 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
-import org.drools.KnowledgeBase;
-import org.drools.builder.*;
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -30,6 +28,8 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
+import org.kie.KnowledgeBase;
+import org.kie.builder.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

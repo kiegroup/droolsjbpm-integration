@@ -16,10 +16,10 @@
 
 package org.drools.fluent.test.impl;
 
-import org.drools.command.Command;
 import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.test.ReflectiveMatcherAssert;
 import org.hamcrest.Matcher;
+import org.kie.command.Command;
 
 import static org.junit.Assert.assertThat;
 

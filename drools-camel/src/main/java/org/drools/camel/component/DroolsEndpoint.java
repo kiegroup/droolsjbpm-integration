@@ -51,7 +51,7 @@ import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
 import org.drools.reteoo.ReteooRuleBase;
-import org.drools.runtime.CommandExecutor;
+import org.kie.runtime.CommandExecutor;
 
 public class DroolsEndpoint extends DefaultEndpoint {
 

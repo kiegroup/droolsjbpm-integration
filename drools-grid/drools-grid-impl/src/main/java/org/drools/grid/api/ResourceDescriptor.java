@@ -15,7 +15,7 @@
  */
 package org.drools.grid.api;
 
-import org.drools.builder.ResourceType;
+import org.kie.builder.ResourceType;
 
 import java.io.Serializable;
 import java.net.URL;

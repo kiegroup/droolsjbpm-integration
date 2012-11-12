@@ -19,11 +19,11 @@ package org.drools.runtime.pipeline.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.drools.command.Command;
-import org.drools.command.CommandFactory;
-import org.drools.runtime.ExecutionResults;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.PipelineContext;
+import org.kie.command.Command;
+import org.kie.command.CommandFactory;
+import org.kie.runtime.ExecutionResults;
 
 public class ExecutorStage<T> extends BaseEmitter
     implements

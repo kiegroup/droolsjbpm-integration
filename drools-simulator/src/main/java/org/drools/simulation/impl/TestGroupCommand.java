@@ -20,14 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.command.Command;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.FixedKnowledgeCommandContext;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.reteoo.ReteooWorkingMemory;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.AgendaFilter;
+import org.kie.command.Command;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.AgendaFilter;
 import org.mvel2.MVEL;
 
 public class TestGroupCommand

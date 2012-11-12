@@ -19,9 +19,9 @@ package org.drools.runtime.pipeline.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.runtime.CommandExecutor;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.ResultHandler;
+import org.kie.runtime.CommandExecutor;
 
 public class BasePipelineContext
     implements

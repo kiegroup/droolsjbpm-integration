@@ -20,8 +20,8 @@ import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.common.EventFactHandle;
-import org.drools.runtime.rule.FactHandle;
-import org.drools.runtime.rule.QueryResultsRow;
+import org.kie.runtime.rule.FactHandle;
+import org.kie.runtime.rule.QueryResultsRow;
 
 /**
  *

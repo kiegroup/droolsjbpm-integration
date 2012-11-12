@@ -42,10 +42,6 @@ import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.help.BatchExecutionHelper;
-import org.drools.runtime.rule.FactHandle;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -57,6 +53,10 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.help.BatchExecutionHelper;
+import org.kie.runtime.rule.FactHandle;
 
 import static org.junit.Assert.*;
 
@@ -73,9 +73,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"salaboy\">\n";
-        cmd += "      <org.drools.pipeline.camel.Person>\n";
+        cmd += "      <org.kie.pipeline.camel.Person>\n";
         cmd += "         <name>salaboy</name>\n";
-        cmd += "      </org.drools.pipeline.camel.Person>\n";
+        cmd += "      </org.kie.pipeline.camel.Person>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -91,9 +91,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"salaboy\">";
-        expectedXml += "<org.drools.pipeline.camel.Person>";
+        expectedXml += "<org.kie.pipeline.camel.Person>";
         expectedXml += "<name>salaboy</name>";
-        expectedXml += "</org.drools.pipeline.camel.Person>";
+        expectedXml += "</org.kie.pipeline.camel.Person>";
         expectedXml += "</result>";
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
@@ -109,7 +109,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "{\"insert\":{\"lookup\":\"ksession1\", ";
-        inXml += "             \"object\":{\"org.drools.pipeline.camel.Person\":{\"name\":\"salaboy\"}}, \"out-identifier\":\"salaboy\" } }";
+        inXml += "             \"object\":{\"org.kie.pipeline.camel.Person\":{\"name\":\"salaboy\"}}, \"out-identifier\":\"salaboy\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
 
@@ -128,9 +128,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "<insert out-identifier=\"salaboy\">\n";
-        cmd += "<org.drools.pipeline.camel.Person>\n";
+        cmd += "<org.kie.pipeline.camel.Person>\n";
         cmd += "<name>salaboy</name>\n";
-        cmd += "</org.drools.pipeline.camel.Person>\n";
+        cmd += "</org.kie.pipeline.camel.Person>\n";
         cmd += "</insert>\n";
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -146,9 +146,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"salaboy\">";
-        expectedXml += "<org.drools.pipeline.camel.Person>";
+        expectedXml += "<org.kie.pipeline.camel.Person>";
         expectedXml += "<name>salaboy</name>";
-        expectedXml += "</org.drools.pipeline.camel.Person>";
+        expectedXml += "</org.kie.pipeline.camel.Person>";
         expectedXml += "</result>";
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
@@ -163,8 +163,8 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "<insert out-identifier=\"salaboy\">\n";
-        cmd += "<org.drools.pipeline.camel.Person name=\"salaboy\">\n";
-        cmd += "</org.drools.pipeline.camel.Person>\n";
+        cmd += "<org.kie.pipeline.camel.Person name=\"salaboy\">\n";
+        cmd += "</org.kie.pipeline.camel.Person>\n";
         cmd += "</insert>\n";
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -184,7 +184,7 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"salaboy\">";
-        expectedXml += "<org.drools.pipeline.camel.Person name=\"salaboy\"/>";
+        expectedXml += "<org.kie.pipeline.camel.Person name=\"salaboy\"/>";
         expectedXml += "</result>";
         expectedXml += "<fact-handle identifier=\"salaboy\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "salaboy" )).toExternalForm() + "\"/>";
         expectedXml += "</execution-results>";
@@ -211,9 +211,9 @@ public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
         String expectedXml = "";
         expectedXml += "<?xml version='1.0' encoding='UTF-8'?><execution-results>";
         expectedXml += "<result identifier=\"rider\">";
-        expectedXml += "<org.drools.pipeline.camel.Person>";
+        expectedXml += "<org.kie.pipeline.camel.Person>";
         expectedXml += "<name>Hadrian</name>";
-        expectedXml += "</org.drools.pipeline.camel.Person>";
+        expectedXml += "</org.kie.pipeline.camel.Person>";
         expectedXml += "</result>";
         expectedXml += "</execution-results>";
 

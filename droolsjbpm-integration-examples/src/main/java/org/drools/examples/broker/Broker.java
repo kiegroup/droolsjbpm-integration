@@ -16,26 +16,26 @@
 
 package org.drools.examples.broker;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.conf.EventProcessingOption;
-import org.drools.conf.MBeansOption;
 import org.drools.event.DebugProcessEventListener;
-import org.drools.event.rule.DebugAgendaEventListener;
-import org.drools.event.rule.DebugWorkingMemoryEventListener;
 import org.drools.examples.broker.events.Event;
 import org.drools.examples.broker.events.EventReceiver;
 import org.drools.examples.broker.model.Company;
 import org.drools.examples.broker.model.CompanyRegistry;
 import org.drools.examples.broker.model.StockTick;
 import org.drools.examples.broker.ui.BrokerWindow;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.conf.EventProcessingOption;
+import org.kie.conf.MBeansOption;
+import org.kie.event.rule.DebugAgendaEventListener;
+import org.kie.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 
 /**
  * The broker application

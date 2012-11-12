@@ -16,7 +16,7 @@
 
 package org.drools.runtime.pipeline;
 
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
 
 
 /**

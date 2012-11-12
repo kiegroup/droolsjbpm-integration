@@ -22,7 +22,7 @@
   </drools:ksession>
 
 
-    <bean id="person1" class="org.drools.Person" >
+    <bean id="person1" class="org.kie.Person" >
         <property name="name" value="mark" />
     </bean>
 </beans>

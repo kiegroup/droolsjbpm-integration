@@ -15,5 +15,5 @@
 # limitations under the License.
 #
 
-class=org.drools.camel.component.DroolsComponent
+class=org.kie.camel.component.DroolsComponent
 

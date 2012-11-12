@@ -24,11 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
 import org.drools.builder.impl.KnowledgeBuilderImpl;
-import org.drools.io.ResourceFactory;
 import org.drools.runtime.pipeline.Callable;
 import org.drools.runtime.pipeline.ListAdapter;
 import org.drools.runtime.pipeline.PipelineFactory;
@@ -43,6 +39,11 @@ import org.mvel2.ParserContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
+
 import static org.junit.Assert.*;
 import net.sf.jxls.reader.ReaderBuilder;
 import net.sf.jxls.reader.XLSDataReadException;
@@ -61,7 +62,7 @@ public class JxlsTest {
         InputStream inputXLS = new BufferedInputStream(getClass().getResourceAsStream( "departmentData.xls"));
         
         XLSReader mainReader = ReaderBuilder.buildFromXML( ResourceFactory.newClassPathResource( "departments.xml", getClass() ).getInputStream() );
-        Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.drools.runtime.pipeline.impl.Company() ]");
+        Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.kie.runtime.pipeline.impl.Company() ]");
         
         Callable callable = new CallableImpl();
 

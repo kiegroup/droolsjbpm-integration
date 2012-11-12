@@ -28,19 +28,19 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.apache.camel.util.jndi.JndiContext;
 import org.drools.camel.testdomain.Person;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.command.BatchExecutionCommand;
-import org.drools.command.Command;
-import org.drools.command.CommandFactory;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.command.BatchExecutionCommand;
+import org.kie.command.Command;
+import org.kie.command.CommandFactory;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 import static org.junit.Assert.*;
 
@@ -89,7 +89,7 @@ public class JaxbInsertTest {
             @Override
             public void configure() throws Exception {          
                 JaxbDataFormat jdf = new JaxbDataFormat();
-                jdf.setContextPath("org.drools.camel.testdomain");
+                jdf.setContextPath("org.kie.camel.testdomain");
                 jdf.setPrettyPrint(true);
 
                 from("direct:test-session").policy(new DroolsPolicy())

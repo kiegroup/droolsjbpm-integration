@@ -6,8 +6,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.*;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.io.AcceptorFactoryService;
@@ -19,6 +17,8 @@ import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.remote.mina.MinaConnectorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -16,10 +16,10 @@
 
 package org.drools.runtime.pipeline.impl;
 
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.StatelessKnowledgeSessionPipelineContext;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.StatelessKnowledgeSession;
 
 public class StatelessKnowledgeSessionPipelineContextImpl extends BasePipelineContext
     implements

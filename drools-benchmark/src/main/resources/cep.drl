@@ -1,4 +1,4 @@
-import org.drools.benchmark.model.cep.*
+import org.kie.benchmark.model.cep.*
 
 declare Letter
     @role( event )

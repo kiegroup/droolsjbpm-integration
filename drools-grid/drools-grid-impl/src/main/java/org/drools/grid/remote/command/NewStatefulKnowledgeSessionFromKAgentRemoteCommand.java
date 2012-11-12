@@ -16,12 +16,12 @@
 
 package org.drools.grid.remote.command;
 
-import org.drools.agent.KnowledgeAgent;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
-import org.drools.runtime.Environment;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.agent.KnowledgeAgent;
+import org.kie.runtime.Environment;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
     implements

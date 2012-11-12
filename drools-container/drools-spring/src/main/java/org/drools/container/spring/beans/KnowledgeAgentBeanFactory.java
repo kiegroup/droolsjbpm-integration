@@ -21,13 +21,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.drools.KnowledgeBase;
-import org.drools.agent.KnowledgeAgent;
-import org.drools.agent.KnowledgeAgentConfiguration;
-import org.drools.agent.KnowledgeAgentFactory;
-import org.drools.io.Resource;
 import org.drools.io.impl.ChangeSetImpl;
 import org.drools.io.internal.InternalResource;
+import org.kie.KnowledgeBase;
+import org.kie.agent.KnowledgeAgent;
+import org.kie.agent.KnowledgeAgentConfiguration;
+import org.kie.agent.KnowledgeAgentFactory;
+import org.kie.io.Resource;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

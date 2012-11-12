@@ -30,7 +30,7 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.runtime.ObjectFilter;
+import org.kie.runtime.ObjectFilter;
 
 public class WorkingMemoryEntryPointRemoteClient
     implements
@@ -80,11 +80,11 @@ public class WorkingMemoryEntryPointRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void retract(org.drools.runtime.rule.FactHandle handle) throws FactException {
+    public void retract(org.kie.runtime.rule.FactHandle handle) throws FactException {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void update(org.drools.runtime.rule.FactHandle handle,
+    public void update(org.kie.runtime.rule.FactHandle handle,
                        Object object) throws FactException {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
@@ -97,11 +97,11 @@ public class WorkingMemoryEntryPointRemoteClient
         return this.name;
     }
 
-    public org.drools.runtime.rule.FactHandle getFactHandle(Object object) {
+    public org.kie.runtime.rule.FactHandle getFactHandle(Object object) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public Object getObject(org.drools.runtime.rule.FactHandle factHandle) {
+    public Object getObject(org.kie.runtime.rule.FactHandle factHandle) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
@@ -113,11 +113,11 @@ public class WorkingMemoryEntryPointRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public <T extends org.drools.runtime.rule.FactHandle> Collection<T> getFactHandles() {
+    public <T extends org.kie.runtime.rule.FactHandle> Collection<T> getFactHandles() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public <T extends org.drools.runtime.rule.FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
+    public <T extends org.kie.runtime.rule.FactHandle> Collection<T> getFactHandles(ObjectFilter filter) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

@@ -10,10 +10,11 @@ import javax.persistence.Persistence;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
+
 import static org.junit.Assert.*;
 
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
@@ -80,7 +81,7 @@ public class RemoteWhitePagesTest {
         conf.addConfiguration( socketConf );
 
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
-        wplConf.setWhitePages( new JpaWhitePages( Persistence.createEntityManagerFactory( "org.drools.grid" ) ) );
+        wplConf.setWhitePages( new JpaWhitePages( Persistence.createEntityManagerFactory( "org.kie.grid" ) ) );
         conf.addConfiguration( wplConf );
 
         socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 8000 );

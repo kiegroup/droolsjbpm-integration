@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
-  <persistence-unit name="org.drools.grid">
+  <persistence-unit name="org.kie.grid">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <class>org.drools.grid.service.directory.impl.GridServiceDescriptionImpl</class>
-    <class>org.drools.grid.service.directory.impl.AddressImpl</class>
+    <class>org.kie.grid.service.directory.impl.GridServiceDescriptionImpl</class>
+    <class>org.kie.grid.service.directory.impl.AddressImpl</class>
     <class>java.lang.String</class>
-    <class>org.drools.grid.timer.impl.ScheduledJob</class>
+    <class>org.kie.grid.timer.impl.ScheduledJob</class>
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
       <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>

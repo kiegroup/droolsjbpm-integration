@@ -16,10 +16,10 @@
 
 package org.drools.benchmark.benchmarks;
 
-import org.drools.*;
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.manners.*;
-import org.drools.runtime.*;
+import org.kie.*;
+import org.kie.runtime.*;
 
 import java.io.*;
 import java.util.*;

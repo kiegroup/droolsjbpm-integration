@@ -17,7 +17,7 @@
 package org.drools.camel.component;
 
 import org.drools.grid.GridNode;
-import org.drools.runtime.CommandExecutor;
+import org.kie.runtime.CommandExecutor;
 
 public class ExecutionNodePipelineContextImpl {
     private GridNode    node;

@@ -21,10 +21,10 @@ import static org.drools.benchmark.model.Gender.*;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.*;
 
-import org.drools.*;
-import org.drools.builder.*;
-import org.drools.io.*;
-import org.drools.runtime.*;
+import org.kie.*;
+import org.kie.builder.*;
+import org.kie.io.*;
+import org.kie.runtime.*;
 
 public class SingleStatelessRule extends AbstractBenchmark {
 

@@ -1,7 +1,7 @@
 dialect "java"
 
 import java.util.*
-import org.drools.benchmark.model.*
+import org.kie.benchmark.model.*
 
 rule "When there is a fire turn on the sprinkler"
 when

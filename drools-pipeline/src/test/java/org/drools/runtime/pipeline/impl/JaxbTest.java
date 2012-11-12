@@ -27,19 +27,21 @@ import javax.xml.transform.stream.StreamSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.JaxbConfiguration;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.builder.help.KnowledgeBuilderHelper;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
+
 import static org.junit.Assert.*;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.JaxbConfiguration;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.builder.help.KnowledgeBuilderHelper;
 import org.drools.common.InternalRuleBase;
 import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Expression;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
@@ -48,7 +50,6 @@ import org.drools.runtime.pipeline.PipelineFactory;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.Splitter;
 import org.drools.runtime.pipeline.Transformer;
-import org.drools.runtime.rule.FactHandle;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
@@ -120,7 +121,7 @@ public class JaxbTest {
 //        ClassLoader classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
 //        
 //        Thread.currentThread().setContextClassLoader( classLoader );
-//        Unmarshaller unmarshaller = JAXBContext.newInstance( "org.drools.model.order" ).createUnmarshaller();
+//        Unmarshaller unmarshaller = JAXBContext.newInstance( "org.kie.model.order" ).createUnmarshaller();
 //        Thread.currentThread().setContextClassLoader( originalClassLoader );
         
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
@@ -143,7 +144,7 @@ public class JaxbTest {
         assertEquals( 1,
                       list1.size() );
 
-        assertEquals( "org.drools.model.order.Order",
+        assertEquals( "org.kie.model.order.Order",
                       list1.get( 0 ).getClass().getName() );
     }
 
@@ -211,10 +212,10 @@ public class JaxbTest {
         assertEquals( 1,
                       list2.size() );
 
-        assertEquals( "org.drools.model.order.Order$OrderItem",
+        assertEquals( "org.kie.model.order.Order$OrderItem",
                       list1.get( 0 ).getClass().getName() );
 
-        assertEquals( "org.drools.model.order.Order$OrderItem",
+        assertEquals( "org.kie.model.order.Order$OrderItem",
                       list2.get( 0 ).getClass().getName() );
 
         assertNotSame( list1.get( 0 ),

@@ -3,8 +3,6 @@ package org.drools.io.mina;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.Acceptor;
@@ -16,6 +14,9 @@ import org.drools.grid.io.impl.ConversationManagerImpl;
 import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.grid.remote.mina.MinaAcceptor;
 import org.junit.Test;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
+
 import static org.junit.Assert.*;
 
 public class MinaTest {

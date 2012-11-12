@@ -1,14 +1,14 @@
 package org.drools.benchmark.benchmarks;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactory;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.cep.Figure;
 import org.drools.benchmark.model.cep.Letter;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.conf.EventProcessingOption;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.conf.EventProcessingOption;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class CepBenchmark extends AbstractBenchmark {
 

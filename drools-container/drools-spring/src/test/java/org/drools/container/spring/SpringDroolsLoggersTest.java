@@ -23,11 +23,11 @@ import org.drools.audit.WorkingMemoryFileLogger;
 import org.drools.container.spring.beans.KnowledgeLoggerAdaptor;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.ArrayList;

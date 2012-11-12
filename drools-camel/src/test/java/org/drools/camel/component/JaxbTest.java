@@ -32,16 +32,17 @@ import javax.xml.bind.Unmarshaller;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.command.Command;
-import org.drools.command.CommandFactory;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.command.Command;
+import org.kie.command.CommandFactory;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
+
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
@@ -88,10 +89,10 @@ public class JaxbTest {
 
     private JAXBContext getJaxbContext() throws JAXBException {
         List<String> classesName = new ArrayList();
-        //        classesName.add("org.drools.model.AddressType");
-        //        classesName.add("org.drools.model.ObjectFactory");
-        //        classesName.add("org.drools.model.Person");
-        classesName.add( "org.drools.pipeline.camel.Person" );
+        //        classesName.add("org.kie.model.AddressType");
+        //        classesName.add("org.kie.model.ObjectFactory");
+        //        classesName.add("org.kie.model.Person");
+        classesName.add( "org.kie.pipeline.camel.Person" );
 
         //jaxbDataFormat = new JaxbDataFormat();
         //jaxbDataFormat.setContextPath( contextPath )

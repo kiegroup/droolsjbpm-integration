@@ -19,12 +19,12 @@ package org.drools.runtime.pipeline.impl;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Receiver;
 import org.drools.runtime.pipeline.StatefulKnowledgeSessionPipelineContext;
-import org.drools.runtime.rule.FactHandle;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 public class StatefulKnowledgeSessionGetObjectStage extends BaseEmitter
     implements

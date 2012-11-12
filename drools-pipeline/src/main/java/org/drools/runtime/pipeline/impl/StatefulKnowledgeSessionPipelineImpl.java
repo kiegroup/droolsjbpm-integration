@@ -19,10 +19,10 @@ package org.drools.runtime.pipeline.impl;
 import org.drools.common.InternalRuleBase;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.ResultHandler;
-import org.drools.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 
 public class StatefulKnowledgeSessionPipelineImpl extends BaseEmitter
     implements

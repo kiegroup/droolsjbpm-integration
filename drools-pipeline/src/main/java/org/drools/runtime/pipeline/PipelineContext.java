@@ -22,7 +22,7 @@ package org.drools.runtime.pipeline;
  */
 import java.util.Map;
 
-import org.drools.runtime.CommandExecutor;
+import org.kie.runtime.CommandExecutor;
 
 public interface PipelineContext {
 

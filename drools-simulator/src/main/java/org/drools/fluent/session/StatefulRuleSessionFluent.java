@@ -16,7 +16,7 @@
 
 package org.drools.fluent.session;
 
-import org.drools.runtime.rule.FactHandle;
+import org.kie.runtime.rule.FactHandle;
 
 public interface StatefulRuleSessionFluent<T> {
 

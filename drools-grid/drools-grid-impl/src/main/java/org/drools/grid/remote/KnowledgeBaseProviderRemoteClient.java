@@ -22,10 +22,6 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.drools.KBaseUnit;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactoryService;
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -34,9 +30,13 @@ import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommand
 import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.runtime.Environment;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.KBaseUnit;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.runtime.Environment;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

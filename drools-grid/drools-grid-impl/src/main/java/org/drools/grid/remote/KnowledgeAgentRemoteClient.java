@@ -20,23 +20,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.drools.ChangeSet;
-import org.drools.KnowledgeBase;
-import org.drools.SystemEventListener;
-import org.drools.agent.KnowledgeAgent;
-import org.drools.command.BatchExecutionCommand;
-import org.drools.command.Command;
-import org.drools.command.CommandFactory;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.event.knowledgeagent.KnowledgeAgentEventListener;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.command.ApplyChangeSetRemoteCommand;
-import org.drools.io.Resource;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.ChangeSet;
+import org.kie.KnowledgeBase;
+import org.kie.SystemEventListener;
+import org.kie.agent.KnowledgeAgent;
+import org.kie.command.BatchExecutionCommand;
+import org.kie.command.Command;
+import org.kie.command.CommandFactory;
+import org.kie.event.knowledgeagent.KnowledgeAgentEventListener;
+import org.kie.io.Resource;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatelessKnowledgeSession;
 
 /**
  *

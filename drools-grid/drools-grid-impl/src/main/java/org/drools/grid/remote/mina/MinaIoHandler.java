@@ -3,13 +3,13 @@ package org.drools.grid.remote.mina;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.drools.SystemEventListener;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.ConversationImpl;
 import org.drools.grid.io.impl.ExceptionMessage;
 import org.drools.grid.io.impl.RequestResponseDispatchListener;
+import org.kie.SystemEventListener;
 
 public class MinaIoHandler extends IoHandlerAdapter {
     /**

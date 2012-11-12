@@ -22,10 +22,10 @@ import java.io.Reader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import org.drools.io.Resource;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Transformer;
 import org.drools.runtime.pipeline.impl.BaseEmitter;
+import org.kie.io.Resource;
 import org.milyn.Smooks;
 import org.milyn.container.ExecutionContext;
 import org.milyn.payload.JavaResult;

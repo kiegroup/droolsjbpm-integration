@@ -1,6 +1,10 @@
 package org.jbpm.task.service.test.spring;
 
-import static org.jbpm.task.admin.TasksAdminTest.*;
+import static org.jbpm.task.admin.TasksAdminTest.addUsersAndGroups;
+import static org.jbpm.task.admin.TasksAdminTest.runArchiveTasksTest;
+import static org.jbpm.task.admin.TasksAdminTest.runCompletedSinceTasksTest;
+import static org.jbpm.task.admin.TasksAdminTest.runCompletedTasksTest;
+import static org.jbpm.task.admin.TasksAdminTest.runRemoveTasksTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,18 +12,16 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.drools.SystemEventListenerFactory;
 import org.jbpm.task.Group;
 import org.jbpm.task.MockUserInfo;
 import org.jbpm.task.User;
-import org.jbpm.task.service.TaskClient;
-import org.jbpm.task.service.TaskServer;
+import org.jbpm.task.identity.UserGroupCallbackManager;
 import org.jbpm.task.service.TaskService;
 import org.jbpm.task.service.TaskServiceSession;
-import org.jbpm.task.identity.UserGroupCallbackManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.SystemEventListenerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

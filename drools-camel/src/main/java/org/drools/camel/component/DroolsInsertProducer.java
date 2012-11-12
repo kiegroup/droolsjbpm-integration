@@ -35,10 +35,10 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.drools.grid.GridNode;
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 
 /**
  * A producer that inserts incoming messages as facts into the

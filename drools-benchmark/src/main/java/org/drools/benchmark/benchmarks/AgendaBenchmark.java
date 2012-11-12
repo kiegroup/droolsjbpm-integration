@@ -1,9 +1,9 @@
 package org.drools.benchmark.benchmarks;
 
-import org.drools.KnowledgeBase;
 import org.drools.benchmark.BenchmarkDefinition;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
+import org.kie.KnowledgeBase;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 public abstract class AgendaBenchmark extends AbstractBenchmark {
 

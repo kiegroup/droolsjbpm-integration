@@ -26,27 +26,27 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
-//import org.drools.grid.ConnectionFactoryService;
-//import org.drools.grid.Grid;
-//import org.drools.grid.GridConnection;
-//import org.drools.grid.GridNode;
-//import org.drools.grid.GridServiceDescription;
-//import org.drools.grid.SocketService;
-//import org.drools.grid.service.directory.WhitePages;
-//import org.drools.grid.service.directory.impl.JpaWhitePages;
-//import org.drools.grid.service.directory.impl.WhitePagesClient;
-//import org.drools.grid.service.directory.impl.WhitePagesImpl;
+//import org.kie.grid.ConnectionFactoryService;
+//import org.kie.grid.Grid;
+//import org.kie.grid.GridConnection;
+//import org.kie.grid.GridNode;
+//import org.kie.grid.GridServiceDescription;
+//import org.kie.grid.SocketService;
+//import org.kie.grid.service.directory.WhitePages;
+//import org.kie.grid.service.directory.impl.JpaWhitePages;
+//import org.kie.grid.service.directory.impl.WhitePagesClient;
+//import org.kie.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.io.impl.ByteArrayResource;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.junit.Assert;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderError;
+import org.kie.builder.KnowledgeBuilderErrors;
+import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.builder.ResourceType;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsGridTest {
@@ -58,7 +58,7 @@ public class SpringDroolsGridTest {
 
 //    @Test
 //    public void test1() {
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+//        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
 //        WhitePages wp = new JpaWhitePages( emf );
 //
 //        wp.create( "s1" );
@@ -88,7 +88,7 @@ public class SpringDroolsGridTest {
 //        assertNotNull( kbuilder );
 //
 //        String rule = "package test\n"
-//                      + "import org.drools.container.spring.SpringDroolsGridTest.MyObject;\n"
+//                      + "import org.kie.container.spring.SpringDroolsGridTest.MyObject;\n"
 //                      + "global MyObject myGlobalObj;\n"
 //                      + "rule \"test\""
 //                      + "  when"

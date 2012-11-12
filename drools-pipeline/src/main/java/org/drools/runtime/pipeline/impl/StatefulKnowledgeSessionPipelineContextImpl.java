@@ -20,11 +20,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.runtime.CommandExecutor;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.pipeline.ResultHandler;
 import org.drools.runtime.pipeline.StatefulKnowledgeSessionPipelineContext;
-import org.drools.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 
 public class StatefulKnowledgeSessionPipelineContextImpl extends BasePipelineContext
     implements

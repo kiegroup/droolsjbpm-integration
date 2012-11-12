@@ -16,10 +16,10 @@
 
 package org.drools;
 
-import org.drools.event.rule.WorkingMemoryEventListener;
-import org.drools.event.rule.ObjectInsertedEvent;
-import org.drools.event.rule.ObjectUpdatedEvent;
-import org.drools.event.rule.ObjectRetractedEvent;
+import org.kie.event.rule.ObjectInsertedEvent;
+import org.kie.event.rule.ObjectRetractedEvent;
+import org.kie.event.rule.ObjectUpdatedEvent;
+import org.kie.event.rule.WorkingMemoryEventListener;
 
 import java.util.ArrayList;
 import java.util.List;

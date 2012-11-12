@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.drools.SystemEventListener;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -16,6 +15,7 @@ import org.drools.grid.io.Acceptor;
 import org.drools.grid.io.AcceptorFactoryService;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.local.LocalGridNodeConnection;
+import org.kie.SystemEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class MultiplexSocketServerImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.impl.SocketServer#addService(int, java.lang.String, org.drools.grid.io.MessageReceiverHandler)
+     * @see org.kie.grid.impl.SocketServer#addService(int, java.lang.String, org.kie.grid.io.MessageReceiverHandler)
      */
     public synchronized void addService( String id,
                                          int port,
@@ -86,7 +86,7 @@ public class MultiplexSocketServerImpl
     }
 
     /* (non-Javadoc)
-     * @see org.drools.grid.impl.SocketServer#removeService(int, java.lang.String)
+     * @see org.kie.grid.impl.SocketServer#removeService(int, java.lang.String)
      */
     public synchronized void removeService(int socket,
                                            String id) {

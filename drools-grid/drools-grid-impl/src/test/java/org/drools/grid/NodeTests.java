@@ -20,14 +20,6 @@ package org.drools.grid;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.SystemEventListenerFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
@@ -40,14 +32,22 @@ import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
 import org.drools.io.impl.ByteArrayResource;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactoryService;
+import org.kie.SystemEventListenerFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderError;
+import org.kie.builder.KnowledgeBuilderErrors;
+import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.builder.ResourceType;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.rule.FactHandle;
 
 import static org.junit.Assert.*;
 
@@ -199,7 +199,7 @@ public class NodeTests {
         Assert.assertNotNull( kbuilder );
 
          String rule = "package test\n"
-                 + "import org.drools.grid.NodeTests.MyObject;\n"
+                 + "import org.kie.grid.NodeTests.MyObject;\n"
                  + "global MyObject myGlobalObj;\n"
                  + "rule \"test\""
                  + "  when"

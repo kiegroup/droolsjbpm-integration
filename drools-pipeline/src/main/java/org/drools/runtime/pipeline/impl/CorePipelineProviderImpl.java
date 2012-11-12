@@ -19,8 +19,6 @@ package org.drools.runtime.pipeline.impl;
 import java.util.List;
 
 import org.drools.command.runtime.rule.InsertElementsCommand;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.drools.runtime.pipeline.Action;
 import org.drools.runtime.pipeline.Callable;
 import org.drools.runtime.pipeline.CorePipelineProvider;
@@ -30,6 +28,8 @@ import org.drools.runtime.pipeline.KnowledgeRuntimeCommand;
 import org.drools.runtime.pipeline.ListAdapter;
 import org.drools.runtime.pipeline.Pipeline;
 import org.drools.runtime.pipeline.Splitter;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
 
 public class CorePipelineProviderImpl
     implements

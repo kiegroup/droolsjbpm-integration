@@ -16,7 +16,7 @@
 
 package org.drools.container.spring;
 
-import org.drools.event.process.*;
+import org.kie.event.process.*;
 
 public class MockProcessEventListener implements ProcessEventListener {
     public void beforeProcessStarted(ProcessStartedEvent processStartedEvent) {

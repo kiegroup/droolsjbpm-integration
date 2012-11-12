@@ -17,20 +17,21 @@ package org.drools.simulation.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
 
-import org.drools.command.BatchExecutionCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.batch.imp.FluentBatchExecutionImpl;
 import org.drools.io.impl.ByteArrayResource;
-import org.drools.runtime.ExecutionResults;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.command.BatchExecutionCommand;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatelessKnowledgeSession;
+
 import static org.junit.Assert.*;
 
 public class BatchFluentTest {
@@ -85,7 +86,7 @@ public class BatchFluentTest {
     }
 
     private StatelessKnowledgeSession createStatelessSession() {
-        String str = "package org.drools.simulation.test\n"
+        String str = "package org.kie.simulation.test\n"
                 + "import " + Person.class.getName() + "\n"
                 + "global java.util.List list\n"
                 + "rule updateAge no-loop\n"

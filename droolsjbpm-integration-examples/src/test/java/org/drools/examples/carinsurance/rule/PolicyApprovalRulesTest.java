@@ -16,9 +16,6 @@
 
 package org.drools.examples.carinsurance.rule;
 
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.ResourceType;
 import org.drools.command.World;
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
@@ -28,9 +25,12 @@ import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.io.ResourceFactory;
 import org.joda.time.LocalDate;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
 
 import java.math.BigDecimal;
 

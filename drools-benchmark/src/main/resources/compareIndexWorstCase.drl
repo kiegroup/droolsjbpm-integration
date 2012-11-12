@@ -1,4 +1,4 @@
-import org.drools.benchmark.model.*
+import org.kie.benchmark.model.*
 
 rule R1 salience 1 when
     $b1 : B( i < 2, $j1 : j < 1000, $bool1 : b == false )

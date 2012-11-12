@@ -24,20 +24,11 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
 import org.drools.compiler.PackageBuilder;
 import org.drools.core.util.DroolsStreamUtils;
-import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
 import org.drools.rule.Package;
-import org.drools.runtime.Environment;
-import org.drools.runtime.EnvironmentName;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.process.NodeInstance;
-import org.drools.runtime.process.ProcessInstance;
-import org.drools.runtime.process.WorkItem;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.compiler.ProcessBuilderImpl;
@@ -59,6 +50,15 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.persistence.jpa.KnowledgeStoreService;
+import org.kie.runtime.Environment;
+import org.kie.runtime.EnvironmentName;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.process.NodeInstance;
+import org.kie.runtime.process.ProcessInstance;
+import org.kie.runtime.process.WorkItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -153,7 +153,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
-        ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
+        ProcessInstance processInstance = service.startProcess( "org.kie.test.TestProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -241,7 +241,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         int sessionId = service.getId();
-        ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
+        ProcessInstance processInstance = service.startProcess( "org.kie.test.TestProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -328,9 +328,9 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     @SuppressWarnings("unused")
     private static Package getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
-        process.setId( "org.drools.test.TestProcess" );
+        process.setId( "org.kie.test.TestProcess" );
         process.setName( "TestProcess" );
-        process.setPackageName( "org.drools.test" );
+        process.setPackageName( "org.kie.test" );
         StartNode start = new StartNode();
         start.setId( 1 );
         start.setName( "Start" );
@@ -424,7 +424,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
         int sessionId = service.getId();
 
-        RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess( "org.drools.test.ProcessSubProcess" );
+        RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess( "org.kie.test.ProcessSubProcess" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
         long processInstanceId = processInstance.getId();
@@ -483,9 +483,9 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     @SuppressWarnings("unused")
     private static Package getProcessSubProcess() {
         RuleFlowProcess process = new RuleFlowProcess();
-        process.setId( "org.drools.test.ProcessSubProcess" );
+        process.setId( "org.kie.test.ProcessSubProcess" );
         process.setName( "ProcessSubProcess" );
-        process.setPackageName( "org.drools.test" );
+        process.setPackageName( "org.kie.test" );
         StartNode start = new StartNode();
         start.setId( 1 );
         start.setName( "Start" );
@@ -505,7 +505,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         SubProcessNode subProcessNode = new SubProcessNode();
         subProcessNode.setId( 3 );
         subProcessNode.setName( "SubProcess" );
-        subProcessNode.setProcessId( "org.drools.test.SubProcess" );
+        subProcessNode.setProcessId( "org.kie.test.SubProcess" );
         process.addNode( subProcessNode );
         new ConnectionImpl( actionNode,
                             Node.CONNECTION_DEFAULT_TYPE,
@@ -526,9 +526,9 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                                      null );
 
         process = new RuleFlowProcess();
-        process.setId( "org.drools.test.SubProcess" );
+        process.setId( "org.kie.test.SubProcess" );
         process.setName( "SubProcess" );
-        process.setPackageName( "org.drools.test" );
+        process.setPackageName( "org.kie.test" );
         start = new StartNode();
         start.setId( 1 );
         start.setName( "Start" );
@@ -578,7 +578,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
 
-        ProcessInstance processInstance = service.startProcess( "org.drools.test.ProcessTimer" );
+        ProcessInstance processInstance = service.startProcess( "org.kie.test.ProcessTimer" );
         long procId = processInstance.getId();
         log.info( "---> Started ProcessTimer id: {}",
                   procId );
@@ -626,9 +626,9 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     @SuppressWarnings("unused")
     private static Package getProcessTimer() {
         RuleFlowProcess process = new RuleFlowProcess();
-        process.setId( "org.drools.test.ProcessTimer" );
+        process.setId( "org.kie.test.ProcessTimer" );
         process.setName( "ProcessTimer" );
-        process.setPackageName( "org.drools.test" );
+        process.setPackageName( "org.kie.test" );
         StartNode start = new StartNode();
         start.setId( 1 );
         start.setName( "Start" );
@@ -678,7 +678,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
         int sessionId = service.getId();
 
-        ProcessInstance processInstance = service.startProcess( "org.drools.test.ProcessTimer2" );
+        ProcessInstance processInstance = service.startProcess( "org.kie.test.ProcessTimer2" );
         log.info( "Started process instance {}",
                   processInstance.getId() );
 
@@ -706,9 +706,9 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     @SuppressWarnings("unused")
     private static Package getProcessTimer2() {
         RuleFlowProcess process = new RuleFlowProcess();
-        process.setId( "org.drools.test.ProcessTimer2" );
+        process.setId( "org.kie.test.ProcessTimer2" );
         process.setName( "ProcessTimer2" );
-        process.setPackageName( "org.drools.test" );
+        process.setPackageName( "org.kie.test" );
         StartNode start = new StartNode();
         start.setId( 1 );
         start.setName( "Start" );

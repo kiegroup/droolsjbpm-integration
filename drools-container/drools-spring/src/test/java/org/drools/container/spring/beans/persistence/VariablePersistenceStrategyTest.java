@@ -35,20 +35,10 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
 import org.drools.base.MapGlobalResolver;
-import org.drools.marshalling.ObjectMarshallingStrategy;
 import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
-import org.drools.persistence.jpa.JPAKnowledgeService;
-import org.drools.persistence.jpa.KnowledgeStoreService;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
-import org.drools.runtime.Environment;
-import org.drools.runtime.EnvironmentName;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.process.WorkItem;
-import org.drools.runtime.process.WorkflowProcessInstance;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.After;
@@ -56,6 +46,16 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.marshalling.ObjectMarshallingStrategy;
+import org.kie.persistence.jpa.JPAKnowledgeService;
+import org.kie.persistence.jpa.KnowledgeStoreService;
+import org.kie.runtime.Environment;
+import org.kie.runtime.EnvironmentName;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.process.WorkItem;
+import org.kie.runtime.process.WorkflowProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -409,7 +409,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
     //
-    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.persistence.jpa" );
+    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.persistence.jpa" );
     //        Environment env = KnowledgeBaseFactory.newEnvironment();
     //        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, emf );
     //
@@ -460,7 +460,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
     //
-    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.persistence.jpa" );
+    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.persistence.jpa" );
     //        Environment env = KnowledgeBaseFactory.newEnvironment();
     //        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, emf );
     //

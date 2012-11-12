@@ -1,6 +1,6 @@
 dialect "java"
 
-import org.drools.benchmark.model.*
+import org.kie.benchmark.model.*
 
 rule "Join" @activationListener('direct')
 when

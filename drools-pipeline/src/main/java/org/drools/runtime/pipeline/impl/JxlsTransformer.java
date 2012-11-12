@@ -25,10 +25,10 @@ import net.sf.jxls.reader.XLSReadMessage;
 import net.sf.jxls.reader.XLSReadStatus;
 import net.sf.jxls.reader.XLSReader;
 
-import org.drools.io.Resource;
 import org.drools.runtime.pipeline.JxlsTransformerProvider;
 import org.drools.runtime.pipeline.PipelineContext;
 import org.drools.runtime.pipeline.Transformer;
+import org.kie.io.Resource;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExpressionCompiler;

@@ -10,29 +10,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.SocketFactory;
 
-import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 /*
-import org.drools.grid.ConnectionFactoryService;
-import org.drools.grid.GridNodeConnection;
-import org.drools.grid.GridServiceDescription;
-import org.drools.grid.SocketService;
-import org.drools.grid.conf.GridPeerServiceConfiguration;
-import org.drools.grid.io.AcceptorFactoryService;
-import org.drools.grid.io.ConnectorFactoryService;
-import org.drools.grid.io.ConversationManager;
-import org.drools.grid.io.impl.ConversationManagerImpl;
-import org.drools.grid.local.LocalGridNodeConnection;
-import org.drools.grid.remote.RemoteGridNodeConnection;
-import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaConnectorFactoryService;
-import org.drools.grid.service.directory.Address;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
-import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
+import org.kie.grid.ConnectionFactoryService;
+import org.kie.grid.GridNodeConnection;
+import org.kie.grid.GridServiceDescription;
+import org.kie.grid.SocketService;
+import org.kie.grid.conf.GridPeerServiceConfiguration;
+import org.kie.grid.io.AcceptorFactoryService;
+import org.kie.grid.io.ConnectorFactoryService;
+import org.kie.grid.io.ConversationManager;
+import org.kie.grid.io.impl.ConversationManagerImpl;
+import org.kie.grid.local.LocalGridNodeConnection;
+import org.kie.grid.remote.RemoteGridNodeConnection;
+import org.kie.grid.remote.mina.MinaAcceptorFactoryService;
+import org.kie.grid.remote.mina.MinaConnectorFactoryService;
+import org.kie.grid.service.directory.Address;
+import org.kie.grid.service.directory.WhitePages;
+import org.kie.grid.service.directory.impl.GridServiceDescriptionImpl;
+import org.kie.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 */
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
 
 public class GridImpl
     implements

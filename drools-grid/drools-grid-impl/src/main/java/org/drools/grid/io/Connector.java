@@ -2,7 +2,7 @@ package org.drools.grid.io;
 
 import java.net.InetSocketAddress;
 
-import org.drools.SystemEventListener;
+import org.kie.SystemEventListener;
 
 public interface Connector {
     public boolean isOpen();

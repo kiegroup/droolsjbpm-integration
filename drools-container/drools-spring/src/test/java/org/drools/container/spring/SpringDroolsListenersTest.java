@@ -17,13 +17,13 @@
 package org.drools.container.spring;
 
 import org.drools.Person;
-import org.drools.event.rule.DebugWorkingMemoryEventListener;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKnowledgeSession;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.ArrayList;

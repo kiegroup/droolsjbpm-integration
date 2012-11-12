@@ -22,9 +22,9 @@
         </drools:resources>
     </drools:kbase>
 
-    <bean id="mock-agenda-listener" class="org.drools.container.spring.MockAgendaEventListener"/>
-    <bean id="mock-wm-listener" class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
-    <bean id="mock-process-listener" class="org.drools.container.spring.MockProcessEventListener"/>
+    <bean id="mock-agenda-listener" class="org.kie.container.spring.MockAgendaEventListener"/>
+    <bean id="mock-wm-listener" class="org.kie.container.spring.MockWorkingMemoryEventListener"/>
+    <bean id="mock-process-listener" class="org.kie.container.spring.MockProcessEventListener"/>
 
     <drools:ksession id="statefulSession" type="stateful" kbase="kbase1" node="node1">
         <drools:agendaEventListener ref="mock-agenda-listener"/>
@@ -34,7 +34,7 @@
 
     <drools:ksession id="statefulWithNestedBean" type="stateful" kbase="kbase1" node="node1">
         <drools:workingMemoryEventListener>
-            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+            <bean class="org.kie.container.spring.MockWorkingMemoryEventListener"/>
         </drools:workingMemoryEventListener>
     </drools:ksession>
 
@@ -46,7 +46,7 @@
         <drools:workingMemoryEventListener/>
     </drools:ksession>
 
-    <bean id="debugWorkingMemoryEventListener" class="org.drools.event.rule.DebugWorkingMemoryEventListener" />
+    <bean id="debugWorkingMemoryEventListener" class="org.kie.event.rule.DebugWorkingMemoryEventListener" />
     <drools:ksession id="statefulWithDebugListener" type="stateful" kbase="kbase1">
       <drools:workingMemoryEventListener ref="debugWorkingMemoryEventListener"/>
     </drools:ksession>
@@ -62,7 +62,7 @@
 
     <drools:ksession id="statelessWithNestedBean" type="stateless" kbase="kbase1" node="node1">
         <drools:workingMemoryEventListener>
-            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+            <bean class="org.kie.container.spring.MockWorkingMemoryEventListener"/>
         </drools:workingMemoryEventListener>
     </drools:ksession>
 
@@ -72,7 +72,7 @@
 
     <drools:ksession id="statelessWithMultipleSameType" type="stateless" kbase="kbase1" node="node1">
         <drools:workingMemoryEventListener>
-            <bean class="org.drools.container.spring.MockWorkingMemoryEventListener"/>
+            <bean class="org.kie.container.spring.MockWorkingMemoryEventListener"/>
         </drools:workingMemoryEventListener>
         <drools:workingMemoryEventListener ref="mock-wm-listener"/>
     </drools:ksession>

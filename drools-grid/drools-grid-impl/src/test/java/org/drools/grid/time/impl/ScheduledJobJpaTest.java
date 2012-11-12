@@ -53,7 +53,7 @@ public class ScheduledJobJpaTest {
     }
     @Test
     public void test1() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
 
         UuidJobHandle handle = new UuidJobHandle();
         ScheduledJob sj1 = new ScheduledJob( handle,

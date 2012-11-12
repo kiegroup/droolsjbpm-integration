@@ -19,10 +19,10 @@ package org.drools.fluent.simulation.impl;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.command.*;
+import org.drools.command.GetVariableCommand;
+import org.drools.command.NewKnowledgeBaseCommand;
+import org.drools.command.NewStatefulKnowledgeSessionCommand;
+import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.VariableContext;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
@@ -34,9 +34,6 @@ import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
 import org.drools.fluent.test.impl.MapVariableContext;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.conf.ClockTypeOption;
 import org.drools.simulation.SimulationPath;
 import org.drools.simulation.Simulation;
 import org.drools.simulation.SimulationStep;
@@ -44,6 +41,13 @@ import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 import org.drools.simulation.impl.Simulator;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.command.*;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.conf.ClockTypeOption;
 
 public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFluent>
         implements SimulationFluent {
