@@ -19,7 +19,7 @@ package org.drools.fluent.test.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.fluent.VariableContext;
+import org.kie.fluent.VariableContext;
 
 public class MapVariableContext<P> implements VariableContext<P>{
 	

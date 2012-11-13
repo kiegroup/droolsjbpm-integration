@@ -16,7 +16,6 @@
 
 package org.drools.examples.carinsurance.rule;
 
-import org.drools.command.World;
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
 import org.drools.examples.carinsurance.domain.Driver;
@@ -30,6 +29,7 @@ import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.ResourceType;
+import org.kie.command.World;
 import org.kie.io.ResourceFactory;
 
 import java.math.BigDecimal;

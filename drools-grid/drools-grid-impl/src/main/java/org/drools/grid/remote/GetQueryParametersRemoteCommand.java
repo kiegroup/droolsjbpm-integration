@@ -15,13 +15,13 @@
  */
 package org.drools.grid.remote;
 
-import org.drools.command.Context;
-import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.rule.Declaration;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.rule.impl.NativeQueryResults;
+import org.kie.command.Context;
+import org.kie.command.World;
 
 /**
  *

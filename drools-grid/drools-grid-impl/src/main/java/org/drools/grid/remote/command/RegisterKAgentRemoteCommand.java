@@ -18,7 +18,6 @@ package org.drools.grid.remote.command;
 
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
-import org.drools.command.Context;
 import org.drools.impl.SystemEventListenerServiceImpl;
 import org.kie.KnowledgeBase;
 import org.kie.SystemEventListener;
@@ -29,6 +28,7 @@ import org.kie.agent.KnowledgeAgentConfiguration;
 import org.kie.agent.KnowledgeAgentFactory;
 import org.kie.agent.conf.NewInstanceOption;
 import org.kie.agent.conf.UseKnowledgeBaseClassloaderOption;
+import org.kie.command.Context;
 import org.kie.runtime.Environment;
 import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;

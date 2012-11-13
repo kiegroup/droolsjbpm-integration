@@ -16,10 +16,10 @@
 
 package org.drools.grid.remote.command;
 
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.kie.ChangeSet;
 import org.kie.agent.KnowledgeAgent;
+import org.kie.command.Context;
 import org.kie.io.Resource;
 
 public class ApplyChangeSetRemoteCommand

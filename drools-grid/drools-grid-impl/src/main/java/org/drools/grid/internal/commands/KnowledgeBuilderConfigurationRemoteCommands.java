@@ -16,11 +16,11 @@
 package org.drools.grid.internal.commands;
 
 import java.io.Serializable;
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.grid.remote.KnowledgeBuilderConfigurationRemoteClient;
 import org.kie.builder.KnowledgeBuilderConfiguration;
+import org.kie.command.Context;
 
 /**
  *

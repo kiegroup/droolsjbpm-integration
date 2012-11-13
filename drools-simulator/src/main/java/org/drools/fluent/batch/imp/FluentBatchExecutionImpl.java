@@ -31,10 +31,10 @@ import org.drools.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
-import org.drools.fluent.VariableContext;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.kie.command.*;
+import org.kie.fluent.VariableContext;
 import org.kie.runtime.rule.FactHandle;
 
 // TODO Do we really want this as a separate class hierarchy just to do batches? Does this fit in with the SimulationFluent?

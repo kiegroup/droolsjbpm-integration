@@ -16,7 +16,7 @@
 
 package org.drools.fluent.test;
 
-import org.drools.fluent.test.ReflectiveMatcherAssert;
+import org.kie.fluent.test.ReflectiveMatcherAssert;
 
 public interface TestableFluent<P> {
 

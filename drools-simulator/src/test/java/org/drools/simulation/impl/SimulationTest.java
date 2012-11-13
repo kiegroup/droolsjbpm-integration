@@ -23,7 +23,6 @@ import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
-import org.drools.command.World;
 import org.drools.command.assertion.AssertEquals;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.NewKnowledgeBuilderCommand;
@@ -31,8 +30,6 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.simulation.Simulation;
-import org.drools.simulation.SimulationStep;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.KnowledgeBase;
@@ -40,10 +37,13 @@ import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.ResourceType;
 import org.kie.command.Command;
+import org.kie.command.World;
 import org.kie.io.ResourceFactory;
 import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.conf.ClockTypeOption;
+import org.kie.simulation.Simulation;
+import org.kie.simulation.SimulationStep;
 
 @RunWith(JUnitSimulationRunner.class)
 public class SimulationTest {

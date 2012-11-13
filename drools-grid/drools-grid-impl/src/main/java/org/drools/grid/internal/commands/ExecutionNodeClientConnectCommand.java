@@ -1,10 +1,10 @@
 package org.drools.grid.internal.commands;
 
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.runtime.impl.ExecutionResultImpl;
+import org.kie.command.Context;
 
 public class ExecutionNodeClientConnectCommand
     implements

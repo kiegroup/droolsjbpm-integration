@@ -19,10 +19,10 @@ package org.drools.fluent.test.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.command.Context;
-import org.drools.fluent.test.ReflectiveMatcher;
-import org.drools.fluent.test.ReflectiveMatcherAssert;
 import org.hamcrest.Matcher;
+import org.kie.command.Context;
+import org.kie.fluent.test.ReflectiveMatcher;
+import org.kie.fluent.test.ReflectiveMatcherAssert;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 

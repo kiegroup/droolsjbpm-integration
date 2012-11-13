@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.drools.fluent.VariableContext;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.AssertThatImpl;
@@ -38,6 +37,7 @@ import org.hamcrest.Matcher;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.builder.ResourceType;
+import org.kie.fluent.VariableContext;
 import org.kie.io.ResourceFactory;
 
 public class CompactFluentTest {

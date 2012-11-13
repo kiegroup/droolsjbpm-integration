@@ -16,10 +16,10 @@
 package org.drools.grid.remote.command;
 
 
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.common.EventFactHandle;
+import org.kie.command.Context;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.runtime.rule.QueryResultsRow;
 

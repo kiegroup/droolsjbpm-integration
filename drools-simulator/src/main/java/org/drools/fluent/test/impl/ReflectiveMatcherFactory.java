@@ -19,8 +19,8 @@ package org.drools.fluent.test.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.fluent.test.ReflectiveMatcher;
-import org.drools.fluent.test.ReflectiveMatcherAssert;
+import org.kie.fluent.test.ReflectiveMatcher;
+import org.kie.fluent.test.ReflectiveMatcherAssert;
 
 public class ReflectiveMatcherFactory {
 

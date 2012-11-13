@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.drools.simulation.SimulationPath;
-import org.drools.simulation.Simulation;
-import org.drools.simulation.SimulationStep;
+import org.kie.simulation.Simulation;
+import org.kie.simulation.SimulationPath;
+import org.kie.simulation.SimulationStep;
 
 public class SimulationPathImpl implements SimulationPath {
 

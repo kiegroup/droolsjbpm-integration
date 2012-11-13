@@ -16,13 +16,13 @@
 
 package org.drools.grid.remote;
 
-import org.drools.command.Context;
-import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderConfiguration;
 import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.command.Context;
+import org.kie.command.World;
 
 public class NewKnowledgeBuilderRemoteCommand
     implements

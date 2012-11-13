@@ -17,9 +17,9 @@ package org.drools.grid.internal.commands;
 
 import java.io.Serializable;
 import org.drools.SessionConfiguration;
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeSessionConfigurationRemoteClient;
+import org.kie.command.Context;
 import org.kie.runtime.conf.KnowledgeSessionOption;
 
 /**

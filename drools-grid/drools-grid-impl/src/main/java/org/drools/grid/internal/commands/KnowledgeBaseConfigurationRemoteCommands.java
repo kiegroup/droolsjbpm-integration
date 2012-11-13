@@ -17,11 +17,11 @@ package org.drools.grid.internal.commands;
 
 import java.io.Serializable;
 import org.drools.RuleBaseConfiguration;
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeBaseConfigurationRemoteClient;
 import org.drools.grid.remote.KnowledgeBuilderConfigurationRemoteClient;
 import org.kie.KnowledgeBaseConfiguration;
+import org.kie.command.Context;
 import org.kie.conf.KnowledgeBaseOption;
 
 /**

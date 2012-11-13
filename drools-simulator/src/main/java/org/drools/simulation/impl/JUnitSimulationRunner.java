@@ -22,11 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
-import org.drools.simulation.SimulationPath;
-import org.drools.simulation.Simulation;
-import org.drools.simulation.SimulationStep;
 import org.drools.simulation.impl.Simulator.CommandExecutionHandler;
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -34,6 +30,10 @@ import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.kie.command.Command;
+import org.kie.command.Context;
+import org.kie.simulation.Simulation;
+import org.kie.simulation.SimulationPath;
+import org.kie.simulation.SimulationStep;
 
 public class JUnitSimulationRunner extends Runner {
 

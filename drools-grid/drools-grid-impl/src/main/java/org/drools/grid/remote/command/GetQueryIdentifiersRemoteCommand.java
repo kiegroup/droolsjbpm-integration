@@ -16,9 +16,9 @@
 package org.drools.grid.remote.command;
 
 
-import org.drools.command.Context;
-import org.drools.command.World;
 import org.drools.command.impl.GenericCommand;
+import org.kie.command.Context;
+import org.kie.command.World;
 import org.kie.runtime.rule.QueryResults;
 
 /**

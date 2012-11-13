@@ -16,9 +16,9 @@
 
 package org.drools.simulation.impl.command;
 
-import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
 import org.junit.Assert;
+import org.kie.command.Context;
 
 import java.util.HashMap;
 import java.util.Map;

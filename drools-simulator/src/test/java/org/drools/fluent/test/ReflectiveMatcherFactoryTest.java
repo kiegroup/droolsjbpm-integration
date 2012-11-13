@@ -26,6 +26,7 @@ import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
 import org.hamcrest.core.IsEqual;
 import org.junit.Test;
+import org.kie.fluent.test.ReflectiveMatcherAssert;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 

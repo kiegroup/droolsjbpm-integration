@@ -16,10 +16,10 @@
 
 package org.drools.fluent.knowledge;
 
-import org.drools.fluent.FluentKnowledgeBase;
 import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
+import org.kie.fluent.FluentKnowledgeBase;
 
 
 public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, TestableFluent<KnowledgeBaseSimFluent> {

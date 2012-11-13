@@ -19,8 +19,8 @@ package org.drools.simulation.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.simulation.SimulationPath;
-import org.drools.simulation.Simulation;
+import org.kie.simulation.Simulation;
+import org.kie.simulation.SimulationPath;
 
 public class SimulationImpl implements Simulation {
 
