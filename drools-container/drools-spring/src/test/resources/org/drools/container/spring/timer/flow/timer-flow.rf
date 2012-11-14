@@ -6,7 +6,7 @@
 
   <header>
     <imports>
-      <import name="org.kie.container.spring.timer.MyDroolsBean" />
+      <import name="org.drools.container.spring.timer.MyDroolsBean" />
     </imports>
   </header>
 

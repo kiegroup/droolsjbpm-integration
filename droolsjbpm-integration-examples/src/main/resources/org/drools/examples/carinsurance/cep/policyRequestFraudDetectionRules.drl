@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.kie.examples.carinsurance.rule;
+package org.drools.examples.carinsurance.rule;
     dialect "java"
 
-import org.kie.examples.carinsurance.domain.Car;
-import org.kie.examples.carinsurance.domain.CarType;
-import org.kie.examples.carinsurance.domain.Driver;
-import org.kie.examples.carinsurance.domain.policy.Coverage;
-import org.kie.examples.carinsurance.domain.policy.CoverageType;
-import org.kie.examples.carinsurance.domain.policy.Policy;
-import org.kie.examples.carinsurance.domain.request.CoverageRequest;
-import org.kie.examples.carinsurance.domain.request.PolicyRequest;
+import org.drools.examples.carinsurance.domain.Car;
+import org.drools.examples.carinsurance.domain.CarType;
+import org.drools.examples.carinsurance.domain.Driver;
+import org.drools.examples.carinsurance.domain.policy.Coverage;
+import org.drools.examples.carinsurance.domain.policy.CoverageType;
+import org.drools.examples.carinsurance.domain.policy.Policy;
+import org.drools.examples.carinsurance.domain.request.CoverageRequest;
+import org.drools.examples.carinsurance.domain.request.PolicyRequest;
 
 // ############################################################################
 // PolicyRequest fraud

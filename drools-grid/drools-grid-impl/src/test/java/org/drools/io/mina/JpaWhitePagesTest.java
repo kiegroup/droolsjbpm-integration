@@ -44,7 +44,7 @@ public class JpaWhitePagesTest {
     }
     @Test
     public void test1() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new JpaWhitePages( emf );
 
         wp.create( "ss1", "grid0" );

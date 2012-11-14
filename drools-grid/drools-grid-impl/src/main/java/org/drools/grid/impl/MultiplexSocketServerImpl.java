@@ -46,7 +46,7 @@ public class MultiplexSocketServerImpl
     }
 
     /* (non-Javadoc)
-     * @see org.kie.grid.impl.SocketServer#addService(int, java.lang.String, org.kie.grid.io.MessageReceiverHandler)
+     * @see org.drools.grid.impl.SocketServer#addService(int, java.lang.String, org.drools.grid.io.MessageReceiverHandler)
      */
     public synchronized void addService( String id,
                                          int port,
@@ -86,7 +86,7 @@ public class MultiplexSocketServerImpl
     }
 
     /* (non-Javadoc)
-     * @see org.kie.grid.impl.SocketServer#removeService(int, java.lang.String)
+     * @see org.drools.grid.impl.SocketServer#removeService(int, java.lang.String)
      */
     public synchronized void removeService(int socket,
                                            String id) {

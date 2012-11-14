@@ -25,13 +25,13 @@
 
       <drools:eventListeners id="listeners">
           <drools:agendaEventListener>
-              <bean class="org.kie.container.spring.MockAgendaEventListener"/>
+              <bean class="org.drools.container.spring.MockAgendaEventListener"/>
           </drools:agendaEventListener>
           <drools:workingMemoryEventListener>
-              <bean class="org.kie.container.spring.MockWorkingMemoryEventListener" />
+              <bean class="org.drools.container.spring.MockWorkingMemoryEventListener" />
           </drools:workingMemoryEventListener>
           <drools:processEventListener>
-              <bean class="org.kie.container.spring.MockProcessEventListener" />
+              <bean class="org.drools.container.spring.MockProcessEventListener" />
           </drools:processEventListener>
       </drools:eventListeners>
 
@@ -41,13 +41,13 @@
   -->
   <drools:ksession id="session2" type="stateful" kbase="kbase">
     <drools:agendaEventListener>
-      <bean class="org.kie.container.spring.MockAgendaEventListener"/>
+      <bean class="org.drools.container.spring.MockAgendaEventListener"/>
     </drools:agendaEventListener>
     <drools:workingMemoryEventListener>
-      <bean class="org.kie.container.spring.MockWorkingMemoryEventListener" />
+      <bean class="org.drools.container.spring.MockWorkingMemoryEventListener" />
     </drools:workingMemoryEventListener>
     <drools:processEventListener>
-      <bean class="org.kie.container.spring.MockProcessEventListener" />
+      <bean class="org.drools.container.spring.MockProcessEventListener" />
     </drools:processEventListener>
   </drools:ksession>
 

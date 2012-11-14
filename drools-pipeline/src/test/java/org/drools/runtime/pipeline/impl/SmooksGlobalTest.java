@@ -52,7 +52,7 @@ public class SmooksGlobalTest {
 
     @Test @Ignore
     public void testGlobal() throws Exception {
-        String xml = "<org.kie.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><quantity>2</quantity><productId>111</productId></example.OrderItem><example.OrderItem><price>5.2</price><quantity>7</quantity><productId>222</productId></example.OrderItem></children></org.kie.runtime.pipeline.impl.Root>";
+        String xml = "<org.drools.runtime.pipeline.impl.Root><children><example.OrderItem><price>8.9</price><quantity>2</quantity><productId>111</productId></example.OrderItem><example.OrderItem><price>5.2</price><quantity>7</quantity><productId>222</productId></example.OrderItem></children></org.drools.runtime.pipeline.impl.Root>";
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 

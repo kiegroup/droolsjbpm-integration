@@ -49,7 +49,7 @@ public class StandardjBPM5FluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.kie.simulation.test\n" +
+        String str = "package org.drools.simulation.test\n" +
                 "import " + Person.class.getName() + "\n" +
                 "global java.util.List list\n" +
                 "rule setTime\n" +

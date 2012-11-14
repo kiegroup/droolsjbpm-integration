@@ -1,4 +1,4 @@
-package org.kie.container.spring.i
+package org.drools.container.spring.i
 
 rule "sample ac��nt�d rule"
 	@output("\"Hello world!\"")

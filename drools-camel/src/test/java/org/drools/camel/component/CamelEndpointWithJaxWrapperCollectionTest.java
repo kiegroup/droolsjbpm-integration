@@ -114,9 +114,9 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
         me.setName( "Hadrian" );
 
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
-        rule += "import org.kie.pipeline.camel.Person\n";
-        rule += "import org.kie.pipeline.camel.WrappedList\n";
+        rule += "package org.drools.pipeline.camel \n";
+        rule += "import org.drools.pipeline.camel.Person\n";
+        rule += "import org.drools.pipeline.camel.WrappedList\n";
         rule += "global WrappedList list\n";
         rule += "rule rule1 \n";
         rule += "  when \n";
@@ -184,8 +184,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            // TODO does not work: def.setContextPath( "org.kie.camel.testdomain:org.kie.pipeline.camel" );
-            def.setContextPath( "org.kie.pipeline.camel" );
+            // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
+            def.setContextPath( "org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -219,8 +219,8 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint(true);
-                // TODO does not work: def.setContextPath( "org.kie.camel.testdomain:org.kie.pipeline.camel" );
-                def.setContextPath("org.kie.pipeline.camel");
+                // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
+                def.setContextPath("org.drools.pipeline.camel");
 
                 from("direct:test-with-session").policy(new DroolsPolicy()).
                         unmarshal(def).to("drools:node/ksession1").marshal(def);

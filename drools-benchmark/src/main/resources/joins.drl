@@ -1,4 +1,4 @@
-import org.kie.benchmark.model.*
+import org.drools.benchmark.model.*
 
 rule "Join" @activationListener('direct')
 when

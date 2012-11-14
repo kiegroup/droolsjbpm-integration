@@ -3,11 +3,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -17,15 +17,15 @@
 
 <batch-execution>
     <insert out-identifier="person" return-object="true">
-        <org.kie.camel.testdomain.Person>
+        <org.drools.camel.testdomain.Person>
             <name>mic</name>
             <age>0</age>
             <sex/>
             <alive>false</alive>
-        </org.kie.camel.testdomain.Person>
+        </org.drools.camel.testdomain.Person>
     </insert>
     <insert out-identifier="changes" return-object="true">
-        <org.kie.camel.testdomain.ChangeCollector/>
+        <org.drools.camel.testdomain.ChangeCollector/>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -35,23 +35,23 @@
 
 <execution-results>
     <result identifier="changes">
-        <org.kie.camel.testdomain.ChangeCollector>
+        <org.drools.camel.testdomain.ChangeCollector>
             <changes>
-                <org.kie.camel.testdomain.Cheese>
+                <org.drools.camel.testdomain.Cheese>
                     <type>stilton</type>
                     <price>42</price>
                     <oldPrice>0</oldPrice>
-                </org.kie.camel.testdomain.Cheese>
+                </org.drools.camel.testdomain.Cheese>
             </changes>
-        </org.kie.camel.testdomain.ChangeCollector>
+        </org.drools.camel.testdomain.ChangeCollector>
     </result>
     <result identifier="person">
-        <org.kie.camel.testdomain.Person>
+        <org.drools.camel.testdomain.Person>
             <name>mic</name>
             <age>0</age>
             <sex/>
             <alive>false</alive>
-        </org.kie.camel.testdomain.Person>
+        </org.drools.camel.testdomain.Person>
     </result>
     <fact-handle external-form="@{var1}" identifier="changes"/>
     <fact-handle external-form="@{var2}" identifier="person"/>
@@ -62,15 +62,15 @@
 
 <batch-execution>
     <insert out-identifier="person" return-object="true">
-        <org.kie.camel.testdomain.Person>
+        <org.drools.camel.testdomain.Person>
             <name>mark</name>
             <age>0</age>
             <sex/>
             <alive>false</alive>
-        </org.kie.camel.testdomain.Person>
+        </org.drools.camel.testdomain.Person>
     </insert>
     <insert out-identifier="changes" return-object="true">
-        <org.kie.camel.testdomain.ChangeCollector/>
+        <org.drools.camel.testdomain.ChangeCollector/>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -80,11 +80,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -94,11 +94,11 @@
 
 <execution-results>
     <result identifier="outStilton">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </result>
     <fact-handle external-form="@{var1}" identifier="outStilton"/>
 </execution-results>
@@ -108,11 +108,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="false">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -147,11 +147,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules max="10"/>
 </batch-execution>
@@ -168,11 +168,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules max="10"/>
 </batch-execution>
@@ -196,11 +196,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -210,11 +210,11 @@
 
 <execution-results>
     <result identifier="outStilton">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </result>
     <fact-handle external-form="@{var1}" identifier="outStilton"/>
 </execution-results>
@@ -263,16 +263,16 @@
         <list/>
     </set-global>
     <insert-elements>
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert-elements>
     <fire-all-rules/>
 </batch-execution>
@@ -283,16 +283,16 @@
 <execution-results>
     <result identifier="list1">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>35</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
-            <org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>30</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
 </execution-results>
@@ -305,16 +305,16 @@
         <list/>
     </set-global>
     <insert-elements out-identifier="myfacts" return-objects="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert-elements>
     <fire-all-rules/>
 </batch-execution>
@@ -325,30 +325,30 @@
 <execution-results>
     <result identifier="myfacts">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>30</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
-            <org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>35</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <result identifier="list1">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>35</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
-            <org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>30</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <fact-handles identifier="myfacts">
@@ -371,11 +371,11 @@
         <list/>
     </set-global>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>5</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -386,27 +386,27 @@
 <execution-results>
     <result identifier="list2">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>30</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <result identifier="outStilton">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </result>
     <result identifier="outList3">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>30</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <fact-handle external-form="@{var1}" identifier="outStilton"/>
@@ -420,11 +420,11 @@
         <list/>
     </set-global>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <get-global identifier="list1" out-identifier="out-list"/>
     <fire-all-rules/>
@@ -436,27 +436,27 @@
 <execution-results>
     <result identifier="out-list">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>25</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <result identifier="outStilton">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </result>
     <result identifier="list1">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>25</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <fact-handle external-form="@{var1}" identifier="outStilton"/>
@@ -467,16 +467,16 @@
 
 <batch-execution>
     <insert-elements>
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert-elements>
     <get-objects out-identifier="list1"/>
 </batch-execution>
@@ -486,26 +486,26 @@
 
 <batch-execution>
     <insert-elements>
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>2</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>cheddar</type>
             <price>1</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>cheddar</type>
             <price>2</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>1</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert-elements>
     <query name="cheeses" out-identifier="cheeses"/>
 </batch-execution>
@@ -518,24 +518,24 @@
         <list/>
     </set-global>
     <insert-elements>
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
-        <org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert-elements>
     <fire-all-rules/>
     <insert out-identifier="outBrie" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>brie</type>
             <price>10</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
 </batch-execution>
 @end{}
@@ -544,24 +544,24 @@
 
 <execution-results>
     <result identifier="outBrie">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>brie</type>
             <price>10</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </result>
     <result identifier="list1">
         <list>
-            <org.kie.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>35</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
-            <org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
+            <org.drools.camel.testdomain.Cheese>
                 <type>stilton</type>
                 <price>30</price>
                 <oldPrice>0</oldPrice>
-            </org.kie.camel.testdomain.Cheese>
+            </org.drools.camel.testdomain.Cheese>
         </list>
     </result>
     <fact-handle external-form="@{var1}" identifier="outBrie"/>
@@ -571,11 +571,11 @@
 @declare{"testProcess.in.1"}
 
 <batch-execution>
-    <start-process processId="org.kie.actions">
+    <start-process processId="org.drools.actions">
         <parameter identifier="person">
-            <org.kie.camel.testdomain.TestVariable>
+            <org.drools.camel.testdomain.TestVariable>
                 <name>John Doe</name>
-            </org.kie.camel.testdomain.TestVariable>
+            </org.drools.camel.testdomain.TestVariable>
         </parameter>
     </start-process>
     <get-global identifier="list1" out-identifier="out-list"/>
@@ -695,11 +695,11 @@
 
 <batch-execution>
     <insert out-identifier="outStilton" return-object="true">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>25</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </insert>
     <fire-all-rules/>
 </batch-execution>
@@ -709,11 +709,11 @@
 
 <execution-results>
     <result identifier="outStilton">
-        <org.kie.camel.testdomain.Cheese>
+        <org.drools.camel.testdomain.Cheese>
             <type>stilton</type>
             <price>30</price>
             <oldPrice>0</oldPrice>
-        </org.kie.camel.testdomain.Cheese>
+        </org.drools.camel.testdomain.Cheese>
     </result>
     <fact-handle external-form="@{var1}" identifier="outStilton"/>
 </execution-results>

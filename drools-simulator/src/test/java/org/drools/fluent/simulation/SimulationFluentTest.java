@@ -48,7 +48,7 @@ public class SimulationFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.kie.simulation.test\n" +
+        String str = "package org.drools.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
@@ -136,13 +136,13 @@ public class SimulationFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str1 = "package org.kie.simulation.test\n" +
+        String str1 = "package org.drools.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                      "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";        
 
-        String str2 = "package org.kie.simulation.test\n" +
+        String str2 = "package org.drools.simulation.test\n" +
                 "import " + Person.class.getName() + "\n" +
                 "global java.util.List list\n" +
                 "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
@@ -221,7 +221,7 @@ public class SimulationFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.kie.simulation.test\n" +
+        String str = "package org.drools.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +

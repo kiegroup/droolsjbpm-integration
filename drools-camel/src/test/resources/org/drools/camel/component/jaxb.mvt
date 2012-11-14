@@ -704,7 +704,7 @@
 @declare{"testProcess.in.1"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <start-process processId="org.kie.actions">
+    <start-process processId="org.drools.actions">
         <parameter>
             <item key="person">
                 <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="testVariable">

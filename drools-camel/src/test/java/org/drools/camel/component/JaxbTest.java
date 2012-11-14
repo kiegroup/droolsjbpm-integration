@@ -89,10 +89,10 @@ public class JaxbTest {
 
     private JAXBContext getJaxbContext() throws JAXBException {
         List<String> classesName = new ArrayList();
-        //        classesName.add("org.kie.model.AddressType");
-        //        classesName.add("org.kie.model.ObjectFactory");
-        //        classesName.add("org.kie.model.Person");
-        classesName.add( "org.kie.pipeline.camel.Person" );
+        //        classesName.add("org.kie.drools.AddressType");
+        //        classesName.add("org.kie.drools.ObjectFactory");
+        //        classesName.add("org.kie.drools.Person");
+        classesName.add( "org.drools.pipeline.camel.Person" );
 
         //jaxbDataFormat = new JaxbDataFormat();
         //jaxbDataFormat.setContextPath( contextPath )

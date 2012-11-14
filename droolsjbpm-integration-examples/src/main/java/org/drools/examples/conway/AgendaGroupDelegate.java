@@ -46,14 +46,14 @@ public class AgendaGroupDelegate
     }
 
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.ConwayRuleDelegate#getSession()
+     * @see org.drools.examples.conway.ConwayRuleDelegate#getSession()
      */
     public StatefulKnowledgeSession getSession() {
         return this.session;
     }
 
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.ConwayRuleDelegate#init()
+     * @see org.drools.examples.conway.ConwayRuleDelegate#init()
      */
     public void init() {
         this.session.getAgenda().getAgendaGroup( "register neighbor" ).setFocus();
@@ -62,10 +62,10 @@ public class AgendaGroupDelegate
     }
 
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.CellGrid#nextGeneration()
+     * @see org.drools.examples.conway.CellGrid#nextGeneration()
      */
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.ConwayRuleDelegate#nextGeneration()
+     * @see org.drools.examples.conway.ConwayRuleDelegate#nextGeneration()
      */
     public boolean nextGeneration() {
         // System.out.println( "next generation" );
@@ -80,10 +80,10 @@ public class AgendaGroupDelegate
     }
 
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.CellGrid#killAll()
+     * @see org.drools.examples.conway.CellGrid#killAll()
      */
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.ConwayRuleDelegate#killAll()
+     * @see org.drools.examples.conway.ConwayRuleDelegate#killAll()
      */
     public void killAll() {
         this.session.getAgenda().getAgendaGroup( "calculate" ).setFocus();

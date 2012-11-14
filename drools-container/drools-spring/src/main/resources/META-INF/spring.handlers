@@ -1,7 +1,7 @@
-http\://drools.org/schema/drools-spring=org.kie.container.spring.namespace.SpringDroolsHandler
-http\://drools.org/schema/drools-spring-1.2.0=org.kie.container.spring.namespace.SpringDroolsHandler
-http\://drools.org/schema/drools-spring-1.3.0=org.kie.container.spring.namespace.SpringDroolsHandler
-http\://drools.org/schema/drools-spring-1.4.0=org.kie.container.spring.namespace.SpringDroolsHandler
-http\://drools.org/schema/drools-spring-1.5.0=org.kie.container.spring.namespace.SpringDroolsHandler
-http\://drools.org/schema/drools-spring-1.6.0=org.kie.container.spring.namespace.SpringDroolsHandler
-http\://drools.org/schema/drools-spring-1.7.0=org.kie.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring-1.2.0=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring-1.3.0=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring-1.4.0=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring-1.5.0=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring-1.6.0=org.drools.container.spring.namespace.SpringDroolsHandler
+http\://drools.org/schema/drools-spring-1.7.0=org.drools.container.spring.namespace.SpringDroolsHandler

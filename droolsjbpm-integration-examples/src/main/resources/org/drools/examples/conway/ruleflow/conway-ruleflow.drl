@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.kie.examples.conway.ruleflow
+package org.drools.examples.conway.ruleflow
  
-import org.kie.examples.conway.Cell;
-import org.kie.examples.conway.CellGrid;
-import org.kie.examples.conway.Neighbor;
-import org.kie.examples.conway.Phase;
-import org.kie.examples.conway.CellState;
+import org.drools.examples.conway.Cell;
+import org.drools.examples.conway.CellGrid;
+import org.drools.examples.conway.Neighbor;
+import org.drools.examples.conway.Phase;
+import org.drools.examples.conway.CellState;
 
 import org.kie.WorkingMemory;
 import org.kie.common.InternalWorkingMemoryActions;

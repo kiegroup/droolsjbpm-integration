@@ -62,7 +62,7 @@ public class JxlsTest {
         InputStream inputXLS = new BufferedInputStream(getClass().getResourceAsStream( "departmentData.xls"));
         
         XLSReader mainReader = ReaderBuilder.buildFromXML( ResourceFactory.newClassPathResource( "departments.xml", getClass() ).getInputStream() );
-        Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.kie.runtime.pipeline.impl.Company() ]");
+        Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.drools.runtime.pipeline.impl.Company() ]");
         
         Callable callable = new CallableImpl();
 

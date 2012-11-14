@@ -570,7 +570,7 @@ public class PipelineFactory {
      * 
      * <pre>
      * XLSReader mainReader = ReaderBuilder.buildFromXML( ResourceFactory.newClassPathResource( "departments.xml", getClass() ).getInputStream() );
-     * Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.kie.runtime.pipeline.impl.Company() ]");
+     * Transformer transformer = PipelineFactory.newJxlsTransformer(mainReader, "[ 'departments' : new java.util.ArrayList(), 'company' : new org.drools.runtime.pipeline.impl.Company() ]");
      * </pre>
      * 
      * @param xlsReader
@@ -596,10 +596,10 @@ public class PipelineFactory {
 
     private static void loadCorePipelineProvider() {
         try {
-            Class<CorePipelineProvider> cls = (Class<CorePipelineProvider>) Class.forName( "org.kie.runtime.pipeline.impl.CorePipelineProviderImpl" );
+            Class<CorePipelineProvider> cls = (Class<CorePipelineProvider>) Class.forName( "org.drools.runtime.pipeline.impl.CorePipelineProviderImpl" );
             setCorePipelineProvider( cls.newInstance() );
         } catch ( Exception e2 ) {
-            throw new RuntimeException( "org.kie.runtime.pipeline.impl.CorePipelineProviderImpl could not be set.",
+            throw new RuntimeException( "org.drools.runtime.pipeline.impl.CorePipelineProviderImpl could not be set.",
                                                        e2 );
         }
     }
@@ -617,10 +617,10 @@ public class PipelineFactory {
 
     private static void loadJaxbTransformerProvider() {
         try {
-            Class<JaxbTransformerProvider> cls = (Class<JaxbTransformerProvider>) Class.forName( "org.kie.runtime.pipeline.impl.JaxbTransformerProviderImpl" );
+            Class<JaxbTransformerProvider> cls = (Class<JaxbTransformerProvider>) Class.forName( "org.drools.runtime.pipeline.impl.JaxbTransformerProviderImpl" );
             setJaxbTransformerProvider( cls.newInstance() );
         } catch ( Exception e2 ) {
-            throw new RuntimeException( "Provider org.kie.runtime.pipeline.impl.JaxbTransformerProviderImpl could not be set.",
+            throw new RuntimeException( "Provider org.drools.runtime.pipeline.impl.JaxbTransformerProviderImpl could not be set.",
                                                        e2 );
         }
     }
@@ -638,10 +638,10 @@ public class PipelineFactory {
 
     private static void loadSmooksTransformerProvider() {
         try {
-            Class<SmooksTransformerProvider> cls = (Class<SmooksTransformerProvider>) Class.forName( "org.kie.runtime.pipeline.impl.SmooksTransformerProviderImpl" );
+            Class<SmooksTransformerProvider> cls = (Class<SmooksTransformerProvider>) Class.forName( "org.drools.runtime.pipeline.impl.SmooksTransformerProviderImpl" );
             setSmooksTransformerProvider( cls.newInstance() );
         } catch ( Exception e2 ) {
-            throw new RuntimeException( "Provider org.kie.runtime.pipeline.impl.SmooksTransformerProviderImpl could not be set.",
+            throw new RuntimeException( "Provider org.drools.runtime.pipeline.impl.SmooksTransformerProviderImpl could not be set.",
                                                        e2 );
         }
     }
@@ -659,10 +659,10 @@ public class PipelineFactory {
 
     private static void loadXStreamTransformerProvider() {
         try {
-            Class<XStreamTransformerProvider> cls = (Class<XStreamTransformerProvider>) Class.forName( "org.kie.runtime.pipeline.impl.XStreamTransformerProviderImpl" );
+            Class<XStreamTransformerProvider> cls = (Class<XStreamTransformerProvider>) Class.forName( "org.drools.runtime.pipeline.impl.XStreamTransformerProviderImpl" );
             setXStreamTransformerProvider( cls.newInstance() );
         } catch ( Exception e2 ) {
-            throw new RuntimeException( "Provider org.kie.runtime.pipeline.impl.XStreamTransformerProviderImpl could not be set.",
+            throw new RuntimeException( "Provider org.drools.runtime.pipeline.impl.XStreamTransformerProviderImpl could not be set.",
                                                        e2 );
         }
     }
@@ -680,10 +680,10 @@ public class PipelineFactory {
 
     private static void loadJxlsTransformerProvider() {
         try {
-            Class<JxlsTransformerProvider> cls = (Class<JxlsTransformerProvider>) Class.forName( "org.kie.runtime.pipeline.impl.JxlsTransformer$JxlsTransformerProviderImpl" );
+            Class<JxlsTransformerProvider> cls = (Class<JxlsTransformerProvider>) Class.forName( "org.drools.runtime.pipeline.impl.JxlsTransformer$JxlsTransformerProviderImpl" );
             setJxlsTransformerProvider( cls.newInstance() );
         } catch ( Exception e2 ) {
-            throw new RuntimeException( "Provider org.kie.runtime.pipeline.impl.JxlsTransformer$JxlsTransformerProviderImpl could not be set.",
+            throw new RuntimeException( "Provider org.drools.runtime.pipeline.impl.JxlsTransformer$JxlsTransformerProviderImpl could not be set.",
                                                        e2 );
         }
     }
@@ -701,10 +701,10 @@ public class PipelineFactory {
 
     private static void loadJmsMessengerProvider() {
         try {
-            Class<JmsMessengerProvider> cls = (Class<JmsMessengerProvider>) Class.forName( "org.kie.runtime.pipeline.impl.JmsMessengerProviderImpl" );
+            Class<JmsMessengerProvider> cls = (Class<JmsMessengerProvider>) Class.forName( "org.drools.runtime.pipeline.impl.JmsMessengerProviderImpl" );
             setJmsMessengerProvider( cls.newInstance() );
         } catch ( Exception e2 ) {
-            throw new RuntimeException( "Provider org.kie.runtime.pipeline.impl.JmsMessengerProviderImpl could not be set.",
+            throw new RuntimeException( "Provider org.drools.runtime.pipeline.impl.JmsMessengerProviderImpl could not be set.",
                                                        e2 );
         }
     }

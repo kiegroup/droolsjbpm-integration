@@ -14,18 +14,18 @@
 
   <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="ds" />
-    <property name="persistenceUnitName" value="org.kie.persistence.jpa.local" />
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
   </bean>
 
   <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
     <property name="entityManagerFactory" ref="myEmf" />
   </bean>
 
-  <bean id="my-globals" class="org.kie.base.MapGlobalResolver"/>
-  <bean id="my-date-formats" class="org.kie.type.DateFormatsImpl"/>
-  <bean id="my-calendars" class="org.kie.base.CalendarsImpl"/>
+  <bean id="my-globals" class="org.drools.base.MapGlobalResolver"/>
+  <bean id="my-date-formats" class="org.drools.type.DateFormatsImpl"/>
+  <bean id="my-calendars" class="org.drools.base.CalendarsImpl"/>
 
-  <bean id="mock-custom-strategy" class="org.kie.container.spring.MockObjectMarshallingStrategy"/>
+  <bean id="mock-custom-strategy" class="org.drools.container.spring.MockObjectMarshallingStrategy"/>
 
   <drools:environment id="drools-env">
 
@@ -59,21 +59,21 @@
     </drools:transaction-manager>
 
     <drools:globals>
-      <bean class="org.kie.base.MapGlobalResolver"/>
+      <bean class="org.drools.base.MapGlobalResolver"/>
     </drools:globals>
 
     <drools:date-formats>
-      <bean class="org.kie.type.DateFormatsImpl"/>
+      <bean class="org.drools.type.DateFormatsImpl"/>
     </drools:date-formats>
 
     <drools:calendars>
-      <bean class="org.kie.base.CalendarsImpl"/>
+      <bean class="org.drools.base.CalendarsImpl"/>
     </drools:calendars>
 
     <drools:object-marshalling-strategies>
       <drools:serializable-placeholder-resolver-strategy>
         <drools:strategy-acceptor>
-          <bean class="org.kie.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+          <bean class="org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
             <constructor-arg>
               <list>
                 <value>*.*</value>
@@ -111,7 +111,7 @@
 
     <drools:object-marshalling-strategies>
       <drools:custom-marshalling-strategy>
-        <bean class="org.kie.container.spring.MockObjectMarshallingStrategy"/>
+        <bean class="org.drools.container.spring.MockObjectMarshallingStrategy"/>
       </drools:custom-marshalling-strategy>
     </drools:object-marshalling-strategies>
 
@@ -126,14 +126,14 @@
       <drools:identity-placeholder-resolver-strategy strategy-acceptor-ref="default-acceptor"/>
       <drools:jpa-placeholder-resolver-strategy env-ref="drools-env-embedded" />
       <drools:custom-marshalling-strategy>
-        <bean class="org.kie.container.spring.MockObjectMarshallingStrategy"/>
+        <bean class="org.drools.container.spring.MockObjectMarshallingStrategy"/>
       </drools:custom-marshalling-strategy>
       <drools:process-instance-resolver-strategy/>
     </drools:object-marshalling-strategies>
 
   </drools:environment>
 
-  <bean id="default-acceptor" class="org.kie.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+  <bean id="default-acceptor" class="org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
     <constructor-arg>
       <list>
         <value>*.*</value>

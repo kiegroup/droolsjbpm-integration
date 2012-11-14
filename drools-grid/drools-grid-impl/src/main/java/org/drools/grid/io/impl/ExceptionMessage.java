@@ -20,7 +20,7 @@ public class ExceptionMessage extends MessageImpl
     }
 
     /* (non-Javadoc)
-     * @see org.kie.grid.io.impl.Message#toString()
+     * @see org.drools.grid.io.impl.Message#toString()
      */
 
     @Override

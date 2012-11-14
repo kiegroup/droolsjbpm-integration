@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.kie.examples.broker
+package org.drools.examples.broker
 
-import org.kie.examples.broker.model.SuddenDropEvent
-import org.kie.examples.broker.model.PortfolioAction
-import org.kie.examples.broker.model.Action
+import org.drools.examples.broker.model.SuddenDropEvent
+import org.drools.examples.broker.model.PortfolioAction
+import org.drools.examples.broker.model.Action
 import java.util.Map
 import java.util.HashMap
 
-import function org.kie.examples.broker.misc.BrokerUtils.selectAction
+import function org.drools.examples.broker.misc.BrokerUtils.selectAction
 
 dialect "mvel"
 

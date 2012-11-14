@@ -63,10 +63,10 @@ public class CxfSoapTestWithLookup extends CamelSpringTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"salaboy\" disconnected=\"true\">\n";
-        cmd += "      <org.kie.springframework.Person2>\n";
+        cmd += "      <org.drools.springframework.Person2>\n";
         cmd += "         <name>salaboy</name>\n";
         cmd += "         <age>27</age>\n";
-        cmd += "      </org.kie.springframework.Person2>\n";
+        cmd += "      </org.drools.springframework.Person2>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
@@ -96,10 +96,10 @@ public class CxfSoapTestWithLookup extends CamelSpringTestSupport {
         String cmd2 = "";
         cmd2 += "<batch-execution lookup=\"ksession2\">\n";
         cmd2 += "  <insert out-identifier=\"salaboy\" disconnected=\"true\">\n";
-        cmd2 += "      <org.kie.springframework.Person3>\n";
+        cmd2 += "      <org.drools.springframework.Person3>\n";
         cmd2 += "         <name>salaboy</name>\n";
         cmd2 += "         <age>27</age>\n";
-        cmd2 += "      </org.kie.springframework.Person3>\n";
+        cmd2 += "      </org.drools.springframework.Person3>\n";
         cmd2 += "   </insert>\n";
         cmd2 += "   <fire-all-rules/>\n";
         cmd2 += "</batch-execution>\n";

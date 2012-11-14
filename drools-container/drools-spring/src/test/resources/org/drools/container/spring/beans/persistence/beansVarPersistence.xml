@@ -28,7 +28,7 @@
 
   <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="ds" />
-    <property name="persistenceUnitName" value="org.kie.persistence.jpa.local" />
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
   </bean>
 
   <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">

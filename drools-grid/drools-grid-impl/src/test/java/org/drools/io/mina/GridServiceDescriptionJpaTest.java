@@ -52,7 +52,7 @@ public class GridServiceDescriptionJpaTest {
     
     @Test
     public void test1() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         WhitePages wp = new WhitePagesImpl();
 
         GridServiceDescription<WhitePages> gsd1 = wp.create( WhitePages.class.getName(), "grid0" );

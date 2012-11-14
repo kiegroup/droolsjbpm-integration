@@ -53,7 +53,7 @@ public class SimulationTest {
         Simulation simulation = new SimulationImpl();
 
         String str = "";
-        str += "package org.kie \n";
+        str += "package org.drools \n";
         str += "import " + Person.class.getName() + ";\n"; 
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
@@ -153,7 +153,7 @@ public class SimulationTest {
         Simulation simulation = new SimulationImpl();
 
         String str = "";
-        str += "package org.kie \n";
+        str += "package org.drools \n";
         str += "import " + Person.class.getName() + ";\n";     
         str += "global java.util.List list \n";
         str += "rule rule1 \n";

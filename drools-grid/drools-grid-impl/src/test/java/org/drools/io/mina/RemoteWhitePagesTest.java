@@ -81,7 +81,7 @@ public class RemoteWhitePagesTest {
         conf.addConfiguration( socketConf );
 
         WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
-        wplConf.setWhitePages( new JpaWhitePages( Persistence.createEntityManagerFactory( "org.kie.grid" ) ) );
+        wplConf.setWhitePages( new JpaWhitePages( Persistence.createEntityManagerFactory( "org.drools.grid" ) ) );
         conf.addConfiguration( wplConf );
 
         socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), 8000 );

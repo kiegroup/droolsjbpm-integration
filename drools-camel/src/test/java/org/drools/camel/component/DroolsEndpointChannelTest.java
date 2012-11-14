@@ -90,7 +90,7 @@ public class DroolsEndpointChannelTest extends DroolsCamelTestSupport {
     @Override
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
+        rule += "package org.drools.pipeline.camel \n";
         rule += "rule rule1 \n";
         rule += "  when \n";
         rule += "    $p : Person( name == 'bob' ) \n";

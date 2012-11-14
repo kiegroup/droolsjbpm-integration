@@ -121,7 +121,7 @@ public class JaxbTest {
 //        ClassLoader classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
 //        
 //        Thread.currentThread().setContextClassLoader( classLoader );
-//        Unmarshaller unmarshaller = JAXBContext.newInstance( "org.kie.model.order" ).createUnmarshaller();
+//        Unmarshaller unmarshaller = JAXBContext.newInstance( "org.kie.drools.order" ).createUnmarshaller();
 //        Thread.currentThread().setContextClassLoader( originalClassLoader );
         
         Transformer transformer = PipelineFactory.newJaxbFromXmlTransformer( unmarshaller );
@@ -144,7 +144,7 @@ public class JaxbTest {
         assertEquals( 1,
                       list1.size() );
 
-        assertEquals( "org.kie.model.order.Order",
+        assertEquals( "org.kie.drools.order.Order",
                       list1.get( 0 ).getClass().getName() );
     }
 
@@ -212,10 +212,10 @@ public class JaxbTest {
         assertEquals( 1,
                       list2.size() );
 
-        assertEquals( "org.kie.model.order.Order$OrderItem",
+        assertEquals( "org.kie.drools.order.Order$OrderItem",
                       list1.get( 0 ).getClass().getName() );
 
-        assertEquals( "org.kie.model.order.Order$OrderItem",
+        assertEquals( "org.kie.drools.order.Order$OrderItem",
                       list2.get( 0 ).getClass().getName() );
 
         assertNotSame( list1.get( 0 ),

@@ -57,7 +57,7 @@ public class GridNodeImpl
     }
 
     /*
-     * (non-Javadoc) @see org.kie.grid.GridNode#get(java.lang.String,
+     * (non-Javadoc) @see org.drools.grid.GridNode#get(java.lang.String,
      * java.lang.Class)
      */
     public <T> T get(String identifier,
@@ -123,7 +123,7 @@ public class GridNodeImpl
     }
 
     /*
-     * (non-Javadoc) @see org.kie.grid.GridNode#get(java.lang.Class)
+     * (non-Javadoc) @see org.drools.grid.GridNode#get(java.lang.Class)
      */
     public <T> T get(Class<T> serviceClass) {
         return get(serviceClass.getName(),
@@ -131,7 +131,7 @@ public class GridNodeImpl
     }
 
     /*
-     * (non-Javadoc) @see org.kie.grid.GridNode#set(java.lang.String,
+     * (non-Javadoc) @see org.drools.grid.GridNode#set(java.lang.String,
      * java.lang.Object)
      */
     public void set(String identifier,
@@ -165,7 +165,7 @@ public class GridNodeImpl
     }
 
     /*
-     * (non-Javadoc) @see org.kie.grid.GridNode#getId()
+     * (non-Javadoc) @see org.drools.grid.GridNode#getId()
      */
     public String getId() {
         return id;

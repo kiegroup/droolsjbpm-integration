@@ -26,16 +26,16 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-//import org.kie.grid.ConnectionFactoryService;
-//import org.kie.grid.Grid;
-//import org.kie.grid.GridConnection;
-//import org.kie.grid.GridNode;
-//import org.kie.grid.GridServiceDescription;
-//import org.kie.grid.SocketService;
-//import org.kie.grid.service.directory.WhitePages;
-//import org.kie.grid.service.directory.impl.JpaWhitePages;
-//import org.kie.grid.service.directory.impl.WhitePagesClient;
-//import org.kie.grid.service.directory.impl.WhitePagesImpl;
+//import org.drools.grid.ConnectionFactoryService;
+//import org.drools.grid.Grid;
+//import org.drools.grid.GridConnection;
+//import org.drools.grid.GridNode;
+//import org.drools.grid.GridServiceDescription;
+//import org.drools.grid.SocketService;
+//import org.drools.grid.service.directory.WhitePages;
+//import org.drools.grid.service.directory.impl.JpaWhitePages;
+//import org.drools.grid.service.directory.impl.WhitePagesClient;
+//import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.drools.io.impl.ByteArrayResource;
 import org.junit.Assert;
 import org.kie.KnowledgeBase;
@@ -58,7 +58,7 @@ public class SpringDroolsGridTest {
 
 //    @Test
 //    public void test1() {
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
+//        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
 //        WhitePages wp = new JpaWhitePages( emf );
 //
 //        wp.create( "s1" );
@@ -88,7 +88,7 @@ public class SpringDroolsGridTest {
 //        assertNotNull( kbuilder );
 //
 //        String rule = "package test\n"
-//                      + "import org.kie.container.spring.SpringDroolsGridTest.MyObject;\n"
+//                      + "import org.drools.container.spring.SpringDroolsGridTest.MyObject;\n"
 //                      + "global MyObject myGlobalObj;\n"
 //                      + "rule \"test\""
 //                      + "  when"

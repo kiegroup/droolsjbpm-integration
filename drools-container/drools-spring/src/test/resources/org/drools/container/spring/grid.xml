@@ -15,12 +15,12 @@
   </bean>
 
   <bean id="myEmf" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
-       <property name="persistenceUnitName" value="org.kie.grid"/>
+       <property name="persistenceUnitName" value="org.drools.grid"/>
   </bean>
 
   <!--bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="ds" />
-    <property name="persistenceUnitName" value="org.kie.grid" />
+    <property name="persistenceUnitName" value="org.drools.grid" />
       <property name="hibernateProperties">
         <value>
           hibernate.dialect=org.hibernate.dialect.MySQLDialect
@@ -41,7 +41,7 @@
 
     <bean id="shared-map" class="java.util.HashMap" />
     
-    <bean id="localWhitePages" class="org.kie.grid.service.directory.impl.WhitePagesImpl" />
+    <bean id="localWhitePages" class="org.drools.grid.service.directory.impl.WhitePagesImpl" />
 
     <drools:grid id="grid1">
      <drools:core-services ref="shared-map" />
@@ -53,7 +53,7 @@
      </drools:whitepages>
 
      <drools:socket-service acceptor="mina" ip="127.0.0.1">
-        <drools:service name="org.kie.grid.service.directory.WhitePages" port="8000" />
+        <drools:service name="org.drools.grid.service.directory.WhitePages" port="8000" />
      </drools:socket-service>
     </drools:grid>
     

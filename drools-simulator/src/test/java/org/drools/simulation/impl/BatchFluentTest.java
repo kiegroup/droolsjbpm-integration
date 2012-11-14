@@ -86,7 +86,7 @@ public class BatchFluentTest {
     }
 
     private StatelessKnowledgeSession createStatelessSession() {
-        String str = "package org.kie.simulation.test\n"
+        String str = "package org.drools.simulation.test\n"
                 + "import " + Person.class.getName() + "\n"
                 + "global java.util.List list\n"
                 + "rule updateAge no-loop\n"

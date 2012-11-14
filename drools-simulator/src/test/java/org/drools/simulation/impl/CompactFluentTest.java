@@ -77,7 +77,7 @@ public class CompactFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.kie.simulation.test\n" +
+        String str = "package org.drools.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
@@ -145,7 +145,7 @@ public class CompactFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.kie.simulation.test\n" +
+        String str = "package org.drools.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
@@ -234,11 +234,11 @@ public class CompactFluentTest {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str1 = "package org.kie.simulation.test\n" +
+        String str1 = "package org.drools.simulation.test\n" +
                       "import " + Person.class.getName() + "\n" +
                       "rule updateAge1 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
-        String str2 = "package org.kie.simulation.test\n" +
+        String str2 = "package org.drools.simulation.test\n" +
                       "import " + Person.class.getName() + "\n" +
                       "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";
 

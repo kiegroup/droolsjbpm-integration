@@ -70,7 +70,7 @@
     </cxf:properties>
   </cxf:cxfEndpoint>
 
-  <bean id="droolsPolicy" class="org.kie.camel.component.DroolsPolicy" />
+  <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />
 
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
 

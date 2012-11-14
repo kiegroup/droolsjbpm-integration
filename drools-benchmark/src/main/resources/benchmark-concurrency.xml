@@ -2,47 +2,47 @@
 
   <benchmark description="Create 1M stateless sessions"
              warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="false"
-             classname="org.kie.benchmark.benchmarks.StatelessSessionCreation">
+             classname="org.drools.benchmark.benchmarks.StatelessSessionCreation">
     <arg>1000000</arg>
   </benchmark>
 
   <benchmark description="Create and dispose 10K stateful sessions"
              warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="false"
-             classname="org.kie.benchmark.benchmarks.StatefulSessionCreation">
+             classname="org.drools.benchmark.benchmarks.StatefulSessionCreation">
     <arg>10000</arg>
   </benchmark>
 
   <benchmark description="Insert and retract 100K objects with a non-firing rule having a simple literal constraint"
              warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="false"
-             classname="org.kie.benchmark.benchmarks.InsertAllAndRetract">
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
     <arg>100000</arg>
     <arg>literalConstraintNonFiringRule.drl</arg>
   </benchmark>
 
   <benchmark description="Insert and retract 100K objects with a firing rule having a simple literal constraint"
              warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="false"
-             classname="org.kie.benchmark.benchmarks.InsertAllAndRetract">
+             classname="org.drools.benchmark.benchmarks.InsertAllAndRetract">
     <arg>100000</arg>
     <arg>literalConstraintFiringRule.drl</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 1M objects a non-firing rule having a simple literal constraint"
              warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="false"
-             classname="org.kie.benchmark.benchmarks.InsertAndRetractInTurn">
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
     <arg>1000000</arg>
     <arg>literalConstraintNonFiringRule.drl</arg>
   </benchmark>
 
   <benchmark description="Insert and retract each one in turn 1M objects a firing rule having a simple literal constraint"
              warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="false"
-             classname="org.kie.benchmark.benchmarks.InsertAndRetractInTurn">
+             classname="org.drools.benchmark.benchmarks.InsertAndRetractInTurn">
     <arg>1000000</arg>
     <arg>literalConstraintFiringRule.drl</arg>
   </benchmark>
 
     <benchmark description="Complex Event Processing"
                warmups="2" repetitions="1" parallel-threads="1,2,4" enabled="true"
-               classname="org.kie.benchmark.benchmarks.CepBenchmark">
+               classname="org.drools.benchmark.benchmarks.CepBenchmark">
         <arg>500000</arg>
     </benchmark>
 </benchmarks>

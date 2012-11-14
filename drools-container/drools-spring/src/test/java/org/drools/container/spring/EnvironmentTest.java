@@ -102,7 +102,7 @@ public class EnvironmentTest {
         assertNotNull(environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES));
         ObjectMarshallingStrategy[] objectMarshallingStrategies = (ObjectMarshallingStrategy[]) environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES);
         assertEquals(1, objectMarshallingStrategies.length);
-        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.kie.container.spring.MockObjectMarshallingStrategy");
+        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.drools.container.spring.MockObjectMarshallingStrategy");
     }
 
     @Test
@@ -112,7 +112,7 @@ public class EnvironmentTest {
 
         ObjectMarshallingStrategy[] objectMarshallingStrategies = (ObjectMarshallingStrategy[]) environment.get(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES);
         assertEquals(1, objectMarshallingStrategies.length);
-        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.kie.container.spring.MockObjectMarshallingStrategy");
+        assertEquals(objectMarshallingStrategies[0].getClass().getName(), "org.drools.container.spring.MockObjectMarshallingStrategy");
     }
 
     @Test

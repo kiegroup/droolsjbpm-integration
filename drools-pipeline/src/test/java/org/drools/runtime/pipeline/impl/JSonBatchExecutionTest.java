@@ -109,9 +109,9 @@ public class JSonBatchExecutionTest {
     public void testListenForChanges() throws Exception {
 
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
-        str += "import org.kie.ChangeCollector \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
+        str += "import org.drools.ChangeCollector \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese(price==25) \n";
@@ -159,7 +159,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -171,8 +171,8 @@ public class JSonBatchExecutionTest {
 
         inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "   {\"insert\":{\"object\":{\"org.kie.Person\":{\"name\":\"mic\"} }, \"out-identifier\":\"person\" } }";
-        inXml += ",  {\"insert\":{\"object\":{\"org.kie.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";
+        inXml += "   {\"insert\":{\"object\":{\"org.drools.Person\":{\"name\":\"mic\"} }, \"out-identifier\":\"person\" } }";
+        inXml += ",  {\"insert\":{\"object\":{\"org.drools.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";
         inXml += ",  {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -192,8 +192,8 @@ public class JSonBatchExecutionTest {
 
         inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "   {\"insert\":{\"object\":{\"org.kie.Person\":{\"name\":\"mark\"} }, \"out-identifier\":\"person\" } }";
-        inXml += ",  {\"insert\":{\"object\":{\"org.kie.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";
+        inXml += "   {\"insert\":{\"object\":{\"org.drools.Person\":{\"name\":\"mark\"} }, \"out-identifier\":\"person\" } }";
+        inXml += ",  {\"insert\":{\"object\":{\"org.drools.ChangeCollector\":{} }, \"out-identifier\":\"changes\" } }";
         inXml += ",  {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -215,8 +215,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testInsertWithDefaults() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -227,7 +227,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -253,15 +253,15 @@ public class JSonBatchExecutionTest {
                       stilton.getPrice() );
 
 //        String expectedXml = "";
-//        expectedXml = "{\"execution-results\":{\"results\":{\"outStilton\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"oldPrice\":0,\"price\":30}}},\"fact-handles\":{\"outStilton\":\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\"}}}";
+//        expectedXml = "{\"execution-results\":{\"results\":{\"outStilton\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"oldPrice\":0,\"price\":30}}},\"fact-handles\":{\"outStilton\":\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\"}}}";
 //        String expectedXml = "";
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier=\"outStilton\">\n";
-//        expectedXml += "    <org.kie.Cheese>\n";
+//        expectedXml += "    <org.drools.Cheese>\n";
 //        expectedXml += "      <type>stilton</type>\n";
 //        expectedXml += "      <oldPrice>0</oldPrice>\n";
 //        expectedXml += "      <price>30</price>\n";
-//        expectedXml += "    </org.kie.Cheese>\n";
+//        expectedXml += "    </org.drools.Cheese>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
 //        expectedXml += "</execution-results>\n";
@@ -274,8 +274,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -286,7 +286,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"return-object\":false, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"return-object\":false, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -319,8 +319,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testGetObject() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -331,7 +331,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":{\"max\":10}}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -375,8 +375,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testRetractObject() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -387,7 +387,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":{\"max\":10}}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -433,8 +433,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testModifyObject() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -445,7 +445,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -468,11 +468,11 @@ public class JSonBatchExecutionTest {
 //        String expectedXml = "";
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier=\"outStilton\">\n";
-//        expectedXml += "    <org.kie.Cheese>\n";
+//        expectedXml += "    <org.drools.Cheese>\n";
 //        expectedXml += "      <type>stilton</type>\n";
 //        expectedXml += "      <oldPrice>0</oldPrice>\n";
 //        expectedXml += "      <price>30</price>\n";
-//        expectedXml += "    </org.kie.Cheese>\n";
+//        expectedXml += "    </org.drools.Cheese>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + factHandle.toExternalForm() + "\" /> \n";
 //        expectedXml += "</execution-results>\n";
@@ -532,8 +532,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testInsertElements() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -550,8 +550,8 @@ public class JSonBatchExecutionTest {
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
         inXml += ",  {\"insert-elements\":{\"objects\":[";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -567,16 +567,16 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier='list'>\n";
 //        expectedXml += "    <list>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>35</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>30</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
 //        expectedXml += "    </list>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "</execution-results>\n";
@@ -603,8 +603,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testFactHandleReturn() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -657,8 +657,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -675,8 +675,8 @@ public class JSonBatchExecutionTest {
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
         inXml += ",  {\"insert-elements\":{\"out-identifier\":\"myfacts\",\"return-objects\":true,\"objects\":[";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
@@ -714,23 +714,23 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier='list'>\n";
 //        expectedXml += "    <list>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>35</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>30</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
 //        expectedXml += "    </list>\n";
 //        expectedXml += "  </result>\n";
 //
 //        expectedXml += "  <result identifier=\"myfacts\">\n";
 //        expectedXml += "  <list>\n";
-//        expectedXml += "    <org.kie.Cheese reference=\"../../../result/list/org.kie.Cheese[2]\"/>\n";
-//        expectedXml += "    <org.kie.Cheese reference=\"../../../result/list/org.kie.Cheese\"/>\n";
+//        expectedXml += "    <org.drools.Cheese reference=\"../../../result/list/org.drools.Cheese[2]\"/>\n";
+//        expectedXml += "    <org.drools.Cheese reference=\"../../../result/list/org.drools.Cheese\"/>\n";
 //        expectedXml += "  </list>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <fact-handles identifier=\"myfacts\">\n";
@@ -756,8 +756,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testSetGlobal() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "global java.util.List list2 \n";
         str += "global java.util.List list3 \n";
@@ -783,7 +783,7 @@ public class JSonBatchExecutionTest {
         inXml += ", {\"set-global\":{\"identifier\":\"list3\",\"out-identifier\"=\"outList3\"";
         inXml += "                  ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "} } ";
-        inXml += ", {\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":5}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += ", {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":5}}, \"out-identifier\":\"outStilton\" } }";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
 
@@ -799,16 +799,16 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier='list2'>\n";
 //        expectedXml += "    <list>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>30</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
 //        expectedXml += "    </list>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <result identifier='outList3'>\n";
 //        expectedXml += "    <list>\n";
-//        expectedXml += "      <org.kie.Cheese reference='../../../result/list/org.kie.Cheese'/>\n";
+//        expectedXml += "      <org.drools.Cheese reference='../../../result/list/org.drools.Cheese'/>\n";
 //        expectedXml += "    </list>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "</execution-results>\n";
@@ -838,8 +838,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testGetGlobal() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -854,7 +854,7 @@ public class JSonBatchExecutionTest {
         inXml += "   {\"set-global\":{\"identifier\":\"list1\",\"out\"=true";
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
-        inXml += ",  {\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += ",  {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ",  {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\"=\"out-list\"}}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -876,11 +876,11 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier=\"out-list\">\n";
 //        expectedXml += "    <list>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>25</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
 //        expectedXml += "    </list>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "</execution-results>\n";
@@ -892,8 +892,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testGetObjects() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -905,8 +905,8 @@ public class JSonBatchExecutionTest {
         String inXml ="";
         inXml =  "{\"batch-execution\":{\"commands\":[";
         inXml += "  {\"insert-elements\":{\"objects\":[";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
         inXml += ",  {\"get-objects\":{\"out-identifier\":\"list1\"}}";
         inXml += "]}}";
@@ -923,16 +923,16 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "<execution-results>";
 //        expectedXml += "  <result identifier='list'>";
 //        expectedXml += "    <list>";
-//        expectedXml += "      <org.kie.Cheese>";
+//        expectedXml += "      <org.drools.Cheese>";
 //        expectedXml += "        <type>stilton</type>";
 //        expectedXml += "        <price>30</price>";
 //        expectedXml += "        <oldPrice>0</oldPrice>";
-//        expectedXml += "      </org.kie.Cheese>";
-//        expectedXml += "      <org.kie.Cheese>";
+//        expectedXml += "      </org.drools.Cheese>";
+//        expectedXml += "      <org.drools.Cheese>";
 //        expectedXml += "        <type>stilton</type>";
 //        expectedXml += "        <price>35</price>";
 //        expectedXml += "        <oldPrice>0</oldPrice>";
-//        expectedXml += "      </org.kie.Cheese>";
+//        expectedXml += "      </org.drools.Cheese>";
 //        expectedXml += "    </list>";
 //        expectedXml += "  </result>";
 //        expectedXml += "</execution-results>";
@@ -959,8 +959,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testQuery() throws Exception {
         String str = "";
-        str += "package org.kie.test  \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools.test  \n";
+        str += "import org.drools.Cheese \n";
         str += "query cheeses \n";
         str += "    stilton : Cheese(type == 'stilton') \n";
         str += "    cheddar : Cheese(type == 'cheddar', price == stilton.price) \n";
@@ -973,10 +973,10 @@ public class JSonBatchExecutionTest {
         String inXml ="";
         inXml =  "{\"batch-execution\":{\"commands\":[";
         inXml += "  {\"insert-elements\":{\"objects\":[";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":2}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"cheddar\",\"price\":1}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"cheddar\",\"price\":2}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":1}}  ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":2}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"cheddar\",\"price\":1}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"cheddar\",\"price\":2}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":1}}  ";
         inXml += "   ]}}";
         inXml += ",  {\"query\":{\"out-identifier\":\"cheeses\",\"name\":\"cheeses\"}}";
         inXml += "]}}";
@@ -1004,32 +1004,32 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "      </identifiers>\n";
 //        expectedXml += "      <row>\n";
 //        row = it1.next();
-//        expectedXml += "        <org.kie.Cheese>\n";
+//        expectedXml += "        <org.drools.Cheese>\n";
 //        expectedXml += "          <type>stilton</type>\n";
 //        expectedXml += "          <price>1</price>\n";
 //        expectedXml += "          <oldPrice>0</oldPrice>\n";
-//        expectedXml += "        </org.kie.Cheese>\n";
+//        expectedXml += "        </org.drools.Cheese>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-//        expectedXml += "        <org.kie.Cheese>\n";
+//        expectedXml += "        <org.drools.Cheese>\n";
 //        expectedXml += "          <type>cheddar</type>\n";
 //        expectedXml += "          <price>1</price>\n";
 //        expectedXml += "          <oldPrice>0</oldPrice>\n";
-//        expectedXml += "        </org.kie.Cheese>\n";
+//        expectedXml += "        </org.drools.Cheese>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
 //        expectedXml += "      </row>\n";
 //        expectedXml += "      <row>\n";
 //        row = it1.next();
-//        expectedXml += "        <org.kie.Cheese>\n";
+//        expectedXml += "        <org.drools.Cheese>\n";
 //        expectedXml += "          <type>stilton</type>\n";
 //        expectedXml += "          <price>2</price>\n";
 //        expectedXml += "          <oldPrice>0</oldPrice>\n";
-//        expectedXml += "        </org.kie.Cheese>\n";
+//        expectedXml += "        </org.drools.Cheese>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-//        expectedXml += "        <org.kie.Cheese>\n";
+//        expectedXml += "        <org.drools.Cheese>\n";
 //        expectedXml += "          <type>cheddar</type>\n";
 //        expectedXml += "          <price>2</price>\n";
 //        expectedXml += "          <oldPrice>0</oldPrice>\n";
-//        expectedXml += "        </org.kie.Cheese>\n";
+//        expectedXml += "        </org.drools.Cheese>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
 //        expectedXml += "      </row>\n";
 //        expectedXml += "    </query-results>\n";
@@ -1042,16 +1042,16 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "      </identifiers>\n";
 //        expectedXml += "      <row>\n";
 //        row = it2.next();
-//        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row/org.kie.Cheese\"/>\n";
+//        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row/org.drools.Cheese\"/>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-//        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row/org.kie.Cheese[2]\"/>\n";
+//        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row/org.drools.Cheese[2]\"/>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
 //        expectedXml += "      </row>\n";
 //        expectedXml += "      <row>\n";
 //        row = it2.next();
-//        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row[2]/org.kie.Cheese\"/>\n";
+//        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.Cheese\"/>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-//        expectedXml += "        <org.kie.Cheese reference=\"../../../../result/query-results/row[2]/org.kie.Cheese[2]\"/>\n";
+//        expectedXml += "        <org.drools.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.Cheese[2]\"/>\n";
 //        expectedXml += "        <fact-handle externalForm='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
 //        expectedXml += "      </row>\n";
 //        expectedXml += "    </query-results>\n";
@@ -1103,8 +1103,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testManualFireAllRules() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -1121,11 +1121,11 @@ public class JSonBatchExecutionTest {
         inXml += "                   ,\"object\":{\"list\":{\"object\":[]}}";
         inXml += "   } } "; //        
         inXml += ",  {\"insert-elements\":{\"objects\":[";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
-        inXml += "   {   \"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, ";
+        inXml += "   {   \"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":30,\"oldPrice\":0}} ";
         inXml += "   ]}}";
         inXml += ", {\"fire-all-rules\":\"\"}";
-        inXml += ", {\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"brie\",\"price\":10,\"oldPrice\":0}}, \"out-identifier\":\"outBrie\" } }";
+        inXml += ", {\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"brie\",\"price\":10,\"oldPrice\":0}}, \"out-identifier\":\"outBrie\" } }";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
         
@@ -1141,24 +1141,24 @@ public class JSonBatchExecutionTest {
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier='list'>\n";
 //        expectedXml += "    <list>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>35</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
-//        expectedXml += "      <org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
+//        expectedXml += "      <org.drools.Cheese>\n";
 //        expectedXml += "        <type>stilton</type>\n";
 //        expectedXml += "        <price>30</price>\n";
 //        expectedXml += "        <oldPrice>0</oldPrice>\n";
-//        expectedXml += "      </org.kie.Cheese>\n";
+//        expectedXml += "      </org.drools.Cheese>\n";
 //        expectedXml += "    </list>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <result identifier='outBrie'>\n";
-//        expectedXml += "    <org.kie.Cheese>\n";
+//        expectedXml += "    <org.drools.Cheese>\n";
 //        expectedXml += "      <type>brie</type>\n";
 //        expectedXml += "      <price>10</price>\n";
 //        expectedXml += "      <oldPrice>5</oldPrice>\n";
-//        expectedXml += "    </org.kie.Cheese>\n";
+//        expectedXml += "    </org.drools.Cheese>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <fact-handle identifier=\"outBrie\" externalForm=\"" + factHandle.toExternalForm() + "\" /> \n";
 //        expectedXml += "</execution-results>\n";
@@ -1200,18 +1200,18 @@ public class JSonBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <imports>\n";
-        str += "      <import name=\"org.kie.TestVariable\" />\n";
+        str += "      <import name=\"org.drools.TestVariable\" />\n";
         str += "    </imports>\n";
         str += "    <globals>\n";
         str += "      <global identifier=\"list1\" type=\"java.util.List\" />\n";
         str += "    </globals>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"person\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1251,10 +1251,10 @@ public class JSonBatchExecutionTest {
         String inXml = "";
         inXml += "{\"batch-execution\":{\"commands\":[";
         inXml += "   {\"start-process\":";
-        inXml += "      {\"process-id\":\"org.kie.actions\",";
+        inXml += "      {\"process-id\":\"org.drools.actions\",";
         inXml += "     \"parameters\":[";
         inXml += "        {\"identifier\":\"person\",";
-        inXml += "         \"object\":{\"@class\":\"org.kie.TestVariable\",";
+        inXml += "         \"object\":{\"@class\":\"org.drools.TestVariable\",";
         inXml += "                     \"name\":\"John Doe\"}}]}},";
         inXml += "    {\"get-global\":{\"identifier\":\"list1\",\"out-identifier\":\"out-list\"}}]}}";
         inXml = roundTripFromXml( inXml );
@@ -1295,12 +1295,12 @@ public class JSonBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1361,12 +1361,12 @@ public class JSonBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1428,22 +1428,22 @@ public class JSonBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.Person\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1453,25 +1453,25 @@ public class JSonBatchExecutionTest {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1508,7 +1508,7 @@ public class JSonBatchExecutionTest {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1545,7 +1545,7 @@ public class JSonBatchExecutionTest {
         person.setName( "Jane Doe" );
         parameters.put( "Person",
                         person );
-        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
+        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
                                                                            parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1589,22 +1589,22 @@ public class JSonBatchExecutionTest {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.Person\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1614,25 +1614,25 @@ public class JSonBatchExecutionTest {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1669,7 +1669,7 @@ public class JSonBatchExecutionTest {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1811,8 +1811,8 @@ public class JSonBatchExecutionTest {
     @Test
     public void testVsmPipeline() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -1823,7 +1823,7 @@ public class JSonBatchExecutionTest {
 
         String inXml = "";
         inXml += "{\"batch-execution\":{\"lookup\":\"ksession1\", \"commands\":[";
-        inXml += "{\"insert\":{\"object\":{\"org.kie.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
+        inXml += "{\"insert\":{\"object\":{\"org.drools.Cheese\":{\"type\":\"stilton\",\"price\":25,\"oldPrice\":0}}, \"out-identifier\":\"outStilton\" } }";
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
         inXml = roundTripFromXml( inXml );
@@ -1859,11 +1859,11 @@ public class JSonBatchExecutionTest {
 //        String expectedXml = "";
 //        expectedXml += "<execution-results>\n";
 //        expectedXml += "  <result identifier=\"outStilton\">\n";
-//        expectedXml += "    <org.kie.Cheese>\n";
+//        expectedXml += "    <org.drools.Cheese>\n";
 //        expectedXml += "      <type>stilton</type>\n";
 //        expectedXml += "      <oldPrice>0</oldPrice>\n";
 //        expectedXml += "      <price>30</price>\n";
-//        expectedXml += "    </org.kie.Cheese>\n";
+//        expectedXml += "    </org.drools.Cheese>\n";
 //        expectedXml += "  </result>\n";
 //        expectedXml += "  <fact-handle identifier=\"outStilton\" externalForm=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
 //        expectedXml += "</execution-results>\n";

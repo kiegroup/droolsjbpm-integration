@@ -3,23 +3,23 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
                  version="1.0">
-  <entity class="org.kie.grid.service.directory.impl.AddressImpl" access="FIELD">
+  <entity class="org.drools.grid.service.directory.impl.AddressImpl" access="FIELD">
       <table name="Address"/>
 
       <attributes>
           <id name="addressId">
           </id>
-          <many-to-one name="gridServiceDescription" target-entity="org.kie.grid.service.directory.impl.GridServiceDescriptionImpl" />
+          <many-to-one name="gridServiceDescription" target-entity="org.drools.grid.service.directory.impl.GridServiceDescriptionImpl" />
       </attributes>
   </entity>
   
-  <entity class="org.kie.grid.service.directory.impl.GridServiceDescriptionImpl" access="FIELD">
+  <entity class="org.drools.grid.service.directory.impl.GridServiceDescriptionImpl" access="FIELD">
       <table name="GridServiceDescription"/>
 
       <attributes>
           <id name="descId" />
           <basic name="ownerGridId" />
-          <one-to-many name="addresses" mapped-by="gridServiceDescription" target-entity="org.kie.grid.service.directory.impl.AddressImpl" fetch="EAGER" >
+          <one-to-many name="addresses" mapped-by="gridServiceDescription" target-entity="org.drools.grid.service.directory.impl.AddressImpl" fetch="EAGER" >
               <map-key name="transport" /> 
               <cascade>
                   <cascade-all/>
@@ -29,7 +29,7 @@
       </attributes>
   </entity>  
   
-  <entity class="org.kie.grid.timer.impl.ScheduledJob" access="FIELD">
+  <entity class="org.drools.grid.timer.impl.ScheduledJob" access="FIELD">
       <table name="ScheduledJob"/>
 
       <attributes>

@@ -1,4 +1,4 @@
-package org.kie.container.spring.u
+package org.drools.container.spring.u
 
 rule "sample acçéntèd rule"
 	@output("\"Hello world!\"")

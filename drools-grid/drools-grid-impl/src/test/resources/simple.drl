@@ -1,5 +1,5 @@
 package test;
-import org.kie.grid.NodeTests.MyObject;
+import org.drools.grid.NodeTests.MyObject;
 rule "test2"
     when
         $o: MyObject( name == "obj2")

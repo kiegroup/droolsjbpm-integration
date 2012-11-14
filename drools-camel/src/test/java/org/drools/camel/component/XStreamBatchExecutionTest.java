@@ -43,7 +43,6 @@ import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
-import org.drools.container.spring.beans.persistence.TestWorkItemHandler;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
 import org.drools.impl.KnowledgeBaseImpl;
@@ -156,9 +155,9 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     public void testListenForChanges() throws Exception {
 
         String str = "";
-        str += "package org.kie.camel.testdomain \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
-        str += "import org.kie.camel.testdomain.ChangeCollector \n";
+        str += "package org.drools.camel.testdomain \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
+        str += "import org.drools.camel.testdomain.ChangeCollector \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese(price==25) \n";
@@ -207,11 +206,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -229,12 +228,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='person'>";
-        inXml += "    <org.kie.camel.testdomain.Person>";
+        inXml += "    <org.drools.camel.testdomain.Person>";
         inXml += "      <name>mic</name>";
-        inXml += "    </org.kie.camel.testdomain.Person>";
+        inXml += "    </org.drools.camel.testdomain.Person>";
         inXml += "  </insert>";
         inXml += "  <insert out-identifier='changes'>";
-        inXml += "    <org.kie.camel.testdomain.ChangeCollector/>";
+        inXml += "    <org.drools.camel.testdomain.ChangeCollector/>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -248,12 +247,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='person'>";
-        inXml += "    <org.kie.camel.testdomain.Person>";
+        inXml += "    <org.drools.camel.testdomain.Person>";
         inXml += "      <name>mark</name>";
-        inXml += "    </org.kie.camel.testdomain.Person>";
+        inXml += "    </org.drools.camel.testdomain.Person>";
         inXml += "  </insert>";
         inXml += "  <insert out-identifier='changes'>";
-        inXml += "    <org.kie.camel.testdomain.ChangeCollector/>";
+        inXml += "    <org.drools.camel.testdomain.ChangeCollector/>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -269,8 +268,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testInsertWithDefaults() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -282,11 +281,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -313,11 +312,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "    <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "    </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -329,8 +328,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testInsertWithReturnObjectFalse() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -342,11 +341,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton' return-object='false'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -380,8 +379,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testGetObject() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -393,11 +392,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -435,8 +434,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testRetractObject() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -448,11 +447,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -497,8 +496,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testModifyObject() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -510,11 +509,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -537,11 +536,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "    <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "    </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + factHandle.toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -600,8 +599,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testInsertElements() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -618,16 +617,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "</batch-execution>";
 
@@ -642,16 +641,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "</execution-results>\n";
@@ -680,8 +679,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testFactHandleReturn() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -723,8 +722,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testInsertElementsWithReturnObjects() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -741,16 +740,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements out-identifier='myfacts' return-objects='true'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "  <fire-all-rules/>";
         inXml += "</batch-execution>";
@@ -768,23 +767,23 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
 
         expectedXml += "  <result identifier=\"myfacts\">\n";
         expectedXml += "  <list>\n";
-        expectedXml += "    <org.kie.camel.testdomain.Cheese reference=\"../../../result/list/org.kie.camel.testdomain.Cheese[2]\"/>\n";
-        expectedXml += "    <org.kie.camel.testdomain.Cheese reference=\"../../../result/list/org.kie.camel.testdomain.Cheese\"/>\n";
+        expectedXml += "    <org.drools.camel.testdomain.Cheese reference=\"../../../result/list/org.drools.camel.testdomain.Cheese[2]\"/>\n";
+        expectedXml += "    <org.drools.camel.testdomain.Cheese reference=\"../../../result/list/org.drools.camel.testdomain.Cheese\"/>\n";
         expectedXml += "  </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handles identifier=\"myfacts\">\n";
@@ -825,8 +824,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testSetGlobal() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list1 \n";
         str += "global java.util.List list2 \n";
         str += "global java.util.List list3 \n";
@@ -853,11 +852,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>5</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "  </org.kie.camel.testdomain.Cheese>";
+        inXml += "  </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "</batch-execution>";
 
@@ -872,16 +871,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list2'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <result identifier='outList3'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese reference='../../../result/list/org.kie.camel.testdomain.Cheese'/>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese reference='../../../result/list/org.drools.camel.testdomain.Cheese'/>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "</execution-results>\n";
@@ -911,8 +910,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testGetGlobal() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -928,11 +927,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <get-global identifier='list' out-identifier='out-list'/>";
         inXml += "</batch-execution>";
@@ -948,11 +947,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"out-list\">\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>25</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "</execution-results>\n";
@@ -965,8 +964,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void FIXME_testQuery() throws Exception {
         String str = "";
-        str += "package org.kie.test  \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools.test  \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "query cheeses \n";
         str += "    stilton : Cheese(type == 'stilton') \n";
         str += "    cheddar : Cheese(type == 'cheddar', price == stilton.price) \n";
@@ -979,32 +978,32 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>1</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <insert>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>2</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <insert>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>cheddar</type>";
         inXml += "      <price>1</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <insert>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>cheddar</type>";
         inXml += "      <price>2</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "  <query out-identifier='cheeses' name='cheeses'/>";
         inXml += "  <query out-identifier='cheeses2' name='cheesesWithParams'>";
@@ -1035,32 +1034,32 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "      </identifiers>\n";
         expectedXml += "      <row>\n";
         row = it1.next();
-        expectedXml += "        <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "          <type>stilton</type>\n";
         expectedXml += "          <price>1</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "          <type>cheddar</type>\n";
         expectedXml += "          <price>1</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "      <row>\n";
         row = it1.next();
-        expectedXml += "        <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "          <type>stilton</type>\n";
         expectedXml += "          <price>2</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "          <type>cheddar</type>\n";
         expectedXml += "          <price>2</price>\n";
         expectedXml += "          <oldPrice>0</oldPrice>\n";
-        expectedXml += "        </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "        </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "    </query-results>\n";
@@ -1073,16 +1072,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "      </identifiers>\n";
         expectedXml += "      <row>\n";
         row = it2.next();
-        expectedXml += "        <org.kie.camel.testdomain.Cheese reference=\"../../../../result/query-results/row/org.kie.camel.testdomain.Cheese\"/>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese reference=\"../../../../result/query-results/row/org.drools.camel.testdomain.Cheese\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.kie.camel.testdomain.Cheese reference=\"../../../../result/query-results/row/org.kie.camel.testdomain.Cheese[2]\"/>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese reference=\"../../../../result/query-results/row/org.drools.camel.testdomain.Cheese[2]\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "      <row>\n";
         row = it2.next();
-        expectedXml += "        <org.kie.camel.testdomain.Cheese reference=\"../../../../result/query-results/row[2]/org.kie.camel.testdomain.Cheese\"/>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.camel.testdomain.Cheese\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "stilton" ).toExternalForm() + "' />";
-        expectedXml += "        <org.kie.camel.testdomain.Cheese reference=\"../../../../result/query-results/row[2]/org.kie.camel.testdomain.Cheese[2]\"/>\n";
+        expectedXml += "        <org.drools.camel.testdomain.Cheese reference=\"../../../../result/query-results/row[2]/org.drools.camel.testdomain.Cheese[2]\"/>\n";
         expectedXml += "        <fact-handle external-form='" + row.getFactHandle( "cheddar" ).toExternalForm() + "' />";
         expectedXml += "      </row>\n";
         expectedXml += "    </query-results>\n";
@@ -1133,8 +1132,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testGetObjects() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "rule rule1 \n";
         str += "  when \n";
         str += "    $c : Cheese() \n";
@@ -1146,16 +1145,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution>";
         inXml += "  <insert-elements>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "  <get-objects out-identifier='list' />";
         inXml += "</batch-execution>";
@@ -1171,16 +1170,16 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "<execution-results>";
         expectedXml += "  <result identifier='list'>";
         expectedXml += "    <list>";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>";
         expectedXml += "        <type>stilton</type>";
         expectedXml += "        <price>30</price>";
         expectedXml += "        <oldPrice>0</oldPrice>";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>";
         expectedXml += "        <type>stilton</type>";
         expectedXml += "        <price>35</price>";
         expectedXml += "        <oldPrice>0</oldPrice>";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>";
         expectedXml += "    </list>";
         expectedXml += "  </result>";
         expectedXml += "</execution-results>";
@@ -1206,8 +1205,8 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testManualFireAllRules() throws Exception {
         String str = "";
-        str += "package org.kie \n";
-        str += "import org.kie.camel.testdomain.Cheese \n";
+        str += "package org.drools \n";
+        str += "import org.drools.camel.testdomain.Cheese \n";
         str += "global java.util.List list \n";
         str += "rule rule1 \n";
         str += "  when \n";
@@ -1224,24 +1223,24 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         inXml += "    <list/>";
         inXml += "  </set-global>";
         inXml += "  <insert-elements>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>30</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert-elements>";
         inXml += "  <fire-all-rules />";
         inXml += "  <insert out-identifier='outBrie'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese>";
+        inXml += "    <org.drools.camel.testdomain.Cheese>";
         inXml += "      <type>brie</type>";
         inXml += "      <price>10</price>";
         inXml += "      <oldPrice>5</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese>";
+        inXml += "    </org.drools.camel.testdomain.Cheese>";
         inXml += "  </insert>";
         inXml += "</batch-execution>";
 
@@ -1258,24 +1257,24 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier='list'>\n";
         expectedXml += "    <list>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>35</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
-        expectedXml += "      <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
+        expectedXml += "      <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "        <type>stilton</type>\n";
         expectedXml += "        <price>30</price>\n";
         expectedXml += "        <oldPrice>0</oldPrice>\n";
-        expectedXml += "      </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "      </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "    </list>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <result identifier='outBrie'>\n";
-        expectedXml += "    <org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "    <org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "      <type>brie</type>\n";
         expectedXml += "      <price>10</price>\n";
         expectedXml += "      <oldPrice>5</oldPrice>\n";
-        expectedXml += "    </org.kie.camel.testdomain.Cheese>\n";
+        expectedXml += "    </org.drools.camel.testdomain.Cheese>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outBrie\" external-form=\"" + factHandle.toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -1316,18 +1315,18 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <imports>\n";
-        str += "      <import name=\"org.kie.camel.testdomain.TestVariable\" />\n";
+        str += "      <import name=\"org.drools.camel.testdomain.TestVariable\" />\n";
         str += "    </imports>\n";
         str += "    <globals>\n";
         str += "      <global identifier=\"list\" type=\"java.util.List\" />\n";
         str += "    </globals>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"person\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"TestVariable\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1367,11 +1366,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         String inXml = "";
         inXml += "<batch-execution>";
-        inXml += "  <start-process processId='org.kie.actions'>";
+        inXml += "  <start-process processId='org.drools.actions'>";
         inXml += "    <parameter identifier='person'>";
-        inXml += "       <org.kie.camel.testdomain.TestVariable>";
+        inXml += "       <org.drools.camel.testdomain.TestVariable>";
         inXml += "         <name>John Doe</name>";
-        inXml += "    </org.kie.camel.testdomain.TestVariable>";
+        inXml += "    </org.drools.camel.testdomain.TestVariable>";
         inXml += "    </parameter>";
         inXml += "  </start-process>";
         inXml += "  <get-global identifier='list' out-identifier='out-list'/>";
@@ -1407,12 +1406,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1474,12 +1473,12 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"MyVar\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>SomeText</value>\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
@@ -1542,22 +1541,22 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.camel.testdomain.Person\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1567,25 +1566,25 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1622,7 +1621,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1661,7 +1660,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         person.setName( "Jane Doe" );
         parameters.put( "Person",
                         person );
-        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
+        processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
                                                                            parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1710,22 +1709,22 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
         str += "      <variable name=\"UserName\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        <value>John Doe</value>\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Person\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"org.kie.camel.testdomain.Person\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
-        str += "        <type name=\"org.kie.process.core.datatype.impl.type.IntegerDataType\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
         str += "      </variable>\n";
         str += "    </variables>\n";
         str += "  </header>\n";
@@ -1735,25 +1734,25 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "    <workItem id=\"2\" name=\"HumanTask\" >\n";
         str += "      <work name=\"Human Task\" >\n";
         str += "        <parameter name=\"ActorId\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{UserName}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Content\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>#{Person.name}</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"TaskName\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "          <value>Do something</value>\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Priority\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Comment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         str += "        </parameter>\n";
         str += "        <parameter name=\"Attachment\" >\n";
-        str += "          <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "          <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
         str += "        </parameter>\n";
         str += "      </work>\n";
         str += "      <mapping type=\"in\" from=\"MyObject\" to=\"Attachment\" />";
@@ -1790,7 +1789,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         person.setName( "John Doe" );
         parameters.put( "Person",
                         person );
-        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.kie.actions",
+        WorkflowProcessInstance processInstance = (WorkflowProcessInstance) ksession.startProcess( "org.drools.actions",
                                                                                                    parameters );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
@@ -1948,7 +1947,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
     @Test
     public void testExecutionNodeLookup() throws Exception {
         String str = "";
-        str += "package org.kie.camel.testdomain \n"
+        str += "package org.drools.camel.testdomain \n"
                 + "declare Cheese1\n"
                 + "   type : String\n"
                 + "   price : int\n"
@@ -1964,7 +1963,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         str += "end\n";
         //System.out.println("STR = "+str);
         String str2 = "";
-        str2 += "package org.kie.camel.testdomain \n"
+        str2 += "package org.drools.camel.testdomain \n"
                 + "declare Cheese2\n"
                 + "   type : String\n"
                 + "   price : int\n"
@@ -1981,11 +1980,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml = "";
         inXml += "<batch-execution lookup=\"ksession1\" >";
         inXml += "  <insert out-identifier='outStilton'>";
-        inXml += "    <org.kie.camel.testdomain.Cheese1>";
+        inXml += "    <org.drools.camel.testdomain.Cheese1>";
         inXml += "      <type>stilton</type>";
         inXml += "      <price>25</price>";
         inXml += "      <oldPrice>0</oldPrice>";
-        inXml += "    </org.kie.camel.testdomain.Cheese1>";
+        inXml += "    </org.drools.camel.testdomain.Cheese1>";
         inXml += "  </insert>";
         inXml += "  <fire-all-rules />";
         inXml += "</batch-execution>";
@@ -1993,11 +1992,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String inXml2 = "";
         inXml2 += "<batch-execution lookup=\"ksession2\" >";
         inXml2 += "  <insert out-identifier='outStilton'>";
-        inXml2 += "    <org.kie.camel.testdomain.Cheese2>";
+        inXml2 += "    <org.drools.camel.testdomain.Cheese2>";
         inXml2 += "      <type>stilton</type>";
         inXml2 += "      <price>25</price>";
         inXml2 += "      <oldPrice>0</oldPrice>";
-        inXml2 += "    </org.kie.camel.testdomain.Cheese2>";
+        inXml2 += "    </org.drools.camel.testdomain.Cheese2>";
         inXml2 += "  </insert>";
         inXml2 += "  <fire-all-rules />";
         inXml2 += "</batch-execution>";
@@ -2021,7 +2020,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         ExecutionResults result = template.requestBody( "direct:unmarshal",
                                                         outXml,
                                                         ExecutionResults.class );
-        org.kie.definition.type.FactType fT = ksession.getKnowledgeBase().getFactType("org.kie.camel.testdomain","Cheese1");
+        org.kie.definition.type.FactType fT = ksession.getKnowledgeBase().getFactType("org.drools.camel.testdomain","Cheese1");
         
         int price = (Integer)fT.get(result.getValue( "outStilton" ), "price");
         assertEquals( 30, 
@@ -2042,7 +2041,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                                                         outXml2,
                                                         ExecutionResults.class );
         
-        org.kie.definition.type.FactType fT2 = ksession2.getKnowledgeBase().getFactType("org.kie.camel.testdomain","Cheese2");
+        org.kie.definition.type.FactType fT2 = ksession2.getKnowledgeBase().getFactType("org.drools.camel.testdomain","Cheese2");
         
         int price2 = (Integer)fT2.get(result2.getValue( "outStilton" ), "price");
         assertEquals( 35, price2 );
@@ -2062,11 +2061,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
-        expectedXml += "    <org.kie.camel.testdomain.Cheese1>\n";
+        expectedXml += "    <org.drools.camel.testdomain.Cheese1>\n";
         expectedXml += "      <type>stilton</type>\n";
         expectedXml += "      <oldPrice>0</oldPrice>\n";
         expectedXml += "      <price>30</price>\n";
-        expectedXml += "    </org.kie.camel.testdomain.Cheese1>\n";
+        expectedXml += "    </org.drools.camel.testdomain.Cheese1>\n";
         expectedXml += "  </result>\n";
         expectedXml += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml += "</execution-results>\n";
@@ -2074,11 +2073,11 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         String expectedXml2 = "";
         expectedXml2 += "<execution-results>\n";
         expectedXml2 += "  <result identifier=\"outStilton\">\n";
-        expectedXml2 += "    <org.kie.camel.testdomain.Cheese2>\n";
+        expectedXml2 += "    <org.drools.camel.testdomain.Cheese2>\n";
         expectedXml2 += "      <type>stilton</type>\n";
         expectedXml2 += "      <oldPrice>0</oldPrice>\n";
         expectedXml2 += "      <price>35</price>\n";
-        expectedXml2 += "    </org.kie.camel.testdomain.Cheese2>\n";
+        expectedXml2 += "    </org.drools.camel.testdomain.Cheese2>\n";
         expectedXml2 += "  </result>\n";
         expectedXml2 += "  <fact-handle identifier=\"outStilton\" external-form=\"" + ((InternalFactHandle) result2.getFactHandle( "outStilton" )).toExternalForm() + "\" /> \n";
         expectedXml2 += "</execution-results>\n";

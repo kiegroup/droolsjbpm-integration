@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.kie.xxx
+package org.drools.xxx
 
-import org.kie.model.order.Order
-import org.kie.model.order.Order.OrderItem
+import org.kie.drools.order.Order
+import org.kie.drools.order.Order.OrderItem
 
 global java.util.List list1;
 global java.util.List list2;
 
-global org.kie.model.order.Order order
+global org.kie.drools.order.Order order
 
 
 rule orderRule

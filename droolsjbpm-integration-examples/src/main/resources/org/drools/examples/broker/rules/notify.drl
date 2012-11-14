@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.kie.examples.broker
+package org.drools.examples.broker
 
-import org.kie.examples.broker.model.PortfolioAction
+import org.drools.examples.broker.model.PortfolioAction
 import org.kie.runtime.rule.FactHandle
 
 rule "Portfolio action no longer needed"

@@ -42,14 +42,14 @@ public class GridHelper {
 
     public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
 
-    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
+    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
     private static JpaWhitePages whitePages = new JpaWhitePages( emf );
 
     public static void reset() {
         if ( emf != null && emf.isOpen() ) {
             emf.close();
         }
-        emf = Persistence.createEntityManagerFactory( "org.kie.grid" );
+        emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
         whitePages = new JpaWhitePages( emf );
     }
 

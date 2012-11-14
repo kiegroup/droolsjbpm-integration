@@ -15,7 +15,7 @@
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-  <bean name="myDroolsBean" class="org.kie.container.spring.timer.MyDroolsBean">
+  <bean name="myDroolsBean" class="org.drools.container.spring.timer.MyDroolsBean">
     <property name="emf" ref="entityManagerFactory" />
     <property name="kbase" ref="knowledgeBase" />
     <property name="kstore" ref="knowledgeStore" />
@@ -46,7 +46,7 @@
 
   <bean id="entityManagerFactory"
     class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-    <property name="persistenceUnitName" value="org.kie.persistence.jpa.local" />
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
     <property name="dataSource" ref="datasource" />
     <!--property name="jpaProperties">
       <props>
@@ -62,7 +62,7 @@
 
   <!--aop:config>
         <aop:pointcut id="timerFlowManagerMethods"
-                      expression="execution(* org.kie.container.spring.timer.MyDroolsBean.*(..))"/>
+                      expression="execution(* org.drools.container.spring.timer.MyDroolsBean.*(..))"/>
 
         <aop:advisor advice-ref="timerFlowManagerTxAdvice"
                      pointcut-ref="timerFlowManagerMethods"/>

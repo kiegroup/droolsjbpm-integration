@@ -105,7 +105,7 @@ public abstract class BaseRemoteTest {
         grid1 = new GridImpl("peer1", new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
-                        new JpaWhitePages(Persistence.createEntityManagerFactory("org.kie.grid")) );
+                        new JpaWhitePages(Persistence.createEntityManagerFactory("org.drools.grid")) );
 
         Grid grid2 = new GridImpl("peer2", new HashMap<String, Object>() );
         configureGrid1( grid2,
@@ -172,7 +172,7 @@ public abstract class BaseRemoteTest {
         assertNotNull( kbuilder );
 
          String rule = "package test\n"
-                 + "import org.kie.grid.NodeTests.MyObject;\n"
+                 + "import org.drools.grid.NodeTests.MyObject;\n"
                  + "global MyObject myGlobalObj;\n"
                  + "query getMyObjects(String n)\n"
                  + "  $mo: MyObject(name == n)\n"

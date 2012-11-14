@@ -11,11 +11,11 @@
    
    <bean id="rwih2" class="org.jbpm.process.instance.impl.humantask.HumanTaskHandler" />
    
-   <bean id="raf1" class="org.kie.container.spring.MockAccumulateFunction" />
-   <bean id="raf2" class="org.kie.container.spring.MockAccumulateFunction" />    
+   <bean id="raf1" class="org.drools.container.spring.MockAccumulateFunction" />
+   <bean id="raf2" class="org.drools.container.spring.MockAccumulateFunction" />
 
-   <bean id="red1" class="org.kie.container.spring.MockEvaluatorDefinition" />
-   <bean id="red2" class="org.kie.container.spring.MockEvaluatorDefinition" />
+   <bean id="red1" class="org.drools.container.spring.MockEvaluatorDefinition" />
+   <bean id="red2" class="org.drools.container.spring.MockEvaluatorDefinition" />
 
   <drools:kbase id="kbase1">
      <drools:resources>
@@ -43,7 +43,7 @@
 
         <drools:assert-behavior mode="IDENTITY" />
 
-              <drools:consequenceExceptionHandler handler="org.kie.container.spring.MockConsequenceExceptionHandler" />
+              <drools:consequenceExceptionHandler handler="org.drools.container.spring.MockConsequenceExceptionHandler" />
 
      </drools:configuration>
   </drools:kbase>

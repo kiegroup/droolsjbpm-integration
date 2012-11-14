@@ -55,10 +55,10 @@ public class CxfSoapTest extends CamelSpringTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"salaboy\" disconnected=\"true\">\n";
-        cmd += "      <org.kie.pipeline.camel.Person>\n";
+        cmd += "      <org.drools.pipeline.camel.Person>\n";
         cmd += "         <name>salaboy</name>\n";
         cmd += "         <age>27</age>\n";
-        cmd += "      </org.kie.pipeline.camel.Person>\n";
+        cmd += "      </org.drools.pipeline.camel.Person>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";

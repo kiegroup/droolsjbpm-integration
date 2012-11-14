@@ -303,7 +303,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
 
-        StartProcessCommand start = new StartProcessCommand( "org.kie.actions" , "process-instance-id" );
+        StartProcessCommand start = new StartProcessCommand( "org.drools.actions" , "process-instance-id" );
         start.putParameter( "person",
                             new Person( "lucaz",
                                         25 ) );
@@ -373,8 +373,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
                 def.setPrettyPrint(true);
-                // TODO does not work: def.setContextPath( "org.kie.camel.testdomain:org.kie.pipeline.camel" );
-                def.setContextPath("org.kie.pipeline.camel");
+                // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
+                def.setContextPath("org.drools.pipeline.camel");
 
                 from("direct:test-with-session").policy(new DroolsPolicy()).unmarshal(def).to("drools:node/ksession1").marshal(def);
                 from("direct:test-no-session").policy(new DroolsPolicy()).unmarshal(def).to("drools:node").marshal(def);
@@ -387,8 +387,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            // TODO does not work: def.setContextPath( "org.kie.camel.testdomain:org.kie.pipeline.camel" );
-            def.setContextPath( "org.kie.pipeline.camel" );
+            // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
+            def.setContextPath( "org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -422,8 +422,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         me.setName( "Hadrian" );
 
         String rule = "";
-        rule += "package org.kie.pipeline.camel \n";
-        rule += "import org.kie.pipeline.camel.Person \n";
+        rule += "package org.drools.pipeline.camel \n";
+        rule += "import org.drools.pipeline.camel.Person \n";
         rule += "global java.util.List list \n";
         rule += "query persons \n";
         rule += "   $p : Person(name != null) \n";
@@ -481,18 +481,18 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process1 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         process1 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         process1 += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        process1 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n";
+        process1 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n";
         process1 += "\n";
         process1 += "  <header>\n";
         process1 += "    <imports>\n";
-        process1 += "      <import name=\"org.kie.camel.testdomain.Person\" />\n";
+        process1 += "      <import name=\"org.drools.camel.testdomain.Person\" />\n";
         process1 += "    </imports>\n";
         process1 += "    <globals>\n";
         process1 += "      <global identifier=\"list\" type=\"java.util.List\" />\n";
         process1 += "    </globals>\n";
         process1 += "    <variables>\n";
         process1 += "      <variable name=\"person\" >\n";
-        process1 += "        <type name=\"org.kie.process.core.datatype.impl.type.ObjectDataType\" className=\"Person\" />\n";
+        process1 += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"Person\" />\n";
         process1 += "      </variable>\n";
         process1 += "    </variables>\n";
         process1 += "  </header>\n";
@@ -527,12 +527,12 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process2 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         process2 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         process2 += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        process2 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n";
+        process2 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
         process2 += "\n";
         process2 += "  <header>\n";
         process2 += "    <variables>\n";
         process2 += "      <variable name=\"MyVar\" >\n";
-        process2 += "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n";
+        process2 += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
         process2 += "        <value>SomeText</value>\n";
         process2 += "      </variable>\n";
         process2 += "    </variables>\n";

@@ -219,7 +219,7 @@ public class SpringDroolsTest {
                       rconf.getEventProcessingMode() );
         assertEquals( AssertBehaviour.IDENTITY,
                       rconf.getAssertBehaviour() );
-        assertEquals( "org.kie.container.spring.MockConsequenceExceptionHandler",
+        assertEquals( "org.drools.container.spring.MockConsequenceExceptionHandler",
                       rconf.getConsequenceExceptionHandler() );
 
         KnowledgeBaseImpl kbase2 = (KnowledgeBaseImpl) context.getBean( "kbase2" );

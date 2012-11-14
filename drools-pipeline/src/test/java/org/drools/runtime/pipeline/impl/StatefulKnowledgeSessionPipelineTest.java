@@ -96,7 +96,7 @@ public class StatefulKnowledgeSessionPipelineTest {
             "<process xmlns=\"http://drools.org/drools-5.0/process\"\n" +
             "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
             "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n" +
-            "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.actions\" package-name=\"org.kie\" version=\"1\" >\n" +
+            "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.actions\" package-name=\"org.drools\" version=\"1\" >\n" +
             "\n" +
             "  <header>\n" +
             "    <globals>\n" +
@@ -147,7 +147,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         Map vars = new HashMap();
         vars.put( "variable", "SomeText" );
         
-        StatefulKnowledgeSessionStartProcessStage startProcess = new StatefulKnowledgeSessionStartProcessStage("org.kie.actions");
+        StatefulKnowledgeSessionStartProcessStage startProcess = new StatefulKnowledgeSessionStartProcessStage("org.drools.actions");
         pipeline = new StatefulKnowledgeSessionPipelineImpl(ksession);
         pipeline.setReceiver( startProcess );
         pipeline.insert( vars, null );
@@ -164,7 +164,7 @@ public class StatefulKnowledgeSessionPipelineTest {
             "<process xmlns=\"http://drools.org/drools-5.0/process\"\n" +
             "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
             "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n" +
-            "         type=\"RuleFlow\" name=\"flow\" id=\"org.kie.event\" package-name=\"org.kie\" version=\"1\" >\n" +
+            "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n" +
             "\n" +
             "  <header>\n" +
             "    <globals>\n" +
@@ -172,7 +172,7 @@ public class StatefulKnowledgeSessionPipelineTest {
             "    </globals>\n" +            
             "    <variables>\n" +
             "      <variable name=\"MyVar\" >\n" +
-            "        <type name=\"org.kie.process.core.datatype.impl.type.StringDataType\" />\n" +
+            "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n" +
             "        <value>SomeText</value>\n" +
             "      </variable>\n" +
             "    </variables>\n" +
@@ -225,7 +225,7 @@ public class StatefulKnowledgeSessionPipelineTest {
         pipeline.setReceiver( setGlobal );
         pipeline.insert( globals, null );
         
-        org.kie.runtime.process.ProcessInstance instance = ksession.startProcess("org.kie.event");
+        org.kie.runtime.process.ProcessInstance instance = ksession.startProcess("org.drools.event");
         
         StatefulKnowledgeSessionSignalEventStage signalEvent = new StatefulKnowledgeSessionSignalEventStage( "MyEvent",
                                                                                                               instance.getId());

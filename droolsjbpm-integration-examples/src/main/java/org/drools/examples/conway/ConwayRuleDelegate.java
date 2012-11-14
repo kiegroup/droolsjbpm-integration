@@ -25,12 +25,12 @@ public interface ConwayRuleDelegate {
     public abstract void init();
 
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.CellGrid#nextGeneration()
+     * @see org.drools.examples.conway.CellGrid#nextGeneration()
      */
     public abstract boolean nextGeneration();
 
     /* (non-Javadoc)
-     * @see org.kie.examples.conway.CellGrid#killAll()
+     * @see org.drools.examples.conway.CellGrid#killAll()
      */
     public abstract void killAll();
 

@@ -38,9 +38,9 @@ public class CxfRestTest extends CamelSpringTestSupport {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"salaboy\">\n";
-        cmd += "      <org.kie.pipeline.camel.Person>\n";
+        cmd += "      <org.drools.pipeline.camel.Person>\n";
         cmd += "         <name>salaboy</name>\n";
-        cmd += "      </org.kie.pipeline.camel.Person>\n";
+        cmd += "      </org.drools.pipeline.camel.Person>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";

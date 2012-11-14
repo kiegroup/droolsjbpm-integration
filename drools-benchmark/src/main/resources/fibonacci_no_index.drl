@@ -1,5 +1,5 @@
 import java.math.BigInteger;
-import org.kie.benchmark.model.Fibonacci;
+import org.drools.benchmark.model.Fibonacci;
 
 dialect "mvel"
 

@@ -199,7 +199,7 @@ public class NodeTests {
         Assert.assertNotNull( kbuilder );
 
          String rule = "package test\n"
-                 + "import org.kie.grid.NodeTests.MyObject;\n"
+                 + "import org.drools.grid.NodeTests.MyObject;\n"
                  + "global MyObject myGlobalObj;\n"
                  + "rule \"test\""
                  + "  when"

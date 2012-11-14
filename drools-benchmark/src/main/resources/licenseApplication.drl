@@ -1,4 +1,4 @@
-import org.kie.benchmark.model.*
+import org.drools.benchmark.model.*
 
 rule "Is of valid age and gender"
 when

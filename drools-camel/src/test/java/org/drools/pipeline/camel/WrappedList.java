@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WrappedList {
     //        @XmlElementWrapper(name="list")
-    @XmlElements({@XmlElement(name = "org.kie.pipeline.camel.Person", type = Person.class)})
+    @XmlElements({@XmlElement(name = "org.drools.pipeline.camel.Person", type = Person.class)})
     private List<Person> people = new ArrayList<Person>();
 
     public void add(int index,
