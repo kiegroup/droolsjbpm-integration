@@ -54,6 +54,8 @@
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
     <module>droolsjbpm-integration-examples</module>
+    <module>drools-kproject-example</module>
+    <module>drools-kcontainer-example</module>
   </modules>
 
   <profiles>
