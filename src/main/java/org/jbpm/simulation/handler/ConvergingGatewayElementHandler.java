@@ -9,8 +9,8 @@ import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.jbpm.simulation.PathContext;
-import org.jbpm.simulation.PathContextManager;
 import org.jbpm.simulation.PathContext.Type;
+import org.jbpm.simulation.PathContextManager;
 
 public class ConvergingGatewayElementHandler extends DefaultElementHandler {
     private PathContextManager manager;

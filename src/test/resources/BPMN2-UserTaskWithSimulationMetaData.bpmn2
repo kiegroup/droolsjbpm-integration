@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_TEnqoPeBEeGKWqHRrzBUaw" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.omg.org/bpmn20" typeLanguage="http://www.java.com/javaTypes">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_TEnqoPeBEeGKWqHRrzBUaw" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.omg.org/bpmn20" typeLanguage="http://www.java.com/javaTypes">
   <bpmn2:process id="UserTask" drools:packageName="defaultPackage" name="User Task" isExecutable="true">
     <bpmn2:startEvent id="_69FD4992-429F-4AD0-B126-85435C2D1A45" drools:bgcolor="#f5deb3" drools:selectable="true" name="StartProcess">
       <bpmn2:outgoing>_D9988BD7-9459-49E4-9C20-7201B47127B9</bpmn2:outgoing>
@@ -47,15 +47,15 @@
     <bpmn2:extensionElements>
       <drools:ProcessAnalysisData>
         <drools:Scenario xsi:type="drools:Scenario" id="default" name="Simulationscenario">
-          <drools:ScenarioParameters xsi:type="drools:ScenarioParameters_._type" baseCurrencyUnit="USD" baseTimeUnit="min"/>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_D9988BD7-9459-49E4-9C20-7201B47127B9" id="_TEoRuveBEeGKWqHRrzBUaw">
+          <drools:ScenarioParameters xsi:type="drools:ScenarioParameters" baseCurrencyUnit="USD" baseTimeUnit="min"/>
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_D9988BD7-9459-49E4-9C20-7201B47127B9" id="_TEoRuveBEeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_2B5B707D-3458-475C-943D-74F20B13AF20" id="_TEoRu_eBEeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_2B5B707D-3458-475C-943D-74F20B13AF20" id="_TEoRu_eBEeGKWqHRrzBUaw">
             <drools:TimeParameters xsi:type="drools:TimeParameters">
               <drools:ProcessingTime xsi:type="drools:Parameter">
                 <drools:NormalDistribution mean="21.0" standardDeviation="12.0"/>
@@ -77,7 +77,7 @@
               <drools:CurrencyUnit>USD</drools:CurrencyUnit>
             </drools:CostParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_E97DF689-7C76-4DDE-8D08-DBE4C33553C2" id="_TEoRvPeBEeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_E97DF689-7C76-4DDE-8D08-DBE4C33553C2" id="_TEoRvPeBEeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>

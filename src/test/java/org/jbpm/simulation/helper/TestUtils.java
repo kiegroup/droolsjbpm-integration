@@ -5,16 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
 import org.drools.impl.EnvironmentFactory;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.KnowledgeSessionConfiguration;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.conf.ClockTypeOption;
 import org.eclipse.bpmn2.FlowElement;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.impl.SimulationEndNodeInstance;
@@ -44,6 +35,15 @@ import org.jbpm.workflow.instance.impl.NodeInstanceFactoryRegistry;
 import org.jbpm.workflow.instance.impl.factory.CreateNewNodeFactory;
 import org.jbpm.workflow.instance.impl.factory.ReuseNodeFactory;
 import org.json.JSONObject;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.conf.ClockTypeOption;
 
 public class TestUtils {
 

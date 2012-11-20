@@ -3,21 +3,16 @@ package org.jbpm.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.base.RuleNameEqualsAgendaFilter;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
-import org.drools.rule.Rule;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.Activation;
-import org.drools.runtime.rule.AgendaFilter;
 import org.jbpm.simulation.AggregatedSimulationEvent;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
-import org.jbpm.simulation.impl.events.GenericSimulationEvent;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.ResourceType;
+import org.kie.io.Resource;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class WorkingMemorySimulationRepository extends InMemorySimulationRepository {
 

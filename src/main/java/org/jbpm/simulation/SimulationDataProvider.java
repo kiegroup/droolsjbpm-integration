@@ -2,8 +2,8 @@ package org.jbpm.simulation;
 
 import java.util.Map;
 
-import org.drools.definition.process.Node;
 import org.jbpm.simulation.impl.SimulationPath;
+import org.kie.definition.process.Node;
 
 public interface SimulationDataProvider {
 

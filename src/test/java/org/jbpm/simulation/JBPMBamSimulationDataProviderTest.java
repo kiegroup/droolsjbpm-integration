@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.definition.process.Node;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.TestUtils;
 import org.jbpm.simulation.impl.JBPMBAMSimulationDataProvider;
@@ -15,6 +13,8 @@ import org.jbpm.workflow.core.impl.NodeImpl;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.definition.process.Node;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 

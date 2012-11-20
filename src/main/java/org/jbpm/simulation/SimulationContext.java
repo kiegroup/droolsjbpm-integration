@@ -1,7 +1,5 @@
 package org.jbpm.simulation;
 
-import java.util.List;
-
 import org.drools.time.SessionPseudoClock;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.ht.StaffPoolManager;

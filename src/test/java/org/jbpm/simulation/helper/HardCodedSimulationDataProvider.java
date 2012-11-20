@@ -3,10 +3,10 @@ package org.jbpm.simulation.helper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.definition.process.Node;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.util.SimulationConstants;
+import org.kie.definition.process.Node;
 
 public class HardCodedSimulationDataProvider implements SimulationDataProvider {
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_Y4jfgPd-EeGKWqHRrzBUaw" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="http://www.omg.org/bpmn20">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_Y4jfgPd-EeGKWqHRrzBUaw" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd" targetNamespace="http://www.omg.org/bpmn20">
   <bpmn2:process id="defaultPackage.test" drools:packageName="defaultPackage" name="test" isExecutable="true">
     <bpmn2:startEvent id="_2F1A7880-B372-43D8-B773-C69599741B36" drools:bgcolor="#9acd32" drools:selectable="true" name="">
       <bpmn2:outgoing>_03FF13A9-0470-446E-999D-EA721E2FE4C2</bpmn2:outgoing>
@@ -102,43 +102,43 @@
     <bpmn2:extensionElements>
       <drools:ProcessAnalysisData>
         <drools:Scenario xsi:type="drools:Scenario" id="default" name="Simulationscenario">
-          <drools:ScenarioParameters xsi:type="drools:ScenarioParameters_._type" baseTimeUnit="ms"/>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_3B5A0AEB-B2C0-4E9E-82F1-0A29EB3ABDD8" id="_Y4kGkPd-EeGKWqHRrzBUaw">
+          <drools:ScenarioParameters xsi:type="drools:ScenarioParameters" baseTimeUnit="ms"/>
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_3B5A0AEB-B2C0-4E9E-82F1-0A29EB3ABDD8" id="_Y4kGkPd-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_B549E898-8837-4FDB-81EB-FB50BE6B010C" id="_Y4kGkfd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_B549E898-8837-4FDB-81EB-FB50BE6B010C" id="_Y4kGkfd-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="70.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_259A9121-596E-4E66-A44D-DA95386A24BE" id="_Y4kGkvd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_259A9121-596E-4E66-A44D-DA95386A24BE" id="_Y4kGkvd-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_03FF13A9-0470-446E-999D-EA721E2FE4C2" id="_Y4kGk_d-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_03FF13A9-0470-446E-999D-EA721E2FE4C2" id="_Y4kGk_d-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_2CF44DB2-521E-47F8-B406-9841A68B1D90" id="_Y4kGlPd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_2CF44DB2-521E-47F8-B406-9841A68B1D90" id="_Y4kGlPd-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_51027F4A-9265-4C80-A52C-3EC3B4E5B4F3" id="_Y4kGlfd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_51027F4A-9265-4C80-A52C-3EC3B4E5B4F3" id="_Y4kGlfd-EeGKWqHRrzBUaw">
             <drools:TimeParameters xsi:type="drools:TimeParameters">
               <drools:ProcessingTime xsi:type="drools:Parameter">
                 <drools:RandomDistribution max="10.0" min="8.0"/>
@@ -159,14 +159,14 @@
               </drools:UnitCost>
             </drools:CostParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_3A675C47-76C9-41E8-A7C1-B9124F972D3A" id="_Y4kGlvd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_3A675C47-76C9-41E8-A7C1-B9124F972D3A" id="_Y4kGlvd-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="100.0"/>
               </drools:Probability>
             </drools:ControlParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_E557B3D9-7DB1-4800-93AA-69615F853A80" id="_Y4kGl_d-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_E557B3D9-7DB1-4800-93AA-69615F853A80" id="_Y4kGl_d-EeGKWqHRrzBUaw">
             <drools:TimeParameters xsi:type="drools:TimeParameters">
               <drools:ProcessingTime xsi:type="drools:Parameter">
                 <drools:RandomDistribution max="500.0" min="0.0"/>
@@ -174,7 +174,7 @@
               <drools:TimeUnit>ms</drools:TimeUnit>
             </drools:TimeParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_A4D84613-3E98-4B2F-BF27-4E604A0934E8" id="_Y4kGmPd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_A4D84613-3E98-4B2F-BF27-4E604A0934E8" id="_Y4kGmPd-EeGKWqHRrzBUaw">
             <drools:TimeParameters xsi:type="drools:TimeParameters">
               <drools:ProcessingTime xsi:type="drools:Parameter">
                 <drools:RandomDistribution max="30.0" min="20.0"/>
@@ -195,7 +195,7 @@
               </drools:UnitCost>
             </drools:CostParameters>
           </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters_._type" elementId="_ABAF69E9-A215-478C-BDC8-B9B7936EF1D7" id="_Y4kGmfd-EeGKWqHRrzBUaw">
+          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_ABAF69E9-A215-478C-BDC8-B9B7936EF1D7" id="_Y4kGmfd-EeGKWqHRrzBUaw">
             <drools:ControlParameters xsi:type="drools:ControlParameters">
               <drools:Probability xsi:type="drools:Parameter">
                 <drools:FloatingParameter value="30.0"/>

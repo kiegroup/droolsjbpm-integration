@@ -14,15 +14,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.ResourceType;
-import org.drools.command.World;
 import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
@@ -36,6 +30,12 @@ import org.jbpm.simulation.impl.events.GenericSimulationEvent;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.junit.Test;
+import org.kie.KnowledgeBase;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.ResourceType;
+import org.kie.command.World;
+import org.kie.io.ResourceFactory;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class SimulateProcessTest {
 

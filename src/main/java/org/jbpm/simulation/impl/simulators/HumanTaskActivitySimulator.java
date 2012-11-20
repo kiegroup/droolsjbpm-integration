@@ -3,9 +3,6 @@ package org.jbpm.simulation.impl.simulators;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.definition.process.Node;
-import org.drools.runtime.process.NodeInstance;
-import org.drools.runtime.process.ProcessInstance;
 import org.jbpm.simulation.ActivitySimulator;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationDataProvider;
@@ -15,6 +12,9 @@ import org.jbpm.simulation.TimeGeneratorFactory;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.ht.StaffPool;
 import org.jbpm.simulation.util.SimulationUtils;
+import org.kie.definition.process.Node;
+import org.kie.runtime.process.NodeInstance;
+import org.kie.runtime.process.ProcessInstance;
 
 public class HumanTaskActivitySimulator implements ActivitySimulator {
 

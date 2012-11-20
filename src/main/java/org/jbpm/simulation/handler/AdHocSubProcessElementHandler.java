@@ -6,7 +6,6 @@ import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.AdHocSubProcess;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
-import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathContextManager;
 
 public class AdHocSubProcessElementHandler extends MainElementHandler {

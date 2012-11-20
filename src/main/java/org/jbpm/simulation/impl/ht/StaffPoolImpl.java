@@ -2,8 +2,6 @@ package org.jbpm.simulation.impl.ht;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math.random.RandomData;
 import org.apache.commons.math.random.RandomDataImpl;
-import org.drools.definition.process.Node;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.TimeGenerator;
 import org.jbpm.simulation.TimeGeneratorFactory;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.simulation.util.SimulationUtils;
+import org.kie.definition.process.Node;
 
 public class StaffPoolImpl implements StaffPool {
     

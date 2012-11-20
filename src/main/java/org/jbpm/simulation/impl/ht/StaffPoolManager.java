@@ -14,7 +14,8 @@
  */
 package org.jbpm.simulation.impl.ht;
 
-import org.drools.definition.process.Node;
+import org.kie.definition.process.Node;
+
 
 
 public interface StaffPoolManager {

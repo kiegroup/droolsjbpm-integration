@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.UUID;
 
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;

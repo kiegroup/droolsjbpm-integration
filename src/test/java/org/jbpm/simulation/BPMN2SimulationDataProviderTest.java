@@ -9,14 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.definition.process.Connection;
-import org.drools.definition.process.Node;
-import org.drools.definition.process.NodeContainer;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.util.SimulationConstants;
+import org.jbpm.workflow.core.NodeContainer;
 import org.junit.Test;
+import org.kie.definition.process.Connection;
+import org.kie.definition.process.Node;
 
 public class BPMN2SimulationDataProviderTest {
 

@@ -7,16 +7,15 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.math.stat.StatUtils;
-import org.drools.definition.process.Node;
 import org.jbpm.simulation.NodeStatistic;
 import org.jbpm.simulation.SimulationDataProvider;
+import org.kie.definition.process.Node;
 
 public class JBPMBAMSimulationDataProvider implements SimulationDataProvider {
 

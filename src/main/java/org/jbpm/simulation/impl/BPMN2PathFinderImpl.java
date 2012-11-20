@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.RootElement;
 import org.eclipse.bpmn2.SignalEventDefinition;
 import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.emf.ecore.util.FeatureMap;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathContextManager;
 import org.jbpm.simulation.PathFinder;
