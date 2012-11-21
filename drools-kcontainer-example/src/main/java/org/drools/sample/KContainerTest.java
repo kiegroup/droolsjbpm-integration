@@ -13,7 +13,7 @@ import java.util.Random;
 public class KContainerTest {
 
     public static final void main(String[] args) {
-        StatefulKnowledgeSession ksession = KnowledgeBaseFactory.getStatefulKnowlegeSession("org.drools.FireAlarmKBase.session");
+        StatefulKnowledgeSession ksession = KnowledgeBaseFactory.getStatefulKnowlegeSession("FireAlarmKBase.session");
 
         int roomsNumber = 3;
 
