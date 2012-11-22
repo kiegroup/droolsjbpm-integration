@@ -18,11 +18,13 @@ package org.drools.simulation.impl;
 
 import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.fluent.simulation.SimulateTestBase;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.junit.Test;
@@ -33,10 +35,10 @@ import org.kie.command.World;
 import org.kie.fluent.VariableContext;
 import org.kie.io.ResourceFactory;
 
-public class StandardjBPM5FluentTest {
+public class StandardjBPM5FluentTest extends SimulateTestBase {
 
     @Test
-    public void testUsingImplicit() {
+    public void testUsingImplicit() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
         
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -95,22 +97,15 @@ public class StandardjBPM5FluentTest {
                             + "</process>"
                 + "</definitions>";
         
+        createKJarWithMultipleResources( "org.test.KBase1", new String[] {str, strProcess} , new ResourceType[] {ResourceType.DRL, ResourceType.BPMN2} );
+        
         List list = new ArrayList();
         
         VariableContext<?> vc = f.getVariableContext();
         // @formatter:off          
         f.newPath("init")
             .newStep( 0 )
-                .newKnowledgeBuilder()
-                    .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                          ResourceType.DRL )
-                    .add( ResourceFactory.newByteArrayResource( strProcess.getBytes() ),
-                          ResourceType.BPMN2 )
-                    .end(World.ROOT, KnowledgeBuilder.class.getName() )
-                .newKnowledgeBase()
-                    .addKnowledgePackages()
-                    .end(World.ROOT, KnowledgeBase.class.getName() )
-                .newStatefulKnowledgeSession()
+                .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
                     .setGlobal( "list", list ).set( "list" )
                     .startProcess("DummyProcess")
                     .fireAllRules()

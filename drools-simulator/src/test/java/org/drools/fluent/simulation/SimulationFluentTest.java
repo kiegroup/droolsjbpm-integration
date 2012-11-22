@@ -16,8 +16,8 @@
 
 package org.drools.fluent.simulation;
 
-import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,17 +25,12 @@ import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.ResourceType;
-import org.kie.command.World;
 import org.kie.fluent.VariableContext;
-import org.kie.io.ResourceFactory;
 
-public class SimulationFluentTest {
+public class SimulationFluentTest extends SimulateTestBase {
 
     @Test
-    public void testUsingImplicit() {
+    public void testUsingImplicit() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
         
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -52,7 +47,9 @@ public class SimulationFluentTest {
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
-                     "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";        
+                     "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
+        
+        createKJar( "org.test.KBase1", str );
         
         List list = new ArrayList();
         
@@ -60,20 +57,13 @@ public class SimulationFluentTest {
         // @formatter:off          
         f.newPath("init")
         .newStep( 0 )
-        .newKnowledgeBuilder()
-            .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                  ResourceType.DRL )
-            .end(World.ROOT, KnowledgeBuilder.class.getName() )
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end(World.ROOT, KnowledgeBase.class.getName() )
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
             .setGlobal( "list", list ).set( "list" )
             .fireAllRules()
             .end()
         .newPath( "path1" )
         .newStep( 1000 )
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
             .setGlobal( "list", list ).set( "list" )
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
@@ -95,7 +85,7 @@ public class SimulationFluentTest {
             .end()
         .newPath(  "path2" )
         .newStep( 1500 )
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
             .setGlobal( "list", list ).set( "list" )
             .insert( new Person( "bobba", 75 ) ).set( "b" )
             .fireAllRules()
@@ -107,7 +97,7 @@ public class SimulationFluentTest {
             .end()
         .getPath(  "path1" )
         .newStep( 1300 )
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
             .setGlobal( "list", list )
             .insert( new Person( "luke", 35 ) ).set( "b" )
             .fireAllRules()
@@ -123,7 +113,7 @@ public class SimulationFluentTest {
     }
     
     @Test
-    public void testUsingExplicit() {
+    public void testUsingExplicit() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
         
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -148,6 +138,9 @@ public class SimulationFluentTest {
                 "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                 "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";        
         
+        createKJar( "org.test.KBase1", str1,
+                    "org.test.KBase2", str2 );
+        
         List list1 = new ArrayList();
         List list2 = new ArrayList();
         
@@ -155,33 +148,17 @@ public class SimulationFluentTest {
         // @formatter:off          
         f.newPath("init")
         .newStep(0)
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newByteArrayResource(str1.getBytes()),
-                    ResourceType.DRL)
-            .end(World.ROOT, KnowledgeBuilder.class.getName())
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end(World.ROOT, "kb1")
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
             .setGlobal("list", list1).set("list")
             .fireAllRules()
             .end()
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newByteArrayResource(str2.getBytes()),
-                    ResourceType.DRL)
-            .end(World.ROOT, KnowledgeBuilder.class.getName())
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end(World.ROOT, "kb2")
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase2.KSession1" )
             .setGlobal("list", list2).set("list")
             .fireAllRules()
-            .end("kb1")
+            .end("ks2.1")
         .newPath("path1")
         .newStep(1000)
-        .getKnowledgeBase("kb1")
-            .end()
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
             .setGlobal("list", list1).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()
@@ -191,9 +168,7 @@ public class SimulationFluentTest {
             .test( "list[list.size()-1] - list[0] == 1000" )
             .end()
         .newStep(2000)
-        .getKnowledgeBase("kb2")
-            .end()
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase2.KSession1" )
             .setGlobal("list", list1).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()
@@ -208,7 +183,7 @@ public class SimulationFluentTest {
     
     
     @Test
-    public void testUsingDifferentPosAsserts() {
+    public void testUsingDifferentPosAsserts() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
         
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -227,26 +202,21 @@ public class SimulationFluentTest {
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                      "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";        
         
+        createKJar( "org.test.KBase1", str );
+
         List list = new ArrayList();
         
         VariableContext<?> vc = f.getVariableContext();
         // @formatter:off          
         f.newPath("init")
         .newStep(0)
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newByteArrayResource(str.getBytes()),
-                    ResourceType.DRL)
-            .end(World.ROOT, KnowledgeBuilder.class.getName())
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end(World.ROOT, KnowledgeBase.class.getName())
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
             .setGlobal("list", list).set("list")
             .fireAllRules()
             .end()
         .newPath("path1")
         .newStep(1000)
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
             .setGlobal("list", list).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()

@@ -16,35 +16,29 @@
 
 package org.drools.fluent.simulation.impl;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.command.GetVariableCommand;
 import org.drools.command.NewKnowledgeBaseCommand;
 import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
-import org.drools.command.builder.NewKnowledgeBuilderCommand;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
-import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
 import org.drools.fluent.knowledge.impl.DefaultKnowledgeBaseSimFluent;
-import org.drools.fluent.knowledge.impl.DefaultKnowledgeBuilderSimFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
 import org.drools.fluent.test.impl.MapVariableContext;
-import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationImpl;
+import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 import org.drools.simulation.impl.Simulator;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseFactory;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.command.*;
+import org.kie.command.Command;
 import org.kie.fluent.VariableContext;
-import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.conf.ClockTypeOption;
 import org.kie.simulation.Simulation;
 import org.kie.simulation.SimulationPath;
 import org.kie.simulation.SimulationStep;
@@ -155,56 +149,56 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         return activeKnowledgeBuilderId;
     }
 
-    public KnowledgeBuilderSimFluent newKnowledgeBuilder() {
-        String knowledgeBuilderId = KnowledgeBuilder.class.getName() + knowledgeBuilderCounter;
-        knowledgeBuilderCounter++;
-        return newKnowledgeBuilder(knowledgeBuilderId);
-    }
-
-    public KnowledgeBuilderSimFluent newKnowledgeBuilder(String id) {
-        assureActiveStep();
-        activeKnowledgeBuilderId = id;
-        addCommand(new NewKnowledgeBuilderCommand(null,
-                null ) );
-        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
-        activeKnowledgeBaseId = null;
-
-        return new DefaultKnowledgeBuilderSimFluent( this );
-    }
-
-    public KnowledgeBuilderSimFluent getKnowledgeBuilder() {
-        assureActiveStep();
-        if (activeKnowledgeBuilderId == null) {
-            throw new IllegalStateException("There is no activeKnowledgeBuilder. Call newKnowledgeBuilder() instead.");
-        }
-        activeKnowledgeBaseId = null;
-        return new DefaultKnowledgeBuilderSimFluent( this );
-    }
-
-    public KnowledgeBuilderSimFluent getKnowledgeBuilder(String id) {
-        assureActiveStep();
-        activeKnowledgeBuilderId = id;
-        addCommand(new GetVariableCommand(id));
-        addCommand(new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
-        activeKnowledgeBaseId = null;
-
-        return new DefaultKnowledgeBuilderSimFluent( this );
-    }
+//    public KnowledgeBuilderSimFluent newKnowledgeBuilder() {
+//        String knowledgeBuilderId = KnowledgeBuilder.class.getName() + knowledgeBuilderCounter;
+//        knowledgeBuilderCounter++;
+//        return newKnowledgeBuilder(knowledgeBuilderId);
+//    }
+//
+//    public KnowledgeBuilderSimFluent newKnowledgeBuilder(String id) {
+//        assureActiveStep();
+//        activeKnowledgeBuilderId = id;
+//        addCommand(new NewKnowledgeBuilderCommand(null,
+//                null ) );
+//        addCommand( new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+//        activeKnowledgeBaseId = null;
+//
+//        return new DefaultKnowledgeBuilderSimFluent( this );
+//    }
+//
+//    public KnowledgeBuilderSimFluent getKnowledgeBuilder() {
+//        assureActiveStep();
+//        if (activeKnowledgeBuilderId == null) {
+//            throw new IllegalStateException("There is no activeKnowledgeBuilder. Call newKnowledgeBuilder() instead.");
+//        }
+//        activeKnowledgeBaseId = null;
+//        return new DefaultKnowledgeBuilderSimFluent( this );
+//    }
+//
+//    public KnowledgeBuilderSimFluent getKnowledgeBuilder(String id) {
+//        assureActiveStep();
+//        activeKnowledgeBuilderId = id;
+//        addCommand(new GetVariableCommand(id));
+//        addCommand(new SetVariableCommandFromLastReturn( KnowledgeBuilder.class.getName() ) );
+//        activeKnowledgeBaseId = null;
+//
+//        return new DefaultKnowledgeBuilderSimFluent( this );
+//    }
 
     public String getActiveKnowledgeBaseId() {
         return activeKnowledgeBaseId;
     }
 
-    public KnowledgeBaseSimFluent newKnowledgeBase() {
-        String knowledgeBaseId = KnowledgeBase.class.getName() + knowledgeBaseCounter;
-        knowledgeBaseCounter++;
-        return newKnowledgeBase(knowledgeBaseId);
-    }
+//    public KnowledgeBaseSimFluent newKnowledgeBase() {
+//        String knowledgeBaseId = KnowledgeBase.class.getName() + knowledgeBaseCounter;
+//        knowledgeBaseCounter++;
+//        return newKnowledgeBase(knowledgeBaseId);
+//    }
 
     public KnowledgeBaseSimFluent newKnowledgeBase(String id) {
         assureActiveStep();
         activeKnowledgeBaseId = id;
-        addCommand( new NewKnowledgeBaseCommand( null ) );
+        addCommand( new NewKnowledgeBaseCommand( id ) );
         addCommand( new SetVariableCommandFromLastReturn( KnowledgeBase.class.getName() ) );
 
         return new DefaultKnowledgeBaseSimFluent(this);
@@ -213,7 +207,7 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     public KnowledgeBaseSimFluent getKnowledgeBase() {
         assureActiveStep();
         if (activeKnowledgeBaseId == null) {
-            throw new IllegalStateException("There is no activeKnowledgeBase. Call newKnowledgeBase() instead.");
+            throw new IllegalStateException("There is no activeKnowledgeBase. Call newKnowledgeBase(String id) instead.");
         }
         return new DefaultKnowledgeBaseSimFluent(this);
     }
@@ -230,7 +224,7 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     public void assureActiveKnowledgeBase() {
         assureActiveStep();
         if (activeKnowledgeBaseId == null) {
-            newKnowledgeBase().addKnowledgePackages();
+            throw new IllegalStateException("There is no activeKnowledgeBase. Call newKnowledgeBase(String id) instead.");
         }
     }
 
@@ -238,25 +232,26 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         return activeKnowledgeSessionId;
     }
 
-    public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession() {
-        String knowledgeSessionId = StatefulKnowledgeSession.class.getName() + knowledgeSessionCounter;
-        knowledgeSessionCounter++;
-        return newStatefulKnowledgeSession(knowledgeSessionId);
-    }
+//    public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession() {
+//        String knowledgeSessionId = StatefulKnowledgeSession.class.getName() + knowledgeSessionCounter;
+//        knowledgeSessionCounter++;
+//        return newStatefulKnowledgeSession(knowledgeSessionId);
+//    }
     
     public StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession(String id) {
-        assureActiveKnowledgeBase();
+        assureActiveStep();
+//        assureActiveKnowledgeBase();
         activeKnowledgeSessionId = id;
-        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
-        ksessionConf.setOption( ClockTypeOption.get("pseudo") );
-        addCommand( new NewStatefulKnowledgeSessionCommand( ksessionConf ) );
+//        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+//        ksessionConf.setOption( ClockTypeOption.get("pseudo") );
+        addCommand( new NewStatefulKnowledgeSessionCommand( id ) );
         addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
 
         return new DefaultStatefulKnowledgeSessionSimFluent( this );
     }
 
     public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession() {
-        assureActiveKnowledgeBase();
+//        assureActiveKnowledgeBase();
         if (activeKnowledgeSessionId == null) {
             throw new IllegalStateException("There is no activeKnowledgeSession. Call newStatefulKnowledgeSession() instead.");
         }
@@ -264,7 +259,7 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     }
 
     public StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String id) {
-        assureActiveKnowledgeBase();
+//        assureActiveKnowledgeBase();
         activeKnowledgeSessionId = id;
         addCommand(new GetVariableCommand(id));
         addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));

@@ -62,9 +62,9 @@ public class DefaultKnowledgeBuilderSimFluent extends AbstractTestableFluent<Kno
         return this;
     }
 
-    public String getActiveKnowledgeBuilderId() {
-        return simulationFluent.getActiveKnowledgeBuilderId();
-    }
+//    public String getActiveKnowledgeBuilderId() {
+//        return simulationFluent.getActiveKnowledgeBuilderId();
+//    }
 
     public SimulationFluent end(String context, String name) {
         addCommand(new GetVariableCommand(KnowledgeBuilder.class.getName()));

@@ -17,52 +17,24 @@
 package org.drools.simulation.impl;
 
 import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
+import static org.junit.Assert.assertTrue;
 
-import static org.junit.Assert.*;
-
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import org.drools.fluent.simulation.SimulateTestBase;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
-import org.drools.fluent.test.impl.AssertThatImpl;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
-import org.hamcrest.Matcher;
-//import static org.hamsandwich.core.ReplayMatcher.on;
-//import static org.hamsandwich.core.ReplayMatcher.replayMatcher;
-//import org.hamsandwich.core.AdaptingMatcher;
-//import org.hamsandwich.core.CannotAdaptException;
-//import org.hamsandwich.core.HamSandwichFactory;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.builder.ResourceType;
 import org.kie.fluent.VariableContext;
-import org.kie.io.ResourceFactory;
 
-public class CompactFluentTest {
-
-    //    public static class PersonMatchers {
-    //
-    //        @HamSandwichFactory
-    //        public static Matcher<Person> name(Matcher<String>... nameMatchers) {
-    //            return replayMatcher( on( Person.class ).getName(),
-    //                                  nameMatchers );
-    //        }
-    //
-    //        @HamSandwichFactory
-    //        public static Matcher<Person> age(Matcher< ? super Integer>... ageMatchers) {
-    //            return new AdaptingMatcher<Person, Integer>( ageMatchers ) {
-    //
-    //                public Integer get(Person in) throws CannotAdaptException {
-    //                    return in.getAge();
-    //                }
-    //            };
-    //        }
-    //    }
+public class CompactFluentTest extends SimulateTestBase {
 
     @Test
-    public void testSimpleForAllAssertionsTypes() {
+    public void testSimpleForAllAssertionsTypes() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
 
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -72,21 +44,17 @@ public class CompactFluentTest {
         imports.add( "org.hamcrest.CoreMatchers.is" );
         imports.add( "org.hamcrest.CoreMatchers.equalTo" );
         imports.add( "org.hamcrest.CoreMatchers.allOf" );
-        //        imports.add( PersonMatchers.class.getName() + ".name" );
-        //        imports.add( PersonMatchers.class.getName() + ".age" );
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
         String str = "package org.drools.simulation.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
-
+        
+        createKJar( "org.test.KBase1", str );
+        
         // @formatter:off        
-        f.newKnowledgeBuilder()
-            .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                   ResourceType.DRL )
-            .end()
-        .newStatefulKnowledgeSession()
+        f.newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
             // show testing inside of ksession execution
@@ -132,7 +100,7 @@ public class CompactFluentTest {
     }
 
     @Test
-    public void testAssertionsFail() {
+    public void testAssertionsFail() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
 
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -149,12 +117,10 @@ public class CompactFluentTest {
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
+        createKJar( "org.test.KBase1", str );
+
         // @formatter:off        
-        f.newKnowledgeBuilder()
-            .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                   ResourceType.DRL )
-            .end()
-        .newStatefulKnowledgeSession()
+        f.newStatefulKnowledgeSession("org.test.KBase1.KSession1")
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
             // show testing inside of ksession execution
@@ -172,11 +138,7 @@ public class CompactFluentTest {
 
         f = new DefaultSimulationFluent();
         // @formatter:off        
-        f.newKnowledgeBuilder()
-            .add( ResourceFactory.newByteArrayResource( str.getBytes() ),
-                                    ResourceType.DRL )
-            .end()
-        .newStatefulKnowledgeSession()
+        f.newStatefulKnowledgeSession("org.test.KBase1.KSession1")
              .insert( new Person( "yoda", 150 ) ).set( "y" )
              .fireAllRules()
              // show testing inside of ksession execution
@@ -219,7 +181,7 @@ public class CompactFluentTest {
     }
 
     @Test @Ignore("Doing newKSession on the same path twice doesn't make the second one the active one") // TODO FIXME
-    public void testMultipleKsessionsWithSteps() {
+    public void testMultipleKsessionsWithSteps() throws IOException {
         SimulationFluent f = new DefaultSimulationFluent();
 
         VariableContext<Person> pc = f.<Person> getVariableContext();
@@ -242,13 +204,12 @@ public class CompactFluentTest {
                       "import " + Person.class.getName() + "\n" +
                       "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";
 
+        createKJar( "org.test.KBase1", str1,
+                    "org.test.KBase2", str2 );
+
         // @formatter:off
-        f.newKnowledgeBuilder()
-            .add( ResourceFactory.newByteArrayResource( str1.getBytes() ),
-                                   ResourceType.DRL )
-            .end()
-        .newRelativeStep( 100 )
-        .newStatefulKnowledgeSession()
+        f.newRelativeStep( 100 )
+        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
             .insert( new Person( "yoda1",
                                  150 ) ).set( "y1" )
             .fireAllRules()
@@ -260,11 +221,7 @@ public class CompactFluentTest {
         .test( "y1.age == 160" )
         .test( "d1.age == 80" )
         .newRelativeStep( 100 )
-        .newKnowledgeBuilder()
-            .add( ResourceFactory.newByteArrayResource( str2.getBytes() ),
-                                   ResourceType.DRL )
-            .end()
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.test.KBase2.KSession1")
             .insert( new Person( "yoda2",
                                  150 ) ).set( "y2" )
             .fireAllRules()

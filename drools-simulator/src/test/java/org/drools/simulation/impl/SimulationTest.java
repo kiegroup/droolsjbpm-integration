@@ -33,6 +33,7 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseConfiguration;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.ResourceType;
@@ -80,7 +81,7 @@ public class SimulationTest {
                 ResourceType.DRL,
                 null));
 
-        cmds1.add(new NewKnowledgeBaseCommand(null));
+        cmds1.add(new NewKnowledgeBaseCommand( (KnowledgeBaseConfiguration) null));
         cmds1.add(new SetVariableCommandFromLastReturn("path1",
                 KnowledgeBase.class.getName()));
 
@@ -181,7 +182,7 @@ public class SimulationTest {
                 ResourceType.DRL,
                 null));
 
-        cmds11.add(new NewKnowledgeBaseCommand(null));
+        cmds11.add(new NewKnowledgeBaseCommand( (KnowledgeBaseConfiguration) null ));
 
         cmds11.add(new SetVariableCommandFromLastReturn(World.ROOT,
                 KnowledgeBase.class.getName()));

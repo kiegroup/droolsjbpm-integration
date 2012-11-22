@@ -21,19 +21,14 @@ import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
-import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
-import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
+import org.kie.KBaseUnit;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.ResourceConfiguration;
 import org.kie.builder.ResourceType;
-import org.kie.command.*;
+import org.kie.command.Command;
 import org.kie.io.Resource;
-import org.kie.runtime.KnowledgeSessionConfiguration;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.conf.ClockTypeOption;
 
 public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<KnowledgeBaseSimFluent>
         implements KnowledgeBaseSimFluent {
@@ -77,13 +72,13 @@ public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<Knowle
     }
 
     public SimulationFluent end(String context, String name) {
-        addCommand(new GetVariableCommand(KnowledgeBase.class.getName()));
+        addCommand(new GetVariableCommand(KBaseUnit.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(context, name));
         return simulationFluent;
     }
 
     public SimulationFluent end(String name) {
-        addCommand(new GetVariableCommand(KnowledgeBase.class.getName()));
+        addCommand(new GetVariableCommand(KBaseUnit.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(name));
         return simulationFluent;
     }
