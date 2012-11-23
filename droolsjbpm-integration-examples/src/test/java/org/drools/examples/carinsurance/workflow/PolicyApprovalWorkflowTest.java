@@ -16,6 +16,14 @@
 
 package org.drools.examples.carinsurance.workflow;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
 import org.drools.examples.carinsurance.domain.Driver;
@@ -26,24 +34,12 @@ import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.joda.time.LocalDate;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.ResourceType;
-import org.kie.command.World;
-import org.kie.io.ResourceFactory;
-import org.kie.runtime.StatefulKnowledgeSession;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class PolicyApprovalWorkflowTest {
+public class PolicyApprovalWorkflowTest extends SimulateTestBase {
 
     @Test
-    public void approvePolicyRequest() {
+    public void approvePolicyRequest() throws IOException {
         SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
         Map<String, Object> processParams = new HashMap<String, Object>();
@@ -56,16 +52,13 @@ public class PolicyApprovalWorkflowTest {
         processParams.put("policyRequest", johnMiniPolicyRequest);
 
         assertEquals(false, johnMiniPolicyRequest.isManuallyApproved());
+        
+        String process = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestWorkflow.bpmn" ) ) );
+        createKJarWithMultipleResources( "org.drools.KBase1", new String[]{process}, new ResourceType[] {ResourceType.BPMN2} );
+        
         // @formatter:off          
         simulationFluent
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/workflow/policyRequestWorkflow.bpmn"),
-                    ResourceType.BPMN2)
-            .end()
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end(World.ROOT, KnowledgeBase.class.getName())
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
             .startProcess("policyRequestProcess", processParams)
             .end()
         .runSimulation();

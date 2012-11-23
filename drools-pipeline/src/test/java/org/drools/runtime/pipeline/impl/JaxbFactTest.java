@@ -72,9 +72,7 @@ public class JaxbFactTest {
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
-        assertFalse( kbuilder.hasErrors() );
-
-        assertFalse( kbuilder.hasErrors() );
+        assertFalse( kbuilder.getErrors().toString(), kbuilder.hasErrors() );
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 

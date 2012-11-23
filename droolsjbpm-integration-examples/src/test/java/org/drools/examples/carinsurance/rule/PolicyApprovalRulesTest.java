@@ -22,6 +22,7 @@ import org.drools.examples.carinsurance.domain.Driver;
 import org.drools.examples.carinsurance.domain.policy.CoverageType;
 import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
+import org.drools.examples.carinsurance.workflow.SimulateTestBase;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.joda.time.LocalDate;
@@ -32,12 +33,14 @@ import org.kie.builder.ResourceType;
 import org.kie.command.World;
 import org.kie.io.ResourceFactory;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 
-public class PolicyApprovalRulesTest {
+public class PolicyApprovalRulesTest extends SimulateTestBase {
 
     @Test
-    public void approvePolicyRequest() {
+    public void approvePolicyRequest() throws IOException {
         SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate(1970, 1, 1));
@@ -46,17 +49,12 @@ public class PolicyApprovalRulesTest {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
+        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
+        createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off          
         simulationFluent
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
-                    ResourceType.DRL)
-            .end()
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end()
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
@@ -70,7 +68,7 @@ public class PolicyApprovalRulesTest {
     }
 
     @Test
-    public void rejectMinors() {
+    public void rejectMinors() throws IOException {
         SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate().minusYears(10));
@@ -79,17 +77,12 @@ public class PolicyApprovalRulesTest {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
+        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
+        createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
         simulationFluent
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
-                    ResourceType.DRL)
-            .end()
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end()
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
@@ -103,7 +96,7 @@ public class PolicyApprovalRulesTest {
     }
 
     @Test(expected = AssertionError.class)
-    public void rejectMinorsFailingAssertion() {
+    public void rejectMinorsFailingAssertion() throws IOException {
         SimulationFluent simulationFluent = new DefaultSimulationFluent();
 
         Driver john = new Driver("John", "Smith", new LocalDate().minusYears(10));
@@ -112,17 +105,12 @@ public class PolicyApprovalRulesTest {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
+        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
+        createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
         simulationFluent
-        .newKnowledgeBuilder()
-            .add(ResourceFactory.newClassPathResource("org/drools/examples/carinsurance/rule/policyRequestApprovalRules.drl"),
-                    ResourceType.DRL)
-            .end()
-        .newKnowledgeBase()
-            .addKnowledgePackages()
-            .end()
-        .newStatefulKnowledgeSession()
+        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")

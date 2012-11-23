@@ -144,7 +144,7 @@ public class JaxbTest {
         assertEquals( 1,
                       list1.size() );
 
-        assertEquals( "org.kie.drools.order.Order",
+        assertEquals( "org.drools.model.order.Order",
                       list1.get( 0 ).getClass().getName() );
     }
 
@@ -212,10 +212,10 @@ public class JaxbTest {
         assertEquals( 1,
                       list2.size() );
 
-        assertEquals( "org.kie.drools.order.Order$OrderItem",
+        assertEquals( "org.drools.model.order.Order$OrderItem",
                       list1.get( 0 ).getClass().getName() );
 
-        assertEquals( "org.kie.drools.order.Order$OrderItem",
+        assertEquals( "org.drools.model.order.Order$OrderItem",
                       list2.get( 0 ).getClass().getName() );
 
         assertNotSame( list1.get( 0 ),
