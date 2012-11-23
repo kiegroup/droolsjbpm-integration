@@ -67,9 +67,9 @@ public class SmooksFromSourceTransformer extends BaseEmitter
                 throw new IllegalArgumentException( "signal object must be instance of Source, InputStream, Reader, Resource or String" );
             }
             
-            this.smooks.filter( source,
-                                javaResult,
-                                executionContext );
+            this.smooks.filterSource( executionContext,
+                                source,
+                                javaResult );
             
             result = javaResult.getBean( this.configuration.getRootId() );
         } catch ( Exception e ) {

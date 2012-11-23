@@ -50,9 +50,9 @@ public class SmooksToSourceTransformer extends BaseEmitter
             StringResult stringResult = new StringResult();
             ExecutionContext executionContext = this.smooks.createExecutionContext();
 
-            this.smooks.filter( new JavaSource( object ),
-                                stringResult,
-                                executionContext );
+            this.smooks.filterSource( executionContext,
+                                new JavaSource( object ),
+                                stringResult );
 
             result = stringResult.getResult();
         } catch ( Exception e ) {
