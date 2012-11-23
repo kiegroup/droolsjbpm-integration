@@ -65,9 +65,9 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
     @Test
     public void testSessionInsert() throws Exception {
         // These 2 classes around defined by person.xsd, not as a class file
-        Class< ? > personClass = classLoader.loadClass( "org.kie.drools.Person" );
+        Class< ? > personClass = classLoader.loadClass( "org.drools.model.Person" );
         assertNotNull( personClass.getPackage() );
-        Class< ? > addressClass = classLoader.loadClass( "org.kie.drools.AddressType" );
+        Class< ? > addressClass = classLoader.loadClass( "org.drools.model.AddressType" );
         assertNotNull( addressClass.getPackage() );
         Object baunax = personClass.newInstance();
         Object lucaz = personClass.newInstance();
@@ -161,7 +161,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
         if ( this.jaxbContext == null ) {
             JaxbDataFormat def = new JaxbDataFormat();
             def.setPrettyPrint( true );
-            def.setContextPath( "org.kie.drools:org.drools.pipeline.camel" );
+            def.setContextPath( "org.drools.model:org.drools.pipeline.camel" );
 
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
@@ -208,7 +208,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
     protected void configureDroolsContext(Context jndiContext) {
         String rule = "";
         rule += "package org.drools.pipeline.camel.test \n";
-        rule += "import org.kie.drools.Person \n";
+        rule += "import org.drools.model.Person \n";
         rule += "global java.util.List list \n";
         rule += "query persons \n";
         rule += "   $p : Person(name != null) \n";
@@ -259,7 +259,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
             }
         }
 
-        assertFalse( kbuilder.hasErrors() );
+        assertFalse( kbuilder.getErrors().toString(), kbuilder.hasErrors() );
 
         KnowledgeBase kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );

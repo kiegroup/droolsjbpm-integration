@@ -337,7 +337,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
     @Test
     public void testProcessInstanceSignalEvent() throws Exception {
 
-        String processId = "org.kie.event";
+        String processId = "org.drools.event";
 
         String cmd = "";
         cmd += "<batch-execution lookup='ksession1'>\n";

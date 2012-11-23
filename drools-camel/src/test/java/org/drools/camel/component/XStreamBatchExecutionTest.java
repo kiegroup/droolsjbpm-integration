@@ -1444,7 +1444,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        ProcessInstance processInstance = ksession.startProcess( "org.kie.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
@@ -1511,7 +1511,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        ProcessInstance processInstance = ksession.startProcess( "org.kie.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
