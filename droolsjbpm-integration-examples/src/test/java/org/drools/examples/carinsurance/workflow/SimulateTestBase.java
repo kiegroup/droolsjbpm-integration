@@ -1,12 +1,5 @@
 package org.drools.examples.carinsurance.workflow;
 
-import static java.util.Arrays.asList;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-
 import org.drools.builder.impl.KnowledgeContainerImpl;
 import org.drools.core.util.FileManager;
 import org.drools.kproject.KBase;
@@ -15,13 +8,19 @@ import org.drools.kproject.KProjectImpl;
 import org.drools.kproject.KSession;
 import org.junit.After;
 import org.junit.Before;
-import org.kie.builder.KnowledgeBuilderFactory;
 import org.kie.builder.KnowledgeContainer;
+import org.kie.builder.KnowledgeContainerFactory;
 import org.kie.builder.ResourceType;
 import org.kie.conf.AssertBehaviorOption;
 import org.kie.conf.EventProcessingOption;
-import org.kie.io.Resource;
 import org.kie.runtime.conf.ClockTypeOption;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+import static java.util.Arrays.asList;
 
 public class SimulateTestBase {
 
@@ -65,7 +64,7 @@ public class SimulateTestBase {
 
         fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), ((KProjectImpl) kproj).toXML() );
 
-        KnowledgeContainer kcontainer = KnowledgeBuilderFactory.newKnowledgeContainer();
+        KnowledgeContainer kcontainer = KnowledgeContainerFactory.newKnowledgeContainer();
 
         // input and output folder are the same
         File kJar = kcontainer.buildKJar( fileManager.getRootDirectory(), fileManager.getRootDirectory(), "test.jar" );
@@ -103,7 +102,7 @@ public class SimulateTestBase {
 
         fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), ((KProjectImpl) kproj).toXML() );
 
-        KnowledgeContainer kcontainer = KnowledgeBuilderFactory.newKnowledgeContainer();
+        KnowledgeContainer kcontainer = KnowledgeContainerFactory.newKnowledgeContainer();
 
         // input and output folder are the same
         File kJar = kcontainer.buildKJar( fileManager.getRootDirectory(), fileManager.getRootDirectory(), "test.jar" );
