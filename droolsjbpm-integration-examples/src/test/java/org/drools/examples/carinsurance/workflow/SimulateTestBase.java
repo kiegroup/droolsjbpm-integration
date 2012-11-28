@@ -2,10 +2,10 @@ package org.drools.examples.carinsurance.workflow;
 
 import org.drools.builder.impl.KnowledgeContainerImpl;
 import org.drools.core.util.FileManager;
-import org.drools.kproject.KBase;
-import org.drools.kproject.KProject;
-import org.drools.kproject.KProjectImpl;
-import org.drools.kproject.KSession;
+import org.kie.builder.KieBaseModel;
+import org.kie.builder.KieProject;
+import org.drools.kproject.KieProjectImpl;
+import org.kie.builder.KieSessionModel;
 import org.junit.After;
 import org.junit.Before;
 import org.kie.builder.KnowledgeContainer;
@@ -45,24 +45,24 @@ public class SimulateTestBase {
     }
 
     protected void createKJar(String... pairs) throws IOException {
-        KProject kproj = new KProjectImpl();
+        KieProject kproj = new KieProjectImpl();
         for ( int i = 0; i < pairs.length; i += 2 ) {
             String id = pairs[i];
             String rule = pairs[i + 1];
 
             fileManager.write( fileManager.newFile( "src/kbases/" + id + "/org/test/rule" + i + ".drl" ), rule );
 
-            KBase kBase1 = kproj.newKBase( id )
+            KieBaseModel kBase1 = kproj.newKieBaseModel( id )
                     .setEqualsBehavior( AssertBehaviorOption.EQUALITY )
                     .setEventProcessingMode( EventProcessingOption.STREAM );
 
-            KSession ksession1 = kBase1.newKSession( id+".KSession1" )
+            KieSessionModel ksession1 = kBase1.newKieSessionModel( id+".KSession1" )
                     .setType( "stateful" )
                     .setAnnotations( asList( "@ApplicationScoped; @Inject" ) )
                     .setClockType( ClockTypeOption.get( "pseudo" ) );
         }
 
-        fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), ((KProjectImpl) kproj).toXML() );
+        fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), kproj.toXML() );
 
         KnowledgeContainer kcontainer = KnowledgeContainerFactory.newKnowledgeContainer();
 
@@ -83,7 +83,7 @@ public class SimulateTestBase {
     protected void createKJarWithMultipleResources(String id,
                                                    String[] resources,
                                                    ResourceType[] types) throws IOException {
-        KProject kproj = new KProjectImpl();
+        KieProject kproj = new KieProjectImpl();
         for ( int i = 0; i < resources.length; i++ ) {
             String res = resources[i];
             String type = types[i].getDefaultExtension();
@@ -91,16 +91,16 @@ public class SimulateTestBase {
             fileManager.write( fileManager.newFile( "src/kbases/" + id + "/org/test/res" + i + "." + type ), res );
         }
 
-        KBase kBase1 = kproj.newKBase( id )
+        KieBaseModel kBase1 = kproj.newKieBaseModel( id )
                 .setEqualsBehavior( AssertBehaviorOption.EQUALITY )
                 .setEventProcessingMode( EventProcessingOption.STREAM );
 
-        KSession ksession1 = kBase1.newKSession( id + ".KSession1" )
+        KieSessionModel ksession1 = kBase1.newKieSessionModel( id + ".KSession1" )
                 .setType( "stateful" )
                 .setAnnotations( asList( "@ApplicationScoped; @Inject" ) )
                 .setClockType( ClockTypeOption.get( "pseudo" ) );
 
-        fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), ((KProjectImpl) kproj).toXML() );
+        fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), kproj.toXML() );
 
         KnowledgeContainer kcontainer = KnowledgeContainerFactory.newKnowledgeContainer();
 
