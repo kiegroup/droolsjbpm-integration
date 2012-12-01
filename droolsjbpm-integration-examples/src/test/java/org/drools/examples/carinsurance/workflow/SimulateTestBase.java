@@ -58,7 +58,6 @@ public class SimulateTestBase {
 
             KieSessionModel ksession1 = kBase1.newKieSessionModel( id+".KSession1" )
                     .setType( "stateful" )
-                    .setAnnotations( asList( "@ApplicationScoped; @Inject" ) )
                     .setClockType( ClockTypeOption.get( "pseudo" ) );
         }
 
@@ -97,7 +96,6 @@ public class SimulateTestBase {
 
         KieSessionModel ksession1 = kBase1.newKieSessionModel( id + ".KSession1" )
                 .setType( "stateful" )
-                .setAnnotations( asList( "@ApplicationScoped; @Inject" ) )
                 .setClockType( ClockTypeOption.get( "pseudo" ) );
 
         fileManager.write( fileManager.newFile( KnowledgeContainerImpl.KPROJECT_RELATIVE_PATH ), kproj.toXML() );

@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import javax.naming.Context;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -35,17 +34,10 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.concurrent.CommandExecutor;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.pipeline.camel.Person;
 import org.drools.pipeline.camel.WrappedList;
 import org.drools.reteoo.ReteooRuleBase;
-
-import com.sun.tools.xjc.Language;
-import com.sun.tools.xjc.Options;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactoryService;
@@ -54,11 +46,13 @@ import org.kie.builder.KnowledgeBuilderFactoryService;
 import org.kie.builder.ResourceType;
 import org.kie.builder.help.KnowledgeBuilderHelper;
 import org.kie.io.ResourceFactory;
+import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 
-import static org.junit.Assert.*;
+import com.sun.tools.xjc.Language;
+import com.sun.tools.xjc.Options;
 
 public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSupport {
 
