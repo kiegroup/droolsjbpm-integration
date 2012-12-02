@@ -17,7 +17,7 @@
 package org.drools.container.spring.beans;
 
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
-import org.kie.persistence.jpa.KnowledgeStoreService;
+import org.kie.persistence.jpa.KieStoreServices;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -30,8 +30,8 @@ public class KnowledgeStoreBeanFactory
         return new KnowledgeStoreServiceImpl();
     }
 
-    public Class< ? extends KnowledgeStoreService> getObjectType() {
-        return KnowledgeStoreService.class;
+    public Class< ? extends KieStoreServices> getObjectType() {
+        return KieStoreServices.class;
     }
 
     public boolean isSingleton() {

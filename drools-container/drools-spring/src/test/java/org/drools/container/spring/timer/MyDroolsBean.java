@@ -6,7 +6,7 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.base.MapGlobalResolver;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
-import org.kie.persistence.jpa.KnowledgeStoreService;
+import org.kie.persistence.jpa.KieStoreServices;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;
 import org.kie.runtime.StatefulKnowledgeSession;
@@ -23,7 +23,7 @@ public class MyDroolsBean {
 
     private EntityManagerFactory  emf;
     private KnowledgeBase         kbase;
-    private KnowledgeStoreService kstore;
+    private KieStoreServices kstore;
     private JpaTransactionManager txm;
 
     private TestWorkItemHandler   workItemHandler = new TestWorkItemHandler();
@@ -113,7 +113,7 @@ public class MyDroolsBean {
         this.kbase = kbase;
     }
 
-    public void setKstore(KnowledgeStoreService kstore) {
+    public void setKstore(KieStoreServices kstore) {
         this.kstore = kstore;
     }
 

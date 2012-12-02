@@ -50,7 +50,7 @@ import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.marshalling.ObjectMarshallingStrategy;
 import org.kie.persistence.jpa.JPAKnowledgeService;
-import org.kie.persistence.jpa.KnowledgeStoreService;
+import org.kie.persistence.jpa.KieStoreServices;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;
 import org.kie.runtime.StatefulKnowledgeSession;
@@ -134,7 +134,7 @@ public class VariablePersistenceStrategyTest {
                  new ObjectMarshallingStrategy[]{new JPAPlaceholderResolverStrategy( env ),
                                                                     new SerializablePlaceholderResolverStrategy( ClassObjectMarshallingStrategyAcceptor.DEFAULT )} );
 
-        final KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        final KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         final KnowledgeBase kbRollback = (KnowledgeBase) ctx.getBean( "kbRollback" );
 
         TransactionTemplate txTemplate = new TransactionTemplate( txManager );
@@ -307,7 +307,7 @@ public class VariablePersistenceStrategyTest {
                                                                   new SerializablePlaceholderResolverStrategy( ClassObjectMarshallingStrategyAcceptor.DEFAULT )
                                                                 } );
 
-        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbase1" );
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,

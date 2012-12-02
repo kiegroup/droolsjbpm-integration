@@ -52,7 +52,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
-import org.kie.persistence.jpa.KnowledgeStoreService;
+import org.kie.persistence.jpa.KieStoreServices;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;
 import org.kie.runtime.StatefulKnowledgeSession;
@@ -169,7 +169,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         env.set( EnvironmentName.TRANSACTION_MANAGER,
                  ctx.getBean( "txManager" ) );
         */
-        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,
@@ -258,7 +258,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         env.set( EnvironmentName.TRANSACTION_MANAGER,
                  ctx.getBean( "txManager" ) );
         */
-        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,
@@ -441,7 +441,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         env.set( EnvironmentName.TRANSACTION_MANAGER,
                  ctx.getBean( "txManager" ) );
         */
-        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,
@@ -594,7 +594,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         env.set( EnvironmentName.TRANSACTION_MANAGER,
                  ctx.getBean( "txManager" ) );
         */
-        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,
@@ -692,7 +692,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         env.set( EnvironmentName.TRANSACTION_MANAGER,
                  ctx.getBean( "txManager" ) );
         */
-        KnowledgeStoreService kstore = (KnowledgeStoreService) ctx.getBean( "kstore1" );
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
         KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
         service = kstore.loadStatefulKnowledgeSession( sessionId,
                                                        kbase1,
