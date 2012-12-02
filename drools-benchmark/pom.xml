@@ -19,17 +19,17 @@
 
   <!--dependencies>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
       <version>5.3.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
       <version>5.3.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.drools</groupId>
       <artifactId>knowledge-api</artifactId>
       <version>5.3.2-SNAPSHOT</version>
     </dependency>
