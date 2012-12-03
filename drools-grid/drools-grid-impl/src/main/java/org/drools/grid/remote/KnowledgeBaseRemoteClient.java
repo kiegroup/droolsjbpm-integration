@@ -17,11 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.SetVariableCommandFromCommand;
@@ -40,9 +35,17 @@ import org.kie.definition.rule.Rule;
 import org.kie.definition.type.FactType;
 import org.kie.event.knowledgebase.KnowledgeBaseEventListener;
 import org.kie.runtime.Environment;
+import org.kie.runtime.KieSession;
 import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.StatelessKieSession;
 import org.kie.runtime.StatelessKnowledgeSession;
+
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 
 public class KnowledgeBaseRemoteClient
     implements
@@ -146,6 +149,26 @@ public class KnowledgeBaseRemoteClient
     }
 
     public Collection<Process> getProcesses() {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public KieSession newKieSession(KnowledgeSessionConfiguration conf, Environment environment) {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public KieSession newKieSession() {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public Collection<? extends KieSession> getKieSessions() {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public StatelessKieSession newStatelessKieSession(KnowledgeSessionConfiguration conf) {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public StatelessKieSession newStatelessKieSession() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

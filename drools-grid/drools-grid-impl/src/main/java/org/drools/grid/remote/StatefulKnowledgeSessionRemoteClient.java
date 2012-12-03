@@ -18,12 +18,6 @@
 package org.drools.grid.remote;
 
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
-
 import org.drools.command.ExecuteCommand;
 import org.drools.command.GetSessionClockCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
@@ -38,7 +32,15 @@ import org.drools.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.process.StartProcessInstanceCommand;
-import org.drools.command.runtime.rule.*;
+import org.drools.command.runtime.rule.FireAllRulesCommand;
+import org.drools.command.runtime.rule.FireUntilHaltCommand;
+import org.drools.command.runtime.rule.GetFactHandleCommand;
+import org.drools.command.runtime.rule.GetFactHandlesCommand;
+import org.drools.command.runtime.rule.GetObjectCommand;
+import org.drools.command.runtime.rule.GetObjectsCommand;
+import org.drools.command.runtime.rule.HaltCommand;
+import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
@@ -47,7 +49,8 @@ import org.drools.grid.remote.command.AsyncBatchExecutionCommandImpl;
 import org.drools.grid.remote.command.GetWorkingMemoryEntryPointRemoteCommand;
 import org.drools.grid.remote.command.QueryRemoteCommand;
 import org.kie.KnowledgeBase;
-import org.kie.command.*;
+import org.kie.command.Command;
+import org.kie.command.CommandFactory;
 import org.kie.event.process.ProcessEventListener;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.WorkingMemoryEventListener;
@@ -71,6 +74,12 @@ import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 import org.kie.time.SessionClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 public class StatefulKnowledgeSessionRemoteClient
     implements
@@ -419,6 +428,10 @@ public class StatefulKnowledgeSessionRemoteClient
                                                                                                                       kresultsId )} ) );
 
         this.sendMessage(cmd);
+    }
+
+    public void delete(FactHandle handle) {
+        retract(handle);
     }
 
     public void update(FactHandle handle,

@@ -17,10 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.drools.FactException;
 import org.drools.FactHandle;
 import org.drools.WorkingMemoryEntryPoint;
@@ -31,6 +27,10 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.runtime.ObjectFilter;
+
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class WorkingMemoryEntryPointRemoteClient
     implements
@@ -81,6 +81,10 @@ public class WorkingMemoryEntryPointRemoteClient
     }
 
     public void retract(org.kie.runtime.rule.FactHandle handle) throws FactException {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public void delete(org.kie.runtime.rule.FactHandle handle) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

@@ -2,12 +2,12 @@ package org.drools.fluent.simulation;
 
 import org.drools.builder.impl.KnowledgeContainerImpl;
 import org.drools.core.util.FileManager;
-import org.kie.builder.KieBaseModel;
-import org.kie.builder.KieProject;
-import org.drools.kproject.KieProjectImpl;
-import org.kie.builder.KieSessionModel;
 import org.junit.After;
 import org.junit.Before;
+import org.kie.builder.KieBaseModel;
+import org.kie.builder.KieFactory;
+import org.kie.builder.KieModuleModel;
+import org.kie.builder.KieSessionModel;
 import org.kie.builder.KnowledgeContainer;
 import org.kie.builder.KnowledgeContainerFactory;
 import org.kie.builder.ResourceType;
@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import static java.util.Arrays.asList;
 
 public class SimulateTestBase {
 
@@ -45,7 +43,8 @@ public class SimulateTestBase {
     }
 
     protected void createKJar(String... pairs) throws IOException {
-        KieProject kproj = new KieProjectImpl();
+        KieFactory kf = KieFactory.Factory.get();
+        KieModuleModel kproj = kf.newKieModuleModel();
         for ( int i = 0; i < pairs.length; i += 2 ) {
             String id = pairs[i];
             String rule = pairs[i + 1];
@@ -82,7 +81,8 @@ public class SimulateTestBase {
     protected void createKJarWithMultipleResources(String id,
                                                    String[] resources,
                                                    ResourceType[] types) throws IOException {
-        KieProject kproj = new KieProjectImpl();
+        KieFactory kf = KieFactory.Factory.get();
+        KieModuleModel kproj = kf.newKieModuleModel();
         for ( int i = 0; i < resources.length; i++ ) {
             String res = resources[i];
             String type = types[i].getDefaultExtension();

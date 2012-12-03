@@ -1,11 +1,9 @@
 package org.drools.grid.io.impl;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.drools.command.impl.ContextImpl;
-import org.drools.command.impl.ContextImplWithEviction;
 import org.kie.command.Context;
 import org.kie.command.World;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NodeData {
     private World contextManager;
@@ -20,6 +18,7 @@ public class NodeData {
     private AtomicInteger  sessionIdCounter = new AtomicInteger();
 
     public NodeData() {
+/*
         // Setup ROOT context, this will hold all long lived intances and instanceIds
         this.contextManager = new ContextManagerImpl();
 
@@ -35,6 +34,7 @@ public class NodeData {
                                      this.root);
         
         ((ContextManagerImpl) this.contextManager).addContext( this.temp );
+*/
     }
 
     public AtomicInteger getSessionIdCounter() {
