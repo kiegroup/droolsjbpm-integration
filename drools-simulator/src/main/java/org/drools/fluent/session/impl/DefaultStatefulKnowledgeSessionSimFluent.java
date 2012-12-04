@@ -16,14 +16,7 @@
 
 package org.drools.fluent.session.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.drools.command.GetVariableCommand;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.AddEventListenerCommand;
 import org.drools.command.runtime.SetGlobalCommand;
@@ -45,6 +38,12 @@ import org.kie.command.Command;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.simulation.SimulationStep;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFluent<StatefulKnowledgeSessionSimFluent>
         implements StatefulKnowledgeSessionSimFluent {

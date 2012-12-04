@@ -17,11 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.UUID;
-
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -30,15 +25,18 @@ import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommand
 import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.kie.KBaseUnit;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseConfiguration;
 import org.kie.KnowledgeBaseFactoryService;
 import org.kie.runtime.Environment;
 import org.kie.runtime.KnowledgeSessionConfiguration;
-import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.UUID;
 
 public class KnowledgeBaseProviderRemoteClient
     implements
@@ -150,17 +148,4 @@ public class KnowledgeBaseProviderRemoteClient
     public Environment newEnvironment() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
-
-    public KnowledgeBase getKnowledgeBase(String kBaseName) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public StatefulKnowledgeSession getStatefulKnowlegeSession(String kSessionName) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public KBaseUnit getKBaseUnit(String kBaseName) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
 }

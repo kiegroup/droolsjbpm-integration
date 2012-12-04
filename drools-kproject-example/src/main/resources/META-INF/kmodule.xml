@@ -1,4 +1,4 @@
-<kproject>
+<kmodule>
   <kbases>
     <kbase name="FireAlarmKBase">
       <ksessions>
@@ -11,4 +11,4 @@
       </ksessions>
     </kbase>
   </kbases>
-</kproject>
+</kmodule>

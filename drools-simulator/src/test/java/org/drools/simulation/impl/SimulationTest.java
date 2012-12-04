@@ -16,12 +16,7 @@
 
 package org.drools.simulation.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.NewKnowledgeBaseCommand;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.assertion.AssertEquals;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
@@ -33,7 +28,6 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseConfiguration;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.ResourceType;
@@ -45,6 +39,9 @@ import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.conf.ClockTypeOption;
 import org.kie.simulation.Simulation;
 import org.kie.simulation.SimulationStep;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(JUnitSimulationRunner.class)
 public class SimulationTest {
@@ -81,7 +78,7 @@ public class SimulationTest {
                 ResourceType.DRL,
                 null));
 
-        cmds1.add(new NewKnowledgeBaseCommand( (KnowledgeBaseConfiguration) null));
+        // cmds1.add(new NewKnowledgeBaseCommand( (KnowledgeBaseConfiguration) null));
         cmds1.add(new SetVariableCommandFromLastReturn("path1",
                 KnowledgeBase.class.getName()));
 
@@ -90,7 +87,7 @@ public class SimulationTest {
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption(ClockTypeOption.get("pseudo"));
 
-        cmds1.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
+        // cmds1.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
         cmds1.add( new SetVariableCommandFromLastReturn( "path1",
                                           StatefulKnowledgeSession.class.getName() ) );
 
@@ -182,7 +179,7 @@ public class SimulationTest {
                 ResourceType.DRL,
                 null));
 
-        cmds11.add(new NewKnowledgeBaseCommand( (KnowledgeBaseConfiguration) null ));
+        // cmds11.add(new NewKnowledgeBaseCommand( (KnowledgeBaseConfiguration) null ));
 
         cmds11.add(new SetVariableCommandFromLastReturn(World.ROOT,
                 KnowledgeBase.class.getName()));
@@ -192,7 +189,7 @@ public class SimulationTest {
         KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption(ClockTypeOption.get("pseudo"));
 
-        cmds11.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
+        // cmds11.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
         cmds11.add(new SetVariableCommandFromLastReturn(World.ROOT,
                 StatefulKnowledgeSession.class.getName()));
 

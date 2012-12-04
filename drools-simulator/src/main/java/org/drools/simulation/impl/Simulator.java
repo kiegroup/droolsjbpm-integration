@@ -16,6 +16,19 @@
 
 package org.drools.simulation.impl;
 
+import org.drools.command.GetDefaultValue;
+import org.drools.command.ResolvingKnowledgeCommandContext;
+import org.drools.command.impl.ContextImpl;
+import org.drools.command.impl.GenericCommand;
+import org.drools.time.SessionPseudoClock;
+import org.kie.command.Command;
+import org.kie.command.Context;
+import org.kie.command.World;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.simulation.Simulation;
+import org.kie.simulation.SimulationPath;
+import org.kie.simulation.SimulationStep;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,18 +36,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.drools.command.GetDefaultValue;
-import org.drools.command.NewStatefulKnowledgeSessionCommand;
-import org.drools.command.ResolvingKnowledgeCommandContext;
-import org.drools.command.impl.ContextImpl;
-import org.drools.command.impl.GenericCommand;
-import org.drools.time.SessionPseudoClock;
-import org.kie.command.*;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.simulation.Simulation;
-import org.kie.simulation.SimulationPath;
-import org.kie.simulation.SimulationStep;
 
 public class Simulator
         implements World, GetDefaultValue {
@@ -131,7 +132,7 @@ public class Simulator
         }
 
         for ( Command cmd : step.getCommands() ) {
-            if ( cmd instanceof NewStatefulKnowledgeSessionCommand ) {
+            /* if ( cmd instanceof NewStatefulKnowledgeSessionCommand ) {
                 // instantiate the ksession, set it's clock and register it
                 StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) executionHandler.execute( (GenericCommand) cmd,
                                                                                                          pathContext );
@@ -144,7 +145,7 @@ public class Simulator
                     this.ksessions.add( ksession );
                     this.lastReturnValue = ksession;
                 }
-            } else if ( cmd instanceof GenericCommand ) {
+            } else */ if ( cmd instanceof GenericCommand ) {
                 this.lastReturnValue = executionHandler.execute( (GenericCommand) cmd,
                                                                  pathContext );
             }

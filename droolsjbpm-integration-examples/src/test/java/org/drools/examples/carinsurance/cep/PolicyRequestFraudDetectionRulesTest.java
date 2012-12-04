@@ -16,10 +16,6 @@
 
 package org.drools.examples.carinsurance.cep;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
 import org.drools.examples.carinsurance.domain.Driver;
@@ -33,6 +29,10 @@ import org.joda.time.LocalDate;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.builder.ResourceType;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
 
 public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
 
@@ -56,7 +56,7 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
         fakeJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
         fakeJohnMiniPolicyRequest.setAutomaticallyRejected(false);
 
-        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestFraudDetectionRules.drl" ) ) );
+        String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestFraudDetectionRules.drl" ) ) );
         createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
@@ -103,7 +103,7 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
         otherJohnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
         otherJohnMiniPolicyRequest.setAutomaticallyRejected(false);
 
-        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestFraudDetectionRules.drl" ) ) );
+        String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestFraudDetectionRules.drl" ) ) );
         createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off

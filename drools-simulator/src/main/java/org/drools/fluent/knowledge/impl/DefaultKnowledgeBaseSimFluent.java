@@ -16,15 +16,12 @@
 
 package org.drools.fluent.knowledge.impl;
 
-import org.drools.command.GetVariableCommand;
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
-import org.kie.KBaseUnit;
-import org.kie.KnowledgeBase;
 import org.kie.builder.ResourceConfiguration;
 import org.kie.builder.ResourceType;
 import org.kie.command.Command;
@@ -72,13 +69,11 @@ public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<Knowle
     }
 
     public SimulationFluent end(String context, String name) {
-        addCommand(new GetVariableCommand(KBaseUnit.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(context, name));
         return simulationFluent;
     }
 
     public SimulationFluent end(String name) {
-        addCommand(new GetVariableCommand(KBaseUnit.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(name));
         return simulationFluent;
     }

@@ -23,15 +23,11 @@ import org.drools.examples.carinsurance.domain.policy.CoverageType;
 import org.drools.examples.carinsurance.domain.request.CoverageRequest;
 import org.drools.examples.carinsurance.domain.request.PolicyRequest;
 import org.drools.examples.carinsurance.workflow.SimulateTestBase;
-import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.joda.time.LocalDate;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.ResourceType;
-import org.kie.command.World;
-import org.kie.io.ResourceFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +45,7 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
-        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
+        String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
         createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off          
@@ -77,7 +73,7 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
-        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
+        String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
         createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
@@ -105,7 +101,7 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COLLISION));
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
-        String rules = fileManager.readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
+        String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
         createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
