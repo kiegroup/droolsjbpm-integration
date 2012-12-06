@@ -16,24 +16,17 @@
 
 package org.drools.simulation.impl;
 
-import static org.drools.fluent.test.impl.ReflectiveMatcherFactory.matcher;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.simulation.SimulateTestBase;
 import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.ResourceType;
-import org.kie.command.World;
 import org.kie.fluent.VariableContext;
-import org.kie.io.ResourceFactory;
+import org.kie.io.ResourceType;
 
 public class StandardjBPM5FluentTest extends SimulateTestBase {
 

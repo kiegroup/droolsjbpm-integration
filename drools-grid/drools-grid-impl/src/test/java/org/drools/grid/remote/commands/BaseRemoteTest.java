@@ -17,10 +17,15 @@
 
 package org.drools.grid.remote.commands;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.persistence.Persistence;
+
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
@@ -51,11 +56,9 @@ import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderError;
 import org.kie.builder.KnowledgeBuilderErrors;
 import org.kie.builder.KnowledgeBuilderFactoryService;
-import org.kie.builder.ResourceType;
 import org.kie.conf.AssertBehaviorOption;
+import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
-
-import static org.junit.Assert.*;
 
 public abstract class BaseRemoteTest {
     

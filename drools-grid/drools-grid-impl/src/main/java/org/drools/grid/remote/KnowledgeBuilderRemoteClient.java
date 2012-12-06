@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
+
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
@@ -30,9 +31,15 @@ import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CollectionClient;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.KnowledgeBase;
-import org.kie.builder.*;
+import org.kie.builder.CompositeKnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderErrors;
+import org.kie.builder.KnowledgeBuilderResults;
+import org.kie.builder.ResultSeverity;
 import org.kie.definition.KnowledgePackage;
 import org.kie.io.Resource;
+import org.kie.io.ResourceConfiguration;
+import org.kie.io.ResourceType;
 
 public class KnowledgeBuilderRemoteClient
     implements

@@ -16,40 +16,9 @@
  */
 package org.drools.io.mina;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import org.drools.grid.CoreServicesLookup;
+
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.SocketService;
-import org.drools.grid.conf.GridPeerServiceConfiguration;
-import org.drools.grid.conf.impl.GridPeerConfiguration;
-import org.drools.grid.impl.GridImpl;
-import org.drools.grid.impl.MultiplexSocketServerImpl;
-import org.drools.grid.io.Connector;
-import org.drools.grid.io.ConversationManager;
-import org.drools.grid.io.impl.ConversationManagerImpl;
-import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
-import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaConnector;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
-import org.drools.grid.service.directory.impl.WhitePagesClient;
-import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
-import org.drools.grid.service.directory.impl.WhitePagesSocketConfiguration;
-import org.drools.grid.time.impl.MockJob;
-import org.drools.grid.timer.impl.CoreServicesSchedulerConfiguration;
-import org.drools.grid.timer.impl.RegisterSchedulerConfiguration;
-import org.drools.grid.timer.impl.SchedulerClient;
-import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
-import org.drools.grid.timer.impl.SchedulerSocketConfiguration;
-import org.drools.grid.util.IoUtils;
-import org.drools.time.SchedulerService;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.SystemEventListener;

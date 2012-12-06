@@ -17,16 +17,13 @@
 package org.drools.examples.broker.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 
 import org.drools.examples.broker.model.Company;
 import org.drools.examples.broker.model.StockTick;

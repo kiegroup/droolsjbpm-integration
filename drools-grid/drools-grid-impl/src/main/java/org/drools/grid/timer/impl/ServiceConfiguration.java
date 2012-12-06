@@ -19,6 +19,7 @@ package org.drools.grid.timer.impl;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
+
 import org.drools.grid.Grid;
 
 public interface ServiceConfiguration

@@ -44,9 +44,6 @@ import org.drools.command.runtime.rule.GetObjectCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.pipeline.camel.Person;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kie.command.BatchExecutionCommand;
 import org.kie.command.Command;
@@ -54,8 +51,6 @@ import org.kie.command.CommandFactory;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
-
-import static org.junit.Assert.*;
 
 public class CamelEndpointTest extends DroolsCamelTestSupport {
     private String handle;

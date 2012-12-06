@@ -20,7 +20,6 @@ package org.drools.grid.remote;
 import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
-import org.drools.grid.GridNodeConnection;
 import org.drools.grid.GridServiceDescription;
 
 public class RemoteGridNodeConnection<T>

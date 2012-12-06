@@ -16,7 +16,11 @@
  */
 package org.drools.grid.remote;
 
-import com.sun.tools.xjc.Options;
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.UUID;
+
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -33,10 +37,7 @@ import org.kie.builder.KnowledgeBuilderFactoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.UUID;
+import com.sun.tools.xjc.Options;
 
 public class KnowledgeBuilderProviderRemoteClient
     implements

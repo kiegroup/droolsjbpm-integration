@@ -15,8 +15,12 @@
 */
 package org.drools.container.spring.beans;
 
-import org.springframework.beans.factory.*;
-import static org.drools.container.spring.beans.KnowledgeLoggerAdaptor.*;
+import org.drools.container.spring.beans.KnowledgeLoggerAdaptor.KNOWLEDGE_LOGGER_TYPE;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.NamedBean;
 
 public class KnowledgeLoggerBeanFactory implements
         FactoryBean<KnowledgeLoggerAdaptor>, InitializingBean, BeanNameAware, NamedBean, DisposableBean {

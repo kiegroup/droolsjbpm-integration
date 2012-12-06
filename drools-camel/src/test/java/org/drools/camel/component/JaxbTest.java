@@ -16,6 +16,8 @@
 
 package org.drools.camel.component;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
@@ -32,8 +34,13 @@ import javax.xml.bind.Unmarshaller;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.junit.After;
-import org.junit.Before;
+import org.drools.command.impl.GenericCommand;
+import org.drools.command.runtime.BatchExecutionCommandImpl;
+import org.drools.command.runtime.GetGlobalCommand;
+import org.drools.command.runtime.SetGlobalCommand;
+import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.pipeline.camel.Person;
+import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
@@ -42,17 +49,6 @@ import org.kie.command.CommandFactory;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.GetGlobalCommand;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.pipeline.camel.Person;
-import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 
 public class JaxbTest {
 

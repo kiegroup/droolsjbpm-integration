@@ -31,29 +31,24 @@
 
 package org.drools.camel.component;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import javax.naming.Context;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.drools.pipeline.camel.Person;
-import org.mockito.ArgumentCaptor;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kie.event.rule.ActivationCreatedEvent;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.ObjectInsertedEvent;
 import org.kie.event.rule.WorkingMemoryEventListener;
 import org.kie.runtime.StatefulKnowledgeSession;
-
-import static org.junit.Assert.*;
+import org.mockito.ArgumentCaptor;
 
 public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
     private StatefulKnowledgeSession ksession;

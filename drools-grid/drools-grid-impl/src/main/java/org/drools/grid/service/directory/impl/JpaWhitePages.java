@@ -1,6 +1,7 @@
 package org.drools.grid.service.directory.impl;
 
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 

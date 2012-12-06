@@ -16,11 +16,11 @@
 
 package org.drools.examples.carinsurance.domain.policy;
 
-import org.drools.examples.carinsurance.domain.Car;
-import org.drools.examples.carinsurance.domain.Driver;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import org.drools.examples.carinsurance.domain.Car;
+import org.drools.examples.carinsurance.domain.Driver;
 
 public class Policy {
 

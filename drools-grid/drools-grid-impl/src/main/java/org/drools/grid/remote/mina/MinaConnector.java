@@ -1,9 +1,6 @@
 package org.drools.grid.remote.mina;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
@@ -13,7 +10,6 @@ import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.drools.grid.io.Connector;
 import org.drools.grid.io.IoWriter;
-import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.kie.SystemEventListener;
 import org.slf4j.Logger;

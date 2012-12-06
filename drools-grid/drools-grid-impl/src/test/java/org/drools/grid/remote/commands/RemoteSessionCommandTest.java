@@ -20,14 +20,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.common.DefaultFactHandle;
-
 import org.drools.grid.NodeTests.MyObject;
 import org.drools.grid.helper.GridHelper;
 import org.drools.grid.remote.InternalQueryResultsClient;
 import org.drools.grid.remote.QueryResultsRemoteClient;
+import org.drools.grid.remote.command.AsyncBatchExecutionCommandImpl;
 import org.drools.io.impl.ByteArrayResource;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.io.internal.InternalResource;
@@ -35,15 +36,15 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.agent.KnowledgeAgent;
-import org.kie.builder.ResourceType;
-import org.kie.command.*;
+import org.kie.command.Command;
+import org.kie.command.CommandFactory;
 import org.kie.io.Resource;
+import org.kie.io.ResourceType;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.runtime.rule.QueryResults;
 import org.kie.runtime.rule.QueryResultsRow;
-import org.drools.grid.remote.command.AsyncBatchExecutionCommandImpl;
 
 public class RemoteSessionCommandTest extends BaseRemoteTest {
 

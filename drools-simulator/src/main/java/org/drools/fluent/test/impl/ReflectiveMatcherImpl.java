@@ -16,10 +16,6 @@
 
 package org.drools.fluent.test.impl;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
-import org.hamcrest.Matcher;
 import org.kie.fluent.test.ReflectiveMatcher;
 
 public class ReflectiveMatcherImpl implements ReflectiveMatcher {

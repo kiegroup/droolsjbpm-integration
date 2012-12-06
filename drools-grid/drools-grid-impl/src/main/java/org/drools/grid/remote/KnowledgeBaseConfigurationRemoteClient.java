@@ -19,6 +19,7 @@ package org.drools.grid.remote;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;

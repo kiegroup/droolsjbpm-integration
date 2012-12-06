@@ -1,14 +1,8 @@
 package org.drools.grid.remote.mina;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.mina.core.session.IoSession;
-import org.drools.grid.ConnectorException;
-import org.drools.grid.internal.responsehandlers.BlockingMessageResponseHandler;
 import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.Message;
-import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.grid.io.impl.MessageImpl;
 
 public class MinaIoWriter
     implements

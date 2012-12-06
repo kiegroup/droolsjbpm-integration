@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Set;
-import org.drools.command.impl.GenericCommand;
+
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -33,7 +33,6 @@ import org.kie.builder.conf.KnowledgeBuilderOption;
 import org.kie.builder.conf.MultiValueKnowledgeBuilderOption;
 import org.kie.builder.conf.SingleValueKnowledgeBuilderOption;
 import org.kie.command.CommandFactory;
-import org.kie.command.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

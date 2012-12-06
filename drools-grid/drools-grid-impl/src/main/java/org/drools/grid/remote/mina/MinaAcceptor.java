@@ -4,15 +4,11 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
-import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-import org.drools.grid.DaemonService;
 import org.drools.grid.io.Acceptor;
-import org.drools.grid.io.IoWriter;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.kie.SystemEventListener;
 import org.slf4j.Logger;

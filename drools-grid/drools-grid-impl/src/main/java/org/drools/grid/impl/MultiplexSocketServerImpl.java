@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.drools.grid.Grid;
+import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
-import org.drools.grid.GridConnection;
 import org.drools.grid.SocketService;
 import org.drools.grid.io.Acceptor;
 import org.drools.grid.io.AcceptorFactoryService;

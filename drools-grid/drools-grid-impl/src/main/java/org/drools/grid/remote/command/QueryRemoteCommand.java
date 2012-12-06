@@ -24,14 +24,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.drools.grid.remote.command.QueryResultsDescriptor;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.runtime.impl.ExecutionResultImpl;
-import org.drools.runtime.rule.impl.NativeQueryResults;
 import org.kie.command.Context;
-import org.kie.command.World;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.QueryResults;
 import org.kie.runtime.rule.Variable;

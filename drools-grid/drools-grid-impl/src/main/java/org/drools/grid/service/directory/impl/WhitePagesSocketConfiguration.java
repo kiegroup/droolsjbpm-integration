@@ -1,15 +1,10 @@
 package org.drools.grid.service.directory.impl;
 
-import java.io.Serializable;
-import java.net.InetSocketAddress;
-
 import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;
-import org.drools.grid.GridServiceDescription;
 import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
-import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 
 public class WhitePagesSocketConfiguration

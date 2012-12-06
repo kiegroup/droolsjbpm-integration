@@ -18,7 +18,6 @@ package org.drools.container.spring.beans.persistence;
 
 import java.util.Stack;
 
-import org.drools.container.spring.beans.persistence.SpringTransactionSynchronizationAdapter;
 import org.drools.persistence.TransactionManager;
 import org.drools.persistence.TransactionSynchronization;
 import org.slf4j.Logger;

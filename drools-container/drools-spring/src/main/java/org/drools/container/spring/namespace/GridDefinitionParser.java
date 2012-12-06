@@ -16,27 +16,12 @@
 
 package org.drools.container.spring.namespace;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.drools.container.spring.beans.GridBeanFactory;
-import org.drools.container.spring.beans.GridBeanFactory.SocketServiceConfiguration;
-/*
-import org.drools.grid.io.AcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.service.directory.impl.JpaWhitePages;
-import org.drools.grid.service.directory.impl.WhitePagesImpl;
-*/
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class GridDefinitionParser extends AbstractBeanDefinitionParser {

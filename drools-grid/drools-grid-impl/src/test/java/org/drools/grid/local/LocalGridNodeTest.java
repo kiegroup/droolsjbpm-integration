@@ -1,11 +1,11 @@
 package org.drools.grid.local;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 import org.drools.grid.ConnectionFactoryService;
 import org.drools.grid.Grid;
@@ -18,7 +18,7 @@ import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactoryService;
 import org.kie.builder.KnowledgeBuilderFactoryService;

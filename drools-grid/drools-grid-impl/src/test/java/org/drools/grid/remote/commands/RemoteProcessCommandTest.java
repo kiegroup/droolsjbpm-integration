@@ -21,6 +21,7 @@ package org.drools.grid.remote.commands;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.kie.runtime.StatefulKnowledgeSession;

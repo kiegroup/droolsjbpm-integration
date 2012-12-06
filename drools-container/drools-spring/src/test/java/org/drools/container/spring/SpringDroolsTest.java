@@ -33,21 +33,18 @@ import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.SessionConfiguration;
 import org.drools.common.InternalRuleBase;
+import org.drools.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
+import org.drools.definition.KnowledgePackage;
 import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.impl.UrlResource;
 import org.drools.io.internal.InternalResource;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.StatelessKnowledgeSession;
 import org.jbpm.process.instance.impl.humantask.HumanTaskHandler;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.conf.EventProcessingOption;
-import org.kie.definition.KnowledgePackage;
-import org.kie.io.Resource;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.StatelessKnowledgeSession;
-import org.kie.runtime.process.WorkItemHandler;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsTest {

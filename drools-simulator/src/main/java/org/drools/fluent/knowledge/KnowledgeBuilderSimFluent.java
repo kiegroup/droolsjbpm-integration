@@ -16,8 +16,8 @@
 
 package org.drools.fluent.knowledge;
 
-import org.drools.fluent.test.TestableFluent;
 import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.test.TestableFluent;
 import org.kie.fluent.FluentKnowledgeBuilder;
 
 

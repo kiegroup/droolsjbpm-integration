@@ -42,6 +42,11 @@ import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
+import org.junit.Test;
+import org.kie.runtime.ExecutionResults;
+import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.help.BatchExecutionHelper;
+import org.kie.runtime.rule.FactHandle;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -49,16 +54,6 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.help.BatchExecutionHelper;
-import org.kie.runtime.rule.FactHandle;
-
-import static org.junit.Assert.*;
 
 public class CamelEndpointWithMarshallersTest extends DroolsCamelTestSupport {
     private String handle;

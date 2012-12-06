@@ -16,21 +16,20 @@
 
 package org.drools.container.spring;
 
-import org.drools.Person;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.kie.event.rule.DebugWorkingMemoryEventListener;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.StatelessKnowledgeSession;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.drools.Person;
+import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.StatelessKnowledgeSession;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsListenersTest {
 

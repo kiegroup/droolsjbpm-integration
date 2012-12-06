@@ -1,26 +1,24 @@
 package org.drools.io.mina;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.drools.grid.GridServiceDescription;
-import org.drools.grid.SocketService;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.AddressImpl;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class GridServiceDescriptionJpaTest {
     private Server server;

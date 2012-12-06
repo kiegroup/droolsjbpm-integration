@@ -17,6 +17,11 @@
 
 package org.drools.grid.remote;
 
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.UUID;
+
 import org.drools.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -32,11 +37,6 @@ import org.kie.runtime.Environment;
 import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.UUID;
 
 public class KnowledgeBaseProviderRemoteClient
     implements

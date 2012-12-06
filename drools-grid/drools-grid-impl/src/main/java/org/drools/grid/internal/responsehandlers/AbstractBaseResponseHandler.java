@@ -1,8 +1,6 @@
 package org.drools.grid.internal.responsehandlers;
 
-import java.lang.reflect.Constructor;
 import org.drools.grid.io.Conversation;
-
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.ExceptionMessage;
 

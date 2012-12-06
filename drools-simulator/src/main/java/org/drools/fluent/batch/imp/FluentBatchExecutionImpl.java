@@ -33,7 +33,7 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.test.impl.MapVariableContext;
-import org.kie.command.*;
+import org.kie.command.BatchExecutionCommand;
 import org.kie.fluent.VariableContext;
 import org.kie.runtime.rule.FactHandle;
 

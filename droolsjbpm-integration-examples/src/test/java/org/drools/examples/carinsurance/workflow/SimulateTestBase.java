@@ -16,6 +16,12 @@
 
 package org.drools.examples.carinsurance.workflow;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.kie.builder.KieBaseModel;
 import org.kie.builder.KieBuilder;
 import org.kie.builder.KieFactory;
@@ -23,16 +29,10 @@ import org.kie.builder.KieFileSystem;
 import org.kie.builder.KieModuleModel;
 import org.kie.builder.KieServices;
 import org.kie.builder.KieSessionModel;
-import org.kie.builder.ResourceType;
 import org.kie.conf.AssertBehaviorOption;
 import org.kie.conf.EventProcessingOption;
+import org.kie.io.ResourceType;
 import org.kie.runtime.conf.ClockTypeOption;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import static org.junit.Assert.assertTrue;
 
 public class SimulateTestBase {
 

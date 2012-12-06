@@ -5,8 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-import org.drools.grid.*;
+import org.drools.grid.ConnectionFactoryService;
+import org.drools.grid.Grid;
+import org.drools.grid.GridConnection;
+import org.drools.grid.GridNode;
+import org.drools.grid.GridServiceDescription;
+import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.io.AcceptorFactoryService;
 import org.drools.grid.io.ConnectorFactoryService;

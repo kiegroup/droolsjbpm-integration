@@ -16,10 +16,10 @@
 
 package org.drools.server;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.camel.CamelContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import static org.junit.Assert.*;
 
 public class CxfRsClientServerTest {
 

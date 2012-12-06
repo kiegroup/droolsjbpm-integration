@@ -16,15 +16,14 @@
 
 package org.drools.fluent.simulation;
 
-import org.drools.fluent.test.TestableFluent;
+import java.util.concurrent.TimeUnit;
+
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
-import org.drools.fluent.knowledge.KnowledgeBuilderSimFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.fluent.test.TestableFluent;
 import org.kie.command.Command;
 import org.kie.fluent.FluentRoot;
 import org.kie.simulation.Simulation;
-
-import java.util.concurrent.TimeUnit;
 
 public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationFluent> {
 

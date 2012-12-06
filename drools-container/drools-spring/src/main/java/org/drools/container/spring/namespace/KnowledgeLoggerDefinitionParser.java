@@ -15,6 +15,8 @@
 */
 package org.drools.container.spring.namespace;
 
+import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
+
 import org.drools.container.spring.beans.KnowledgeLoggerAdaptor;
 import org.drools.container.spring.beans.KnowledgeLoggerBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -23,8 +25,6 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
-
-import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
 
 public class KnowledgeLoggerDefinitionParser extends AbstractBeanDefinitionParser {

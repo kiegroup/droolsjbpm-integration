@@ -16,23 +16,24 @@
  */
 package org.drools.grid;
 
-import org.drools.time.JobContext;
-import org.drools.time.JobHandle;
+import static org.junit.Assert.assertNull;
+
 import java.io.Serializable;
 import java.util.Date;
-import org.drools.grid.impl.GridNodeServer;
-import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.grid.impl.GridNodeImpl;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.command.impl.ContextImplWithEviction;
 import org.drools.grid.impl.EvictionJob;
+import org.drools.grid.impl.GridNodeImpl;
+import org.drools.grid.impl.GridNodeServer;
+import org.drools.grid.io.MessageReceiverHandler;
+import org.drools.time.JobContext;
+import org.drools.time.JobHandle;
 import org.drools.time.Trigger;
 import org.drools.time.impl.JDKTimerService;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class TempEvictionTest {
 

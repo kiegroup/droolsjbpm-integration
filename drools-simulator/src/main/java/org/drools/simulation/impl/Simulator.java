@@ -16,6 +16,14 @@
 
 package org.drools.simulation.impl;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import org.drools.command.GetDefaultValue;
 import org.drools.command.ResolvingKnowledgeCommandContext;
 import org.drools.command.impl.ContextImpl;
@@ -28,14 +36,6 @@ import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.simulation.Simulation;
 import org.kie.simulation.SimulationPath;
 import org.kie.simulation.SimulationStep;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class Simulator
         implements World, GetDefaultValue {

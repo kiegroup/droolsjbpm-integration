@@ -1,5 +1,7 @@
 package org.drools.grid.service.directory.impl;
 
+import static org.drools.grid.service.directory.impl.WhitePagesClient.sendMessage;
+
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -7,14 +9,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.service.directory.Address;
-
-import static org.drools.grid.service.directory.impl.WhitePagesClient.sendMessage;
 
 public class GridServiceDescriptionClient
     implements

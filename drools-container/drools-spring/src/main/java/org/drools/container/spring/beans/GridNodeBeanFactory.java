@@ -20,13 +20,9 @@ import java.util.HashMap;
 
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
-//import org.drools.grid.SocketService;
 import org.drools.grid.impl.GridImpl;
-//import org.drools.grid.service.directory.WhitePages;
-//import org.drools.grid.service.directory.impl.WhitePagesImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.StringUtils;
 
 public class GridNodeBeanFactory
     implements

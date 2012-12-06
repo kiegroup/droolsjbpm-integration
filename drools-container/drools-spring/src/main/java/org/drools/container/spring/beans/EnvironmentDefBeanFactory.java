@@ -15,36 +15,36 @@
 */
 package org.drools.container.spring.beans;
 
+import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_CUSTOM_MARSHALLING_STRATEGY;
+import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_IDENTITY_PLACEHOLDER_RESOLVER_STRATEGY;
+import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_JPA_PLACEHOLDER_RESOLVER_STRATEGY;
+import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_PROCESS_INSTANCE_RESOLVER_STRATEGY;
+import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_SERIALIZABLE_PLACEHOLDER_RESOLVER_STRATEGY;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.impl.EnvironmentFactory;
+import org.drools.marshalling.ObjectMarshallingStrategy;
+import org.drools.marshalling.ObjectMarshallingStrategyAcceptor;
 import org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
+import org.drools.runtime.Calendars;
+import org.drools.runtime.EnvironmentName;
+import org.drools.runtime.Globals;
 import org.drools.type.DateFormats;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
-import org.kie.marshalling.ObjectMarshallingStrategy;
-import org.kie.marshalling.ObjectMarshallingStrategyAcceptor;
-import org.kie.runtime.Calendars;
-import org.kie.runtime.Environment;
-import org.kie.runtime.EnvironmentName;
-import org.kie.runtime.Globals;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NamedBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
-
-import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_SERIALIZABLE_PLACEHOLDER_RESOLVER_STRATEGY;
-import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_CUSTOM_MARSHALLING_STRATEGY;
-import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_IDENTITY_PLACEHOLDER_RESOLVER_STRATEGY;
-import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_JPA_PLACEHOLDER_RESOLVER_STRATEGY;
-import static org.drools.container.spring.namespace.EnvironmentDefinitionParser.ELEMENT_PROCESS_INSTANCE_RESOLVER_STRATEGY;
 
 public class EnvironmentDefBeanFactory implements
         FactoryBean<Environment>, InitializingBean, BeanNameAware, NamedBean, DisposableBean {

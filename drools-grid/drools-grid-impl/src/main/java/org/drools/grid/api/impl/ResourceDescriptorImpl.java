@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.drools.grid.api.ResourceDescriptor;
-import org.kie.builder.ResourceType;
+import org.kie.io.ResourceType;
 
 
 /**

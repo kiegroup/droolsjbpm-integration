@@ -15,6 +15,8 @@
 */
 package org.drools.container.spring.namespace;
 
+import java.util.List;
+
 import org.drools.core.util.StringUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -22,8 +24,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-
-import java.util.List;
 
 public class KnowledgeLoggerUtil {
     static int i = 0;

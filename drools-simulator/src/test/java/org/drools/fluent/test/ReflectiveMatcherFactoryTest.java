@@ -16,22 +16,18 @@
 
 package org.drools.fluent.test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
-import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 import org.kie.fluent.test.ReflectiveMatcherAssert;
-import org.mvel2.MVEL;
-import org.mvel2.ParserContext;
-
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
 public class ReflectiveMatcherFactoryTest {    
     @Test
     public void test1() {

@@ -17,15 +17,20 @@ package org.drools.grid.helper;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import org.drools.grid.*;
+
+import org.drools.grid.ConnectionFactoryService;
+import org.drools.grid.Grid;
+import org.drools.grid.GridConnection;
+import org.drools.grid.GridNode;
+import org.drools.grid.GridServiceDescription;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.remote.KnowledgeAgentRemoteClient;
 import org.drools.grid.remote.QueryResultsRemoteClient;
-import org.drools.grid.remote.StatefulKnowledgeSessionRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;

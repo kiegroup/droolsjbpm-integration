@@ -16,6 +16,10 @@
 
 package org.drools.simulation.impl.command;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.kie.event.rule.ActivationCancelledEvent;
 import org.kie.event.rule.ActivationCreatedEvent;
 import org.kie.event.rule.AfterActivationFiredEvent;
@@ -25,10 +29,6 @@ import org.kie.event.rule.AgendaGroupPushedEvent;
 import org.kie.event.rule.BeforeActivationFiredEvent;
 import org.kie.event.rule.RuleFlowGroupActivatedEvent;
 import org.kie.event.rule.RuleFlowGroupDeactivatedEvent;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class FiredRuleCounter implements AgendaEventListener {
 

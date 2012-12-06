@@ -19,13 +19,10 @@ package org.drools.camel.component.cxf;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
-
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
-
-
 
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
 import org.springframework.context.support.AbstractXmlApplicationContext;

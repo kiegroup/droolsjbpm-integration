@@ -15,10 +15,15 @@
  */
 package org.drools.camel.component;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.naming.Context;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -27,20 +32,17 @@ import org.apache.camel.util.jndi.JndiContext;
 import org.drools.camel.testdomain.Person;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.builder.ResourceType;
 import org.kie.command.Command;
 import org.kie.command.CommandFactory;
 import org.kie.io.ResourceFactory;
+import org.kie.io.ResourceType;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.QueryResults;
-
-import static org.junit.Assert.*;
 
 /**
  * Camel - JSON reproducer

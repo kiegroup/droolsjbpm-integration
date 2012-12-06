@@ -16,6 +16,7 @@
 package org.drools.grid.internal.commands;
 
 import java.io.Serializable;
+
 import org.drools.SessionConfiguration;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeSessionConfigurationRemoteClient;

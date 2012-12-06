@@ -17,6 +17,8 @@
 package org.drools.container.spring.namespace;
 
 
+import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +32,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-
-import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
 public class EnvironmentDefinitionParser extends AbstractBeanDefinitionParser {
 

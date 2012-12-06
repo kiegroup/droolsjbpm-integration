@@ -15,6 +15,8 @@
  */
 package org.drools.simulation.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,12 +29,10 @@ import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.builder.ResourceType;
 import org.kie.command.BatchExecutionCommand;
+import org.kie.io.ResourceType;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatelessKnowledgeSession;
-
-import static org.junit.Assert.*;
 
 public class BatchFluentTest {
 

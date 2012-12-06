@@ -16,11 +16,11 @@
 
 package org.drools.examples.carinsurance.domain.request;
 
-import org.drools.examples.carinsurance.domain.Car;
-import org.drools.examples.carinsurance.domain.Driver;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.drools.examples.carinsurance.domain.Car;
+import org.drools.examples.carinsurance.domain.Driver;
 
 public class PolicyRequest {
 

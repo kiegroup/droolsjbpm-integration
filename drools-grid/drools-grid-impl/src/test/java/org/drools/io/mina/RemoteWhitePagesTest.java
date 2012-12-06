@@ -1,5 +1,9 @@
 package org.drools.io.mina;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,29 +11,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Persistence;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.kie.SystemEventListener;
-import org.kie.SystemEventListenerFactory;
-
-import static org.junit.Assert.*;
-
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
-import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
 import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
 import org.drools.grid.service.directory.WhitePages;
+import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.kie.SystemEventListener;
+import org.kie.SystemEventListenerFactory;
 
 public class RemoteWhitePagesTest {
 

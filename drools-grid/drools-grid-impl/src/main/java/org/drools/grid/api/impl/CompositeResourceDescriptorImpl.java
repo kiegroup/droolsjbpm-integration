@@ -16,6 +16,7 @@
 package org.drools.grid.api.impl;
 
 import java.util.List;
+
 import org.drools.grid.api.CompositeResourceDescriptor;
 import org.drools.grid.api.ResourceDescriptor;
 

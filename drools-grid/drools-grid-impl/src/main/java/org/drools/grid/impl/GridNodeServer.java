@@ -19,7 +19,7 @@ package org.drools.grid.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
+
 import org.drools.command.ResolvingKnowledgeCommandContext;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;

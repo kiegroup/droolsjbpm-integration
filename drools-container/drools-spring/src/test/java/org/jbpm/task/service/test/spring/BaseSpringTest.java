@@ -1,7 +1,8 @@
 package org.jbpm.task.service.test.spring;
 
-import static org.jbpm.task.BaseTest.*;
-import static org.jbpm.task.service.test.impl.TestServerUtil.*;
+import static org.jbpm.task.BaseTest.fillUsersOrGroups;
+import static org.jbpm.task.service.test.impl.TestServerUtil.createTestTaskClientConnector;
+import static org.jbpm.task.service.test.impl.TestServerUtil.startServer;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,6 @@ import org.jbpm.task.service.TaskServiceSession;
 import org.jbpm.task.service.test.impl.TestTaskServer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

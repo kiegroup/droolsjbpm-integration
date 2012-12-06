@@ -16,12 +16,12 @@
 
 package org.drools.fluent.test.impl;
 
+import static org.junit.Assert.assertThat;
+
 import org.drools.fluent.test.TestableFluent;
 import org.hamcrest.Matcher;
 import org.kie.command.Command;
 import org.kie.fluent.test.ReflectiveMatcherAssert;
-
-import static org.junit.Assert.assertThat;
 
 public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
     

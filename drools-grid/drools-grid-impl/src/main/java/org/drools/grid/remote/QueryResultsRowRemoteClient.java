@@ -17,6 +17,7 @@ package org.drools.grid.remote;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;

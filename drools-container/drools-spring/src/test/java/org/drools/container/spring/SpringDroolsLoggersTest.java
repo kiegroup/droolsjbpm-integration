@@ -16,6 +16,13 @@
 
 package org.drools.container.spring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.drools.Person;
 import org.drools.audit.ThreadedWorkingMemoryFileLogger;
 import org.drools.audit.WorkingMemoryConsoleLogger;
@@ -23,19 +30,12 @@ import org.drools.audit.WorkingMemoryFileLogger;
 import org.drools.container.spring.beans.KnowledgeLoggerAdaptor;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.StatelessKnowledgeSession;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class SpringDroolsLoggersTest {
 

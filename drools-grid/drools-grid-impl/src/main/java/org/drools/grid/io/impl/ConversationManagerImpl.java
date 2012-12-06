@@ -9,7 +9,6 @@ import org.drools.grid.io.ConnectorFactoryService;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.IoWriter;
-import org.drools.grid.io.MessageReceiverHandler;
 import org.kie.SystemEventListener;
 
 public class ConversationManagerImpl

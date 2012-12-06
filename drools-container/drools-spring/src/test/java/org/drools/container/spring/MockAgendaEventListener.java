@@ -16,7 +16,6 @@
 
 package org.drools.container.spring;
 
-import org.kie.event.rule.*;
 
 public class MockAgendaEventListener implements AgendaEventListener {
 

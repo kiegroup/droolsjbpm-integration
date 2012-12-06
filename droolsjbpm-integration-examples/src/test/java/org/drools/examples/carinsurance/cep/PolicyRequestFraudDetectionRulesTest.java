@@ -16,6 +16,10 @@
 
 package org.drools.examples.carinsurance.cep;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
 import org.drools.examples.carinsurance.domain.Driver;
@@ -28,11 +32,7 @@ import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.joda.time.LocalDate;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.builder.ResourceType;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
+import org.kie.io.ResourceType;
 
 public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
 

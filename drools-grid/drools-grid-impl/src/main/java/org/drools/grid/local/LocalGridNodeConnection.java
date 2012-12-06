@@ -2,7 +2,6 @@ package org.drools.grid.local;
 
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
-import org.drools.grid.GridNodeConnection;
 import org.drools.grid.impl.GridNodeImpl;
 
 public class LocalGridNodeConnection<T>

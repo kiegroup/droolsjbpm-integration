@@ -36,13 +36,8 @@ import javax.naming.Context;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.drools.pipeline.camel.Person;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kie.runtime.StatefulKnowledgeSession;
-
-import static org.junit.Assert.*;
 
 public class DroolsEndpointChannelTest extends DroolsCamelTestSupport {
     private StatefulKnowledgeSession ksession;

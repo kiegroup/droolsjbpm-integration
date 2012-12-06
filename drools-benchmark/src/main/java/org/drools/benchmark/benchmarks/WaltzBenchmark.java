@@ -1,26 +1,22 @@
 package org.drools.benchmark.benchmarks;
 
-import org.drools.PackageIntegrationException;
-import org.drools.RuleIntegrationException;
-import org.drools.benchmark.BenchmarkDefinition;
-import org.drools.benchmark.model.waltz.Line;
-import org.drools.benchmark.model.waltz.Stage;
-import org.drools.compiler.DroolsParserException;
-import org.drools.rule.InvalidPatternException;
-import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseFactory;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.builder.ResourceType;
-import org.kie.io.ResourceFactory;
-import org.kie.runtime.StatefulKnowledgeSession;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import org.drools.benchmark.BenchmarkDefinition;
+import org.drools.benchmark.model.waltz.Line;
+import org.drools.benchmark.model.waltz.Stage;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.io.ResourceFactory;
+import org.kie.io.ResourceType;
+import org.kie.runtime.StatefulKnowledgeSession;
 
 public class WaltzBenchmark extends AbstractBenchmark {
 

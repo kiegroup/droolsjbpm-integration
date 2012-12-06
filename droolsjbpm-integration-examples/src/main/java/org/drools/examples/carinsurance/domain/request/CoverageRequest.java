@@ -16,11 +16,10 @@
 
 package org.drools.examples.carinsurance.domain.request;
 
-import org.drools.examples.carinsurance.domain.policy.CoverageType;
-
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.drools.examples.carinsurance.domain.policy.CoverageType;
 
 public class CoverageRequest {
 

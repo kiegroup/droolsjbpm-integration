@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.camel.builder.RouteBuilder;
@@ -41,12 +40,6 @@ import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.pipeline.camel.Person;
 import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.rule.impl.FlatQueryResults;
-
-import com.sun.tools.xjc.Language;
-import com.sun.tools.xjc.Options;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactoryService;
@@ -54,15 +47,16 @@ import org.kie.builder.JaxbConfiguration;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactory;
 import org.kie.builder.KnowledgeBuilderFactoryService;
-import org.kie.builder.ResourceType;
 import org.kie.io.ResourceFactory;
+import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.runtime.rule.QueryResultsRow;
 
-import static org.junit.Assert.*;
+import com.sun.tools.xjc.Language;
+import com.sun.tools.xjc.Options;
 
 public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
 

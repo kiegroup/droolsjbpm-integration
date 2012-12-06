@@ -32,7 +32,6 @@ import org.drools.time.Job;
 import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
 import org.drools.time.SchedulerService;
-
 import org.drools.time.TimerService;
 import org.drools.time.Trigger;
 import org.drools.time.impl.JDKTimerService;

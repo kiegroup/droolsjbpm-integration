@@ -18,7 +18,6 @@ package org.drools.container.spring.namespace;
 
 import static org.drools.container.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.ClockType;
@@ -33,12 +32,8 @@ import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;
 import org.drools.container.spring.beans.StatelessKnowledgeSessionBeanFactory;
-import org.drools.event.DebugProcessEventListener;
-import org.kie.event.rule.DebugAgendaEventListener;
-import org.kie.event.rule.DebugWorkingMemoryEventListener;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

@@ -18,8 +18,8 @@ package org.drools.container.spring.namespace;
 
 import java.util.List;
 
-import org.kie.builder.JaxbConfiguration;
-import org.kie.builder.KnowledgeBuilderFactory;
+import org.drools.builder.JaxbConfiguration;
+import org.drools.builder.KnowledgeBuilderFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;

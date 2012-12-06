@@ -17,12 +17,12 @@ package org.drools.grid.remote;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.grid.remote.command.GetQueryIdentifiersRemoteCommand;
 
 /**
  *

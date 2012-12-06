@@ -16,10 +16,8 @@
 package org.drools.grid.remote.command;
 
 
-import java.util.Iterator;
 import org.drools.command.impl.GenericCommand;
 import org.kie.command.Context;
-import org.kie.command.World;
 import org.kie.runtime.rule.QueryResultsRow;
 
 /**

@@ -16,9 +16,9 @@
 
 package org.drools.examples.carinsurance.domain.claim;
 
-import org.drools.examples.carinsurance.domain.policy.CoverageType;
-
 import java.math.BigDecimal;
+
+import org.drools.examples.carinsurance.domain.policy.CoverageType;
 
 public class ClaimPart {
     

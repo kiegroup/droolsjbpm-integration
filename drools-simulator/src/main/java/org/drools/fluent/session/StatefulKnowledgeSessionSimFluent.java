@@ -16,10 +16,10 @@
 
 package org.drools.fluent.session;
 
-import org.drools.fluent.test.TestableFluent;
-import org.drools.fluent.simulation.SimulationFluent;
-
 import java.util.concurrent.TimeUnit;
+
+import org.drools.fluent.simulation.SimulationFluent;
+import org.drools.fluent.test.TestableFluent;
 
 
 public interface StatefulKnowledgeSessionSimFluent

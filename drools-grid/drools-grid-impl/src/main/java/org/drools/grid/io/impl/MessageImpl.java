@@ -1,7 +1,6 @@
 package org.drools.grid.io.impl;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import org.drools.grid.io.Message;
 

@@ -16,12 +16,12 @@
 
 package org.drools.simulation.impl.command;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.command.impl.GenericCommand;
 import org.junit.Assert;
 import org.kie.command.Context;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AssertRulesFiredCommand implements GenericCommand<Object> {
 

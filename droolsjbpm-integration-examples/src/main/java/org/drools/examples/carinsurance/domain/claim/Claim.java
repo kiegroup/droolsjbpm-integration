@@ -16,10 +16,10 @@
 
 package org.drools.examples.carinsurance.domain.claim;
 
+import java.util.List;
+
 import org.drools.examples.carinsurance.domain.policy.Policy;
 import org.joda.time.LocalDate;
-
-import java.util.List;
 
 public class Claim {
 

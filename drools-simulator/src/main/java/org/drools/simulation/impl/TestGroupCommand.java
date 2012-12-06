@@ -16,19 +16,11 @@
 
 package org.drools.simulation.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.drools.command.impl.GenericCommand;
-import org.drools.command.impl.FixedKnowledgeCommandContext;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.reteoo.ReteooWorkingMemory;
 import org.kie.command.Command;
 import org.kie.command.Context;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.AgendaFilter;
-import org.mvel2.MVEL;
 
 public class TestGroupCommand
         implements GenericCommand<Void> {

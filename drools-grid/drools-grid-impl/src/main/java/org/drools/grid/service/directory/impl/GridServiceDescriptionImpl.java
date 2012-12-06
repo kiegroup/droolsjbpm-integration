@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.persistence.Id;
 
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.service.directory.Address;

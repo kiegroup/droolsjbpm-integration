@@ -17,9 +17,10 @@
 
 package org.drools.grid.service.directory.impl;
 
-import org.drools.grid.timer.impl.*;
 import java.net.InetSocketAddress;
+
 import org.drools.grid.Grid;
+import org.drools.grid.timer.impl.ServiceConfiguration;
 
 public class WhitePagesServiceConfiguration
     implements

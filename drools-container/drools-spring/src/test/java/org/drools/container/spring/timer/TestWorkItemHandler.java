@@ -1,8 +1,5 @@
 package org.drools.container.spring.timer;
 
-import org.kie.runtime.process.WorkItem;
-import org.kie.runtime.process.WorkItemHandler;
-import org.kie.runtime.process.WorkItemManager;
 
 public class TestWorkItemHandler
     implements

@@ -21,11 +21,10 @@ import javax.persistence.EntityManagerFactory;
 
 import org.drools.persistence.PersistenceContext;
 import org.drools.persistence.jpa.JpaPersistenceContext;
+import org.drools.runtime.EnvironmentName;
 import org.jbpm.persistence.JpaProcessPersistenceContext;
 import org.jbpm.persistence.ProcessPersistenceContext;
 import org.jbpm.persistence.ProcessPersistenceContextManager;
-import org.kie.runtime.Environment;
-import org.kie.runtime.EnvironmentName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.EntityManagerHolder;

@@ -25,14 +25,9 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.junit.Test;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class CxfSoapTest extends CamelSpringTestSupport {
 

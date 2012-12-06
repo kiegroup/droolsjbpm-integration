@@ -16,6 +16,8 @@
 
 package org.drools.server;
 
+import static org.junit.Assert.assertTrue;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
@@ -23,8 +25,6 @@ import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.CamelContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import static org.junit.Assert.*;
 
 public class CxfSoapClientServerTest {
 

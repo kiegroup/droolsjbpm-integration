@@ -16,21 +16,17 @@
 
 package org.drools.container.spring.beans;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.drools.container.spring.namespace.EventListenersUtil;
+import org.drools.event.KnowledgeRuntimeEventManager;
+import org.drools.event.process.ProcessEventListener;
 import org.drools.grid.GridNode;
-import org.kie.KnowledgeBase;
-import org.kie.command.Command;
-import org.kie.event.KnowledgeRuntimeEventManager;
-import org.kie.event.process.ProcessEventListener;
-import org.kie.event.rule.AgendaEventListener;
-import org.kie.event.rule.WorkingMemoryEventListener;
-import org.kie.logger.KnowledgeRuntimeLogger;
-import org.kie.logger.KnowledgeRuntimeLoggerFactory;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.KnowledgeSessionConfiguration;
-import org.kie.runtime.process.WorkItemHandler;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;

@@ -1,11 +1,11 @@
 package org.drools.grid.timer.impl;
 
 import org.drools.grid.CoreServicesLookup;
-import org.drools.grid.service.directory.impl.*;
 import org.drools.grid.Grid;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
-import org.drools.grid.io.ConversationManager;
+import org.drools.grid.service.directory.impl.CoreServicesLookupImpl;
+import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 import org.drools.time.SchedulerService;
 
 public class SchedulerRemoteConfiguration

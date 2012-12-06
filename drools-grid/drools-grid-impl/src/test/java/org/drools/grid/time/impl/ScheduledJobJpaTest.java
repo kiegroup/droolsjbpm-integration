@@ -1,28 +1,26 @@
 package org.drools.grid.time.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.sql.SQLException;
-import org.drools.grid.timer.impl.UuidJobHandle;
-import org.drools.grid.timer.impl.ScheduledJob;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import org.drools.grid.SocketService;
 
+import org.drools.grid.timer.impl.ScheduledJob;
+import org.drools.grid.timer.impl.UuidJobHandle;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 import org.drools.time.JobHandle;
 import org.drools.time.Trigger;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class ScheduledJobJpaTest {
 

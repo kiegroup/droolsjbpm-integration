@@ -1,8 +1,8 @@
 package org.drools.container.spring;
 
 import org.drools.runtime.rule.impl.DefaultConsequenceExceptionHandler;
-import org.kie.runtime.rule.Match;
-import org.kie.runtime.rule.WorkingMemory;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
 public class MockConsequenceExceptionHandler extends DefaultConsequenceExceptionHandler {
 

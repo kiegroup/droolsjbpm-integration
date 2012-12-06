@@ -20,8 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
-import javax.swing.UnsupportedLookAndFeelException;
-
 import org.drools.examples.broker.events.EventFeeder;
 import org.drools.examples.broker.events.StockTickPersister;
 import org.drools.examples.broker.model.CompanyRegistry;

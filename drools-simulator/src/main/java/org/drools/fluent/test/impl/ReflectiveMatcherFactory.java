@@ -16,7 +16,6 @@
 
 package org.drools.fluent.test.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.kie.fluent.test.ReflectiveMatcher;

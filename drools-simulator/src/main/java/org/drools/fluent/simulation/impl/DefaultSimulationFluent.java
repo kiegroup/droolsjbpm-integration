@@ -16,6 +16,10 @@
 
 package org.drools.fluent.simulation.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
@@ -36,10 +40,6 @@ import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.simulation.Simulation;
 import org.kie.simulation.SimulationPath;
 import org.kie.simulation.SimulationStep;
-
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFluent>
         implements SimulationFluent {

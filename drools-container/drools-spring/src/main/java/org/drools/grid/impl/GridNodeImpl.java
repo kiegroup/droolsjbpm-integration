@@ -16,23 +16,12 @@
  */
 package org.drools.grid.impl;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
-/*
-import org.drools.grid.GridServiceDescription;
-import org.drools.grid.MessageReceiverHandlerFactoryService;
-import org.drools.grid.SocketService;
-import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.grid.io.impl.NodeData;
-import org.drools.grid.service.directory.WhitePages;
-*/
-import org.kie.util.ServiceRegistry;
-import org.kie.util.ServiceRegistryImpl;
+import org.drools.util.ServiceRegistryImpl;
 
 public class GridNodeImpl
     implements

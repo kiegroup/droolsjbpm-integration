@@ -22,10 +22,10 @@ import org.drools.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;
-import org.kie.builder.ResourceConfiguration;
-import org.kie.builder.ResourceType;
 import org.kie.command.Command;
 import org.kie.io.Resource;
+import org.kie.io.ResourceConfiguration;
+import org.kie.io.ResourceType;
 
 public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<KnowledgeBaseSimFluent>
         implements KnowledgeBaseSimFluent {

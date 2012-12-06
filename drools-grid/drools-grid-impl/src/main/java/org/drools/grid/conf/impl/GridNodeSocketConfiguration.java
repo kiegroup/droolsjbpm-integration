@@ -1,13 +1,12 @@
 package org.drools.grid.conf.impl;
 
-import org.drools.grid.conf.GridPeerServiceConfiguration;
-import org.drools.grid.service.directory.impl.*;
 import org.drools.grid.CoreServicesLookup;
-
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
-import org.drools.grid.MessageReceiverHandlerFactoryService;
 import org.drools.grid.SocketService;
+import org.drools.grid.conf.GridPeerServiceConfiguration;
+import org.drools.grid.service.directory.impl.CoreServicesLookupImpl;
+import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
 
 public class GridNodeSocketConfiguration
     implements

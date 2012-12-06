@@ -15,12 +15,12 @@
  */
 package org.drools.grid.api;
 
-import org.kie.builder.ResourceType;
-
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Date;
 import java.util.Set;
+
+import org.kie.io.ResourceType;
 
 /**
  * Agnostic description of a Resource

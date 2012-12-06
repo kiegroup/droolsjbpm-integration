@@ -15,9 +15,9 @@
 */
 package org.drools.container.spring.beans;
 
-import org.kie.logger.KnowledgeRuntimeLogger;
-
 import java.io.Serializable;
+
+import org.drools.logger.KnowledgeRuntimeLogger;
 
 public class KnowledgeLoggerAdaptor implements Serializable {
     public static enum KNOWLEDGE_LOGGER_TYPE {

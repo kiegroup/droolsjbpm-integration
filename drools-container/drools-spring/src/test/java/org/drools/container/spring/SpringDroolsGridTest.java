@@ -18,36 +18,7 @@ package org.drools.container.spring;
 
 import java.io.Serializable;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
-//import org.drools.grid.ConnectionFactoryService;
-//import org.drools.grid.Grid;
-//import org.drools.grid.GridConnection;
-//import org.drools.grid.GridNode;
-//import org.drools.grid.GridServiceDescription;
-//import org.drools.grid.SocketService;
-//import org.drools.grid.service.directory.WhitePages;
-//import org.drools.grid.service.directory.impl.JpaWhitePages;
-//import org.drools.grid.service.directory.impl.WhitePagesClient;
-//import org.drools.grid.service.directory.impl.WhitePagesImpl;
-import org.drools.io.impl.ByteArrayResource;
-import org.junit.Assert;
-import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseFactoryService;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.KnowledgeBuilderError;
-import org.kie.builder.KnowledgeBuilderErrors;
-import org.kie.builder.KnowledgeBuilderFactoryService;
-import org.kie.builder.ResourceType;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.FactHandle;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringDroolsGridTest {
     

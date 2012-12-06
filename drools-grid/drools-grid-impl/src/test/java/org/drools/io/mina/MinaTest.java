@@ -1,5 +1,7 @@
 package org.drools.io.mina;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,8 +18,6 @@ import org.drools.grid.remote.mina.MinaAcceptor;
 import org.junit.Test;
 import org.kie.SystemEventListener;
 import org.kie.SystemEventListenerFactory;
-
-import static org.junit.Assert.*;
 
 public class MinaTest {
 

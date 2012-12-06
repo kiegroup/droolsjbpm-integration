@@ -1,7 +1,8 @@
 package org.jbpm.task.service.test.spring;
 
-import static org.jbpm.task.service.base.async.TaskServiceBaseUserGroupCallbackAsyncTest.*;
-import org.junit.Ignore;
+import static org.jbpm.task.service.base.async.TaskServiceBaseUserGroupCallbackAsyncTest.runTestPeopleAssignmentQueries;
+import static org.jbpm.task.service.base.async.TaskServiceBaseUserGroupCallbackAsyncTest.runTestPotentialOwnerQueries;
+import static org.jbpm.task.service.base.async.TaskServiceBaseUserGroupCallbackAsyncTest.runTestTasksOwnedQueryWithI18N;
 
 import org.junit.Test;
 public class TaskServiceBaseUserGroupCallbackSpringTest extends BaseSpringNoUserGroupSetupTest {

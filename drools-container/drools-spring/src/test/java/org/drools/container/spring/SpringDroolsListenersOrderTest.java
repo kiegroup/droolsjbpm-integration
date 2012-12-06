@@ -15,13 +15,13 @@
  */
 package org.drools.container.spring;
 
+import static org.junit.Assert.assertNotNull;
+
+import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.runtime.StatefulKnowledgeSession;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * bz761427 reproducer

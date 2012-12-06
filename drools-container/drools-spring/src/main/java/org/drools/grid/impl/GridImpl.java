@@ -1,38 +1,12 @@
 package org.drools.grid.impl;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.net.SocketFactory;
-
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
-/*
-import org.drools.grid.ConnectionFactoryService;
-import org.drools.grid.GridNodeConnection;
-import org.drools.grid.GridServiceDescription;
-import org.drools.grid.SocketService;
-import org.drools.grid.conf.GridPeerServiceConfiguration;
-import org.drools.grid.io.AcceptorFactoryService;
-import org.drools.grid.io.ConnectorFactoryService;
-import org.drools.grid.io.ConversationManager;
-import org.drools.grid.io.impl.ConversationManagerImpl;
-import org.drools.grid.local.LocalGridNodeConnection;
-import org.drools.grid.remote.RemoteGridNodeConnection;
-import org.drools.grid.remote.mina.MinaAcceptorFactoryService;
-import org.drools.grid.remote.mina.MinaConnectorFactoryService;
-import org.drools.grid.service.directory.Address;
-import org.drools.grid.service.directory.WhitePages;
-import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
-import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
-*/
-import org.kie.SystemEventListener;
-import org.kie.SystemEventListenerFactory;
 
 public class GridImpl
     implements

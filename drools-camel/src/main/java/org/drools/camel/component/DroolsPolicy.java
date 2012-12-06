@@ -39,16 +39,12 @@ import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.apache.camel.spi.Policy;
 import org.apache.camel.spi.RouteContext;
-import org.drools.common.DefaultFactHandle;
 import org.drools.core.util.StringUtils;
 import org.drools.jax.soap.PostCxfSoapProcessor;
 import org.drools.jax.soap.PostCxfTransportSoapProcessor;
 import org.drools.jax.soap.PreCxfSoapProcessor;
 import org.drools.jax.soap.PreCxfTransportSoapProcessor;
-import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
-import org.drools.runtime.rule.impl.FlatQueryResults;
-import org.drools.xml.jaxb.util.JaxbListWrapper;
 import org.kie.runtime.CommandExecutor;
 
 public class DroolsPolicy implements Policy {

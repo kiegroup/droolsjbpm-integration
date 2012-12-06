@@ -7,7 +7,6 @@ import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.local.LocalGridNodeConnection;
 import org.drools.grid.remote.RemoteGridNodeConnection;
-import org.drools.grid.remote.mina.MinaConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

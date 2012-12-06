@@ -2,9 +2,7 @@ package org.drools.grid.service.directory.impl;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.drools.grid.CoreServicesLookup;
 import org.drools.grid.Grid;

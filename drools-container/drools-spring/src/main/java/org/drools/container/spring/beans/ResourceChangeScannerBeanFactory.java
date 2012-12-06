@@ -16,8 +16,8 @@
 
 package org.drools.container.spring.beans;
 
-import org.kie.io.ResourceChangeScanner;
-import org.kie.io.ResourceFactory;
+import org.drools.io.ResourceChangeScanner;
+import org.drools.io.ResourceFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

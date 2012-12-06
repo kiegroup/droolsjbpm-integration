@@ -21,32 +21,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import org.apache.camel.CamelContext;
-import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseFactoryService;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.KnowledgeBuilderError;
-import org.kie.builder.KnowledgeBuilderErrors;
-import org.kie.builder.KnowledgeBuilderFactoryService;
-import org.kie.builder.ResourceType;
-//import org.drools.grid.ConnectionFactoryService;
-//import org.drools.grid.GridConnection;
-//import org.drools.grid.GridNode;
-//import org.drools.grid.GridServiceDescription;
-//import org.drools.grid.SocketService;
-//import org.drools.grid.service.directory.WhitePages;
-import org.drools.io.impl.ByteArrayResource;
-import org.kie.runtime.StatefulKnowledgeSession;
 import org.junit.Ignore;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import static org.junit.Assert.*;
 
 public class CxfSoapClientServerGridTest {
 

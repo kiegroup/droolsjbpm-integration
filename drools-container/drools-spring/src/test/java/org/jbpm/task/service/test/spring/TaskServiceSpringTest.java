@@ -1,7 +1,8 @@
 package org.jbpm.task.service.test.spring;
 
-import static org.jbpm.task.service.base.async.TaskServiceBaseAsyncTest.*;
-import org.junit.Ignore;
+import static org.jbpm.task.service.base.async.TaskServiceBaseAsyncTest.runTestPeopleAssignmentQueries;
+import static org.jbpm.task.service.base.async.TaskServiceBaseAsyncTest.runTestPotentialOwnerQueries;
+import static org.jbpm.task.service.base.async.TaskServiceBaseAsyncTest.runTestTasksOwnedQueryWithI18N;
 
 import org.junit.Test;
 

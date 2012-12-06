@@ -18,6 +18,7 @@
 package org.drools.grid.timer.impl;
 
 import java.net.InetSocketAddress;
+
 import org.drools.grid.Grid;
 
 public class SchedulerServiceConfiguration
