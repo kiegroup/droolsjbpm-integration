@@ -20,13 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kie.event.rule.ActivationCancelledEvent;
-import org.kie.event.rule.ActivationCreatedEvent;
-import org.kie.event.rule.AfterActivationFiredEvent;
+import org.kie.event.rule.AfterMatchFiredEvent;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.AgendaGroupPoppedEvent;
 import org.kie.event.rule.AgendaGroupPushedEvent;
-import org.kie.event.rule.BeforeActivationFiredEvent;
+import org.kie.event.rule.BeforeMatchFiredEvent;
+import org.kie.event.rule.MatchCancelledEvent;
+import org.kie.event.rule.MatchCreatedEvent;
 import org.kie.event.rule.RuleFlowGroupActivatedEvent;
 import org.kie.event.rule.RuleFlowGroupDeactivatedEvent;
 
@@ -58,17 +58,17 @@ public class FiredRuleCounter implements AgendaEventListener {
 
     // Events
 
-    public void activationCreated(ActivationCreatedEvent event) {
+    public void activationCreated(MatchCreatedEvent event) {
     }
 
-    public void activationCancelled(ActivationCancelledEvent event) {
+    public void activationCancelled(MatchCancelledEvent event) {
     }
 
-    public void beforeActivationFired(BeforeActivationFiredEvent event) {
+    public void beforeActivationFired(BeforeMatchFiredEvent event) {
     }
 
-    public void afterActivationFired(AfterActivationFiredEvent event) {
-        String ruleName = event.getActivation().getRule().getName();
+    public void afterActivationFired(AfterMatchFiredEvent event) {
+        String ruleName = event.getMatch().getRule().getName();
         if (acceptRuleName(ruleName)) {
             incrementFireCount(ruleName);
         }

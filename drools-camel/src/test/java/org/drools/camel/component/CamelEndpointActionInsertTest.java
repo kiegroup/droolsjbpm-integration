@@ -45,6 +45,7 @@ import org.drools.pipeline.camel.Person;
 import org.junit.Test;
 import org.kie.event.rule.ActivationCreatedEvent;
 import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.MatchCreatedEvent;
 import org.kie.event.rule.ObjectInsertedEvent;
 import org.kie.event.rule.WorkingMemoryEventListener;
 import org.kie.runtime.StatefulKnowledgeSession;
@@ -63,13 +64,13 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         template.sendBody( "direct:test-no-ep", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<ActivationCreatedEvent> ace = ArgumentCaptor.forClass( ActivationCreatedEvent.class );
+        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
         
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) oie.getValue().getObject(), is( person ) );
         
         verify( ael ).activationCreated( ace.capture() );
-        assertThat( ace.getValue().getActivation().getRule().getName(), is("rule1") );
+        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule1") );
     }
 
     @Test
@@ -80,13 +81,13 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         template.sendBody( "direct:test-with-ep", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<ActivationCreatedEvent> ace = ArgumentCaptor.forClass( ActivationCreatedEvent.class );
+        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
         
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) oie.getValue().getObject(), is( person ) );
         
         verify( ael ).activationCreated( ace.capture() );
-        assertThat( ace.getValue().getActivation().getRule().getName(), is("rule2") );
+        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule2") );
     }
 
     @Test
@@ -97,13 +98,13 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         template.sendBody( "direct:test-message", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<ActivationCreatedEvent> ace = ArgumentCaptor.forClass( ActivationCreatedEvent.class );
+        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
         
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) ((Message) oie.getValue().getObject()).getBody(), is( person ) );
         
         verify( ael ).activationCreated( ace.capture() );
-        assertThat( ace.getValue().getActivation().getRule().getName(), is("rule3") );
+        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule3") );
     }
 
     @Test
@@ -114,13 +115,13 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         template.sendBody( "direct:test-exchange", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<ActivationCreatedEvent> ace = ArgumentCaptor.forClass( ActivationCreatedEvent.class );
+        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
         
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) ((Exchange) oie.getValue().getObject()).getIn().getBody(), is( person ) );
         
         verify( ael ).activationCreated( ace.capture() );
-        assertThat( ace.getValue().getActivation().getRule().getName(), is("rule4") );
+        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule4") );
     }
 
     @Override

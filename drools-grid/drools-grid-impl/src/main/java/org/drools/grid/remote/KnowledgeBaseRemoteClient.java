@@ -39,7 +39,7 @@ import org.kie.definition.process.Process;
 import org.kie.definition.rule.Query;
 import org.kie.definition.rule.Rule;
 import org.kie.definition.type.FactType;
-import org.kie.event.knowledgebase.KnowledgeBaseEventListener;
+import org.kie.event.kiebase.KieBaseEventListener;
 import org.kie.runtime.Environment;
 import org.kie.runtime.KieSession;
 import org.kie.runtime.KnowledgeSessionConfiguration;
@@ -228,15 +228,15 @@ public class KnowledgeBaseRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void addEventListener(KnowledgeBaseEventListener listener) {
+    public void addEventListener(KieBaseEventListener listener) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public void removeEventListener(KnowledgeBaseEventListener listener) {
+    public void removeEventListener(KieBaseEventListener listener) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public Collection<KnowledgeBaseEventListener> getKnowledgeBaseEventListeners() {
+    public Collection<KieBaseEventListener> getKnowledgeBaseEventListeners() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
