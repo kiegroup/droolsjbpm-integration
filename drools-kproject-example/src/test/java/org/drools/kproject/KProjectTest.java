@@ -1,14 +1,14 @@
 package org.drools.kproject;
 
+import static junit.framework.Assert.assertEquals;
+
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
+import org.kie.KieBase;
 import org.kie.builder.KieContainer;
 import org.kie.builder.KieServices;
 import org.kie.definition.type.FactType;
 import org.kie.runtime.KieSession;
-
-import static junit.framework.Assert.assertEquals;
 
 public class KProjectTest {
 
@@ -22,7 +22,7 @@ public class KProjectTest {
     }
 
     private void useKSession(KieSession ksession) throws InstantiationException, IllegalAccessException {
-        KnowledgeBase kbase = ksession.getKnowledgeBase();
+        KieBase kbase = ksession.getKnowledgeBase();
         FactType aType = kbase.getFactType( "org.drools.test", "FactA" );
         Object a = aType.newInstance();
         FactType bType = kbase.getFactType( "org.drools.test", "FactB" );
