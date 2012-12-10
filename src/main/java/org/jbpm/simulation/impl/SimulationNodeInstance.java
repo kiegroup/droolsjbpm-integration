@@ -29,7 +29,11 @@ public class SimulationNodeInstance extends NodeInstanceImpl {
         List<Connection> outgoing = getNode().getOutgoingConnections().get(org.jbpm.workflow.core.Node.CONNECTION_DEFAULT_TYPE);
         for (Connection conn : outgoing) {
             if (context.getCurrentPath().getSequenceFlowsIds().contains(conn.getMetaData().get("UniqueId"))) {
-                
+                // handle loops
+                if (context.isLoopLimitExceeded((String) conn.getMetaData().get("UniqueId"))) {
+                    continue;
+                }
+                context.addExecutedNode((String) conn.getMetaData().get("UniqueId"));
                 triggerConnection(conn);
                 // reset clock to the value of this node
                 context.getClock().advanceTime((thisNodeCurrentTime - context.getClock().getCurrentTime()), TimeUnit.MILLISECONDS);

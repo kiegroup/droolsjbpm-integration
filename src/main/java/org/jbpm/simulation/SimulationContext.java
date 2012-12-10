@@ -1,5 +1,9 @@
 package org.jbpm.simulation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.drools.time.SessionPseudoClock;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.ht.StaffPoolManager;
@@ -16,6 +20,8 @@ public class SimulationContext {
     private SessionPseudoClock clock;
     private StaffPoolManager staffPoolManager;
     private long maxEndTime;
+    private List<String> executedNodes = new ArrayList<String>();
+    private int loopLimit = 2;
     
     public static SimulationContext getContext() {
         return simulationContextThreadLocal.get();
@@ -93,5 +99,25 @@ public class SimulationContext {
     
     public void resetMaxEndTime() {
         this.maxEndTime = -1;
+    }
+
+    public List<String> getExecutedNodes() {
+        return executedNodes;
+    }
+
+    public void setExecutedNodes(List<String> executedNodes) {
+        this.executedNodes = executedNodes;
+    }
+    
+    public void addExecutedNode(String node) {
+
+        this.executedNodes.add(node);
+    }
+    
+    public boolean isLoopLimitExceeded(String node) {
+        int currentCount = Collections.frequency(executedNodes, node);
+        return currentCount >= loopLimit;
+        
+        
     }
 }

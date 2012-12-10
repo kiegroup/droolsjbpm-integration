@@ -397,4 +397,26 @@ public class SimulateProcessTest {
         assertEquals(7, summary.size());
         wmRepo.close();
     }
+    
+    @Test
+    public void testSimulationRunnerWithLoop() throws IOException {
+        
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-loop-sim.bpmn2"));
+        
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine()) 
+          out += line;
+
+
+        
+        SimulationRepository repo = SimulationRunner.runSimulation("defaultPackage.loop-sim", out, 5, 2000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+        
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(19, wmRepo.getAggregatedEvents().size());
+        assertEquals(37, wmRepo.getEvents().size());
+        wmRepo.close();
+    }
 }

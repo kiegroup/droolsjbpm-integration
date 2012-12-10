@@ -102,6 +102,7 @@ public class SimulateProcessPathCommand implements GenericCommand<Void> {
         }
         // reset max end time before starting new instance
         simContext.resetMaxEndTime();
+        simContext.getExecutedNodes().clear();
         
         ProcessInstance pi = session.startProcess(processId);
         long instanceId = session.getId()+pi.getId();
