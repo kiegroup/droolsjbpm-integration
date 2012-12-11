@@ -1,12 +1,7 @@
 package org.drools.fluent.simulation;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
 import org.kie.builder.KieBaseModel;
 import org.kie.builder.KieBuilder;
-import org.kie.builder.KieFactory;
 import org.kie.builder.KieFileSystem;
 import org.kie.builder.KieModuleModel;
 import org.kie.builder.KieServices;
@@ -16,13 +11,16 @@ import org.kie.conf.EventProcessingOption;
 import org.kie.io.ResourceType;
 import org.kie.runtime.conf.ClockTypeOption;
 
+import java.io.IOException;
+
+import static org.junit.Assert.assertTrue;
+
 public class SimulateTestBase {
 
     protected void createKJar(String... pairs) throws IOException {
         KieServices ks = KieServices.Factory.get();
-        KieFactory kf = KieFactory.Factory.get();
-        KieModuleModel kproj = kf.newKieModuleModel();
-        KieFileSystem kfs = kf.newKieFileSystem();
+        KieModuleModel kproj = ks.newKieModuleModel();
+        KieFileSystem kfs = ks.newKieFileSystem();
 
         for ( int i = 0; i < pairs.length; i += 2 ) {
             String id = pairs[i];
@@ -34,24 +32,23 @@ public class SimulateTestBase {
                     .setEqualsBehavior( AssertBehaviorOption.EQUALITY )
                     .setEventProcessingMode( EventProcessingOption.STREAM );
 
-            KieSessionModel ksession1 = kBase1.newKieSessionModel( id+".KSession1" )
-                    .setType( "stateful" )
-                    .setClockType( ClockTypeOption.get( "pseudo" ) );
+            KieSessionModel ksession1 = kBase1.newKieSessionModel(id + ".KSession1")
+                    .setType(KieSessionModel.KieSessionType.STATEFUL)
+                    .setClockType(ClockTypeOption.get("pseudo"));
         }
 
         kfs.writeKModuleXML(kproj.toXML());
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-        assertTrue(kieBuilder.build().getInsertedMessages().isEmpty());
+        assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
     }
 
     protected void createKJarWithMultipleResources(String id,
                                                    String[] resources,
                                                    ResourceType[] types) throws IOException {
         KieServices ks = KieServices.Factory.get();
-        KieFactory kf = KieFactory.Factory.get();
-        KieModuleModel kproj = kf.newKieModuleModel();
-        KieFileSystem kfs = kf.newKieFileSystem();
+        KieModuleModel kproj = ks.newKieModuleModel();
+        KieFileSystem kfs = ks.newKieFileSystem();
 
         for ( int i = 0; i < resources.length; i++ ) {
             String res = resources[i];
@@ -65,12 +62,12 @@ public class SimulateTestBase {
                 .setEventProcessingMode( EventProcessingOption.STREAM );
 
         KieSessionModel ksession1 = kBase1.newKieSessionModel( id + ".KSession1" )
-                .setType( "stateful" )
+                .setType(KieSessionModel.KieSessionType.STATEFUL)
                 .setClockType( ClockTypeOption.get( "pseudo" ) );
 
         kfs.writeKModuleXML(kproj.toXML());
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-        assertTrue(kieBuilder.build().getInsertedMessages().isEmpty());
+        assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
     }
 }
