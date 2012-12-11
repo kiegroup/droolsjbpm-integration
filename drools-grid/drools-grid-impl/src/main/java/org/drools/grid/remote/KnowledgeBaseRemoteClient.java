@@ -17,12 +17,6 @@
 
 package org.drools.grid.remote;
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
-
 import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.command.SetVariableCommandFromCommand;
@@ -34,6 +28,7 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.command.NewStatefulKnowledgeSessionFromKAgentRemoteCommand;
 import org.drools.grid.remote.command.RegisterKAgentRemoteCommand;
 import org.kie.KnowledgeBase;
+import org.kie.definition.KiePackage;
 import org.kie.definition.KnowledgePackage;
 import org.kie.definition.process.Process;
 import org.kie.definition.rule.Query;
@@ -46,6 +41,12 @@ import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.StatelessKieSession;
 import org.kie.runtime.StatelessKnowledgeSession;
+
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 
 public class KnowledgeBaseRemoteClient
     implements
@@ -257,4 +258,15 @@ public class KnowledgeBaseRemoteClient
         
     }
 
+    public Collection<KiePackage> getKiePackages() {
+        return getKiePackages();
+    }
+
+    public KiePackage getKiePackage(String packageName) {
+        return getKnowledgePackage(packageName);
+    }
+
+    public void removeKiePackage(String packageName) {
+        removeKnowledgePackage(packageName);
+    }
 }
