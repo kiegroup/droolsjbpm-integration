@@ -16,17 +16,7 @@
 
 package org.drools.grid.remote.command;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
+import com.hazelcast.impl.ascii.memcache.DeleteCommand;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
@@ -41,11 +31,20 @@ import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.command.runtime.rule.QueryCommand;
-import org.drools.command.runtime.rule.RetractCommand;
 import org.kie.command.BatchExecutionCommand;
 import org.kie.command.Command;
 import org.kie.command.Context;
 import org.kie.runtime.ExecutionResults;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -106,7 +105,7 @@ public class AsyncBatchExecutionCommandImpl implements BatchExecutionCommand, Ge
         @XmlElement(name = "abort-work-item", type = AbortWorkItemCommand.class),
         @XmlElement(name = "signal-event", type = SignalEventCommand.class),
         @XmlElement(name = "start-process", type = StartProcessCommand.class),
-        @XmlElement(name = "retract", type = RetractCommand.class),
+        @XmlElement(name = "retract", type = DeleteCommand.class),
         @XmlElement(name = "get-global", type = GetGlobalCommand.class),
         @XmlElement(name = "set-global", type = SetGlobalCommand.class),
         @XmlElement(name = "insert-elements", type = InsertElementsCommand.class),

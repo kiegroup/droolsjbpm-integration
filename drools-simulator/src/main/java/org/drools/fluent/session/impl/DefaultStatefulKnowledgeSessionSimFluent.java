@@ -16,12 +16,6 @@
 
 package org.drools.fluent.session.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.drools.command.GetVariableCommand;
 import org.drools.command.SetVariableCommandFromLastReturn;
 import org.drools.command.runtime.AddEventListenerCommand;
@@ -30,9 +24,9 @@ import org.drools.command.runtime.process.CreateProcessInstanceCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.process.StartProcessInstanceCommand;
+import org.drools.command.runtime.rule.DeleteCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
@@ -44,6 +38,12 @@ import org.kie.command.Command;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.simulation.SimulationStep;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFluent<StatefulKnowledgeSessionSimFluent>
         implements StatefulKnowledgeSessionSimFluent {
@@ -77,8 +77,8 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
         return this;
     }
     
-    public StatefulKnowledgeSessionSimFluent retract(FactHandle handle) {
-        addCommand(new RetractCommand(handle));
+    public StatefulKnowledgeSessionSimFluent delete(FactHandle handle) {
+        addCommand(new DeleteCommand(handle));
         return this;
     }
     

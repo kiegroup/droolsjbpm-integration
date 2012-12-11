@@ -16,9 +16,6 @@
 
 package org.drools.camel.component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
 import org.drools.command.runtime.GetGlobalCommand;
@@ -27,6 +24,7 @@ import org.drools.command.runtime.process.AbortWorkItemCommand;
 import org.drools.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.command.runtime.process.SignalEventCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
+import org.drools.command.runtime.rule.DeleteCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.GetObjectCommand;
 import org.drools.command.runtime.rule.GetObjectsCommand;
@@ -35,10 +33,12 @@ import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.command.runtime.rule.ModifyCommand;
 import org.drools.command.runtime.rule.ModifyCommand.SetterImpl;
 import org.drools.command.runtime.rule.QueryCommand;
-import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.drools.runtime.rule.impl.FlatQueryResults;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class XStreamHelper {
     public static void setAliases(XStreamDataFormat dataFormat) {
@@ -56,7 +56,7 @@ public class XStreamHelper {
         map.put( "setters",
                  SetterImpl.class.getName() );
         map.put( "retract",
-                 RetractCommand.class.getName() );
+                 DeleteCommand.class.getName() );
         map.put( "insert-elements",
                  InsertElementsCommand.class.getName() );
         map.put( "start-process",

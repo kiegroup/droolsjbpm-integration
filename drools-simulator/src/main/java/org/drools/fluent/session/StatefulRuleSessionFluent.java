@@ -26,7 +26,7 @@ public interface StatefulRuleSessionFluent<T> {
     
     T update( FactHandle handle, Object object );  
     
-    T retract(FactHandle handle);
+    T delete(FactHandle handle);
 
     T fireAllRules();
 

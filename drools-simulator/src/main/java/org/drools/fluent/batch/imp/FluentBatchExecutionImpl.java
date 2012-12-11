@@ -15,12 +15,6 @@
  */
 package org.drools.fluent.batch.imp;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.drools.command.IdentifiableResult;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.runtime.BatchExecutionCommandImpl;
@@ -28,14 +22,20 @@ import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.process.CreateProcessInstanceCommand;
 import org.drools.command.runtime.process.StartProcessCommand;
 import org.drools.command.runtime.process.StartProcessInstanceCommand;
+import org.drools.command.runtime.rule.DeleteCommand;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.command.runtime.rule.RetractCommand;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.kie.command.BatchExecutionCommand;
 import org.kie.fluent.VariableContext;
 import org.kie.runtime.rule.FactHandle;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // TODO Do we really want this as a separate class hierarchy just to do batches? Does this fit in with the SimulationFluent?
 public class FluentBatchExecutionImpl implements FluentBatchExecution {
@@ -76,8 +76,8 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         return this;
     }
 
-    public FluentBatchExecution retract(FactHandle handle) {
-        lastAddedCommand = new RetractCommand(handle);
+    public FluentBatchExecution delete(FactHandle handle) {
+        lastAddedCommand = new DeleteCommand(handle);
         addCommand(lastAddedCommand);
         return this;
     }
