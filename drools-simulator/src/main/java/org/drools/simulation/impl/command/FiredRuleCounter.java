@@ -16,10 +16,6 @@
 
 package org.drools.simulation.impl.command;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.kie.event.rule.AfterMatchFiredEvent;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.AgendaGroupPoppedEvent;
@@ -29,6 +25,10 @@ import org.kie.event.rule.MatchCancelledEvent;
 import org.kie.event.rule.MatchCreatedEvent;
 import org.kie.event.rule.RuleFlowGroupActivatedEvent;
 import org.kie.event.rule.RuleFlowGroupDeactivatedEvent;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FiredRuleCounter implements AgendaEventListener {
 
@@ -58,16 +58,16 @@ public class FiredRuleCounter implements AgendaEventListener {
 
     // Events
 
-    public void activationCreated(MatchCreatedEvent event) {
+    public void matchCreated(MatchCreatedEvent event) {
     }
 
-    public void activationCancelled(MatchCancelledEvent event) {
+    public void matchCancelled(MatchCancelledEvent event) {
     }
 
-    public void beforeActivationFired(BeforeMatchFiredEvent event) {
+    public void beforeMatchFired(BeforeMatchFiredEvent event) {
     }
 
-    public void afterActivationFired(AfterMatchFiredEvent event) {
+    public void afterMatchFired(AfterMatchFiredEvent event) {
         String ruleName = event.getMatch().getRule().getName();
         if (acceptRuleName(ruleName)) {
             incrementFireCount(ruleName);

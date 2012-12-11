@@ -31,25 +31,24 @@
 
 package org.drools.camel.component;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
-import javax.naming.Context;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.drools.pipeline.camel.Person;
 import org.junit.Test;
-import org.kie.event.rule.ActivationCreatedEvent;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.MatchCreatedEvent;
 import org.kie.event.rule.ObjectInsertedEvent;
 import org.kie.event.rule.WorkingMemoryEventListener;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.mockito.ArgumentCaptor;
+
+import javax.naming.Context;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
     private StatefulKnowledgeSession ksession;
@@ -69,7 +68,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) oie.getValue().getObject(), is( person ) );
         
-        verify( ael ).activationCreated( ace.capture() );
+        verify( ael ).matchCreated( ace.capture() );
         assertThat( ace.getValue().getMatch().getRule().getName(), is("rule1") );
     }
 
@@ -86,7 +85,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) oie.getValue().getObject(), is( person ) );
         
-        verify( ael ).activationCreated( ace.capture() );
+        verify( ael ).matchCreated( ace.capture() );
         assertThat( ace.getValue().getMatch().getRule().getName(), is("rule2") );
     }
 
@@ -103,7 +102,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) ((Message) oie.getValue().getObject()).getBody(), is( person ) );
         
-        verify( ael ).activationCreated( ace.capture() );
+        verify( ael ).matchCreated( ace.capture() );
         assertThat( ace.getValue().getMatch().getRule().getName(), is("rule3") );
     }
 
@@ -120,7 +119,7 @@ public class CamelEndpointActionInsertTest extends DroolsCamelTestSupport {
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) ((Exchange) oie.getValue().getObject()).getIn().getBody(), is( person ) );
         
-        verify( ael ).activationCreated( ace.capture() );
+        verify( ael ).matchCreated( ace.capture() );
         assertThat( ace.getValue().getMatch().getRule().getName(), is("rule4") );
     }
 

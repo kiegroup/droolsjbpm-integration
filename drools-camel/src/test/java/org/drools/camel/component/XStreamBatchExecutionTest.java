@@ -2020,7 +2020,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         ExecutionResults result = template.requestBody( "direct:unmarshal",
                                                         outXml,
                                                         ExecutionResults.class );
-        org.kie.definition.type.FactType fT = ksession.getKnowledgeBase().getFactType("org.drools.camel.testdomain","Cheese1");
+        org.kie.definition.type.FactType fT = ksession.getKieBase().getFactType("org.drools.camel.testdomain","Cheese1");
         
         int price = (Integer)fT.get(result.getValue( "outStilton" ), "price");
         assertEquals( 30, 
@@ -2041,7 +2041,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
                                                         outXml2,
                                                         ExecutionResults.class );
         
-        org.kie.definition.type.FactType fT2 = ksession2.getKnowledgeBase().getFactType("org.drools.camel.testdomain","Cheese2");
+        org.kie.definition.type.FactType fT2 = ksession2.getKieBase().getFactType("org.drools.camel.testdomain","Cheese2");
         
         int price2 = (Integer)fT2.get(result2.getValue( "outStilton" ), "price");
         assertEquals( 35, price2 );
@@ -2157,7 +2157,7 @@ public class XStreamBatchExecutionTest extends ContextTestSupport {
         } else if ( exec instanceof StatelessKnowledgeSessionImpl ) {
             cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
         } else if ( exec instanceof CommandBasedStatefulKnowledgeSession ) {
-            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
+            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKieBase()).getRuleBase()).getRootClassLoader();
         }
 
         return cl;

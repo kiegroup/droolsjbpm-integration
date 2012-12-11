@@ -16,10 +16,6 @@
 
 package org.drools.grid.remote;
 
-import java.io.Serializable;
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
@@ -27,11 +23,15 @@ import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommand
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.KnowledgeBaseConfiguration;
-import org.kie.conf.KnowledgeBaseOption;
+import org.kie.conf.KieBaseOption;
 import org.kie.conf.MultiValueKnowledgeBaseOption;
-import org.kie.conf.SingleValueKnowledgeBaseOption;
+import org.kie.conf.SingleValueKieBaseOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  *
@@ -92,7 +92,7 @@ public class KnowledgeBaseConfigurationRemoteClient implements KnowledgeBaseConf
         this.instanceId = instanceId;
     }
 
-    public <T extends KnowledgeBaseOption> void setOption(T option) {
+    public <T extends KieBaseOption> void setOption(T option) {
         CommandImpl cmd = new CommandImpl( "execute",
             Arrays.asList( new Object[]{
                 new KnowledgeBaseConfigurationRemoteCommands.SetOptionRemoteCommand(instanceId, option)
@@ -104,7 +104,7 @@ public class KnowledgeBaseConfigurationRemoteClient implements KnowledgeBaseConf
                                                       cmd );
     }
 
-    public <T extends SingleValueKnowledgeBaseOption> T getOption(Class<T> option) {
+    public <T extends SingleValueKieBaseOption> T getOption(Class<T> option) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

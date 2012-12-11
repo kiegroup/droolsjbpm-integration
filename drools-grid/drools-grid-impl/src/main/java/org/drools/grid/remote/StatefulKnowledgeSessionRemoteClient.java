@@ -57,7 +57,6 @@ import org.kie.event.rule.WorkingMemoryEventListener;
 import org.kie.runtime.Calendars;
 import org.kie.runtime.Channel;
 import org.kie.runtime.Environment;
-import org.kie.runtime.ExitPoint;
 import org.kie.runtime.Globals;
 import org.kie.runtime.KnowledgeSessionConfiguration;
 import org.kie.runtime.ObjectFilter;
@@ -297,16 +296,7 @@ public class StatefulKnowledgeSessionRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeBase getKnowledgeBase() {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public void registerExitPoint(String name,
-                                  ExitPoint exitPoint) {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public void unregisterExitPoint(String name) {
+    public KnowledgeBase getKieBase() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

@@ -237,7 +237,7 @@ public class KnowledgeBaseRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public Collection<KieBaseEventListener> getKnowledgeBaseEventListeners() {
+    public Collection<KieBaseEventListener> getKieBaseEventListeners() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

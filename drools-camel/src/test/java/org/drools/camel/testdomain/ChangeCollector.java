@@ -16,20 +16,19 @@
 
 package org.drools.camel.testdomain;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.drools.xml.jaxb.util.JaxbListAdapter;
+import org.kie.event.rule.ObjectDeletedEvent;
+import org.kie.event.rule.ObjectInsertedEvent;
+import org.kie.event.rule.ObjectUpdatedEvent;
+import org.kie.event.rule.WorkingMemoryEventListener;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.drools.xml.jaxb.util.JaxbListAdapter;
-import org.kie.event.rule.ObjectInsertedEvent;
-import org.kie.event.rule.ObjectRetractedEvent;
-import org.kie.event.rule.ObjectUpdatedEvent;
-import org.kie.event.rule.WorkingMemoryEventListener;
+import java.util.ArrayList;
+import java.util.List;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -65,7 +64,7 @@ public class ChangeCollector
         }
     }
 
-    public void objectRetracted(ObjectRetractedEvent event) {
+    public void objectDeleted(ObjectDeletedEvent event) {
         if ( retracted == null ) retracted = new ArrayList<String>();
         if ( event.getOldObject() instanceof Cheese ) {
             Cheese c = (Cheese) event.getOldObject();

@@ -253,7 +253,7 @@ public class DroolsEndpoint extends DefaultEndpoint {
         } else if ( exec instanceof StatelessKnowledgeSessionImpl ) {
             cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
         } else if ( exec instanceof CommandBasedStatefulKnowledgeSession ) {
-            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKnowledgeBase()).getRuleBase()).getRootClassLoader();
+            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKieBase()).getRuleBase()).getRootClassLoader();
         }
 
         return cl;

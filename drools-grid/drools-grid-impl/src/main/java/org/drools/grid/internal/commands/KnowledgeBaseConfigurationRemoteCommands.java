@@ -15,14 +15,14 @@
  */
 package org.drools.grid.internal.commands;
 
-import java.io.Serializable;
-
 import org.drools.RuleBaseConfiguration;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeBaseConfigurationRemoteClient;
 import org.kie.KnowledgeBaseConfiguration;
 import org.kie.command.Context;
-import org.kie.conf.KnowledgeBaseOption;
+import org.kie.conf.KieBaseOption;
+
+import java.io.Serializable;
 
 /**
  *
@@ -104,9 +104,9 @@ public class KnowledgeBaseConfigurationRemoteCommands implements Serializable {
             implements GenericCommand<Void> {
 
         private final String identifier;
-        private final KnowledgeBaseOption option;
+        private final KieBaseOption option;
 
-        public SetOptionRemoteCommand(String identifier, KnowledgeBaseOption option) {
+        public SetOptionRemoteCommand(String identifier, KieBaseOption option) {
             this.identifier = identifier;
             this.option = option;
         }

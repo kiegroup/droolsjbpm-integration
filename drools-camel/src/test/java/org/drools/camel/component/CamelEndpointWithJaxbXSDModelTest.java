@@ -160,7 +160,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
                                                                                       CommandExecutor.class );
-            KnowledgeBase kbase = ksession1.getKnowledgeBase();
+            KnowledgeBase kbase = ksession1.getKieBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );

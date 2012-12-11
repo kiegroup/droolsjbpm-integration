@@ -16,16 +16,8 @@
 
 package org.drools.camel.component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Arrays;
-
-import javax.naming.Context;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
+import com.sun.tools.xjc.Language;
+import com.sun.tools.xjc.Options;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.command.impl.GenericCommand;
@@ -51,8 +43,14 @@ import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 
-import com.sun.tools.xjc.Language;
-import com.sun.tools.xjc.Options;
+import javax.naming.Context;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Arrays;
 
 public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSupport {
 
@@ -184,7 +182,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
             // create a jaxbContext for the test to use outside of Camel.
             StatefulKnowledgeSession ksession1 = (StatefulKnowledgeSession) node.get( "ksession1",
                                                                                       CommandExecutor.class );
-            KnowledgeBase kbase = ksession1.getKnowledgeBase();
+            KnowledgeBase kbase = ksession1.getKieBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );

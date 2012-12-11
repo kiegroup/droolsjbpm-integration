@@ -22,7 +22,7 @@ public class KProjectTest {
     }
 
     private void useKSession(KieSession ksession) throws InstantiationException, IllegalAccessException {
-        KieBase kbase = ksession.getKnowledgeBase();
+        KieBase kbase = ksession.getKieBase();
         FactType aType = kbase.getFactType( "org.drools.test", "FactA" );
         Object a = aType.newInstance();
         FactType bType = kbase.getFactType( "org.drools.test", "FactB" );
