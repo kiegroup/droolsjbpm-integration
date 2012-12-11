@@ -37,7 +37,7 @@ import org.kie.command.Command;
 import org.kie.command.World;
 import org.kie.io.ResourceFactory;
 import org.kie.io.ResourceType;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.conf.ClockTypeOption;
 import org.kie.simulation.Simulation;
@@ -84,7 +84,7 @@ public class SimulationTest {
 
         cmds1.add(new KnowledgeBaseAddKnowledgePackagesCommand());
 
-        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        KieSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption(ClockTypeOption.get("pseudo"));
 
         // cmds1.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));
@@ -186,7 +186,7 @@ public class SimulationTest {
 
         cmds11.add(new KnowledgeBaseAddKnowledgePackagesCommand());
 
-        KnowledgeSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        KieSessionConfiguration ksessionConf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         ksessionConf.setOption(ClockTypeOption.get("pseudo"));
 
         // cmds11.add(new NewStatefulKnowledgeSessionCommand(ksessionConf));

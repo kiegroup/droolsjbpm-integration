@@ -4,7 +4,7 @@ import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.cep.Figure;
 import org.drools.benchmark.model.cep.Letter;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.conf.EventProcessingOption;
@@ -29,7 +29,7 @@ public class CepBenchmark extends AbstractBenchmark {
         if (isFirst) {
             KnowledgeBuilder kbuilder = createKnowledgeBuilder("cep.drl");
 
-            KnowledgeBaseConfiguration config = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
+            KieBaseConfiguration config = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
             config.setOption( EventProcessingOption.STREAM );
 
             kbase = KnowledgeBaseFactory.newKnowledgeBase(config);
