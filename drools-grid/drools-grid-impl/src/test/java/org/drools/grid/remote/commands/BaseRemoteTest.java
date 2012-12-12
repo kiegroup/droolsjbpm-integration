@@ -48,15 +48,15 @@ import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.After;
 import org.junit.Before;
+import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseConfiguration;
 import org.kie.KnowledgeBaseFactoryService;
 import org.kie.SystemEventListenerFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderError;
 import org.kie.builder.KnowledgeBuilderErrors;
 import org.kie.builder.KnowledgeBuilderFactoryService;
-import org.kie.conf.AssertBehaviorOption;
+import org.kie.conf.EqualityBehaviorOption;
 import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
 
@@ -199,8 +199,8 @@ public abstract class BaseRemoteTest {
             }
             fail("KnowledgeBase did not build");
         }
-        KnowledgeBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
-        kbaseConf.setProperty(AssertBehaviorOption.PROPERTY_NAME, "equality");
+        KieBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
+        kbaseConf.setProperty(EqualityBehaviorOption.PROPERTY_NAME, "equality");
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(kbaseConf);
 
         assertNotNull( kbase );
@@ -254,8 +254,8 @@ public abstract class BaseRemoteTest {
             }
             fail("KnowledgeBase did not build");
         }
-        KnowledgeBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
-        kbaseConf.setProperty(AssertBehaviorOption.PROPERTY_NAME, "equality");
+        KieBaseConfiguration kbaseConf = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBaseConfiguration();
+        kbaseConf.setProperty(EqualityBehaviorOption.PROPERTY_NAME, "equality");
         KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase(kbaseConf);
 
         assertNotNull( kbase );

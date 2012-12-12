@@ -40,12 +40,12 @@ import org.kie.KnowledgeBaseFactoryService;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactoryService;
 import org.kie.builder.help.KnowledgeBuilderHelper;
+import org.kie.internal.utils.CompositeClassLoader;
 import org.kie.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.util.CompositeClassLoader;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;

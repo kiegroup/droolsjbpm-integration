@@ -15,14 +15,14 @@
  */
 package org.drools.grid.internal.commands;
 
+import java.io.Serializable;
+
 import org.drools.RuleBaseConfiguration;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeBaseConfigurationRemoteClient;
-import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KieBaseConfiguration;
 import org.kie.command.Context;
 import org.kie.conf.KieBaseOption;
-
-import java.io.Serializable;
 
 /**
  *
@@ -94,7 +94,7 @@ public class KnowledgeBaseConfigurationRemoteCommands implements Serializable {
         }
 
         public Void execute(Context context) {
-            KnowledgeBaseConfiguration kconf = (KnowledgeBaseConfiguration) context.getContextManager().getContext("__TEMP__").get(identifier);
+            KieBaseConfiguration kconf = (KieBaseConfiguration) context.getContextManager().getContext("__TEMP__").get(identifier);
             kconf.setProperty(propertyName, propertyValue);
             return null;
         }
@@ -112,7 +112,7 @@ public class KnowledgeBaseConfigurationRemoteCommands implements Serializable {
         }
 
         public Void execute(Context context) {
-            KnowledgeBaseConfiguration kconf = (KnowledgeBaseConfiguration) context.getContextManager().getContext("__TEMP__").get(identifier);
+            KieBaseConfiguration kconf = (KieBaseConfiguration) context.getContextManager().getContext("__TEMP__").get(identifier);
             kconf.setOption(option);
             return null;
         }
@@ -130,7 +130,7 @@ public class KnowledgeBaseConfigurationRemoteCommands implements Serializable {
         }
 
         public String execute(Context context) {
-            KnowledgeBaseConfiguration kconf = (KnowledgeBaseConfiguration) context.getContextManager().getContext("__TEMP__").get(identifier);
+            KieBaseConfiguration kconf = (KieBaseConfiguration) context.getContextManager().getContext("__TEMP__").get(identifier);
             return kconf.getProperty(propertyName);
         }
     }

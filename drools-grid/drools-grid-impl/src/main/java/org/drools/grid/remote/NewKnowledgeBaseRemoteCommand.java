@@ -17,8 +17,8 @@
 package org.drools.grid.remote;
 
 import org.drools.command.impl.GenericCommand;
+import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseConfiguration;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.command.Context;
 
@@ -38,10 +38,10 @@ public class NewKnowledgeBaseRemoteCommand
 
     public KnowledgeBase execute(Context context) {
         KnowledgeBase kbase = null;
-        KnowledgeBaseConfiguration kconf = null;
+        KieBaseConfiguration kconf = null;
         
         if(kbaseConfId != null){
-           kconf  = (KnowledgeBaseConfiguration) context.getContextManager().getContext( "__TEMP__" ).get(kbaseConfId);
+           kconf  = (KieBaseConfiguration) context.getContextManager().getContext( "__TEMP__" ).get(kbaseConfId);
         }
         if ( kconf == null ) {
             kbase = KnowledgeBaseFactory.newKnowledgeBase();

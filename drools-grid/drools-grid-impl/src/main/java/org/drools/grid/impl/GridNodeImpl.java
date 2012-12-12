@@ -30,9 +30,9 @@ import org.drools.grid.io.impl.NodeData;
 import org.drools.grid.remote.StatefulKnowledgeSessionRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.kie.internal.utils.ServiceRegistry;
+import org.kie.internal.utils.ServiceRegistryImpl;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.util.ServiceRegistry;
-import org.kie.util.ServiceRegistryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

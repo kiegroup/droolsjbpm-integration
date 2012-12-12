@@ -35,7 +35,7 @@ import org.kie.command.Command;
 import org.kie.command.CommandFactory;
 import org.kie.event.knowledgeagent.KnowledgeAgentEventListener;
 import org.kie.io.Resource;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.StatelessKnowledgeSession;
 
 /**
@@ -74,7 +74,7 @@ public class KnowledgeAgentRemoteClient implements KnowledgeAgent {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public StatelessKnowledgeSession newStatelessKnowledgeSession(KnowledgeSessionConfiguration ksc) {
+    public StatelessKnowledgeSession newStatelessKnowledgeSession(KieSessionConfiguration ksc) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

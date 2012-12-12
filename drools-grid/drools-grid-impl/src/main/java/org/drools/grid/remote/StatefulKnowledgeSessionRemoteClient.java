@@ -18,6 +18,12 @@
 package org.drools.grid.remote;
 
 
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+
 import org.drools.command.ExecuteCommand;
 import org.drools.command.GetSessionClockCommand;
 import org.drools.command.KnowledgeContextResolveFromContextCommand;
@@ -58,7 +64,7 @@ import org.kie.runtime.Calendars;
 import org.kie.runtime.Channel;
 import org.kie.runtime.Environment;
 import org.kie.runtime.Globals;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.ObjectFilter;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.process.ProcessInstance;
@@ -73,12 +79,6 @@ import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 import org.kie.time.SessionClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
 
 public class StatefulKnowledgeSessionRemoteClient
     implements
@@ -313,7 +313,7 @@ public class StatefulKnowledgeSessionRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeSessionConfiguration getSessionConfiguration() {
+    public KieSessionConfiguration getSessionConfiguration() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

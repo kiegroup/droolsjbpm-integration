@@ -32,9 +32,9 @@ import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
 import org.kie.KnowledgeBaseFactoryService;
 import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.internal.utils.ServiceRegistry;
+import org.kie.internal.utils.ServiceRegistryImpl;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.util.ServiceRegistry;
-import org.kie.util.ServiceRegistryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

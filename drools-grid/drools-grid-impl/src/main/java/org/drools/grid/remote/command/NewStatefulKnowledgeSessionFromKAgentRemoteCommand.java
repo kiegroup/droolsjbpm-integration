@@ -20,7 +20,7 @@ import org.drools.command.impl.GenericCommand;
 import org.kie.agent.KnowledgeAgent;
 import org.kie.command.Context;
 import org.kie.runtime.Environment;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
 
 public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
@@ -47,9 +47,9 @@ public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
 
     public StatefulKnowledgeSession execute(Context context) {
         
-        KnowledgeSessionConfiguration kconf = null;
+        KieSessionConfiguration kconf = null;
         if (ksessionConfId != null){
-            kconf = (KnowledgeSessionConfiguration) context.getContextManager().getContext("__TEMP__").get(ksessionConfId);
+            kconf = (KieSessionConfiguration) context.getContextManager().getContext("__TEMP__").get(ksessionConfId);
         }
         
         KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext("__TEMP__").get(kbaseKagentId+"_kAgent");

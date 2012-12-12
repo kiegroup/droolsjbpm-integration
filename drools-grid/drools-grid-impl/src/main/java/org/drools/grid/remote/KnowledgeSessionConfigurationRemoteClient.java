@@ -26,7 +26,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.conf.KnowledgeSessionOption;
 import org.kie.runtime.conf.MultiValueKnowledgeSessionOption;
 import org.kie.runtime.conf.SingleValueKnowledgeSessionOption;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class KnowledgeSessionConfigurationRemoteClient implements KnowledgeSessionConfiguration, Serializable{
+public class KnowledgeSessionConfigurationRemoteClient implements KieSessionConfiguration, Serializable{
     
     public final static String PROPERTY_MESSAGE_TIMEOUT = "grid.ksession.message.timeout";
     public final static String PROPERTY_MESSAGE_MINIMUM_WAIT_TIME = "grid.ksession.message.min.wait";

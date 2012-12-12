@@ -16,27 +16,27 @@
 
 package org.drools.grid.remote;
 
+import java.io.Serializable;
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.kie.KnowledgeBaseConfiguration;
+import org.kie.KieBaseConfiguration;
 import org.kie.conf.KieBaseOption;
 import org.kie.conf.MultiValueKnowledgeBaseOption;
 import org.kie.conf.SingleValueKieBaseOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-
 /**
  *
  */
-public class KnowledgeBaseConfigurationRemoteClient implements KnowledgeBaseConfiguration, Serializable{
+public class KnowledgeBaseConfigurationRemoteClient implements KieBaseConfiguration, Serializable{
     
     public final static String PROPERTY_MESSAGE_TIMEOUT = "grid.kbase.message.timeout";
     public final static String PROPERTY_MESSAGE_MINIMUM_WAIT_TIME = "grid.kbase.message.min.wait";

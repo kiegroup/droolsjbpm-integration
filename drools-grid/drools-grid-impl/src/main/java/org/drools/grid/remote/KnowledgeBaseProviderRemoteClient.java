@@ -30,11 +30,11 @@ import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommand
 import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
+import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseConfiguration;
 import org.kie.KnowledgeBaseFactoryService;
 import org.kie.runtime.Environment;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.runtime.KieSessionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class KnowledgeBaseProviderRemoteClient
         this.gsd = gsd;
     }
 
-    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration() {
+    public KieBaseConfiguration newKnowledgeBaseConfiguration() {
         
         String localId = UUID.randomUUID().toString();
         logger.info("This InstanceId (just generated) = "+localId);
@@ -73,12 +73,12 @@ public class KnowledgeBaseProviderRemoteClient
         
     }
 
-    public KnowledgeBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
+    public KieBaseConfiguration newKnowledgeBaseConfiguration(Properties properties,
                                                                     ClassLoader... classLoader) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public KnowledgeSessionConfiguration newKnowledgeSessionConfiguration() {
+    public KieSessionConfiguration newKnowledgeSessionConfiguration() {
         String localId = UUID.randomUUID().toString();
         logger.info("This InstanceId (just generated) = "+localId);
         CommandImpl cmd = new CommandImpl("execute", Arrays.asList(
@@ -97,7 +97,7 @@ public class KnowledgeBaseProviderRemoteClient
         
     }
 
-    public KnowledgeSessionConfiguration newKnowledgeSessionConfiguration(Properties properties) {
+    public KieSessionConfiguration newKnowledgeSessionConfiguration(Properties properties) {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
@@ -112,13 +112,13 @@ public class KnowledgeBaseProviderRemoteClient
                                  null );
     }
 
-    public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
+    public KnowledgeBase newKnowledgeBase(KieBaseConfiguration conf) {
         return newKnowledgeBase( null,
                                  conf );
     }
 
     public KnowledgeBase newKnowledgeBase(String kbaseId,
-                                          KnowledgeBaseConfiguration conf) {
+                                          KieBaseConfiguration conf) {
         String localId = "";
         if ( kbaseId == null || kbaseId.equals( "" ) ) {
             localId = UUID.randomUUID().toString();
