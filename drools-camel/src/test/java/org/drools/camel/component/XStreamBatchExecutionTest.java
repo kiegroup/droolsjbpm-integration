@@ -66,7 +66,7 @@ import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.StatelessKnowledgeSession;
-import org.kie.runtime.help.BatchExecutionHelper;
+import org.kie.runtime.helper.BatchExecutionHelper;
 import org.kie.runtime.process.ProcessInstance;
 import org.kie.runtime.process.WorkItem;
 import org.kie.runtime.process.WorkItemHandler;
