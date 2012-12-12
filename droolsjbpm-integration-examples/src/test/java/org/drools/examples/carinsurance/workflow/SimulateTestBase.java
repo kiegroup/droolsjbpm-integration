@@ -16,22 +16,22 @@
 
 package org.drools.examples.carinsurance.workflow;
 
-import org.kie.builder.KieBaseModel;
-import org.kie.builder.KieBuilder;
-import org.kie.builder.KieFileSystem;
-import org.kie.builder.KieModuleModel;
-import org.kie.builder.KieServices;
-import org.kie.builder.KieSessionModel;
-import org.kie.conf.AssertBehaviorOption;
-import org.kie.conf.EventProcessingOption;
-import org.kie.io.ResourceType;
-import org.kie.runtime.conf.ClockTypeOption;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static org.junit.Assert.assertTrue;
+import org.kie.KieServices;
+import org.kie.builder.KieBaseModel;
+import org.kie.builder.KieBuilder;
+import org.kie.builder.KieFileSystem;
+import org.kie.builder.KieModuleModel;
+import org.kie.builder.KieSessionModel;
+import org.kie.conf.EqualityBehaviorOption;
+import org.kie.conf.EventProcessingOption;
+import org.kie.io.ResourceType;
+import org.kie.runtime.conf.ClockTypeOption;
 
 public class SimulateTestBase {
 
@@ -47,7 +47,7 @@ public class SimulateTestBase {
             kfs.write( "src/kbases/" + id + "/org/test/rule" + i + ".drl", rule );
 
             KieBaseModel kBase1 = kproj.newKieBaseModel( id )
-                    .setEqualsBehavior( AssertBehaviorOption.EQUALITY )
+                    .setEqualsBehavior( EqualityBehaviorOption.EQUALITY )
                     .setEventProcessingMode( EventProcessingOption.STREAM );
 
             KieSessionModel ksession1 = kBase1.newKieSessionModel( id+".KSession1" )
@@ -76,7 +76,7 @@ public class SimulateTestBase {
         }
 
         KieBaseModel kBase1 = kproj.newKieBaseModel( id )
-                .setEqualsBehavior( AssertBehaviorOption.EQUALITY )
+                .setEqualsBehavior( EqualityBehaviorOption.EQUALITY )
                 .setEventProcessingMode( EventProcessingOption.STREAM );
 
         KieSessionModel ksession1 = kBase1.newKieSessionModel( id + ".KSession1" )

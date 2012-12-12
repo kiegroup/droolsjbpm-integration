@@ -89,13 +89,14 @@ public class KnowledgeBuilderConfigurationRemoteClient implements KnowledgeBuild
     }
 
     public <T extends KnowledgeBuilderOption> void setOption(T option) {
-        CommandImpl cmd = new CommandImpl( "execute",
-                                           Arrays.asList( new Object[]{CommandFactory.newKnowledgeBuilderSetPropertyCommand(instanceId, option.getPropertyName(), ((AccumulateFunctionOption)option).getFunction().getClass().getCanonicalName())} ) );
-        
-        ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
-                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
-                                                      this.gsd.getId(),
-                                                      cmd );
+    	throw new UnsupportedOperationException("Setting kbuilder options through API is no longer supported");
+//        CommandImpl cmd = new CommandImpl( "execute",
+//                                           Arrays.asList( new Object[]{CommandFactory.newKnowledgeBuilderSetPropertyCommand(instanceId, option.getPropertyName(), ((AccumulateFunctionOption)option).getFunction().getClass().getCanonicalName())} ) );
+//        
+//        ConversationUtil.sendMessage( this.grid.get(ConversationManager.class),
+//                                                      (InetSocketAddress) this.gsd.getAddresses().get( "socket" ).getObject(),
+//                                                      this.gsd.getId(),
+//                                                      cmd );
     }
 
     public <T extends SingleValueKnowledgeBuilderOption> T getOption(Class<T> option) {
