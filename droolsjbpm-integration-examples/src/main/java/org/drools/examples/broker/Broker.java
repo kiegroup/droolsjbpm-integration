@@ -32,7 +32,7 @@ import org.kie.conf.MBeansOption;
 import org.kie.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.runtime.rule.SessionEntryPoint;
 
 /**
  * The broker application
@@ -48,7 +48,7 @@ public class Broker implements EventReceiver, BrokerServices {
     private BrokerWindow window;
     private CompanyRegistry companies;
     private StatefulKnowledgeSession session;
-    private WorkingMemoryEntryPoint tickStream;
+    private SessionEntryPoint tickStream;
 
     public Broker(BrokerWindow window,
                   CompanyRegistry companies) {

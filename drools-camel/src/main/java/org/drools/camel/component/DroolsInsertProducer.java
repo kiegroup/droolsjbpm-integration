@@ -38,7 +38,7 @@ import org.drools.grid.GridNode;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.StatelessKnowledgeSession;
-import org.kie.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.runtime.rule.SessionEntryPoint;
 
 /**
  * A producer that inserts incoming messages as facts into the
@@ -81,12 +81,12 @@ public class DroolsInsertProducer extends DefaultProducer {
         // Creates the actual worker
         CommandExecutor exec = de.getExecutor();
         if ( exec instanceof StatefulKnowledgeSession ) {
-            WorkingMemoryEntryPoint wmep;
+            SessionEntryPoint wmep;
             String ep = de.getEntryPoint();
             if ( ep != null ) {
                 wmep = ((StatefulKnowledgeSession) exec).getWorkingMemoryEntryPoint( ep );
             } else {
-                wmep = (WorkingMemoryEntryPoint) exec;
+                wmep = (SessionEntryPoint) exec;
             }
             worker = new StatefulSessionInsertWorker( wmep,
                                                       unwrapper );
@@ -113,10 +113,10 @@ public class DroolsInsertProducer extends DefaultProducer {
     private static class StatefulSessionInsertWorker
         implements
         InsertWorker {
-        private WorkingMemoryEntryPoint wmep;
+        private SessionEntryPoint wmep;
         private Unwrapper               unwrapper;
 
-        public StatefulSessionInsertWorker(WorkingMemoryEntryPoint wmep,
+        public StatefulSessionInsertWorker(SessionEntryPoint wmep,
                                            Unwrapper unwrapper) {
             this.wmep = wmep;
             this.unwrapper = unwrapper;
