@@ -22,15 +22,16 @@ package org.drools.grid.remote.command;
  * this class should not exist!
  */
 
+import org.drools.WorkingMemoryEntryPoint;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.kie.command.Context;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.WorkingMemoryEntryPoint;
+import org.kie.runtime.rule.SessionEntryPoint;
 
 public class GetWorkingMemoryEntryPointRemoteCommand
     implements
-    GenericCommand<WorkingMemoryEntryPoint> {
+    GenericCommand<SessionEntryPoint> {
 
     private String name;
 
@@ -40,7 +41,7 @@ public class GetWorkingMemoryEntryPointRemoteCommand
 
     public WorkingMemoryEntryPoint execute(Context context) {
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
-        WorkingMemoryEntryPoint ep = ksession.getWorkingMemoryEntryPoint( this.name );
+        SessionEntryPoint ep = ksession.getWorkingMemoryEntryPoint( this.name );
         context.set( this.name,
                                                              ep );
         // If I return the command I need to create a serializable version of NamedEntryPoint

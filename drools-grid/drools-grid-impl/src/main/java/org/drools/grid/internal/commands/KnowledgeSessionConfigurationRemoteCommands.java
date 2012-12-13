@@ -21,7 +21,7 @@ import org.drools.SessionConfiguration;
 import org.drools.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeSessionConfigurationRemoteClient;
 import org.kie.command.Context;
-import org.kie.runtime.conf.KnowledgeSessionOption;
+import org.kie.runtime.conf.KieSessionOption;
 
 /**
  *
@@ -103,9 +103,9 @@ public class KnowledgeSessionConfigurationRemoteCommands implements Serializable
             implements GenericCommand<Void> {
 
         private final String identifier;
-        private final KnowledgeSessionOption option;
+        private final KieSessionOption option;
 
-        public SetOptionRemoteCommand(String identifier, KnowledgeSessionOption option) {
+        public SetOptionRemoteCommand(String identifier, KieSessionOption option) {
             this.identifier = identifier;
             this.option = option;
         }

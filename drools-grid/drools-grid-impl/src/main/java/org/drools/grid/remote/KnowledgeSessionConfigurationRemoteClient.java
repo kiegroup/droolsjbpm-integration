@@ -27,9 +27,9 @@ import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteComm
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.runtime.KieSessionConfiguration;
-import org.kie.runtime.conf.KnowledgeSessionOption;
-import org.kie.runtime.conf.MultiValueKnowledgeSessionOption;
-import org.kie.runtime.conf.SingleValueKnowledgeSessionOption;
+import org.kie.runtime.conf.KieSessionOption;
+import org.kie.runtime.conf.MultiValueKieSessionOption;
+import org.kie.runtime.conf.SingleValueKieSessionOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,7 @@ public class KnowledgeSessionConfigurationRemoteClient implements KieSessionConf
         this.instanceId = instanceId;
     }
 
-    public <T extends KnowledgeSessionOption> void setOption(T option) {
+    public <T extends KieSessionOption> void setOption(T option) {
         CommandImpl cmd = new CommandImpl( "execute",
             Arrays.asList( new Object[]{
                 new KnowledgeSessionConfigurationRemoteCommands.SetOptionRemoteCommand(instanceId, option)
@@ -104,11 +104,11 @@ public class KnowledgeSessionConfigurationRemoteClient implements KieSessionConf
                                                       cmd );
     }
 
-    public <T extends SingleValueKnowledgeSessionOption> T getOption(Class<T> option) {
+    public <T extends SingleValueKieSessionOption> T getOption(Class<T> option) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public <T extends MultiValueKnowledgeSessionOption> T getOption(Class<T> option, String key) {
+    public <T extends MultiValueKieSessionOption> T getOption(Class<T> option, String key) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

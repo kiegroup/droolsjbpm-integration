@@ -74,8 +74,8 @@ import org.kie.runtime.rule.AgendaFilter;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.runtime.rule.LiveQuery;
 import org.kie.runtime.rule.QueryResults;
+import org.kie.runtime.rule.SessionEntryPoint;
 import org.kie.runtime.rule.ViewChangedEventListener;
-import org.kie.runtime.rule.WorkingMemoryEntryPoint;
 import org.kie.time.SessionClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -333,7 +333,7 @@ public class StatefulKnowledgeSessionRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public WorkingMemoryEntryPoint getWorkingMemoryEntryPoint(String name) {
+    public SessionEntryPoint getWorkingMemoryEntryPoint(String name) {
         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointRemoteCommand( name ),
@@ -351,7 +351,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                         this.cm );
     }
 
-    public Collection< ? extends WorkingMemoryEntryPoint> getWorkingMemoryEntryPoints() {
+    public Collection< ? extends SessionEntryPoint> getWorkingMemoryEntryPoints() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
