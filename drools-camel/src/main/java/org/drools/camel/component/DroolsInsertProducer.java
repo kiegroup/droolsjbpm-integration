@@ -84,7 +84,7 @@ public class DroolsInsertProducer extends DefaultProducer {
             SessionEntryPoint wmep;
             String ep = de.getEntryPoint();
             if ( ep != null ) {
-                wmep = ((StatefulKnowledgeSession) exec).getWorkingMemoryEntryPoint( ep );
+                wmep = ((StatefulKnowledgeSession) exec).getEntryPoint( ep );
             } else {
                 wmep = (SessionEntryPoint) exec;
             }

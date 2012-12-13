@@ -333,7 +333,7 @@ public class StatefulKnowledgeSessionRemoteClient
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 
-    public SessionEntryPoint getWorkingMemoryEntryPoint(String name) {
+    public SessionEntryPoint getEntryPoint(String name) {
         String kresultsId = "kresults_" + this.gsd.getId();
         CommandImpl cmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new KnowledgeContextResolveFromContextCommand( new GetWorkingMemoryEntryPointRemoteCommand( name ),
@@ -351,7 +351,7 @@ public class StatefulKnowledgeSessionRemoteClient
                                                         this.cm );
     }
 
-    public Collection< ? extends SessionEntryPoint> getWorkingMemoryEntryPoints() {
+    public Collection< ? extends SessionEntryPoint> getEntryPoints() {
         throw new UnsupportedOperationException( "Not supported yet." );
     }
 

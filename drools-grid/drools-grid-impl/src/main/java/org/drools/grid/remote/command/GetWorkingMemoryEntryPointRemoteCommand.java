@@ -41,7 +41,7 @@ public class GetWorkingMemoryEntryPointRemoteCommand
 
     public WorkingMemoryEntryPoint execute(Context context) {
         StatefulKnowledgeSession ksession = ((KnowledgeCommandContext) context).getStatefulKnowledgesession();
-        SessionEntryPoint ep = ksession.getWorkingMemoryEntryPoint( this.name );
+        SessionEntryPoint ep = ksession.getEntryPoint( this.name );
         context.set( this.name,
                                                              ep );
         // If I return the command I need to create a serializable version of NamedEntryPoint

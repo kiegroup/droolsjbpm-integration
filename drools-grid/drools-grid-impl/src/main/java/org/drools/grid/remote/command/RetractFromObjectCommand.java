@@ -45,7 +45,7 @@ public class RetractFromObjectCommand
         FactHandle handle = ksession.getFactHandle(this.object);
         if ( handle != null ) {
             // objects may not be in the WM (anymore). The remote client is not guaranteed to have up-to-date information
-            ksession.getWorkingMemoryEntryPoint( ((InternalFactHandle)handle).getEntryPoint().getEntryPointId() ).retract( handle );
+            ksession.getEntryPoint( ((InternalFactHandle)handle).getEntryPoint().getEntryPointId() ).retract( handle );
         }
         return null;
     }

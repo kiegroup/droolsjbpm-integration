@@ -56,7 +56,7 @@ public class Broker implements EventReceiver, BrokerServices {
         this.window = window;
         this.companies = companies;
         this.session = createSession();
-        this.tickStream = this.session.getWorkingMemoryEntryPoint( "StockTick stream" );
+        this.tickStream = this.session.getEntryPoint( "StockTick stream" );
     }
 
     @SuppressWarnings("unchecked")
