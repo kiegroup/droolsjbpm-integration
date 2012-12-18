@@ -70,12 +70,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.commons</groupId>
+      <groupId>org.hibernate.common</groupId>
       <artifactId>hibernate-commons-annotations</artifactId>
       <optional>true</optional>
     </dependency>
