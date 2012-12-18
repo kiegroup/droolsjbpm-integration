@@ -179,27 +179,6 @@ public class DroolsEndpoint extends DefaultEndpoint {
             }
             // TODO: test this scenario...
         }
-
-        //        if ( !StringUtils.isEmpty( getDataFormat() ) ) {
-        //            String dataFormatName = getDataFormat();
-        //            if ( "drools-xstream".equals( dataFormatName ) ) {
-        //                XStreamDataFormat xstreaDataFormat = new XStreamDataFormat();
-        //                xstreaDataFormat.setXStream( BatchExecutionHelper.newXStreamMarshaller() );
-        //                this.dataFormat = xstreaDataFormat;
-        //            } else if ( "drools-json".equals( dataFormatName ) ) {
-        //                JsonDataFormat xstreaDataFormat = new JsonDataFormat();
-        //                xstreaDataFormat.setXStream( BatchExecutionHelper.newJSonMarshaller() );
-        //                this.dataFormat = xstreaDataFormat;
-        //            } else if ( "jaxb".equals( dataFormatName ) ) {
-        //                // to specify jaxb must be 
-        //                //JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
-        //                //jaxbDataFormat.setContextPath( contextPath )
-        //            } else {
-        //                this.dataFormat = getCamelContext().getRegistry().lookup( getDataFormat(),
-        //                                                                          DataFormat.class );
-        //            }
-        //        }
-
     }
 
     public static final String getExecuteNodeId(String uri) {
