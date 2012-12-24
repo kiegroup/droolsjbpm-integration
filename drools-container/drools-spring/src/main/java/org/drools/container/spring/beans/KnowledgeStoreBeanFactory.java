@@ -17,6 +17,7 @@
 package org.drools.container.spring.beans;
 
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
+import org.kie.persistence.jpa.KieStoreServices;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

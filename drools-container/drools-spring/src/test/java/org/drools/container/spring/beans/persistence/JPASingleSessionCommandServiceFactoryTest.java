@@ -28,14 +28,20 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
 
-import org.drools.KnowledgeBaseFactory;
+import org.kie.KieBase;
+import org.kie.KnowledgeBaseFactory;
 import org.drools.compiler.PackageBuilder;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
 import org.drools.rule.Package;
-import org.drools.runtime.EnvironmentName;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.persistence.jpa.KieStoreServices;
+import org.kie.runtime.Environment;
+import org.kie.runtime.EnvironmentName;
+import org.kie.runtime.KieSession;
+import org.kie.runtime.process.NodeInstance;
+import org.kie.runtime.process.ProcessInstance;
+import org.kie.runtime.process.WorkItem;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.compiler.ProcessBuilderImpl;
@@ -141,7 +147,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceWorkItems() throws Exception {
         log.info( "---> get bean jpaSingleSessionCommandService" );
-        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
+        KieSession service = (KieSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         log.info( "---> create new SingleSessionCommandService" );
 
@@ -164,16 +170,16 @@ public class JPASingleSessionCommandServiceFactoryTest {
                  ctx.getBean( "txManager" ) );
 
         KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        KieBase kbase1 = (KieBase) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadKieSession(  sessionId,
+                                          kbase1,
+                                          null,
+                                          env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
+        service = kstore.loadKieSession( sessionId,
                                                        kbase1,
                                                        null,
                                                        env );
@@ -184,18 +190,18 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
                                                        env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         service.getWorkItemManager().completeWorkItem( workItem.getId(),
                                                        null );
 
@@ -203,17 +209,17 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         service.getWorkItemManager().completeWorkItem( workItem.getId(),
                                                        null );
 
@@ -221,10 +227,10 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull( workItem );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         service.dispose();
     }
@@ -232,7 +238,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceWorkItemsUserTransaction() throws Exception {
 
-        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
+        KieSession service = (KieSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         int sessionId = service.getId();
         ProcessInstance processInstance = service.startProcess( "org.drools.test.TestProcess" );
@@ -251,20 +257,20 @@ public class JPASingleSessionCommandServiceFactoryTest {
                  ctx.getBean( "txManager" ) );
 
         KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        KieBase kbase1 = (KieBase) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
 
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         service.getWorkItemManager().completeWorkItem( workItem.getId(),
                                                        null );
 
@@ -272,46 +278,46 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         service.getWorkItemManager().abortWorkItem( workItem.getId() );
 
         workItem = handler.getWorkItem();
         assertNotNull( workItem );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         service.getWorkItemManager().completeWorkItem( workItem.getId(),
                                                        null );
         workItem = handler.getWorkItem();
         assertNull( workItem );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNull( processInstance );
         service.dispose();
@@ -412,7 +418,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceSubProcess() {
 
-        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
+        KieSession service = (KieSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         int sessionId = service.getId();
 
@@ -433,11 +439,11 @@ public class JPASingleSessionCommandServiceFactoryTest {
                  ctx.getBean( "txManager" ) );
 
         KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        KieBase kbase1 = (KieBase) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
 
         processInstance = (RuleFlowProcessInstance) service.getProcessInstance( processInstanceId );
         assertNotNull( processInstance );
@@ -451,18 +457,18 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( subProcessInstance );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         service.getWorkItemManager().completeWorkItem( workItem.getId(),
                                                        null );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         subProcessInstance = (RuleFlowProcessInstance) service.getProcessInstance( subProcessInstanceId );
         assertNull( subProcessInstance );
 
@@ -564,7 +570,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @Test
     public void testPersistenceTimer() throws Exception {
         log.info( "---> get bean jpaSingleSessionCommandService" );
-        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
+        KieSession service = (KieSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
@@ -584,11 +590,11 @@ public class JPASingleSessionCommandServiceFactoryTest {
                  ctx.getBean( "txManager" ) );
 
         KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );               
+        KieBase kbase1 = (KieBase) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
 
         log.info( "---> load session: " + sessionId );
         processInstance = service.getProcessInstance( procId );
@@ -599,10 +605,10 @@ public class JPASingleSessionCommandServiceFactoryTest {
         log.info( "---> session disposed" );
         service.dispose();
 
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
         log.info( "---> load session: " + sessionId );
         Thread.sleep( 3000 );
 
@@ -663,7 +669,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
     @Test
     public void testPersistenceTimer2() throws Exception {
-        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
+        KieSession service = (KieSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         int sessionId = service.getId();
 
@@ -680,11 +686,11 @@ public class JPASingleSessionCommandServiceFactoryTest {
                  ctx.getBean( "txManager" ) );
 
         KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbProcessWorkItems" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        KieBase kbase1 = (KieBase) ctx.getBean( "kbProcessWorkItems" );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
 
         processInstance = service.getProcessInstance( processInstance.getId() );
         assertNull( processInstance );

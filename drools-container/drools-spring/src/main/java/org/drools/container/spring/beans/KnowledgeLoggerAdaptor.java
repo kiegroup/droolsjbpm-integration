@@ -17,7 +17,7 @@ package org.drools.container.spring.beans;
 
 import java.io.Serializable;
 
-import org.drools.logger.KnowledgeRuntimeLogger;
+import org.kie.logger.KieRuntimeLogger;
 
 public class KnowledgeLoggerAdaptor implements Serializable {
     public static enum KNOWLEDGE_LOGGER_TYPE {
@@ -27,7 +27,7 @@ public class KnowledgeLoggerAdaptor implements Serializable {
     String file;
     int interval;
     KNOWLEDGE_LOGGER_TYPE loggerType = KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_CONSOLE;
-    KnowledgeRuntimeLogger runtimeLogger;
+    KieRuntimeLogger runtimeLogger;
 
     public KnowledgeLoggerAdaptor(KNOWLEDGE_LOGGER_TYPE loggerType){
         setLoggerType(loggerType);
@@ -57,11 +57,11 @@ public class KnowledgeLoggerAdaptor implements Serializable {
         this.file = file;
     }
 
-    protected void setRuntimeLogger(KnowledgeRuntimeLogger runtimeLogger){
+    protected void setRuntimeLogger(KieRuntimeLogger runtimeLogger){
         this.runtimeLogger = runtimeLogger;
     }
 
-    public KnowledgeRuntimeLogger getRuntimeLogger(){
+    public KieRuntimeLogger getRuntimeLogger(){
         return runtimeLogger;
     }
 

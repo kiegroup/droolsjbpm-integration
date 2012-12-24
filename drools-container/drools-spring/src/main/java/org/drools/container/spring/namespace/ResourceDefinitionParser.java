@@ -18,8 +18,8 @@ package org.drools.container.spring.namespace;
 
 import java.util.List;
 
-import org.drools.builder.DecisionTableInputType;
-import org.drools.builder.ResourceType;
+import org.kie.builder.DecisionTableInputType;
+import org.kie.io.ResourceType;
 import org.drools.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -29,6 +29,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+
+import static org.drools.core.util.StringUtils.isEmpty;
 
 public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -87,16 +89,23 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
         }
 
         String encoding = element.getAttribute( ENCODING );
-        factory.addPropertyValue( "encoding",
-                                  org.drools.core.util.StringUtils.isEmpty(encoding) ? null : encoding);
+        if ( !isEmpty(encoding) ){
+            factory.addPropertyValue( "encoding",
+                                      encoding);            
+        }
+
 
         String name = element.getAttribute( NAME );
-        factory.addPropertyValue( "name",
-                                  org.drools.core.util.StringUtils.isEmpty(name) ? null : name);
+        if ( !isEmpty(name) ){
+            factory.addPropertyValue( "name",
+                                      name);
+        }
 
         String description = element.getAttribute( DESCRIPTION );
-        factory.addPropertyValue( "description",
-                                  org.drools.core.util.StringUtils.isEmpty(description) ? null : description);
+        if ( !isEmpty(description) ){
+            factory.addPropertyValue( "description",
+                                      description);
+        }
         
 
         if ( "xsd".equals( resourceType.toLowerCase() ) ) {

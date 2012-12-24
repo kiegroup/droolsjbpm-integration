@@ -16,24 +16,34 @@
 
 package org.drools.container.spring;
 
+import org.kie.event.rule.AfterMatchFiredEvent;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.AgendaGroupPoppedEvent;
+import org.kie.event.rule.AgendaGroupPushedEvent;
+import org.kie.event.rule.BeforeMatchFiredEvent;
+import org.kie.event.rule.MatchCancelledEvent;
+import org.kie.event.rule.MatchCreatedEvent;
+import org.kie.event.rule.RuleFlowGroupActivatedEvent;
+import org.kie.event.rule.RuleFlowGroupDeactivatedEvent;
+
 
 public class MockAgendaEventListener implements AgendaEventListener {
 
-    public void activationCreated(ActivationCreatedEvent activationCreatedEvent) {
-        System.out.println("MockAgendaEventListener:: activationCreated");
+    public void matchCreated(MatchCreatedEvent matchCreatedEvent) {
+        System.out.println("MockAgendaEventListener:: matchCreated");
     }
 
-    public void activationCancelled(ActivationCancelledEvent activationCancelledEvent) {
-        System.out.println("MockAgendaEventListener:: activationCancelled");
+    public void matchCancelled(MatchCancelledEvent matchCancelledEvent) {
+        System.out.println("MockAgendaEventListener:: matchCancelled");
     }
 
-    public void beforeActivationFired(BeforeActivationFiredEvent beforeActivationFiredEvent) {
-        System.out.println("MockAgendaEventListener:: beforeActivationFired");
+    public void beforeMatchFired(BeforeMatchFiredEvent beforeMatchFiredEvent) {
+        System.out.println("MockAgendaEventListener:: beforeMatchFired");
         SpringDroolsListenersTest.incrementValueFromListener();
     }
 
-    public void afterActivationFired(AfterActivationFiredEvent afterActivationFiredEvent) {
-        System.out.println("MockAgendaEventListener:: afterActivationFired");
+    public void afterMatchFired(AfterMatchFiredEvent afterMatchFiredEvent) {
+        System.out.println("MockAgendaEventListener:: afterMatchFired");
     }
 
     public void agendaGroupPopped(AgendaGroupPoppedEvent agendaGroupPoppedEvent) {

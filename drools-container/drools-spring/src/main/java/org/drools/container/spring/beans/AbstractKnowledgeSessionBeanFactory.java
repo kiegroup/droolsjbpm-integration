@@ -21,12 +21,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.container.spring.namespace.EventListenersUtil;
-import org.drools.event.KnowledgeRuntimeEventManager;
-import org.drools.event.process.ProcessEventListener;
+import org.kie.KieBase;
+import org.kie.command.Command;
+import org.kie.event.KieRuntimeEventManager;
+import org.kie.event.KnowledgeRuntimeEventManager;
+import org.kie.event.process.ProcessEventListener;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.WorkingMemoryEventListener;
 import org.drools.grid.GridNode;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.KnowledgeSessionConfiguration;
+import org.kie.logger.KieRuntimeLogger;
+import org.kie.logger.KnowledgeRuntimeLogger;
+import org.kie.logger.KnowledgeRuntimeLoggerFactory;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.KieSessionConfiguration;
+import org.kie.runtime.process.WorkItemHandler;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,8 +50,8 @@ public abstract class AbstractKnowledgeSessionBeanFactory
 
     private GridNode node;
     private Map<String, WorkItemHandler> workItems;
-    private KnowledgeSessionConfiguration conf;
-    private KnowledgeBase kbase;
+    private KieSessionConfiguration conf;
+    private KieBase kbase;
     private String beanName;
     private String name;
 
@@ -79,11 +87,11 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         this.workItems = workItems;
     }
 
-    public KnowledgeSessionConfiguration getConf() {
+    public KieSessionConfiguration getConf() {
         return conf;
     }
 
-    public void setConf(KnowledgeSessionConfiguration conf) {
+    public void setConf(KieSessionConfiguration conf) {
         this.conf = conf;
     }
 
@@ -95,11 +103,11 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         this.name = name;
     }
 
-    public KnowledgeBase getKbase() {
+    public KieBase getKbase() {
         return kbase;
     }
 
-    public void setKbase(KnowledgeBase kbase) {
+    public void setKbase(KieBase kbase) {
         this.kbase = kbase;
     }
 
@@ -232,21 +240,21 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         this.loggerAdaptors.addAll(loggers);
     }
 
-    protected void attachLoggers(KnowledgeRuntimeEventManager ksession){
+    protected void attachLoggers(KieRuntimeEventManager ksession){
         if ( loggerAdaptors != null && loggerAdaptors.size() > 0){
             for ( KnowledgeLoggerAdaptor adaptor : loggerAdaptors) {
                 KnowledgeRuntimeLogger runtimeLogger;
                 switch (adaptor.getLoggerType()) {
                     case LOGGER_TYPE_FILE :
-                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, adaptor.getFile());
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newFileLogger((KnowledgeRuntimeEventManager) ksession, adaptor.getFile());
                         adaptor.setRuntimeLogger(runtimeLogger);
                         break;
                     case LOGGER_TYPE_THREADED_FILE:
-                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(ksession, adaptor.getFile(), adaptor.getInterval());
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger( ( KnowledgeRuntimeEventManager ) ksession, adaptor.getFile(), adaptor.getInterval());
                         adaptor.setRuntimeLogger(runtimeLogger);
                         break;
                     case LOGGER_TYPE_CONSOLE:
-                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger( ( KnowledgeRuntimeEventManager ) ksession);
                         adaptor.setRuntimeLogger(runtimeLogger);
                         break;
                 }

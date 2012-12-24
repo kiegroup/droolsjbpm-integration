@@ -30,8 +30,8 @@ import org.drools.audit.WorkingMemoryFileLogger;
 import org.drools.container.spring.beans.KnowledgeLoggerAdaptor;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.KieSession;
+import org.kie.runtime.StatelessKieSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatefulKnowledgeConsoleLogger() throws Exception {
-        StatefulKnowledgeSession statefulSession = (StatefulKnowledgeSession) context.getBean( "ConsoleLogger-statefulSession" );
+        KieSession statefulSession = (KieSession) context.getBean( "ConsoleLogger-statefulSession" );
         StatefulKnowledgeSessionImpl impl = (StatefulKnowledgeSessionImpl)statefulSession;
         for ( Object listener : impl.session.getWorkingMemoryEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
@@ -62,7 +62,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatefulKnowledgeFileLogger() throws Exception {
-        StatefulKnowledgeSession statefulSession = (StatefulKnowledgeSession) context.getBean( "FileLogger-statefulSession" );
+        KieSession statefulSession = (KieSession) context.getBean( "FileLogger-statefulSession" );
         assertNotNull(statefulSession.getGlobals().get("list"));
         StatefulKnowledgeSessionImpl impl = (StatefulKnowledgeSessionImpl)statefulSession;
         for ( Object listener : impl.session.getWorkingMemoryEventListeners()) {
@@ -77,7 +77,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatefulKnowledgeThreadedFileLogger() throws Exception {
-        StatefulKnowledgeSession statefulSession = (StatefulKnowledgeSession) context.getBean( "ThreadedFileLogger-statefulSession" );
+        KieSession statefulSession = (KieSession) context.getBean( "ThreadedFileLogger-statefulSession" );
         assertNotNull(statefulSession.getGlobals().get("list"));
         StatefulKnowledgeSessionImpl impl = (StatefulKnowledgeSessionImpl)statefulSession;
         for ( Object listener : impl.session.getWorkingMemoryEventListeners()) {
@@ -91,7 +91,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatelessKnowledgeConsoleLogger() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "ConsoleLogger-statelessSession" );
+        StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean( "ConsoleLogger-statelessSession" );
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl)statelessKnowledgeSession;
         for ( Object listener : impl.workingMemoryEventSupport.getEventListeners()){
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
@@ -100,7 +100,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatelessKnowledgeFileLogger() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "FileLogger-statelessSession" );
+        StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean( "FileLogger-statelessSession" );
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl)statelessKnowledgeSession;
         for ( Object listener : impl.workingMemoryEventSupport.getEventListeners()){
             assertTrue(listener instanceof WorkingMemoryFileLogger);
@@ -112,7 +112,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatelessKnowledgeThreadedFileLogger() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "ThreadedFileLogger-statelessSession" );
+        StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean( "ThreadedFileLogger-statelessSession" );
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl)statelessKnowledgeSession;
         for ( Object listener : impl.workingMemoryEventSupport.getEventListeners()){
             assertTrue(listener instanceof ThreadedWorkingMemoryFileLogger);
@@ -125,7 +125,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testKSessionLoggersFromGroupAndNested() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "k1" );
+        StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean( "k1" );
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl)statelessKnowledgeSession;
         assertEquals(2, impl.workingMemoryEventSupport.getEventListeners().size());
 
@@ -146,7 +146,7 @@ public class SpringDroolsLoggersTest {
 
     @Test
     public void testStatelessNoNameFileLogger() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean( "FileLogger-statelessSession-noNameLogger" );
+        StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean( "FileLogger-statelessSession-noNameLogger" );
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl)statelessKnowledgeSession;
         for ( Object listener : impl.workingMemoryEventSupport.getEventListeners()){
             assertTrue(listener instanceof WorkingMemoryFileLogger);

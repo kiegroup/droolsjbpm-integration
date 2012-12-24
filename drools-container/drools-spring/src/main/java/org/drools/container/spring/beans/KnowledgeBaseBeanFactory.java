@@ -22,19 +22,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactoryService;
-import org.drools.base.accumulators.AccumulateFunction;
+import org.kie.KieBaseConfiguration;
+import org.kie.KnowledgeBase;
+import org.kie.KnowledgeBaseFactoryService;
 import org.drools.base.evaluators.EvaluatorDefinition;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.KnowledgeBuilderFactoryService;
-import org.drools.builder.ResourceType;
-import org.drools.builder.conf.AccumulateFunctionOption;
-import org.drools.builder.conf.EvaluatorOption;
+import org.kie.builder.KnowledgeBuilder;
+import org.kie.builder.KnowledgeBuilderErrors;
+import org.kie.builder.KnowledgeBuilderFactory;
+import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.io.ResourceType;
+import org.kie.runtime.rule.AccumulateFunction;
+import org.kie.builder.conf.AccumulateFunctionOption;
+import org.kie.builder.conf.EvaluatorOption;
 import org.drools.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.compiler.PackageBuilderConfiguration;
+import org.drools.conf.KnowledgeBaseConfigurationTest;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.impl.KnowledgeBaseImpl;
@@ -46,7 +48,7 @@ public class KnowledgeBaseBeanFactory
     FactoryBean,
     InitializingBean {
 
-    private KnowledgeBaseConfiguration       conf;
+    private KieBaseConfiguration       conf;
     private Map<String, AccumulateFunction>  accumulateFunctions;
     private Map<String, EvaluatorDefinition> evaluators;
 
@@ -146,11 +148,11 @@ public class KnowledgeBaseBeanFactory
         this.evaluators = evaluators;
     }
 
-    public KnowledgeBaseConfiguration getConf() {
+    public KieBaseConfiguration getConf() {
         return conf;
     }
 
-    public void setConf(KnowledgeBaseConfiguration conf) {
+    public void setConf(KieBaseConfiguration conf) {
         this.conf = conf;
     }
 

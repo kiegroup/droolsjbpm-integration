@@ -17,9 +17,9 @@ package org.drools.container.spring;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.runtime.KieSession;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -37,8 +37,8 @@ public class SpringDroolsListenersOrderTest {
         ctx = new ClassPathXmlApplicationContext("org/drools/container/spring/listenersOrderTest.xml");
     }
 
-    private StatefulKnowledgeSession getSession() {
-        return (StatefulKnowledgeSession) ctx.getBean("session2");
+    private KieSession getSession() {
+        return (KieSession) ctx.getBean("session2");
     }
 
     /**
@@ -48,7 +48,7 @@ public class SpringDroolsListenersOrderTest {
      */
     @Test
     public void testListeners() {
-        StatefulKnowledgeSession session = getSession();
+        KieSession session = getSession();
         assertNotNull(session);
     }
 }

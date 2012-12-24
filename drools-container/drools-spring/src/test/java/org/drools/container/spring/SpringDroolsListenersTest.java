@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.Person;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.runtime.KieSession;
+import org.kie.runtime.StatelessKieSession;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,27 +59,27 @@ public class SpringDroolsListenersTest {
 
     //@Test
     public void testStatefulAgendaEventListener() throws Exception {
-        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean("statefulSession");
-        assertEquals(1, statefulKnowledgeSession.getAgendaEventListeners().size());
-        assertTrue(statefulKnowledgeSession.getAgendaEventListeners().toArray()[0] instanceof MockAgendaEventListener);
+        KieSession KieSession = (KieSession) context.getBean("statefulSession");
+        assertEquals(1, KieSession.getAgendaEventListeners().size());
+        assertTrue(KieSession.getAgendaEventListeners().toArray()[0] instanceof MockAgendaEventListener);
     }
 
     @Test
     public void testStatefulProcessEventListener() throws Exception {
-        StatefulKnowledgeSessionImpl statefulKnowledgeSession = (StatefulKnowledgeSessionImpl) context.getBean("statefulSession");
-        assertEquals(1, statefulKnowledgeSession.getProcessEventListeners().size());
-        assertTrue(statefulKnowledgeSession.getProcessEventListeners().toArray()[0] instanceof MockProcessEventListener);
+        KieSession KieSession = (KieSession) context.getBean("statefulSession");
+        assertEquals(1, KieSession.getProcessEventListeners().size());
+        assertTrue(KieSession.getProcessEventListeners().toArray()[0] instanceof MockProcessEventListener);
     }
 
     @Test
     public void testStatefulWMEventListener() throws Exception {
-        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulSession");
-        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
-        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
+        KieSession KieSession = (KieSession) context.getBean("statefulSession");
+        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
+        assertTrue(KieSession.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
 
-        statefulKnowledgeSession.setGlobal("list", list);
-        statefulKnowledgeSession.insert(new Person());
-        statefulKnowledgeSession.fireAllRules();
+        KieSession.setGlobal("list", list);
+        KieSession.insert(new Person());
+        KieSession.fireAllRules();
         //this assert to show that our listener was called X number of times.
         // once from agenda listener, and second from working memory event listener
         assertEquals(2, counterFromListener);
@@ -87,21 +87,21 @@ public class SpringDroolsListenersTest {
 
     @Test
     public void testStatelessAgendaEventListener() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean("statelessSession");
-        assertEquals(1, statelessKnowledgeSession.getAgendaEventListeners().size());
-        assertTrue(statelessKnowledgeSession.getAgendaEventListeners().toArray()[0] instanceof MockAgendaEventListener);
+        StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessSession");
+        assertEquals(1, StatelessKieSession.getAgendaEventListeners().size());
+        assertTrue(StatelessKieSession.getAgendaEventListeners().toArray()[0] instanceof MockAgendaEventListener);
     }
 
     @Test
     public void testStatelessProcessEventListener() throws Exception {
-        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean("statelessSession");
+        StatelessKieSession kstateless = (StatelessKieSession) context.getBean("statelessSession");
         assertEquals(1, kstateless.getProcessEventListeners().size());
         assertTrue(kstateless.getProcessEventListeners().toArray()[0] instanceof MockProcessEventListener);
     }
 
     @Test
     public void testStatelessWMEventListener() throws Exception {
-        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean("statelessSession");
+        StatelessKieSession kstateless = (StatelessKieSession) context.getBean("statelessSession");
         assertEquals(1, kstateless.getWorkingMemoryEventListeners().size());
         assertTrue(kstateless.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
 
@@ -114,50 +114,50 @@ public class SpringDroolsListenersTest {
 
     @Test
     public void testStatefulWithNestedBean() throws Exception {
-        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithNestedBean");
-        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+        KieSession KieSession = (KieSession) context.getBean("statefulWithNestedBean");
+        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
 
-        statefulKnowledgeSession.setGlobal("list", list);
-        statefulKnowledgeSession.insert(new Person());
-        statefulKnowledgeSession.fireAllRules();
+        KieSession.setGlobal("list", list);
+        KieSession.insert(new Person());
+        KieSession.fireAllRules();
         //this assert to show that our listener was called X number of times.
         assertEquals(1, counterFromListener);
     }
 
     @Test
     public void testStatefulWithRef() throws Exception {
-        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithRef");
-        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+        KieSession KieSession = (KieSession) context.getBean("statefulWithRef");
+        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
 
-        statefulKnowledgeSession.setGlobal("list", list);
-        statefulKnowledgeSession.insert(new Person());
-        statefulKnowledgeSession.fireAllRules();
+        KieSession.setGlobal("list", list);
+        KieSession.insert(new Person());
+        KieSession.fireAllRules();
         //this assert to show that our listener was called X number of times.
         assertEquals(1, counterFromListener);
     }
 
     @Test
     public void testStatefulWithDefault() throws Exception {
-        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithDefault");
-        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
-        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+        KieSession KieSession = (KieSession) context.getBean("statefulWithDefault");
+        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
+        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
     }
 
     @Test
     public void testStatefulWithLegacyDebugListener() throws Exception {
-        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithDebugListener");
-        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
-        assertTrue(statefulKnowledgeSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+        KieSession KieSession = (KieSession) context.getBean("statefulWithDebugListener");
+        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
+        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
     }
 
     @Test
     public void testStatefulWithGroupedListeners() throws Exception {
-        StatefulKnowledgeSession statefulKnowledgeSession = (StatefulKnowledgeSession) context.getBean("statefulWithGroupedListeners");
-        assertEquals(1, statefulKnowledgeSession.getWorkingMemoryEventListeners().size());
+        KieSession KieSession = (KieSession) context.getBean("statefulWithGroupedListeners");
+        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
 
-        statefulKnowledgeSession.setGlobal("list", list);
-        statefulKnowledgeSession.insert(new Person());
-        statefulKnowledgeSession.fireAllRules();
+        KieSession.setGlobal("list", list);
+        KieSession.insert(new Person());
+        KieSession.fireAllRules();
         //this assert to show that our listener was called X number of times.
         // once from agenda listener, and second from working memory event listener
         assertEquals(2, counterFromListener);
@@ -166,33 +166,33 @@ public class SpringDroolsListenersTest {
     //stateless
     @Test
     public void testStatelessWithNestedBean() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean("statelessWithNestedBean");
-        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+        StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithNestedBean");
+        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
 
-        statelessKnowledgeSession.setGlobal("list", list);
-        statelessKnowledgeSession.execute(new Person());
+        StatelessKieSession.setGlobal("list", list);
+        StatelessKieSession.execute(new Person());
         //this assert to show that our listener was called X number of times.
         assertEquals(1, counterFromListener);
     }
 
     @Test
     public void testStatelessWithRef() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean("statelessWithRef");
-        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+        StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithRef");
+        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
 
-        statelessKnowledgeSession.setGlobal("list", list);
-        statelessKnowledgeSession.execute(new Person());
+        StatelessKieSession.setGlobal("list", list);
+        StatelessKieSession.execute(new Person());
         //this assert to show that our listener was called X number of times.
         assertEquals(1, counterFromListener);
     }
 
     @Test
     public void testStatelessWithMultipleSameType() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean("statelessWithMultipleSameType");
-        assertEquals(2, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+        StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithMultipleSameType");
+        assertEquals(2, StatelessKieSession.getWorkingMemoryEventListeners().size());
 
-        statelessKnowledgeSession.setGlobal("list", list);
-        statelessKnowledgeSession.execute(new Person());
+        StatelessKieSession.setGlobal("list", list);
+        StatelessKieSession.execute(new Person());
         // this assert to show that our listener was called X number of times.
         // two working memory listeners were added!
         assertEquals(2, counterFromListener);
@@ -200,18 +200,18 @@ public class SpringDroolsListenersTest {
 
     @Test
     public void testStatelessWithDefault() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean("statelessWithDefault");
-        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
-        assertTrue(statelessKnowledgeSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
+        StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithDefault");
+        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
+        assertTrue(StatelessKieSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
     }
 
     @Test
     public void testStatelessWithGroupedListeners() throws Exception {
-        StatelessKnowledgeSession statelessKnowledgeSession = (StatelessKnowledgeSession) context.getBean("statelessWithGroupedListeners");
-        assertEquals(1, statelessKnowledgeSession.getWorkingMemoryEventListeners().size());
+        StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithGroupedListeners");
+        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
 
-        statelessKnowledgeSession.setGlobal("list", list);
-        statelessKnowledgeSession.execute(new Person());
+        StatelessKieSession.setGlobal("list", list);
+        StatelessKieSession.execute(new Person());
         // this assert to show that our listener was called X number of times.
         // once from agenda listener, and second from working memory event listener
         assertEquals(2, counterFromListener);

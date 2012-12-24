@@ -3,10 +3,13 @@ package org.drools.container.spring.timer;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.drools.KnowledgeBaseFactory;
+import org.kie.KieBase;
+import org.kie.KnowledgeBaseFactory;
 import org.drools.base.MapGlobalResolver;
-import org.drools.runtime.EnvironmentName;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.runtime.EnvironmentName;
+import org.kie.runtime.KieSession;
+import org.kie.persistence.jpa.KieStoreServices;
+import org.kie.runtime.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -19,7 +22,7 @@ public class MyDroolsBean {
     private Logger logger          = LoggerFactory.getLogger( getClass() );
 
     private EntityManagerFactory  emf;
-    private KnowledgeBase         kbase;
+    private KieBase         kbase;
     private KieStoreServices kstore;
     private JpaTransactionManager txm;
 
@@ -29,9 +32,9 @@ public class MyDroolsBean {
         try {
             EntityManager em = txm.getEntityManagerFactory().createEntityManager();
             // create new ksession with kstore
-            StatefulKnowledgeSession ksession = kstore.newStatefulKnowledgeSession( kbase,
-                                                                                    null,
-                                                                                    getEnvironment() );
+            KieSession ksession = kstore.newKieSession( kbase,
+                                                        null,
+                                                        getEnvironment() );
             sessionId = ksession.getId();
 
             logger.info( "\n\tSession id: " + sessionId + "\n" );
@@ -67,10 +70,10 @@ public class MyDroolsBean {
 
     public void endTheProcess() {
         try {
-            StatefulKnowledgeSession ksession = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                                                     kbase,
-                                                                                     null,
-                                                                                     getEnvironment() );
+            KieSession ksession = kstore.loadKieSession( sessionId,
+                                                         kbase,
+                                                         null,
+                                                         getEnvironment() );
 
             //Sleep to check if the timer continues executing.
             logger.info( "\n\nSleeping to check that the timer is still running" );
@@ -106,7 +109,7 @@ public class MyDroolsBean {
         this.emf = emf;
     }
 
-    public void setKbase(KnowledgeBase kbase) {
+    public void setKbase(KieBase kbase) {
         this.kbase = kbase;
     }
 

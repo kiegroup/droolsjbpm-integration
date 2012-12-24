@@ -21,7 +21,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.grid.GridNode;
-import org.drools.util.ServiceRegistryImpl;
+import org.kie.internal.utils.ServiceRegistry;
+import org.kie.internal.utils.ServiceRegistryImpl;
 
 public class GridNodeImpl
     implements

@@ -16,8 +16,9 @@
 
 package org.drools.container.spring.beans;
 
-import org.drools.builder.ResourceConfiguration;
-import org.drools.builder.ResourceType;
+import org.kie.io.Resource;
+import org.kie.io.ResourceConfiguration;
+import org.kie.io.ResourceType;
 import org.drools.io.impl.ClassPathResource;
 import org.drools.io.impl.UrlResource;
 import org.drools.io.internal.InternalResource;
@@ -92,7 +93,7 @@ public class DroolsResourceAdapter
         if ( !(this.resource instanceof InternalResource) ) {
             throw new IllegalArgumentException( "'name' attribute is only valid for InternalResource subclasses" );
         }
-        ((InternalResource) this.resource).setName( name );
+        ((InternalResource) this.resource).setSourcePath( name );
     }
     
     public void setDescription(String description){

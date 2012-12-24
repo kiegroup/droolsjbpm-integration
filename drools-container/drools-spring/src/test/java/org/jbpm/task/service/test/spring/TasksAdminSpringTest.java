@@ -12,7 +12,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.drools.SystemEventListenerFactory;
+import org.kie.SystemEventListenerFactory;
 import org.jbpm.task.Group;
 import org.jbpm.task.MockUserInfo;
 import org.jbpm.task.User;

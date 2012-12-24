@@ -8,63 +8,6 @@
 
   <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"/>
 
-  <!-- xsd:element name="grid">
-    <xsd:complexType>
-      <xsd:all minOccurs="0">
-        <xsd:element name="core-services" minOccurs="0" maxOccurs="1">
-          <xsd:complexType>
-                <xsd:choice minOccurs="0" maxOccurs="1">
-                 <xsd:element ref="spring:bean"/>
-               <xsd:element ref="spring:ref"/>
-               <xsd:element ref="spring:idref"/>
-               <xsd:element ref="spring:value"/>
-               <xsd:element ref="spring:null"/>
-               <xsd:element ref="spring:list"/>
-               <xsd:element ref="spring:set"/>
-               <xsd:element ref="spring:map"/>
-               <xsd:element ref="spring:props"/>
-            </xsd:choice>
-          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-          </xsd:complexType>
-        </xsd:element>
-
-        <xsd:element name="whitepages" minOccurs="0" maxOccurs="1">
-          <xsd:complexType>
-            <xsd:choice minOccurs="0" maxOccurs="1">
-              <xsd:element ref="persistence"/>
-                  <xsd:element ref="spring:bean"/>
-                 <xsd:element ref="spring:ref"/>
-                <xsd:element ref="spring:idref"/>
-                <xsd:element ref="spring:value"/>
-                <xsd:element ref="spring:null"/>
-                <xsd:element ref="spring:list"/>
-                <xsd:element ref="spring:set"/>
-                <xsd:element ref="spring:map"/>
-                <xsd:element ref="spring:props"/>
-            </xsd:choice>
-            <xsd:attribute name="ref" use="optional" type="xsd:string"/>
-          </xsd:complexType>
-        </xsd:element>
-
-        <xsd:element name="socket-service" minOccurs="0" maxOccurs="1">
-          <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="service" minOccurs="0" maxOccurs="unbounded">
-              <xsd:complexType>
-                <xsd:attribute name="name" use="required" type="xsd:string"/>
-                <xsd:attribute name="port" use="required" type="xsd:string"/>
-              </xsd:complexType>
-            </xsd:element>
-          </xsd:sequence>
-          <xsd:attribute name="acceptor" use="optional" type="xsd:string"/>
-          <xsd:attribute name="ip" use="required" type="xsd:string"/>
-          </xsd:complexType>
-        </xsd:element>
-
-      </xsd:all>
-      <xsd:attribute name="id" use="required" type="xsd:ID"/>
-    </xsd:complexType>
-  </xsd:element -->
 
   <xsd:element name="grid-node">
     <xsd:complexType>
@@ -187,12 +130,13 @@
           </xsd:complexType>
         </xsd:element>
       </xsd:all>
-      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
-      <xsd:attribute name="node" use="optional" type="xsd:string"/>
+      
+      <xsd:attribute name="id" use="optional" type="xsd:ID" />
+      <xsd:attribute name="node" use="optional" type="xsd:string" />
     </xsd:complexType>
   </xsd:element>
 
-  <xsd:element name="kagent">
+  <!-- xsd:element name="kagent">
     <xsd:complexType>
       <xsd:all>
         <xsd:element ref="resources"  minOccurs="0" maxOccurs="1" />
@@ -202,7 +146,7 @@
       <xsd:attribute name="new-instance" use="optional" type="xsd:boolean"/>
       <xsd:attribute name="use-kbase-classloader" use="optional" type="xsd:boolean"/>
     </xsd:complexType>
-  </xsd:element>
+  </xsd:element -->
 
   <xsd:element name="kstore" />
 

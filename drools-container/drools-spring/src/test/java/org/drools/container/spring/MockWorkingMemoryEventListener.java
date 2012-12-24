@@ -16,6 +16,11 @@
 
 package org.drools.container.spring;
 
+import org.kie.event.rule.ObjectDeletedEvent;
+import org.kie.event.rule.ObjectInsertedEvent;
+import org.kie.event.rule.ObjectUpdatedEvent;
+import org.kie.event.rule.WorkingMemoryEventListener;
+
 
 public class MockWorkingMemoryEventListener implements WorkingMemoryEventListener {
     public void objectInserted(ObjectInsertedEvent objectInsertedEvent) {
@@ -28,7 +33,7 @@ public class MockWorkingMemoryEventListener implements WorkingMemoryEventListene
         System.out.println("MockWorkingMemoryEventListener :: objectUpdated");
     }
 
-    public void objectRetracted(ObjectRetractedEvent objectRetractedEvent) {
-        System.out.println("MockWorkingMemoryEventListener :: objectRetracted");
+    public void objectDeleted(ObjectDeletedEvent objectRetractedEvent) {
+        System.out.println("MockWorkingMemoryEventListener :: objectDeleted");
     }
 }

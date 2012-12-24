@@ -19,21 +19,16 @@ package org.drools.container.spring.beans;
 import java.util.Map;
 
 import org.drools.SessionConfiguration;
-import org.drools.agent.KnowledgeAgent;
-import org.drools.event.process.ProcessEventListener;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.event.process.ProcessEventListener;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.runtime.CommandExecutor;
+import org.kie.runtime.StatelessKieSession;
+import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.process.WorkItemHandler;
 
 public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {
-    private StatelessKnowledgeSession ksession;
-    private KnowledgeAgent            kagent;
-
-    public void setKnowledgeAgent(KnowledgeAgent kagent) {
-        this.kagent = kagent;
-    }
-
-    public KnowledgeAgent getKnowledgeAgent() {
-        return this.kagent;
-    }
+    private StatelessKieSession ksession;
 
     public Class<StatelessKnowledgeSession> getObjectType() {
         return StatelessKnowledgeSession.class;
@@ -51,11 +46,11 @@ public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessi
             map.putAll( getWorkItems() );
         }
 
-        if ( this.kagent != null ) {
-            ksession = this.kagent.newStatelessKnowledgeSession( getConf() );
-        } else {
-            ksession = getKbase().newStatelessKnowledgeSession( getConf() );
-        }
+//        if ( this.kagent != null ) {
+//            ksession = this.kagent.newStatelessKnowledgeSession( getConf() );
+//        } else {
+            ksession = getKbase().newStatelessKieSession( getConf() );
+//        }
 
         if ( getNode() != null ) {
             getNode().set( getName(),
@@ -63,7 +58,7 @@ public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessi
         }
 
         // Additions for JIRA JBRULES-3076
-        for (AgendaEventListener agendaEventListener :getAgendaEventListeners()) {
+        for (AgendaEventListener agendaEventListener : getAgendaEventListeners()) {
             ksession.addEventListener(agendaEventListener);
         }
         for (ProcessEventListener processEventListener :getProcessEventListeners()) {

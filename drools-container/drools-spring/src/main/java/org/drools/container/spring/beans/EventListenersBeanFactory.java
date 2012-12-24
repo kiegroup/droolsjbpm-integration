@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.container.spring.namespace.EventListenersUtil;
-import org.drools.event.process.ProcessEventListener;
+import org.kie.event.process.ProcessEventListener;
+import org.kie.event.rule.AgendaEventListener;
+import org.kie.event.rule.WorkingMemoryEventListener;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

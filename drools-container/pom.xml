@@ -17,7 +17,7 @@
 
   <modules>
     <!--<module>drools-seam</module>-->
-    <!--module>drools-spring</module-->
+    <module>drools-spring</module>
   </modules>
 
 </project>

@@ -21,7 +21,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 
-import org.drools.base.accumulators.AccumulateFunction;
+import org.kie.runtime.rule.AccumulateFunction;
 
 public class MockAccumulateFunction
     implements

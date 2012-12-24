@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
-import org.drools.conf.EventProcessingOption;
+import org.kie.conf.EventProcessingOption;
 import org.drools.container.spring.beans.KnowledgeBaseBeanFactory;
 import org.drools.core.util.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;

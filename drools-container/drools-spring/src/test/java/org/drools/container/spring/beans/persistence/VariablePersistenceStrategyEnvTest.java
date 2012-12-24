@@ -35,8 +35,6 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
-import org.drools.persistence.jpa.JPAKnowledgeService;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.After;
@@ -44,6 +42,13 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.KieBase;
+import org.kie.persistence.jpa.JPAKnowledgeService;
+import org.kie.persistence.jpa.KieStoreServices;
+import org.kie.runtime.Environment;
+import org.kie.runtime.KieSession;
+import org.kie.runtime.process.WorkItem;
+import org.kie.runtime.process.WorkflowProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -125,15 +130,15 @@ public class VariablePersistenceStrategyEnvTest {
         final Environment env = (Environment) ctx.getBean("env");
 
         final KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        final KnowledgeBase kbRollback = (KnowledgeBase) ctx.getBean( "kbRollback" );
+        final KieBase kbRollback = (KieBase) ctx.getBean( "kbRollback" );
 
         TransactionTemplate txTemplate = new TransactionTemplate( txManager );
-        final StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) txTemplate.execute( new TransactionCallback() {
+        final KieSession ksession = (KieSession) txTemplate.execute( new TransactionCallback() {
 
             public Object doInTransaction(TransactionStatus status) {
-                StatefulKnowledgeSession kNewSession = kstore.newStatefulKnowledgeSession( kbRollback,
-                                                                                           null,
-                                                                                           env );
+                KieSession kNewSession = kstore.newKieSession( kbRollback,
+                                                               null,
+                                                               env );
                 kNewSession.setGlobal( "list",
                                        list );
                 kNewSession.insert( 1 );
@@ -202,10 +207,10 @@ public class VariablePersistenceStrategyEnvTest {
         ksession.dispose();
 
         // now load the ksession
-        final StatefulKnowledgeSession ksession2 = JPAKnowledgeService.loadStatefulKnowledgeSession( sessionId,
-                                                                                                     kbRollback,
-                                                                                                     null,
-                                                                                                     env );
+        final KieSession ksession2 = JPAKnowledgeService.loadStatefulKnowledgeSession( sessionId,
+                                                                                       kbRollback,
+                                                                                       null,
+                                                                                       env );
 
         txTemplate = new TransactionTemplate( txManager );
         txTemplate.execute( new TransactionCallback() {
@@ -252,7 +257,7 @@ public class VariablePersistenceStrategyEnvTest {
         em.close();
 
         log.info( "---> get bean jpaSingleSessionCommandService" );
-        StatefulKnowledgeSession service = (StatefulKnowledgeSession) ctx.getBean( "jpaSingleSessionCommandService" );
+        KieSession service = (KieSession) ctx.getBean( "jpaSingleSessionCommandService" );
 
         int sessionId = service.getId();
         log.info( "---> created SingleSessionCommandService id: " + sessionId );
@@ -299,11 +304,11 @@ public class VariablePersistenceStrategyEnvTest {
 */
         final Environment env = (Environment) ctx.getBean("env2");
         KieStoreServices kstore = (KieStoreServices) ctx.getBean( "kstore1" );
-        KnowledgeBase kbase1 = (KnowledgeBase) ctx.getBean( "kbase1" );
-        service = kstore.loadStatefulKnowledgeSession( sessionId,
-                                                       kbase1,
-                                                       null,
-                                                       env );
+        KieBase kbase1 = (KieBase) ctx.getBean( "kbase1" );
+        service = kstore.loadKieSession( sessionId,
+                                         kbase1,
+                                         null,
+                                         env );
 
         processInstance = (WorkflowProcessInstance) service.getProcessInstance( processInstance.getId() );
         assertNotNull( processInstance );

@@ -33,16 +33,19 @@ import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.SessionConfiguration;
 import org.drools.common.InternalRuleBase;
-import org.drools.conf.EventProcessingOption;
+import org.kie.KieBase;
+import org.kie.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
-import org.drools.definition.KnowledgePackage;
+import org.kie.definition.KiePackage;
+import org.kie.io.Resource;
 import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.io.impl.UrlResource;
 import org.drools.io.internal.InternalResource;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.kie.runtime.KieSession;
+import org.kie.runtime.StatelessKieSession;
+import org.kie.runtime.process.WorkItemHandler;
 import org.jbpm.process.instance.impl.humantask.HumanTaskHandler;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -64,9 +67,9 @@ public class SpringDroolsTest {
     public void testEncoding() throws Exception {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/resourceWithEncoding.xml" );
 
-        KnowledgeBase kbase = (KnowledgeBase) context.getBean("kbase");
+        KieBase kbase = (KieBase) context.getBean("kbase");
         assertNotNull( kbase );
-        for (KnowledgePackage pkg : kbase.getKnowledgePackages()) {
+        for (KiePackage pkg : kbase.getKiePackages()) {
             assertEquals("sample acçéntèd rule", pkg.getRules().iterator().next().getName());
         }
 
@@ -77,7 +80,7 @@ public class SpringDroolsTest {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/no-node-beans.xml" );
 
         List<String> list = new ArrayList<String>();
-        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean( "ksession1" );
+        StatelessKieSession kstateless = (StatelessKieSession) context.getBean( "ksession1" );
         kstateless.setGlobal( "list",
                               list );
         kstateless.execute( new Person( "Darth",
@@ -87,7 +90,7 @@ public class SpringDroolsTest {
                       list.size() );
 
         list = new ArrayList<String>();
-        StatefulKnowledgeSession kstateful = ((StatefulKnowledgeSession) context.getBean( "ksession2" ));
+        KieSession kstateful = ((KieSession) context.getBean( "ksession2" ));
         kstateful.setGlobal( "list",
                              list );
         kstateful.insert( new Person( "Darth",
@@ -103,7 +106,7 @@ public class SpringDroolsTest {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext( "org/drools/container/spring/beans.xml" );
 
         List<String> list = new ArrayList<String>();
-        StatelessKnowledgeSession kstateless = (StatelessKnowledgeSession) context.getBean( "ksession1" );
+        StatelessKieSession kstateless = (StatelessKieSession) context.getBean( "ksession1" );
         kstateless.setGlobal( "list",
                               list );
         kstateless.execute( new Person( "Darth",
@@ -113,7 +116,7 @@ public class SpringDroolsTest {
                       list.size() );
 
         list = new ArrayList<String>();
-        StatefulKnowledgeSession kstateful = ((StatefulKnowledgeSession) context.getBean( "ksession2" ));
+        KieSession kstateful = ((KieSession) context.getBean( "ksession2" ));
         kstateful.setGlobal( "list",
                              list );
         kstateful.insert( new Person( "Darth",
@@ -179,8 +182,8 @@ public class SpringDroolsTest {
 
         GridNode node = (GridNode) context.getBean( "node1" );
         List<String> list = new ArrayList<String>();
-        StatelessKnowledgeSession kstateless = node.get( "stateless1",
-                                                         StatelessKnowledgeSession.class );
+        StatelessKieSession kstateless = node.get( "stateless1",
+                                                   StatelessKieSession.class );
         assertNotNull( "can't obtain session named: stateless1",
                        kstateless );
         kstateless.setGlobal( "list",
@@ -192,8 +195,8 @@ public class SpringDroolsTest {
                       list.size() );
 
         list = new ArrayList<String>();
-        StatefulKnowledgeSession kstateful = node.get( "ksession2",
-                                                       StatefulKnowledgeSession.class );
+        KieSession kstateful = node.get( "ksession2",
+                                         KieSession.class );
         kstateful.setGlobal( "list",
                              list );
         kstateful.insert( new Person( "Darth",
@@ -301,14 +304,14 @@ public class SpringDroolsTest {
         assertNotNull(resource);
         InternalResource secureResource = (InternalResource) resource.getDroolsResource();
         
-        assertNull(secureResource.getName());
+        assertEquals("/someDRLResource.drl", secureResource.getSourcePath());
         assertNull(secureResource.getDescription());
         
         resource = (DroolsResourceAdapter)context.getBean("resourceWithNameAndDescription");
         assertNotNull( resource );
         InternalResource resourceWithNameAndDescription = (InternalResource) resource.getDroolsResource();
         
-        assertEquals("A Name", resourceWithNameAndDescription.getName());
+        assertEquals("A Name", resourceWithNameAndDescription.getSourcePath());
         assertEquals("A Description", resourceWithNameAndDescription.getDescription());
         
     }

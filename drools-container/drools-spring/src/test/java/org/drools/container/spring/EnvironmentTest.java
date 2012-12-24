@@ -20,11 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.drools.marshalling.ObjectMarshallingStrategy;
+import org.kie.marshalling.ObjectMarshallingStrategy;
 import org.drools.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
-import org.drools.runtime.EnvironmentName;
+import org.kie.runtime.Environment;
+import org.kie.runtime.EnvironmentName;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;

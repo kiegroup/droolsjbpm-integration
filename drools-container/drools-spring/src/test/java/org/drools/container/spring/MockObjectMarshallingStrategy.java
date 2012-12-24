@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.drools.marshalling.ObjectMarshallingStrategy;
+import org.kie.marshalling.ObjectMarshallingStrategy;
 
 public class MockObjectMarshallingStrategy implements ObjectMarshallingStrategy{
 
