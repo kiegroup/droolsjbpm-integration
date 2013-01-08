@@ -58,7 +58,7 @@ public class PolicyApprovalWorkflowTest extends SimulateTestBase {
         
         // @formatter:off          
         simulationFluent
-        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
+        .newKieSession("org.drools.KBase1.KSession1")
             .startProcess("policyRequestProcess", processParams)
             .end()
         .runSimulation();

@@ -29,6 +29,7 @@ import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.builder.ReleaseId;
 import org.kie.fluent.VariableContext;
 
 public class CompactFluentTest extends SimulateTestBase {
@@ -51,10 +52,10 @@ public class CompactFluentTest extends SimulateTestBase {
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
         
-        createKJar( "org.test.KBase1", str );
+        ReleaseId releaseId = createKJar( "org.test.KBase1", str );
         
         // @formatter:off        
-        f.newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+        f.newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
             // show testing inside of ksession execution
@@ -117,10 +118,10 @@ public class CompactFluentTest extends SimulateTestBase {
                      "import " + Person.class.getName() + "\n" +
                      "rule updateAge no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
 
-        createKJar( "org.test.KBase1", str );
+        ReleaseId releaseId = createKJar( "org.test.KBase1", str );
 
         // @formatter:off        
-        f.newStatefulKnowledgeSession("org.test.KBase1.KSession1")
+        f.newKieSession(releaseId, "org.test.KBase1.KSession1")
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
             // show testing inside of ksession execution
@@ -138,7 +139,7 @@ public class CompactFluentTest extends SimulateTestBase {
 
         f = new DefaultSimulationFluent();
         // @formatter:off        
-        f.newStatefulKnowledgeSession("org.test.KBase1.KSession1")
+        f.newKieSession(releaseId, "org.test.KBase1.KSession1")
              .insert( new Person( "yoda", 150 ) ).set( "y" )
              .fireAllRules()
              // show testing inside of ksession execution
@@ -204,12 +205,12 @@ public class CompactFluentTest extends SimulateTestBase {
                       "import " + Person.class.getName() + "\n" +
                       "rule updateAge2 no-loop when  $p : Person() then modify( $p ) { setAge( $p.getAge() + 20 ) }; end\n";
 
-        createKJar( "org.test.KBase1", str1,
+        ReleaseId releaseId = createKJar( "org.test.KBase1", str1,
                     "org.test.KBase2", str2 );
 
         // @formatter:off
         f.newRelativeStep( 100 )
-        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
+        .newKieSession(releaseId, "org.test.KBase1.KSession1")
             .insert( new Person( "yoda1",
                                  150 ) ).set( "y1" )
             .fireAllRules()
@@ -221,7 +222,7 @@ public class CompactFluentTest extends SimulateTestBase {
         .test( "y1.age == 160" )
         .test( "d1.age == 80" )
         .newRelativeStep( 100 )
-        .newStatefulKnowledgeSession("org.test.KBase2.KSession1")
+        .newKieSession(releaseId, "org.test.KBase2.KSession1")
             .insert( new Person( "yoda2",
                                  150 ) ).set( "y2" )
             .fireAllRules()

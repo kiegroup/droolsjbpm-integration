@@ -121,7 +121,7 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
     }
 
     public String getActiveKnowledgeSessionId() {
-        return simulationFluent.getActiveKnowledgeSessionId();
+        return simulationFluent.getActiveKieSessionId();
     }
     
     public SimulationFluent end(String context, String name) {

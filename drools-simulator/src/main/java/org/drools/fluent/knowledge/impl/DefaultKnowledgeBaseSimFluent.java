@@ -64,10 +64,6 @@ public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<Knowle
         return this;
     }
 
-    public String getActiveKnowledgeBaseId() {
-        return simulationFluent.getActiveKnowledgeBaseId();
-    }
-
     public SimulationFluent end(String context, String name) {
         addCommand(new SetVariableCommandFromLastReturn(context, name));
         return simulationFluent;

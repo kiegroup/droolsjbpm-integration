@@ -25,6 +25,7 @@ import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
+import org.kie.builder.ReleaseId;
 import org.kie.fluent.VariableContext;
 
 public class SimulationFluentTest extends SimulateTestBase {
@@ -43,13 +44,13 @@ public class SimulationFluentTest extends SimulateTestBase {
 
         ReflectiveMatcherFactory rf = new ReflectiveMatcherFactory( imports );
 
-        String str = "package org.drools.simulation.test\n" +
+        String str = "package org.test\n" +
                      "import " + Person.class.getName() + "\n" +
                      "global java.util.List list\n" +
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                      "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";
         
-        createKJar( "org.test.KBase1", str );
+        ReleaseId releaseId = createKJar( "org.test.KBase1", str );
         
         List list = new ArrayList();
         
@@ -57,13 +58,13 @@ public class SimulationFluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
         .newStep( 0 )
-        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal( "list", list ).set( "list" )
             .fireAllRules()
             .end()
         .newPath( "path1" )
         .newStep( 1000 )
-        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
+        .newKieSession( releaseId, "org.test.KBase1.KSession1")
             .setGlobal( "list", list ).set( "list" )
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
@@ -73,7 +74,7 @@ public class SimulationFluentTest extends SimulateTestBase {
             .test( "list[list.size()-1] - list[0] == 1000" )
             .end()
         .newStep( 2000 )
-        .getStatefulKnowledgeSession()
+        .getKieSession()
             .insert( new Person( "darth", 110 ) ).set( "d" )
             .fireAllRules()
              // show testing inside of ksession execution
@@ -85,7 +86,7 @@ public class SimulationFluentTest extends SimulateTestBase {
             .end()
         .newPath(  "path2" )
         .newStep( 1500 )
-        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
+        .newKieSession( releaseId, "org.test.KBase1.KSession1")
             .setGlobal( "list", list ).set( "list" )
             .insert( new Person( "bobba", 75 ) ).set( "b" )
             .fireAllRules()
@@ -97,7 +98,7 @@ public class SimulationFluentTest extends SimulateTestBase {
             .end()
         .getPath(  "path1" )
         .newStep( 1300 )
-        .newStatefulKnowledgeSession("org.test.KBase1.KSession1")
+        .newKieSession( releaseId, "org.test.KBase1.KSession1")
             .setGlobal( "list", list )
             .insert( new Person( "luke", 35 ) ).set( "b" )
             .fireAllRules()
@@ -148,17 +149,17 @@ public class SimulationFluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
         .newStep(0)
-        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+        .newKieSession( null, "org.test.KBase1.KSession1" )
             .setGlobal("list", list1).set("list")
             .fireAllRules()
             .end()
-        .newStatefulKnowledgeSession( "org.test.KBase2.KSession1" )
+        .newKieSession( null, "org.test.KBase2.KSession1" )
             .setGlobal("list", list2).set("list")
             .fireAllRules()
             .end("ks2.1")
         .newPath("path1")
         .newStep(1000)
-        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+        .newKieSession( null, "org.test.KBase1.KSession1" )
             .setGlobal("list", list1).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()
@@ -168,7 +169,7 @@ public class SimulationFluentTest extends SimulateTestBase {
             .test( "list[list.size()-1] - list[0] == 1000" )
             .end()
         .newStep(2000)
-        .newStatefulKnowledgeSession( "org.test.KBase2.KSession1" )
+        .newKieSession( null, "org.test.KBase2.KSession1" )
             .setGlobal("list", list1).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()
@@ -210,13 +211,13 @@ public class SimulationFluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
         .newStep(0)
-        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+        .newKieSession( null, "org.test.KBase1.KSession1" )
             .setGlobal("list", list).set("list")
             .fireAllRules()
             .end()
         .newPath("path1")
         .newStep(1000)
-        .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+        .newKieSession( null, "org.test.KBase1.KSession1" )
             .setGlobal("list", list).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()

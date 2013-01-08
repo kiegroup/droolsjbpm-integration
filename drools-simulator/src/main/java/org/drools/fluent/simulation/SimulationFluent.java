@@ -18,9 +18,9 @@ package org.drools.fluent.simulation;
 
 import java.util.concurrent.TimeUnit;
 
-import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.test.TestableFluent;
+import org.kie.builder.ReleaseId;
 import org.kie.command.Command;
 import org.kie.fluent.FluentRoot;
 import org.kie.simulation.Simulation;
@@ -35,22 +35,12 @@ public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationF
     SimulationFluent newRelativeStep(long relativeDistance);
     SimulationFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit);
 
-    SimulationFluent addCommand(Command command);
+    SimulationFluent addCommand(Command<?> command);
 
-//    String getActiveKnowledgeBuilderId();
-//    KnowledgeBuilderSimFluent newKnowledgeBuilder();
-//    KnowledgeBuilderSimFluent getKnowledgeBuilder();
-//    KnowledgeBuilderSimFluent getKnowledgeBuilder(String id);
-
-    String getActiveKnowledgeBaseId();
-    KnowledgeBaseSimFluent newKnowledgeBase(String id);
-    KnowledgeBaseSimFluent getKnowledgeBase();
-    KnowledgeBaseSimFluent getKnowledgeBase(String id);
-
-    String getActiveKnowledgeSessionId();
-    StatefulKnowledgeSessionSimFluent newStatefulKnowledgeSession(String id);
-    StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession();
-    StatefulKnowledgeSessionSimFluent getStatefulKnowledgeSession(String id);
+    String getActiveKieSessionId();
+    StatefulKnowledgeSessionSimFluent newKieSession(ReleaseId releaseId, String id);
+    StatefulKnowledgeSessionSimFluent getKieSession();
+    StatefulKnowledgeSessionSimFluent getKieSession(String id);
 
     /**
      * Gets the Simulation

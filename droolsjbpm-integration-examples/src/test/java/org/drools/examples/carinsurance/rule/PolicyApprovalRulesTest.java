@@ -50,7 +50,7 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
 
         // @formatter:off          
         simulationFluent
-        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
+        .newKieSession("org.drools.KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
@@ -78,7 +78,7 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
 
         // @formatter:off
         simulationFluent
-        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
+        .newKieSession("org.drools.KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
@@ -106,7 +106,7 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
 
         // @formatter:off
         simulationFluent
-        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
+        .newKieSession("org.drools.KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")

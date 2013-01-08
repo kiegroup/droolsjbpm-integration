@@ -62,7 +62,7 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
         // @formatter:off
         simulationFluent
         .newStep(1000)
-        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
+        .newKieSession("org.drools.KBase1.KSession1")
             .insert(realJohn).set("realJohn")
             .insert(realMini).set("realMini")
             .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
@@ -71,7 +71,7 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
             .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
             .end()
         .newStep(5000)
-        .getStatefulKnowledgeSession()
+        .getKieSession()
             .insert(fakeJohn).set("fakeJohn")
             .insert(fakeMini).set("fakeMini")
             .insert(fakeJohnMiniPolicyRequest).set("fakeJohnMiniPolicyRequest")
@@ -109,7 +109,7 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
         // @formatter:off
         simulationFluent.newPath("init")
         .newStep(1000L)
-        .newStatefulKnowledgeSession("org.drools.KBase1.KSession1")
+        .newKieSession("org.drools.KBase1.KSession1")
             .insert(realJohn).set("realJohn")
             .insert(realMini).set("realMini")
             .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
@@ -118,7 +118,7 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
             .test("realJohnMiniPolicyRequest.requiresManualApproval == false")
             .end()
         .newStep(2L * 60L * 60L * 1000L)
-        .getStatefulKnowledgeSession()
+        .getKieSession()
             .insert(otherJohn).set("otherJohn")
             .insert(otherMini).set("otherMini")
             .insert(otherJohnMiniPolicyRequest).set("otherJohnMiniPolicyRequest")

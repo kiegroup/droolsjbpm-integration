@@ -98,7 +98,7 @@ public class StandardjBPM5FluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
             .newStep( 0 )
-                .newStatefulKnowledgeSession( "org.test.KBase1.KSession1" )
+                .newKieSession( null, "org.test.KBase1.KSession1" )
                     .setGlobal( "list", list ).set( "list" )
                     .startProcess("DummyProcess")
                     .fireAllRules()

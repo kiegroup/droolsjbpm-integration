@@ -1,8 +1,14 @@
 package org.drools.fluent.simulation;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
 import org.kie.KieServices;
 import org.kie.builder.KieBuilder;
 import org.kie.builder.KieFileSystem;
+import org.kie.builder.KieModule;
+import org.kie.builder.ReleaseId;
 import org.kie.builder.model.KieBaseModel;
 import org.kie.builder.model.KieModuleModel;
 import org.kie.builder.model.KieSessionModel;
@@ -11,13 +17,9 @@ import org.kie.conf.EventProcessingOption;
 import org.kie.io.ResourceType;
 import org.kie.runtime.conf.ClockTypeOption;
 
-import java.io.IOException;
-
-import static org.junit.Assert.assertTrue;
-
 public class SimulateTestBase {
 
-    protected void createKJar(String... pairs) throws IOException {
+    protected ReleaseId createKJar(String... pairs) throws IOException {
         KieServices ks = KieServices.Factory.get();
         KieModuleModel kproj = ks.newKieModuleModel();
         KieFileSystem kfs = ks.newKieFileSystem();
@@ -26,7 +28,7 @@ public class SimulateTestBase {
             String id = pairs[i];
             String rule = pairs[i + 1];
 
-            kfs.write( "src/main/resources/kbases/" + id + "/org/test/rule" + i + ".drl", rule );
+            kfs.write( "src/main/resources/" + id + "/org/test/rule" + i + ".drl", rule );
 
             KieBaseModel kBase1 = kproj.newKieBaseModel( id )
                     .setEqualsBehavior( EqualityBehaviorOption.EQUALITY )
@@ -39,8 +41,12 @@ public class SimulateTestBase {
 
         kfs.writeKModuleXML(kproj.toXML());
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-        assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
+        // buildAll() automatically adds the module to the kieRepository
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        assertTrue(kieBuilder.getResults().getMessages().isEmpty());
+        
+        KieModule kieModule = kieBuilder.getKieModule();
+        return kieModule.getReleaseId();
     }
 
     protected void createKJarWithMultipleResources(String id,
