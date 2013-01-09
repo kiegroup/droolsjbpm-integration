@@ -28,7 +28,7 @@ public class SimulateTestBase {
             String id = pairs[i];
             String rule = pairs[i + 1];
 
-            kfs.write( "src/main/resources/" + id + "/org/test/rule" + i + ".drl", rule );
+            kfs.write( "src/main/resources/" + id.replaceAll( "\\.", "/" ) + "/org/test/rule" + i + ".drl", rule );
 
             KieBaseModel kBase1 = kproj.newKieBaseModel( id )
                     .setEqualsBehavior( EqualityBehaviorOption.EQUALITY )
@@ -49,9 +49,9 @@ public class SimulateTestBase {
         return kieModule.getReleaseId();
     }
 
-    protected void createKJarWithMultipleResources(String id,
-                                                   String[] resources,
-                                                   ResourceType[] types) throws IOException {
+    protected ReleaseId createKJarWithMultipleResources(String id,
+                                                        String[] resources,
+                                                        ResourceType[] types) throws IOException {
         KieServices ks = KieServices.Factory.get();
         KieModuleModel kproj = ks.newKieModuleModel();
         KieFileSystem kfs = ks.newKieFileSystem();
@@ -60,7 +60,7 @@ public class SimulateTestBase {
             String res = resources[i];
             String type = types[i].getDefaultExtension();
 
-            kfs.write( "src/kbases/" + id + "/org/test/res" + i + "." + type, res );
+            kfs.write( "src/main/resources/" + id.replaceAll( "\\.", "/" ) + "/org/test/res" + i + "." + type, res );
         }
 
         KieBaseModel kBase1 = kproj.newKieBaseModel( id )
@@ -73,7 +73,10 @@ public class SimulateTestBase {
 
         kfs.writeKModuleXML(kproj.toXML());
 
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-        assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        assertTrue(kieBuilder.getResults().getMessages().isEmpty());
+        
+        KieModule kieModule = kieBuilder.getKieModule();
+        return kieModule.getReleaseId();
     }
 }

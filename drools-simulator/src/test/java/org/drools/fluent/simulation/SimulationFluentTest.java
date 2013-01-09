@@ -139,8 +139,8 @@ public class SimulationFluentTest extends SimulateTestBase {
                 "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                 "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";        
         
-        createKJar( "org.test.KBase1", str1,
-                    "org.test.KBase2", str2 );
+        ReleaseId releaseId = createKJar( "org.test.KBase1", str1,
+                                          "org.test.KBase2", str2 );
         
         List list1 = new ArrayList();
         List list2 = new ArrayList();
@@ -149,17 +149,17 @@ public class SimulationFluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
         .newStep(0)
-        .newKieSession( null, "org.test.KBase1.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal("list", list1).set("list")
             .fireAllRules()
             .end()
-        .newKieSession( null, "org.test.KBase2.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase2.KSession1" )
             .setGlobal("list", list2).set("list")
             .fireAllRules()
             .end("ks2.1")
         .newPath("path1")
         .newStep(1000)
-        .newKieSession( null, "org.test.KBase1.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal("list", list1).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()
@@ -169,7 +169,7 @@ public class SimulationFluentTest extends SimulateTestBase {
             .test( "list[list.size()-1] - list[0] == 1000" )
             .end()
         .newStep(2000)
-        .newKieSession( null, "org.test.KBase2.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase2.KSession1" )
             .setGlobal("list", list1).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()
@@ -203,7 +203,7 @@ public class SimulationFluentTest extends SimulateTestBase {
                      "rule setTime when then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n end\n " +
                      "rule updateAge no-loop when  $p : Person() then list.add( kcontext.getKnowledgeRuntime().getSessionClock().getCurrentTime() );\n modify( $p ) { setAge( $p.getAge() + 10 ) }; end\n";        
         
-        createKJar( "org.test.KBase1", str );
+        ReleaseId releaseId = createKJar( "org.test.KBase1", str );
 
         List list = new ArrayList();
         
@@ -211,13 +211,13 @@ public class SimulationFluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
         .newStep(0)
-        .newKieSession( null, "org.test.KBase1.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal("list", list).set("list")
             .fireAllRules()
             .end()
         .newPath("path1")
         .newStep(1000)
-        .newKieSession( null, "org.test.KBase1.KSession1" )
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal("list", list).set("list")
             .insert(new Person("yoda", 150)).set("y")
             .fireAllRules()

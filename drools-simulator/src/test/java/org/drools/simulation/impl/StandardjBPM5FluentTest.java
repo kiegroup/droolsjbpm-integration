@@ -25,6 +25,7 @@ import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
 import org.junit.Test;
+import org.kie.builder.ReleaseId;
 import org.kie.fluent.VariableContext;
 import org.kie.io.ResourceType;
 
@@ -90,7 +91,7 @@ public class StandardjBPM5FluentTest extends SimulateTestBase {
                             + "</process>"
                 + "</definitions>";
         
-        createKJarWithMultipleResources( "org.test.KBase1", new String[] {str, strProcess} , new ResourceType[] {ResourceType.DRL, ResourceType.BPMN2} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "org.test.KBase1", new String[] {str, strProcess} , new ResourceType[] {ResourceType.DRL, ResourceType.BPMN2} );
         
         List list = new ArrayList();
         
@@ -98,7 +99,7 @@ public class StandardjBPM5FluentTest extends SimulateTestBase {
         // @formatter:off          
         f.newPath("init")
             .newStep( 0 )
-                .newKieSession( null, "org.test.KBase1.KSession1" )
+                .newKieSession( releaseId, "org.test.KBase1.KSession1" )
                     .setGlobal( "list", list ).set( "list" )
                     .startProcess("DummyProcess")
                     .fireAllRules()

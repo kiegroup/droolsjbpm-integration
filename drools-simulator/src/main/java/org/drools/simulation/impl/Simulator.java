@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.command.GetDefaultValue;
+import org.drools.command.NewKieSessionCommand;
 import org.drools.command.ResolvingKnowledgeCommandContext;
 import org.drools.command.impl.ContextImpl;
 import org.drools.command.impl.GenericCommand;
@@ -132,7 +133,7 @@ public class Simulator
         }
 
         for ( Command cmd : step.getCommands() ) {
-            /* if ( cmd instanceof NewStatefulKnowledgeSessionCommand ) {
+            if ( cmd instanceof NewKieSessionCommand ) {
                 // instantiate the ksession, set it's clock and register it
                 StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) executionHandler.execute( (GenericCommand) cmd,
                                                                                                          pathContext );
@@ -145,7 +146,7 @@ public class Simulator
                     this.ksessions.add( ksession );
                     this.lastReturnValue = ksession;
                 }
-            } else */ if ( cmd instanceof GenericCommand ) {
+            } else if ( cmd instanceof GenericCommand ) {
                 this.lastReturnValue = executionHandler.execute( (GenericCommand) cmd,
                                                                  pathContext );
             }
