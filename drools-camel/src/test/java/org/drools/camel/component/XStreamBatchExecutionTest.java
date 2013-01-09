@@ -30,8 +30,8 @@ import java.util.Set;
 
 import javax.naming.Context;
 
-import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -78,7 +78,7 @@ import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 
-public class XStreamBatchExecutionTest extends ContextTestSupport {
+public class XStreamBatchExecutionTest extends CamelTestSupport {
     protected GridNode        node;
     protected CommandExecutor exec;
     protected CommandExecutor exec2;

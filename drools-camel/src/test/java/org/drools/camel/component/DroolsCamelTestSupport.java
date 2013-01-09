@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 import javax.naming.Context;
 
-import org.apache.camel.ContextTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -54,7 +54,7 @@ import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class DroolsCamelTestSupport extends ContextTestSupport {
+public abstract class DroolsCamelTestSupport extends CamelTestSupport {
     protected static final Logger LOG = LoggerFactory.getLogger( DroolsCamelTestSupport.class );
     protected GridNode            node;
 
