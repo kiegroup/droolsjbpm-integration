@@ -16,10 +16,6 @@
 
 package org.drools.examples.carinsurance.cep;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
 import org.drools.examples.carinsurance.domain.Driver;
@@ -32,7 +28,12 @@ import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.joda.time.LocalDate;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.builder.ReleaseId;
 import org.kie.io.ResourceType;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
 
 public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
 
@@ -57,12 +58,12 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
         fakeJohnMiniPolicyRequest.setAutomaticallyRejected(false);
 
         String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestFraudDetectionRules.drl" ) ) );
-        createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
         simulationFluent
         .newStep(1000)
-        .newKieSession("org.drools.KBase1.KSession1")
+        .newKieSession(releaseId, "org.drools.KBase1.KSession1")
             .insert(realJohn).set("realJohn")
             .insert(realMini).set("realMini")
             .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")
@@ -104,12 +105,12 @@ public class PolicyRequestFraudDetectionRulesTest extends SimulateTestBase {
         otherJohnMiniPolicyRequest.setAutomaticallyRejected(false);
 
         String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestFraudDetectionRules.drl" ) ) );
-        createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
         simulationFluent.newPath("init")
         .newStep(1000L)
-        .newKieSession("org.drools.KBase1.KSession1")
+        .newKieSession(releaseId, "org.drools.KBase1.KSession1")
             .insert(realJohn).set("realJohn")
             .insert(realMini).set("realMini")
             .insert(realJohnMiniPolicyRequest).set("realJohnMiniPolicyRequest")

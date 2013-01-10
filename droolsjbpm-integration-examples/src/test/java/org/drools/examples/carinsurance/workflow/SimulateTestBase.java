@@ -19,6 +19,7 @@ package org.drools.examples.carinsurance.workflow;
 import org.kie.KieServices;
 import org.kie.builder.KieBuilder;
 import org.kie.builder.KieFileSystem;
+import org.kie.builder.ReleaseId;
 import org.kie.builder.model.KieBaseModel;
 import org.kie.builder.model.KieModuleModel;
 import org.kie.builder.model.KieSessionModel;
@@ -61,7 +62,7 @@ public class SimulateTestBase {
         assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
     }
 
-    protected void createKJarWithMultipleResources(String id,
+    protected ReleaseId createKJarWithMultipleResources(String id,
                                                    String[] resources,
                                                    ResourceType[] types) throws IOException {
         KieServices ks = KieServices.Factory.get();
@@ -87,6 +88,7 @@ public class SimulateTestBase {
 
         KieBuilder kieBuilder = ks.newKieBuilder(kfs);
         assertTrue(kieBuilder.buildAll().getResults().getMessages().isEmpty());
+        return kieBuilder.getKieModule().getReleaseId();
     }
 
     protected String readInputStreamReaderAsString(InputStreamReader in) throws IOException {
