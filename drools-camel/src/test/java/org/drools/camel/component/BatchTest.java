@@ -24,9 +24,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
+import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.drools.camel.testdomain.ChangeCollector;
 import org.drools.camel.testdomain.Cheese;
@@ -73,7 +73,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 @RunWith(JUnit4.class)
-public abstract class BatchTest extends ContextTestSupport {
+public abstract class BatchTest extends CamelTestSupport {
     protected GridNode        node;
     protected CommandExecutor exec;
     protected String          dataformat;
