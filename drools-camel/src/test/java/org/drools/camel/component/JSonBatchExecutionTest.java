@@ -3,10 +3,8 @@ package org.drools.camel.component;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
-@Ignore
-public class JSonBatchExecutionTest extends BatchTest {//extends ContextTestSupport {
+public class JSonBatchExecutionTest extends BatchTest {
 
     public JSonBatchExecutionTest() {
         super();
