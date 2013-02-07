@@ -70,6 +70,7 @@
       <artifactId>drools-camel-server-example</artifactId>
       <classifier>sources</classifier>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-grid-impl</artifactId>
@@ -79,6 +80,7 @@
       <artifactId>drools-grid-impl</artifactId>
       <classifier>sources</classifier>
     </dependency>
+    -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-simulator</artifactId>
