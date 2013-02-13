@@ -47,8 +47,8 @@
   <cxf:cxfEndpoint id="soapServer"
              address="http://localhost:58002/soap"
              serviceName="ns:CommandExecutor"
+             wsdlURL="classpath:org/drools/camel/component/soap.wsdl"
              endpointName="ns:CommandExecutorPort"
-          wsdlURL="src/test/resources/org/drools/camel/component/soap.wsdl"
           xmlns:ns="http://soap.jax.drools.org/" >
     <cxf:properties>
       <entry key="dataFormat" value="MESSAGE"/>
