@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"       
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd
+                           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <!-- org.h2.jdbcx.JdbcDataSource -->
+    <property name="driverClassName" value="org.h2.Driver" />
+    <property name="url" value="jdbc:h2:mem:mydb" />
+    <property name="username" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <bean id="myEmf" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
+       <property name="persistenceUnitName" value="org.drools.grid"/>
+  </bean>
+
+  <!--bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource" ref="ds" />
+    <property name="persistenceUnitName" value="org.drools.grid" />
+      <property name="hibernateProperties">
+        <value>
+          hibernate.dialect=org.hibernate.dialect.MySQLDialect
+          hibernate.show_sql=true
+
+      hibernate.dialect=org.hibernate.dialect.H2Dialect
+      hibernate.connection.driver_class="org.h2.Driver
+      hibernate.connection.url=jdbc:h2:mem:mydb
+      hibernate.connection.username=sa
+      hibernate.connection.password=sasa
+      hibernate.connection.autocommit=false
+      hibernate.max_fetch_depth=3
+      hibernate.hbm2ddl.auto=create
+      hibernate.show_sql=true        
+        </value>
+      </property>    
+  </bean-->
+
+    <bean id="shared-map" class="java.util.HashMap" />
+    
+    <bean id="localWhitePages" class="org.drools.grid.service.directory.impl.WhitePagesImpl" />
+
+    <drools:grid id="grid1">
+     <drools:core-services ref="shared-map" />
+
+     <drools:whitepages>
+      <drools:jpa-persistence>
+              <drools:entity-manager-factory ref="myEmf" />
+        </drools:jpa-persistence>
+     </drools:whitepages>
+
+     <drools:socket-service acceptor="mina" ip="127.0.0.1">
+        <drools:service name="org.drools.grid.service.directory.WhitePages" port="8000" />
+     </drools:socket-service>
+    </drools:grid>
+    
+
+  <drools:grid id="grid2">
+       <drools:core-services ref="shared-map" />
+  </drools:grid>
+
+
+    <drools:grid id="grid3">
+     <drools:whitepages ref="localWhitePages" />
+    </drools:grid>
+
+
+  <drools:grid-node id="node1" grid="grid1">
+     <drools:socket-service port="8000" />
+  </drools:grid-node>
+
+  <drools:grid-node id="node2" />
+
+
+</beans>

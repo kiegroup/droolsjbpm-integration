@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://drools.org/schema/drools-spring"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://drools.org/schema/drools-spring"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+  <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"/>
+
+  <!-- xsd:element name="grid">
+    <xsd:complexType>
+      <xsd:all minOccurs="0">
+        <xsd:element name="core-services" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+                <xsd:choice minOccurs="0" maxOccurs="1">
+                 <xsd:element ref="spring:bean"/>
+               <xsd:element ref="spring:ref"/>
+               <xsd:element ref="spring:idref"/>
+               <xsd:element ref="spring:value"/>
+               <xsd:element ref="spring:null"/>
+               <xsd:element ref="spring:list"/>
+               <xsd:element ref="spring:set"/>
+               <xsd:element ref="spring:map"/>
+               <xsd:element ref="spring:props"/>
+            </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+          </xsd:complexType>
+        </xsd:element>
+
+        <xsd:element name="whitepages" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+              <xsd:element ref="persistence"/>
+                  <xsd:element ref="spring:bean"/>
+                 <xsd:element ref="spring:ref"/>
+                <xsd:element ref="spring:idref"/>
+                <xsd:element ref="spring:value"/>
+                <xsd:element ref="spring:null"/>
+                <xsd:element ref="spring:list"/>
+                <xsd:element ref="spring:set"/>
+                <xsd:element ref="spring:map"/>
+                <xsd:element ref="spring:props"/>
+            </xsd:choice>
+            <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+          </xsd:complexType>
+        </xsd:element>
+
+        <xsd:element name="socket-service" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="service" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:attribute name="name" use="required" type="xsd:string"/>
+                <xsd:attribute name="port" use="required" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="acceptor" use="optional" type="xsd:string"/>
+          <xsd:attribute name="ip" use="required" type="xsd:string"/>
+          </xsd:complexType>
+        </xsd:element>
+
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element -->
+
+  <xsd:element name="grid-node">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element name="socket-service" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:attribute name="port" use="required" type="xsd:string"/>
+          </xsd:complexType>
+        </xsd:element>
+
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="grid" use="optional" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="resource-change-scanner">
+    <xsd:complexType>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="interval" use="optional" type="xsd:integer"/>
+      <xsd:attribute name="enabled" use="optional" type="xsd:boolean"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="resources">
+    <xsd:complexType>
+      <xsd:choice  minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="resource" />
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="resource">
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="resourceType">
+          <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+          <xsd:attribute name="basic-authentication" use="optional" type="enabledDisabledEnum"/>
+          <xsd:attribute name="username" use="optional" type="xsd:string"/>
+          <xsd:attribute name="password" use="optional" type="xsd:string"/>
+          <xsd:attribute name="name" use="optional" type="xsd:string"/>
+          <xsd:attribute name="description" use="optional" type="xsd:string"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+
+  <xsd:element name="kbase">
+    <xsd:complexType>
+      <xsd:all minOccurs="0">
+        <xsd:element ref="resources"  minOccurs="0" maxOccurs="1" />
+
+        <xsd:element name="configuration" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:all minOccurs="0">
+              <xsd:element name="advanced-process-rule-integration" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="enabled" type="xsd:boolean"/>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="multithread" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="enabled" type="xsd:boolean"/>
+                  <xsd:attribute name="max-threads" type="xsd:positiveInteger"/>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="mbeans" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="enabled" type="xsd:boolean"/>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="event-processing-mode" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="mode" type="cloudModeEnum"/>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="assert-behavior" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="mode" type="assertBehaviorEnum"/>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="accumulate-functions" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:choice>
+                    <xsd:element name="accumulate-function" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:complexType>
+                        <xsd:attribute name="name" use="required" type="xsd:string"/>
+                        <xsd:attribute name="ref" use="required" type="xsd:string"/>
+                      </xsd:complexType>
+                    </xsd:element>
+                  </xsd:choice>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="evaluators" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:choice>
+                    <xsd:element name="evaluator" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:complexType>
+                        <xsd:attribute name="name" use="required" type="xsd:string"/>
+                        <xsd:attribute name="ref" use="required" type="xsd:string"/>
+                      </xsd:complexType>
+                    </xsd:element>
+                  </xsd:choice>
+                </xsd:complexType>
+              </xsd:element>
+
+              <xsd:element name="consequenceExceptionHandler" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="handler" type="xsd:string"/>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:all>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:all>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+      <xsd:attribute name="node" use="optional" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="kagent">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="resources"  minOccurs="0" maxOccurs="1" />
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="kbase" use="required" type="xsd:string"/>
+      <xsd:attribute name="new-instance" use="optional" type="xsd:boolean"/>
+      <xsd:attribute name="use-kbase-classloader" use="optional" type="xsd:boolean"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="kstore" />
+
+  <!-- additions for JIRA JBRULES-3076 -->
+  <xsd:complexType name="eventListener">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element ref="spring:bean"/>
+    </xsd:choice>
+    <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:element name="agendaEventListener" type="eventListener"/>
+  <xsd:element name="workingMemoryEventListener" type="eventListener"/>
+  <xsd:element name="processEventListener" type="eventListener"/>
+
+  <xsd:element name="eventListeners">
+    <xsd:complexType>
+      <xsd:all maxOccurs="1" minOccurs="0">
+        <xsd:element ref="agendaEventListener"/>
+        <xsd:element ref="workingMemoryEventListener"/>
+        <xsd:element ref="processEventListener"/>
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+  <!-- end of additions for JIRA JBRULES-3076 -->
+
+  <xsd:element name="ksession">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <!-- additions for JIRA JBRULES-3076 -->
+          <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- end of additions for JIRA JBRULES-3076 -->
+        </xsd:sequence>
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element ref="consoleLogger" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element ref="fileLogger" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:choice minOccurs="0" maxOccurs="1">
+          <xsd:element name="batch" minOccurs="0" maxOccurs="1">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded" />
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="script" minOccurs="0" maxOccurs="1">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded" />
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="configuration" minOccurs="0" maxOccurs="1">
+            <xsd:complexType>
+              <xsd:all minOccurs="0">
+                <xsd:element ref="persistence" minOccurs="0"/>
+
+                <xsd:element name="keep-reference" minOccurs="0">
+                  <xsd:complexType>
+                    <xsd:attribute name="enabled" type="xsd:boolean"/>
+                  </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="clock-type" minOccurs="0">
+                  <xsd:complexType>
+                    <xsd:attribute name="type" type="clockTypeEnum"/>
+                  </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="work-item-handlers" minOccurs="0">
+                  <xsd:complexType>
+                    <xsd:choice>
+                      <xsd:element name="work-item-handler" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                          <xsd:attribute name="name" use="required" type="xsd:string"/>
+                          <xsd:attribute name="ref" use="required" type="xsd:string"/>
+                        </xsd:complexType>
+                      </xsd:element>
+                    </xsd:choice>
+                  </xsd:complexType>
+                </xsd:element>
+              </xsd:all>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:sequence>
+
+      <xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
+      <xsd:attribute name="kbase" use="required" type="xsd:string"/>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="node" use="optional" type="xsd:string"/>
+      <xsd:attribute name="name" use="optional" type="xsd:string"/>
+      <!-- additions for JIRA JBRULES-3076 -->
+      <xsd:attribute name="listeners" use="optional" type="xsd:string"/>
+      <!-- end of additions for JIRA JBRULES-3076 -->
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:simpleType name="connectionTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="local" />
+      <xsd:enumeration value="remote" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="knowledgeSessionTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="stateful" />
+      <xsd:enumeration value="stateless" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="resourceTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DRL" />
+      <xsd:enumeration value="BPMN2" />
+      <xsd:enumeration value="XDRL" />
+      <xsd:enumeration value="DSL" />
+      <xsd:enumeration value="DSLR" />
+      <xsd:enumeration value="DRF" />
+      <xsd:enumeration value="DTABLE" />
+      <xsd:enumeration value="PKG" />
+      <xsd:enumeration value="BRL" />
+      <xsd:enumeration value="CHANGE_SET" />
+      <xsd:enumeration value="XSD" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="languageTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DTD" />
+      <xsd:enumeration value="RELAXNG" />
+      <xsd:enumeration value="RELAXNG_COMPACT" />
+      <xsd:enumeration value="WSDL" />
+      <xsd:enumeration value="XMLSCHEMA" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="cloudModeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="STREAM" />
+      <xsd:enumeration value="CLOUD" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="enabledDisabledEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="enabled" />
+      <xsd:enumeration value="disabled" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:simpleType name="assertBehaviorEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="IDENTITY" />
+      <xsd:enumeration value="EQUALITY" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="clockTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="REALTIME" />
+      <xsd:enumeration value="PSEUDO" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:complexType name="resourceType">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="decisiontable-conf">
+        <xsd:complexType>
+          <xsd:attribute name="input-type" use="required" type="xsd:string"/>
+          <xsd:attribute name="worksheet-name" use="required" type="xsd:string"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="jaxb-conf">
+        <xsd:complexType>
+          <xsd:attribute name="system-id" use="optional" type="xsd:string" />
+          <xsd:attribute name="schema-language" type="languageTypeEnum" use="optional" />
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:choice>
+    <xsd:attribute name="source" use="optional" type="xsd:string"/>
+    <xsd:attribute name="type" use="optional" type="resourceTypeEnum"/>
+    <xsd:attribute name="ref"  use="optional" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="resourceRefType">
+    <xsd:attribute name="id" use="required" type="xsd:string"/>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="classesType">
+    <xsd:sequence>
+      <xsd:element name="class" type="xsd:string"  />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="persisterType">
+    <xsd:attribute name="for-class" use="required" type="xsd:string"/>
+    <xsd:attribute name="implementation" use="required" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="variablePersistersType">
+    <xsd:sequence>
+      <xsd:element name="persister" type="persisterType" minOccurs="1" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="jpaSessionServiceFactory">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="variablePersisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+      <xsd:attribute name="kbase" use="required" type="xsd:string"/>
+      <xsd:attribute name="entityManagerFactory" use="required" type="xsd:string"/>
+      <xsd:attribute name="transactionManager" use="required" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- Persistence -->
+  <xsd:element name="persistence" type="persistenceType" abstract="true"/>
+
+  <xsd:complexType name="persistenceType">
+  </xsd:complexType>
+
+  <xsd:element name="jpa-persistence"  substitutionGroup="persistence" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="persistenceType">
+          <xsd:all>
+            <xsd:element name="variable-persisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="transaction-manager" minOccurs="0" maxOccurs="1">
+              <xsd:complexType>
+                <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="entity-manager-factory" minOccurs="1" maxOccurs="1">
+              <xsd:complexType>
+                <xsd:attribute name="ref" use="required" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+          <xsd:attribute name="load" use="optional" type="xsd:integer"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- Commands -->
+  <xsd:element name="command" type="commandType" abstract="true"/>
+
+  <xsd:complexType name="commandType">
+  </xsd:complexType>
+
+  <xsd:element name="insert-object"  substitutionGroup="command" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="commandType">
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="spring:bean"/>
+            <xsd:element ref="spring:ref"/>
+            <xsd:element ref="spring:idref"/>
+            <xsd:element ref="spring:value"/>
+            <xsd:element ref="spring:null"/>
+            <xsd:element ref="spring:list"/>
+            <xsd:element ref="spring:set"/>
+            <xsd:element ref="spring:map"/>
+            <xsd:element ref="spring:props"/>
+          </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="set-global"  substitutionGroup="command" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="commandType">
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="spring:bean"/>
+            <xsd:element ref="spring:ref"/>
+            <xsd:element ref="spring:idref"/>
+            <xsd:element ref="spring:value"/>
+            <xsd:element ref="spring:null"/>
+            <xsd:element ref="spring:list"/>
+            <xsd:element ref="spring:set"/>
+            <xsd:element ref="spring:map"/>
+            <xsd:element ref="spring:props"/>
+          </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+          <xsd:attribute name="identifier" use="required" type="xsd:string"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="fire-all-rules"  substitutionGroup="command" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="commandType">
+          <xsd:attribute name="max" use="optional" type="xsd:integer"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="fire-until-halt"  substitutionGroup="command" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="commandType">
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="start-process"  substitutionGroup="command" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="commandType">
+          <xsd:sequence>
+            <xsd:element name="parameter" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:choice minOccurs="0" maxOccurs="1">
+                  <xsd:element ref="spring:bean"/>
+                  <xsd:element ref="spring:ref"/>
+                  <xsd:element ref="spring:idref"/>
+                  <xsd:element ref="spring:value"/>
+                  <xsd:element ref="spring:null"/>
+                  <xsd:element ref="spring:list"/>
+                  <xsd:element ref="spring:set"/>
+                  <xsd:element ref="spring:map"/>
+                  <xsd:element ref="spring:props"/>
+                </xsd:choice>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="process-id" use="required" type="xsd:string"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="signal-event"  substitutionGroup="command" >
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="commandType">
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element ref="spring:bean"/>
+            <xsd:element ref="spring:ref"/>
+            <xsd:element ref="spring:idref"/>
+            <xsd:element ref="spring:value"/>
+            <xsd:element ref="spring:null"/>
+            <xsd:element ref="spring:list"/>
+            <xsd:element ref="spring:set"/>
+            <xsd:element ref="spring:map"/>
+            <xsd:element ref="spring:props"/>
+          </xsd:choice>
+          <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+          <xsd:attribute name="event-type" use="required" type="xsd:string"/>
+          <xsd:attribute name="process-instance-id" use="optional" type="xsd:integer"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="consoleLogger">
+    <xsd:complexType>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="fileLogger">
+    <xsd:complexType>
+      <xsd:attribute name="file" use="required" type="xsd:string"/>
+      <xsd:attribute name="threaded" use="optional" type="xsd:boolean" default="false"/>
+      <xsd:attribute name="interval" use="optional" type="xsd:int" default="30"/>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- additions for environment JBRULES-3553 -->
+  <xsd:element name="environment">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="transaction-manager"  minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="entity-manager-factory" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="globals" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="object-marshalling-strategies" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="scoped-entity-manager" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="date-formats" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="calendars" minOccurs="0" maxOccurs="1"/>
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="generic-ref-or-nested-type">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element ref="spring:bean"/>
+    </xsd:choice>
+    <xsd:attribute name="ref" use="optional" type="xsd:IDREF"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="generic-scoped-entitymanager">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element ref="spring:bean"/>
+    </xsd:choice>
+    <xsd:attribute name="scope" use="required" type="scopedEntityManagerTypeEnum"/>
+    <xsd:attribute name="ref" use="optional" type="xsd:IDREF"/>
+  </xsd:complexType>
+
+  <xsd:simpleType name="scopedEntityManagerTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="app" />
+      <xsd:enumeration value="cmd" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:element name="scoped-entity-manager" type="generic-scoped-entitymanager"/>
+
+  <xsd:element name="transaction-manager" type="generic-ref-or-nested-type"/>
+  <xsd:element name="entity-manager-factory" type="generic-ref-or-nested-type"/>
+  <xsd:element name="globals" type="generic-ref-or-nested-type"/>
+  <xsd:element name="date-formats" type="generic-ref-or-nested-type"/>
+  <xsd:element name="calendars" type="generic-ref-or-nested-type"/>
+
+  <xsd:element name="object-marshalling-strategies">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="serializable-placeholder-resolver-strategy" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="jpa-placeholder-resolver-strategy" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="identity-placeholder-resolver-strategy" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="process-instance-resolver-strategy" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="custom-marshalling-strategy" minOccurs="0"/>
+      </xsd:all>
+      <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="jpa-placeholder-resolver-strategy">
+    <xsd:complexType>
+      <xsd:attribute name="env-ref" use="optional" type="xsd:IDREF"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="generic-resolver-strategy">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element ref="strategy-acceptor"/>
+    </xsd:choice>
+    <xsd:attribute name="strategy-acceptor-ref" use="optional" type="xsd:IDREF"/>
+  </xsd:complexType>
+
+  <xsd:element name="serializable-placeholder-resolver-strategy" type="generic-resolver-strategy"/>
+  <xsd:element name="identity-placeholder-resolver-strategy" type="generic-resolver-strategy"/>
+  <xsd:element name="process-instance-resolver-strategy"/>
+
+  <xsd:element name="strategy-acceptor" >
+    <xsd:complexType>
+      <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:element ref="spring:bean" />
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="custom-marshalling-strategy" type="generic-ref-or-nested-type"/>
+  <!-- end of additions for environment -->
+</xsd:schema>

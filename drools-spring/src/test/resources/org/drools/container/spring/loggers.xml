@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.6.0.xsd">
+
+    <drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/>
+
+    <drools:kbase id="kbase1">
+        <drools:resources>
+            <drools:resource ref="resource1"/>
+        </drools:resources>
+    </drools:kbase>
+
+    <drools:ksession id="statelessSession" type="stateless" kbase="kbase1"/>
+
+    <bean id="globalList" class="java.util.ArrayList"/>
+
+    <!-- stateful sessions -->
+    <drools:ksession id="ConsoleLogger-statefulSession" type="stateful" kbase="kbase1">
+        <drools:consoleLogger/>
+        <drools:batch>
+            <drools:set-global identifier="list" ref="globalList"/>
+        </drools:batch>
+    </drools:ksession>
+
+    <drools:ksession id="FileLogger-statefulSession" type="stateful" kbase="kbase1">
+        <drools:fileLogger id="sf_fl_logger"  file="#{ systemProperties['java.io.tmpdir'] }/drools-log1"/>
+        <drools:batch>
+            <drools:set-global identifier="list" ref="globalList"/>
+        </drools:batch>
+    </drools:ksession>
+
+    <drools:ksession id="ThreadedFileLogger-statefulSession" type="stateful" kbase="kbase1">
+        <drools:fileLogger id="sf_tfl_logger" file="#{ systemProperties['java.io.tmpdir'] }/drools-log2" threaded="true" interval="5"/>
+        <drools:batch>
+            <drools:set-global identifier="list" ref="globalList"/>
+        </drools:batch>
+    </drools:ksession>
+
+    <!-- stateless sessions -->
+    <drools:ksession id="ConsoleLogger-statelessSession" type="stateless" kbase="kbase1">
+        <drools:consoleLogger/>
+    </drools:ksession>
+
+    <drools:ksession id="k2" type="stateless" kbase="kbase1">
+        <drools:consoleLogger />
+    </drools:ksession>
+
+    <drools:ksession id="k1" type="stateless" kbase="kbase1">
+        <drools:consoleLogger id="k1_console_logger"/>
+        <drools:fileLogger id="k1_logger" file="#{ systemProperties['java.io.tmpdir'] }/drools-log3"/>
+    </drools:ksession>
+
+    <drools:ksession id="ThreadedFileLogger-statelessSession" type="stateless" kbase="kbase1">
+        <drools:fileLogger id="ss_tfl_logger" file="#{ systemProperties['java.io.tmpdir'] }/drools-log4" threaded="true" interval="5"/>
+    </drools:ksession>
+
+    <drools:ksession id="FileLogger-statelessSession" type="stateless" kbase="kbase1">
+        <drools:fileLogger id="ss_fl_logger" file="#{ systemProperties['java.io.tmpdir'] }/drools-log5"/>
+    </drools:ksession>
+
+    <drools:ksession id="FileLogger-statelessSession-noNameLogger" type="stateless" kbase="kbase1">
+        <drools:fileLogger file="#{ systemProperties['java.io.tmpdir'] }/drools-log6"/>
+    </drools:ksession>
+
+</beans>
+
