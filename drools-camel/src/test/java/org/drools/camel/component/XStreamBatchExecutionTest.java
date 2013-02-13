@@ -1553,7 +1553,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" className=\"java.lang.String\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
         str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
@@ -1725,7 +1725,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"org.drools.camel.testdomain.Person\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"MyObject\" >\n";
-        str += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"java.lang.Object\" />\n";
+        str += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" className=\"java.lang.String\" />\n";
         str += "      </variable>\n";
         str += "      <variable name=\"Number\" >\n";
         str += "        <type name=\"org.drools.process.core.datatype.impl.type.IntegerDataType\" />\n";
