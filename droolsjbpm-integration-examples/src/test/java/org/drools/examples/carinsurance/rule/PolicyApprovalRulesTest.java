@@ -47,11 +47,11 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
         String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
-        ReleaseId releaseId = createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off          
         simulationFluent
-        .newKieSession(releaseId, "org.drools.KBase1.KSession1")
+        .newKieSession(releaseId, "KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
@@ -75,11 +75,11 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
         String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
-        ReleaseId releaseId = createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
         simulationFluent
-        .newKieSession(releaseId, "org.drools.KBase1.KSession1")
+        .newKieSession(releaseId, "KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")
@@ -103,11 +103,11 @@ public class PolicyApprovalRulesTest extends SimulateTestBase {
         johnMiniPolicyRequest.addCoverageRequest(new CoverageRequest(CoverageType.COMPREHENSIVE));
 
         String rules = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestApprovalRules.drl" ) ) );
-        ReleaseId releaseId = createKJarWithMultipleResources( "org.drools.KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "KBase1", new String[]{rules}, new ResourceType[] {ResourceType.DRL} );
 
         // @formatter:off
         simulationFluent
-        .newKieSession(releaseId, "org.drools.KBase1.KSession1")
+        .newKieSession(releaseId, "KBase1.KSession1")
             .insert(john).set("john")
             .insert(mini).set("mini")
             .insert(johnMiniPolicyRequest).set("johnMiniPolicyRequest")

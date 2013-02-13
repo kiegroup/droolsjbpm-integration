@@ -73,7 +73,7 @@ public class SimulateTestBase {
             String res = resources[i];
             String type = types[i].getDefaultExtension();
 
-            kfs.write( "src/kbases/" + id + "/org/test/res" + i + "." + type, res );
+            kfs.write( "src/main/resources/" + id + "/org/test/res" + i + "." + type, res );
         }
 
         KieBaseModel kBase1 = kproj.newKieBaseModel( id )

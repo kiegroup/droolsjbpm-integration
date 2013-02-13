@@ -55,11 +55,11 @@ public class PolicyApprovalWorkflowTest extends SimulateTestBase {
         assertEquals(false, johnMiniPolicyRequest.isManuallyApproved());
         
         String process = readInputStreamReaderAsString( new InputStreamReader( getClass().getResourceAsStream( "policyRequestWorkflow.bpmn" ) ) );
-        ReleaseId releaseId = createKJarWithMultipleResources( "org.drools.KBase1", new String[]{process}, new ResourceType[] {ResourceType.BPMN2} );
+        ReleaseId releaseId = createKJarWithMultipleResources( "KBase1", new String[]{process}, new ResourceType[] {ResourceType.BPMN2} );
         
         // @formatter:off          
         simulationFluent
-        .newKieSession(releaseId, "org.drools.KBase1.KSession1")
+        .newKieSession(releaseId, "KBase1.KSession1")
             .startProcess("policyRequestProcess", processParams)
             .end()
         .runSimulation();
