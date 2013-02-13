@@ -46,7 +46,7 @@
 
   <modules>
     <module>drools-benchmark</module>
-    <module>drools-container</module>
+    <module>drools-spring</module>
     <module>drools-camel</module>
     <module>drools-camel-server-example</module>
     <!--module>drools-grid</module-->
