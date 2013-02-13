@@ -1606,6 +1606,10 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         kbuilder.add( ResourceFactory.newReaderResource( source ),
                       ResourceType.DRF );
 
+        if ( kbuilder.hasErrors() ) {
+            fail( kbuilder.getErrors().toString() );
+        }
+
         Collection<KnowledgePackage> kpkgs = kbuilder.getKnowledgePackages();
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         kbase.addKnowledgePackages( kpkgs );
@@ -1773,6 +1777,10 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         Reader source = new StringReader( str );
         kbuilder.add( ResourceFactory.newReaderResource( source ),
                       ResourceType.DRF );
+
+        if ( kbuilder.hasErrors() ) {
+            fail( kbuilder.getErrors().toString() );
+        }
 
         Collection<KnowledgePackage> kpkgs = kbuilder.getKnowledgePackages();
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
