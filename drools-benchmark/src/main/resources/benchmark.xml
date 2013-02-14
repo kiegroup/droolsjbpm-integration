@@ -164,6 +164,12 @@
     <arg>constraintsEvaluation.drl</arg>
   </benchmark>
 
+  <benchmark description="Property Reactivity"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive.drl</arg>
+  </benchmark>
+
   <!-- Index -->
 
   <benchmark description="CompareIndex WorstCase"
@@ -280,7 +286,7 @@
   <!-- Fusion -->
 
   <benchmark description="Complex Event Processing"
-             warmups="2" repetitions="1" enabled="true"
+             warmups="2" repetitions="1" enabled="false"
              classname="org.drools.benchmark.benchmarks.CepBenchmark">
       <arg>1000000</arg>
   </benchmark>
