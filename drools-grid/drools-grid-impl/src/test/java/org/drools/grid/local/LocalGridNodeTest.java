@@ -27,14 +27,14 @@ public class LocalGridNodeTest {
 
     @Test
     public void testConnectWithId() {
-        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id", null );
         GridNode gnode = connection.connect();
         assertNotNull( gnode );
     }
 
     @Test
     public void testConnectWithGivenGridNode() {
-        GridNode gnode = new GridNodeImpl();
+        GridNode gnode = new GridNodeImpl( null );
         GridConnection<GridNode> connection = new LocalGridNodeConnection( gnode );
         assertSame( gnode,
                     connection.connect() );
@@ -42,7 +42,7 @@ public class LocalGridNodeTest {
 
     @Test
     public void testGetFactoryService() {
-        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id", null );
         GridNode gnode = connection.connect();
         KnowledgeBuilderFactoryService kbfService = gnode.get( KnowledgeBuilderFactoryService.class );
         assertNotNull( kbfService );
@@ -50,7 +50,7 @@ public class LocalGridNodeTest {
 
     @Test
     public void testSetObject() {
-        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id" );
+        GridConnection<GridNode> connection = new LocalGridNodeConnection( "test-id", null );
         GridNode gnode = connection.connect();
 
         KnowledgeBaseFactoryService kbfService = gnode.get( KnowledgeBaseFactoryService.class );
@@ -84,6 +84,8 @@ public class LocalGridNodeTest {
         GridConnection connection = grid.get( ConnectionFactoryService.class ).createConnection( gsd );
         assertSame( gnode,
                     connection.connect() );
+
+        grid.dispose();
     }
 
     //    public void testWhitePagesAddRemoveAddresss() {

@@ -101,31 +101,39 @@ public class NodeTests {
         assertNotNull(gsd);
         assertEquals( 0, gsd.getAddresses().size() );
 
-        gnode = grid.getGridNode( gsd.getId() );
-        assertNotNull( gnode );
-        
+        GridNode gnode1 = grid.getGridNode( gsd.getId() );
+        assertNotNull( gnode1 );
+
         grid.removeGridNode( gsd.getId() );
         assertNull( wp.lookup( "n1" ) );
         assertNull( grid.getGridNode( gsd.getId() ) );
-        
+
+        grid.dispose();
+        // node has been removed, so disposal should not affect it
+        assertFalse( gnode.isDisposed() );
+
+        gnode.dispose();
+        assertTrue( gnode.isDisposed() );
+
     }
 
 
     @Test
     public void remoteNodeTest() {
+        WhitePages wp = new WhitePagesImpl();
         Grid grid1 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid1,
-                        8000,
-                        new WhitePagesImpl() );
+                8000,
+                wp );
 
         Grid grid2 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid2,
-                        -1,
-                        null );
+                -1,
+                wp );
 
         GridNode n1 = grid1.createGridNode( "n1" );
         grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
-               
+
         GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "n1" );
         GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
         GridNode remoteN1 = conn.connect();
@@ -135,14 +143,16 @@ public class NodeTests {
         Assert.assertNotNull( kbuilder );
 
         String rule = "package test\n"
-                      + "rule \"test\""
-                      + "  when"
-                      + "  then"
-                      + "      System.out.println(\"Rule Fired!\");"
-                      + " end";
+                + "global org.drools.grid.Grid grid; \n" +
+                "" +
+                "rule \"test\""
+                + "  when"
+                + "  then"
+                + "      System.out.println(\"Rule Fired!\");"
+                + " end";
 
         kbuilder.add( new ByteArrayResource( rule.getBytes() ),
-                      ResourceType.DRL );
+                ResourceType.DRL );
 
         KnowledgeBuilderErrors errors = kbuilder.getErrors();
         if ( errors != null && errors.size() > 0 ) {
@@ -153,7 +163,8 @@ public class NodeTests {
             fail("KnowledgeBase did not build");
         }
 
-        KnowledgeBase kbase = remoteN1.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
+        KnowledgeBaseFactoryService kbfs = remoteN1.get( KnowledgeBaseFactoryService.class );
+        KnowledgeBase kbase = kbfs.newKnowledgeBase( kbfs.newKnowledgeBaseConfiguration() );
 
         Assert.assertNotNull( kbase );
 
@@ -168,28 +179,32 @@ public class NodeTests {
 
         int i = session.fireAllRules();
         Assert.assertEquals( 1,
-                             i );
-        
-        remoteN1.dispose();
-         grid1.get(SocketService.class).close();
+                i );
+
+        grid1.dispose();
+        grid2.dispose();
+
+        assertTrue( n1.isDisposed() );
+        assertTrue( remoteN1.isDisposed() );
 
     }
-    
-     @Test
+
+    @Test
     public void remoteNodeRetractUpdateGlobalsTest() {
+        WhitePages wp = new WhitePagesImpl();
         Grid grid1 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid1,
-                        8000,
-                        new WhitePagesImpl() );
+                8000,
+                wp );
 
         Grid grid2 = new GridImpl( new HashMap<String, Object>() );
         configureGrid1( grid2,
-                        -1,
-                        null );
+                -1,
+                wp );
 
         GridNode n1 = grid1.createGridNode( "n1" );
         grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
-               
+
         GridServiceDescription<GridNode> n1Gsd = grid2.get( WhitePages.class ).lookup( "n1" );
         GridConnection<GridNode> conn = grid2.get( ConnectionFactoryService.class ).createConnection( n1Gsd );
         GridNode remoteN1 = conn.connect();
@@ -198,19 +213,20 @@ public class NodeTests {
 
         Assert.assertNotNull( kbuilder );
 
-         String rule = "package test\n"
-                 + "import org.drools.grid.NodeTests.MyObject;\n"
-                 + "global MyObject myGlobalObj;\n"
-                 + "rule \"test\""
-                 + "  when"
-                 + "       $o: MyObject()"
-                 + "  then"
-                 + "      System.out.println(\"My Global Object -> \"+myGlobalObj.getName());"
-                 + "      System.out.println(\"Rule Fired! ->\"+$o.getName());"
-                 + " end";
+        String rule = "package test\n"
+                + "import org.drools.grid.NodeTests.MyObject;\n"
+                + "global MyObject myGlobalObj;\n"
+                + "global org.drools.grid.Grid grid; \n"
+                + "rule \"test\""
+                + "  when"
+                + "       $o: MyObject()"
+                + "  then"
+                + "      System.out.println(\"My Global Object -> \"+myGlobalObj.getName());"
+                + "      System.out.println(\"Rule Fired! ->\"+$o.getName());"
+                + " end";
 
         kbuilder.add( new ByteArrayResource( rule.getBytes() ),
-                      ResourceType.DRL );
+                ResourceType.DRL );
 
         KnowledgeBuilderErrors errors = kbuilder.getErrors();
         if ( errors != null && errors.size() > 0 ) {
@@ -237,22 +253,24 @@ public class NodeTests {
 
         int fired = session.fireAllRules();
         Assert.assertEquals( 1,
-                             fired );
-        
-         session.retract(handle);
-         
-         
-         handle = session.insert(new MyObject("myObj2"));
-         
-         session.update(handle, new MyObject("myObj3"));
-         
-         fired = session.fireAllRules();
-         
-         remoteN1.dispose();
-         grid1.get(SocketService.class).close();
+                fired );
+
+        session.retract(handle);
+
+
+        handle = session.insert(new MyObject("myObj2"));
+
+        session.update(handle, new MyObject("myObj3"));
+
+        fired = session.fireAllRules();
+
+        grid1.dispose();
+        grid2.dispose();
+        assertTrue( remoteN1.isDisposed() );
+        assertTrue( n1.isDisposed() );
 
     }
-     
+
     private void configureGrid1(Grid grid,
                                 int port,
                                 WhitePages wp) {
@@ -279,16 +297,16 @@ public class NodeTests {
 //        //Create a Local Scheduler
 //        SchedulerLocalConfiguration schlConf = new SchedulerLocalConfiguration( "myLocalSched" );
 //        conf.addConfiguration( schlConf );
-        
+
         if ( port >= 0 ) {
             //Configuring the SocketService
             MultiplexSocketServiceConfiguration socketConf = new MultiplexSocketServiceConfiguration( new MultiplexSocketServerImpl( "127.0.0.1",
-                                                                                                                                     new MinaAcceptorFactoryService(),
-                                                                                                                                     SystemEventListenerFactory.getSystemEventListener(),
-                                                                                                                                     grid) );
+                    new MinaAcceptorFactoryService(),
+                    SystemEventListenerFactory.getSystemEventListener(),
+                    grid) );
             socketConf.addService( WhitePages.class.getName(), wplConf.getWhitePages(), port );
 //            socketConf.addService( SchedulerService.class.getName(), schlConf.getSchedulerService(), port );
-                        
+
             conf.addConfiguration( socketConf );
         }
         conf.configure( grid );
@@ -296,8 +314,8 @@ public class NodeTests {
     }
 
     public static class MyObject
-        implements
-        Serializable {
+            implements
+            Serializable {
         private String name;
         public MyObject(String name) {
             this.name = name;
@@ -338,9 +356,9 @@ public class NodeTests {
             return "MyObject{" + "name=" + name + '}';
         }
 
-        
-       
-        
-        
+
+
+
+
     }
 }

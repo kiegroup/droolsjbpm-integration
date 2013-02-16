@@ -1,10 +1,15 @@
 package org.drools.grid.local;
 
+import org.drools.grid.Grid;
 import org.drools.grid.GridConnection;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridNodeConnection;
 import org.drools.grid.impl.GridNodeImpl;
 
+/**
+ * Testing only
+ * @param <T>
+ */
 public class LocalGridNodeConnection<T>
     implements
     GridConnection<GridNode> {
@@ -14,8 +19,8 @@ public class LocalGridNodeConnection<T>
         this.gridNode = gridNode;
     }
 
-    public LocalGridNodeConnection(String id) {
-        gridNode = new GridNodeImpl( id );
+    public LocalGridNodeConnection( String id, Grid grid ) {
+        gridNode = new GridNodeImpl( id, grid );
     }
 
     public GridNode connect() {

@@ -80,7 +80,9 @@ public class GridImpl implements Grid {
                     if( ! node.isLocalProxy() ) {
                         wp.remove( nodeId );
                     }
-                    node.dispose();
+                    if ( ! node.isDisposed() ) {
+                        node.dispose();
+                    }
                 }
                 wp.dispose();
             }
@@ -88,9 +90,14 @@ public class GridImpl implements Grid {
             logger.error( " Grid couldn't unregister all local nodes " + t.getMessage(), t );
         } finally {
             SocketService socketService = get( SocketService.class );
-            socketService.close();
+            if ( socketService != null ) {
+                socketService.close();
+            }
         }
 
+        this.services.clear();
+        this.serviceConfigurators.clear();
+        this.localNodes.clear();
 //        SystemEventListener listener = get( SystemEventListener.class, false );
 //
 //        AcceptorFactoryService acceptor = get( AcceptorFactoryService.class, false );
@@ -100,6 +107,7 @@ public class GridImpl implements Grid {
 //        ConversationManager orator = get( ConversationManager.class, false );
 //
 //        ConnectionFactoryService connecter = get( ConnectionFactoryService.class, false );
+
 
         if ( logger.isInfoEnabled() ) {
             logger.info( " GRID shut down ! " + id );
@@ -145,7 +153,7 @@ public class GridImpl implements Grid {
         WhitePages wp = get( WhitePages.class );
         GridServiceDescription gsd = wp.create( id, this.id );
         gsd.setServiceInterface( GridNode.class );
-        GridNode node = new GridNodeImpl( id );
+        GridNode node = new GridNodeImpl( id, this );
         this.localNodes.put( id , node );
         return node;
     }
@@ -158,7 +166,7 @@ public class GridImpl implements Grid {
         wp.remove( id );
         GridServiceDescription gsd = wp.create( id, this.id );
         gsd.setServiceInterface( GridNode.class );
-        GridNode node = new GridNodeImpl( id );
+        GridNode node = new GridNodeImpl( id, this );
         this.localNodes.put( id , node );
         return node;
     }
@@ -167,6 +175,14 @@ public class GridImpl implements Grid {
         WhitePages wp = get( WhitePages.class );
         wp.remove( id );
         this.localNodes.remove( id );
+    }
+
+    public boolean addGridNode( GridNode node ) {
+        if ( ! localNodes.containsKey( node.getId() ) ) {
+            this.localNodes.put( node.getId(), node );
+            return true;
+        }
+        return false;
     }
 
     public GridNode getGridNode( String id ) {

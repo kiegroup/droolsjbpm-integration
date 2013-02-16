@@ -27,6 +27,9 @@ import org.drools.builder.KnowledgeBuilderFactoryService;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
+import org.drools.grid.SocketService;
+import org.drools.grid.helper.GridHelper;
+import org.drools.grid.impl.GridImpl;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.mina.MinaConnector;
@@ -50,12 +53,14 @@ public class GridNodeRemoteClient<T>
     private MinaConnector             connector       = new MinaConnector();
 
     private boolean                   localProxy      = false;
+    private boolean                   disposed        = false;
 
     public GridNodeRemoteClient( Grid grid,
                                  GridServiceDescription gsd ) {
         this.gsd = gsd;
         this.grid = grid;
-        init( this.localContext );
+        grid.addGridNode(this);
+        init(this.localContext);
     }
 
     public <T> T get( String identifier,
@@ -152,7 +157,23 @@ public class GridNodeRemoteClient<T>
     }
 
     public void dispose() {
-        connector.close();
+        if ( ! disposed ) {
+//            CommandImpl cmd = new CommandImpl( "dispose", Arrays.asList( (Object) this.getId() ) );
+//
+//            ConversationManager connm = this.grid.get( ConversationManager.class );
+//            ConversationUtil.sendMessage( connm,
+//                    (InetSocketAddress) ((Map<String, Address>)this.gsd.getAddresses()).get( "socket" ).getObject(),
+//                    this.gsd.getId(),
+//                    cmd );
+            connector.close();
+            GridHelper.notifyDestruction( this );
+            grid = null;
+            disposed = true;
+        }
+    }
+
+    public boolean isDisposed() {
+        return disposed;
     }
 
     public boolean isRemote() {
@@ -160,11 +181,18 @@ public class GridNodeRemoteClient<T>
     }
 
     public boolean isLocalProxy() {
-        return localProxy;
+        return true;
     }
 
     public void setLocalProxy( boolean proxy ) {
-        localProxy = proxy;
+//        localProxy = proxy;
     }
 
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
+    }
 }

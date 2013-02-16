@@ -92,7 +92,7 @@ public class KnowledgeBaseProviderRemoteClient
                                       this.gsd.getId(),
                                       cmd );
 
-        return new KnowledgeSessionConfigurationRemoteClient(localId, grid, gsd);
+        return new KnowledgeSessionConfigurationRemoteClient( localId, grid, gsd) ;
         
     }
 
@@ -101,18 +101,18 @@ public class KnowledgeBaseProviderRemoteClient
     }
 
     public KnowledgeBase newKnowledgeBase() {
-        return newKnowledgeBase( "",
-                                 null );
+        return newKnowledgeBase( UUID.randomUUID().toString(),
+                                 new KnowledgeBaseProviderRemoteClient( grid, gsd ).newKnowledgeBaseConfiguration() );
 
     }
 
-    public KnowledgeBase newKnowledgeBase(String kbaseId) {
+    public KnowledgeBase newKnowledgeBase( String kbaseId ) {
         return newKnowledgeBase( kbaseId,
-                                 null );
+                                 new KnowledgeBaseProviderRemoteClient( grid, gsd ).newKnowledgeBaseConfiguration() );
     }
 
     public KnowledgeBase newKnowledgeBase(KnowledgeBaseConfiguration conf) {
-        return newKnowledgeBase( null,
+        return newKnowledgeBase( UUID.randomUUID().toString(),
                                  conf );
     }
 
@@ -125,6 +125,7 @@ public class KnowledgeBaseProviderRemoteClient
             localId = kbaseId;
         }
         
+
         String kbaseConfId = ((KnowledgeBaseConfigurationRemoteClient)conf).getId();
         
 

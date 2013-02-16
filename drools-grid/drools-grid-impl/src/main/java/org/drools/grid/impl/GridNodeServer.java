@@ -76,6 +76,19 @@ public class GridNodeServer
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
 
         {
+            put( "dispose",
+                    new Exec() {
+
+                        public void execute(Object object,
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
+                            gnode.dispose();
+                            con.respond( null );
+                        }
+
+                    });
+
             put("registerKAgent",
                     new Exec() {
 
@@ -131,6 +144,7 @@ public class GridNodeServer
                             ExecutionResultImpl localKresults = new ExecutionResultImpl();
                             localSessionContext.set("kresults_" + cmd.getName(),
                                     localKresults);
+                            localSessionContext.set( "grid_node", gnode );
 
                             //This is a set of Bad Hack that works for now, I need to do a proper check (execute command, etc)
                             // These hacks where done to make it work and must be corrected to make it work properly

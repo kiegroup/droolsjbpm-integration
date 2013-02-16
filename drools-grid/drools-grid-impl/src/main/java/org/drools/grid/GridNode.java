@@ -16,4 +16,6 @@ public interface GridNode
 
     public boolean isLocalProxy();
 
+    public Grid getGrid();
+
 }

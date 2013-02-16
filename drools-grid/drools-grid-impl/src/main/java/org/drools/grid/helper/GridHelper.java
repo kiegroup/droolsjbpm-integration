@@ -40,42 +40,56 @@ import org.slf4j.LoggerFactory;
  */
 public class GridHelper {
 
-    public static Logger logger = LoggerFactory.getLogger(GridHelper.class);
+    public static Logger logger = LoggerFactory.getLogger( GridHelper.class );
 
-    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
-    private static JpaWhitePages whitePages = new JpaWhitePages( emf );
+    private static GridHelper instance = new GridHelper();
+//    private WhitePages whitePages;
 
-    public static void reset() {
-        if ( emf != null && emf.isOpen() ) {
-            emf.close();
-        }
-        emf = Persistence.createEntityManagerFactory( "org.drools.grid" );
-        whitePages = new JpaWhitePages( emf );
+    public static GridHelper getInstance() {
+        return instance;
     }
 
-    public static Grid createGrid() {
 
-        Grid gridHelper = new GridImpl( new HashMap<String, Object>() );
-        //Local Grid Configuration, for our client
-        GridPeerConfiguration conf = new GridPeerConfiguration();
+//    public void reinitialize( WhitePages wp ) {
+//        if ( whitePages != null ) {
+//            whitePages.dispose();
+//        }
+//        whitePages = wp;
+//    }
 
-
-        //Configuring the a local WhitePages service that is being shared with all the grid peers
-        WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
-
-        wplConf.setWhitePages( whitePages );
-        conf.addConfiguration( wplConf );
-
-        conf.configure( gridHelper );
-
-        return gridHelper;
-
+    private GridHelper() {
     }
+
+//    public Grid createGrid() {
+//
+//        Grid grid = new GridImpl( new HashMap<String, Object>() );
+//        //Local Grid Configuration, for our client
+//        GridPeerConfiguration conf = new GridPeerConfiguration();
+//
+//
+//        //Configuring the a local WhitePages service that is being shared with all the grid peers
+//        WhitePagesLocalConfiguration wplConf = new WhitePagesLocalConfiguration();
+//
+//        wplConf.setWhitePages( whitePages );
+//        conf.addConfiguration( wplConf );
+//
+//        conf.configure( grid );
+//
+//        return grid;
+////        return null;
+//
+//    }
     
     
     private static Map<String, GridNode> nodeCache = new HashMap<String, GridNode>();
 
-    public static synchronized GridNode getGridNode( String name, Grid grid, boolean forceRemote ) {
+    public static void notifyDestruction( GridNode node ) {
+        if ( nodeCache.containsKey( node.getId() ) ) {
+            nodeCache.remove( node.getId() );
+        }
+    }
+
+    public synchronized GridNode getGridNode( String name, Grid grid, boolean forceRemote ) {
 
         if ( logger.isDebugEnabled() ) {
             logger.debug(" ### Grid Helper trying to locate GridNode: " + name);
@@ -128,7 +142,7 @@ public class GridHelper {
         return node;
     }
 
-    public static QueryResultsRemoteClient getQueryResultRemoteClient( Grid grid, String nodeId, String sessionId, String queryName, String remoteResultsId ) {
+    public QueryResultsRemoteClient getQueryResultRemoteClient( Grid grid, String nodeId, String sessionId, String queryName, String remoteResultsId ) {
 
         GridServiceDescription<GridNode> gsd = getGridServiceDescriptor( grid, nodeId );
         GridNode node = getGridNode( nodeId, grid, false );
@@ -137,7 +151,7 @@ public class GridHelper {
     }
     
     
-    public static KnowledgeAgent getKnowledgeAgentRemoteClient( Grid grid, String nodeId, String sessionId ) {
+    public KnowledgeAgent getKnowledgeAgentRemoteClient( Grid grid, String nodeId, String sessionId ) {
         GridServiceDescription<GridNode> gsd = getGridServiceDescriptor( grid, nodeId );
         GridNode node = getGridNode( nodeId, grid, false );
         String reverseId = node.get( sessionId, String.class );
@@ -147,7 +161,7 @@ public class GridHelper {
         return new KnowledgeAgentRemoteClient( reverseId, gsd, grid.get( ConversationManager.class ) );
     }
 
-    private static GridServiceDescription<GridNode> getGridServiceDescriptor( Grid grid, String name ) {
+    private GridServiceDescription<GridNode> getGridServiceDescriptor( Grid grid, String name ) {
         if ( logger.isDebugEnabled() ) {
             logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### Grid Helper trying to locate GridNode: " + name );
         }
@@ -160,8 +174,8 @@ public class GridHelper {
         return nGsd;
     }
     
-    public static StatefulKnowledgeSession getStatefulKnowledgeSession( Grid grid, String nodeId, String sessionId, boolean forceRemote ) {
-        GridNode node = GridHelper.getGridNode( nodeId, grid, forceRemote );
+    public StatefulKnowledgeSession getStatefulKnowledgeSession( Grid grid, String nodeId, String sessionId, boolean forceRemote ) {
+        GridNode node = getGridNode( nodeId, grid, forceRemote );
         logger.error( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node );
         if ( logger.isDebugEnabled() ) {
             logger.debug( "(" + Thread.currentThread().getId() + ")"+Thread.currentThread().getName() +" ### SESSION 2 : Looking session = "+sessionId + " in node = "+nodeId + " - " + node );

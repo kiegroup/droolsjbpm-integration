@@ -6,7 +6,7 @@ import org.drools.grid.io.Message;
 
 public class BlockingMessageResponseHandler extends AbstractBaseResponseHandler {
 
-    private long timeout = 6000;
+    private long timeout = 60000;
     public long initialWaitTime = 50;
     
     
