@@ -10,4 +10,6 @@ public interface WhitePages {
 
     public GridServiceDescription lookup( String serviceDescriptionId );
 
+    public void dispose();
+
 }

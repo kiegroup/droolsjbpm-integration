@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.drools.agent.KnowledgeAgent;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -176,6 +178,24 @@ public class GridNodeImpl
     }
 
     public void dispose() {
+        for ( String sid : reversesessionids.keySet() ) {
+            String sName = reversesessionids.get( sid );
+            if ( sName != null && localContext.containsKey( sName ) ) {
+                StatefulKnowledgeSession ks = (StatefulKnowledgeSession) localContext.get( sName );
+                if ( ks != null ) {
+                    ks.dispose();
+                } else {
+                    throw new IllegalStateException( "Expected kSession in node " + sName );
+                }
+            }
+            String kName = sName + "_kAgent";
+            if ( localContext.containsKey( kName ) ) {
+                KnowledgeAgent kAgent = (KnowledgeAgent) localContext.get( kName );
+                kAgent.dispose();
+            } else {
+//                throw new IllegalStateException( "Expected kAgent in node " + kName );
+            }
+        }
     }
 
     public void init(Object context) {

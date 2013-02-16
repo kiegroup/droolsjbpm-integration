@@ -24,6 +24,7 @@ import org.drools.agent.conf.NewInstanceOption;
 import org.drools.agent.conf.UseKnowledgeBaseClassloaderOption;
 import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
+import org.drools.grid.GridNode;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -86,6 +87,10 @@ public class RegisterKAgentRemoteCommand
         };
         
         kagent.setSystemEventListener( systemEventListener );
+
+        GridNode gn = (GridNode) context.get("grid_node");
+        gn.set( this.kAgentId + "_kAgent", kagent );
+
         return kagent;
     }
 

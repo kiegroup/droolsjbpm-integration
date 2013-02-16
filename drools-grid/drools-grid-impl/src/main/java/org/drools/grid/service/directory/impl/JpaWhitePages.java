@@ -65,4 +65,8 @@ public class JpaWhitePages
     public void registerSocketService( Grid grid, String id, String ip, int port ) {
         WhitePagesImpl.doRegisterSocketService(grid, id, ip, port);
     }
+
+    public void dispose() {
+        this.emf.close();
+    }
 }

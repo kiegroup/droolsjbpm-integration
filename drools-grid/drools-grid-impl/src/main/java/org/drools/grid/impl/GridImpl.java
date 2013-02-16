@@ -82,6 +82,7 @@ public class GridImpl implements Grid {
                     }
                     node.dispose();
                 }
+                wp.dispose();
             }
         } catch ( Throwable t ) {
             logger.error( " Grid couldn't unregister all local nodes " + t.getMessage(), t );
