@@ -35,7 +35,7 @@ public class StateBasedActivitySimulator implements ActivitySimulator {
 
        String type = (String) provider.getProcessDataForNode(node).get("node.type");
 
-       return new ActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(), bpmn2NodeId, duration,
+       return new ActivitySimulationEvent(pi.getProcessId(), context.getProcessInstanceId(), node.getName(), bpmn2NodeId, duration,
                startTime, context.getClock().getCurrentTime(), type);
     }
 

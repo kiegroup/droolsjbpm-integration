@@ -22,6 +22,7 @@ public class SimulationContext {
     private long maxEndTime;
     private List<String> executedNodes = new ArrayList<String>();
     private int loopLimit = 2;
+    private long processInstanceId;
     
     public static SimulationContext getContext() {
         return simulationContextThreadLocal.get();
@@ -116,8 +117,18 @@ public class SimulationContext {
     
     public boolean isLoopLimitExceeded(String node) {
         int currentCount = Collections.frequency(executedNodes, node);
-        return currentCount >= loopLimit;
-        
-        
+        return currentCount >= loopLimit;        
+    }
+
+    public long getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(long processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+    
+    public void incrementProcessInstanceId() {
+        this.processInstanceId++;
     }
 }

@@ -52,7 +52,7 @@ public class HumanTaskActivitySimulator implements ActivitySimulator {
         // set end time for processinstance end time
         context.setMaxEndTime(context.getClock().getCurrentTime());
         
-        return new HumanTaskActivitySimulationEvent(pi.getProcessId(), pi.getId(), node.getName(),
+        return new HumanTaskActivitySimulationEvent(pi.getProcessId(), context.getProcessInstanceId(), node.getName(),
                 bpmn2NodeId, duration, waitTime, resourceCost, startTime, 
                 context.getClock().getCurrentTime(), resourceUtilization);
     }

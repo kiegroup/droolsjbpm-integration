@@ -34,7 +34,7 @@ public class GatewaySimulator implements ActivitySimulator {
         SimulationDataProvider provider = context.getDataProvider();
         String type = (String) provider.getProcessDataForNode(node).get("node.type");
 
-        return new GatewaySimulationEvent(pi.getProcessId(), pi.getId(), startTime, endTime, bpmn2NodeId, node.getName(), type);
+        return new GatewaySimulationEvent(pi.getProcessId(), context.getProcessInstanceId(), startTime, endTime, bpmn2NodeId, node.getName(), type);
     }
     
 }

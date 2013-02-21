@@ -25,7 +25,7 @@ public class EndEventSimulator implements ActivitySimulator {
         }
         // set end time for processinstance end time
         context.setMaxEndTime(context.getClock().getCurrentTime());
-        return new EndSimulationEvent(pi.getProcessId(), pi.getId(), startTime, context.getClock().getCurrentTime(), context.getStartTime(), bpmn2NodeId, node.getName(), processName, processVer);
+        return new EndSimulationEvent(pi.getProcessId(), context.getProcessInstanceId(), startTime, context.getClock().getCurrentTime(), context.getStartTime(), bpmn2NodeId, node.getName(), processName, processVer);
     }
 
 }
