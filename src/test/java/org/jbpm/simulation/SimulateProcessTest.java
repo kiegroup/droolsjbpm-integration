@@ -18,6 +18,7 @@ import org.drools.command.runtime.rule.InsertElementsCommand;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
+import org.jbpm.simulation.helper.TestUtils;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
@@ -32,15 +33,16 @@ import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.ResourceType;
+import org.kie.builder.ReleaseId;
 import org.kie.command.World;
 import org.kie.io.ResourceFactory;
+import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
 
 public class SimulateProcessTest {
 
     @Test
-    public void testSimpleExclusiveGatewayTest() {
+    public void testSimpleExclusiveGatewayTest() throws Exception {
         
         PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
         
@@ -49,6 +51,8 @@ public class SimulateProcessTest {
         
         SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2")));
         
+        ReleaseId releaseId = TestUtils.createKJarWithMultipleResources("TestKbase",
+                new String[]{"BPMN-SimpleExclusiveGatewayProcess.bpmn2"}, new ResourceType[]{ResourceType.BPMN2});
         
         SimulationDataProvider provider = context.getDataProvider();
         
@@ -63,20 +67,13 @@ public class SimulateProcessTest {
             
             double probability = provider.calculatePathProbability(path);
             f.newPath("path" + counter);
-
-            f.newKnowledgeBuilder().add( ResourceFactory.newClassPathResource("BPMN-SimpleExclusiveGatewayProcess.bpmn2"),
-                    ResourceType.BPMN2 )
-              .end(World.ROOT, KnowledgeBuilder.class.getName() )
-            .newKnowledgeBase()
-              .addKnowledgePackages()
-              .end(World.ROOT, KnowledgeBase.class.getName() );
             
             // count how many instances/steps should current path have
             int instancesOfPath = (int) (numberOfAllInstances * probability);
             
             for (int i = 0; i < instancesOfPath; i++) {
                 f.newStep( interval * i )
-                    .newStatefulKnowledgeSession()
+                    .newKieSession( releaseId, "TestKbase.KSession1" )
                         .end(World.ROOT, StatefulKnowledgeSession.class.getName())
                     .addCommand(new SimulateProcessPathCommand("defaultPackage.test", context, path));
             }

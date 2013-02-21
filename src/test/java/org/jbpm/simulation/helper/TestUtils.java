@@ -1,5 +1,9 @@
 package org.jbpm.simulation.helper;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,13 +39,24 @@ import org.jbpm.workflow.instance.impl.NodeInstanceFactoryRegistry;
 import org.jbpm.workflow.instance.impl.factory.CreateNewNodeFactory;
 import org.jbpm.workflow.instance.impl.factory.ReuseNodeFactory;
 import org.json.JSONObject;
+import org.kie.KieServices;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
+import org.kie.builder.KieBuilder;
+import org.kie.builder.KieFileSystem;
+import org.kie.builder.KieModule;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.builder.ResourceType;
+import org.kie.builder.ReleaseId;
+import org.kie.builder.model.KieBaseModel;
+import org.kie.builder.model.KieModuleModel;
+import org.kie.builder.model.KieSessionModel;
+import org.kie.conf.EqualityBehaviorOption;
+import org.kie.conf.EventProcessingOption;
+import org.kie.io.Resource;
 import org.kie.io.ResourceFactory;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.io.ResourceType;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.conf.ClockTypeOption;
 
@@ -119,7 +134,7 @@ public class TestUtils {
         builder.add(ResourceFactory.newClassPathResource(process), ResourceType.BPMN2);
         
         KnowledgeBase kbase = builder.newKnowledgeBase();
-        KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        KieSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         config.setOption(ClockTypeOption.get("pseudo") );
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession(config, EnvironmentFactory.newEnvironment());
         NodeInstanceFactoryRegistry n = NodeInstanceFactoryRegistry.INSTANCE;
@@ -181,5 +196,64 @@ public class TestUtils {
         }
         System.out.println("Size of flow elements after removing duplicates " + unique.size());
         return unique;
+    }
+    
+    public static ReleaseId createKJarWithMultipleResources(String id, String[] resourceFiles, ResourceType[] types) throws IOException {
+        KieServices ks = KieServices.Factory.get();
+        KieModuleModel kproj = ks.newKieModuleModel();
+        KieFileSystem kfs = ks.newKieFileSystem();
+
+        for (int i = 0; i < resourceFiles.length; i++) {            
+            Resource resource = ResourceFactory.newClassPathResource(resourceFiles[i]);
+            String res = readResourceContent(resource);
+            String type = types[i].getDefaultExtension();
+
+            kfs.write("src/main/resources/" + id.replaceAll("\\.", "/")
+                    + "/org/test/res" + i + "." + type, res);
+        }
+
+        KieBaseModel kBase1 = kproj.newKieBaseModel(id)
+                .setEqualsBehavior(EqualityBehaviorOption.EQUALITY)
+                .setEventProcessingMode(EventProcessingOption.STREAM);
+
+        KieSessionModel ksession1 = kBase1
+                .newKieSessionModel(id + ".KSession1")
+                .setType(KieSessionModel.KieSessionType.STATEFUL)
+                .setClockType(ClockTypeOption.get("pseudo"));
+
+        kfs.writeKModuleXML(kproj.toXML());
+
+        KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+        assertTrue(kieBuilder.getResults().getMessages().isEmpty());
+
+        KieModule kieModule = kieBuilder.getKieModule();
+        return kieModule.getReleaseId();
+    }
+    
+    protected static String readResourceContent(Resource resource) {
+        StringBuilder contents = new StringBuilder();
+        BufferedReader reader = null;
+ 
+        try {
+            reader = new BufferedReader(resource.getReader());
+            String text = null;
+ 
+            // repeat until all lines is read
+            while ((text = reader.readLine()) != null) {
+                contents.append(text);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return contents.toString();
     }
 }

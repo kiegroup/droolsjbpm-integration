@@ -14,9 +14,9 @@ import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.builder.ResourceType;
 import org.kie.io.ResourceFactory;
-import org.kie.runtime.KnowledgeSessionConfiguration;
+import org.kie.io.ResourceType;
+import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.conf.ClockTypeOption;
 
@@ -35,7 +35,7 @@ public class SimulationCommandTest {
         builder.add(ResourceFactory.newClassPathResource("BPMN2-ExclusiveSplit.bpmn2"), ResourceType.BPMN2);
         
         KnowledgeBase kbase = builder.newKnowledgeBase();
-        KnowledgeSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        KieSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         config.setOption(ClockTypeOption.get("pseudo") );
         
         for (SimulationPath sp : paths) {

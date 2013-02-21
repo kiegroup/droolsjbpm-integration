@@ -30,6 +30,7 @@ import org.jbpm.workflow.instance.impl.NodeInstanceFactoryRegistry;
 import org.jbpm.workflow.instance.impl.factory.CreateNewNodeFactory;
 import org.jbpm.workflow.instance.impl.factory.ReuseNodeFactory;
 import org.kie.command.Context;
+import org.kie.runtime.KieSession;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.process.ProcessInstance;
 
@@ -92,13 +93,13 @@ public class SimulateProcessPathCommand implements GenericCommand<Void> {
         n.register(ThrowLinkNode.class, new CreateNewNodeFactory(
                 SimulationNodeInstance.class));
         
-        StatefulKnowledgeSession session = ((KnowledgeCommandContext)context).getStatefulKnowledgesession();
+        KieSession session = ((KnowledgeCommandContext)context).getKieSession();
         simContext.setClock((SessionPseudoClock) session.getSessionClock());
         simContext.setCurrentPath(path);
         SimulationInfo simInfo = simContext.getRepository().getSimulationInfo();
         if (simInfo != null) {
-            simInfo.setProcessName(session.getKnowledgeBase().getProcess(processId).getName());
-            simInfo.setProcessVersion(session.getKnowledgeBase().getProcess(processId).getVersion());
+            simInfo.setProcessName(session.getKieBase().getProcess(processId).getName());
+            simInfo.setProcessVersion(session.getKieBase().getProcess(processId).getVersion());
         }
         // reset max end time before starting new instance
         simContext.resetMaxEndTime();
