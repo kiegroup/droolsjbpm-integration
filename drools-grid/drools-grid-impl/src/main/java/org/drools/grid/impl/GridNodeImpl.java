@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.drools.agent.KnowledgeAgent;
+import org.drools.grid.helper.GridHelper;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
@@ -48,11 +51,17 @@ public class GridNodeImpl
     private final ServiceRegistry serviceRegistry = ServiceRegistryImpl.getInstance();
     private static Logger logger = LoggerFactory.getLogger(GridNodeImpl.class);
 
-    public GridNodeImpl() {
+    private Grid grid;
+
+    private boolean disposed = false;
+
+    public GridNodeImpl( Grid grid ) {
+        this.grid = grid;
         this.id = UUID.randomUUID().toString();
     }
 
-    public GridNodeImpl(String id) {
+    public GridNodeImpl( String id, Grid grid ) {
+        this.grid = grid;
         this.id = id;
     }
 
@@ -176,6 +185,34 @@ public class GridNodeImpl
     }
 
     public void dispose() {
+        if ( ! disposed ) {
+            for ( String sid : reversesessionids.keySet() ) {
+                String sName = reversesessionids.get( sid );
+                if ( sName != null && localContext.containsKey( sName ) ) {
+                    StatefulKnowledgeSession ks = (StatefulKnowledgeSession) localContext.get( sName );
+                    if ( ks != null ) {
+                        ks.dispose();
+                    } else {
+                        throw new IllegalStateException( "Expected kSession in node " + sName );
+                    }
+                }
+                String kName = sName + "_kAgent";
+                if ( localContext.containsKey( kName ) ) {
+                    KnowledgeAgent kAgent = (KnowledgeAgent) localContext.get( kName );
+                    kAgent.dispose();
+                } else {
+//                throw new IllegalStateException( "Expected kAgent in node " + kName );
+                }
+            }
+            localContext.clear();
+            GridHelper.notifyDestruction( this );
+            grid = null;
+            disposed = true;
+        }
+    }
+
+    public boolean isDisposed() {
+        return disposed;
     }
 
     public void init(Object context) {
@@ -209,5 +246,13 @@ public class GridNodeImpl
 
     public boolean isLocalProxy() {
         return false;
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
     }
 }

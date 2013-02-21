@@ -76,6 +76,54 @@ public class GridNodeServer
     private Map<String, Exec> execs = new HashMap<String, Exec>() {
 
         {
+            put( "dispose",
+                    new Exec() {
+
+                        public void execute(Object object,
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
+                            gnode.dispose();
+                            con.respond( null );
+                        }
+
+                    });
+
+            put("registerKAgent",
+                    new Exec() {
+
+                        public void execute(Object object,
+                                            Conversation con,
+                                            Message msg,
+                                            CommandImpl cmd) {
+
+                            GridNode gnode = (GridNode) object;
+                            List list = cmd.getArguments();
+                            GenericCommand command = (GenericCommand) list.get(0);
+
+                            // Setup the evaluation context
+                            ContextImpl localSessionContext = new ContextImpl("session_" + cmd.getName(),
+                                    data.getContextManager(),
+                                    data.getTemp());
+                            localSessionContext.set( "grid_node", gnode );
+//
+                            ExecutionResultImpl localKresults = new ExecutionResultImpl();
+                            localSessionContext.set("kresults_" + cmd.getName(),
+                                    localKresults);
+
+
+                            ResolvingKnowledgeCommandContext resolvingContext = new ResolvingKnowledgeCommandContext(localSessionContext);
+
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(" ### GridNodeServer (execute): " + command);
+                            }
+
+                            Object result = command.execute( resolvingContext );
+
+                            con.respond( result );
+                        }
+                    });
+
             put("execute",
                     new Exec() {
 
@@ -96,6 +144,7 @@ public class GridNodeServer
                             ExecutionResultImpl localKresults = new ExecutionResultImpl();
                             localSessionContext.set("kresults_" + cmd.getName(),
                                     localKresults);
+                            localSessionContext.set( "grid_node", gnode );
 
                             //This is a set of Bad Hack that works for now, I need to do a proper check (execute command, etc)
                             // These hacks where done to make it work and must be corrected to make it work properly

@@ -108,6 +108,10 @@ public class WhitePagesClient
                                                                        convm );
     }
 
+    public void dispose() {
+
+    }
+
     public void remove(String serviceDescriptionId) {
         GridServiceDescription<WhitePages> wpGsd = getGsd();
 

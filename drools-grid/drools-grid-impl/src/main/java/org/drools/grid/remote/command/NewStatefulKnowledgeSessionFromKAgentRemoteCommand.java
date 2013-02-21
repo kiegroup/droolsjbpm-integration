@@ -19,6 +19,7 @@ package org.drools.grid.remote.command;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.command.Context;
 import org.drools.command.impl.GenericCommand;
+import org.drools.grid.GridNode;
 import org.drools.runtime.Environment;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -36,9 +37,9 @@ public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
         
     }
     
-    public NewStatefulKnowledgeSessionFromKAgentRemoteCommand(String ksessionConfId,
-                                                Environment env, String kbaseKagentId) { 
-        this(ksessionConfId);
+    public NewStatefulKnowledgeSessionFromKAgentRemoteCommand( String ksessionConfId,
+                                                Environment env, String kbaseKagentId ) {
+        this( ksessionConfId );
         this.environment = env;
         this.kbaseKagentId = kbaseKagentId;
         
@@ -48,14 +49,17 @@ public class NewStatefulKnowledgeSessionFromKAgentRemoteCommand
     public StatefulKnowledgeSession execute(Context context) {
         
         KnowledgeSessionConfiguration kconf = null;
-        if (ksessionConfId != null){
-            kconf = (KnowledgeSessionConfiguration) context.getContextManager().getContext("__TEMP__").get(ksessionConfId);
+        if ( ksessionConfId != null ) {
+            kconf = (KnowledgeSessionConfiguration) context.getContextManager().getContext( "__TEMP__" ).get( ksessionConfId );
         }
         
-        KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext("__TEMP__").get(kbaseKagentId+"_kAgent");
+        KnowledgeAgent agent = (KnowledgeAgent) context.getContextManager().getContext( "__TEMP__" ).get( kbaseKagentId + "_kAgent" );
         
-        if(agent != null){
-            return agent.getKnowledgeBase().newStatefulKnowledgeSession(kconf, environment);
+        if( agent != null ) {
+            StatefulKnowledgeSession knowledgeSession = agent.getKnowledgeBase().newStatefulKnowledgeSession( kconf, environment );
+            GridNode gnode = (GridNode) context.get( "grid_node" );
+            knowledgeSession.setGlobal( "grid", gnode.getGrid() );
+            return knowledgeSession;
         }
         return null;
     }

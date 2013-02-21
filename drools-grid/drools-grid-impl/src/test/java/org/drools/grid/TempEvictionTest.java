@@ -49,7 +49,7 @@ public class TempEvictionTest {
 
     @Test
     public void simpleEvictionTest() throws InterruptedException {
-        MessageReceiverHandler handler = new GridNodeImpl("myNode").getMessageReceiverHandler();
+        MessageReceiverHandler handler = new GridNodeImpl( "myNode", null ).getMessageReceiverHandler();
         ContextImplWithEviction contextTemp = (ContextImplWithEviction) ((GridNodeServer) handler).getData().getTemp();
         ((ContextImplWithEviction) contextTemp).setEntryEvictionTime(2000); // 2 seconds 
         ((ContextImplWithEviction) contextTemp).setEvictionWakeUpTime(1000); // 1 seconds

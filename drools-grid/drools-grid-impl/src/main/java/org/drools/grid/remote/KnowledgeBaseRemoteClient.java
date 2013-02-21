@@ -152,9 +152,14 @@ public class KnowledgeBaseRemoteClient
     public StatefulKnowledgeSession newStatefulKnowledgeSession(KnowledgeSessionConfiguration conf,
                                                                 Environment environment) {
         String kresultsId = "kresults_" + this.cm.toString();
-        String localId = UUID.randomUUID().toString();
+        String localId;
+        if ( environment != null && environment.get( "sessionId" ) != null ) {
+            localId = (String) environment.get( "sessionId" );
+        } else {
+            localId = UUID.randomUUID().toString();
+        }
         
-        CommandImpl registerKAgentCmd = new CommandImpl( "execute",
+        CommandImpl registerKAgentCmd = new CommandImpl( "registerKAgent",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId+"_kAgent",
                                                                                                 new KnowledgeContextResolveFromContextCommand( new RegisterKAgentRemoteCommand( localId ),
@@ -173,7 +178,7 @@ public class KnowledgeBaseRemoteClient
         CommandImpl newSessionCmd = new CommandImpl( "execute",
                                            Arrays.asList( new Object[]{new SetVariableCommandFromCommand( "__TEMP__",
                                                                                                 localId,
-                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionFromKAgentRemoteCommand( ksessionConfId , environment, localId),
+                                                                                                new KnowledgeContextResolveFromContextCommand( new NewStatefulKnowledgeSessionFromKAgentRemoteCommand( ksessionConfId , null, localId),
                                                                                                                                                null,
                                                                                                                                                this.instanceId,
                                                                                                                                                null,

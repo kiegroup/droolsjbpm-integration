@@ -1,5 +1,7 @@
 package org.drools.grid;
 
+import org.drools.grid.remote.GridNodeRemoteClient;
+
 public interface Grid {
 
     public <T> T get(Class<T> serviceClass);
@@ -18,4 +20,5 @@ public interface Grid {
 
     public void dispose();
 
+    boolean addGridNode(GridNode node);
 }

@@ -39,6 +39,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.SocketService;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.conf.impl.GridPeerConfiguration;
+import org.drools.grid.helper.GridHelper;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.impl.MultiplexSocketServerImpl;
 import org.drools.grid.io.impl.MultiplexSocketServiceConfiguration;
@@ -63,6 +64,8 @@ public abstract class BaseRemoteTest {
     
     private Map<String, GridServiceDescription> coreServicesMap;
     protected Grid grid1;
+    protected Grid grid2;
+    protected WhitePages wps;
     
     protected GridNode remoteN1;
     protected GridServiceDescription gsdN1;
@@ -70,7 +73,7 @@ public abstract class BaseRemoteTest {
     
     @Before
     public void setUp() {
-         DeleteDbFiles.execute("~", "mydb", false);
+        DeleteDbFiles.execute("~", "mydb", false);
 
         System.out.println("Staring DB for white pages ...");
         
@@ -90,27 +93,27 @@ public abstract class BaseRemoteTest {
     @After
     public void tearDown() {
         
-        
-        remoteN1.dispose();
-        
-        grid1.removeGridNode( gsdN1.getId() );
-        
-        grid1.get(SocketService.class).close();
-        
+        grid1.dispose();
+        grid2.dispose();
+
+        wps.dispose();
+
         server.stop();
         
     }
     
     private GridServiceDescription createRemoteNode(){
+        wps = new JpaWhitePages( Persistence.createEntityManagerFactory("org.drools.grid") );
+
         grid1 = new GridImpl("peer1", new HashMap<String, Object>() );
         configureGrid1( grid1,
                         8000,
-                        new JpaWhitePages(Persistence.createEntityManagerFactory("org.drools.grid")) );
+                        wps );
 
-        Grid grid2 = new GridImpl("peer2", new HashMap<String, Object>() );
+        grid2 = new GridImpl("peer2", new HashMap<String, Object>() );
         configureGrid1( grid2,
                         -1,
-                        grid1.get( WhitePages.class ) );
+                        wps );
 
         GridNode n1 = grid1.createGridNode( "n1" );
         grid1.get( SocketService.class ).addService( "n1", 8000, n1 );
@@ -174,6 +177,7 @@ public abstract class BaseRemoteTest {
          String rule = "package test\n"
                  + "import org.drools.grid.NodeTests.MyObject;\n"
                  + "global MyObject myGlobalObj;\n"
+                 + "global org.drools.grid.Grid grid; \n"
                  + "query getMyObjects(String n)\n"
                  + "  $mo: MyObject(name == n)\n"
                  + "end\n"
@@ -218,6 +222,11 @@ public abstract class BaseRemoteTest {
 
         assertNotNull( kbuilder );
 
+        String header = "package test\n"
+                + "global org.drools.grid.Grid grid; \n"
+                ;
+
+
         String process = "<definitions id=\"Definition\" "
                 + "targetNamespace=\"http://www.example.org/MinimalExample\" "
                 + "typeLanguage=\"http://www.java.com/javaTypes\" "
@@ -240,9 +249,11 @@ public abstract class BaseRemoteTest {
                 + "</definitions>";
         System.out.println("Process = "+process);
          
+        kbuilder.add( new ByteArrayResource( header.getBytes() ),
+                      ResourceType.DRL );
         kbuilder.add( new ByteArrayResource( process.getBytes() ),
                       ResourceType.BPMN2 );
-        
+
         KnowledgeBuilderErrors errors = kbuilder.getErrors();
         if ( errors != null && errors.size() > 0 ) {
             for ( KnowledgeBuilderError error : errors ) {

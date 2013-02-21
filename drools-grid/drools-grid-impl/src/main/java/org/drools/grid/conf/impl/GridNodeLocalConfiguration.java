@@ -36,8 +36,8 @@ public class GridNodeLocalConfiguration
         this.gnode = gnode;
     }
 
-    public void configureService(Grid grid) {
-        GridNode gnode = (this.gnode != null) ? this.gnode : new GridNodeImpl();
+    public void configureService( Grid grid ) {
+        GridNode gnode = (this.gnode != null) ? this.gnode : new GridNodeImpl( grid );
         ((GridImpl) grid).addService( GridNode.class,
                                       gnode );
     }

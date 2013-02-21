@@ -88,4 +88,8 @@ public class WhitePagesImpl
             service.setData( conf );
         }
     }
+
+    public void dispose() {
+        directory.clear();
+    }
 }

@@ -267,7 +267,7 @@ public class RemoteSessionCommandTest extends BaseRemoteTest {
         //changeSet.setResourcesAdded(Arrays.asList(res));
         //@TODO: for some reason the Classpath resource when is sent to the grid node is loosing the
         // ResourceType, so I need to fix that. 
-        KnowledgeAgent kAgent = GridHelper.getKnowledgeAgentRemoteClient( GridHelper.createGrid(), remoteN1.getId(), "ksession-rules" );
+        KnowledgeAgent kAgent = GridHelper.getInstance().getKnowledgeAgentRemoteClient( grid2, remoteN1.getId(), "ksession-rules" );
         kAgent.applyChangeSet(res);
 
 
@@ -284,13 +284,13 @@ public class RemoteSessionCommandTest extends BaseRemoteTest {
     
     public void remoteKAgentRuleTest() throws IOException, IOException, IOException, IOException, InterruptedException {
         StatefulKnowledgeSession ksession = createSession();
-        ksession.setGlobal("myGlobalObj", new MyObject("myglobalObj"));
+        ksession.setGlobal( "myGlobalObj", new MyObject( "myglobalObj" ) );
         
-        MyObject obj1 = new MyObject("obj1");
-        ksession.insert(obj1);
+        MyObject obj1 = new MyObject( "obj1" );
+        ksession.insert( obj1 );
 
         int fired = ksession.fireAllRules();
-        Assert.assertEquals(1, fired);
+        Assert.assertEquals( 1, fired );
 
         String changeSetString = "<change-set xmlns='http://drools.org/drools-5.0/change-set'>"
                 + "<add>"
@@ -298,13 +298,13 @@ public class RemoteSessionCommandTest extends BaseRemoteTest {
                 + "</add>"
                 + "</change-set>"
                 + "";
-        Resource changeSetRes = new ByteArrayResource(changeSetString.getBytes());
-        ((InternalResource) changeSetRes).setResourceType(ResourceType.CHANGE_SET);
+        Resource changeSetRes = new ByteArrayResource( changeSetString.getBytes() );
+        ( (InternalResource) changeSetRes ).setResourceType( ResourceType.CHANGE_SET );
         
         
         
-        KnowledgeAgent kAgent = GridHelper.getKnowledgeAgentRemoteClient(  GridHelper.createGrid(), remoteN1.getId(), "ksession-rules" );
-        kAgent.applyChangeSet(changeSetRes);
+        KnowledgeAgent kAgent = GridHelper.getInstance().getKnowledgeAgentRemoteClient( grid2, remoteN1.getId(), "ksession-rules" );
+        kAgent.applyChangeSet( changeSetRes );
 
         Thread.sleep(5000);
 
