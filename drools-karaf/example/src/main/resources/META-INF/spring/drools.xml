@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:drools="http://drools.org/schema/drools-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd">
+
+    <drools:grid-node id="node1"/>
+
+    <drools:kbase id="kbase1" node="node1">
+        <drools:configuration>
+            <drools:mbeans enabled="true"/>
+        </drools:configuration>
+        <drools:resources>
+            <drools:resource type="DRL" source="classpath:testSpring.drl"/>
+        </drools:resources>
+    </drools:kbase>
+
+    <drools:ksession id="ksession1"
+                     type="stateless"
+                     name="ksession1"
+                     kbase="kbase1"
+                     node="node1"/>
+
+</beans>
