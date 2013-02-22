@@ -1,0 +1,131 @@
+declare A
+  a1 : int
+  a2 : int
+end
+
+declare B
+  b1 : int
+  b2 : int
+end
+
+declare C
+  c1 : int
+  c2 : int
+end
+
+declare D
+  d1 : int
+  d2 : int
+end
+
+declare E
+  e1 : int
+  e2 : int
+end
+
+declare F
+  f1 : int
+  f2 : int
+end
+
+declare G
+  g1 : int
+  g2 : int
+end
+
+declare H
+  h1 : int
+  h2 : int
+end
+
+declare I
+  i1 : int
+  i2 : int
+end
+
+declare J
+  j1 : int
+  j2 : int
+end
+
+declare K
+  k1 : int
+  k2 : int
+end
+
+declare L
+  l1 : int
+  l2 : int
+end
+
+declare M
+  m1 : int
+  m2 : int
+end
+
+declare N
+  n1 : int
+  n2 : int
+end
+
+declare O
+  o1 : int
+  o2 : int
+end
+
+declare P
+  p1 : int
+  p2 : int
+end
+
+declare Q
+  q1 : int
+  q2 : int
+end
+
+rule Init salience 100
+when
+then
+    for (int i = 0; i < 1000000; i++) {
+        insert( new A(1, 1) );
+    }
+    insert( new B(0, 2) );
+    insert( new C(-1, 2) );
+    insert( new D(-2, 2) );
+    insert( new E(-3, 2) );
+    insert( new F(-4, 2) );
+    insert( new G(-5, 2) );
+    insert( new H(-6, 2) );
+    insert( new I(-7, 2) );
+    insert( new J(-8, 2) );
+    insert( new K(-9, 2) );
+    insert( new L(-10, 2) );
+    insert( new M(-11, 2) );
+    insert( new N(-12, 2) );
+    insert( new O(-13, 2) );
+    insert( new P(-14, 2) );
+    insert( new Q(-15, 2) );
+end
+
+rule R1
+when
+    $a: A( a1 < 10 )
+    $b: B( b1 < $a.a1 )
+    $c: C( c1 < $b.b1 )
+    $d: D( d1 < $c.c1 )
+    $e: E( e1 < $d.d1 )
+    $f: F( f1 < $e.e1 )
+    $g: G( g1 < $f.f1 )
+    $h: H( h1 < $g.g1 )
+    $i: I( i1 < $h.h1 )
+    $j: J( j1 < $i.i1 )
+    $k: K( k1 < $j.j1 )
+    $l: L( l1 < $k.k1 )
+    $m: M( m1 < $l.l1 )
+    $n: N( n1 < $m.m1 )
+    $o: O( o1 < $n.n1 )
+    $p: P( p1 < $o.o1 )
+    $q: Q( q1 < $p.p1, q2 > $a.a2 )
+then
+    modify( $a ) { setA2( $q.getQ2() + 1 ) };
+end

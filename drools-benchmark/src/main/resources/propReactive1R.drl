@@ -1,0 +1,28 @@
+declare A
+@propertyReactive
+  a1 : int
+  a2 : int
+end
+
+declare B
+@propertyReactive
+  b1 : int
+  b2 : int
+end
+
+rule Init salience 100
+when
+then
+    for (int i = 0; i < 1000000; i++) {
+        insert( new A(1, 1) );
+    }
+    insert( new B(0, 2) );
+end
+
+rule R1
+when
+    $a: A( a1 < 10 )
+    $b: B( b1 < $a.a1 )
+then
+    modify( $a ) { setA2( $b.getB2() + 1 ) };
+end

@@ -164,10 +164,88 @@
     <arg>constraintsEvaluation.drl</arg>
   </benchmark>
 
-  <benchmark description="Property Reactivity"
+  <benchmark description="Property Reactivity - 1 Rule"
              warmups="1" repetitions="1" enabled="true"
              classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
-    <arg>propReactive.drl</arg>
+    <arg>propReactive1R.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 1 Rule"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive1RNo.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity - 2 Rules"
+             warmups="1" repetitions="1" enabled="false"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive2R.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 2 Rules"
+             warmups="1" repetitions="1" enabled="false"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive2RNo.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity - 4 Rules"
+             warmups="1" repetitions="1" enabled="false"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive4R.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 4 Rules"
+             warmups="1" repetitions="1" enabled="false"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive4RNo.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity - 2 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive2P.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 2 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive2PNo.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity - 4 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive4P.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 4 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive4PNo.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity - 8 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive8P.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 8 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive8PNo.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity - 16 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive16P.drl</arg>
+  </benchmark>
+
+  <benchmark description="Property Reactivity NO - 16 Patterns"
+             warmups="1" repetitions="1" enabled="true"
+             classname="org.drools.benchmark.benchmarks.PlainDRLBenchmark">
+    <arg>propReactive16PNo.drl</arg>
   </benchmark>
 
   <!-- Index -->
