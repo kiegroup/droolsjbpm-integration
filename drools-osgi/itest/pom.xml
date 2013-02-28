@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <artifactId>parent</artifactId>
+    <groupId>org.drools.karaf</groupId>
+    <version>6.0.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>itest</artifactId>
+  <version>6.0.0-SNAPSHOT</version>
+
+  <name>Drools :: Karaf iTest</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.camel.karaf</groupId>
+      <artifactId>apache-camel</artifactId>
+      <version>${camel.version}</version>
+      <scope>test</scope>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <version>${drools.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-spring</artifactId>
+      <version>${drools.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-camel</artifactId>
+      <version>${drools.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf</groupId>
+      <artifactId>apache-karaf</artifactId>
+      <version>${karaf.version}</version>
+      <scope>test</scope>
+      <type>tar.gz</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.karaf</groupId>
+          <artifactId>org.apache.karaf.client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.gogo.runtime</artifactId>
+      <version>0.10.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>org.apache.karaf.features.core</artifactId>
+      <version>${karaf.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Pax exam & karaf tooling -->
+    <dependency>
+      <groupId>org.apache.karaf.tooling.exam</groupId>
+      <artifactId>org.apache.karaf.tooling.exam.container</artifactId>
+      <version>${karaf.version}</version>
+      <scope>test</scope>
+      <!-- inclusion added to avoid that karaf tooling transitive
+      dependencies load pax-exam 2.4 -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.ops4j.pax.exam</groupId>
+          <artifactId>pax-exam</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ops4j.pax.exam</groupId>
+          <artifactId>pax-exam-extender-service</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ops4j.pax.exam</groupId>
+          <artifactId>pax-exam-spi</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ops4j.pax.exam</groupId>
+          <artifactId>pax-exam-inject</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ops4j.pax.exam</groupId>
+          <artifactId>pax-exam-invoker-junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-junit4</artifactId>
+      <version>${pax-exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.servicemix.tooling</groupId>
+        <artifactId>depends-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <id>generate-depends-file</id>
+            <goals>
+              <goal>generate-depends-file</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
+</project>

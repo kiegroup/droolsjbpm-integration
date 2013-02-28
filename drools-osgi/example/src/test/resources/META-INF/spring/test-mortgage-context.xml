@@ -1,0 +1,68 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:drools="http://drools.org/schema/drools-spring"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
+    ">
+
+    <!-- The source should be changed accoring to the version used of Drools -->
+    <drools:resource id="guvnor-package"
+                     type="PKG"
+                     source="http://localhost:8080/guvnor-6.0.0-SNAPSHOT-tomcat-6.0/org.drools.guvnor.Guvnor/package/mortgages/LATEST"
+                     basic-authentication="enabled"
+                     username="admin"
+                     password="admin"/>
+
+    <drools:ksession id="ksession1" type="stateful" kbase="kbase1">
+        <drools:configuration>
+            <drools:keep-reference enabled="true"/>
+            <drools:clock-type type="REALTIME"/>
+        </drools:configuration>
+    </drools:ksession>
+
+    <drools:resource-change-scanner id="guvnor-monitor"
+                                    interval="10"/>
+
+    <drools:kagent kbase="kbase1" id="kagent" new-instance="false"
+                   use-kbase-classloader="true">
+        <drools:resources>
+            <drools:resource ref="guvnor-package"></drools:resource>
+        </drools:resources>
+    </drools:kagent>
+
+    <drools:kbase id="kbase1">
+        <drools:resources>
+            <drools:resource ref="guvnor-package"></drools:resource>
+        </drools:resources>
+        <drools:configuration>
+            <drools:mbeans enabled="true"/>
+            <drools:event-processing-mode mode="STREAM"/>
+            <drools:assert-behavior mode="IDENTITY"/>
+        </drools:configuration>
+    </drools:kbase>
+
+    <bean id="fireAllCommands" class="org.drools.camel.example.FireAllCommands"/>
+
+    <camelContext trace="true" id="drools-routes"
+                  xmlns="http://camel.apache.org/schema/spring">
+
+        <route id="directToDroolsInsert">
+            <from uri="direct:insert"/>
+            <to uri="drools:/ksession1?action=insertBody"/>
+        </route>
+
+        <route id="directToDroolsExecute">
+            <from uri="direct:execute"/>
+            <bean ref="fireAllCommands" method="insertAndFireAll"/>
+            <to uri="drools:/ksession1?action=execute"/>
+            <log message=">> All rules fired !"/>
+            <!-- <to uri="mock:result"/> -->
+        </route>
+
+    </camelContext>
+
+
+</beans>
