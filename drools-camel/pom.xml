@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>drools-camel</artifactId>
+  <packaging>bundle</packaging>
 
   <name>Drools Camel integration</name>
   <description>Drools integration for Camel that provides an integration framework  based on known Enterprise Integration Pattern.</description>
@@ -181,5 +182,40 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <instructions>
+            <_removeheaders>Ignore-Package</_removeheaders>
+            <Bundle-SymbolicName>org.drools.camel</Bundle-SymbolicName>
+            <Bundle-Name>Drools Camel</Bundle-Name>
+            <Import-Package>
+              !org.drools.camel.component,
+              !org.drools.jax*,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.drools.camel.component,
+              org.drools.jax*
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
