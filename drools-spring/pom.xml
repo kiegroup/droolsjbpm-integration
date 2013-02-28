@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>drools-spring</artifactId>
+  <packaging>bundle</packaging>
 
   <name>Drools Spring</name>
   <description>Drools and jBPM integration for Spring.</description>
@@ -157,5 +158,49 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <instructions>
+            <_removeheaders>Ignore-Package</_removeheaders>
+            <Bundle-SymbolicName>org.drools.spring</Bundle-SymbolicName>
+            <Bundle-Name>Drools Spring</Bundle-Name>
+            <Import-Package>
+              !org.drools.container.spring*,
+              !org.drools.grid*,
+              com.sun.tools.xjc*;resolution:=optional,
+              javax.enterprise.context;resolution:=optional,
+              javax.persistence;resolution:=optional,
+              org.drools.persistence*;resolution:=optional,
+              <!-- TODO Resolution should be removed as jBPM will be deployed on karaf too-->
+              org.jbpm*;resolution:=optional,
+              <!-- TODO Features spring-orm, spring-tx could be installed by default to avoid to declare them as optional -->
+              org.springframework.orm.jpa;resolution:=optional,
+              org.springframework.transaction*;resolution:=optional,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.drools.container.spring*,
+              org.drools.grid*
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
