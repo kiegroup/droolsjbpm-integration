@@ -9,7 +9,7 @@
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>features</artifactId>
+  <artifactId>drools-karaf-features</artifactId>
 
   <name>Drools :: Karaf Features</name>
 

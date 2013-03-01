@@ -19,7 +19,7 @@ Start Fuse ESB or Apache Karaf
 
 In the console, use the following commands
 
-    features:addurl mvn:org.drools/features/6.0.0-SNAPSHOT/xml/features
+    features:addurl mvn:org.drools/drools-karaf-features/6.0.0-SNAPSHOT/xml/features
     features:install drools-module
     features:install drools-camel
     features:install drools-camel-example

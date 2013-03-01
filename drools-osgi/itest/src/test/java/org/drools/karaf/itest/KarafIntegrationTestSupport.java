@@ -102,7 +102,7 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
         for (String feature : features) {
             result.add(feature);
         }
-        return scanFeatures(getFeatureUrl("org.drools", "features").type("xml/features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
+        return scanFeatures(getFeatureUrl("org.drools", "drools-karaf-features").type("xml/features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
     }
 
 }
