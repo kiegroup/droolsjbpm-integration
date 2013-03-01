@@ -16,7 +16,7 @@
   <name>Drools :: OSGI Parent project</name>
 
   <modules>
-    <module>bundles</module>
+    <module>drools-osgi-uber-workaround</module>
     <module>drools-karaf-features</module>
     <module>drools-osgi-examples</module>
     <module>drools-karaf-itest</module>

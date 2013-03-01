@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.drools</groupId>
-    <artifactId>bundles</artifactId>
+    <artifactId>drools-osgi-uber-workaround</artifactId>
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
