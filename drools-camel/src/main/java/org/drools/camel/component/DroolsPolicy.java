@@ -90,7 +90,7 @@ public class DroolsPolicy implements Policy {
                                     Set visited) {
         if ( !nav.getOutputs().isEmpty() ) {
 
-            List<ProcessorDefinition> outputs = nav.getOutputs();
+            List<ProcessorDefinition<?>> outputs = nav.getOutputs();
             for ( int i = 0; i < outputs.size(); i++ ) {
                 ProcessorDefinition child = outputs.get( i );//it.next();
                 if ( child instanceof ToDefinition ) {
@@ -134,7 +134,7 @@ public class DroolsPolicy implements Policy {
                 }
             }
 
-            for ( Iterator<ProcessorDefinition> it = nav.getOutputs().iterator(); it.hasNext(); ) {
+            for ( Iterator<ProcessorDefinition<?>> it = nav.getOutputs().iterator(); it.hasNext(); ) {
                 ProcessorDefinition child = it.next();
                 augmentNodes( routeContext,
                               child,
@@ -178,7 +178,7 @@ public class DroolsPolicy implements Policy {
 
     private ToDefinition getDroolsNode(ProcessorDefinition nav) {
         if ( !nav.getOutputs().isEmpty() ) {
-            List<ProcessorDefinition> children = nav.getOutputs();
+            List<ProcessorDefinition<?>> children = nav.getOutputs();
             for ( ProcessorDefinition child : children ) {
                 if ( child instanceof ToDefinition ) {
                     ToDefinition to = (ToDefinition) child;
