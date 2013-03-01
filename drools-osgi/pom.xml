@@ -15,9 +15,22 @@
 
   <name>Drools :: OSGI Parent project</name>
 
+  <properties>
+    <aries.jpa.version>1.0.1</aries.jpa.version>
+    <antlr-bundle.version>3.5_1</antlr-bundle.version>
+    <jexcelapi.version>2.6.12</jexcelapi.version>
+    <quartz-bundle.version>2.1.6_1</quartz-bundle.version>
+    <javax-inject.version>1.0</javax-inject.version>
+    <protobuf-google-bundle.version>2.4.1_1</protobuf-google-bundle.version>
+    <eclipse-jdt.version>4.2.1</eclipse-jdt.version>
+    <janino.version>2.6.1</janino.version>
+    <xstream-bundle.version>1.4.3_1</xstream-bundle.version>
+    <woodstock-bundle.version>3.2.9_3</woodstock-bundle.version>
+  </properties>
+
   <modules>
     <!-- drools-osgi-uber-workaround is disabled because it doesn't build -->
-    <!--<module>drools-osgi-uber-workaround</module>-->
+    <module>drools-osgi-uber-workaround</module>
     <module>drools-karaf-features</module>
     <module>drools-osgi-examples</module>
     <module>drools-karaf-itest</module>
