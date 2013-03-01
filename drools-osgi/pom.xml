@@ -12,6 +12,7 @@
 
   <artifactId>drools-osgi</artifactId>
   <packaging>pom</packaging>
+
   <name>Drools :: OSGI Parent project</name>
 
   <modules>
