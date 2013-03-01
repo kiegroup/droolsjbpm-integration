@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="camel-drools-example-6.0.0-SNAPSHOT"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
+
+  <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
+  <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
+
+  <feature name="drools-common" version="${drools.version}" description="Drools Commons">
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.protobuf-java/${protobuf-google-bundle.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${antlr-bundle.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.woodstox/${woodstock-bundle.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${xstream-bundle.version}</bundle>
+    <bundle>mvn:org.mvel/mvel2/${mvel.dep.version}</bundle>
+    <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${eclipse-jdt.version}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${eclipse-jdt.version}</bundle>
+    <bundle>wrap:mvn:org.codehaus.janino/janino/${janino.version}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${janino.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${quartz-bundle.version}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${javax-inject.version}</bundle>
+    <bundle>wrap:mvn:javax.enterprise/cdi-api/1.0-SP4</bundle>
+  </feature>
+
+  <feature name="drools-module" version="${drools.version}" description="Drools Module containing core, compiler &amp; KIE">
+    <feature version="${drools.version}">drools-common</feature>
+    <!-- Should be removed after refactoring of drools-spring packages -->
+    <feature version="${drools.version}">drools-spring</feature>
+    <bundle>mvn:org.drools/drools-uber/${drools.version}</bundle>
+  </feature>
+
+  <!-- DOES NOT WORK AS WE HAVE PACKAGING ISSUES WITH KIE
+  <repository name="drools-core-compiler" version="${drools.version}" description="Drools core &amp; compiler">
+      <repository version="${drools.version}">drools-common</repository>
+      <repository version="${drools.version}">drools-kie</repository>
+      <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
+      <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
+  </repository>
+
+  <repository name="drools-kie" version="${drools.version}">
+      <bundle>mvn:org.kie/kie-api/${drools.version}</bundle>
+      <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
+  </repository>
+
+  <repository name="drools-kieuber" version="${drools.version}">
+      <bundle>mvn:org.drools/kie-uber/${drools.version}</bundle>
+  </repository>
+  -->
+
+  <!-- NOT SURE THAT IT IS REQUIRED
+  <repository name="drools-knowledge" version="${drools.version}">
+      <bundle>mvn:org.kie/knowledge-api/${drools.version}</bundle>
+      <bundle>mvn:org.kie/knowledge-internal-api/${drools.version}</bundle>
+  </repository>
+  -->
+
+  <feature name="drools-spring" version="${drools.version}" description="Drools Spring">
+    <feature version="[3.0,4.0)">spring</feature>
+    <bundle>mvn:org.drools/drools-spring/${drools.version}</bundle>
+  </feature>
+
+  <feature name="drools-camel" version="${drools.version}" description="Drools Camel">
+    <feature version="${drools.version}">drools-module</feature>
+    <feature version="${camel.version}">camel</feature>
+    <feature version="${camel.version}">camel-cxf</feature>
+    <feature version="[2.6,3.0)">cxf-specs</feature>
+    <feature version="[2.6,3.0)">cxf-core</feature>
+    <feature version="[2.6,3.0)">cxf-jaxrs</feature>
+    <bundle>mvn:org.drools/drools-camel/${drools.version}</bundle>
+  </feature>
+
+  <feature name="drools-decisiontables" description="Drools Decision Tables" version="5.5.0.Final">
+    <feature version="${drools.version}">drools-module</feature>
+    <bundle dependency="true">wrap:mvn:net.sourceforge.jexcelapi/jxl/${jexcelapi.version}</bundle>
+    <bundle>mvn:org.drools/drools-decisiontables/${drools.version}</bundle>
+  </feature>
+
+  <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
+    <feature version="${project.version}">drools-module</feature>
+    <feature version="[3.0,4.0)">spring-orm</feature>
+    <feature version="${aries.jpa.version}">jpa</feature>
+    <bundle>mvn:org.drools/drools-persistence-jpa/${drools.version}</bundle>
+  </feature>
+
+  <feature name="drools-camel-example" version="${drools.version}" description="Drools Camel Spring Example">
+    <feature version="${drools.version}">drools-module</feature>
+    <feature version="${drools.version}">drools-spring</feature>
+    <feature version="${drools.version}">drools-camel</feature>
+    <bundle>mvn:org.drools/drools-osgi-examples/${drools.version}</bundle>
+  </feature>
+
+
+</features>
