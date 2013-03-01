@@ -9,10 +9,10 @@
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-uber</artifactId>
+  <artifactId>drools-compiler-uber-workaround</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Drools :: Core &amp; compiler uber bundle</name>
+  <name>Drools :: OSGi Core &amp; compiler uber bundle</name>
 
   <dependencies>
     <dependency>

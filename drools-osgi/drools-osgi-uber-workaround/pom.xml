@@ -19,7 +19,7 @@
 
   <modules>
     <module>kie-internal-uber-workaround</module>
-    <module>drools-uber</module>
+    <module>drools-compiler-uber-workaround</module>
   </modules>
 
 </project>

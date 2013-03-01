@@ -24,7 +24,7 @@
     <feature version="${drools.version}">drools-common</feature>
     <!-- Should be removed after refactoring of drools-spring packages -->
     <feature version="${drools.version}">drools-spring</feature>
-    <bundle>mvn:org.drools/drools-uber/${drools.version}</bundle>
+    <bundle>mvn:org.drools/drools-compiler-uber-workaround/${drools.version}</bundle>
   </feature>
 
   <!-- DOES NOT WORK AS WE HAVE PACKAGING ISSUES WITH KIE

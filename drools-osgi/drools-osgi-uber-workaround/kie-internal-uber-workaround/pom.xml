@@ -13,7 +13,7 @@
   <artifactId>kie-internal-uber-workaround</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Drools :: KIE API &amp; Internal uber bundle</name>
+  <name>Drools :: OSGi KIE API &amp; Internal uber bundle</name>
 
   <dependencies>
     <dependency>
