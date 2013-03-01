@@ -11,24 +11,22 @@ To run this project use
 
     mvn camel:run
 
-To deploy this project into [Fuse ESB](http://fusesource.com/downloads)
+To deploy this project into [Fuse ESB](http://fusesource.com/downloads) or [Apache Karaf](http://karaf.apache.org/index/community/download.html)
 
-Start Fuse ESB
+Start Fuse ESB or Apache Karaf
 
-    <Fuse ESB Home>/bin/fuseesb
+    <Fuse ESB Home>/bin/fuseesb  or <Karaf Home>/bin/karaf
 
-In the Fuse ESB console, use the following commands
+In the console, use the following commands
 
-    FuseESB:karaf@root>
-    features:addurl mvn:org.drools.karaf/drools/6.0.0-SNAPSHOT/xml/features
+    features:addurl mvn:org.drools/features/6.0.0-SNAPSHOT/xml/features
     features:install drools-module
-    features:install drools-spring
     features:install drools-camel
     features:install drools-camel-example
 
 To see the results tail the Fuse ESB log
 
-    tail -f <Fuse ESB Home>/data/log/fuseesb.log
+    tail -f <Fuse ESB Home> or <Karaf Home>/data/log/fuseesb.log
     
     2013-02-22 17:52:51,192 | INFO  | imer://testRoute | Home  | ... | Person Young Person is staying home
     2013-02-22 17:52:52,133 | INFO  | imer://testRoute | Bar   | ... | Person Old Person can go to the bar

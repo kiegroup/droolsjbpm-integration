@@ -16,10 +16,12 @@
 
 package org.drools.karaf.itest;
 
+import java.io.File;
+
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.drools.camel.example.Person;
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
+import org.drools.camel.example.Person;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.MavenUtils;
@@ -30,10 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
-import java.io.File;
-
 import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
-import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(JUnit4TestRunner.class)
 public class DroolsOnBodyCamelKarafTest extends OSGiIntegrationSpringTestSupport {
@@ -86,11 +86,10 @@ public class DroolsOnBodyCamelKarafTest extends OSGiIntegrationSpringTestSupport
                 loadCamelFeatures("camel-cxf"),
 
                 // Load drools-module (= core + compiler + knowledge), drools-camel & drools-spring
-                loadDroolsFeatures("drools-camel","drools-spring")
+                loadDroolsFeatures("drools-camel", "drools-spring")
 
         };
 
     }
-
 
 }

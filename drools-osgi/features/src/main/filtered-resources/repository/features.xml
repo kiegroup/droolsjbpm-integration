@@ -12,7 +12,7 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${antlr-bundle.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.woodstox/${woodstock-bundle.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${xstream-bundle.version}</bundle>
-    <bundle>mvn:org.mvel/mvel2/${mvel.version}</bundle>
+    <bundle>mvn:org.mvel/mvel2/${mvel.dep.version}</bundle>
     <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${eclipse-jdt.version}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${eclipse-jdt.version}</bundle>
     <bundle>wrap:mvn:org.codehaus.janino/janino/${janino.version}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${janino.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${quartz-bundle.version}</bundle>
@@ -24,36 +24,36 @@
     <feature version="${drools.version}">drools-common</feature>
     <!-- Should be removed after refactoring of drools-spring packages -->
     <feature version="${drools.version}">drools-spring</feature>
-    <bundle>mvn:org.drools.karaf/drools-component/${drools.version}</bundle>
+    <bundle>mvn:org.drools/drools-uber/${drools.version}</bundle>
   </feature>
 
   <!-- DOES NOT WORK AS WE HAVE PACKAGING ISSUES WITH KIE
-  <feature name="drools-core-compiler" version="${drools.version}" description="Drools core &amp; compiler">
-      <feature version="${drools.version}">drools-common</feature>
-      <feature version="${drools.version}">drools-kie</feature>
+  <repository name="drools-core-compiler" version="${drools.version}" description="Drools core &amp; compiler">
+      <repository version="${drools.version}">drools-common</repository>
+      <repository version="${drools.version}">drools-kie</repository>
       <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
       <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
-  </feature>
+  </repository>
 
-  <feature name="drools-kie" version="${drools.version}">
+  <repository name="drools-kie" version="${drools.version}">
       <bundle>mvn:org.kie/kie-api/${drools.version}</bundle>
       <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
-  </feature>
+  </repository>
 
-  <feature name="drools-kieuber" version="${drools.version}">
-      <bundle>mvn:org.drools.karaf/kie-uber/${drools.version}</bundle>
-  </feature>
+  <repository name="drools-kieuber" version="${drools.version}">
+      <bundle>mvn:org.drools/kie-uber/${drools.version}</bundle>
+  </repository>
   -->
 
   <!-- NOT SURE THAT IT IS REQUIRED
-  <feature name="drools-knowledge" version="${drools.version}">
+  <repository name="drools-knowledge" version="${drools.version}">
       <bundle>mvn:org.kie/knowledge-api/${drools.version}</bundle>
       <bundle>mvn:org.kie/knowledge-internal-api/${drools.version}</bundle>
-  </feature>
+  </repository>
   -->
 
   <feature name="drools-spring" version="${drools.version}" description="Drools Spring">
-    <feature version="${spring.version}">spring</feature>
+    <feature version="[3.0,4.0)">spring</feature>
     <bundle>mvn:org.drools/drools-spring/${drools.version}</bundle>
   </feature>
 
@@ -84,7 +84,7 @@
     <feature version="${drools.version}">drools-module</feature>
     <feature version="${drools.version}">drools-spring</feature>
     <feature version="${drools.version}">drools-camel</feature>
-    <bundle>mvn:org.drools.karaf/drools-example/${drools.version}</bundle>
+    <bundle>mvn:org.drools/drools-osgi-examples/${drools.version}</bundle>
   </feature>
 
 

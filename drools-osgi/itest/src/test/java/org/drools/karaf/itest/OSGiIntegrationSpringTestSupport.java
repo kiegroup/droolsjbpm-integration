@@ -23,6 +23,7 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 public abstract class OSGiIntegrationSpringTestSupport extends KarafIntegrationTestSupport {
 
     protected OsgiBundleXmlApplicationContext applicationContext;
+
     protected abstract OsgiBundleXmlApplicationContext createApplicationContext();
 
     @Override

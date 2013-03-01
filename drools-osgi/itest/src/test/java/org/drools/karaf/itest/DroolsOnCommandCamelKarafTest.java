@@ -113,11 +113,10 @@ public class DroolsOnCommandCamelKarafTest extends OSGiIntegrationSpringTestSupp
                 loadCamelFeatures("camel-cxf"),
 
                 // Load drools-module (= core + compiler + knowledge), drools-camel & drools-spring
-                loadDroolsFeatures("drools-camel","drools-spring")
+                loadDroolsFeatures("drools-camel", "drools-spring")
 
         };
 
     }
-
 
 }

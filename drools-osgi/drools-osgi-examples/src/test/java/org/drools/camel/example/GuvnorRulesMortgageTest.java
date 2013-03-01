@@ -5,9 +5,9 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelSpringJUnit4ClassRunner;
-import org.drools.KnowledgeBase;
-import org.drools.definition.type.FactType;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.KnowledgeBase;
+import org.kie.definition.type.FactType;
+import org.kie.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.impl.ExecutionResultImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
-
 
 @RunWith(CamelSpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:META-INF/spring/test-mortgage-context.xml"})

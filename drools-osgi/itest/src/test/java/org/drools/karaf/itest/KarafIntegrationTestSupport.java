@@ -77,7 +77,7 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
 
     public static UrlReference getCamelKarafFeatureUrl(String version) {
         String type = "xml/features";
-        MavenArtifactProvisionOption mavenOption = getFeatureUrl("org.apache.camel.karaf","apache-camel");
+        MavenArtifactProvisionOption mavenOption = getFeatureUrl("org.apache.camel.karaf", "apache-camel");
         if (version == null) {
             return mavenOption.versionAsInProject().type(type);
         } else {
@@ -102,8 +102,7 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
         for (String feature : features) {
             result.add(feature);
         }
-        return scanFeatures(getFeatureUrl("org.drools.karaf","drools").type("xml/features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
+        return scanFeatures(getFeatureUrl("org.drools", "features").type("xml/features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
     }
-
 
 }
