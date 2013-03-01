@@ -18,8 +18,8 @@
   <description>These uber-workaround bundles are a temporary workaround to the split packages problem.</description>
 
   <modules>
+    <module>kie-internal-uber-workaround</module>
     <module>drools-uber</module>
-    <module>kie-uber</module>
   </modules>
 
 </project>

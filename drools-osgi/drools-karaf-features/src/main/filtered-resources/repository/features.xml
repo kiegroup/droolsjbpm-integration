@@ -41,7 +41,7 @@
   </repository>
 
   <repository name="drools-kieuber" version="${drools.version}">
-      <bundle>mvn:org.drools/kie-uber/${drools.version}</bundle>
+      <bundle>mvn:org.drools/kie-internal-uber-workaround/${drools.version}</bundle>
   </repository>
   -->
 
