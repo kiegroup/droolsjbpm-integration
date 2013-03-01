@@ -10,10 +10,12 @@
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
+  <!--- TODO remove this directory when split packages issue is fixed: https://issues.jboss.org/browse/DROOLS-57-->
   <artifactId>drools-osgi-uber-workaround</artifactId>
   <packaging>pom</packaging>
 
   <name>Drools :: OSGi Uber workaround bundles</name>
+  <description>These uber-workaround bundles are a temporary workaround to the split packages problem.</description>
 
   <modules>
     <module>drools-uber</module>
