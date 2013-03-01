@@ -1,0 +1,20 @@
+declare A
+@propertyReactive
+  a1 : int
+  a2 : int
+end
+
+rule Init salience 100
+when
+then
+    for (int i = 0; i < 1000000; i++) {
+        insert( new A(1, 1) );
+    }
+end
+
+rule R1
+when
+    $a: A( a1 < 10 )
+then
+    modify( $a ) { setA2( $a.getA1() + 1 ) };
+end
