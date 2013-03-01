@@ -15,8 +15,6 @@
   <name>Drools :: Karaf Features</name>
 
   <build>
-    <defaultGoal>install</defaultGoal>
-
     <resources>
       <resource>
         <directory>${project.basedir}/src/main/filtered-resources</directory>
