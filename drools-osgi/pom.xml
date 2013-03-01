@@ -19,7 +19,7 @@
     <module>bundles</module>
     <module>drools-karaf-features</module>
     <module>drools-osgi-examples</module>
-    <module>itest</module>
+    <module>drools-karaf-itest</module>
   </modules>
 
 </project>
