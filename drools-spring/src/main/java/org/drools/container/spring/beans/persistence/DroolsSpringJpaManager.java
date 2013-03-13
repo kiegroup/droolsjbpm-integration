@@ -145,7 +145,7 @@ public class DroolsSpringJpaManager
     }
 
     public ProcessPersistenceContext getProcessPersistenceContext() {
-        return new JpaProcessPersistenceContext( appScopedEntityManager );
+        return new JpaProcessPersistenceContext( (EntityManager) this.env.get( EnvironmentName.CMD_SCOPED_ENTITY_MANAGER ) );
     }
 
     public void clearPersistenceContext() {
