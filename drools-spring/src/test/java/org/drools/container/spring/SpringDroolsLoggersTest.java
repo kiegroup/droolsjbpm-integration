@@ -23,9 +23,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.audit.ThreadedWorkingMemoryFileLogger;
-import org.drools.audit.WorkingMemoryConsoleLogger;
-import org.drools.audit.WorkingMemoryFileLogger;
+import org.drools.core.audit.ThreadedWorkingMemoryFileLogger;
+import org.drools.core.audit.WorkingMemoryConsoleLogger;
+import org.drools.core.audit.WorkingMemoryFileLogger;
 import org.drools.container.spring.beans.KnowledgeLoggerAdaptor;
 import org.drools.impl.StatefulKnowledgeSessionImpl;
 import org.drools.impl.StatelessKnowledgeSessionImpl;
