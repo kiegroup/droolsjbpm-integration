@@ -82,7 +82,7 @@
     </drools:object-marshalling-strategies>
   </drools:environment>
 
-  <bean id="default-acceptor" class="org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+  <bean id="default-acceptor" class="org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
     <constructor-arg>
       <list>
         <value>*.*</value>

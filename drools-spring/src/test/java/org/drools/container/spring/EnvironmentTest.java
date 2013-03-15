@@ -21,8 +21,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.kie.marshalling.ObjectMarshallingStrategy;
-import org.drools.marshalling.impl.IdentityPlaceholderResolverStrategy;
-import org.drools.marshalling.impl.SerializablePlaceholderResolverStrategy;
+import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
+import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;

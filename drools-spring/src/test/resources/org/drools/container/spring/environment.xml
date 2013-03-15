@@ -73,7 +73,7 @@
     <drools:object-marshalling-strategies>
       <drools:serializable-placeholder-resolver-strategy>
         <drools:strategy-acceptor>
-          <bean class="org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+          <bean class="org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
             <constructor-arg>
               <list>
                 <value>*.*</value>
@@ -133,7 +133,7 @@
 
   </drools:environment>
 
-  <bean id="default-acceptor" class="org.drools.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+  <bean id="default-acceptor" class="org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
     <constructor-arg>
       <list>
         <value>*.*</value>
