@@ -21,9 +21,9 @@
     <property name="entityManagerFactory" ref="myEmf" />
   </bean>
 
-  <bean id="my-globals" class="org.drools.base.MapGlobalResolver"/>
+  <bean id="my-globals" class="org.drools.core.base.MapGlobalResolver"/>
   <bean id="my-date-formats" class="org.drools.type.DateFormatsImpl"/>
-  <bean id="my-calendars" class="org.drools.base.CalendarsImpl"/>
+  <bean id="my-calendars" class="org.drools.core.base.CalendarsImpl"/>
 
   <bean id="mock-custom-strategy" class="org.drools.container.spring.MockObjectMarshallingStrategy"/>
 
@@ -59,7 +59,7 @@
     </drools:transaction-manager>
 
     <drools:globals>
-      <bean class="org.drools.base.MapGlobalResolver"/>
+      <bean class="org.drools.core.base.MapGlobalResolver"/>
     </drools:globals>
 
     <drools:date-formats>
@@ -67,7 +67,7 @@
     </drools:date-formats>
 
     <drools:calendars>
-      <bean class="org.drools.base.CalendarsImpl"/>
+      <bean class="org.drools.core.base.CalendarsImpl"/>
     </drools:calendars>
 
     <drools:object-marshalling-strategies>

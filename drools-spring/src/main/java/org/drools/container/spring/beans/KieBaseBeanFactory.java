@@ -16,7 +16,7 @@
 
 package org.drools.container.spring.beans;
 
-import org.drools.base.evaluators.EvaluatorDefinition;
+import org.drools.core.base.evaluators.EvaluatorDefinition;
 import org.drools.grid.GridNode;
 import org.kie.KieBase;
 import org.kie.KnowledgeBase;

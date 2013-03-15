@@ -5,7 +5,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.kie.KieBase;
 import org.kie.KnowledgeBaseFactory;
-import org.drools.base.MapGlobalResolver;
+import org.drools.core.base.MapGlobalResolver;
 import org.kie.runtime.EnvironmentName;
 import org.kie.runtime.KieSession;
 import org.kie.persistence.jpa.KieStoreServices;

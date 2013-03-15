@@ -57,7 +57,7 @@
   </drools:ksession>
 
   <!-- additions for environment -->
-  <bean id="globals" class="org.drools.base.MapGlobalResolver"/>
+  <bean id="globals" class="org.drools.core.base.MapGlobalResolver"/>
 
   <drools:environment id="env">
     <drools:entity-manager-factory ref="myEmf"/>
@@ -74,7 +74,7 @@
     <drools:entity-manager-factory ref="myEmf"/>
     <drools:transaction-manager ref="txManager"/>
     <drools:globals>
-      <bean class="org.drools.base.MapGlobalResolver"/>
+      <bean class="org.drools.core.base.MapGlobalResolver"/>
     </drools:globals>
 
     <drools:object-marshalling-strategies>

@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactoryService;
-import org.drools.base.evaluators.EvaluatorDefinition;
+import org.drools.core.base.evaluators.EvaluatorDefinition;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderErrors;
 import org.kie.builder.KnowledgeBuilderFactory;
