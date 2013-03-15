@@ -76,10 +76,10 @@ command.getCommands().add(fireAllRulesCommand);</programlisting>
 
           <programlisting language="xml">&lt;batch-execution lookup="ksession1"&gt;
   &lt;insert&gt;
-    &lt;org.drools.test.Person&gt;
+    &lt;org.drools.compiler.test.Person&gt;
       &lt;name&gt;john&lt;/name&gt;
       &lt;age&gt;25&lt;/age&gt;
-    &lt;/org.drools.test.Person&gt;
+    &lt;/org.drools.compiler.test.Person&gt;
   &lt;/insert&gt;
   &lt;fire-all-rules/&gt;
 &lt;/batch-execution&gt;</programlisting>
@@ -90,7 +90,7 @@ command.getCommands().add(fireAllRulesCommand);</programlisting>
         <listitem>
           <para>JSON</para>
 
-          <programlisting>{"batch-execution":{"lookup":"ksession1","commands":[{"insert":{"object":{"org.drools.test.Person":{"name":"john","age":25}}}},{"fire-all-rules":""}]}} </programlisting>
+          <programlisting>{"batch-execution":{"lookup":"ksession1","commands":[{"insert":{"object":{"org.drools.compiler.test.Person":{"name":"john","age":25}}}},{"fire-all-rules":""}]}} </programlisting>
 
           <para></para>
         </listitem>

@@ -71,7 +71,7 @@
   </itemizedlist>
 
   <note>
-      <para>In the next snippets code we are going to use a POJO org.drools.test.Person that has two fields</para>
+      <para>In the next snippets code we are going to use a POJO org.drools.compiler.test.Person that has two fields</para>
 
       <itemizedlist>
         <listitem>

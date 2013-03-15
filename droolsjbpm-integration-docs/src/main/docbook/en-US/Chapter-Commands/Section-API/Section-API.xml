@@ -99,7 +99,7 @@ kbuilder.add(ResourceFactory.newClassPathResource("person.xsd", getClass()), Res
 KnowledgeBase kbase = kbuilder.newKnowledgeBase();
 
 List&lt;String&gt; classesName = new ArrayList&lt;String&gt;();
-classesName.add("org.drools.test.Person");
+classesName.add("org.drools.compiler.test.Person");
    
 JAXBContext jaxbContext = KnowledgeBuilderHelper.newJAXBContext(classesName.toArray(new String[classesName.size()]), kbase);</programlisting>
     </section>
@@ -122,7 +122,7 @@ JAXBContext jaxbContext = KnowledgeBuilderHelper.newJAXBContext(classesName.toAr
       </orderedlist>
 
       <programlisting language="java">List&lt;String&gt; classNames = new ArrayList&lt;String&gt;();
-classNames.add("org.drools.test.Person");
+classNames.add("org.drools.compiler.test.Person");
 JAXBContext jaxbContext = DroolsJaxbHelperProviderImpl.createDroolsJaxbContext(classNames, null);
 Marshaller marshaller = jaxbContext.createMarshaller();</programlisting>
 

@@ -101,14 +101,14 @@ BatchExecutionCommand command = CommandFactory.createBatchExecution(cmds, "ksess
 
           <programlisting language="xml">&lt;batch-execution lookup="ksession1"&gt;
   &lt;insert-elements&gt;
-    &lt;org.drools.test.Person&gt;
+    &lt;org.drools.compiler.test.Person&gt;
       &lt;name&gt;john&lt;/name&gt;
       &lt;age&gt;25&lt;/age&gt;
-    &lt;/org.drools.test.Person&gt;
-    &lt;org.drools.test.Person&gt;
+    &lt;/org.drools.compiler.test.Person&gt;
+    &lt;org.drools.compiler.test.Person&gt;
       &lt;name&gt;sarah&lt;/name&gt;
       &lt;age&gt;35&lt;/age&gt;
-    &lt;/org.drools.test.Person&gt;
+    &lt;/org.drools.compiler.test.Person&gt;
   &lt;/insert-elements&gt;
 &lt;/batch-execution&gt;</programlisting>
 
@@ -117,7 +117,7 @@ BatchExecutionCommand command = CommandFactory.createBatchExecution(cmds, "ksess
         <listitem>
           <para>JSON</para>
 
-          <programlisting>{"batch-execution":{"lookup":"ksession1","commands":{"insert-elements":{"objects":[{"containedObject":{"@class":"org.drools.test.Person","name":"john","age":25}},{"containedObject":{"@class":"org.drools.test.Person","name":"sarah","age":35}}]}}}} </programlisting>
+          <programlisting>{"batch-execution":{"lookup":"ksession1","commands":{"insert-elements":{"objects":[{"containedObject":{"@class":"org.drools.compiler.test.Person","name":"john","age":25}},{"containedObject":{"@class":"Person","name":"sarah","age":35}}]}}}} </programlisting>
 
         </listitem>
 
