@@ -58,7 +58,7 @@
               !org.drools*,
               org.drools.grid,
               org.drools.grid.impl,
-              <!-- TODO To be investigated as this package is required by org.drools.builder.conf.impl
+              <!-- TODO To be investigated as this package is required by org.drools.core.builder.conf.impl
               org.kie.process;resolution:=optional,
                -->
               <!-- Required for CDI stuffs -->

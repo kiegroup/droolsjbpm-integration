@@ -41,7 +41,7 @@
             <Import-Package>
               !org.kie*,
               com.sun.tools.xjc*;resolution:=optional,
-              org.drools.builder.impl,
+              org.drools.core.builder.impl,
               org.drools.impl,
               *
             </Import-Package>

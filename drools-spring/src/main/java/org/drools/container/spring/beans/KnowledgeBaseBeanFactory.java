@@ -34,7 +34,7 @@ import org.kie.io.ResourceType;
 import org.kie.runtime.rule.AccumulateFunction;
 import org.kie.builder.conf.AccumulateFunctionOption;
 import org.kie.builder.conf.EvaluatorOption;
-import org.drools.builder.conf.impl.JaxbConfigurationImpl;
+import org.drools.core.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.compiler.compiler.PackageBuilderConfiguration;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridNodeImpl;
