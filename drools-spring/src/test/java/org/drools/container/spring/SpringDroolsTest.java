@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.ClockType;
-import org.drools.Person;
 import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.SessionConfiguration;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.helper;
+package org.drools.container.spring.helper;
 
 import java.io.File;
 

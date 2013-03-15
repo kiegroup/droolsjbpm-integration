@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools;
+package org.drools.container.spring;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
