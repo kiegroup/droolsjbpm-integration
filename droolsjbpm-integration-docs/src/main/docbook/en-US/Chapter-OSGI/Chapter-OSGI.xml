@@ -96,7 +96,7 @@
 &lt;reference bind="setKnowledgeBuilderFactoryService"
            unbind="unsetKnowledgeBuilderFactoryService"
            interface="org.drools.builder.KnowledgeBuilderFactoryService"
-           target="(org.drools.compiler.DecisionTableProvider=true)"  /&gt;          
+           target="(org.drools.compiler.compiler.DecisionTableProvider=true)"  /&gt;
 &lt;/scr:component&gt;</programlisting>
   </example>
 

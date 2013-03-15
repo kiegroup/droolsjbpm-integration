@@ -28,7 +28,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
 
-import org.drools.compiler.PackageBuilder;
+import org.drools.compiler.compiler.PackageBuilder;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
