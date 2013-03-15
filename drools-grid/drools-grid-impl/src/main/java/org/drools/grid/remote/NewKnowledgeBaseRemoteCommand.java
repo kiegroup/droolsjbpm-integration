@@ -16,7 +16,7 @@
 
 package org.drools.grid.remote;
 
-import org.drools.command.impl.GenericCommand;
+import org.drools.core.command.impl.GenericCommand;
 import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;

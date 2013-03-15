@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.core.command.KnowledgeContextResolveFromContextCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;

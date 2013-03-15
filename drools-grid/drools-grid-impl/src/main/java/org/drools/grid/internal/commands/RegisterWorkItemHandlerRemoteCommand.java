@@ -20,8 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.impl.KnowledgeCommandContext;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.kie.command.Context;
 import org.kie.runtime.KnowledgeRuntime;
 import org.kie.runtime.StatefulKnowledgeSession;

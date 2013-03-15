@@ -18,7 +18,7 @@ package org.drools.grid.internal.commands;
 import java.io.Serializable;
 
 import org.drools.RuleBaseConfiguration;
-import org.drools.command.impl.GenericCommand;
+import org.drools.core.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeBaseConfigurationRemoteClient;
 import org.kie.KieBaseConfiguration;
 import org.kie.command.Context;

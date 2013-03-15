@@ -23,8 +23,8 @@ package org.drools.grid.remote.command;
  */
 
 import org.drools.WorkingMemoryEntryPoint;
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.impl.KnowledgeCommandContext;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.kie.command.Context;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.SessionEntryPoint;

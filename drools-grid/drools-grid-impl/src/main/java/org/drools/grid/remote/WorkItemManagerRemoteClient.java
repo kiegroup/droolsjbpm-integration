@@ -5,9 +5,9 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.runtime.process.AbortWorkItemCommand;
-import org.drools.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.core.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.core.command.runtime.process.AbortWorkItemCommand;
+import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.RegisterWorkItemHandlerRemoteCommand;

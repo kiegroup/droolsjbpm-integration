@@ -20,9 +20,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.command.GetVariableCommand;
-import org.drools.command.NewKieSessionCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
+import org.drools.core.command.GetVariableCommand;
+import org.drools.core.command.NewKieSessionCommand;
+import org.drools.core.command.SetVariableCommandFromLastReturn;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;

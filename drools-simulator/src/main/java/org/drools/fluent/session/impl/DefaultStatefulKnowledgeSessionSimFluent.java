@@ -16,18 +16,18 @@
 
 package org.drools.fluent.session.impl;
 
-import org.drools.command.GetVariableCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
-import org.drools.command.runtime.AddEventListenerCommand;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.process.CreateProcessInstanceCommand;
-import org.drools.command.runtime.process.SignalEventCommand;
-import org.drools.command.runtime.process.StartProcessCommand;
-import org.drools.command.runtime.process.StartProcessInstanceCommand;
-import org.drools.command.runtime.rule.DeleteCommand;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
-import org.drools.command.runtime.rule.UpdateCommand;
+import org.drools.core.command.GetVariableCommand;
+import org.drools.core.command.SetVariableCommandFromLastReturn;
+import org.drools.core.command.runtime.AddEventListenerCommand;
+import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.process.CreateProcessInstanceCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
+import org.drools.core.command.runtime.rule.DeleteCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.drools.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.simulation.impl.DefaultSimulationFluent;

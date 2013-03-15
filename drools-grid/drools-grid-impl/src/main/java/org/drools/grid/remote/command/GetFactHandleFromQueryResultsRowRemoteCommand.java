@@ -16,7 +16,7 @@
 package org.drools.grid.remote.command;
 
 
-import org.drools.command.impl.GenericCommand;
+import org.drools.core.command.impl.GenericCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.common.EventFactHandle;
 import org.kie.command.Context;

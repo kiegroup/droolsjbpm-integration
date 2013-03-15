@@ -7,7 +7,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.drools.camel.testdomain.ChangeCollector;
 import org.drools.camel.testdomain.Cheese;
 import org.drools.camel.testdomain.Person;
-import org.drools.command.runtime.rule.ModifyCommand;
+import org.drools.core.command.runtime.rule.ModifyCommand;
 import org.drools.common.InternalFactHandle;
 import org.drools.common.InternalRuleBase;
 import org.drools.core.util.StringUtils;

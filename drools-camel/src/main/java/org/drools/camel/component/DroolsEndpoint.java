@@ -44,7 +44,7 @@ import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.impl.DefaultMessage;
 import org.apache.camel.spi.DataFormat;
-import org.drools.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
 import org.drools.impl.KnowledgeBaseImpl;

@@ -22,9 +22,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.builder.KnowledgeBuilderAddCommand;
-import org.drools.command.builder.KnowledgeBuilderGetErrorsCommand;
+import org.drools.core.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.core.command.builder.KnowledgeBuilderAddCommand;
+import org.drools.core.command.builder.KnowledgeBuilderGetErrorsCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;

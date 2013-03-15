@@ -2,10 +2,10 @@ package org.drools.camel.example;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 
 import java.util.List;
 

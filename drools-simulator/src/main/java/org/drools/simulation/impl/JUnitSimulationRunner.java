@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.command.impl.GenericCommand;
+import org.drools.core.command.impl.GenericCommand;
 import org.drools.simulation.impl.Simulator.CommandExecutionHandler;
 import org.junit.Test;
 import org.junit.runner.Description;

@@ -15,16 +15,16 @@
  */
 package org.drools.fluent.batch.imp;
 
-import org.drools.command.IdentifiableResult;
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.process.CreateProcessInstanceCommand;
-import org.drools.command.runtime.process.StartProcessCommand;
-import org.drools.command.runtime.process.StartProcessInstanceCommand;
-import org.drools.command.runtime.rule.DeleteCommand;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.IdentifiableResult;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.process.CreateProcessInstanceCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
+import org.drools.core.command.runtime.rule.DeleteCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.test.impl.MapVariableContext;
 import org.kie.command.BatchExecutionCommand;

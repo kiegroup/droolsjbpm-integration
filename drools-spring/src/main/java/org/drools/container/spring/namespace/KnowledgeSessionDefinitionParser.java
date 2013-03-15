@@ -22,12 +22,12 @@ import java.util.List;
 
 import org.drools.ClockType;
 import org.drools.SessionConfiguration;
-import org.drools.command.runtime.SetGlobalCommand;
-import org.drools.command.runtime.process.SignalEventCommand;
-import org.drools.command.runtime.process.StartProcessCommand;
-import org.drools.command.runtime.rule.FireAllRulesCommand;
-import org.drools.command.runtime.rule.FireUntilHaltCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.FireUntilHaltCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.container.spring.beans.KnowledgeAgentBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory;
 import org.drools.container.spring.beans.StatefulKnowledgeSessionBeanFactory.JpaConfiguration;

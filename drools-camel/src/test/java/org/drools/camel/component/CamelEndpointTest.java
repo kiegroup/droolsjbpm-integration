@@ -38,10 +38,10 @@ import java.util.List;
 import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
-import org.drools.command.runtime.rule.GetObjectCommand;
-import org.drools.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.rule.GetObjectCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.common.DefaultFactHandle;
 import org.drools.pipeline.camel.Person;
 import org.junit.Test;

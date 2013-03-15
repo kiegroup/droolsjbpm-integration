@@ -23,9 +23,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
-import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.KnowledgeContextResolveFromContextCommand;
-import org.drools.command.SetVariableCommandFromCommand;
+import org.drools.core.command.KnowledgeBaseAddKnowledgePackagesCommand;
+import org.drools.core.command.KnowledgeContextResolveFromContextCommand;
+import org.drools.core.command.SetVariableCommandFromCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;
 import org.drools.grid.io.ConversationManager;

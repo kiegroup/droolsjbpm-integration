@@ -19,8 +19,8 @@ package org.drools.grid.remote.command;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.impl.KnowledgeCommandContext;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.drools.common.InternalFactHandle;
 import org.kie.command.Context;
 import org.kie.runtime.StatefulKnowledgeSession;

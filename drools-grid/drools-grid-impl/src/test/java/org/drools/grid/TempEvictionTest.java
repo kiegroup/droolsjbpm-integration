@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.command.impl.ContextImplWithEviction;
+import org.drools.core.command.impl.ContextImplWithEviction;
 import org.drools.grid.impl.EvictionJob;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.grid.impl.GridNodeServer;

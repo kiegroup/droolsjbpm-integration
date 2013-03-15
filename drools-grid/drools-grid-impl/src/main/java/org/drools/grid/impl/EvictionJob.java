@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.drools.command.impl.ContextImplWithEviction;
+import org.drools.core.command.impl.ContextImplWithEviction;
 import org.drools.time.Job;
 import org.drools.time.JobContext;
 

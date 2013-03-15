@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.drools.command.SetVariableCommandFromCommand;
+import org.drools.core.command.SetVariableCommandFromCommand;
 import org.drools.grid.Grid;
 import org.drools.grid.GridNode;
 import org.drools.grid.GridServiceDescription;

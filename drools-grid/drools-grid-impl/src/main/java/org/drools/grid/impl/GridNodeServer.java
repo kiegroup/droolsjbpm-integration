@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.command.ResolvingKnowledgeCommandContext;
-import org.drools.command.impl.ContextImpl;
-import org.drools.command.impl.GenericCommand;
+import org.drools.core.command.ResolvingKnowledgeCommandContext;
+import org.drools.core.command.impl.ContextImpl;
+import org.drools.core.command.impl.GenericCommand;
 import org.drools.grid.GridNode;
 import org.drools.grid.io.Conversation;
 import org.drools.grid.io.Message;

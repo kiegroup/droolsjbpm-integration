@@ -16,9 +16,9 @@
 
 package org.drools.fluent.knowledge.impl;
 
-import org.drools.command.KnowledgeBaseAddKnowledgePackagesCommand;
-import org.drools.command.SetVariableCommandFromLastReturn;
-import org.drools.command.builder.KnowledgeBuilderAddCommand;
+import org.drools.core.command.KnowledgeBaseAddKnowledgePackagesCommand;
+import org.drools.core.command.SetVariableCommandFromLastReturn;
+import org.drools.core.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.fluent.knowledge.KnowledgeBaseSimFluent;
 import org.drools.fluent.simulation.SimulationFluent;
 import org.drools.fluent.test.impl.AbstractTestableFluent;

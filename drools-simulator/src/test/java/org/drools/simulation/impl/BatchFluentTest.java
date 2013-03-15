@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.fluent.batch.FluentBatchExecution;
 import org.drools.fluent.batch.imp.FluentBatchExecutionImpl;
 import org.drools.io.impl.ByteArrayResource;

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.model.dataformat.XStreamDataFormat;
-import org.drools.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.runtime.help.impl.XStreamXML.AbortWorkItemConverter;
 import org.drools.runtime.help.impl.XStreamXML.BatchExecutionResultConverter;
 import org.drools.runtime.help.impl.XStreamXML.CompleteWorkItemConverter;
