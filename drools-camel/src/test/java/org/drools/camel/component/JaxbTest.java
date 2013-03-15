@@ -40,7 +40,7 @@ import org.drools.command.runtime.GetGlobalCommand;
 import org.drools.command.runtime.SetGlobalCommand;
 import org.drools.command.runtime.rule.InsertObjectCommand;
 import org.drools.pipeline.camel.Person;
-import org.drools.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
+import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
