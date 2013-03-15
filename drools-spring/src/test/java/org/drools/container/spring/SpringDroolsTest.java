@@ -31,7 +31,7 @@ import org.drools.ClockType;
 import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.SessionConfiguration;
-import org.drools.common.InternalRuleBase;
+import org.drools.core.common.InternalRuleBase;
 import org.kie.KieBase;
 import org.kie.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;

@@ -40,7 +40,7 @@ import org.apache.camel.model.DataFormatDefinition;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.common.InternalFactHandle;
+import org.drools.core.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
 import org.junit.Test;
 import org.kie.runtime.ExecutionResults;

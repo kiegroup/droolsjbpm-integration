@@ -31,7 +31,7 @@ import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.common.InternalRuleBase;
+import org.drools.core.common.InternalRuleBase;
 import org.drools.impl.KnowledgeBaseImpl;
 import org.drools.reteoo.ReteooRuleBase;
 import org.junit.Test;
