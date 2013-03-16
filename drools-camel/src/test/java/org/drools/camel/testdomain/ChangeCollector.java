@@ -16,7 +16,7 @@
 
 package org.drools.camel.testdomain;
 
-import org.drools.xml.jaxb.util.JaxbListAdapter;
+import org.drools.core.xml.jaxb.util.JaxbListAdapter;
 import org.kie.event.rule.ObjectDeletedEvent;
 import org.kie.event.rule.ObjectInsertedEvent;
 import org.kie.event.rule.ObjectUpdatedEvent;
