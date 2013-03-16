@@ -26,7 +26,7 @@ import org.kie.event.process.ProcessEventListener;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.WorkingMemoryEventListener;
 import org.kie.marshalling.ObjectMarshallingStrategy;
-import org.drools.impl.EnvironmentFactory;
+import org.drools.core.impl.EnvironmentFactory;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.kie.persistence.jpa.JPAKnowledgeService;

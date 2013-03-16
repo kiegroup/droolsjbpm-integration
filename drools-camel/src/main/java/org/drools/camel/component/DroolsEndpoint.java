@@ -47,9 +47,9 @@ import org.apache.camel.spi.DataFormat;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
-import org.drools.impl.KnowledgeBaseImpl;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
-import org.drools.impl.StatelessKnowledgeSessionImpl;
+import org.drools.core.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
+import org.drools.core.impl.StatelessKnowledgeSessionImpl;
 import org.drools.reteoo.ReteooRuleBase;
 import org.kie.runtime.CommandExecutor;
 

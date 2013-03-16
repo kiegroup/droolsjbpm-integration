@@ -1,7 +1,5 @@
 package org.drools.benchmark;
 
-import org.drools.impl.StatelessKnowledgeSessionImpl;
-import org.drools.reteoo.ReteooWorkingMemory;
 import org.kie.KnowledgeBase;
 
 import java.util.concurrent.Callable;

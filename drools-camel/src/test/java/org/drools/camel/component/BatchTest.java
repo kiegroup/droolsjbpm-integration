@@ -13,7 +13,7 @@ import org.drools.core.common.InternalRuleBase;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.After;

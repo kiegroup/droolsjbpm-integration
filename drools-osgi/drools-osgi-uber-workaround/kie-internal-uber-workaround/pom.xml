@@ -42,7 +42,7 @@
               !org.kie*,
               com.sun.tools.xjc*;resolution:=optional,
               org.drools.core.builder.impl,
-              org.drools.impl,
+              org.drools.core.impl,
               *
             </Import-Package>
             <Embed-Dependency>

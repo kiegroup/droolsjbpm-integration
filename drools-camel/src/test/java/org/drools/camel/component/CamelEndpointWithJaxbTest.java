@@ -29,7 +29,7 @@ import org.drools.core.command.runtime.rule.InsertElementsCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.QueryCommand;
 import org.drools.core.common.DefaultFactHandle;
-import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.pipeline.camel.Person;
 import org.drools.reteoo.ReteooRuleBase;
 import org.drools.runtime.rule.impl.FlatQueryResults;

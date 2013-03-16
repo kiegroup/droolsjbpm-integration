@@ -29,7 +29,7 @@ import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.grid.remote.StatefulKnowledgeSessionRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.impl.StatefulKnowledgeSessionImpl;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.internal.utils.ServiceRegistry;
 import org.kie.internal.utils.ServiceRegistryImpl;
 import org.kie.runtime.StatefulKnowledgeSession;

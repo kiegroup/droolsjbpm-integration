@@ -27,7 +27,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.drools.impl.EnvironmentFactory;
+import org.drools.core.impl.EnvironmentFactory;
 import org.kie.marshalling.ObjectMarshallingStrategy;
 import org.kie.marshalling.ObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;

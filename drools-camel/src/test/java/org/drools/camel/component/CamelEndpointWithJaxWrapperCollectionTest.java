@@ -26,7 +26,7 @@ import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.pipeline.camel.Person;
 import org.drools.pipeline.camel.WrappedList;
 import org.drools.reteoo.ReteooRuleBase;

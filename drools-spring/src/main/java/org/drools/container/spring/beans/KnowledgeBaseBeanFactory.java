@@ -38,7 +38,7 @@ import org.drools.core.builder.conf.impl.JaxbConfigurationImpl;
 import org.drools.compiler.compiler.PackageBuilderConfiguration;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridNodeImpl;
-import org.drools.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.KnowledgeBaseImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
