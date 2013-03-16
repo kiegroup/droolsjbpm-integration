@@ -484,7 +484,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process1 += "    </globals>\n";
         process1 += "    <variables>\n";
         process1 += "      <variable name=\"person\" >\n";
-        process1 += "        <type name=\"org.drools.process.core.datatype.impl.type.ObjectDataType\" className=\"Person\" />\n";
+        process1 += "        <type name=\"org.drools.core.process.core.datatype.impl.type.ObjectDataType\" className=\"Person\" />\n";
         process1 += "      </variable>\n";
         process1 += "    </variables>\n";
         process1 += "  </header>\n";
@@ -524,7 +524,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process2 += "  <header>\n";
         process2 += "    <variables>\n";
         process2 += "      <variable name=\"MyVar\" >\n";
-        process2 += "        <type name=\"org.drools.process.core.datatype.impl.type.StringDataType\" />\n";
+        process2 += "        <type name=\"org.drools.core.process.core.datatype.impl.type.StringDataType\" />\n";
         process2 += "        <value>SomeText</value>\n";
         process2 += "      </variable>\n";
         process2 += "    </variables>\n";
