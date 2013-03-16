@@ -14,7 +14,7 @@
  * limitations under the License.
  * under the License.
  */
-package org.drools.io.mina;
+package org.drools.core.io.mina;
 
 import java.util.Map;
 

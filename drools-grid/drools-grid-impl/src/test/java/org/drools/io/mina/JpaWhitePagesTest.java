@@ -1,4 +1,4 @@
-package org.drools.io.mina;
+package org.drools.core.io.mina;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
