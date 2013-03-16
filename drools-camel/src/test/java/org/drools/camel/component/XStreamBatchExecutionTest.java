@@ -48,7 +48,7 @@ import org.drools.grid.impl.GridImpl;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.impl.StatelessKnowledgeSessionImpl;
-import org.drools.reteoo.ReteooRuleBase;
+import org.drools.core.reteoo.ReteooRuleBase;
 import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.Before;
