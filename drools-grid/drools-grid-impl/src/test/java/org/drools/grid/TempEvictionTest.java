@@ -28,10 +28,10 @@ import org.drools.grid.impl.EvictionJob;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.grid.impl.GridNodeServer;
 import org.drools.grid.io.MessageReceiverHandler;
-import org.drools.time.JobContext;
-import org.drools.time.JobHandle;
-import org.drools.time.Trigger;
-import org.drools.time.impl.JDKTimerService;
+import org.drools.core.time.JobContext;
+import org.drools.core.time.JobHandle;
+import org.drools.core.time.Trigger;
+import org.drools.core.time.impl.JDKTimerService;
 import org.junit.Before;
 import org.junit.Test;
 

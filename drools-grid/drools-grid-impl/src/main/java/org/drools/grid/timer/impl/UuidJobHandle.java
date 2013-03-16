@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.drools.time.JobHandle;
+import org.drools.core.time.JobHandle;
 
 public class UuidJobHandle
     implements

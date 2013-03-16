@@ -21,7 +21,7 @@ import org.drools.grid.service.directory.impl.CoreServicesLookupConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.drools.grid.service.directory.impl.WhitePagesRemoteConfiguration;
 import org.drools.grid.timer.impl.SchedulerLocalConfiguration;
-import org.drools.time.SchedulerService;
+import org.drools.core.time.SchedulerService;
 import org.junit.Test;
 import org.kie.SystemEventListener;
 import org.kie.SystemEventListenerFactory;

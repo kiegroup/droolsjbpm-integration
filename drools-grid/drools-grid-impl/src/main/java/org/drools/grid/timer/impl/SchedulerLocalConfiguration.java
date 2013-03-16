@@ -4,7 +4,7 @@ import org.drools.grid.Grid;
 import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.WhitePages;
-import org.drools.time.SchedulerService;
+import org.drools.core.time.SchedulerService;
 
 public class SchedulerLocalConfiguration
     implements

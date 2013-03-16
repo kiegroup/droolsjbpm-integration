@@ -25,7 +25,7 @@ import org.drools.grid.io.Message;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.io.impl.ExceptionMessage;
-import org.drools.time.SchedulerService;
+import org.drools.core.time.SchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

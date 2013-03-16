@@ -6,7 +6,7 @@ import org.drools.grid.conf.GridPeerServiceConfiguration;
 import org.drools.grid.impl.GridImpl;
 import org.drools.grid.service.directory.impl.CoreServicesLookupImpl;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
-import org.drools.time.SchedulerService;
+import org.drools.core.time.SchedulerService;
 
 public class SchedulerRemoteConfiguration
     implements

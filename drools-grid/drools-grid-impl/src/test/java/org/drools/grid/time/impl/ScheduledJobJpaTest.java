@@ -12,10 +12,10 @@ import javax.persistence.Persistence;
 
 import org.drools.grid.timer.impl.ScheduledJob;
 import org.drools.grid.timer.impl.UuidJobHandle;
-import org.drools.time.Job;
-import org.drools.time.JobContext;
-import org.drools.time.JobHandle;
-import org.drools.time.Trigger;
+import org.drools.core.time.Job;
+import org.drools.core.time.JobContext;
+import org.drools.core.time.JobHandle;
+import org.drools.core.time.Trigger;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.After;

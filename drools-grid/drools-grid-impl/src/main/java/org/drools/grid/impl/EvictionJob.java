@@ -22,8 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.drools.core.command.impl.ContextImplWithEviction;
-import org.drools.time.Job;
-import org.drools.time.JobContext;
+import org.drools.core.time.Job;
+import org.drools.core.time.JobContext;
 
 public class EvictionJob implements Job {
     private static Logger log = Logger.getLogger( EvictionJob.class.getName() );

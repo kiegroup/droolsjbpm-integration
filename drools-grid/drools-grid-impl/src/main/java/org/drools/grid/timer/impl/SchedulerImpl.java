@@ -28,13 +28,13 @@ import org.drools.grid.service.directory.Address;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.CoreServicesLookupImpl;
 import org.drools.grid.service.directory.impl.GridServiceDescriptionImpl;
-import org.drools.time.Job;
-import org.drools.time.JobContext;
-import org.drools.time.JobHandle;
-import org.drools.time.SchedulerService;
-import org.drools.time.TimerService;
-import org.drools.time.Trigger;
-import org.drools.time.impl.JDKTimerService;
+import org.drools.core.time.Job;
+import org.drools.core.time.JobContext;
+import org.drools.core.time.JobHandle;
+import org.drools.core.time.SchedulerService;
+import org.drools.core.time.TimerService;
+import org.drools.core.time.Trigger;
+import org.drools.core.time.impl.JDKTimerService;
 
 public class SchedulerImpl
     implements

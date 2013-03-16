@@ -17,8 +17,8 @@
 
 package org.drools.grid.time.impl;
 
-import org.drools.time.Job;
-import org.drools.time.JobContext;
+import org.drools.core.time.Job;
+import org.drools.core.time.JobContext;
 
 public class MockJob
     implements

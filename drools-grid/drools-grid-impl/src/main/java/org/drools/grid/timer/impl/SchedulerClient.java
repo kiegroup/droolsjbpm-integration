@@ -34,12 +34,12 @@ import org.drools.grid.io.Conversation;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.MessageReceiverHandler;
 import org.drools.grid.io.impl.CommandImpl;
-import org.drools.time.Job;
-import org.drools.time.JobContext;
-import org.drools.time.JobHandle;
-import org.drools.time.SchedulerService;
-import org.drools.time.Trigger;
-import org.drools.time.impl.MultiJobHandle;
+import org.drools.core.time.Job;
+import org.drools.core.time.JobContext;
+import org.drools.core.time.JobHandle;
+import org.drools.core.time.SchedulerService;
+import org.drools.core.time.Trigger;
+import org.drools.core.time.impl.MultiJobHandle;
 
 public class SchedulerClient
     implements

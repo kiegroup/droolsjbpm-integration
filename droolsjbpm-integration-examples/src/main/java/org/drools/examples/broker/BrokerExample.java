@@ -24,8 +24,8 @@ import org.drools.examples.broker.events.EventFeeder;
 import org.drools.examples.broker.events.StockTickPersister;
 import org.drools.examples.broker.model.CompanyRegistry;
 import org.drools.examples.broker.ui.BrokerWindow;
-import org.drools.time.TimerService;
-import org.drools.time.impl.JDKTimerService;
+import org.drools.core.time.TimerService;
+import org.drools.core.time.impl.JDKTimerService;
 
 /**
  * This is the main class for the broker example.
