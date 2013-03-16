@@ -755,7 +755,7 @@
             <title>Listener configuration example - defaulting to the debug
             versions provided by the Knowledge-API .</title>
 
-            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+            <programlisting language="xml"><![CDATA[<![CDATA[<![CDATA[  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
 
   &lt;drools:kbase id="kbase1"&gt;
     &lt;drools:resources&gt;
@@ -765,14 +765,14 @@
 
   &lt;drools:ksession id="statefulWithDefault" type="stateful" kbase="kbase1" node="node1"&gt;
 
-    &lt;drools:agendaEventListener/&gt; &lt;!-- attaches the org.drools.event.rule.DebugAgendaEventListener --&gt;
-    &lt;drools:workingMemoryEventListener/&gt; &lt;!-- attaches the org.drools.event.rule.DebugWorkingMemoryEventListener --&gt;
-    &lt;drools:processEventListener/&gt; &lt;!-- attaches the org.drools.event.DebugProcessEventListener --&gt;
+    &lt;drools:agendaEventListener/&gt; &ltorg.drools.core.evente org.drools.event.rule.DebugAgendaEventListener --&gt;
+    &lt;drools:workingMemoryEventListener/&gt; &lt;!-- attaorg.drools.core.eventols.event.rule.DebugWorkingMemoryEventListener --&gt;
+    &lt;drools:processEventListener/&gt; &lt;!-- attaches the org.drools.core.event.DebugProcessEventListener --&gt;
 
   &lt;/drools:ksession&gt;
 
 
-</programlisting>
+]]>]]>]]></programlisting>
           </example>
         </section>
 
@@ -787,7 +787,7 @@
             <title>Listener configuration example - mix and match of
             'ref'/nested-bean/empty styles.</title>
 
-            <programlisting language="xml">  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
+            <programlisting language="xml"><![CDATA[  &lt;drools:resource id="resource1" type="DRL" source="classpath:org/drools/container/spring/testSpring.drl"/&gt;
 
   &lt;drools:kbase id="kbase1"&gt;
     &lt;drools:resources&gt;
@@ -805,12 +805,12 @@
 
     &lt;drools:agendaEventListener ref="mock-agenda-listener"/&gt;
 
-    &lt;drools:processEventListener/&gt; &lt;!-- attaches the org.drools.event.DebugProcessEventListener --&gt;
+    &lt;drools:processEventListener/&gt; &lt;!-- attaches the org.drools.core.event.DebugProcessEventListener --&gt;
 
   &lt;/drools:ksession&gt;
 
 
-</programlisting>
+]]></programlisting>
           </example>
         </section>
 

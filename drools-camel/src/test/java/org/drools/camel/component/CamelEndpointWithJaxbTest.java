@@ -329,7 +329,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
     @Test
     public void testProcessInstanceSignalEvent() throws Exception {
 
-        String processId = "org.drools.event";
+        String processId = "org.drools.core.event";
 
         String cmd = "";
         cmd += "<batch-execution lookup='ksession1'>\n";
@@ -519,7 +519,7 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         process2 += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         process2 += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         process2 += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        process2 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        process2 += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.core.event\" package-name=\"org.drools\" version=\"1\" >\n";
         process2 += "\n";
         process2 += "  <header>\n";
         process2 += "    <variables>\n";

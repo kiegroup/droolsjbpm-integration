@@ -1406,7 +1406,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.core.event\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
@@ -1444,7 +1444,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.drools.core.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
@@ -1473,7 +1473,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         str += "<process xmlns=\"http://drools.org/drools-5.0/process\"\n";
         str += "         xmlns:xs=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
         str += "         xs:schemaLocation=\"http://drools.org/drools-5.0/process drools-processes-5.0.xsd\"\n";
-        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.event\" package-name=\"org.drools\" version=\"1\" >\n";
+        str += "         type=\"RuleFlow\" name=\"flow\" id=\"org.drools.core.event\" package-name=\"org.drools\" version=\"1\" >\n";
         str += "\n";
         str += "  <header>\n";
         str += "    <variables>\n";
@@ -1511,7 +1511,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
         StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-        ProcessInstance processInstance = ksession.startProcess( "org.drools.event" );
+        ProcessInstance processInstance = ksession.startProcess( "org.drools.core.event" );
         assertEquals( ProcessInstance.STATE_ACTIVE,
                       processInstance.getState() );
 
