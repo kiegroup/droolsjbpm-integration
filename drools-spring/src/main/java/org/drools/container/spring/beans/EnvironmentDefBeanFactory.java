@@ -38,7 +38,7 @@ import org.kie.runtime.Calendars;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;
 import org.kie.runtime.Globals;
-import org.drools.type.DateFormats;
+import org.drools.core.type.DateFormats;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
