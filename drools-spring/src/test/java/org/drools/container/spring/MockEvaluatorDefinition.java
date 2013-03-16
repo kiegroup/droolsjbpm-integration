@@ -23,7 +23,7 @@ import java.io.ObjectOutput;
 import org.drools.core.base.ValueType;
 import org.drools.core.base.evaluators.EvaluatorDefinition;
 import org.drools.core.base.evaluators.Operator;
-import org.drools.spi.Evaluator;
+import org.drools.core.spi.Evaluator;
 
 public class MockEvaluatorDefinition
     implements
