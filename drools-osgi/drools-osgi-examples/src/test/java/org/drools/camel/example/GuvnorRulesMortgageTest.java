@@ -8,7 +8,7 @@ import org.apache.camel.test.junit4.CamelSpringJUnit4ClassRunner;
 import org.kie.KnowledgeBase;
 import org.kie.definition.type.FactType;
 import org.kie.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.impl.ExecutionResultImpl;
+import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.annotation.DirtiesContext;

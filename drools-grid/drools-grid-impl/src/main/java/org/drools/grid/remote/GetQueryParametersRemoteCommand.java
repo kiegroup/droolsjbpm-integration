@@ -17,7 +17,7 @@ package org.drools.grid.remote;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.rule.Declaration;
-import org.drools.runtime.rule.impl.NativeQueryResults;
+import org.drools.core.runtime.rule.impl.NativeQueryResults;
 import org.kie.command.Context;
 
 /**

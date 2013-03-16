@@ -1,6 +1,6 @@
 package org.drools.container.spring;
 
-import org.drools.runtime.rule.impl.DefaultConsequenceExceptionHandler;
+import org.drools.core.runtime.rule.impl.DefaultConsequenceExceptionHandler;
 import org.kie.runtime.rule.Match;
 import org.kie.runtime.rule.Session;
 

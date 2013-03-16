@@ -23,7 +23,7 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.drools.camel.example.Person;
-import org.drools.runtime.impl.ExecutionResultImpl;
+import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

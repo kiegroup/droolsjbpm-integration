@@ -19,7 +19,7 @@ package org.drools.camel.example;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
-import org.drools.runtime.impl.ExecutionResultImpl;
+import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

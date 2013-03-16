@@ -23,23 +23,23 @@ import java.util.Map;
 
 import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
-import org.drools.runtime.help.impl.XStreamXML.AbortWorkItemConverter;
-import org.drools.runtime.help.impl.XStreamXML.BatchExecutionResultConverter;
-import org.drools.runtime.help.impl.XStreamXML.CompleteWorkItemConverter;
-import org.drools.runtime.help.impl.XStreamXML.FactHandleConverter;
-import org.drools.runtime.help.impl.XStreamXML.FireAllRulesConverter;
-import org.drools.runtime.help.impl.XStreamXML.GetGlobalConverter;
-import org.drools.runtime.help.impl.XStreamXML.GetObjectConverter;
-import org.drools.runtime.help.impl.XStreamXML.GetObjectsConverter;
-import org.drools.runtime.help.impl.XStreamXML.InsertConverter;
-import org.drools.runtime.help.impl.XStreamXML.InsertElementsConverter;
-import org.drools.runtime.help.impl.XStreamXML.ModifyConverter;
-import org.drools.runtime.help.impl.XStreamXML.QueryConverter;
-import org.drools.runtime.help.impl.XStreamXML.QueryResultsConverter;
-import org.drools.runtime.help.impl.XStreamXML.RetractConverter;
-import org.drools.runtime.help.impl.XStreamXML.SetGlobalConverter;
-import org.drools.runtime.help.impl.XStreamXML.SignalEventConverter;
-import org.drools.runtime.help.impl.XStreamXML.StartProcessConvert;
+import org.drools.core.runtime.help.impl.XStreamXML.AbortWorkItemConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.BatchExecutionResultConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.CompleteWorkItemConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.FactHandleConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.FireAllRulesConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.GetGlobalConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.GetObjectConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.GetObjectsConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.InsertConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.InsertElementsConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.ModifyConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.QueryConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.QueryResultsConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.RetractConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.SetGlobalConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.SignalEventConverter;
+import org.drools.core.runtime.help.impl.XStreamXML.StartProcessConvert;
 
 public class XStreamXml {
 
