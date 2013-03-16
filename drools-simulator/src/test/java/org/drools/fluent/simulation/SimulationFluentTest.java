@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
-import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
+import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
+import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
 import org.kie.builder.ReleaseId;

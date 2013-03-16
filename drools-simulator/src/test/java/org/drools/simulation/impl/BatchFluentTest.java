@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
-import org.drools.fluent.batch.FluentBatchExecution;
-import org.drools.fluent.batch.imp.FluentBatchExecutionImpl;
+import org.drools.simulation.fluent.batch.FluentBatchExecution;
+import org.drools.simulation.fluent.batch.imp.FluentBatchExecutionImpl;
 import org.drools.core.io.impl.ByteArrayResource;
 import org.junit.Test;
 import org.kie.KnowledgeBase;

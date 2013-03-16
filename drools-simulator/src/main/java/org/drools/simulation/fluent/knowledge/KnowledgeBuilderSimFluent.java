@@ -1,0 +1,30 @@
+/*
+ * Copyright 2011 JBoss Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.drools.simulation.fluent.knowledge;
+
+import org.drools.simulation.fluent.simulation.SimulationFluent;
+import org.drools.simulation.fluent.test.TestableFluent;
+import org.kie.fluent.FluentKnowledgeBuilder;
+
+
+public interface KnowledgeBuilderSimFluent extends FluentKnowledgeBuilder<KnowledgeBuilderSimFluent>, TestableFluent<KnowledgeBuilderSimFluent> {
+
+    SimulationFluent end(String context, String name);
+    SimulationFluent end(String name);
+    SimulationFluent end();
+
+}

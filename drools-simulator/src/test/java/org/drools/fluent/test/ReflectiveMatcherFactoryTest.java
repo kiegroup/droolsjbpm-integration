@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.fluent.test.impl.ReflectiveMatcherFactory;
+import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
 import org.kie.fluent.test.ReflectiveMatcherAssert;
