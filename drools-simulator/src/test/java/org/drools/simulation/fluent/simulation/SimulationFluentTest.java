@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.simulation;
+package org.drools.simulation.fluent.simulation;
 
 
 import java.io.IOException;
@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
-import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
 import org.kie.builder.ReleaseId;

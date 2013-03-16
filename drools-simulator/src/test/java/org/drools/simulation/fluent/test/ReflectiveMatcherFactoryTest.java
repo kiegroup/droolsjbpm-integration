@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.fluent.test;
+package org.drools.simulation.fluent.test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

@@ -1,4 +1,4 @@
-package org.drools.fluent.simulation;
+package org.drools.simulation.fluent.simulation;
 
 import static org.junit.Assert.assertTrue;
 

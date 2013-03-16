@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.fluent.simulation.SimulateTestBase;
+import org.drools.simulation.fluent.simulation.SimulateTestBase;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
