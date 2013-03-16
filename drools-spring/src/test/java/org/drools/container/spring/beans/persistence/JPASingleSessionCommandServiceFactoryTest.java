@@ -34,7 +34,7 @@ import org.kie.KnowledgeBaseFactory;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
-import org.drools.rule.Package;
+import org.drools.core.rule.Package;
 import org.kie.persistence.jpa.KieStoreServices;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;

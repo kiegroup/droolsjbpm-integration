@@ -32,7 +32,7 @@ import org.drools.compiler.compiler.PackageBuilder;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.process.core.Work;
 import org.drools.process.core.impl.WorkImpl;
-import org.drools.rule.Package;
+import org.drools.core.rule.Package;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.compiler.ProcessBuilderImpl;
