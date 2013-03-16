@@ -20,8 +20,8 @@ import static org.drools.container.spring.namespace.DefinitionParserHelper.empty
 
 import java.util.List;
 
-import org.drools.ClockType;
-import org.drools.SessionConfiguration;
+import org.drools.core.ClockType;
+import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;

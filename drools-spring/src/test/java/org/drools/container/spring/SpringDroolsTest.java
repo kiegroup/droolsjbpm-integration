@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.ClockType;
-import org.drools.RuleBaseConfiguration;
-import org.drools.RuleBaseConfiguration.AssertBehaviour;
-import org.drools.SessionConfiguration;
+import org.drools.core.ClockType;
+import org.drools.core.RuleBaseConfiguration;
+import org.drools.core.RuleBaseConfiguration.AssertBehaviour;
+import org.drools.core.SessionConfiguration;
 import org.drools.core.common.InternalRuleBase;
 import org.kie.KieBase;
 import org.kie.conf.EventProcessingOption;

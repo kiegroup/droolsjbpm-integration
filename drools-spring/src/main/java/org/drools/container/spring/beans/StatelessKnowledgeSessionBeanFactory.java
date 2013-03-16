@@ -18,7 +18,7 @@ package org.drools.container.spring.beans;
 
 import java.util.Map;
 
-import org.drools.SessionConfiguration;
+import org.drools.core.SessionConfiguration;
 import org.kie.event.process.ProcessEventListener;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.WorkingMemoryEventListener;

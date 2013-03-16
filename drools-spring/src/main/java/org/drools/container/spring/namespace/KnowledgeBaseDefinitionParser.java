@@ -18,8 +18,8 @@ package org.drools.container.spring.namespace;
 
 import java.util.List;
 
-import org.drools.RuleBaseConfiguration;
-import org.drools.RuleBaseConfiguration.AssertBehaviour;
+import org.drools.core.RuleBaseConfiguration;
+import org.drools.core.RuleBaseConfiguration.AssertBehaviour;
 import org.kie.conf.EventProcessingOption;
 import org.drools.container.spring.beans.KnowledgeBaseBeanFactory;
 import org.drools.core.util.StringUtils;
