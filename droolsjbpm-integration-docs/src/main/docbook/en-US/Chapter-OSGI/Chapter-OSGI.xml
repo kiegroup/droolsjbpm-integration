@@ -80,7 +80,7 @@
   <example>
     <title>OSGi Declarative Services</title>
 
-    <programlisting language="xml"><![CDATA[<![CDATA[&lt;scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"&gt;
+    <programlisting language="xml">&lt;scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"&gt;
 &lt;implementation class="testosgi.TestComponent"/&gt;
 
 &lt;reference bind="setKnowledgeBaseFactoryService"
@@ -97,7 +97,7 @@
            unbind="unsetKnowledgeBuilderFactoryService"
            interface="org.drools.core.builder.KnowledgeBuilderFactoryService"
            target="(org.drools.compiler.compiler.DecisionTableProvider=true)"  /&gt;
-&lt;/scr:component&gt;]]>]]></programlisting>
+&lt;/scr:component&gt;</programlisting>
   </example>
 
   <para>The TestComponent will only be activated when all of the referenced
