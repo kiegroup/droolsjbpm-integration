@@ -56,7 +56,7 @@ import org.kie.api.builder.KnowledgeBuilder;
 import org.kie.api.builder.KnowledgeBuilderError;
 import org.kie.api.builder.KnowledgeBuilderErrors;
 import org.kie.api.builder.KnowledgeBuilderFactoryService;
-import org.kie.conf.EqualityBehaviorOption;
+import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
 

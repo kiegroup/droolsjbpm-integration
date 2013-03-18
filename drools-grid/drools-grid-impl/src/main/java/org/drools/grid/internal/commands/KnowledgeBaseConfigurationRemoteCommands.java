@@ -22,7 +22,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeBaseConfigurationRemoteClient;
 import org.kie.KieBaseConfiguration;
 import org.kie.api.command.Context;
-import org.kie.conf.KieBaseOption;
+import org.kie.api.conf.KieBaseOption;
 
 /**
  *

@@ -7,7 +7,7 @@ import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KieBaseConfiguration;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.conf.EventProcessingOption;
+import org.kie.api.conf.EventProcessingOption;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class CepBenchmark extends AbstractBenchmark {

@@ -27,9 +27,9 @@ import org.drools.grid.internal.commands.KnowledgeBaseConfigurationRemoteCommand
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.KieBaseConfiguration;
-import org.kie.conf.KieBaseOption;
-import org.kie.conf.MultiValueKnowledgeBaseOption;
-import org.kie.conf.SingleValueKieBaseOption;
+import org.kie.api.conf.KieBaseOption;
+import org.kie.api.conf.MultiValueKnowledgeBaseOption;
+import org.kie.api.conf.SingleValueKieBaseOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

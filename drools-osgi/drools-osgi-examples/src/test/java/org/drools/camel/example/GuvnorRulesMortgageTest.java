@@ -6,7 +6,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelSpringJUnit4ClassRunner;
 import org.kie.internal.KnowledgeBase;
-import org.kie.definition.type.FactType;
+import org.kie.api.definition.type.FactType;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Test;

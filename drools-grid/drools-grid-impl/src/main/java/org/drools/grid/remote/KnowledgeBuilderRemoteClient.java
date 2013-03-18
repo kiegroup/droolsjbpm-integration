@@ -36,7 +36,7 @@ import org.kie.api.builder.KnowledgeBuilder;
 import org.kie.api.builder.KnowledgeBuilderErrors;
 import org.kie.api.builder.KnowledgeBuilderResults;
 import org.kie.api.builder.ResultSeverity;
-import org.kie.definition.KnowledgePackage;
+import org.kie.api.definition.KnowledgePackage;
 import org.kie.io.Resource;
 import org.kie.io.ResourceConfiguration;
 import org.kie.io.ResourceType;

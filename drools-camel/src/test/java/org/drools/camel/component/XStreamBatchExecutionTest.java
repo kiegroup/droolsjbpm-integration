@@ -2028,7 +2028,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         ExecutionResults result = template.requestBody( "direct:unmarshal",
                                                         outXml,
                                                         ExecutionResults.class );
-        org.kie.definition.type.FactType fT = ksession.getKieBase().getFactType("org.drools.camel.testdomain","Cheese1");
+        org.kie.api.definition.type.FactType fT = ksession.getKieBase().getFactType("org.drools.camel.testdomain","Cheese1");
         
         int price = (Integer)fT.get(result.getValue( "outStilton" ), "price");
         assertEquals( 30, 
@@ -2049,7 +2049,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
                                                         outXml2,
                                                         ExecutionResults.class );
         
-        org.kie.definition.type.FactType fT2 = ksession2.getKieBase().getFactType("org.drools.camel.testdomain","Cheese2");
+        org.kie.api.definition.type.FactType fT2 = ksession2.getKieBase().getFactType("org.drools.camel.testdomain","Cheese2");
         
         int price2 = (Integer)fT2.get(result2.getValue( "outStilton" ), "price");
         assertEquals( 35, price2 );
