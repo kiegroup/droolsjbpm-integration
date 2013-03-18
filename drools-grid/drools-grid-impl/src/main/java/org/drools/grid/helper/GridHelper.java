@@ -34,7 +34,7 @@ import org.drools.grid.remote.QueryResultsRemoteClient;
 import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
-import org.kie.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgent;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

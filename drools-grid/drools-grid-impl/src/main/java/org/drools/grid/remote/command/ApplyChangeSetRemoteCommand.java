@@ -18,7 +18,7 @@ package org.drools.grid.remote.command;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.kie.ChangeSet;
-import org.kie.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgent;
 import org.kie.command.Context;
 import org.kie.io.Resource;
 

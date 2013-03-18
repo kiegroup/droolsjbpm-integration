@@ -35,7 +35,7 @@ import org.drools.core.io.internal.InternalResource;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgent;
 import org.kie.command.Command;
 import org.kie.command.CommandFactory;
 import org.kie.io.Resource;

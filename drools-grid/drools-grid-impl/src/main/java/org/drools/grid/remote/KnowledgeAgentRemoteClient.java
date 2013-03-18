@@ -29,7 +29,7 @@ import org.drools.grid.remote.command.ApplyChangeSetRemoteCommand;
 import org.kie.ChangeSet;
 import org.kie.KnowledgeBase;
 import org.kie.SystemEventListener;
-import org.kie.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgent;
 import org.kie.command.BatchExecutionCommand;
 import org.kie.command.Command;
 import org.kie.command.CommandFactory;

@@ -17,7 +17,7 @@
 package org.drools.grid.remote.command;
 
 import org.drools.core.command.impl.GenericCommand;
-import org.kie.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgent;
 import org.kie.command.Context;
 import org.kie.runtime.Environment;
 import org.kie.runtime.KieSessionConfiguration;

@@ -20,11 +20,11 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.kie.KnowledgeBase;
 import org.kie.SystemEventListener;
-import org.kie.agent.KnowledgeAgent;
-import org.kie.agent.KnowledgeAgentConfiguration;
-import org.kie.agent.KnowledgeAgentFactory;
-import org.kie.agent.conf.NewInstanceOption;
-import org.kie.agent.conf.UseKnowledgeBaseClassloaderOption;
+import org.kie.internal.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgentConfiguration;
+import org.kie.internal.agent.KnowledgeAgentFactory;
+import org.kie.internal.agent.conf.NewInstanceOption;
+import org.kie.internal.agent.conf.UseKnowledgeBaseClassloaderOption;
 import org.kie.command.Context;
 public class RegisterKAgentRemoteCommand
     implements
