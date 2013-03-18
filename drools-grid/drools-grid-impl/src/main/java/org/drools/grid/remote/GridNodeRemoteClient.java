@@ -31,7 +31,7 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.mina.MinaConnector;
 import org.drools.grid.service.directory.Address;
 import org.kie.KnowledgeBaseFactoryService;
-import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.api.builder.KnowledgeBuilderFactoryService;
 import org.kie.internal.utils.ServiceRegistry;
 import org.kie.internal.utils.ServiceRegistryImpl;
 import org.kie.runtime.StatefulKnowledgeSession;

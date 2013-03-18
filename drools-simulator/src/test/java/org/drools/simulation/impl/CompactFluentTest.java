@@ -29,7 +29,7 @@ import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.builder.ReleaseId;
+import org.kie.api.builder.ReleaseId;
 import org.kie.internal.fluent.VariableContext;
 
 public class CompactFluentTest extends SimulateTestBase {

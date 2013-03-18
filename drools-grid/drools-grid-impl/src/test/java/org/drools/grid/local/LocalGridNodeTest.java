@@ -21,7 +21,7 @@ import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.junit.Test;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactoryService;
-import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.api.builder.KnowledgeBuilderFactoryService;
 
 public class LocalGridNodeTest {
 

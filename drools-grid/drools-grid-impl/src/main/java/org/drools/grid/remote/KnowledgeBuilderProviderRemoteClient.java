@@ -29,11 +29,11 @@ import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteComm
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.KnowledgeBase;
-import org.kie.builder.DecisionTableConfiguration;
-import org.kie.builder.JaxbConfiguration;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.KnowledgeBuilderConfiguration;
-import org.kie.builder.KnowledgeBuilderFactoryService;
+import org.kie.api.builder.DecisionTableConfiguration;
+import org.kie.api.builder.JaxbConfiguration;
+import org.kie.api.builder.KnowledgeBuilder;
+import org.kie.api.builder.KnowledgeBuilderConfiguration;
+import org.kie.api.builder.KnowledgeBuilderFactoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

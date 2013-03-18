@@ -27,7 +27,7 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.kie.builder.KnowledgeBuilderConfiguration;
+import org.kie.api.builder.KnowledgeBuilderConfiguration;
 import org.kie.internal.builder.conf.AccumulateFunctionOption;
 import org.kie.internal.builder.conf.KnowledgeBuilderOption;
 import org.kie.internal.builder.conf.MultiValueKnowledgeBuilderOption;

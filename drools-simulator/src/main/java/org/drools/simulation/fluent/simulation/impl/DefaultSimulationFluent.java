@@ -32,7 +32,7 @@ import org.drools.simulation.impl.SimulationImpl;
 import org.drools.simulation.impl.SimulationPathImpl;
 import org.drools.simulation.impl.SimulationStepImpl;
 import org.drools.simulation.impl.Simulator;
-import org.kie.builder.ReleaseId;
+import org.kie.api.builder.ReleaseId;
 import org.kie.command.Command;
 import org.kie.internal.fluent.VariableContext;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
