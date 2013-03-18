@@ -38,7 +38,7 @@ import javax.transaction.SystemException;
 import org.kie.api.KieBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.drools.core.base.MapGlobalResolver;
-import org.kie.marshalling.ObjectMarshallingStrategy;
+import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.kie.internal.persistence.jpa.JPAKnowledgeService;

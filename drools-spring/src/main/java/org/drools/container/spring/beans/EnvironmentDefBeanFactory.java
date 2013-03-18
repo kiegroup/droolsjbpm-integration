@@ -28,8 +28,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.core.impl.EnvironmentFactory;
-import org.kie.marshalling.ObjectMarshallingStrategy;
-import org.kie.marshalling.ObjectMarshallingStrategyAcceptor;
+import org.kie.api.marshalling.ObjectMarshallingStrategy;
+import org.kie.api.marshalling.ObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
