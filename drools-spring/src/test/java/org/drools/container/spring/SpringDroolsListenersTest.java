@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kie.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.api.event.rule.DebugWorkingMemoryEventListener;
 import org.kie.runtime.KieSession;
 import org.kie.runtime.StatelessKieSession;
 import org.junit.Before;

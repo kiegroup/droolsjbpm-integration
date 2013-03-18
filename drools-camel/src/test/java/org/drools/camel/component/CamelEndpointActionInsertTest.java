@@ -36,10 +36,10 @@ import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.drools.pipeline.camel.Person;
 import org.junit.Test;
-import org.kie.event.rule.AgendaEventListener;
-import org.kie.event.rule.MatchCreatedEvent;
-import org.kie.event.rule.ObjectInsertedEvent;
-import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.MatchCreatedEvent;
+import org.kie.api.event.rule.ObjectInsertedEvent;
+import org.kie.api.event.rule.WorkingMemoryEventListener;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.mockito.ArgumentCaptor;
 

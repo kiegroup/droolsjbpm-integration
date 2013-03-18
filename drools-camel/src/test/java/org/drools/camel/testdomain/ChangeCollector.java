@@ -17,10 +17,10 @@
 package org.drools.camel.testdomain;
 
 import org.drools.core.xml.jaxb.util.JaxbListAdapter;
-import org.kie.event.rule.ObjectDeletedEvent;
-import org.kie.event.rule.ObjectInsertedEvent;
-import org.kie.event.rule.ObjectUpdatedEvent;
-import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.ObjectDeletedEvent;
+import org.kie.api.event.rule.ObjectInsertedEvent;
+import org.kie.api.event.rule.ObjectUpdatedEvent;
+import org.kie.api.event.rule.WorkingMemoryEventListener;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
