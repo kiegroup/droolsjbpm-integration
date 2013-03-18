@@ -35,9 +35,9 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.drools.grid.GridNode;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.internal.runtime.StatelessKnowledgeSession;
 import org.kie.runtime.rule.SessionEntryPoint;
 
 /**

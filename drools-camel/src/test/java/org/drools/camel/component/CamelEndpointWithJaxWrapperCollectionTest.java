@@ -37,10 +37,10 @@ import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactoryService;
 import org.kie.internal.builder.help.KnowledgeBuilderHelper;
 import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 
 import javax.naming.Context;

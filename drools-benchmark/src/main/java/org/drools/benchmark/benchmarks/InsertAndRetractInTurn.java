@@ -18,7 +18,7 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
 import org.kie.internal.KnowledgeBase;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 
 public class InsertAndRetractInTurn extends AbstractBenchmark {

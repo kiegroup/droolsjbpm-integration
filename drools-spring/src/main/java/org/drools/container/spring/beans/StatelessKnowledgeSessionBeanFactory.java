@@ -22,9 +22,9 @@ import org.drools.core.SessionConfiguration;
 import org.kie.event.process.ProcessEventListener;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.WorkingMemoryEventListener;
+import org.kie.internal.runtime.StatelessKnowledgeSession;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.StatelessKieSession;
-import org.kie.runtime.StatelessKnowledgeSession;
 import org.kie.runtime.process.WorkItemHandler;
 
 public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {

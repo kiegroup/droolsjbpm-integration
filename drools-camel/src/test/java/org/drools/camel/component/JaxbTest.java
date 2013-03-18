@@ -47,7 +47,7 @@ import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.command.Command;
 import org.kie.internal.command.CommandFactory;
 import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 
 public class JaxbTest {

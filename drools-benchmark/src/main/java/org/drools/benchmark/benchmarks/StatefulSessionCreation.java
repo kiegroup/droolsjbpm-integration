@@ -2,7 +2,7 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
 import org.kie.internal.KnowledgeBase;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class StatefulSessionCreation extends AbstractBenchmark {
 

@@ -19,8 +19,8 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
+import org.kie.internal.runtime.KnowledgeRuntime;
 import org.kie.runtime.Channel;
-import org.kie.runtime.KnowledgeRuntime;
 
 /**
  * A consumer that consumes objects sent into channels of a drools

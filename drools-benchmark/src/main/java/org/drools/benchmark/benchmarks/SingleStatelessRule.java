@@ -22,7 +22,7 @@ import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.*;
 
 import org.kie.internal.KnowledgeBase;
-import org.kie.runtime.*;
+import org.kie.internal.runtime.StatelessKnowledgeSession;
 
 public class SingleStatelessRule extends AbstractBenchmark {
 

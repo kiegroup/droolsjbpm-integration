@@ -33,7 +33,7 @@ import org.drools.core.time.SessionPseudoClock;
 import org.kie.command.Command;
 import org.kie.internal.command.Context;
 import org.kie.internal.command.World;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.simulation.Simulation;
 import org.kie.internal.simulation.SimulationPath;
 import org.kie.internal.simulation.SimulationStep;

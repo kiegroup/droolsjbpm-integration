@@ -16,7 +16,7 @@
 
 package org.drools.examples.conway;
 
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public interface ConwayRuleDelegate {
 

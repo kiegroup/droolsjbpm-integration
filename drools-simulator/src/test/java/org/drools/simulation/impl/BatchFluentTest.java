@@ -32,7 +32,7 @@ import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.command.BatchExecutionCommand;
 import org.kie.io.ResourceType;
 import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.internal.runtime.StatelessKnowledgeSession;
 
 public class BatchFluentTest {
 

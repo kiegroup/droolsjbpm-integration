@@ -45,7 +45,7 @@ import org.kie.internal.utils.CompositeClassLoader;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;

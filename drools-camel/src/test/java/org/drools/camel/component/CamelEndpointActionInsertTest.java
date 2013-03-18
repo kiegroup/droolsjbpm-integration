@@ -40,7 +40,7 @@ import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.MatchCreatedEvent;
 import org.kie.event.rule.ObjectInsertedEvent;
 import org.kie.event.rule.WorkingMemoryEventListener;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.mockito.ArgumentCaptor;
 
 import javax.naming.Context;

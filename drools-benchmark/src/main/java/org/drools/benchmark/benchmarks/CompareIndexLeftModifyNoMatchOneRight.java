@@ -4,7 +4,7 @@ import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.A;
 import org.drools.benchmark.model.B;
 import org.kie.internal.KnowledgeBase;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 import java.util.Random;
 

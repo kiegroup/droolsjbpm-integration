@@ -17,7 +17,7 @@
 package org.drools.examples.conway;
 
 import org.drools.examples.conway.patterns.ConwayPattern;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 /**
  * A <code>CellGrid</code> represents a grid of <code>Cell</code> objects.
