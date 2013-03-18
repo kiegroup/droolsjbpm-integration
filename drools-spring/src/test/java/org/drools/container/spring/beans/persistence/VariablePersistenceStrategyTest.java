@@ -41,7 +41,7 @@ import org.drools.core.base.MapGlobalResolver;
 import org.kie.marshalling.ObjectMarshallingStrategy;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
-import org.kie.persistence.jpa.JPAKnowledgeService;
+import org.kie.internal.persistence.jpa.JPAKnowledgeService;
 import org.kie.persistence.jpa.KieStoreServices;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.kie.runtime.Environment;
