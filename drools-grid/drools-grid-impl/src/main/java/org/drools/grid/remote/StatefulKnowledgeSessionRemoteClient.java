@@ -76,7 +76,7 @@ import org.kie.api.runtime.rule.LiveQuery;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.SessionEntryPoint;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
-import org.kie.time.SessionClock;
+import org.kie.api.time.SessionClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
