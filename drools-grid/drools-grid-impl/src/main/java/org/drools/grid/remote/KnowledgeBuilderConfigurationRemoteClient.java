@@ -28,10 +28,10 @@ import org.drools.grid.internal.commands.KnowledgeBuilderConfigurationRemoteComm
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.kie.builder.KnowledgeBuilderConfiguration;
-import org.kie.builder.conf.AccumulateFunctionOption;
-import org.kie.builder.conf.KnowledgeBuilderOption;
-import org.kie.builder.conf.MultiValueKnowledgeBuilderOption;
-import org.kie.builder.conf.SingleValueKnowledgeBuilderOption;
+import org.kie.internal.builder.conf.AccumulateFunctionOption;
+import org.kie.internal.builder.conf.KnowledgeBuilderOption;
+import org.kie.internal.builder.conf.MultiValueKnowledgeBuilderOption;
+import org.kie.internal.builder.conf.SingleValueKnowledgeBuilderOption;
 import org.kie.command.CommandFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

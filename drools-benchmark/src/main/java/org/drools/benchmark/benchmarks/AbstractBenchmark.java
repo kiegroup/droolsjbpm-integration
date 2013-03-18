@@ -18,8 +18,8 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.*;
 import org.drools.benchmark.util.DroolsUtil;
-import org.kie.builder.*;
 import org.kie.internal.KnowledgeBase;
+import org.kie.internal.builder.KnowledgeBuilder;
 
 public abstract class AbstractBenchmark implements Benchmark {
 

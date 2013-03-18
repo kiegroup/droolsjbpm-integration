@@ -18,7 +18,7 @@ package org.drools.container.spring.namespace;
 
 import java.util.List;
 
-import org.kie.builder.DecisionTableInputType;
+import org.kie.internal.builder.DecisionTableInputType;
 import org.kie.io.ResourceType;
 import org.drools.core.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
@@ -123,7 +123,7 @@ public class ResourceDefinitionParser extends AbstractBeanDefinitionParser {
                 emptyAttributeCheck( conf.getLocalName(),
                                      INPUT_TYPE_ATTRIBUTE,
                                      inputType );
-                dtableConf.setInputType( DecisionTableInputType.valueOf( inputType ) );
+                dtableConf.setInputType( DecisionTableInputType.valueOf(inputType) );
 
                 String worksheetName = conf.getAttribute( WORKSHEET_NAME_ATTRIBUTE );
                 emptyAttributeCheck( conf.getLocalName(),

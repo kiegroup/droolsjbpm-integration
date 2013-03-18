@@ -22,7 +22,7 @@ import org.drools.core.command.builder.KnowledgeBuilderAddCommand;
 import org.drools.simulation.fluent.knowledge.KnowledgeBuilderSimFluent;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.impl.AbstractTestableFluent;
-import org.kie.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.command.Command;
 import org.kie.io.Resource;
 import org.kie.io.ResourceConfiguration;

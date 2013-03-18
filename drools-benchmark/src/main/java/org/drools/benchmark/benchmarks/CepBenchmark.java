@@ -6,7 +6,7 @@ import org.drools.benchmark.model.cep.Letter;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KieBaseConfiguration;
 import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.conf.EventProcessingOption;
 import org.kie.runtime.StatefulKnowledgeSession;
 
