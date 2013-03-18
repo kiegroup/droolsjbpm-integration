@@ -30,7 +30,7 @@ import java.util.Properties;
 
 import org.drools.compiler.compiler.PackageBuilder;
 import org.kie.KieBase;
-import org.kie.KnowledgeBaseFactory;
+import org.kie.internal.KnowledgeBaseFactory;
 import org.drools.core.util.DroolsStreamUtils;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.impl.WorkImpl;

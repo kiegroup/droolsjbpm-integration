@@ -19,7 +19,7 @@ package org.drools.container.spring.beans;
 import org.drools.core.base.evaluators.EvaluatorDefinition;
 import org.drools.grid.GridNode;
 import org.kie.KieBase;
-import org.kie.KnowledgeBase;
+import org.kie.internal.KnowledgeBase;
 import org.kie.runtime.rule.AccumulateFunction;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;

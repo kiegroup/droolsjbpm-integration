@@ -1,6 +1,6 @@
 package org.drools.benchmark;
 
-import org.kie.KnowledgeBase;
+import org.kie.internal.KnowledgeBase;
 
 import java.util.concurrent.Callable;
 

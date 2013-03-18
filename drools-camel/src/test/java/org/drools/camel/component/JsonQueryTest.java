@@ -33,7 +33,7 @@ import org.drools.camel.testdomain.Person;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridImpl;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
+import org.kie.internal.KnowledgeBase;
 import org.kie.builder.KnowledgeBuilder;
 import org.kie.builder.KnowledgeBuilderFactory;
 import org.kie.command.Command;

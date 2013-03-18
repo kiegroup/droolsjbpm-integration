@@ -21,9 +21,7 @@ import static org.drools.benchmark.model.Gender.*;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.*;
 
-import org.kie.*;
-import org.kie.builder.*;
-import org.kie.io.*;
+import org.kie.internal.KnowledgeBase;
 import org.kie.runtime.*;
 
 public class SingleStatelessRule extends AbstractBenchmark {
