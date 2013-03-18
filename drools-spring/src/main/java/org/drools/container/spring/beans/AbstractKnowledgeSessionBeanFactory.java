@@ -24,7 +24,7 @@ import org.drools.container.spring.namespace.EventListenersUtil;
 import org.kie.KieBase;
 import org.kie.command.Command;
 import org.kie.event.KieRuntimeEventManager;
-import org.kie.event.KnowledgeRuntimeEventManager;
+import org.kie.internal.event.KnowledgeRuntimeEventManager;
 import org.kie.event.process.ProcessEventListener;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.WorkingMemoryEventListener;
