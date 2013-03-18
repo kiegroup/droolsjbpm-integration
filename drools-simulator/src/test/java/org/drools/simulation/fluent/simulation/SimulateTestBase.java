@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.kie.KieServices;
+import org.kie.api.KieServices;
 import org.kie.builder.KieBuilder;
 import org.kie.builder.KieFileSystem;
 import org.kie.builder.KieModule;

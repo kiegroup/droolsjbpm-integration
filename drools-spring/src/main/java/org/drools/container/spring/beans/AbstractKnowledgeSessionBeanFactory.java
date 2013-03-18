@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.container.spring.namespace.EventListenersUtil;
-import org.kie.KieBase;
+import org.kie.api.KieBase;
 import org.kie.command.Command;
 import org.kie.event.KieRuntimeEventManager;
 import org.kie.internal.event.KnowledgeRuntimeEventManager;

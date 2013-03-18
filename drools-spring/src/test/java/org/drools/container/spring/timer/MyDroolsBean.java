@@ -3,7 +3,7 @@ package org.drools.container.spring.timer;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.kie.KieBase;
+import org.kie.api.KieBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.drools.core.base.MapGlobalResolver;
 import org.kie.runtime.EnvironmentName;

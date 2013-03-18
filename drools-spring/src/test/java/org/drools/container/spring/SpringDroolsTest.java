@@ -32,7 +32,7 @@ import org.drools.core.RuleBaseConfiguration;
 import org.drools.core.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.core.SessionConfiguration;
 import org.drools.core.common.InternalRuleBase;
-import org.kie.KieBase;
+import org.kie.api.KieBase;
 import org.kie.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.kie.definition.KiePackage;

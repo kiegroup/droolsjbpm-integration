@@ -19,7 +19,7 @@ package org.drools.container.spring.beans;
 import java.util.Collections;
 import java.util.List;
 
-import org.kie.KieBase;
+import org.kie.api.KieBase;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

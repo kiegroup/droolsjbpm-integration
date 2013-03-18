@@ -35,7 +35,7 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
-import org.kie.KieBase;
+import org.kie.api.KieBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.drools.core.base.MapGlobalResolver;
 import org.kie.marshalling.ObjectMarshallingStrategy;
