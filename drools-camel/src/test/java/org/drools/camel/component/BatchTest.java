@@ -32,14 +32,14 @@ import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.runtime.StatelessKnowledgeSession;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.process.ProcessInstance;
-import org.kie.runtime.process.WorkItem;
-import org.kie.runtime.process.WorkItemHandler;
-import org.kie.runtime.process.WorkItemManager;
-import org.kie.runtime.process.WorkflowProcessInstance;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.process.WorkItem;
+import org.kie.api.runtime.process.WorkItemHandler;
+import org.kie.api.runtime.process.WorkItemManager;
+import org.kie.api.runtime.process.WorkflowProcessInstance;
+import org.kie.api.runtime.rule.FactHandle;
 import org.mvel2.templates.SimpleTemplateRegistry;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRegistry;
@@ -913,13 +913,13 @@ public abstract class BatchTest extends CamelTestSupport {
         list.add( cheddar2 );
         set.add( list );
 
-        org.kie.runtime.rule.QueryResults results = (org.kie.runtime.rule.QueryResults) batchResult.getValue( "cheeses" );
+        org.kie.api.runtime.rule.QueryResults results = (org.kie.api.runtime.rule.QueryResults) batchResult.getValue( "cheeses" );
         assertEquals( 2,
                       results.size() );
         assertEquals( 2,
                       results.getIdentifiers().length );
         Set newSet = new HashSet();
-        for ( org.kie.runtime.rule.QueryResultsRow result : results ) {
+        for ( org.kie.api.runtime.rule.QueryResultsRow result : results ) {
             list = new ArrayList();
             list.add( result.get( "stilton" ) );
             list.add( result.get( "cheddar" ) );

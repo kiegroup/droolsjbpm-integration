@@ -26,8 +26,8 @@ import org.drools.WorkingMemoryEntryPoint;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.kie.api.command.Context;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.SessionEntryPoint;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.rule.SessionEntryPoint;
 
 public class GetWorkingMemoryEntryPointRemoteCommand
     implements

@@ -40,11 +40,11 @@ import org.kie.api.command.Command;
 import org.kie.api.command.CommandFactory;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.FactHandle;
-import org.kie.runtime.rule.QueryResults;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 public class RemoteSessionCommandTest extends BaseRemoteTest {
 

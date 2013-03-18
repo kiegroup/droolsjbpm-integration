@@ -31,7 +31,7 @@ import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.ExecutionResults;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.StatelessKnowledgeSession;
 
 public class BatchFluentTest {

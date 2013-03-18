@@ -35,7 +35,7 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.grid.service.directory.impl.JpaWhitePages;
 import org.drools.grid.service.directory.impl.WhitePagesLocalConfiguration;
 import org.kie.internal.agent.KnowledgeAgent;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

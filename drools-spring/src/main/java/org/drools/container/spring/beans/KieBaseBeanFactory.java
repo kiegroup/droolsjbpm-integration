@@ -20,7 +20,7 @@ import org.drools.core.base.evaluators.EvaluatorDefinition;
 import org.drools.grid.GridNode;
 import org.kie.api.KieBase;
 import org.kie.internal.KnowledgeBase;
-import org.kie.runtime.rule.AccumulateFunction;
+import org.kie.api.runtime.rule.AccumulateFunction;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

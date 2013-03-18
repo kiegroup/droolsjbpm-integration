@@ -20,8 +20,8 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.common.EventFactHandle;
 import org.kie.api.command.Context;
-import org.kie.runtime.rule.FactHandle;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 /**
  *

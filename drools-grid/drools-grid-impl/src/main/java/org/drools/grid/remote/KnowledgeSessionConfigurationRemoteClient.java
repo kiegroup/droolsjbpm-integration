@@ -26,10 +26,10 @@ import org.drools.grid.GridServiceDescription;
 import org.drools.grid.internal.commands.KnowledgeSessionConfigurationRemoteCommands;
 import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
-import org.kie.runtime.KieSessionConfiguration;
-import org.kie.runtime.conf.KieSessionOption;
-import org.kie.runtime.conf.MultiValueKieSessionOption;
-import org.kie.runtime.conf.SingleValueKieSessionOption;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.conf.KieSessionOption;
+import org.kie.api.runtime.conf.MultiValueKieSessionOption;
+import org.kie.api.runtime.conf.SingleValueKieSessionOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

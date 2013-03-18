@@ -41,12 +41,12 @@ import org.kie.api.definition.rule.Query;
 import org.kie.api.definition.rule.Rule;
 import org.kie.api.definition.type.FactType;
 import org.kie.api.event.kiebase.KieBaseEventListener;
-import org.kie.runtime.Environment;
-import org.kie.runtime.KieSession;
-import org.kie.runtime.KieSessionConfiguration;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.StatelessKieSession;
-import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.StatelessKnowledgeSession;
 
 public class KnowledgeBaseRemoteClient
     implements

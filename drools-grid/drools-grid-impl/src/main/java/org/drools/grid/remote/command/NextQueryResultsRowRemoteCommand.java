@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.kie.api.command.Context;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 /**
  *

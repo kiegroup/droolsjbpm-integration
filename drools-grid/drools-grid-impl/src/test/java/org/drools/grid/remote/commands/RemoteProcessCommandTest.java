@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.process.ProcessInstance;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.process.ProcessInstance;
 
 public class RemoteProcessCommandTest extends BaseRemoteTest{
 

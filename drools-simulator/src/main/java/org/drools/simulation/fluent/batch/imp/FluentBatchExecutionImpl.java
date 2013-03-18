@@ -29,7 +29,7 @@ import org.drools.simulation.fluent.batch.FluentBatchExecution;
 import org.drools.simulation.fluent.test.impl.MapVariableContext;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.internal.fluent.VariableContext;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.FactHandle;
 
 import java.util.ArrayList;
 import java.util.List;

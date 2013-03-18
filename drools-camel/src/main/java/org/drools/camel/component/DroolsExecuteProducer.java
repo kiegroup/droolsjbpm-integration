@@ -42,8 +42,8 @@ import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
 import org.kie.api.command.Command;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.ExecutionResults;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.ExecutionResults;
 
 public class DroolsExecuteProducer extends DefaultProducer {
 

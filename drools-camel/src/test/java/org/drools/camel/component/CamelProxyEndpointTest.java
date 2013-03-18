@@ -43,8 +43,8 @@ import org.drools.pipeline.camel.Person;
 import org.junit.Test;
 import org.kie.internal.command.CommandFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.rule.FactHandle;
 
 public class CamelProxyEndpointTest extends DroolsCamelTestSupport {
     private String handle;

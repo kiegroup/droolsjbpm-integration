@@ -43,10 +43,10 @@ import org.kie.internal.builder.KnowledgeBuilderFactoryService;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.ExecutionResults;
-import org.kie.runtime.rule.FactHandle;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;

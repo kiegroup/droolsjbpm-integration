@@ -45,7 +45,7 @@ import org.drools.jax.soap.PostCxfTransportSoapProcessor;
 import org.drools.jax.soap.PreCxfSoapProcessor;
 import org.drools.jax.soap.PreCxfTransportSoapProcessor;
 import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
-import org.kie.runtime.CommandExecutor;
+import org.kie.api.runtime.CommandExecutor;
 
 public class DroolsPolicy implements Policy {
 

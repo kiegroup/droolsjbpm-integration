@@ -58,7 +58,7 @@ import org.kie.api.builder.KnowledgeBuilderErrors;
 import org.kie.api.builder.KnowledgeBuilderFactoryService;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.StatefulKnowledgeSession;
 
 public abstract class BaseRemoteTest {
     

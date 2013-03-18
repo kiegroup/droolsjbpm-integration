@@ -31,7 +31,7 @@ import org.kie.internal.builder.KnowledgeBuilderErrors;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.builder.KnowledgeBuilderFactoryService;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.rule.AccumulateFunction;
+import org.kie.api.runtime.rule.AccumulateFunction;
 import org.kie.internal.builder.conf.AccumulateFunctionOption;
 import org.kie.internal.builder.conf.EvaluatorOption;
 import org.drools.core.builder.conf.impl.JaxbConfigurationImpl;

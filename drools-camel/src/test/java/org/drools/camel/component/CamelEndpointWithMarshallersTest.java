@@ -44,9 +44,9 @@ import org.drools.core.common.InternalFactHandle;
 import org.drools.pipeline.camel.Person;
 import org.junit.Test;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.ExecutionResults;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.helper.BatchExecutionHelper;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.FactHandle;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;

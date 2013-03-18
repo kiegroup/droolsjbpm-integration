@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.runtime.KieSession;
+import org.kie.api.runtime.KieSession;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

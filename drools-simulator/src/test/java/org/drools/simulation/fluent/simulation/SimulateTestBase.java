@@ -15,7 +15,7 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.conf.ClockTypeOption;
+import org.kie.api.runtime.conf.ClockTypeOption;
 
 public class SimulateTestBase {
 

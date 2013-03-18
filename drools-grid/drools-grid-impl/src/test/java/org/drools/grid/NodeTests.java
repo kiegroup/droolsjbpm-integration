@@ -52,8 +52,8 @@ import org.kie.api.builder.KnowledgeBuilderError;
 import org.kie.api.builder.KnowledgeBuilderErrors;
 import org.kie.api.builder.KnowledgeBuilderFactoryService;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.rule.FactHandle;
 
 public class NodeTests {
 

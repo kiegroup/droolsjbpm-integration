@@ -41,9 +41,9 @@ import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.internal.command.CommandFactory;
-import org.kie.runtime.ExecutionResults;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.FactHandle;
 
 /**
  * Camel - JAXB reproducer test

@@ -35,8 +35,8 @@ import org.kie.api.command.Command;
 import org.kie.api.command.CommandFactory;
 import org.kie.internal.event.knowledgeagent.KnowledgeAgentEventListener;
 import org.kie.api.io.Resource;
-import org.kie.runtime.KieSessionConfiguration;
-import org.kie.runtime.StatelessKnowledgeSession;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.StatelessKnowledgeSession;
 
 /**
  *

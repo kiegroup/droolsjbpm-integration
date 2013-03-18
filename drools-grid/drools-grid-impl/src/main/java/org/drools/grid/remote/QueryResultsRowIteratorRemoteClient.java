@@ -26,7 +26,7 @@ import org.drools.grid.io.ConversationManager;
 import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.command.HasNextQueryResultsRowRemoteCommand;
 import org.drools.grid.remote.command.NextQueryResultsRowRemoteCommand;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 /**
  *

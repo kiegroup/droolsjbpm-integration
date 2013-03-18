@@ -20,7 +20,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
 import org.kie.internal.runtime.KnowledgeRuntime;
-import org.kie.runtime.Channel;
+import org.kie.api.runtime.Channel;
 
 /**
  * A consumer that consumes objects sent into channels of a drools

@@ -44,7 +44,7 @@ import org.drools.core.command.runtime.rule.QueryCommand;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.Context;
-import org.kie.runtime.ExecutionResults;
+import org.kie.api.runtime.ExecutionResults;
 
 import com.hazelcast.impl.ascii.memcache.DeleteCommand;
 

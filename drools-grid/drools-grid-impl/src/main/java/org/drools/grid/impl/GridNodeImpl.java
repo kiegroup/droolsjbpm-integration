@@ -32,7 +32,7 @@ import org.drools.grid.service.directory.WhitePages;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.internal.utils.ServiceRegistry;
 import org.kie.internal.utils.ServiceRegistryImpl;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

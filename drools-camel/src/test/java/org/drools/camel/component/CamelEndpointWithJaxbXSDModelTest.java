@@ -43,8 +43,8 @@ import org.kie.internal.builder.help.KnowledgeBuilderHelper;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.utils.CompositeClassLoader;
 import org.kie.api.io.ResourceType;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.ExecutionResults;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 import com.sun.tools.xjc.Language;

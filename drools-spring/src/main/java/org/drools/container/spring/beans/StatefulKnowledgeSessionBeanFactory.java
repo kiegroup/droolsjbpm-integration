@@ -30,11 +30,11 @@ import org.drools.core.impl.EnvironmentFactory;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.kie.internal.persistence.jpa.JPAKnowledgeService;
-import org.kie.runtime.EnvironmentName;
-import org.kie.runtime.KieSession;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.Environment;
-import org.kie.runtime.process.WorkItemHandler;
+import org.kie.api.runtime.EnvironmentName;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.process.WorkItemHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {

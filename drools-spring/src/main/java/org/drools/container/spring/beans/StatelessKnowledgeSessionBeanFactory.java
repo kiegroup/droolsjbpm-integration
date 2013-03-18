@@ -23,9 +23,9 @@ import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.WorkingMemoryEventListener;
 import org.kie.internal.runtime.StatelessKnowledgeSession;
-import org.kie.runtime.CommandExecutor;
-import org.kie.runtime.StatelessKieSession;
-import org.kie.runtime.process.WorkItemHandler;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.process.WorkItemHandler;
 
 public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessionBeanFactory {
     private StatelessKieSession ksession;

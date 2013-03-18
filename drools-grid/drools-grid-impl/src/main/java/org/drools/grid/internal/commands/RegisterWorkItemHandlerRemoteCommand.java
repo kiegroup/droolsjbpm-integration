@@ -23,9 +23,9 @@ import java.util.logging.Logger;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.kie.api.command.Context;
-import org.kie.runtime.KnowledgeRuntime;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.process.WorkItemHandler;
+import org.kie.api.runtime.KnowledgeRuntime;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.process.WorkItemHandler;
 
 public class RegisterWorkItemHandlerRemoteCommand implements GenericCommand<Object> {
 

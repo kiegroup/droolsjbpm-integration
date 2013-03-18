@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.kie.api.event.rule.DebugWorkingMemoryEventListener;
-import org.kie.runtime.KieSession;
-import org.kie.runtime.StatelessKieSession;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

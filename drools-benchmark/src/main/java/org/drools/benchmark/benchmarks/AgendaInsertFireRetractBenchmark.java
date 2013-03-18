@@ -1,6 +1,6 @@
 package org.drools.benchmark.benchmarks;
 
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.FactHandle;
 
 public class AgendaInsertFireRetractBenchmark extends AgendaBenchmark {
 

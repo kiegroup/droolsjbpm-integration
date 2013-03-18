@@ -27,8 +27,8 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.drools.grid.remote.command.GetQueryIdentifiersRemoteCommand;
 import org.drools.grid.remote.command.GetQueryResultsSizeRemoteCommand;
 import org.drools.grid.remote.command.SetQueryIteratorRemoteCommand;
-import org.kie.runtime.rule.QueryResults;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 /**
  *

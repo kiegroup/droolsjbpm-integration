@@ -9,7 +9,7 @@
       <import name="org.drools.container.spring.beans.persistence.MyEntity" />
       <import name="org.drools.container.spring.beans.persistence.MyVariableSerializable" />
         <import name="javax.persistence.EntityManager" />
-        <import name="org.kie.runtime.EnvironmentName" />
+        <import name="org.kie.api.runtime.EnvironmentName" />
     </imports>
     <variables>
       <variable name="x" >

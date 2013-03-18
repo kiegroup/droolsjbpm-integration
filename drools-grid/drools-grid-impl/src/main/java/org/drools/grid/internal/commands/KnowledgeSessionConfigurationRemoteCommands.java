@@ -21,7 +21,7 @@ import org.drools.SessionConfiguration;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeSessionConfigurationRemoteClient;
 import org.kie.api.command.Context;
-import org.kie.runtime.conf.KieSessionOption;
+import org.kie.api.runtime.conf.KieSessionOption;
 
 /**
  *

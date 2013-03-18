@@ -33,8 +33,8 @@ import org.drools.grid.io.impl.CommandImpl;
 import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactoryService;
-import org.kie.runtime.Environment;
-import org.kie.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.KieSessionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

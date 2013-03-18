@@ -20,8 +20,8 @@ import java.util.Iterator;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.kie.api.command.Context;
-import org.kie.runtime.rule.QueryResults;
-import org.kie.runtime.rule.QueryResultsRow;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 /**
  *

@@ -1,8 +1,8 @@
 package org.drools.container.spring;
 
 import org.drools.core.runtime.rule.impl.DefaultConsequenceExceptionHandler;
-import org.kie.runtime.rule.Match;
-import org.kie.runtime.rule.Session;
+import org.kie.api.runtime.rule.Match;
+import org.kie.api.runtime.rule.Session;
 
 
 public class MockConsequenceExceptionHandler extends DefaultConsequenceExceptionHandler {

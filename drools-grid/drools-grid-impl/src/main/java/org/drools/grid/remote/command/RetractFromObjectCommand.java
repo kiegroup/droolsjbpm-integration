@@ -23,8 +23,8 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.drools.core.common.InternalFactHandle;
 import org.kie.api.command.Context;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.rule.FactHandle;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public class RetractFromObjectCommand

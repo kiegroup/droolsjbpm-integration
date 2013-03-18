@@ -22,7 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.kie.api.command.Command;
-import org.kie.runtime.CommandExecutor;
+import org.kie.api.runtime.CommandExecutor;
 
 public class CommandExecutorImpl
     implements

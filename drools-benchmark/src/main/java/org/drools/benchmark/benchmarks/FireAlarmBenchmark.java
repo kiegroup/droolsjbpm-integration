@@ -20,7 +20,7 @@ import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.FactHandle;
 
 import java.util.*;
 

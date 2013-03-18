@@ -34,7 +34,7 @@ import org.kie.KnowledgeBaseFactoryService;
 import org.kie.api.builder.KnowledgeBuilderFactoryService;
 import org.kie.internal.utils.ServiceRegistry;
 import org.kie.internal.utils.ServiceRegistryImpl;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
