@@ -16,7 +16,7 @@
 
 package  org.drools.springframework
 
-import org.drools.Person
+import org.drools.container.spring.Person
 
 global java.util.List list;
 
