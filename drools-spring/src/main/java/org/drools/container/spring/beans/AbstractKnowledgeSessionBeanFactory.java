@@ -29,8 +29,8 @@ import org.kie.event.process.ProcessEventListener;
 import org.kie.event.rule.AgendaEventListener;
 import org.kie.event.rule.WorkingMemoryEventListener;
 import org.drools.grid.GridNode;
-import org.kie.logger.KnowledgeRuntimeLogger;
-import org.kie.logger.KnowledgeRuntimeLoggerFactory;
+import org.kie.internal.logger.KnowledgeRuntimeLogger;
+import org.kie.internal.logger.KnowledgeRuntimeLoggerFactory;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.process.WorkItemHandler;
@@ -249,7 +249,7 @@ public abstract class AbstractKnowledgeSessionBeanFactory
                         adaptor.setRuntimeLogger(runtimeLogger);
                         break;
                     case LOGGER_TYPE_THREADED_FILE:
-                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger( ( KnowledgeRuntimeEventManager ) ksession, adaptor.getFile(), adaptor.getInterval());
+                        runtimeLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger((KnowledgeRuntimeEventManager) ksession, adaptor.getFile(), adaptor.getInterval());
                         adaptor.setRuntimeLogger(runtimeLogger);
                         break;
                     case LOGGER_TYPE_CONSOLE:
