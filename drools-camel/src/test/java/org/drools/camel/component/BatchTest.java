@@ -27,8 +27,8 @@ import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.definition.KnowledgePackage;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.io.Resource;
-import org.kie.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
@@ -450,7 +450,7 @@ public abstract class BatchTest extends CamelTestSupport {
         str += "    $c.setPrice( $c.getPrice() + 5 ); \n";
         str += "end\n";
 
-        StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource(str.getBytes()) );
         setExec( ksession );
 
         String outXml = execContent( "testInsertWithReturnObjectFalse.in.1" );

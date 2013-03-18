@@ -40,8 +40,8 @@ import org.kie.internal.KnowledgeBaseFactoryService;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactoryService;
 import org.kie.internal.builder.help.KnowledgeBuilderHelper;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.utils.CompositeClassLoader;
-import org.kie.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
@@ -244,7 +244,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
         assertFalse( kbuilder.hasErrors() );
 
         if ( rule != null && rule.length() > 0 ) {
-            kbuilder.add( ResourceFactory.newByteArrayResource( rule.getBytes() ),
+            kbuilder.add( ResourceFactory.newByteArrayResource(rule.getBytes()),
                           ResourceType.DRL );
 
             if ( kbuilder.hasErrors() ) {

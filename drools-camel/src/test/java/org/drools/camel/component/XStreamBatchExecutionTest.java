@@ -59,8 +59,8 @@ import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.definition.KnowledgePackage;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.io.Resource;
-import org.kie.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
@@ -1918,7 +1918,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         inXml += "  </insert>";
         inXml += "</batch-execution>";
 
-        StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource( str.getBytes() ) );
+        StatefulKnowledgeSession ksession = getStatefulKnowledgeSession( ResourceFactory.newByteArrayResource(str.getBytes()) );
         setExec( ksession );
 
         String outXml = template.requestBody( "direct:exec",

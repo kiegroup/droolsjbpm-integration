@@ -40,7 +40,7 @@ import org.kie.internal.builder.JaxbConfiguration;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.builder.KnowledgeBuilderFactoryService;
-import org.kie.io.ResourceFactory;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
@@ -453,8 +453,8 @@ public class CamelEndpointWithJaxbTest extends DroolsCamelTestSupport {
         JaxbConfiguration jaxbConfiguration = KnowledgeBuilderFactory.newJaxbConfiguration( xjcOpts,
                                                                                             "xsd" );
 
-        kbuilder.add( ResourceFactory.newClassPathResource( "person.xsd",
-                                                            getClass() ),
+        kbuilder.add( ResourceFactory.newClassPathResource("person.xsd",
+                getClass()),
                       ResourceType.XSD,
                       jaxbConfiguration );
 

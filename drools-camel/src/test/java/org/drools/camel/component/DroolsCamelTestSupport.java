@@ -48,7 +48,7 @@ import org.kie.internal.KnowledgeBaseFactoryService;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactoryService;
 import org.kie.internal.definition.KnowledgePackage;
-import org.kie.io.ResourceFactory;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
@@ -102,7 +102,7 @@ public abstract class DroolsCamelTestSupport extends CamelTestSupport {
         KnowledgeBuilder kbuilder = node.get( KnowledgeBuilderFactoryService.class ).newKnowledgeBuilder();
 
         if ( rule != null && rule.length() > 0 ) {
-            kbuilder.add( ResourceFactory.newByteArrayResource( rule.getBytes() ),
+            kbuilder.add( ResourceFactory.newByteArrayResource(rule.getBytes()),
                           ResourceType.DRL );
 
             if ( kbuilder.hasErrors() ) {

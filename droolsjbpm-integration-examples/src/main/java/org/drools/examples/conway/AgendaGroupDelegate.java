@@ -20,7 +20,7 @@ import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.io.ResourceFactory;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.io.ResourceType;
 import org.kie.runtime.StatefulKnowledgeSession;
 
@@ -32,8 +32,8 @@ public class AgendaGroupDelegate
     public AgendaGroupDelegate() {
         try {
             KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-            kbuilder.add( ResourceFactory.newClassPathResource( "agendagroup/conway-agendagroup.drl",
-                                                                        getClass() ),
+            kbuilder.add( ResourceFactory.newClassPathResource("agendagroup/conway-agendagroup.drl",
+                    getClass()),
                                   ResourceType.DRL );
 
             KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
