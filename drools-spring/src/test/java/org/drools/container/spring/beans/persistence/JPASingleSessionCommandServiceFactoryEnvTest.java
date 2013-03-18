@@ -55,7 +55,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
-import org.kie.persistence.jpa.KieStoreServices;
+import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.runtime.Environment;
 import org.kie.runtime.KieSession;
 import org.kie.runtime.process.NodeInstance;

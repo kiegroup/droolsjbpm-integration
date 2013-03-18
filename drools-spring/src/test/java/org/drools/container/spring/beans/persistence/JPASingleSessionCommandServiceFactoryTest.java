@@ -35,7 +35,7 @@ import org.drools.core.util.DroolsStreamUtils;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.impl.WorkImpl;
 import org.drools.core.rule.Package;
-import org.kie.persistence.jpa.KieStoreServices;
+import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;
 import org.kie.runtime.KieSession;

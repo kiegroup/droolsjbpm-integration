@@ -42,7 +42,7 @@ import org.kie.marshalling.ObjectMarshallingStrategy;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.kie.internal.persistence.jpa.JPAKnowledgeService;
-import org.kie.persistence.jpa.KieStoreServices;
+import org.kie.api.persistence.jpa.KieStoreServices;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.kie.runtime.Environment;
 import org.kie.runtime.EnvironmentName;
@@ -409,7 +409,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
     //
-    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.persistence.jpa" );
+    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.api.persistence.jpa" );
     //        Environment env = KnowledgeBaseFactory.newEnvironment();
     //        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, emf );
     //
@@ -460,7 +460,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
     //
-    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.persistence.jpa" );
+    //        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "org.kie.api.persistence.jpa" );
     //        Environment env = KnowledgeBaseFactory.newEnvironment();
     //        env.set( EnvironmentName.ENTITY_MANAGER_FACTORY, emf );
     //
