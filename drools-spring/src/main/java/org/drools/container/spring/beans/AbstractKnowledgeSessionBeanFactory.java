@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.drools.container.spring.namespace.EventListenersUtil;
 import org.kie.api.KieBase;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.event.KieRuntimeEventManager;
 import org.kie.internal.event.KnowledgeRuntimeEventManager;
 import org.kie.event.process.ProcessEventListener;

@@ -29,7 +29,7 @@ import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.command.BatchExecutionCommand;
+import org.kie.api.command.BatchExecutionCommand;
 import org.kie.io.ResourceType;
 import org.kie.runtime.ExecutionResults;
 import org.kie.internal.runtime.StatelessKnowledgeSession;

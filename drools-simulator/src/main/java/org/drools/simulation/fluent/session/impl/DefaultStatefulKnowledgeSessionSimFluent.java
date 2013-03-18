@@ -34,7 +34,7 @@ import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.simulation.fluent.test.impl.AbstractTestableFluent;
 import org.drools.simulation.impl.command.AssertRulesFiredCommand;
 import org.drools.simulation.impl.command.FiredRuleCounter;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 import org.kie.internal.simulation.SimulationStep;

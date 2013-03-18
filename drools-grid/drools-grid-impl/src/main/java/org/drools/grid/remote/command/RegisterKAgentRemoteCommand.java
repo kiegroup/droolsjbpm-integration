@@ -25,7 +25,7 @@ import org.kie.internal.agent.KnowledgeAgentConfiguration;
 import org.kie.internal.agent.KnowledgeAgentFactory;
 import org.kie.internal.agent.conf.NewInstanceOption;
 import org.kie.internal.agent.conf.UseKnowledgeBaseClassloaderOption;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 public class RegisterKAgentRemoteCommand
     implements
     GenericCommand<KnowledgeAgent> {

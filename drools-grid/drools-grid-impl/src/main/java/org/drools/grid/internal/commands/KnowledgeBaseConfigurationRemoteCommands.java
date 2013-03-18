@@ -21,7 +21,7 @@ import org.drools.RuleBaseConfiguration;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.grid.remote.KnowledgeBaseConfigurationRemoteClient;
 import org.kie.KieBaseConfiguration;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 import org.kie.conf.KieBaseOption;
 
 /**

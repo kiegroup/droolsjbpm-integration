@@ -44,7 +44,7 @@ import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.junit.Test;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.internal.command.CommandFactory;
 import org.kie.runtime.ExecutionResults;
 import org.kie.internal.runtime.StatefulKnowledgeSession;

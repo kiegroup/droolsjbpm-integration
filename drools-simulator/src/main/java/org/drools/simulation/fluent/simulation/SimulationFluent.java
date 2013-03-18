@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.drools.simulation.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
 import org.kie.api.builder.ReleaseId;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.internal.fluent.FluentRoot;
 import org.kie.internal.simulation.Simulation;
 

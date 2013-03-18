@@ -21,7 +21,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.grid.remote.KnowledgeBuilderConfigurationRemoteClient;
 import org.kie.api.builder.KnowledgeBuilderConfiguration;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 
 /**
  *

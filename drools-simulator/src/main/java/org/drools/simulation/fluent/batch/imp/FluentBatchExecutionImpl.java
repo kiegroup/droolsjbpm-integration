@@ -27,7 +27,7 @@ import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.simulation.fluent.batch.FluentBatchExecution;
 import org.drools.simulation.fluent.test.impl.MapVariableContext;
-import org.kie.command.BatchExecutionCommand;
+import org.kie.api.command.BatchExecutionCommand;
 import org.kie.internal.fluent.VariableContext;
 import org.kie.runtime.rule.FactHandle;
 

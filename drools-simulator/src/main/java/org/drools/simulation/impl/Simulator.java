@@ -30,7 +30,7 @@ import org.drools.core.command.ResolvingKnowledgeCommandContext;
 import org.drools.core.command.impl.ContextImpl;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.time.SessionPseudoClock;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.internal.command.Context;
 import org.kie.internal.command.World;
 import org.kie.internal.runtime.StatefulKnowledgeSession;

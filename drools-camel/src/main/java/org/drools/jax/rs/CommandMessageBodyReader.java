@@ -29,7 +29,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.drools.core.util.StringUtils;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 
 @Consumes("text/plain")
 @Provider

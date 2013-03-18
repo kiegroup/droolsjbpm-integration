@@ -21,8 +21,8 @@ import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.kie.api.builder.KnowledgeBuilder;
 import org.kie.api.builder.KnowledgeBuilderConfiguration;
 import org.kie.api.builder.KnowledgeBuilderFactory;
-import org.kie.command.Context;
-import org.kie.command.World;
+import org.kie.api.command.Context;
+import org.kie.api.command.World;
 
 public class NewKnowledgeBuilderRemoteCommand
     implements

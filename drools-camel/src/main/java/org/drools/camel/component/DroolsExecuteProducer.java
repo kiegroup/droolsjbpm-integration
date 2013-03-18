@@ -41,7 +41,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
 import org.drools.grid.GridNode;
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.runtime.CommandExecutor;
 import org.kie.runtime.ExecutionResults;
 
@@ -60,7 +60,7 @@ public class DroolsExecuteProducer extends DefaultProducer {
         Command<?> cmd = exchange.getIn().getBody( Command.class );
 
         if ( cmd == null ) {
-            throw new RuntimeCamelException( "Body of in message not of the expected type 'org.kie.command.Command' for uri" + de.getEndpointUri() );
+            throw new RuntimeCamelException( "Body of in message not of the expected type 'org.kie.api.command.Command' for uri" + de.getEndpointUri() );
         }
 
         if ( !(cmd instanceof BatchExecutionCommandImpl) ) {

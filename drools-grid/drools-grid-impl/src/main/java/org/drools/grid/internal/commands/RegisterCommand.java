@@ -2,7 +2,7 @@ package org.drools.grid.internal.commands;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.grid.io.impl.NodeData;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 
 public class RegisterCommand
     implements

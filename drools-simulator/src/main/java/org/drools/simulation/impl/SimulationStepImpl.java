@@ -19,7 +19,7 @@ package org.drools.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kie.command.Command;
+import org.kie.api.command.Command;
 import org.kie.internal.simulation.SimulationPath;
 import org.kie.internal.simulation.SimulationStep;
 

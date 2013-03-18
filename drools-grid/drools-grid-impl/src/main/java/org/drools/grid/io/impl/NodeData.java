@@ -2,8 +2,8 @@ package org.drools.grid.io.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.kie.command.Context;
-import org.kie.command.World;
+import org.kie.api.command.Context;
+import org.kie.api.command.World;
 
 public class NodeData {
     private World contextManager;

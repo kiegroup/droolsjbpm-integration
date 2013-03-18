@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 import org.kie.runtime.KnowledgeRuntime;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.process.WorkItemHandler;

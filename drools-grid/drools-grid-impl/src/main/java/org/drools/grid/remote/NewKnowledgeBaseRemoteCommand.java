@@ -20,7 +20,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.kie.KieBaseConfiguration;
 import org.kie.KnowledgeBase;
 import org.kie.KnowledgeBaseFactory;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 
 public class NewKnowledgeBaseRemoteCommand
     implements

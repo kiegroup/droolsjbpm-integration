@@ -4,7 +4,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.drools.grid.io.impl.NodeData;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 
 public class LookupCommand
     implements

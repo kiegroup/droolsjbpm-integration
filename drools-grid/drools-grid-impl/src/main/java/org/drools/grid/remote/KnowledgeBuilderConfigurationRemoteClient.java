@@ -32,7 +32,7 @@ import org.kie.internal.builder.conf.AccumulateFunctionOption;
 import org.kie.internal.builder.conf.KnowledgeBuilderOption;
 import org.kie.internal.builder.conf.MultiValueKnowledgeBuilderOption;
 import org.kie.internal.builder.conf.SingleValueKnowledgeBuilderOption;
-import org.kie.command.CommandFactory;
+import org.kie.api.command.CommandFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

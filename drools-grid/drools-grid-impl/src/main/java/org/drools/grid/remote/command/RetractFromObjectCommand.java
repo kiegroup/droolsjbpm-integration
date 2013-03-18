@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.drools.core.common.InternalFactHandle;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
 

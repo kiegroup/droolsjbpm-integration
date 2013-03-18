@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.impl.KnowledgeCommandContext;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
-import org.kie.command.Context;
+import org.kie.api.command.Context;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.QueryResults;
 import org.kie.runtime.rule.Variable;
