@@ -45,7 +45,7 @@ import org.junit.Test;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.command.Command;
-import org.kie.command.CommandFactory;
+import org.kie.internal.command.CommandFactory;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;

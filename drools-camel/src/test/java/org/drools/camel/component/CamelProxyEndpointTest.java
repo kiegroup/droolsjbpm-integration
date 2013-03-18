@@ -41,7 +41,7 @@ import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.pipeline.camel.Person;
 import org.junit.Test;
-import org.kie.command.CommandFactory;
+import org.kie.internal.command.CommandFactory;
 import org.kie.runtime.ExecutionResults;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;

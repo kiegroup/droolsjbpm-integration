@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.junit.Assert;
-import org.kie.command.Context;
+import org.kie.internal.command.Context;
 
 public class AssertRulesFiredCommand implements GenericCommand<Object> {
 
