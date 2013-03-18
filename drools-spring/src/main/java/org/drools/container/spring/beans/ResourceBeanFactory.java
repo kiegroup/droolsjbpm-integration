@@ -18,7 +18,7 @@ package org.drools.container.spring.beans;
 
 import org.drools.core.io.impl.ClassPathResource;
 import org.drools.core.io.impl.UrlResource;
-import org.kie.io.Resource;
+import org.kie.api.io.Resource;
 import org.springframework.beans.factory.FactoryBean;
 
 public class ResourceBeanFactory

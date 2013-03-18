@@ -19,7 +19,7 @@ package org.drools.container.spring.namespace;
 import java.util.List;
 
 import org.kie.internal.builder.DecisionTableInputType;
-import org.kie.io.ResourceType;
+import org.kie.api.io.ResourceType;
 import org.drools.core.builder.conf.impl.DecisionTableConfigurationImpl;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

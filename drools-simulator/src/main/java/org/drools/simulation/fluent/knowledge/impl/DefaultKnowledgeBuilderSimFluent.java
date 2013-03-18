@@ -24,9 +24,9 @@ import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.impl.AbstractTestableFluent;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.api.command.Command;
-import org.kie.io.Resource;
-import org.kie.io.ResourceConfiguration;
-import org.kie.io.ResourceType;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceConfiguration;
+import org.kie.api.io.ResourceType;
 
 public class DefaultKnowledgeBuilderSimFluent extends AbstractTestableFluent<KnowledgeBuilderSimFluent>
         implements KnowledgeBuilderSimFluent {

@@ -28,7 +28,7 @@ import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.kie.api.builder.ReleaseId;
-import org.kie.io.ResourceType;
+import org.kie.api.io.ResourceType;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

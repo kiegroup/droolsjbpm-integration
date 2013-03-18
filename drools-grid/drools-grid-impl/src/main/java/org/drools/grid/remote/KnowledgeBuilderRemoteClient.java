@@ -37,9 +37,9 @@ import org.kie.api.builder.KnowledgeBuilderErrors;
 import org.kie.api.builder.KnowledgeBuilderResults;
 import org.kie.api.builder.ResultSeverity;
 import org.kie.api.definition.KnowledgePackage;
-import org.kie.io.Resource;
-import org.kie.io.ResourceConfiguration;
-import org.kie.io.ResourceType;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceConfiguration;
+import org.kie.api.io.ResourceType;
 
 public class KnowledgeBuilderRemoteClient
     implements

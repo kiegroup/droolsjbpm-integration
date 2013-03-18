@@ -34,7 +34,7 @@ import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.CommandFactory;
 import org.kie.internal.event.knowledgeagent.KnowledgeAgentEventListener;
-import org.kie.io.Resource;
+import org.kie.api.io.Resource;
 import org.kie.runtime.KieSessionConfiguration;
 import org.kie.runtime.StatelessKnowledgeSession;
 

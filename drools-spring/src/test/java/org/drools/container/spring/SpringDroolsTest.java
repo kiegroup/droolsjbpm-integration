@@ -36,7 +36,7 @@ import org.kie.api.KieBase;
 import org.kie.api.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
 import org.kie.api.definition.KiePackage;
-import org.kie.io.Resource;
+import org.kie.api.io.Resource;
 import org.drools.grid.GridNode;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;

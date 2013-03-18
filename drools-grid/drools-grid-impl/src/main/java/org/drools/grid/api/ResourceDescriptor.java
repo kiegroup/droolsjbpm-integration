@@ -20,7 +20,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Set;
 
-import org.kie.io.ResourceType;
+import org.kie.api.io.ResourceType;
 
 /**
  * Agnostic description of a Resource

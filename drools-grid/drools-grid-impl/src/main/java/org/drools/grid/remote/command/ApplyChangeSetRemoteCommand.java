@@ -20,7 +20,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.kie.ChangeSet;
 import org.kie.internal.agent.KnowledgeAgent;
 import org.kie.api.command.Context;
-import org.kie.io.Resource;
+import org.kie.api.io.Resource;
 
 public class ApplyChangeSetRemoteCommand
     implements
