@@ -59,7 +59,7 @@
               org.drools.grid,
               org.drools.grid.impl,
               <!-- TODO To be investigated as this package is required by org.drools.core.builder.conf.impl
-              org.kie.process;resolution:=optional,
+              org.kie.internal.process;resolution:=optional,
                -->
               <!-- Required for CDI stuffs -->
               javax.enterprise.context,
@@ -71,7 +71,7 @@
             <Embed-Dependency>artifactId=drools-core|drools-compiler|kie-api|kie-internal;scope=compile</Embed-Dependency>
             <DynamicImport-Package>
               <!-- Add this package as some classes are created by EclipseCompiler -->
-              org.kie.process
+              org.kie.internal.process
             </DynamicImport-Package>
             <Embed-Transitive>false</Embed-Transitive>
             <_exportcontents>
