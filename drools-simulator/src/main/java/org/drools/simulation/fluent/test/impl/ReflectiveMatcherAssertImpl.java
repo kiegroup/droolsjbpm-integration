@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.hamcrest.Matcher;
 import org.kie.command.Context;
-import org.kie.fluent.test.ReflectiveMatcher;
-import org.kie.fluent.test.ReflectiveMatcherAssert;
+import org.kie.internal.fluent.test.ReflectiveMatcher;
+import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 

@@ -17,7 +17,7 @@
 package org.drools.simulation.fluent.test.impl;
 
 import org.hamcrest.Matcher;
-import org.kie.fluent.test.ReflectiveMatcher;
+import org.kie.internal.fluent.test.ReflectiveMatcher;
 
 public class AssertThatImpl implements ReflectiveMatcher {
     

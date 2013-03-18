@@ -16,7 +16,7 @@
 
 package org.drools.simulation.fluent.test.impl;
 
-import org.kie.fluent.test.ReflectiveMatcher;
+import org.kie.internal.fluent.test.ReflectiveMatcher;
 
 public class ReflectiveMatcherImpl implements ReflectiveMatcher {
 

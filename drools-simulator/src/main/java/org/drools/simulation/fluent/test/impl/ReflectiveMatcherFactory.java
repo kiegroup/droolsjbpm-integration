@@ -18,8 +18,8 @@ package org.drools.simulation.fluent.test.impl;
 
 import java.util.List;
 
-import org.kie.fluent.test.ReflectiveMatcher;
-import org.kie.fluent.test.ReflectiveMatcherAssert;
+import org.kie.internal.fluent.test.ReflectiveMatcher;
+import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
 
 public class ReflectiveMatcherFactory {
 

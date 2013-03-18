@@ -26,7 +26,7 @@ import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
 import org.junit.Test;
 import org.kie.builder.ReleaseId;
-import org.kie.fluent.VariableContext;
+import org.kie.internal.fluent.VariableContext;
 import org.kie.io.ResourceType;
 
 public class StandardjBPM5FluentTest extends SimulateTestBase {

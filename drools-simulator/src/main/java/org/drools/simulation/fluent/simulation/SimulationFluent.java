@@ -22,7 +22,7 @@ import org.drools.simulation.fluent.session.StatefulKnowledgeSessionSimFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
 import org.kie.builder.ReleaseId;
 import org.kie.command.Command;
-import org.kie.fluent.FluentRoot;
+import org.kie.internal.fluent.FluentRoot;
 import org.kie.simulation.Simulation;
 
 public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationFluent> {

@@ -27,7 +27,7 @@ import java.util.Map;
 import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
-import org.kie.fluent.test.ReflectiveMatcherAssert;
+import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
 public class ReflectiveMatcherFactoryTest {    
     @Test
     public void test1() {

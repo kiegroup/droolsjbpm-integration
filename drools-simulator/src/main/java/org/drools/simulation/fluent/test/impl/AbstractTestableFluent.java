@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 import org.drools.simulation.fluent.test.TestableFluent;
 import org.hamcrest.Matcher;
 import org.kie.command.Command;
-import org.kie.fluent.test.ReflectiveMatcherAssert;
+import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
 
 public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
     

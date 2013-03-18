@@ -28,7 +28,7 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.simulation.fluent.batch.FluentBatchExecution;
 import org.drools.simulation.fluent.test.impl.MapVariableContext;
 import org.kie.command.BatchExecutionCommand;
-import org.kie.fluent.VariableContext;
+import org.kie.internal.fluent.VariableContext;
 import org.kie.runtime.rule.FactHandle;
 
 import java.util.ArrayList;

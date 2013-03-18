@@ -18,7 +18,7 @@ package org.drools.simulation.fluent.knowledge;
 
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
-import org.kie.fluent.FluentKnowledgeBase;
+import org.kie.internal.fluent.FluentKnowledgeBase;
 
 
 public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, TestableFluent<KnowledgeBaseSimFluent> {
