@@ -37,7 +37,7 @@ import org.drools.simulation.impl.command.FiredRuleCounter;
 import org.kie.command.Command;
 import org.kie.runtime.StatefulKnowledgeSession;
 import org.kie.runtime.rule.FactHandle;
-import org.kie.simulation.SimulationStep;
+import org.kie.internal.simulation.SimulationStep;
 
 import java.util.Collections;
 import java.util.List;

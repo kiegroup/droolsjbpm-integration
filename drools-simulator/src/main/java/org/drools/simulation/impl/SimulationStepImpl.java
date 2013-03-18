@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.kie.command.Command;
-import org.kie.simulation.SimulationPath;
-import org.kie.simulation.SimulationStep;
+import org.kie.internal.simulation.SimulationPath;
+import org.kie.internal.simulation.SimulationStep;
 
 public class SimulationStepImpl implements SimulationStep {
 

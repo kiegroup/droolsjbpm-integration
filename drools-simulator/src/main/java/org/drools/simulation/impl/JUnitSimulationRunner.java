@@ -31,9 +31,9 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.kie.command.Command;
 import org.kie.command.Context;
-import org.kie.simulation.Simulation;
-import org.kie.simulation.SimulationPath;
-import org.kie.simulation.SimulationStep;
+import org.kie.internal.simulation.Simulation;
+import org.kie.internal.simulation.SimulationPath;
+import org.kie.internal.simulation.SimulationStep;
 
 public class JUnitSimulationRunner extends Runner {
 
