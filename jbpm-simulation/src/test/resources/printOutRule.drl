@@ -1,0 +1,48 @@
+//created on: Aug 2, 2012
+package simulation
+
+//list any import classes here.
+import org.jbpm.simulation.impl.events.*;
+import java.util.Date;
+
+
+//declare any global variables here
+
+
+
+
+rule "Printout start of process"
+
+    when
+        event : StartSimulationEvent();
+    then
+        System.out.println("Simulation started for process " + event.getProcessId() + " started at " + new Date(event.getStartTime()));
+
+end
+
+rule "Print out end of process"
+    when
+        event : EndSimulationEvent();
+    then
+        System.out.println("Simulation ended for process " + event.getProcessId() + " completed at " + new Date(event.getEndTime()));
+
+end
+
+rule "Print out activity of process"
+    when
+        // exclude HumanTaskActivitySimulationEvent sub class to avoid double printouts
+        // in other cases this could be useful to handle generic stuff here and specific in other rules
+        event : ActivitySimulationEvent(class != HumanTaskActivitySimulationEvent.class);
+    then
+        System.out.println("Simulating activity " + event.getActivityName() + " of process " + event.getProcessId() + " it took : " + event.getDuration());
+
+end
+
+rule "Print out human task details of process"
+
+    when
+        event : HumanTaskActivitySimulationEvent();
+    then
+        System.out.println("Simulating activity " + event.getActivityName() + " of process " + event.getProcessId() + " it took : " + event.getDuration() + " wait time : " + event.getWaitTime());
+
+end

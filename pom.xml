@@ -36,6 +36,10 @@
         <updatePolicy>daily</updatePolicy>
       </snapshots>
     </repository>
+    <repository>
+        <id>jboss-thirdparty-uploads</id>
+        <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads</url>
+    </repository>
   </repositories>
 
   <scm>
@@ -54,6 +58,7 @@
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
     <module>droolsjbpm-integration-examples</module>
+    <module>jbpm-simulation</module>
   </modules>
 
   <profiles>
