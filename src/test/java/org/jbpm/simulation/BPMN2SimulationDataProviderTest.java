@@ -15,8 +15,8 @@ import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.workflow.core.NodeContainer;
 import org.junit.Test;
-import org.kie.definition.process.Connection;
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Connection;
+import org.kie.api.definition.process.Node;
 
 public class BPMN2SimulationDataProviderTest {
 

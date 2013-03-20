@@ -1,11 +1,10 @@
 package org.jbpm.simulation;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.simulation.fluent.simulation.SimulationFluent;
+import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.helper.TestUtils;
@@ -13,13 +12,10 @@ import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.ReleaseId;
-import org.kie.command.World;
-import org.kie.io.ResourceFactory;
-import org.kie.io.ResourceType;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.builder.ReleaseId;
+import org.kie.api.io.ResourceType;
+import org.kie.internal.command.World;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationFluentTest {
 

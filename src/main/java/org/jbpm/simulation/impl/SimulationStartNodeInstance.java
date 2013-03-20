@@ -7,8 +7,8 @@ import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.workflow.core.Node;
 import org.jbpm.workflow.instance.node.StartNodeInstance;
-import org.kie.definition.process.Connection;
-import org.kie.runtime.process.NodeInstance;
+import org.kie.api.definition.process.Connection;
+import org.kie.api.runtime.process.NodeInstance;
 
 public class SimulationStartNodeInstance extends StartNodeInstance {
 

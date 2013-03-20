@@ -15,7 +15,7 @@ import org.jbpm.workflow.core.node.HumanTaskNode;
 import org.jbpm.workflow.core.node.Join;
 import org.jbpm.workflow.core.node.Split;
 import org.jbpm.workflow.core.node.StartNode;
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Node;
 
 
 

@@ -13,8 +13,8 @@ import org.jbpm.workflow.core.impl.NodeImpl;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.definition.process.Node;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.definition.process.Node;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 

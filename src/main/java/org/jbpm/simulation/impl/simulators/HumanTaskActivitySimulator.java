@@ -12,9 +12,9 @@ import org.jbpm.simulation.TimeGeneratorFactory;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.ht.StaffPool;
 import org.jbpm.simulation.util.SimulationUtils;
-import org.kie.definition.process.Node;
-import org.kie.runtime.process.NodeInstance;
-import org.kie.runtime.process.ProcessInstance;
+import org.kie.api.definition.process.Node;
+import org.kie.api.runtime.process.NodeInstance;
+import org.kie.api.runtime.process.ProcessInstance;
 
 public class HumanTaskActivitySimulator implements ActivitySimulator {
 

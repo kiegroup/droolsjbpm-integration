@@ -3,7 +3,7 @@ package org.jbpm.simulation;
 import java.util.Map;
 
 import org.jbpm.simulation.impl.SimulationPath;
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Node;
 
 public interface SimulationDataProvider {
 

@@ -1,8 +1,8 @@
 package org.jbpm.simulation.impl;
 
-import org.drools.command.impl.GenericCommand;
-import org.drools.command.impl.KnowledgeCommandContext;
-import org.drools.time.SessionPseudoClock;
+import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.KnowledgeCommandContext;
+import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationInfo;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
@@ -29,10 +29,9 @@ import org.jbpm.workflow.core.node.WorkItemNode;
 import org.jbpm.workflow.instance.impl.NodeInstanceFactoryRegistry;
 import org.jbpm.workflow.instance.impl.factory.CreateNewNodeFactory;
 import org.jbpm.workflow.instance.impl.factory.ReuseNodeFactory;
-import org.kie.command.Context;
-import org.kie.runtime.KieSession;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.process.ProcessInstance;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.internal.command.Context;
 
 public class SimulateProcessPathCommand implements GenericCommand<Void> {
 

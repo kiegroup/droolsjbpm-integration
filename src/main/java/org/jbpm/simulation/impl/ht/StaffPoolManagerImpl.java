@@ -3,7 +3,7 @@ package org.jbpm.simulation.impl.ht;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Node;
 
 
 public class StaffPoolManagerImpl implements StaffPoolManager {

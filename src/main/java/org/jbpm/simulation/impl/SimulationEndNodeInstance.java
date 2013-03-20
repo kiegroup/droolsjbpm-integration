@@ -5,7 +5,7 @@ import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.workflow.instance.NodeInstanceContainer;
 import org.jbpm.workflow.instance.node.EndNodeInstance;
-import org.kie.runtime.process.NodeInstance;
+import org.kie.api.runtime.process.NodeInstance;
 
 public class SimulationEndNodeInstance extends EndNodeInstance {
 

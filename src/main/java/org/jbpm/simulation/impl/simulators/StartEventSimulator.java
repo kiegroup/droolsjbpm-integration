@@ -4,9 +4,9 @@ import org.jbpm.simulation.ActivitySimulator;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.simulation.impl.events.StartSimulationEvent;
-import org.kie.definition.process.Node;
-import org.kie.runtime.process.NodeInstance;
-import org.kie.runtime.process.ProcessInstance;
+import org.kie.api.definition.process.Node;
+import org.kie.api.runtime.process.NodeInstance;
+import org.kie.api.runtime.process.ProcessInstance;
 
 public class StartEventSimulator implements ActivitySimulator {
 

@@ -56,7 +56,7 @@ import org.jboss.drools.UniformDistributionType;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.util.BPMN2Utils;
 import org.jbpm.simulation.util.SimulationConstants;
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Node;
 
 public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     private Definitions def;

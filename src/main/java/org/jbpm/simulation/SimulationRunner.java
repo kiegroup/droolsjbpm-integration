@@ -1,30 +1,30 @@
 package org.jbpm.simulation;
 import java.util.List;
 
-import org.drools.fluent.simulation.SimulationFluent;
-import org.drools.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.simulation.fluent.simulation.SimulationFluent;
+import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
-import org.kie.KieServices;
-import org.kie.builder.KieBuilder;
-import org.kie.builder.KieFileSystem;
-import org.kie.builder.KieModule;
-import org.kie.builder.Message;
-import org.kie.builder.ReleaseId;
-import org.kie.builder.model.KieBaseModel;
-import org.kie.builder.model.KieModuleModel;
-import org.kie.builder.model.KieSessionModel;
-import org.kie.command.World;
-import org.kie.conf.EqualityBehaviorOption;
-import org.kie.conf.EventProcessingOption;
-import org.kie.io.Resource;
-import org.kie.io.ResourceFactory;
-import org.kie.io.ResourceType;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.conf.ClockTypeOption;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieModule;
+import org.kie.api.builder.Message;
+import org.kie.api.builder.ReleaseId;
+import org.kie.api.builder.model.KieBaseModel;
+import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.conf.EqualityBehaviorOption;
+import org.kie.api.conf.EventProcessingOption;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.conf.ClockTypeOption;
+import org.kie.internal.command.World;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationRunner {
 

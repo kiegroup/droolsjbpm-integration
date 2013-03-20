@@ -3,22 +3,22 @@ package org.jbpm.simulation;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.impl.EnvironmentFactory;
-import org.drools.time.SessionPseudoClock;
+import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.junit.Test;
-import org.kie.KnowledgeBase;
-import org.kie.KnowledgeBaseFactory;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.io.ResourceFactory;
-import org.kie.io.ResourceType;
-import org.kie.runtime.KieSessionConfiguration;
-import org.kie.runtime.StatefulKnowledgeSession;
-import org.kie.runtime.conf.ClockTypeOption;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.conf.ClockTypeOption;
+import org.kie.internal.KnowledgeBase;
+import org.kie.internal.KnowledgeBaseFactory;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationCommandTest {
 

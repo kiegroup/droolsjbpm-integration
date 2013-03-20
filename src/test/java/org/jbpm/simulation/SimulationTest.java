@@ -3,13 +3,13 @@ package org.jbpm.simulation;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.time.SessionPseudoClock;
+import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.helper.TestUtils;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.junit.Test;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 //@Ignore
 public class SimulationTest {

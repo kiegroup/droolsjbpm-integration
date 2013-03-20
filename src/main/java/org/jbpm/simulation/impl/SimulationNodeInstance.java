@@ -7,9 +7,9 @@ import org.jbpm.simulation.ActivitySimulator;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.workflow.instance.impl.NodeInstanceImpl;
-import org.kie.definition.process.Connection;
-import org.kie.definition.process.Node;
-import org.kie.runtime.process.NodeInstance;
+import org.kie.api.definition.process.Connection;
+import org.kie.api.definition.process.Node;
+import org.kie.api.runtime.process.NodeInstance;
 
 public class SimulationNodeInstance extends NodeInstanceImpl {
 
@@ -44,7 +44,7 @@ public class SimulationNodeInstance extends NodeInstanceImpl {
         for (String boundaryEvent : context.getCurrentPath().getBoundaryEventIds()) {
             
             Node boundaryEventNode = null;
-            for (org.kie.definition.process.Node node : getNode().getNodeContainer().getNodes()) {
+            for (Node node : getNode().getNodeContainer().getNodes()) {
                 
                 if (node.getMetaData().get("UniqueId").equals(boundaryEvent) && 
                         node.getMetaData().get("AttachedTo").equals(getNode().getMetaData().get("UniqueId"))) {

@@ -2,7 +2,7 @@ package org.jbpm.simulation.impl.ht;
 
 import java.util.concurrent.TimeUnit;
 
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Node;
 
 
 public interface StaffPool {

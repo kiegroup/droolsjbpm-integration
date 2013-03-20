@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.time.SessionPseudoClock;
+import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.helper.TestUtils;
@@ -14,7 +14,7 @@ import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.junit.Test;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class WorkingMemorySimulationRepositoryTest {
 

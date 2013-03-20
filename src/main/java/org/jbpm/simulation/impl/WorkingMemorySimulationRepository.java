@@ -7,12 +7,12 @@ import org.jbpm.simulation.AggregatedSimulationEvent;
 import org.jbpm.simulation.SimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
-import org.kie.builder.KnowledgeBuilder;
-import org.kie.builder.KnowledgeBuilderFactory;
-import org.kie.io.Resource;
-import org.kie.io.ResourceFactory;
-import org.kie.io.ResourceType;
-import org.kie.runtime.StatefulKnowledgeSession;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class WorkingMemorySimulationRepository extends InMemorySimulationRepository {
 

@@ -14,7 +14,7 @@
  */
 package org.jbpm.simulation.impl.ht;
 
-import org.kie.definition.process.Node;
+import org.kie.api.definition.process.Node;
 
 
 
