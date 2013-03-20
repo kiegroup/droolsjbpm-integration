@@ -9,14 +9,14 @@ import org.jbpm.simulation.impl.events.AggregatedActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class WorkingMemorySimulationRepository extends InMemorySimulationRepository {
 
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
     private boolean fireRulesOnStore = false;
     
     public WorkingMemorySimulationRepository() {
@@ -43,7 +43,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
             throw new RuntimeException("Error while building knowledge base: " + kbuilder.getErrors());
         }
         
-        this.ksession = kbuilder.newKnowledgeBase().newStatefulKnowledgeSession();
+        this.ksession = kbuilder.newKnowledgeBase().newKieSession();
         try {
             // register global for aggregated events
             ksession.setGlobal("simulation", new ArrayList<AggregatedActivitySimulationEvent>());
@@ -69,7 +69,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
             throw new RuntimeException("Error while building knowledge base: " + kbuilder.getErrors());
         }
         
-        this.ksession = kbuilder.newKnowledgeBase().newStatefulKnowledgeSession();
+        this.ksession = kbuilder.newKnowledgeBase().newKieSession();
         try {
             // register global for aggregated events
             ksession.setGlobal("simulation", new ArrayList<AggregatedActivitySimulationEvent>());
@@ -90,7 +90,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
         ksession.fireAllRules();
     }
     
-    public StatefulKnowledgeSession getSession() {
+    public KieSession getSession() {
         return this.ksession;
     }
     
