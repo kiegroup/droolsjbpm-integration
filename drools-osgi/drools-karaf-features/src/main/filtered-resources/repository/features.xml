@@ -8,49 +8,32 @@
   <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
 
   <feature name="drools-common" version="${drools.version}" description="Drools Commons">
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.protobuf-java/${protobuf-google-bundle.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${antlr-bundle.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.woodstox/${woodstock-bundle.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${xstream-bundle.version}</bundle>
+    <bundle>mvn:com.google.protobuf/protobuf-java/${protobuf.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${servicemix-antlr-bundle.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.woodstox/${servicemix-woodstock-bundle.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${servicemix-xstream-bundle.version}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${servicemix-jaxb-spec.version}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${servicemix-jaxb.version}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${servicemix-jaxb.version}</bundle>
     <bundle>mvn:org.mvel/mvel2/${mvel.dep.version}</bundle>
     <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${eclipse-jdt.version}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${eclipse-jdt.version}</bundle>
     <bundle>wrap:mvn:org.codehaus.janino/janino/${janino.version}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${janino.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${quartz-bundle.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${servicemix-quartz-bundle.version}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${javax-inject.version}</bundle>
     <bundle>wrap:mvn:javax.enterprise/cdi-api/1.0-SP4</bundle>
   </feature>
 
-  <feature name="drools-module" version="${drools.version}" description="Drools Module containing core, compiler &amp; KIE">
+  <feature name="drools-module" version="${drools.version}" description="Drools core">
     <feature version="${drools.version}">drools-common</feature>
-    <!-- Should be removed after refactoring of drools-spring packages -->
-    <feature version="${drools.version}">drools-spring</feature>
-    <bundle>mvn:org.drools/drools-compiler-uber-workaround/${drools.version}</bundle>
+    <feature version="${drools.version}">kie</feature>
+    <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
+    <bundle>mvn:org.drools/drools-compiler/${drools.version}</bundle>
   </feature>
 
-  <!-- DOES NOT WORK AS WE HAVE PACKAGING ISSUES WITH KIE
-  <repository name="drools-core-compiler" version="${drools.version}" description="Drools core &amp; compiler">
-      <repository version="${drools.version}">drools-common</repository>
-      <repository version="${drools.version}">drools-kie</repository>
-      <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
-      <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
-  </repository>
-
-  <repository name="drools-kie" version="${drools.version}">
-      <bundle>mvn:org.kie/kie-api/${drools.version}</bundle>
-      <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
-  </repository>
-
-  <repository name="drools-kieuber" version="${drools.version}">
-      <bundle>mvn:org.drools/kie-internal-uber-workaround/${drools.version}</bundle>
-  </repository>
-  -->
-
-  <!-- NOT SURE THAT IT IS REQUIRED
-  <repository name="drools-knowledge" version="${drools.version}">
-      <bundle>mvn:org.kie/knowledge-api/${drools.version}</bundle>
-      <bundle>mvn:org.kie/knowledge-internal-api/${drools.version}</bundle>
-  </repository>
-  -->
+  <feature name="kie" version="${drools.version}">
+    <bundle>mvn:org.kie/kie-api/${drools.version}</bundle>
+    <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
+  </feature>
 
   <feature name="drools-spring" version="${drools.version}" description="Drools Spring">
     <feature version="[3.0,4.0)">spring</feature>
