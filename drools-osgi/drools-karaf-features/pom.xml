@@ -15,15 +15,17 @@
 
   <properties>
     <aries.jpa.version>1.0.1</aries.jpa.version>
-    <antlr-bundle.version>3.5_1</antlr-bundle.version>
     <jexcelapi.version>2.6.12</jexcelapi.version>
-    <quartz-bundle.version>2.1.6_1</quartz-bundle.version>
     <javax-inject.version>1.0</javax-inject.version>
-    <protobuf-google-bundle.version>2.4.1_1</protobuf-google-bundle.version>
     <eclipse-jdt.version>4.2.1</eclipse-jdt.version>
     <janino.version>2.6.1</janino.version>
-    <xstream-bundle.version>1.4.3_1</xstream-bundle.version>
-    <woodstock-bundle.version>3.2.9_3</woodstock-bundle.version>
+    <servicemix-antlr-bundle.version>3.5_1</servicemix-antlr-bundle.version>
+    <servicemix-jaxb.version>2.2.1.1_2</servicemix-jaxb.version>
+    <servicemix-jaxb-spec.version>1.9.0</servicemix-jaxb-spec.version>
+    <servicemix-quartz-bundle.version>2.1.6_1</servicemix-quartz-bundle.version>
+    <servicemix-protobuf-google-bundle.version>2.4.1_1</servicemix-protobuf-google-bundle.version>
+    <servicemix-xstream-bundle.version>1.4.3_1</servicemix-xstream-bundle.version>
+    <servicemix-woodstock-bundle.version>3.2.9_3</servicemix-woodstock-bundle.version>
   </properties>
 
   <build>
