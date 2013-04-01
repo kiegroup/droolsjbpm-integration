@@ -9,10 +9,6 @@
     <artifactId>jbpm-simulation</artifactId>
     <name>jBPM Simulation</name>
 
-    <properties>
-        <eclipse.bpmn2.version>0.7.0.010</eclipse.bpmn2.version>
-        <json.version>20090211</json.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.drools</groupId>
@@ -29,17 +25,14 @@
         <dependency>
             <groupId>org.jbpm</groupId>
             <artifactId>jbpm-bpmn2</artifactId>
-            <version>${jbpm.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jbpm</groupId>
             <artifactId>jbpm-bpmn2-emfextmodel</artifactId>
-            <version>${jbpm.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>org.eclipse.bpmn2</artifactId>
-            <version>${eclipse.bpmn2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -49,14 +42,11 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math</artifactId>
-            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.btm</groupId>
             <artifactId>btm</artifactId>
-            <version>2.1.2</version>
             <scope>test</scope>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
