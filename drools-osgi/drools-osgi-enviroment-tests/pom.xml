@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-osgi</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>drools-osgi-enviroment-tests</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <exam.version>3.0.1</exam.version>
+        <url.version>1.5.2</url.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <modules>
+        <module>drools-osgi-enviroment-tests-common</module>
+        <!-- <module>drools-osgi-enviroment-tests-equinox-juno</module> -->
+        <!-- <module>drools-osgi-enviroment-tests-equinox-kepler</module> -->
+        <module>drools-osgi-enviroment-tests-felix</module>
+        <!-- <module>drools-osgi-enviroment-tests-jbosgi</module> -->
+        <!-- <module>drools-osgi-enviroment-tests-knoplerfish</module> -->
+        <!-- <module>drools-osgi-enviroment-tests-karaf</module> -->
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.knowhowlab.osgi</groupId>
+            <artifactId>org.knowhowlab.osgi.testing.utils</artifactId>
+            <version>1.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.compendium</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.knowhowlab.osgi</groupId>
+            <artifactId>org.knowhowlab.osgi.testing.assertions</artifactId>
+            <version>1.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.compendium</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>junit</groupId> -->
+        <!-- <artifactId>junit</artifactId> -->
+        <!-- </dependency> -->
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-native</artifactId>
+            <version>${exam.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${exam.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${exam.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>${url.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-decisiontables</artifactId>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.4</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.14</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+
+                    <systemProperties>
+                        <property>
+                            <name>project.version</name>
+                            <value>${project.version}</value>
+                        </property>
+                    </systemProperties>
+                    <testFailureIgnore>false</testFailureIgnore>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
