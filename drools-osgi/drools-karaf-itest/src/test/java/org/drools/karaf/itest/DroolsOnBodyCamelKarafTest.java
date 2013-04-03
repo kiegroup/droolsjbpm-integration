@@ -22,6 +22,7 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.drools.camel.example.Person;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.MavenUtils;
@@ -49,7 +50,7 @@ public class DroolsOnBodyCamelKarafTest extends OSGiIntegrationSpringTestSupport
         return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/camel-context.xml"});
     }
 
-    @Test
+    @Test @Ignore
     public void testRuleOnBody() throws Exception {
         Person person = new Person();
         person.setName("Young Scott");
