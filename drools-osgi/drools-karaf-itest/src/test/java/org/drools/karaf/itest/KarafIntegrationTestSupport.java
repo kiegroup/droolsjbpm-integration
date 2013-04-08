@@ -37,7 +37,7 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(KarafIntegrationTestSupport.class);
     private static final String CamelVersion = "2.10.3";
-    protected static final String DroolsVersion = "6.0.0-SNAPSHOT";
+    protected static final String DroolsVersion = "6.0.0.Beta1";
 
     @Inject
     protected BundleContext bundleContext;
