@@ -50,30 +50,6 @@
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
     </dependency>
-    <dependency>
-      <!-- Overwrites the older junit dependency on hamcrest-core 1.1 -->
-       <groupId>org.hamcrest</groupId>
-       <artifactId>hamcrest-core</artifactId>
-       <version>1.2.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-integration</artifactId>
-      <version>1.2.1</version>
-    </dependency>
-    <!-- dependency>
-       <groupId>org.hamsandwich</groupId>
-       <artifactId>hamsandwich</artifactId>
-       <version>1.2</version>
-    </dependency-->
   </dependencies>
 
-  <!-- repositories>
-    <repository>
-       <id>hamsandwich-repo</id>
-       <name>hamsandwich repository on GitHub</name>
-       <url>http://wcmatthysen.github.com/hamsandwich/repository/</url>
-    </repository>
- </repositories -->
 </project>
