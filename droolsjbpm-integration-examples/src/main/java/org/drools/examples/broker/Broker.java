@@ -23,7 +23,7 @@ import org.drools.examples.broker.model.CompanyRegistry;
 import org.drools.examples.broker.model.StockTick;
 import org.drools.examples.broker.ui.BrokerWindow;
 import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KieBaseConfiguration;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;

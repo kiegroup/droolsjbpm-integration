@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.kie.internal.KieBaseConfiguration;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactoryService;
 import org.drools.core.base.evaluators.EvaluatorDefinition;

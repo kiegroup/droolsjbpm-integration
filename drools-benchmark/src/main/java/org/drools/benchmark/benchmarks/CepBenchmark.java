@@ -4,7 +4,7 @@ import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.cep.Figure;
 import org.drools.benchmark.model.cep.Letter;
 import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KieBaseConfiguration;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.api.conf.EventProcessingOption;
