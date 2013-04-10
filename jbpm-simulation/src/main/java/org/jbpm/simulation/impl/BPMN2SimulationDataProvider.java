@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import bpsim.*;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.CancelEventDefinition;
@@ -39,20 +40,6 @@ import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.TimerEventDefinition;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.emf.ecore.util.FeatureMap;
-import org.jboss.drools.CostParameters;
-import org.jboss.drools.DecimalParameterType;
-import org.jboss.drools.DroolsPackage;
-import org.jboss.drools.ElementParameters;
-import org.jboss.drools.FloatingParameterType;
-import org.jboss.drools.NormalDistributionType;
-import org.jboss.drools.Parameter;
-import org.jboss.drools.ParameterValue;
-import org.jboss.drools.PoissonDistributionType;
-import org.jboss.drools.ProcessAnalysisDataType;
-import org.jboss.drools.RandomDistributionType;
-import org.jboss.drools.ResourceParameters;
-import org.jboss.drools.Scenario;
-import org.jboss.drools.UniformDistributionType;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.util.BPMN2Utils;
 import org.jbpm.simulation.util.SimulationConstants;
@@ -90,8 +77,8 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
             }
         	
         	if(scenario.getElementParameters() != null) {
-        		for(ElementParameters eleType : scenario.getElementParameters()) {
-        			if(eleType.getElementId().equals(nodeId)) {
+        		for(ElementParametersType eleType : scenario.getElementParameters()) {
+        			if(eleType.getElementRef().equals(nodeId)) {
         				if(eleType.getControlParameters() != null && eleType.getControlParameters().getProbability() != null) {
         					FloatingParameterType valType = (FloatingParameterType) eleType.getControlParameters().getProbability().getParameterValue().get(0);
                 			properties.put("probability", valType.getValue());
@@ -110,21 +97,19 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                     				properties.put("max", udt.getMax());
                     				properties.put("min", udt.getMin());
                     				properties.put("distributiontype", "uniform");
-                    			} else if(paramValue instanceof RandomDistributionType) {
-                    				RandomDistributionType rdt = (RandomDistributionType) paramValue;
-                    				properties.put("max", rdt.getMax());
-                    				properties.put("min", rdt.getMin());
-                    				properties.put("distributiontype", "random");
+                                // random distribution not supported in bpsim 1.0
+//                    			} else if(paramValue instanceof RandomDistributionType) {
+//                    				RandomDistributionType rdt = (RandomDistributionType) paramValue;
+//                    				properties.put("max", rdt.getMax());
+//                    				properties.put("min", rdt.getMin());
+//                    				properties.put("distributiontype", "random");
                     			} else if(paramValue instanceof PoissonDistributionType) {
                     				PoissonDistributionType pdt = (PoissonDistributionType) paramValue;
                     				properties.put("mean", pdt.getMean());
                     				properties.put("distributiontype", "poisson");
                     			}
-                    			if(eleType.getTimeParameters().getTimeUnit() != null) {
-                    				properties.put("timeunit", eleType.getTimeParameters().getTimeUnit().getName());
-                    			} else {
-                    				properties.put("timeunit", baseTimeUnitValue);
-                    			}
+                                properties.put("timeunit", baseTimeUnitValue);
+
                                 if(eleType.getTimeParameters().getWaitTime() != null) {
                                     FloatingParameterType waittimeType = (FloatingParameterType) eleType.getTimeParameters().getWaitTime().getParameterValue().get(0);
                                     properties.put("waittime", waittimeType.getValue());
@@ -134,10 +119,10 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         				if(eleType.getCostParameters() != null) {
         					CostParameters costParams = eleType.getCostParameters();
         					if(costParams.getUnitCost() != null) {
-        						DecimalParameterType unitCostVal = (DecimalParameterType) costParams.getUnitCost().getParameterValue().get(0);
-        						properties.put("unitcost", unitCostVal.getValue().toString()); 
+                                FloatingParameterType unitCostVal = (FloatingParameterType) costParams.getUnitCost().getParameterValue().get(0);
+        						properties.put("unitcost", unitCostVal.getValue());
         					}
-        					properties.put("currency", costParams.getCurrencyUnit() == null ? baseCurrencyUnitValue : costParams.getCurrencyUnit());
+        					properties.put("currency", baseCurrencyUnitValue);
         				}
         				if(eleType.getResourceParameters() != null) {
         					ResourceParameters resourceParams = eleType.getResourceParameters();
@@ -145,8 +130,8 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         						FloatingParameterType quantityVal = (FloatingParameterType) resourceParams.getQuantity().getParameterValue().get(0);
     	            			properties.put("quantity", quantityVal.getValue()); 
         					}
-        					if(resourceParams.getWorkinghours() != null) {
-        						FloatingParameterType workingHoursVal = (FloatingParameterType) resourceParams.getWorkinghours().getParameterValue().get(0);
+        					if(resourceParams.getAvailability() != null) {
+        						FloatingParameterType workingHoursVal = (FloatingParameterType) resourceParams.getAvailability().getParameterValue().get(0);
     	            			properties.put("workinghours", workingHoursVal.getValue()); 
         					}
         				}
@@ -307,11 +292,11 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         	for(ExtensionAttributeValue extattrval : relationship.getExtensionValues()) {
                 FeatureMap extensionElements = extattrval.getValue();
                 @SuppressWarnings("unchecked")
-                List<ProcessAnalysisDataType> processAnalysisExtensions = (List<ProcessAnalysisDataType>) extensionElements.get(DroolsPackage.Literals.DOCUMENT_ROOT__PROCESS_ANALYSIS_DATA, true);
-                if(processAnalysisExtensions != null && processAnalysisExtensions.size() > 0) {
-                	ProcessAnalysisDataType processAnalysis = processAnalysisExtensions.get(0);
-                	if(processAnalysis.getScenario() != null && processAnalysis.getScenario().size() > 0) {
-                		return processAnalysis.getScenario().get(0);
+                List<BPSimDataType> bpsimExtension = (List<BPSimDataType>) extensionElements.get(BpsimPackage.Literals.DOCUMENT_ROOT__BP_SIM_DATA, true);
+                if(bpsimExtension != null && bpsimExtension.size() > 0) {
+                    BPSimDataType bpmsim = bpsimExtension.get(0);
+                	if(bpmsim.getScenario() != null && bpmsim.getScenario().size() > 0) {
+                		return bpmsim.getScenario().get(0);
                 	}
                 }
         	}

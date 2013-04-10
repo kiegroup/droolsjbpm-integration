@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import bpsim.impl.BpsimPackageImpl;
 import org.eclipse.bpmn2.AdHocSubProcess;
 import org.eclipse.bpmn2.Bpmn2Package;
 import org.eclipse.bpmn2.Definitions;
@@ -25,6 +26,7 @@ public class BPMN2Utils {
 
     public static Definitions getDefinitions(InputStream is) {
         DroolsPackageImpl.init();
+        BpsimPackageImpl.init();
         try {
             ResourceSet resourceSet = new ResourceSetImpl();
             resourceSet
