@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_LggP0BkpEeKRVJpxY83aLQ" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd" targetNamespace="http://www.omg.org/bpmn20">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_LggP0BkpEeKRVJpxY83aLQ" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" targetNamespace="http://www.omg.org/bpmn20">
   <bpmn2:itemDefinition id="_EE3F4D4D-150A-48CA-80DD-B10C58B0FA6E_InMessageType" structureRef="String" />
   <bpmn2:message id="_EE3F4D4D-150A-48CA-80DD-B10C58B0FA6E_InMessage" itemRef="_EE3F4D4D-150A-48CA-80DD-B10C58B0FA6E_InMessageType"/>
   <bpmn2:interface id="_EE3F4D4D-150A-48CA-80DD-B10C58B0FA6E_ServiceInterface" name="">
@@ -69,79 +69,74 @@
   </bpmndi:BPMNDiagram>
   <bpmn2:relationship id="_Lgg26xkpEeKRVJpxY83aLQ">
     <bpmn2:extensionElements>
-      <drools:ProcessAnalysisData>
-        <drools:Scenario xsi:type="drools:Scenario" id="default" name="Simulationscenario">
-          <drools:ScenarioParameters xsi:type="drools:ScenarioParameters" baseTimeUnit="s"/>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_41F58207-1C0E-4F49-86A5-0F135691BF97" id="_Lgg27BkpEeKRVJpxY83aLQ">
-            <drools:TimeParameters xsi:type="drools:TimeParameters">
-              <drools:ProcessingTime xsi:type="drools:Parameter">
-                <drools:RandomDistribution max="100.0" min="50.0"/>
-              </drools:ProcessingTime>
-              <drools:TimeUnit>s</drools:TimeUnit>
-            </drools:TimeParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_E9EC9BB1-5459-4BD5-83EA-B8557D356E07" id="_Lgg27RkpEeKRVJpxY83aLQ">
-            <drools:TimeParameters xsi:type="drools:TimeParameters">
-              <drools:WaitTime xsi:type="drools:Parameter">
-                <drools:FloatingParameter value="0.0"/>
-              </drools:WaitTime>
-              <drools:TimeUnit>ms</drools:TimeUnit>
-            </drools:TimeParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_31B45EC3-8C8C-45DF-8E1E-CA559E2ED8C5" id="_Lgg27hkpEeKRVJpxY83aLQ">
-            <drools:ControlParameters xsi:type="drools:ControlParameters">
-              <drools:Probability xsi:type="drools:Parameter">
-                <drools:FloatingParameter value="100.0"/>
-              </drools:Probability>
-            </drools:ControlParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_92E0F6ED-F967-4E51-A765-3BE22AB3D937" id="_Lgg27xkpEeKRVJpxY83aLQ">
-            <drools:ControlParameters xsi:type="drools:ControlParameters">
-              <drools:Probability xsi:type="drools:Parameter">
-                <drools:FloatingParameter value="100.0"/>
-              </drools:Probability>
-            </drools:ControlParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_2F2F4FF5-DA32-4124-A00F-1D7DFE86A6F2" id="_Lgg28BkpEeKRVJpxY83aLQ">
-            <drools:ControlParameters xsi:type="drools:ControlParameters">
-              <drools:Probability xsi:type="drools:Parameter">
-                <drools:FloatingParameter value="100.0"/>
-              </drools:Probability>
-            </drools:ControlParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_719F0536-EE8D-41A2-B341-1204E214388E" id="_Lgg28RkpEeKRVJpxY83aLQ">
-            <drools:TimeParameters xsi:type="drools:TimeParameters">
-              <drools:ProcessingTime xsi:type="drools:Parameter">
-                <drools:RandomDistribution max="0.0" min="0.0"/>
-              </drools:ProcessingTime>
-              <drools:TimeUnit>ms</drools:TimeUnit>
-            </drools:TimeParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_A056FB3D-A78E-4DDC-89E1-889E2B6F3F26" id="_Lgg28hkpEeKRVJpxY83aLQ">
-            <drools:TimeParameters xsi:type="drools:TimeParameters">
-              <drools:ProcessingTime xsi:type="drools:Parameter">
-                <drools:RandomDistribution max="100.0" min="50.0"/>
-              </drools:ProcessingTime>
-              <drools:TimeUnit>s</drools:TimeUnit>
-            </drools:TimeParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_EE3F4D4D-150A-48CA-80DD-B10C58B0FA6E" id="_Lgg28xkpEeKRVJpxY83aLQ">
-            <drools:TimeParameters xsi:type="drools:TimeParameters">
-              <drools:ProcessingTime xsi:type="drools:Parameter">
-                <drools:RandomDistribution max="300.0" min="100.0"/>
-              </drools:ProcessingTime>
-              <drools:TimeUnit>s</drools:TimeUnit>
-            </drools:TimeParameters>
-          </drools:ElementParameters>
-          <drools:ElementParameters xsi:type="drools:ElementParameters" elementId="_F099CDEB-10AC-428C-A814-1C0C36608019" id="_Lgg29BkpEeKRVJpxY83aLQ">
-            <drools:ControlParameters xsi:type="drools:ControlParameters">
-              <drools:Probability xsi:type="drools:Parameter">
-                <drools:FloatingParameter value="100.0"/>
-              </drools:Probability>
-            </drools:ControlParameters>
-          </drools:ElementParameters>
-        </drools:Scenario>
-      </drools:ProcessAnalysisData>
+      <bpsim:BPSimData>
+        <bpsim:Scenario xsi:type="bpsim:Scenario" id="default" name="Simulationscenario">
+          <bpsim:ScenarioParameters xsi:type="bpsim:ScenarioParameters" baseTimeUnit="s"/>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_41F58207-1C0E-4F49-86A5-0F135691BF97" id="_Lgg27BkpEeKRVJpxY83aLQ">
+            <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
+              <bpsim:ProcessingTime xsi:type="bpsim:Parameter">
+                <bpsim:NormalDistribution mean="1.0" standardDeviation="1.0"/>
+              </bpsim:ProcessingTime>
+            </bpsim:TimeParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_E9EC9BB1-5459-4BD5-83EA-B8557D356E07" id="_Lgg27RkpEeKRVJpxY83aLQ">
+            <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
+              <bpsim:WaitTime xsi:type="bpsim:Parameter">
+                <bpsim:FloatingParameter value="0.0"/>
+              </bpsim:WaitTime>
+            </bpsim:TimeParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_31B45EC3-8C8C-45DF-8E1E-CA559E2ED8C5" id="_Lgg27hkpEeKRVJpxY83aLQ">
+            <bpsim:ControlParameters xsi:type="bpsim:ControlParameters">
+              <bpsim:Probability xsi:type="bpsim:Parameter">
+                <bpsim:FloatingParameter value="100.0"/>
+              </bpsim:Probability>
+            </bpsim:ControlParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_92E0F6ED-F967-4E51-A765-3BE22AB3D937" id="_Lgg27xkpEeKRVJpxY83aLQ">
+            <bpsim:ControlParameters xsi:type="bpsim:ControlParameters">
+              <bpsim:Probability xsi:type="bpsim:Parameter">
+                <bpsim:FloatingParameter value="100.0"/>
+              </bpsim:Probability>
+            </bpsim:ControlParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_2F2F4FF5-DA32-4124-A00F-1D7DFE86A6F2" id="_Lgg28BkpEeKRVJpxY83aLQ">
+            <bpsim:ControlParameters xsi:type="bpsim:ControlParameters">
+              <bpsim:Probability xsi:type="bpsim:Parameter">
+                <bpsim:FloatingParameter value="100.0"/>
+              </bpsim:Probability>
+            </bpsim:ControlParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_719F0536-EE8D-41A2-B341-1204E214388E" id="_Lgg28RkpEeKRVJpxY83aLQ">
+            <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
+              <bpsim:ProcessingTime xsi:type="bpsim:Parameter">
+                <bpsim:NormalDistribution mean="1.0" standardDeviation="1.0"/>
+              </bpsim:ProcessingTime>
+            </bpsim:TimeParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_A056FB3D-A78E-4DDC-89E1-889E2B6F3F26" id="_Lgg28hkpEeKRVJpxY83aLQ">
+            <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
+              <bpsim:ProcessingTime xsi:type="bpsim:Parameter">
+                <bpsim:NormalDistribution mean="1.0" standardDeviation="1.0"/>
+              </bpsim:ProcessingTime>
+            </bpsim:TimeParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_EE3F4D4D-150A-48CA-80DD-B10C58B0FA6E" id="_Lgg28xkpEeKRVJpxY83aLQ">
+            <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
+              <bpsim:ProcessingTime xsi:type="bpsim:Parameter">
+                <bpsim:NormalDistribution mean="1.0" standardDeviation="1.0"/>
+              </bpsim:ProcessingTime>
+            </bpsim:TimeParameters>
+          </bpsim:ElementParameters>
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_F099CDEB-10AC-428C-A814-1C0C36608019" id="_Lgg29BkpEeKRVJpxY83aLQ">
+            <bpsim:ControlParameters xsi:type="bpsim:ControlParameters">
+              <bpsim:Probability xsi:type="bpsim:Parameter">
+                <bpsim:FloatingParameter value="100.0"/>
+              </bpsim:Probability>
+            </bpsim:ControlParameters>
+          </bpsim:ElementParameters>
+        </bpsim:Scenario>
+      </bpsim:BPSimData>
     </bpmn2:extensionElements>
     <bpmn2:source>_LggP0BkpEeKRVJpxY83aLQ</bpmn2:source>
     <bpmn2:target>_LggP0BkpEeKRVJpxY83aLQ</bpmn2:target>

@@ -77,7 +77,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
             }
         	
         	if(scenario.getElementParameters() != null) {
-        		for(ElementParametersType eleType : scenario.getElementParameters()) {
+        		for(ElementParameters eleType : scenario.getElementParameters()) {
         			if(eleType.getElementRef().equals(nodeId)) {
         				if(eleType.getControlParameters() != null && eleType.getControlParameters().getProbability() != null) {
         					FloatingParameterType valType = (FloatingParameterType) eleType.getControlParameters().getProbability().getParameterValue().get(0);
