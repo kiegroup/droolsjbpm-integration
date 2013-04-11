@@ -8,9 +8,9 @@
   <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
 
   <feature name="drools-common" version="${drools.version}" description="Drools Commons">
+    <feature version="[2.6,3.0)">cxf-specs</feature>
     <bundle>mvn:com.google.protobuf/protobuf-java/${protobuf.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${servicemix-antlr-bundle.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.woodstox/${servicemix-woodstock-bundle.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${servicemix-xstream-bundle.version}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${servicemix-jaxb-spec.version}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${servicemix-jaxb.version}</bundle>
@@ -42,6 +42,7 @@
 
   <feature name="drools-camel" version="${drools.version}" description="Drools Camel">
     <feature version="${drools.version}">drools-module</feature>
+    <feature version="${drools.version}">drools-spring</feature>
     <feature version="${camel.version}">camel</feature>
     <feature version="${camel.version}">camel-cxf</feature>
     <feature version="[2.6,3.0)">cxf-specs</feature>
@@ -69,6 +70,5 @@
     <feature version="${drools.version}">drools-camel</feature>
     <bundle>mvn:org.drools/drools-osgi-examples/${drools.version}</bundle>
   </feature>
-
 
 </features>
