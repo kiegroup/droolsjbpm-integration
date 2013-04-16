@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-osgi-environment-tests</artifactId>
+    <version>6.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>drools-osgi-environment-tests-common</artifactId>
+  <description>Drools OSGi Tests</description>
+  <dependencies>
+<!--     <dependency> -->
+<!--       <groupId>org.knowhowlab.osgi</groupId> -->
+<!--       <artifactId>org.knowhowlab.osgi.testing.utils</artifactId> -->
+<!--       <scope>provided</scope> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>org.knowhowlab.osgi</groupId> -->
+<!--       <artifactId>org.knowhowlab.osgi.testing.assertions</artifactId> -->
+<!--       <scope>provided</scope> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>junit</groupId> -->
+<!--       <artifactId>junit</artifactId> -->
+<!--       <scope>provided</scope> -->
+<!--     </dependency> -->
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-container-native</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-junit4</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-link-mvn</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.url</groupId>
+      <artifactId>pax-url-aether</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.url</groupId>
+      <artifactId>pax-url-wrap</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+<!--       <plugin> -->
+<!--         <groupId>org.apache.felix</groupId> -->
+<!--         <artifactId>maven-bundle-plugin</artifactId> -->
+<!--         <extensions>true</extensions> -->
+<!--         <configuration> -->
+<!--           <instructions> -->
+<!--             <Bundle-SymbolicName>org.drools.osgi.tests.common</Bundle-SymbolicName> -->
+<!--             <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy> -->
+<!--             <Export-Package> -->
+<!--                 org.drools.osgi.tests.common.config, -->
+<!--                 org.drools.osgi.tests.env -->
+<!--             </Export-Package> -->
+<!--           </instructions> -->
+<!--         </configuration> -->
+<!--       </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
