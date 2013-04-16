@@ -13,8 +13,6 @@
   <packaging>pom</packaging>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <pax.exam.version>3.0.3</pax.exam.version>
     <pax.url.version>1.5.2</pax.url.version>
     <knowhowlab.osgi.testing.version>1.2.0</knowhowlab.osgi.testing.version>
@@ -131,7 +129,6 @@
       <plugins>
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.14</version>
           <configuration>
             <!-- <failIfNoTests>true</failIfNoTests> -->
             <includes>
@@ -162,7 +159,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.5</version>
           <executions>
             <execution>
               <id>resource-dependencies</id>
@@ -188,7 +184,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
         <configuration>
           <skip>true</skip>
         </configuration>
