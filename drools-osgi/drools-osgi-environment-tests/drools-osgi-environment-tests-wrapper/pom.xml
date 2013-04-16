@@ -25,10 +25,10 @@
       <classifier>tests</classifier>
       <scope>provided</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
-      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>org.osgi</groupId>
@@ -53,7 +53,6 @@
           <artifactId>org.osgi.compendium</artifactId>
         </exclusion>
       </exclusions>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -68,7 +67,6 @@
           <artifactId>org.osgi.compendium</artifactId>
         </exclusion>
       </exclusions>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -83,7 +81,6 @@
           <artifactId>org.osgi.compendium</artifactId>
         </exclusion>
       </exclusions>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
