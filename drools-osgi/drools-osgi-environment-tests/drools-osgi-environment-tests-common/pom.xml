@@ -12,21 +12,6 @@
   <artifactId>drools-osgi-environment-tests-common</artifactId>
   <description>Drools OSGi Tests</description>
   <dependencies>
-<!--     <dependency> -->
-<!--       <groupId>org.knowhowlab.osgi</groupId> -->
-<!--       <artifactId>org.knowhowlab.osgi.testing.utils</artifactId> -->
-<!--       <scope>provided</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.knowhowlab.osgi</groupId> -->
-<!--       <artifactId>org.knowhowlab.osgi.testing.assertions</artifactId> -->
-<!--       <scope>provided</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>junit</groupId> -->
-<!--       <artifactId>junit</artifactId> -->
-<!--       <scope>provided</scope> -->
-<!--     </dependency> -->
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam-container-native</artifactId>
@@ -51,21 +36,6 @@
 
   <build>
     <plugins>
-<!--       <plugin> -->
-<!--         <groupId>org.apache.felix</groupId> -->
-<!--         <artifactId>maven-bundle-plugin</artifactId> -->
-<!--         <extensions>true</extensions> -->
-<!--         <configuration> -->
-<!--           <instructions> -->
-<!--             <Bundle-SymbolicName>org.drools.osgi.tests.common</Bundle-SymbolicName> -->
-<!--             <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy> -->
-<!--             <Export-Package> -->
-<!--                 org.drools.osgi.tests.common.config, -->
-<!--                 org.drools.osgi.tests.env -->
-<!--             </Export-Package> -->
-<!--           </instructions> -->
-<!--         </configuration> -->
-<!--       </plugin> -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
