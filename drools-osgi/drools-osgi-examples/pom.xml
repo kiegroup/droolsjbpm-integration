@@ -21,6 +21,10 @@
       <artifactId>kie-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
     </dependency>
@@ -30,11 +34,21 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
+      <artifactId>drools-decisiontables</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
       <artifactId>drools-spring</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-camel</artifactId>
+    </dependency>
+
+    <!-- POI - Excell -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
     </dependency>
 
     <dependency>
@@ -59,19 +73,14 @@
       <artifactId>camel-spring</artifactId>
     </dependency>
 
-
-    <!-- logging -->
+    <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
+    <dependency><!-- For unit test logging: configure in src/test/resources/logback-test.xml -->
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
     </dependency>
 
     <!-- testing -->
@@ -96,7 +105,12 @@
     <resources>
       <resource>
         <directory>${project.basedir}/src/main/filtered-resources</directory>
-        <filtering>true</filtering>
+        <includes>
+          <include>data/*.xls</include>
+          <include>META-INF/spring/*.xml</include>
+          <include>*.xml</include>
+          <include>*.drl</include>
+        </includes>
       </resource>
     </resources>
 
@@ -132,6 +146,9 @@
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
+        <configuration>
+          <applicationContextUri>META-INF/spring/*.xml</applicationContextUri>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -145,5 +162,37 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>simple</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-maven-plugin</artifactId>
+            <configuration>
+              <applicationContextUri>META-INF/spring/camel-context.xml;META-INF/spring/drools.xml</applicationContextUri>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>decision-table</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-maven-plugin</artifactId>
+            <configuration>
+              <applicationContextUri>META-INF/spring/camel-context-decision-table.xml;META-INF/spring/drools-decision-table.xml</applicationContextUri>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 
 </project>

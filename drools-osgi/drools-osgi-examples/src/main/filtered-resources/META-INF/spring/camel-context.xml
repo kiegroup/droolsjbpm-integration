@@ -15,7 +15,7 @@
         <route trace="false" id="testRoute">
             <description>Example route that will regularly create a Person with a random age and verify their age
             </description>
-            <from uri="timer:testRoute"/>
+            <from uri="timer:testRoute?period=10s"/>
             <bean method="createTestPerson" ref="personHelper"/>
             <to uri="drools:node1/ksession1?action=insertBody" id="AgeVerification">
                 <description>valid 'action' values are:

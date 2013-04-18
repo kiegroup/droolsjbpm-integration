@@ -34,7 +34,6 @@
     </drools:resources>
   </drools:kbase>
 
-
   <drools:ksession id="ksession1" type="stateless" name="stateless1" kbase="kbase1" node="node1"/>
 
   <drools:ksession id="ksession2" type="stateful" kbase="kbase1" node="node1"/>

@@ -40,6 +40,10 @@
     <bundle>mvn:org.drools/drools-spring/${drools.version}</bundle>
   </feature>
 
+  <feature name="drools-templates" version="${drools.version}" description="Drools Templates">
+    <bundle>mvn:org.drools/drools-templates/${drools.version}</bundle>
+  </feature>
+
   <feature name="drools-camel" version="${drools.version}" description="Drools Camel">
     <feature version="${drools.version}">drools-module</feature>
     <feature version="${drools.version}">drools-spring</feature>
@@ -51,9 +55,12 @@
     <bundle>mvn:org.drools/drools-camel/${drools.version}</bundle>
   </feature>
 
-  <feature name="drools-decisiontables" description="Drools Decision Tables" version="5.5.0.Final">
+  <feature name="drools-decisiontable" description="Drools Decision Tables" version="${drools.version}">
     <feature version="${drools.version}">drools-module</feature>
-    <bundle dependency="true">wrap:mvn:net.sourceforge.jexcelapi/jxl/${jexcelapi.version}</bundle>
+    <feature version="${drools.version}">drools-templates</feature>
+    <bundle>wrap:mvn:net.sourceforge.jexcelapi/jxl/${jexcelapi.version}</bundle>
+    <bundle>wrap:mvn:org.apache.poi/poi/3.9</bundle>
+    <bundle>wrap:mvn:org.apache.poi/poi-ooxml/3.9</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${drools.version}</bundle>
   </feature>
 
@@ -66,6 +73,7 @@
 
   <feature name="drools-camel-example" version="${drools.version}" description="Drools Camel Spring Example">
     <feature version="${drools.version}">drools-module</feature>
+    <feature version="${drools.version}">drools-decisiontable</feature>
     <feature version="${drools.version}">drools-spring</feature>
     <feature version="${drools.version}">drools-camel</feature>
     <bundle>mvn:org.drools/drools-osgi-examples/${drools.version}</bundle>

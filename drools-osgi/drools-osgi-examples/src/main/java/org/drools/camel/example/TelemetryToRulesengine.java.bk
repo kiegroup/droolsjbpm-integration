@@ -1,0 +1,173 @@
+package org.drools.camel.example;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Resource;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.RouteBuilder;
+import org.kie.internal.agent.KnowledgeAgent;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.kie.internal.definition.KnowledgePackage;
+import org.kie.api.definition.rule.Rule;
+import org.kie.internal.event.knowledgeagent.AfterChangeSetAppliedEvent;
+import org.kie.internal.event.knowledgeagent.AfterChangeSetProcessedEvent;
+import org.kie.internal.event.knowledgeagent.AfterResourceProcessedEvent;
+import org.kie.internal.event.knowledgeagent.BeforeChangeSetAppliedEvent;
+import org.kie.internal.event.knowledgeagent.BeforeChangeSetProcessedEvent;
+import org.kie.internal.event.knowledgeagent.BeforeResourceProcessedEvent;
+import org.kie.internal.event.knowledgeagent.KnowledgeAgentEventListener;
+import org.kie.internal.event.knowledgeagent.KnowledgeBaseUpdatedEvent;
+import org.kie.internal.event.knowledgeagent.ResourceCompilationFailedEvent;
+import org.kie.api.event.rule.ObjectInsertedEvent;
+import org.drools.core.event.ObjectRetractedEvent;
+import org.kie.api.event.rule.ObjectUpdatedEvent;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.internal.KnowledgeBase;
+
+public class TelemetryToRulesEngine extends RouteBuilder implements
+        WorkingMemoryEventListener, KnowledgeAgentEventListener {
+
+    @Resource(name = "kbase1")
+    protected KnowledgeBase kBase;
+
+    @Resource(name = "ksession1")
+    protected StatefulKnowledgeSession ksession;
+
+    @Resource(name = "kagent")
+    protected KnowledgeAgent kagent;
+
+    @Produce(uri = "direct:processSymbol")
+    protected ProducerTemplate processSymbol;
+
+    @Override
+    public void configure() throws Exception {
+
+        printKBaseContent(kBase);
+        List<String> telemetryStreams = getTelemetryStreams(kBase);
+
+        if(ksession!=null)
+            ksession.addEventListener(this);
+        if(kagent!=null)
+            kagent.addEventListener(this);
+
+        ResourceFactory.getResourceChangeNotifierService().start();
+        ResourceFactory.getResourceChangeScannerService().start();
+
+        from("direct:start").routeId("directTestRoute").to(
+                "drools:/ksession1?action=insertBody");
+
+        from("activemq:topic:" + compileSubscriptionTopic(telemetryStreams))
+                .routeId("telemetryListener").unmarshal().xstream()
+                .to("drools:/ksession1?action=insertBody");
+
+        from("timer:firerules?period=1000").routeId("fireRulesEverySecond")
+                .process(new Processor() {
+                    public void process(Exchange exchange) throws Exception {
+                        FireAllRulesCommand fireAllRulesCommand = new FireAllRulesCommand();
+                        exchange.getOut().setBody(fireAllRulesCommand);
+                    }
+                }).to("drools:/ksession1");
+
+
+    }
+
+    public void objectInserted(ObjectInsertedEvent event) {
+        Object obj = event.getObject();
+        if (obj instanceof UserSymbol) {
+            processSymbol.sendBody(obj);
+        }
+    }
+
+    public void knowledgeBaseUpdated(KnowledgeBaseUpdatedEvent event) {
+        System.out.println("Knowledgebase updated " + event.getKnowledgeBase());
+        try {
+            getContext().stopRoute("telemetryListener");
+            getContext().startRoute("telemetryListener");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private List<String> getTelemetryStreams(KnowledgeBase kb) {
+        // here we can eventually parse input streams from the rules and
+        // then adjust the JMS subscriptions
+        return Arrays.asList("a", "b");
+    }
+
+    private String compileSubscriptionTopic(List<String> telemetryStreams) {
+        String str = "enditems.data";
+/*
+		for (String stream : telemetryStreams) {
+			if (str.length() > 0)
+				str += ",";
+			str += "adco.telemetry." + stream;
+		}
+*/		return str;
+    }
+
+    private void printKBaseContent(KnowledgeBase kbase) {
+        if (kbase == null) {
+            log.error("printKBaseContent: no knowledgebase (null)");
+            return;
+        }
+        Collection<KnowledgePackage> packages = kbase.getKnowledgePackages();
+        for (KnowledgePackage pack : packages) {
+            System.out.println("Package found: " + pack.getName());
+            Collection<Rule> rules = pack.getRules();
+            for (Rule rule : rules) {
+                System.out.println("   Rule found: " + rule.getName());
+            }
+        }
+    }
+
+    public void afterChangeSetApplied(AfterChangeSetAppliedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void afterChangeSetProcessed(AfterChangeSetProcessedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void afterResourceProcessed(AfterResourceProcessedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void beforeChangeSetApplied(BeforeChangeSetAppliedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void beforeChangeSetProcessed(BeforeChangeSetProcessedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void beforeResourceProcessed(BeforeResourceProcessedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void resourceCompilationFailed(ResourceCompilationFailedEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void objectRetracted(ObjectRetractedEvent arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    public void objectUpdated(ObjectUpdatedEvent arg0) {
+        // TODO Auto-generated method stub
+    }
+}
