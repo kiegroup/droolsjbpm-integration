@@ -13,47 +13,32 @@
   <bean id="drools" class="org.drools.camel.component.DroolsComponent"/>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
-    <route trace="false" id="testRoute">
-      <description>Example route that will regularly create a Person with a random age and verify their age
-      </description>
-      <from uri="timer:testRoute?period=10s"/>
-      <bean method="createTestPerson" ref="personHelper"/>
-      <to uri="drools:node1/ksession1?action=insertBody" id="AgeVerification"/>
-      <choice>
-        <when id="CanDrink">
-          <simple>${body.canDrink}</simple>
-          <log logName="Bar" message="Person ${body.name} can go to the bar"/>
-        </when>
-        <otherwise>
-          <log logName="Home" message="Person ${body.name} is staying home"/>
-        </otherwise>
-      </choice>
+
+    <route trace="false" id="testRouteDecisionTable">
+
+      <from uri="timer:testRouteDecisionTable?period=10s"/>
       <bean method="createTestCheese" ref="cheeseHelper"/>
+      <to uri="drools:node-dt-1/ksession-dt-1?action=insertBody" id="AgeVerification"/>
       <choice>
         <when id="CheeseType">
           <simple>${body.type}</simple>
-          <log logName="Chilton" message="Cheese ${body.type} costs ${body.price} €."/>
+          <log logName="Chilton" message="Cheese ${body.type} costs ${body.price} EUR."/>
         </when>
         <otherwise>
-          <log logName="Cheddar" message="Cheese ${body.type} costs ${body.price} €."/>
+          <log logName="Cheddar" message="Cheese ${body.type} costs ${body.price} EUR."/>
         </otherwise>
       </choice>
     </route>
-    <route trace="false" id="ruleOnBody">
-      <description>This route shows an example of passing (inserting) the Body of the message as a POJO to Drools
-        for execution
-      </description>
-      <from uri="direct://ruleOnBody"/>
-      <to uri="drools:node1/ksession1?action=insertBody"/>
+
+    <route trace="false" id="ruleOnBodyDT">
+      <from uri="direct://ruleOnBodyDT"/>
+      <to uri="drools:node-dt-1/ksession-dt-1?action=insertBody"/>
     </route>
-    <route trace="false" id="ruleOnCommand">
-      <description>This route shows an example of creating a Drools Command wrapping the Body of the message with
-        the help of the custom DroolsCommandHelperBean (included in this project), and passing this Drools
-        Command to the ruleset for execution.
-      </description>
-      <from uri="direct://ruleOnCommand"/>
+
+    <route trace="false" id="ruleOnCommandDT">
+      <from uri="direct://ruleOnCommandDT"/>
       <bean method="insertAndFireAll" ref="droolsHelper"/>
-      <to uri="drools:node1/ksession1?action=execute"/>
+      <to uri="drools:node-dt-1/ksession-dt-1?action=execute"/>
     </route>
   </camelContext>
 

@@ -5,9 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd">
 
-    <drools:grid-node id="node1"/>
+    <drools:grid-node id="node-dt-1"/>
 
-    <drools:kbase id="kbase1" node="node1">
+    <drools:kbase id="kbase-dt-1" node="node1">
         <drools:configuration>
             <drools:mbeans enabled="true"/>
         </drools:configuration>
@@ -18,10 +18,10 @@
         </drools:resources>
     </drools:kbase>
 
-    <drools:ksession id="ksession1"
+    <drools:ksession id="ksession-dt-1"
                      type="stateless"
-                     name="ksession1"
-                     kbase="kbase1"
-                     node="node1"/>
+                     name="ksession-dt-1"
+                     kbase="kbase-dt-1"
+                     node="node-dt-1"/>
 
 </beans>

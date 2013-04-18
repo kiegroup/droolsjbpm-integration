@@ -59,8 +59,10 @@
     <feature version="${drools.version}">drools-module</feature>
     <feature version="${drools.version}">drools-templates</feature>
     <bundle>wrap:mvn:net.sourceforge.jexcelapi/jxl/${jexcelapi.version}</bundle>
-    <bundle>wrap:mvn:org.apache.poi/poi/3.9</bundle>
-    <bundle>wrap:mvn:org.apache.poi/poi-ooxml/3.9</bundle>
+    <!--<bundle>wrap:mvn:org.apache.poi/poi/3.9</bundle>
+    <bundle>wrap:mvn:org.apache.poi/poi-ooxml/3.9</bundle>-->
+    <bundle>mvn:commons-codec/commons-codec/1.7</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/3.9_2</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${drools.version}</bundle>
   </feature>
 

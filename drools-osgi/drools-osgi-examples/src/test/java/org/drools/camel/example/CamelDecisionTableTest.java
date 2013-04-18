@@ -29,9 +29,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class CamelDecisionTableTest extends CamelSpringTestSupport {
 
     // templates to send to input endpoints
-    @Produce(uri = "direct://ruleOnBody")
+    @Produce(uri = "direct://ruleOnBodyDT")
     protected ProducerTemplate ruleOnBodyEndpoint;
-    @Produce(uri = "direct://ruleOnCommand")
+    @Produce(uri = "direct://ruleOnCommandDT")
     protected ProducerTemplate ruleOnCommandEndpoint;
 
     @Test @Ignore
