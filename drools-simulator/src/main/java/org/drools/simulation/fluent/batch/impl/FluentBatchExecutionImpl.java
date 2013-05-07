@@ -13,11 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.drools.simulation.fluent.batch.imp;
+package org.drools.simulation.fluent.batch.impl;
 
 import org.drools.core.command.IdentifiableResult;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.CreateProcessInstanceCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
@@ -143,8 +144,26 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    // added but not yet tested
     public FluentBatchExecution signalEvent(String id, Object event) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public FluentBatchExecution out() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public FluentBatchExecution out(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    // added but not yet tested
+    public FluentBatchExecution getGlobal(String identifier) {
+        lastAddedCommand = new GetGlobalCommand(identifier);
+        addCommand(lastAddedCommand);
+        return this;
     }
 
 }

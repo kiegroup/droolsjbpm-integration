@@ -16,24 +16,19 @@
 
 package org.drools.simulation.fluent.session;
 
-import java.util.concurrent.TimeUnit;
-
+import org.drools.simulation.fluent.SimulationFluentBuilder;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
+import org.drools.simulation.fluent.test.RuleTestFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
+import org.kie.internal.fluent.EndContextFluent;
+import org.kie.internal.fluent.runtime.KieSessionFluent;
 
 
-public interface StatefulKnowledgeSessionSimFluent
-        extends StatefulRuleSessionFluent<StatefulKnowledgeSessionSimFluent>,
-        StatefulProcessSessionFluent<StatefulKnowledgeSessionSimFluent>,
-        TestableFluent<StatefulKnowledgeSessionSimFluent> {
+public interface KieSessionSimulationFluent
+        extends KieSessionFluent<KieSessionSimulationFluent>,
+        TestableFluent<KieSessionSimulationFluent>, 
+        SimulationFluentBuilder<KieSessionSimulationFluent>, 
+        EndContextFluent<SimulationFluent>,
+        RuleTestFluent<KieSessionSimulationFluent> {
 
-    StatefulKnowledgeSessionSimFluent newStep(long distanceMillis);
-    StatefulKnowledgeSessionSimFluent newStep(long distanceMillis, TimeUnit timeUnit);
-    StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance);
-    StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit);
-
-    SimulationFluent end(String context, String name);
-    SimulationFluent end(String name);
-    SimulationFluent end();
-    
 }

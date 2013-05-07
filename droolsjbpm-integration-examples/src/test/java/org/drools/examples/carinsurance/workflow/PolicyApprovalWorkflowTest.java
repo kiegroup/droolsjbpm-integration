@@ -16,6 +16,14 @@
 
 package org.drools.examples.carinsurance.workflow;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.examples.carinsurance.domain.Car;
 import org.drools.examples.carinsurance.domain.CarType;
 import org.drools.examples.carinsurance.domain.Driver;
@@ -28,14 +36,6 @@ import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.ResourceType;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public class PolicyApprovalWorkflowTest extends SimulateTestBase {
 

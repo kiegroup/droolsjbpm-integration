@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.NewKieSessionCommand;
 import org.drools.core.command.SetVariableCommandFromLastReturn;
-import org.drools.simulation.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.simulation.fluent.session.KieSessionSimulationFluent;
 import org.drools.simulation.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.impl.AbstractTestableFluent;
@@ -143,11 +143,11 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         return activeKieSessionId;
     }
 
-    public StatefulKnowledgeSessionSimFluent newKieSession() {
+    public KieSessionSimulationFluent newKieSession() {
         return newKieSession( null, null);
     }
     
-    public StatefulKnowledgeSessionSimFluent newKieSession(ReleaseId releaseId, String id) {
+    public KieSessionSimulationFluent newKieSession(ReleaseId releaseId, String id) {
         assureActiveStep();
         activeKieSessionId = id == null ? DEFAULT_ID : id;
         addCommand( new NewKieSessionCommand( releaseId, id ) );
@@ -156,14 +156,14 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         return new DefaultStatefulKnowledgeSessionSimFluent( this );
     }
 
-    public StatefulKnowledgeSessionSimFluent getKieSession() {
+    public KieSessionSimulationFluent getKieSession() {
         if (activeKieSessionId == null) {
             throw new IllegalStateException("There is no activeKnowledgeSession. Call newStatefulKnowledgeSession() instead.");
         }
         return new DefaultStatefulKnowledgeSessionSimFluent( this );
     }
 
-    public StatefulKnowledgeSessionSimFluent getKieSession(String id) {
+    public KieSessionSimulationFluent getKieSession(String id) {
         activeKieSessionId = id;
         addCommand(new GetVariableCommand(id));
         addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));

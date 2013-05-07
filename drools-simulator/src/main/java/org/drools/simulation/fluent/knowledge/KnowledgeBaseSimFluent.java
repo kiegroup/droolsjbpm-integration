@@ -18,15 +18,13 @@ package org.drools.simulation.fluent.knowledge;
 
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
-import org.kie.internal.fluent.FluentKnowledgeBase;
+import org.kie.internal.fluent.EndContextFluent;
+import org.kie.internal.fluent.KnowledgeBaseFluent;
 
 
-public interface KnowledgeBaseSimFluent extends FluentKnowledgeBase<KnowledgeBaseSimFluent>, TestableFluent<KnowledgeBaseSimFluent> {
+public interface KnowledgeBaseSimFluent 
+    extends KnowledgeBaseFluent<KnowledgeBaseSimFluent>, 
+    TestableFluent<KnowledgeBaseSimFluent>, 
+    EndContextFluent<SimulationFluent> {
 
-    SimulationFluent end(String context, String name);
-
-    SimulationFluent end(String name);
-
-    SimulationFluent end();
-        
 }

@@ -17,12 +17,9 @@
   <dependencies>
     <!-- Internal dependencies -->
     <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
+      <!-- includes kie-api and kie-internal which we use here -->
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

@@ -16,31 +16,25 @@
 
 package org.drools.simulation.fluent.simulation;
 
-import java.util.concurrent.TimeUnit;
-
-import org.drools.simulation.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.simulation.fluent.SimulationFluentBuilder;
+import org.drools.simulation.fluent.session.KieSessionSimulationFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.command.Command;
 import org.kie.internal.fluent.FluentRoot;
 import org.kie.internal.simulation.Simulation;
 
-public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationFluent> {
+public interface SimulationFluent extends FluentRoot, TestableFluent<SimulationFluent>, SimulationFluentBuilder<SimulationFluent> {
 
     SimulationFluent newPath(String id);
     SimulationFluent getPath(String id);
 
-    SimulationFluent newStep(long distanceMillis);
-    SimulationFluent newStep(long distanceMillis, TimeUnit timeUnit);
-    SimulationFluent newRelativeStep(long relativeDistance);
-    SimulationFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit);
-
     SimulationFluent addCommand(Command<?> command);
 
     String getActiveKieSessionId();
-    StatefulKnowledgeSessionSimFluent newKieSession(ReleaseId releaseId, String id);
-    StatefulKnowledgeSessionSimFluent getKieSession();
-    StatefulKnowledgeSessionSimFluent getKieSession(String id);
+    KieSessionSimulationFluent newKieSession(ReleaseId releaseId, String id);
+    KieSessionSimulationFluent getKieSession();
+    KieSessionSimulationFluent getKieSession(String id);
 
     /**
      * Gets the Simulation

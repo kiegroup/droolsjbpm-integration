@@ -16,10 +16,18 @@
 
 package org.drools.simulation.fluent.session.impl;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.SetVariableCommandFromLastReturn;
 import org.drools.core.command.runtime.AddEventListenerCommand;
+import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.CreateProcessInstanceCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
@@ -28,25 +36,19 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
-import org.drools.simulation.fluent.session.StatefulKnowledgeSessionSimFluent;
+import org.drools.simulation.fluent.session.KieSessionSimulationFluent;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
 import org.drools.simulation.fluent.test.impl.AbstractTestableFluent;
 import org.drools.simulation.impl.command.AssertRulesFiredCommand;
 import org.drools.simulation.impl.command.FiredRuleCounter;
 import org.kie.api.command.Command;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.simulation.SimulationStep;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFluent<StatefulKnowledgeSessionSimFluent>
-        implements StatefulKnowledgeSessionSimFluent {
+public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFluent<KieSessionSimulationFluent>
+        implements KieSessionSimulationFluent {
     
     private SimulationFluent simulationFluent;
     
@@ -55,43 +57,43 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
         this.simulationFluent = simulationFluent;
     }
 
-    protected StatefulKnowledgeSessionSimFluent addCommand(Command command) {
+    protected KieSessionSimulationFluent addCommand(Command command) {
         simulationFluent.addCommand(command);
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent setGlobal(String identifier,
+    public KieSessionSimulationFluent setGlobal(String identifier,
                                                             Object object) {
         addCommand(new SetGlobalCommand(identifier, object));
         return this;
     }    
     
-    public StatefulKnowledgeSessionSimFluent insert(Object object) {
+    public KieSessionSimulationFluent insert(Object object) {
         addCommand(new InsertObjectCommand(object));
         
         return this;
     }
     
-    public StatefulKnowledgeSessionSimFluent update(FactHandle handle, Object object) {
+    public KieSessionSimulationFluent update(FactHandle handle, Object object) {
         addCommand(new UpdateCommand(handle, object));
         return this;
     }
     
-    public StatefulKnowledgeSessionSimFluent delete(FactHandle handle) {
+    public KieSessionSimulationFluent delete(FactHandle handle) {
         addCommand(new DeleteCommand(handle));
         return this;
     }
     
-    public StatefulKnowledgeSessionSimFluent fireAllRules() {
+    public KieSessionSimulationFluent fireAllRules() {
         addCommand(new FireAllRulesCommand());
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent assertRuleFired(String ruleName) {
+    public KieSessionSimulationFluent assertRuleFired(String ruleName) {
         return assertRuleFired(ruleName, 1);
     }
 
-    public StatefulKnowledgeSessionSimFluent assertRuleFired(String ruleName, int fireCount) {
+    public KieSessionSimulationFluent assertRuleFired(String ruleName, int fireCount) {
         SimulationStep activeStep = ((DefaultSimulationFluent) simulationFluent).getActiveStep();
         FiredRuleCounter firedRuleCounter = new FiredRuleCounter();
         firedRuleCounter.setInclusiveRuleNameList(Collections.singletonList(ruleName));
@@ -140,59 +142,81 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
         return simulationFluent;
     }
 
-    public StatefulKnowledgeSessionSimFluent set(String name) {
+    public KieSessionSimulationFluent set(String name) {
         addCommand(new SetVariableCommandFromLastReturn(null, name));
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent startProcess(String identifier, Map<String, Object> params) {
+    public KieSessionSimulationFluent startProcess(String identifier, Map<String, Object> params) {
         addCommand(new StartProcessCommand(identifier, params));
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent startProcess(String identifier) {
+    public KieSessionSimulationFluent startProcess(String identifier) {
         addCommand(new StartProcessCommand(identifier));
         return this;
     }
     
 
-    public StatefulKnowledgeSessionSimFluent createProcessInstance(String identifier, Map<String, Object> params) {
+    public KieSessionSimulationFluent createProcessInstance(String identifier, Map<String, Object> params) {
         addCommand(new CreateProcessInstanceCommand(identifier, params));
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent startProcessInstance(long processId) {
+    public KieSessionSimulationFluent startProcessInstance(long processId) {
         addCommand(new StartProcessInstanceCommand(processId));
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent signalEvent(String id, Object event, long processId) {
+    public KieSessionSimulationFluent abortProcessInstance(long processInstanceId) {
+        AbortProcessInstanceCommand cmd = new AbortProcessInstanceCommand();
+        cmd.setProcessInstanceId(processInstanceId);
+        addCommand(cmd);
+        return this;
+    }
+
+    public KieSessionSimulationFluent signalEvent(String id, Object event, long processId) {
         addCommand(new SignalEventCommand(processId, id, event));
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent signalEvent(String id, Object event) {
+    public KieSessionSimulationFluent signalEvent(String id, Object event) {
         addCommand(new SignalEventCommand(id, event));
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent newStep(long distanceMillis) {
+    public KieSessionSimulationFluent newStep(long distanceMillis) {
         simulationFluent.newStep(distanceMillis);
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent newStep(long distanceMillis, TimeUnit timeUnit) {
+    public KieSessionSimulationFluent newStep(long distanceMillis, TimeUnit timeUnit) {
         simulationFluent.newStep(distanceMillis, timeUnit);
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance) {
+    public KieSessionSimulationFluent newRelativeStep(long relativeDistance) {
         simulationFluent.newRelativeStep(relativeDistance);
         return this;
     }
 
-    public StatefulKnowledgeSessionSimFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit) {
+    public KieSessionSimulationFluent newRelativeStep(long relativeDistance, TimeUnit timeUnit) {
         simulationFluent.newRelativeStep(relativeDistance, timeUnit);
+        return this;
+    }
+
+    @Override
+    public KieSessionSimulationFluent out() {
+        throw new UnsupportedOperationException("Not supported yet.");    }
+
+    @Override
+    public KieSessionSimulationFluent out(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public KieSessionSimulationFluent getGlobal(String identifier) {
+        addCommand(new GetGlobalCommand(identifier));
         return this;
     }
 
