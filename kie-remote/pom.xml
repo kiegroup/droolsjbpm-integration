@@ -1,0 +1,159 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.drools</groupId>
+    <artifactId>droolsjbpm-integration</artifactId>
+    <version>6.0.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie.remote</groupId>
+  <artifactId>kie-remote</artifactId>
+  <packaging>pom</packaging>
+  
+  <name>KIE Remote Services multiproject</name>
+  <description>
+    Remote services (REST, JMS, etc.) for various kie projects
+  </description>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <modules>
+    <module>kie-services-client</module>
+    <module>kie-services-remote</module>
+  </modules>
+
+  <properties>
+    <!--  eap 6.1 versions -->
+    <resteasy.version>2.3.6.Final</resteasy.version>
+    <hornetq.version>2.3.0.Final</hornetq.version>
+    <camel.version>2.10.3</camel.version>
+
+    <arquillian.version>1.0.0.Final</arquillian.version>
+    <shrinkwrap.version>2.0.0-beta-2</shrinkwrap.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- this module -->
+      <dependency>
+        <groupId>org.kie.remote</groupId>
+        <artifactId>kie-services-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.remote</groupId>
+        <artifactId>kie-services-remote</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!--  jms -->
+      <dependency>
+        <groupId>org.hornetq</groupId>
+        <artifactId>hornetq-core-client</artifactId>
+        <version>${hornetq.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hornetq</groupId>
+        <artifactId>hornetq-jms-client</artifactId>
+        <version>${hornetq.version}</version>
+      </dependency>
+
+      <!-- rest -->
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>jaxrs-api</artifactId>
+        <version>${resteasy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>${resteasy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxb-provider</artifactId>
+        <version>${resteasy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-cdi</artifactId>
+        <version>${resteasy.version}</version>
+      </dependency>
+
+<!-- 
+      // general 
+      <dependency>
+        <groupId>org.jboss.spec.javax.ejb</groupId>
+        <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+        <version>1.0.2.Final</version>
+      </dependency>
+
+      // camel 
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-restlet</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-ejb</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-cdi</artifactId>
+        <version>${camel.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>geronimo-jcdi_1.0_spec</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>geronimo-atinject_1.0_spec</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>deltaspike-core-api</artifactId>
+            <groupId>org.apache.deltaspike.core</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>geronimo-interceptor_1.1_spec</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-jms</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+-->
+
+      <!-- arquillian -->
+      <!-- Override dependency resolver with test version. This must go *BEFORE* the Arquillian BOM. -->
+      <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-bom</artifactId>
+        <version>${shrinkwrap.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <!-- arquillian: contains all versions for specific arquillian artifacts -->
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${arquillian.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

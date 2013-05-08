@@ -1,0 +1,39 @@
+<ejb-jar id="ejb-jar_ID" version="3.1"
+      xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                          http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd">
+
+  <enterprise-beans>
+    <message-driven>
+      <ejb-name>KieSessionRequesMessageBean</ejb-name>
+      <ejb-class>org.jbpm.console.ng.services.jms.RequestMessageBean</ejb-class>
+      <transaction-type>Container</transaction-type>
+      <activation-config>
+        <activation-config-property>
+          <activation-config-property-name>destinationType</activation-config-property-name>
+          <activation-config-property-value>javax.jms.Queue</activation-config-property-value>
+        </activation-config-property>
+        <activation-config-property>
+          <activation-config-property-name>destination</activation-config-property-name>
+          <activation-config-property-value>java:/queue/JBPM.SESSION</activation-config-property-value>
+        </activation-config-property> 
+      </activation-config>
+    </message-driven>  
+    <message-driven>
+      <ejb-name>TaskServiceRequesMessageBean</ejb-name>
+      <ejb-class>org.jbpm.console.ng.services.jms.RequestMessageBean</ejb-class>
+      <transaction-type>Container</transaction-type>
+      <activation-config>
+        <activation-config-property>
+          <activation-config-property-name>destinationType</activation-config-property-name>
+          <activation-config-property-value>javax.jms.Queue</activation-config-property-value>
+        </activation-config-property>
+        <activation-config-property>
+          <activation-config-property-name>destination</activation-config-property-name>
+          <activation-config-property-value>java:/queue/JBPM.TASK</activation-config-property-value>
+        </activation-config-property> 
+      </activation-config>
+    </message-driven>  
+  </enterprise-beans>
+</ejb-jar>

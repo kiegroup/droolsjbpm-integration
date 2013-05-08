@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+    <datasource jndi-name="java:/jdbc/jbpm-ds" enabled="true" use-java-context="true"
+                pool-name="jbpmDS">
+        <connection-url>jdbc:h2:file:arquillian-test;DB_CLOSE_DELAY=-1</connection-url>
+        <driver>h2</driver>
+        <pool></pool>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </datasource>
+    <!--
+    <xa-datasource jndi-name="java:jbdc/jbpm-ds" pool-name="H2XADS">
+        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+        <xa-datasource-property name="URL">jdbc:h2:file:arquillian-test;DB_CLOSE_DELAY=-1</xa-datasource-property>
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </xa-datasource>
+    -->
+</datasources>

@@ -59,6 +59,7 @@
     <module>drools-rhq-plugin</module>
     <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
+    <module>kie-remote</module>
   </modules>
 
   <profiles>
