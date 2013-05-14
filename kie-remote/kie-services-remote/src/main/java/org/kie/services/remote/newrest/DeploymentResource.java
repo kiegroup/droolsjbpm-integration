@@ -13,14 +13,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-import org.kie.services.client.message.serialization.impl.jaxb.JaxbServiceMessage;
 import org.kie.services.remote.ejb.ProcessRequestBean;
+import org.kie.services.remote.newrest.move.me.to.client.JaxbDeploymentMessage;
+import org.kie.services.remote.newrest.move.me.to.client.JaxbResponseMessage;
+import org.kie.services.remote.newrest.move.me.to.client.JaxbTaskMessage;
+import org.kie.services.remote.newrest.move.me.to.client.JaxbVariableOrSignalMessage;
+import org.kie.services.remote.newrest.move.me.to.client.JaxbWorkItemMessage;
 import org.kie.services.remote.rest.DomainResource;
-import org.kie.services.remote.rest.move.me.to.client.JaxbDeploymentMessage;
-import org.kie.services.remote.rest.move.me.to.client.JaxbResponseMessage;
-import org.kie.services.remote.rest.move.me.to.client.JaxbTaskMessage;
-import org.kie.services.remote.rest.move.me.to.client.JaxbVariableOrSignalMessage;
-import org.kie.services.remote.rest.move.me.to.client.JaxbWorkItemMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
