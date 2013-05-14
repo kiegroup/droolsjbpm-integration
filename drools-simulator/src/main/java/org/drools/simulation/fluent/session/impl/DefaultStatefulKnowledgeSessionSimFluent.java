@@ -44,6 +44,7 @@ import org.drools.simulation.impl.command.AssertRulesFiredCommand;
 import org.drools.simulation.impl.command.FiredRuleCounter;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.fluent.runtime.WorkItemManagerFluent;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.simulation.SimulationStep;
 
@@ -218,6 +219,11 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
     public KieSessionSimulationFluent getGlobal(String identifier) {
         addCommand(new GetGlobalCommand(identifier));
         return this;
+    }
+
+    @Override
+    public WorkItemManagerFluent<WorkItemManagerFluent, KieSessionSimulationFluent> getWorkItemManager() {
+        return new DefaultWorkItemManagerSimFluentImpl(this);
     }
 
 }
