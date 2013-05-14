@@ -13,13 +13,14 @@ import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.services.client.message.OperationMessage;
+import org.kie.services.client.message.OperationMessageExecutor;
 import org.kie.services.client.message.ServiceMessage;
 import org.kie.services.remote.cdi.RuntimeManagerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
-public class ProcessRequestBean {
+public class ProcessRequestBean extends OperationMessageExecutor {
 
     private static Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);
 
@@ -33,11 +34,11 @@ public class ProcessRequestBean {
         switch( operation.getServiceType() ) { 
         case ServiceMessage.KIE_SESSION_REQUEST: 
             KieSession kieSession = getRuntimeEngine(request.getDomainName()).getKieSession();
-            result = invokeMethod(operation, kieSession);
+            result = executeOperation(operation, kieSession);
             break;
         case ServiceMessage.TASK_SERVICE_REQUEST:
             TaskService taskService = getRuntimeEngine(request.getDomainName()).getTaskService();
-            result = invokeMethod(operation, taskService);
+            result = executeOperation(operation, taskService);
             break;
         default:
             throw new UnsupportedOperationException("Unknown service type: " + operation.getServiceType());
@@ -48,18 +49,7 @@ public class ProcessRequestBean {
         return new OperationMessage(operation, null);
     }
     
-    private Object invokeMethod(OperationMessage request, Object serviceInstance) {
-        Object result = null;
-        try {
-            result = request.getMethod().invoke(serviceInstance, request.getArgs());
-        } catch (Exception e ) {
-            handlException(request, e);
-        }
-
-        return result;
-    }
-
-    private void handlException(OperationMessage request, Exception e) {
+    protected void handleException(OperationMessage request, Exception e) {
         String serviceClassName = null;
         switch(request.getServiceType()) { 
         case ServiceMessage.KIE_SESSION_REQUEST:
