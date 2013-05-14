@@ -19,7 +19,7 @@ import org.kie.services.remote.newrest.move.me.to.client.JaxbResponseMessage;
 import org.kie.services.remote.newrest.move.me.to.client.JaxbTaskMessage;
 import org.kie.services.remote.newrest.move.me.to.client.JaxbVariableOrSignalMessage;
 import org.kie.services.remote.newrest.move.me.to.client.JaxbWorkItemMessage;
-import org.kie.services.remote.rest.DomainResource;
+import org.kie.services.remote.rest.RuntimeResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
  * 
  *
  */
-public class DeploymentResource {
+public class NewDeploymentResource {
 
-    private Logger logger = LoggerFactory.getLogger(DomainResource.class);
+    private Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
 
     @EJB
     protected ProcessRequestBean processRequestBean;
