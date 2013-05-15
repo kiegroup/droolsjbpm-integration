@@ -8,10 +8,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
-import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
-import org.drools.core.command.runtime.process.SignalEventCommand;
-import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.StartTaskCommand;
 import org.kie.api.command.Command;
 import org.kie.services.remote.ejb.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
@@ -39,6 +37,11 @@ public class TaskResource {
             // TODO: extract params
             String userId = null;
             cmd = new ActivateTaskCommand(taskId, userId);
+        } else  if ("start".equals(operation.toLowerCase().trim())) {
+            uriInfo.getQueryParameters();
+            // TODO: extract params
+            String userId = null;
+            cmd = new StartTaskCommand(taskId, userId);
         } else {
             throw new IncorrectRequestException("Unsupported operation: /task/" + taskId + "/" + operation );
         }

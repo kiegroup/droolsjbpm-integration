@@ -51,7 +51,7 @@ public class RestIntegrationTest extends IntegrationBase {
     @Ignore
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
-        String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.scripttask/start").toExternalForm();
+        String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.humantask/start").toExternalForm();
         System.out.println( ">> " + urlString );
         
         ClientRequest restRequest = new ClientRequest(urlString);
@@ -60,9 +60,23 @@ public class RestIntegrationTest extends IntegrationBase {
         ClientResponse responseObj = restRequest.post();
 
         // Check response
-        assertEquals(200, responseObj.getStatus());
-        Object result = responseObj.getEntity();
-        System.out.println(result);
+//        assertEquals(200, responseObj.getStatus());
+//        Object result = responseObj.getEntity();
+//        System.out.println(result);
+        
+        urlString = new URL(deploymentUrl, "/arquillian-test/rest/task/1/start").toExternalForm();
+        System.out.println( ">> " + urlString );
+        
+        restRequest = new ClientRequest(urlString);
+
+        // Get response
+        responseObj = restRequest.post();
+
+        // Check response
+//        assertEquals(200, responseObj.getStatus());
+//        Object result = responseObj.getEntity();
+//        System.out.println(result);
+
     }
     
 //    @Test
