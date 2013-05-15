@@ -45,7 +45,7 @@ public class RuntimeResource {
     // Helper data --------------------------------------------------------------------------------------------------------------
 
     @POST
-    @Path("/process/{processDefId: [a-zA-Z0-9]+}/start")
+    @Path("/process/{processDefId}/start")
     public void startNewProcess(@PathParam("processDefId") String processId, @Context UriInfo uriInfo) {
         Command cmd = new StartProcessCommand(processId);
         uriInfo.getQueryParameters();

@@ -19,15 +19,7 @@ package org.kie.services.remote;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -36,20 +28,11 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.commons.java.nio.file.spi.FileSystemProvider;
-import org.kie.commons.java.nio.fs.file.SimpleFileSystemProvider;
 import org.kie.services.remote.setup.ArquillianJbossServerSetupTask;
-
-import com.sun.tools.internal.ws.processor.model.Request;
 
 @RunAsClient
 @RunWith(Arquillian.class)
@@ -58,7 +41,7 @@ public class RestIntegrationTest extends IntegrationBase {
 
     @Deployment(testable = false)
     public static WebArchive createTestWar() {
-     return createWebArchive();
+         return createWebArchive();
     }
 
     @ArquillianResource
@@ -68,22 +51,22 @@ public class RestIntegrationTest extends IntegrationBase {
     @Ignore
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
-        String urlString = new URL(deploymentUrl, "test" + "/session/startProcess").toExternalForm();
+        String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.scripttask/start").toExternalForm();
         System.out.println( ">> " + urlString );
         
         ClientRequest restRequest = new ClientRequest(urlString);
-        restRequest.queryParameter("processId", "org.jbpm.scripttask");
 
         // Get response
-        ClientResponse<String> responseObj = restRequest.post(String.class);
+        ClientResponse responseObj = restRequest.post();
 
         // Check response
         assertEquals(200, responseObj.getStatus());
-        String result = responseObj.getEntity();
+        Object result = responseObj.getEntity();
+        System.out.println(result);
     }
     
-    @Test
-    public void shouldBeAbleToDeployAndProcessSimpleRestXmlRequest() throws Exception { 
+//    @Test
+//    public void shouldBeAbleToDeployAndProcessSimpleRestXmlRequest() throws Exception { 
 //        SameApiRequestHandler requestFactory = getSameApiRequestFactory();
 //
 //        // create service request
@@ -111,7 +94,7 @@ public class RestIntegrationTest extends IntegrationBase {
 //        // Check response
 //        assertEquals(200, responseObj.getStatus());
 //        String result = responseObj.getEntity();
-    }
+//    }
 
 //    private SameApiRequestHandler getSameApiRequestFactory() { 
 //        SameApiRequestHandler factory = ApiRequestFactoryProvider.createNewSameApiInstance();

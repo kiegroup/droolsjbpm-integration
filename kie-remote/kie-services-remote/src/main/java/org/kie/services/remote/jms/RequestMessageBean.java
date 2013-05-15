@@ -36,7 +36,7 @@ public class RequestMessageBean implements MessageListener {
     @Inject
     private ProcessRequestBean processRequestBean;
 
-    @Inject
+//    @Inject
 //    private MessageSerializationProviderFactory serializationProviderFactory;
 
     public void onMessage(Message message) {
