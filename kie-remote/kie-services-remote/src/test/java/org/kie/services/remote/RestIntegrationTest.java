@@ -47,8 +47,8 @@ public class RestIntegrationTest extends IntegrationBase {
     @ArquillianResource
     URL deploymentUrl;
 
-    @Test
     @Ignore
+    @Test
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
         String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.humantask/start").toExternalForm();
@@ -64,7 +64,7 @@ public class RestIntegrationTest extends IntegrationBase {
 //        Object result = responseObj.getEntity();
 //        System.out.println(result);
         
-        urlString = new URL(deploymentUrl, "/arquillian-test/rest/task/1/start").toExternalForm();
+        urlString = new URL(deploymentUrl, "/arquillian-test/rest/task/1/start?userId=salaboy").toExternalForm();
         System.out.println( ">> " + urlString );
         
         restRequest = new ClientRequest(urlString);

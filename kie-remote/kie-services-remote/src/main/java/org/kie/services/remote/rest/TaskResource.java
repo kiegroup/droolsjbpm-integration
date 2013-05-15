@@ -5,6 +5,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -30,17 +31,20 @@ public class TaskResource {
 
     @POST
     @Path("/{oper: [a-zA-Z]+}")
-    public void doTaskOperation(@PathParam("oper") String operation, @Context UriInfo uriInfo) { 
+    public void doTaskOperation(@PathParam("oper") String operation, @Context UriInfo uriInfo, @QueryParam("userId") String userId) { 
         Command cmd; 
+        if (userId == null) {
+        	// TODO: error handling
+        	throw new RuntimeException("start task: userId null");
+        }
         if ("activate".equals(operation.toLowerCase().trim())) {
             uriInfo.getQueryParameters();
             // TODO: extract params
-            String userId = null;
             cmd = new ActivateTaskCommand(taskId, userId);
-        } else  if ("start".equals(operation.toLowerCase().trim())) {
+        } else if ("start".equals(operation.toLowerCase().trim())) {
             uriInfo.getQueryParameters();
             // TODO: extract params
-            String userId = null;
+            System.out.println("StartTaskCommand " + taskId + " " + userId);
             cmd = new StartTaskCommand(taskId, userId);
         } else {
             throw new IncorrectRequestException("Unsupported operation: /task/" + taskId + "/" + operation );
