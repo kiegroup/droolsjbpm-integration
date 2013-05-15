@@ -6,11 +6,11 @@ import javax.ws.rs.core.Response.Status;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.kie.api.command.Command;
-import org.kie.internal.task.api.TaskCommandExecutor;
+import org.kie.api.runtime.CommandExecutor;
 import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
 import org.kie.services.client.message.serialization.impl.JaxbSerializationProvider;
 
-public class RemoteTaskCommandExecutor implements TaskCommandExecutor {
+public class RemoteTaskCommandExecutor implements CommandExecutor {
 	
 	private String url;
 	private String deploymentId;
@@ -20,7 +20,7 @@ public class RemoteTaskCommandExecutor implements TaskCommandExecutor {
 		this.deploymentId = deploymentId;
 	}
 	
-	public <T> T executeTaskCommand(Command<T> command) {
+	public <T> T execute(Command<T> command) {
         ClientRequest restRequest = new ClientRequest(url);
         try {
             restRequest.body(MediaType.APPLICATION_XML,

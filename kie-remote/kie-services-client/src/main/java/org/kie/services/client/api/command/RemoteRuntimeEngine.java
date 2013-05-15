@@ -3,10 +3,10 @@ package org.kie.services.client.api.command;
 import org.drools.core.command.CommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.jbpm.services.task.impl.command.CommandBasedTaskService;
+import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
-import org.kie.internal.task.api.TaskCommandExecutor;
 
 public class RemoteRuntimeEngine implements RuntimeEngine {
 
@@ -34,7 +34,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 		if (this.contextId != null) {
 			url += "?contextId=" + contextId;
 		}
-		TaskCommandExecutor executor = new RemoteTaskCommandExecutor(url, deploymentId);
+		CommandExecutor executor = new RemoteTaskCommandExecutor(url, deploymentId);
 		return new CommandBasedTaskService(executor);
 	}
 
