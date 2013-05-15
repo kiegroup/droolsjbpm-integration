@@ -23,11 +23,7 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.kie.api.command.Command;
-import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
-import org.kie.services.client.message.OperationMessage;
-import org.kie.services.client.message.ServiceMessage;
-import org.kie.services.client.message.serialization.impl.JaxbSerializationProvider;
 import org.kie.services.remote.ejb.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
@@ -120,8 +116,6 @@ public class RuntimeResource {
     @Consumes(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbGenericResponse execute(JaxbCommandMessage cmdMsg) {
-        ServiceMessage requestMsg = null;
-        // TODO: convert cmdMsg to msg
         List<Object> results = new ArrayList<Object>();
         for( Object cmd : cmdMsg.getCommands() ) {
             Object result = processRequestBean.doKieSessionOperation((Command) cmd, deploymentId);

@@ -8,7 +8,7 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
-import org.kie.services.client.message.serialization.impl.JaxbSerializationProvider;
+import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbSerializationProvider;
 
 public class RemoteTaskCommandExecutor implements CommandExecutor {
 	
