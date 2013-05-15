@@ -6,6 +6,9 @@ import javax.jms.Session;
 import org.kie.services.client.message.ServiceMessage;
 import org.kie.services.client.message.serialization.MessageSerializationProvider;
 
+/**
+ * TODO: THIS IS NOT PRODUCTION READY!!
+ */
 public class ProtobufSerializationProvider implements MessageSerializationProvider {
 
     /**

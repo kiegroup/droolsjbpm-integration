@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessRuntime;
 
@@ -17,34 +18,33 @@ import org.kie.api.runtime.process.ProcessRuntime;
  */
 public class OperationMessage {
 
-    private Method method;
+    private Command command;
     // See ServiceMessage
     private int serviceType;
     // taskId or processInstanceId
     private Long objectId;
-    private Object[] args;
-    private boolean response = false;
+    private Object result = null;
     
-    public OperationMessage(Method method, int serviceType, boolean response) {
-        this.method = method;
+    public OperationMessage(Command command, int serviceType, Object result) {
+        this.command = command;
         this.serviceType = serviceType;
-        this.response = response;
+        this.result = result;
     }
     
-    public OperationMessage(Method method, Object [] args, int serviceType) { 
-        this.method = method;
+    public OperationMessage(Command method, Object [] args, int serviceType) { 
+        this.command = method;
         this.serviceType = serviceType;
-        this.args = args;
     }
 
     /**
      * Default constructor for REST operations
      * 
-     * @param methodName
+     * @param commandName
      * @param serviceType
      */
-    public OperationMessage(String methodName, Object [] args, int serviceType) { 
-        this(getMethodFromNameAndArgs(methodName, args.length, serviceTypeToClass(serviceType)), args);
+    public OperationMessage(String commandName, Object [] args, int serviceType) { 
+        // TODO: mapping from commandName/args to command
+        // this(getMethodFromNameAndArgs(commandName, args.length, serviceTypeToClass(serviceType)), args);
     }
 
     /**
@@ -54,16 +54,14 @@ public class OperationMessage {
      * @param result
      */
     public OperationMessage(OperationMessage operationRequest, Object result) {
-        this(operationRequest.method, operationRequest.serviceType, true);
-        this.args = new Object[1];
-        this.args[0] = result;
+        this(operationRequest.command, operationRequest.serviceType, true);
     }
 
     // Constructor for Request
-    public OperationMessage(Method method, Object[] args) {
-        this.method = method;
-        this.args = args;
-        setServiceType(method);
+    public OperationMessage(Command command) { 
+        this.command = command;
+        // TODO: determine service type (task? kiesession?)
+        // setServiceType(command);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -90,12 +88,8 @@ public class OperationMessage {
         }
     }
 
-    public Method getMethod() {
-        return this.method;
-    }
-
-    public String getMethodName() {
-        return this.method.getName();
+    public Command getCommand() {
+        return this.command;
     }
 
     /**
@@ -108,30 +102,16 @@ public class OperationMessage {
         return this.serviceType;
     }
 
-    public Object[] getArgs() {
-        return this.args;
-    }
-
-    public void setArgs(Object[] args) {
-        this.args = args;
-    }
-
     public Object getResult() {
-        return this.args[0];
+        return this.result;
     }
 
     public void setResult(Object result) {
-        this.args = new Object[1];
-        this.args[0] = result;
-        this.response = true;
+        this.result = result;
     }
 
     public boolean isResponse() {
-        return response;
-    }
-
-    public void setResponse(boolean responseStatus) {
-        this.response = responseStatus;
+        return result != null;
     }
 
     public Long getObjectId() {
@@ -141,7 +121,5 @@ public class OperationMessage {
     public void setObjectId(Long processInstanceOrTaskId) {
         this.objectId = processInstanceOrTaskId;
     }
-
-    // helper methods (methodName --> method) ------------------------------------------------------------------------------------
 
 }

@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
 import org.kie.services.client.message.OperationMessage;
 import org.kie.services.client.message.ServiceMessage;
 
@@ -24,8 +25,8 @@ public class JaxbServiceMessage {
     @XmlSchemaType(name="int")
     private Integer version; 
     
-    @XmlElement(name="operation")
-    private List<JaxbOperation> operations = new ArrayList<JaxbOperation>();
+    @XmlElement(name="command")
+    private List<JaxbCommandMessage> commands = new ArrayList<JaxbCommandMessage>();
     
     public JaxbServiceMessage() { 
         // Default constructor
@@ -34,11 +35,11 @@ public class JaxbServiceMessage {
     public JaxbServiceMessage(ServiceMessage origRequest) { 
        this.domain = origRequest.getDomainName();
        this.version = origRequest.getVersion();
-       this.operations = new ArrayList<JaxbOperation>();
+       this.commands = new ArrayList<JaxbCommandMessage>();
        
        for( OperationMessage oper : origRequest.getOperations() ) { 
-           JaxbOperation jaxbOper = new JaxbOperation(oper);
-           operations.add(jaxbOper);
+           JaxbCommandMessage jaxbCmd = new JaxbCommandMessage(oper);
+           commands.add(jaxbCmd);
        }
     }
     
@@ -59,11 +60,11 @@ public class JaxbServiceMessage {
     }
 
     public void addOperation(OperationMessage origOper) {
-        this.operations.add(new JaxbOperation(origOper));
+        this.commands.add(new JaxbCommandMessage(origOper));
     }
 
-    public List<JaxbOperation> getOperations() { 
-        return this.operations;
+    public List<JaxbCommandMessage> getOperations() { 
+        return this.commands;
     }
     
 }

@@ -14,6 +14,7 @@ import java.util.Queue;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.api.task.TaskService;
@@ -48,66 +49,13 @@ public class ServiceMessageMapper {
     /**
      * See {@link #getMethodFromNameAndArgs(String, int, Class)}
      */
-    public static Method getMethodFromNameAndArgs(String methodName, int numArgs, int serviceType) {
+    public static Command getMethodFromNameAndArgs(String methodName, int numArgs, int serviceType) {
         Class<?> service = serviceTypeToClass(serviceType);
         return getMethodFromNameAndArgs(methodName, numArgs, service);
     }
     
-    /**
-     * This will not work for the following methods:
-     * <ul> 
-     * <li>{@link KieSession#fireAllRules(int)}</li>
-     * <li>{@link KieSession#fireAllRules(org.kie.api.runtime.rule.AgendaFilter)}</li>
-     * <li>{@link KieSession#addEventListener(org.kie.api.event.rule.AgendaEventListener)}</li>
-     * <li>{@link KieSession#addEventListener(org.kie.api.event.process.ProcessEventListener)}</li>
-     * <li>{@link KieSession#addEventListener(org.kie.api.event.rule.WorkingMemoryEventListener)}</li>
-     * <li>{@link KieSession#removeEventListener(org.kie.api.event.rule.AgendaEventListener)}</li>
-     * <li>{@link KieSession#removeEventListener(org.kie.api.event.process.ProcessEventListener)}</li>
-     * <li>{@link KieSession#removeEventListener(org.kie.api.event.rule.WorkingMemoryEventListener)}</li>
-     * </ul>
-     * @param methodName The method name, regardless of lower/uppercase
-     * @param numArgs The number of parameters 
-     * @param servicea The class of the instance that the method will be called on
-     * @return
-     */
-    public static Method getMethodFromNameAndArgs(String methodName, int numArgs, Class<?> service) {
-        boolean operationExists = false;
-        List<Method> possibleMethods = new ArrayList<Method>();
-        
-        List<Method> serviceMethods = new ArrayList<Method>();
-        Queue<Class<?>> interfaces = new LinkedList<Class<?>>();
-        interfaces.add(service);
-        interfaces.addAll(Arrays.asList(service.getInterfaces()));
-        while (service != null) { 
-            serviceMethods.addAll(Arrays.asList(service.getDeclaredMethods()));
-            interfaces.addAll(Arrays.asList(service.getInterfaces()));
-            service = interfaces.poll();
-        }
-        for(Method method : serviceMethods ) { 
-            // Operation message may contain name with incorrect lower/upper case
-            if (method.getName().matches("(?i)" + methodName)) {
-                possibleMethods.add(method);
-                operationExists = true;
-            }
-    
-        }
-    
-        // Check if method name with supplied parameters exists
-        if (operationExists) {
-            Method correctMethod = null;
-            for (Method possMethod : possibleMethods) {
-                if (possMethod.getParameterTypes().length <= numArgs) {
-                    if (correctMethod == null) {
-                        correctMethod = possMethod;
-                    } else if (possMethod.getParameterTypes().length > correctMethod.getParameterTypes().length) {
-                        correctMethod = possMethod;
-                    }
-                }
-            }
-            if (correctMethod != null) {
-                return correctMethod;
-            }
-        }
+
+    public static Command getMethodFromNameAndArgs(String methodName, int numArgs, Class<?> service) {
         return null;
     }
 
@@ -115,10 +63,10 @@ public class ServiceMessageMapper {
     
     public static ServiceMessage convertQueryParamsToServiceMsg(String domain, String operName, MultivaluedMap<String, String> queryParams, int serviceType, Long objectId, 
             Map<Method, Map<String, Integer>> methodArgsMap) {
-        Method method = getMethodFromNameAndArgs(operName, queryParams.size(), serviceType);
+        Command method = getMethodFromNameAndArgs(operName, queryParams.size(), serviceType);
         Object [] args = convertQueryParamsToMethodParams(method, queryParams, methodArgsMap);
         ServiceMessage srvcMsg = new ServiceMessage(domain);
-        OperationMessage operMsg = new OperationMessage(method, args, serviceType);
+        OperationMessage operMsg = new OperationMessage(method, serviceType);
         srvcMsg.addOperation(operMsg);
         return srvcMsg;
     }
