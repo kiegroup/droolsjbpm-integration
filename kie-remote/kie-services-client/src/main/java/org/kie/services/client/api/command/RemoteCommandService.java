@@ -25,12 +25,13 @@ public class RemoteCommandService implements CommandService {
         ClientRequest restRequest = new ClientRequest(url);
         try {
             restRequest.body(MediaType.APPLICATION_XML, 
-        		JaxbSerializationProvider.convertJaxbObjectToString(
-    				new JaxbCommandMessage<T>(deploymentId, 1, command)));
+        		new JaxbCommandMessage<T>(deploymentId, 1, command));
             ClientResponse<Object> response = restRequest.post(Object.class);
             if (response.getResponseStatus() == Status.OK) {
             	// TODO result
                 return (T) response.getEntity();
+            } else if (response.getResponseStatus() == Status.NO_CONTENT) {
+            	return null;
             } else {
             	// TODO error handling
                 throw new RuntimeException("REST request error code " + response.getResponseStatus());
