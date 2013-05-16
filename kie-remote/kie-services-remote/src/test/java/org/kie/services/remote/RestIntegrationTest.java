@@ -187,40 +187,4 @@ public class RestIntegrationTest extends IntegrationBase {
 //        taskService.complete(1, "salaboy", null);
     }
     
-//    @Test
-//    public void shouldBeAbleToDeployAndProcessSimpleRestXmlRequest() throws Exception { 
-//        SameApiRequestHandler requestFactory = getSameApiRequestFactory();
-//
-//        // create service request
-//        RuntimeEngine remoteRuntimeEngine = requestFactory.getRemoteRuntimeEngine("test");
-//        KieSession serviceRequest =  remoteRuntimeEngine.getKieSession();
-//        HashMap<String, Object> params = new HashMap<String, Object>();
-//        params.put("user-id", "Lin Dze");
-//        serviceRequest.startProcess("org.jbpm.scripttask", params);
-//        
-//        // send REST request
-//        // requestFactory.sendRestRequest(serviceRequest, deploymentUrl);
-//        
-//        String msgXmlString = ((MessageHolder) serviceRequest).getMessageXmlString();
-//
-//        // create REST request
-//        String urlString = new URL(deploymentUrl, "test" + "/session/startProcess").toExternalForm();
-//        System.out.println( ">> " + urlString );
-//        
-//        ClientRequest restRequest = new ClientRequest(urlString);
-//        restRequest.body(MediaType.APPLICATION_XML, msgXmlString);
-//
-//        // Get response
-//        ClientResponse<String> responseObj = restRequest.post(String.class);
-//
-//        // Check response
-//        assertEquals(200, responseObj.getStatus());
-//        String result = responseObj.getEntity();
-//    }
-
-//    private SameApiRequestHandler getSameApiRequestFactory() { 
-//        SameApiRequestHandler factory = ApiRequestFactoryProvider.createNewSameApiInstance();
-//        factory.setSerialization(Type.JAXB);
-//        return factory;
-//    }
 }
