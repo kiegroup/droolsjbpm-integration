@@ -60,7 +60,7 @@
     <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
     <module>kie-remote</module>
-    <module>drools-jboss-integration</module>
+    <!--module>drools-jboss-integration</module-->
   </modules>
 
   <profiles>
