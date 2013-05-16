@@ -3,8 +3,8 @@ package org.kie.services.remote.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -24,19 +24,19 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.kie.api.command.Command;
 import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
-import org.kie.services.remote.ejb.ProcessRequestBean;
+import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/rest/runtime/{id: [a-zA-Z0-9-]+}")
+@Path("/runtime/{id: .+}")
 @RequestScoped
 public class RuntimeResource {
 
     private Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
 
-    @EJB
+    @Inject
     protected ProcessRequestBean processRequestBean;
 
     @PathParam("id")

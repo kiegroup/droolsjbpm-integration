@@ -1,6 +1,6 @@
-package org.kie.services.remote.ejb;
+package org.kie.services.remote.cdi;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.kie.api.command.Command;
@@ -14,11 +14,10 @@ import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
-import org.kie.services.remote.cdi.RuntimeManagerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Stateless
+@ApplicationScoped
 public class ProcessRequestBean {
 
     private static Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);

@@ -11,7 +11,7 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.kie.services.remote.UnfinishedError;
-import org.kie.services.remote.ejb.ProcessRequestBean;
+import org.kie.services.remote.cdi.ProcessRequestBean;
 
 /**
  * This class is the link between incoming request (whether via REST or JMS or .. whatever)
