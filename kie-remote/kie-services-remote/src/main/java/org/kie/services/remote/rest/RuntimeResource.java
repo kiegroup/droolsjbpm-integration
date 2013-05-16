@@ -52,7 +52,6 @@ public class RuntimeResource extends ResourceBase {
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/process/{processDefId}/start")
     public void startNewProcess(@PathParam("processDefId") String processId) { 
         Map<String, List<String>> formParams = getRequestParams(request);
@@ -72,7 +71,6 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/process/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
     public void doProcessInstanceOperation(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) { 
         Map<String, List<String>> formParams = getRequestParams(request);
@@ -93,7 +91,6 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/signal/{signal: [a-zA-Z0-9-]+}")
     public void signalEvent(@PathParam("signal") String signal) { 
         Map<String, List<String>> formParams = getRequestParams(request);
@@ -104,7 +101,6 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public void doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) { 
         Map<String, List<String>> formParams = getRequestParams(request);

@@ -58,7 +58,6 @@ public class RestIntegrationTest extends IntegrationBase {
     @ArquillianResource
     URL deploymentUrl;
 
-    @Ignore
     @Test
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request

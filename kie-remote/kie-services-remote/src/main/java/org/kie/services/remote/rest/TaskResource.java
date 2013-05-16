@@ -89,7 +89,6 @@ public class TaskResource extends ResourceBase {
 
     @POST
     @Path("/{id: [0-9-]+}/{oper: [a-zA-Z]+}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void doTaskOperation(@PathParam("id") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> formParams = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
