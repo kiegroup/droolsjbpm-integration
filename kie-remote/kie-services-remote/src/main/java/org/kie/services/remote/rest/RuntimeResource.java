@@ -104,7 +104,7 @@ public class RuntimeResource extends ResourceBase {
     public void doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation, MultivaluedMap<String, String> formParams) { 
         Command cmd = null;
         if ("complete".equals(operation.toLowerCase().trim())) {
-            uriInfo.getQueryParameters();
+            //uriInfo.getQueryParameters();
             // TODO: add params passed as query params
             cmd = new CompleteWorkItemCommand(workItemId);
         } else if ("abort".equals(operation.toLowerCase())) {
@@ -124,12 +124,12 @@ public class RuntimeResource extends ResourceBase {
             Object result = processRequestBean.doKieSessionOperation((Command) cmd, deploymentId);
             results.add(result);
         }
-        if( null instanceof ProcessInstance ) { 
-            return JaxbProcessInstance((ProcessInstance) results.get(0));
-        } else { 
+//        if( null instanceof ProcessInstance ) { 
+//            return JaxbProcessInstance((ProcessInstance) results.get(0));
+//        } else { 
             //???
         return null;
-        }
+//        }
     }
 
 }

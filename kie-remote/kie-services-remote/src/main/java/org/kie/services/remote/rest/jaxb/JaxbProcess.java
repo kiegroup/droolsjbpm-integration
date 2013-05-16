@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.jbpm.services.task.query.OrganizationalEntityAdapter;
 import org.kie.api.definition.process.Process;
 import org.kie.api.io.Resource;
 import org.kie.api.task.model.User;
@@ -47,7 +46,7 @@ public class JaxbProcess implements Process {
     private String namespace;
 
     @XmlElement
-    @XmlJavaTypeAdapter(value=OrganizationalEntityAdapter.class, type=User.class)
+    @XmlJavaTypeAdapter(value=KnowledgeTypeXmlAdapter.class, type=User.class)
     private KnowledgeType knowledgeType;
     
     public JaxbProcess() { 
