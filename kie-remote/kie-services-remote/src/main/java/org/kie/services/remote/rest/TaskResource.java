@@ -6,16 +6,30 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
-import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
+import org.jbpm.services.task.commands.ClaimTaskCommand;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.ExitTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
+import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.NominateTaskCommand;
+import org.jbpm.services.task.commands.ReleaseTaskCommand;
+import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SkipTaskCommand;
+import org.jbpm.services.task.commands.StartTaskCommand;
+import org.jbpm.services.task.commands.StopTaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
@@ -32,10 +46,13 @@ public class TaskResource extends ResourceBase {
     private Logger logger = LoggerFactory.getLogger(TaskResource.class);
 
     @Inject
-    protected ProcessRequestBean processRequestBean;
+    private ProcessRequestBean processRequestBean;
+    
+    @Context 
+    private HttpServletRequest request;
     
     private static String[] allowedOperations = { "activate", "claim", "claimnextavailable", "complete", "delegate", "exit",
-            "fail", "forward", "release", "resume", "skip", "stop", "suspend", "nominate" };
+            "fail", "forward", "release", "resume", "skip", "start", "stop", "suspend", "nominate" };
 
 
     @GET
@@ -73,8 +90,9 @@ public class TaskResource extends ResourceBase {
     @POST
     @Path("/{id: [0-9-]+}/{oper: [a-zA-Z]+}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void doTaskOperation(@PathParam("id") long taskId, @PathParam("oper") String operation,  MultivaluedMap<String, String> formParams) {
-        operation = checkThatOperationExists(operation, allowedOperations);
+    public void doTaskOperation(@PathParam("id") long taskId, @PathParam("oper") String operation) { 
+        Map<String, List<String>> formParams = getRequestParams(request);
+        operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = getStringParam("userId", true, formParams, operation);
         Command<?> cmd = null;
         if ("activate".equals(operation)) {

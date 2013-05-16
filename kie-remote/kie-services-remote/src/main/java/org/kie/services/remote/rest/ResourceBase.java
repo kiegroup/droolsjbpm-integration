@@ -1,11 +1,13 @@
 package org.kie.services.remote.rest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
+import javax.servlet.http.HttpServletRequest;
 
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
@@ -21,11 +23,22 @@ public class ResourceBase {
         throw new IncorrectRequestException("Operation '" + operation + "' is not supported on tasks.");
     }
 
-    protected static String getStringParam(String paramName, boolean required, MultivaluedMap<String, String> params,
+    protected static Map<String, List<String>> getRequestParams(HttpServletRequest request) {
+        Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+        Enumeration<String> names = request.getParameterNames();
+        while(names.hasMoreElements()) {
+            String name = names.nextElement();
+            parameters.put(name, Arrays.asList(request.getParameterValues(name)));
+        }
+        
+        return parameters;
+    }
+
+    protected static String getStringParam(String paramName, boolean required, Map<String, List<String>> params,
             String operation) {
         List<String> paramValues = null;
         for (String key : params.keySet()) {
-            if (key.toLowerCase().equals(paramName)) {
+            if (key.equalsIgnoreCase(paramName)) {
                 paramValues = params.get(key);
                 break;
             }
@@ -44,7 +57,7 @@ public class ResourceBase {
         return paramValues.get(0);
     }
 
-    protected static Object getObjectParam(String paramName, boolean required, MultivaluedMap<String, String> params,
+    protected static Object getObjectParam(String paramName, boolean required, Map<String, List<String>> params,
             String operation) {
         String paramVal = getStringParam(paramName, required, params, operation);
         if( !required && paramVal == null ) { 
@@ -54,7 +67,7 @@ public class ResourceBase {
     
     }
 
-    protected static Object getNumberParam(String paramName, boolean required, MultivaluedMap<String, String> params,
+    protected static Object getNumberParam(String paramName, boolean required, Map<String, List<String>> params,
             String operation) {
         String paramVal = getStringParam(paramName, required, params, operation);
         if( !required && paramVal == null ) { 
@@ -91,9 +104,9 @@ public class ResourceBase {
         throw new IncorrectRequestException( paramName + " parameter does not have a numerical format (" + paramVal + ")");
     }
 
-    protected static Map<String, Object> extractMapFromParams(MultivaluedMap<String, String> params, String operation) {
+    protected static Map<String, Object> extractMapFromParams(Map<String, List<String>> params, String operation) {
         Map<String, Object> map = new HashMap<String, Object>();
-    
+
         for (String key : params.keySet()) {
             if (key.startsWith("map_")) {
                 List<String> paramValues = params.get(key);
@@ -110,9 +123,9 @@ public class ResourceBase {
         return map;
     }
 
-    protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(MultivaluedMap<String, String> params) {
+    protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, List<String>> params) {
         List<OrganizationalEntity> orgEntList = new ArrayList<OrganizationalEntity>();
     
-        return orgEntList;
+        throw new UnsupportedOperationException("//TODO: getOrganizationalEntityListFromParams" );
     }
 }
