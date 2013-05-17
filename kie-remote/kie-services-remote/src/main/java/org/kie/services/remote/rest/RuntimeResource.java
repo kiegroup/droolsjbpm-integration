@@ -34,7 +34,7 @@ import org.kie.services.remote.rest.jaxb.JaxbProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/runtime/{id: .+}")
+@Path("/runtime/{id: [a-zA-Z0-9-]+}")
 @RequestScoped
 public class RuntimeResource extends ResourceBase {
 
