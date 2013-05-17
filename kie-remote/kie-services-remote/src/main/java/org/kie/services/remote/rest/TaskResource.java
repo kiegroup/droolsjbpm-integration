@@ -16,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
@@ -50,6 +51,9 @@ public class TaskResource extends ResourceBase {
     
     @Context 
     private HttpServletRequest request;
+    
+    @Inject
+    private IdentityProvider identityProvider;
     
     private static String[] allowedOperations = { "activate", "claim", "claimnextavailable", "complete", "delegate", "exit",
             "fail", "forward", "release", "resume", "skip", "start", "stop", "suspend", "nominate" };
@@ -92,7 +96,7 @@ public class TaskResource extends ResourceBase {
     public void doTaskOperation(@PathParam("id") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> formParams = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
-        String userId = getStringParam("userId", true, formParams, operation);
+        String userId = identityProvider.getName();
         Command<?> cmd = null;
         if ("activate".equals(operation)) {
             cmd = new ActivateTaskCommand(taskId, userId);
