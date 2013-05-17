@@ -15,6 +15,12 @@ public class JaxbGenericResponse {
     @XmlElement(name = "value")
     private List<JaxbGenericValue> values = new ArrayList<JaxbGenericValue>();
 
+//    @XmlElement(name = "status")
+//    private RequestStatus requestStatus;
+    
+    @XmlElement
+    private String reason = null;
+
     public List<JaxbGenericValue> getValues() {
         return values;
     }

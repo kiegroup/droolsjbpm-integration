@@ -23,6 +23,7 @@
     <arquillian.launch>jboss</arquillian.launch>
     <jboss.version>7.1.1.Final</jboss.version>
     <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
+    <arquillian.version>1.0.3.Final</arquillian.version>
   </properties>
 
   <dependencies>

@@ -98,7 +98,7 @@ public class RestIntegrationTest extends IntegrationBase {
         
         ClientRequest restRequest = new ClientRequest(urlString);
         JaxbCommandMessage commandMessage = new JaxbCommandMessage("test", 1, 
-    		new StartProcessCommand("org.jbpm.humantask"));
+            new StartProcessCommand("org.jbpm.humantask"));
         String body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, body);
@@ -117,7 +117,7 @@ public class RestIntegrationTest extends IntegrationBase {
         
         restRequest = new ClientRequest(urlString);
         commandMessage = new JaxbCommandMessage(null, 1, 
-    		new StartTaskCommand(1, "salaboy"));
+            new StartTaskCommand(1, "salaboy"));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, commandMessage);
@@ -136,7 +136,7 @@ public class RestIntegrationTest extends IntegrationBase {
         
         restRequest = new ClientRequest(urlString);
         commandMessage = new JaxbCommandMessage(null, 1, 
-    		new CompleteTaskCommand(1, "salaboy", null));
+            new CompleteTaskCommand(1, "salaboy", null));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, commandMessage);
@@ -154,7 +154,7 @@ public class RestIntegrationTest extends IntegrationBase {
 //        
 //        restRequest = new ClientRequest(urlString);
 //        commandMessage = new JaxbCommandMessage(null, 1, 
-//    		new CompleteTaskCommand(1, "salaboy", null));
+//          new CompleteTaskCommand(1, "salaboy", null));
 //        body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
 //        System.out.println(body);
 //        restRequest.body(MediaType.APPLICATION_XML, commandMessage);
@@ -173,10 +173,10 @@ public class RestIntegrationTest extends IntegrationBase {
     @Ignore
     @Test
     public void clientRestRequest() throws Exception {
-    	System.out.println("clientRestRequest()");
+        System.out.println("clientRestRequest()");
         // create REST request
         RuntimeManager runtimeManager = new RemoteSessionFactory(
-    		"http://127.0.0.1:8080/arquillian-test", "test").newRuntimeManager();
+            "http://127.0.0.1:8080/arquillian-test", "test").newRuntimeManager();
         RuntimeEngine engine = runtimeManager.getRuntimeEngine(EmptyContext.get());
         KieSession ksession = engine.getKieSession();
         ksession.startProcess("org.jbpm.humantask");

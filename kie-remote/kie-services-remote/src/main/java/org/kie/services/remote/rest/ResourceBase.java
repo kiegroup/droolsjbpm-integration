@@ -9,7 +9,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.Status;
+import org.kie.api.task.model.Task;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
 
 public class ResourceBase {
@@ -26,16 +30,28 @@ public class ResourceBase {
     protected static Map<String, List<String>> getRequestParams(HttpServletRequest request) {
         Map<String, List<String>> parameters = new HashMap<String, List<String>>();
         Enumeration<String> names = request.getParameterNames();
-        while(names.hasMoreElements()) {
+        while (names.hasMoreElements()) {
             String name = names.nextElement();
             parameters.put(name, Arrays.asList(request.getParameterValues(name)));
         }
-        
+
         return parameters;
     }
 
-    protected static String getStringParam(String paramName, boolean required, Map<String, List<String>> params,
-            String operation) {
+    protected static String getStringParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
+        List<String> paramValues = getStringListParam(paramName, required, params, operation);
+        if( ! required && paramValues.isEmpty() ) { 
+            return null;
+        }
+        if (paramValues.size() != 1) {
+            throw new IncorrectRequestException("One and only one '" + paramName + "' query parameter required for '" + operation
+                    + "' operation (" + paramValues.size() + " passed).");
+        }
+        return paramValues.get(0);
+        
+    }
+
+    protected static List<String> getStringListParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
         List<String> paramValues = null;
         for (String key : params.keySet()) {
             if (key.equalsIgnoreCase(paramName)) {
@@ -48,60 +64,86 @@ public class ResourceBase {
                 throw new IncorrectRequestException("Query parameter '" + paramName + "' required for '" + operation
                         + "' operation.");
             }
-            return null;
+            return new ArrayList<String>();
         }
-        if (paramValues.size() != 1) {
-            throw new IncorrectRequestException("One and only one '" + paramName + "' query parameter required for '" + operation
-                    + "' operation (" + paramValues.size() + " passed).");
-        }
-        return paramValues.get(0);
+        return paramValues;
     }
 
-    protected static Object getObjectParam(String paramName, boolean required, Map<String, List<String>> params,
-            String operation) {
+    
+    protected static Object getObjectParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
         String paramVal = getStringParam(paramName, required, params, operation);
-        if( !required && paramVal == null ) { 
+        if (!required && paramVal == null) {
             return null;
         }
         return getObjectFromString(paramName, paramVal);
-    
+
     }
 
-    protected static Object getNumberParam(String paramName, boolean required, Map<String, List<String>> params,
-            String operation) {
-        String paramVal = getStringParam(paramName, required, params, operation);
-        if( !required && paramVal == null ) { 
-            return null;
+    protected static List<Long> getLongListParam(String paramName, boolean required, Map<String, List<String>> params, String operation,
+            boolean mustBeLong) {
+        List<String> paramValues = getStringListParam(paramName, required, params, operation);
+        List<Long> longValues = new ArrayList<Long>();
+        for( String strVal : paramValues ) { 
+           longValues.add((Long) getNumberFromString(paramName, strVal, mustBeLong));
         }
-        return getNumberFromString(paramName, paramVal);
+        return longValues;
     }
     
+    protected static Number getNumberParam(String paramName, boolean required, Map<String, List<String>> params, String operation,
+            boolean mustBeLong) {
+        String paramVal = getStringParam(paramName, required, params, operation);
+        if (!required && paramVal == null) {
+            return null;
+        }
+        return getNumberFromString(paramName, paramVal, mustBeLong);
+    }
+
     private static Object getObjectFromString(String key, String mapVal) {
         if (!mapVal.matches("^\\d+[li]?$")) {
             return mapVal;
-        } else { 
-            return getNumberFromString(key, mapVal); 
+        } else {
+            return getNumberFromString(key, mapVal, false);
         }
     }
-    
-    private static Number getNumberFromString(String paramName, String paramVal) {
-        if ( paramVal.matches("^\\d+[li]?$")) {
-            if (paramVal.matches(".*l$")) {
-                if (paramVal.length() > 19) {
-                    throw new IncorrectRequestException( paramName + " parameter is numerical but too large to be a long (" + paramVal + ")");
+
+    /**
+     * Returns a Long if no suffix is present.
+     * Otherwise, possible suffixes are:
+     * <ul>
+     * <li>i : returns an Integer</li>
+     * <li>l : returns an Long</li>
+     * </ul>
+     * 
+     * @param paramName
+     * @param paramVal
+     * @return
+     */
+    private static Number getNumberFromString(String paramName, String paramVal, boolean mustBeLong) {
+        if (paramVal.matches("^\\d+[li]?$")) {
+            if (paramVal.matches(".*i$")) {
+                if (mustBeLong) {
+                    throw new IncorrectRequestException( paramName 
+                            + " parameter is numerical but contains the \"Integer\" suffix 'i' and must have no suffix or \"Long\" suffix 'l' ("
+                            + paramVal + ")");
                 }
-                return Long.parseLong(paramVal.substring(0, paramVal.length() - 1));
-            } else {
-                if (paramVal.matches(".*i$")) {
-                    paramVal = paramVal.substring(0, paramVal.length() - 1);
-                }
+                paramVal = paramVal.substring(0, paramVal.length() - 1);
                 if (paramVal.length() > 9) {
-                    throw new IncorrectRequestException( paramName + " parameter is numerical but too large to be an integer (" + paramVal + ")");
+                    throw new IncorrectRequestException(paramName + " parameter is numerical but too large to be an integer ("
+                            + paramVal + "i)");
                 }
                 return Integer.parseInt(paramVal);
+            } else {
+                if (paramVal.length() > 18) {
+                    throw new IncorrectRequestException(paramName + " parameter is numerical but too large to be a long ("
+                            + paramVal + ")");
+                }
+                if (paramVal.matches(".*l$")) {
+                    paramVal = paramVal.substring(0, paramVal.length() - 1);
+                }
+                return Long.parseLong(paramVal);
             }
         }
-        throw new IncorrectRequestException( paramName + " parameter does not have a numerical format (" + paramVal + ")");
+        throw new IncorrectRequestException(paramName + " parameter does not have a numerical format (" + paramVal + ")");
     }
 
     protected static Map<String, Object> extractMapFromParams(Map<String, List<String>> params, String operation) {
@@ -116,7 +158,7 @@ public class ResourceBase {
                 }
                 String mapKey = key.substring("map_".length());
                 String mapVal = paramValues.get(0).trim();
-    
+
                 map.put(mapKey, getObjectFromString(key, mapVal));
             }
         }
@@ -125,7 +167,38 @@ public class ResourceBase {
 
     protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, List<String>> params) {
         List<OrganizationalEntity> orgEntList = new ArrayList<OrganizationalEntity>();
+
+        throw new UnsupportedOperationException("//TODO: getOrganizationalEntityListFromParams");
+    }
     
-        throw new UnsupportedOperationException("//TODO: getOrganizationalEntityListFromParams" );
+    protected static TaskSummaryImpl convertTaskToTaskSummary(TaskImpl task) { 
+       TaskSummaryImpl taskSummary = new TaskSummaryImpl(
+               task.getId().longValue(),
+               task.getTaskData().getProcessInstanceId(),
+               task.getNames().get(0).getText(),
+               task.getSubjects().get(0).getText(),
+               task.getDescriptions().get(0).getText(),
+               task.getTaskData().getStatus(),
+               task.getPriority(),
+               task.getTaskData().isSkipable(),
+               task.getTaskData().getActualOwner(),
+               task.getTaskData().getCreatedBy(),
+               task.getTaskData().getCreatedOn(),
+               task.getTaskData().getActivationTime(),
+               task.getTaskData().getExpirationTime(),
+               task.getTaskData().getProcessId(),
+               task.getTaskData().getProcessSessionId(),
+               task.getSubTaskStrategy(),
+               task.getTaskData().getParentId()
+               );
+       return taskSummary;
+    }
+    
+    protected static List<Status> convertStringListToStatusList( List<String> statusStrList ) { 
+        List<Status> statusList = new ArrayList<Status>();
+        for( String strStatus : statusStrList ) { 
+            statusList.add(Status.valueOf(Status.class, strStatus));
+        }
+        return statusList;
     }
 }

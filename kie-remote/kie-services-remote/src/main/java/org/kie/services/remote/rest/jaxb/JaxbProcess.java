@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.kie.api.definition.process.Process;
 import org.kie.api.io.Resource;
 import org.kie.api.task.model.User;
+import org.kie.services.remote.rest.jaxb.adapter.KnowledgeTypeXmlAdapter;
 
 @XmlRootElement(name="processInstance")
 @XmlAccessorType(XmlAccessType.FIELD)

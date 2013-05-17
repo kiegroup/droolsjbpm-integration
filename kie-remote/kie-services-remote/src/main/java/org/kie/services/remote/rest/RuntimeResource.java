@@ -106,7 +106,6 @@ public class RuntimeResource extends ResourceBase {
         Map<String, List<String>> formParams = getRequestParams(request);
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
-
             Map<String, Object> results = extractMapFromParams(formParams, operation);
             cmd = new CompleteWorkItemCommand(workItemId, results);
         } else if ("abort".equals(operation.toLowerCase())) {

@@ -1,8 +1,12 @@
 package org.kie.services.remote.rest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -15,28 +19,22 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.jbpm.kie.services.api.IdentityProvider;
-import org.jbpm.services.task.commands.ActivateTaskCommand;
-import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
-import org.jbpm.services.task.commands.ClaimTaskCommand;
-import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.DelegateTaskCommand;
-import org.jbpm.services.task.commands.ExitTaskCommand;
-import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.ForwardTaskCommand;
-import org.jbpm.services.task.commands.NominateTaskCommand;
-import org.jbpm.services.task.commands.ReleaseTaskCommand;
-import org.jbpm.services.task.commands.ResumeTaskCommand;
-import org.jbpm.services.task.commands.SkipTaskCommand;
-import org.jbpm.services.task.commands.StartTaskCommand;
-import org.jbpm.services.task.commands.StopTaskCommand;
+import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.Status;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
+import org.kie.services.remote.rest.jaxb.JaxbTaskSummaryList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +46,8 @@ public class TaskResource extends ResourceBase {
 
     @Inject
     private ProcessRequestBean processRequestBean;
-    
-    @Context 
+
+    @Context
     private HttpServletRequest request;
     
     @Inject
@@ -58,11 +56,10 @@ public class TaskResource extends ResourceBase {
     private static String[] allowedOperations = { "activate", "claim", "claimnextavailable", "complete", "delegate", "exit",
             "fail", "forward", "release", "resume", "skip", "start", "stop", "suspend", "nominate" };
 
-
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/")
-    public JaxbGenericResponse getTaskInstanceInfo(@PathParam("oper") String operation) { 
+    public JaxbGenericResponse getTaskInstanceInfo(@PathParam("oper") String operation) {
         return null;
     }
 
@@ -82,19 +79,121 @@ public class TaskResource extends ResourceBase {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/query")
-    public JaxbGenericResponse query(JaxbCommandMessage<?> cmdMsg) {
-        List<Object> results = new ArrayList<Object>();
-        for (Object cmd : cmdMsg.getCommands()) {
-            Object result = processRequestBean.doTaskOperation((Command<?>) cmd);
-            results.add(result);
+    public JaxbTaskSummaryList query(@Context UriInfo uriInfo) {
+        MultivaluedMap<String, String> multiParams = uriInfo.getQueryParameters();
+        Map<String, List<String>> params = getRequestParams(request);
+        List<Long> workItemIdList = getLongListParam("workItemId", false, params, "query", true);
+        List<Long> taskIdList = getLongListParam("taskId", false, params, "query", true);
+        List<String> busAdminList = getStringListParam("businessAdministrator", false, params, "query");
+        List<String> potOwnList = getStringListParam("potentialOwner", false, params, "query");
+        List<String> statusStrList = getStringListParam("status", false, params, "query");
+        List<String> taskOwnList = getStringListParam("taskOwner", false, params, "query");
+        List<Long> procInstIdList = getLongListParam("processInstanceId", false, params, "query", true);
+        String language = getStringParam("languauge", false, params, "query");
+
+        // clean up params
+        if (language == null) {
+            language = "en-UK";
         }
-        return null;
+        List<Status> statusList = convertStringListToStatusList(statusStrList);
+
+        // process params/cmds
+        Queue<Command<?>> cmds = new LinkedList<Command<?>>();
+        if (!workItemIdList.isEmpty()) {
+            for (Long workItemId : workItemIdList) {
+                cmds.add(new GetTaskByWorkItemIdCommand(workItemId));
+            }
+        }
+        if (!taskIdList.isEmpty()) {
+            for (Long taskId : taskIdList) {
+                cmds.add(new GetTaskCommand(taskId));
+            }
+        }
+
+        Set<TaskSummaryImpl> results = new HashSet<TaskSummaryImpl>();
+        Command<?> cmd = null;
+        while (!cmds.isEmpty()) {
+            cmd = cmds.poll();
+            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(cmd);
+            if (task != null) {
+                results.add(convertTaskToTaskSummary(task));
+            }
+        }
+
+        int assignments = 0;
+        assignments += potOwnList.isEmpty() ? 0 : 1;
+        assignments += busAdminList.isEmpty() ? 0 : 1;
+        assignments += taskOwnList.isEmpty() ? 0 : 1;
+
+        if (assignments == 0) {
+            if (!procInstIdList.isEmpty()) {
+                if (!statusList.isEmpty()) {
+                    for (Long procInstId : procInstIdList) {
+                        cmds.add(new GetTasksByStatusByProcessInstanceIdCommand(procInstId.longValue(), language, statusList));
+                    }
+                } else {
+                    for (Long procInstId : procInstIdList) {
+                        cmd = new GetTasksByProcessInstanceIdCommand(procInstId);
+                        List<Long> procInstTaskIdList = (List<Long>) processRequestBean.doTaskOperation(cmd);
+                        for (Long taskId : procInstTaskIdList) {
+                            cmd = new GetTaskCommand(taskId);
+                            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(cmd);
+                            if (task != null) {
+                                results.add(convertTaskToTaskSummary(task));
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            if (!busAdminList.isEmpty()) {
+                for (String userId : busAdminList) {
+                    cmds.add(new GetTaskAssignedAsBusinessAdminCommand(userId, language));
+                }
+            }
+            if (!potOwnList.isEmpty()) {
+                if (statusList.isEmpty()) {
+                    for (String userId : potOwnList) {
+                        cmds.add(new GetTasksOwnedCommand(userId, language));
+                    }
+                } else {
+                    for (String userId : potOwnList) {
+                        cmds.add(new GetTasksOwnedCommand(userId, language, statusList));
+                    }
+
+                }
+            }
+            if (!taskOwnList.isEmpty()) {
+                if (statusList.isEmpty()) {
+                    for (String userId : taskOwnList) {
+                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language));
+                    }
+                } else {
+                    for (String userId : taskOwnList) {
+                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language, statusList));
+                    }
+                }
+            }
+        }
+
+        while (!cmds.isEmpty()) {
+            cmd = cmds.poll();
+            List<TaskSummary> taskSummaryList = (List<TaskSummary>) processRequestBean.doTaskOperation(cmd);
+            if (taskSummaryList != null && !taskSummaryList.isEmpty()) {
+                for (TaskSummary taskSummary : taskSummaryList) {
+                    results.add((TaskSummaryImpl) taskSummary);
+                }
+            }
+        }
+
+        System.out.println("TEST SEND");
+        return new JaxbTaskSummaryList(results);
     }
 
     @POST
     @Path("/{id: [0-9-]+}/{oper: [a-zA-Z]+}")
     public void doTaskOperation(@PathParam("id") long taskId, @PathParam("oper") String operation) { 
-        Map<String, List<String>> formParams = getRequestParams(request);
+        Map<String, List<String>> params = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
         Command<?> cmd = null;
@@ -103,24 +202,24 @@ public class TaskResource extends ResourceBase {
         } else if ("claim".equals(operation)) {
             cmd = new ClaimTaskCommand(taskId, userId);
         } else if ("claimnextavailable".equals(operation)) {
-            String language = getStringParam("language", false, formParams, operation);
+            String language = getStringParam("language", false, params, operation);
             if (language == null) {
                 language = "en-UK";
             }
             cmd = new ClaimNextAvailableTaskCommand(userId, language);
         } else if ("complete".equals(operation)) {
-            Map<String, Object> data = extractMapFromParams(formParams, operation);
+            Map<String, Object> data = extractMapFromParams(params, operation);
             cmd = new CompleteTaskCommand(taskId, userId, data);
         } else if ("delegate".equals(operation)) {
-            String targetEntityId = getStringParam("targetEntityId", true, formParams, operation);
-           cmd = new DelegateTaskCommand(taskId, userId, targetEntityId);
+            String targetEntityId = getStringParam("targetEntityId", true, params, operation);
+            cmd = new DelegateTaskCommand(taskId, userId, targetEntityId);
         } else if ("exit".equals(operation)) {
             cmd = new ExitTaskCommand(taskId, userId);
         } else if ("fail".equals(operation)) {
-            Map<String, Object> data = extractMapFromParams(formParams, operation);
+            Map<String, Object> data = extractMapFromParams(params, operation);
             cmd = new FailTaskCommand(taskId, userId, data);
         } else if ("forward".equals(operation)) {
-            String targetEntityId = getStringParam("targetEntityId", true, formParams, operation);
+            String targetEntityId = getStringParam("targetEntityId", true, params, operation);
             cmd = new ForwardTaskCommand(taskId, userId, targetEntityId);
         } else if ("release".equals(operation)) {
             cmd = new ReleaseTaskCommand(taskId, userId);
@@ -133,7 +232,7 @@ public class TaskResource extends ResourceBase {
         } else if ("stop".equals(operation)) {
             cmd = new StopTaskCommand(taskId, userId);
         } else if ("nominate".equals(operation)) {
-            List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(formParams);
+            List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params);
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
         } else {
             throw new IncorrectRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
