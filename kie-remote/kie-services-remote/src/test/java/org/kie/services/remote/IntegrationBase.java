@@ -3,6 +3,7 @@ package org.kie.services.remote;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,10 +47,17 @@ public class IntegrationBase {
         List<File> libList = new ArrayList<File>(Arrays.asList(warLibs));
         libList.addAll(Arrays.asList(libs));
         Iterator<File> iter = libList.iterator();
+        HashSet<String> depSet = new HashSet<String>();
         while( iter.hasNext() ) {
-            if( iter.next().getAbsolutePath().contains("dom4j") ) { 
+            File depFile = iter.next();
+            if( depFile.getAbsolutePath().contains("dom4j") ) { 
+                iter.remove();
+                continue;
+            }
+            if( depSet.contains(depFile.getParent()) ) { 
                 iter.remove();
             }
+            depSet.add(depFile.getParent());
         }
         libs = libList.toArray(new File[libList.size()]);
         

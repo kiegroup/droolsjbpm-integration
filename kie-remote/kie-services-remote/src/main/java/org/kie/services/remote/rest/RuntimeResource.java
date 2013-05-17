@@ -58,7 +58,7 @@ public class RuntimeResource extends ResourceBase {
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
         
-        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        processRequestBean.doKieSessionOperation(cmd, deploymentId);
     }
 
     @GET
@@ -94,9 +94,8 @@ public class RuntimeResource extends ResourceBase {
     @Path("/signal/{signal: [a-zA-Z0-9-]+}")
     public void signalEvent(@PathParam("signal") String signal) { 
         Map<String, List<String>> formParams = getRequestParams(request);
-        String eventType = getStringParam("eventType", true, formParams, "signal/" + signal );
         Object event = getObjectParam("event", false, formParams, "signal/" + signal);
-        Command<?> cmd = new SignalEventCommand(eventType, event);
+        Command<?> cmd = new SignalEventCommand(signal, event);
         processRequestBean.doKieSessionOperation(cmd, deploymentId);
     }
 
@@ -119,18 +118,20 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Path("/execute")
-    public JaxbGenericResponse execute(JaxbCommandMessage cmdMsg) {
+    public JaxbGenericResponse execute(JaxbCommandMessage<?> cmdMsg) {
+        // TODO: add "ExecuteResource" for general execute mehod that differentiates based on package name?
         List<Object> results = new ArrayList<Object>();
-        for( Object cmd : cmdMsg.getCommands() ) {
-            Object result = processRequestBean.doKieSessionOperation((Command) cmd, deploymentId);
+        for( Object cmdObj : cmdMsg.getCommands() ) {
+            Command<?> cmd = (Command<?>) cmdObj;
+            if( ! cmd.getClass().getPackage().getName().startsWith("org.drools.core.command") ) {
+                throw new IncorrectRequestException("Command " + cmd.getClass().getSimpleName() + " is not supported for the TaskService."); 
+             }
+            Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
             results.add(result);
         }
-        if( null instanceof ProcessInstance ) { 
-            return null;//JaxbProcessInstance((ProcessInstance) results.get(0));
-        } else { 
-            //???
+        
+        // TODO: jaxb object for results
         return null;
-        }
     }
 
 }

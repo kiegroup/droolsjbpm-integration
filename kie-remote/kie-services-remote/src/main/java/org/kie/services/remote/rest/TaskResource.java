@@ -69,7 +69,11 @@ public class TaskResource extends ResourceBase {
     @Path("/execute")
     public JaxbGenericResponse execute(JaxbCommandMessage<?> cmdMsg) {
         List<Object> results = new ArrayList<Object>();
-        for (Object cmd : cmdMsg.getCommands()) {
+        for (Object cmdObj : cmdMsg.getCommands()) {
+            Command<?> cmd = (Command<?>) cmdObj;
+            if( ! cmd.getClass().getPackage().getName().startsWith("org.jbpm.services.task") ) {
+               throw new IncorrectRequestException("Command " + cmd.getClass().getSimpleName() + " is not supported for the TaskService."); 
+            }
             Object result = processRequestBean.doTaskOperation((Command<?>) cmd);
             results.add(result);
         }
@@ -154,11 +158,11 @@ public class TaskResource extends ResourceBase {
             if (!potOwnList.isEmpty()) {
                 if (statusList.isEmpty()) {
                     for (String userId : potOwnList) {
-                        cmds.add(new GetTasksOwnedCommand(userId, language));
+                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language));
                     }
                 } else {
                     for (String userId : potOwnList) {
-                        cmds.add(new GetTasksOwnedCommand(userId, language, statusList));
+                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language, statusList));
                     }
 
                 }
@@ -166,11 +170,11 @@ public class TaskResource extends ResourceBase {
             if (!taskOwnList.isEmpty()) {
                 if (statusList.isEmpty()) {
                     for (String userId : taskOwnList) {
-                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language));
+                        cmds.add(new GetTasksOwnedCommand(userId, language));
                     }
                 } else {
                     for (String userId : taskOwnList) {
-                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language, statusList));
+                        cmds.add(new GetTasksOwnedCommand(userId, language, statusList));
                     }
                 }
             }
@@ -186,7 +190,6 @@ public class TaskResource extends ResourceBase {
             }
         }
 
-        System.out.println("TEST SEND");
         return new JaxbTaskSummaryList(results);
     }
 
