@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.TaskImpl;
@@ -32,7 +33,6 @@ import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.rest.exception.IncorrectRequestException;
 import org.kie.services.remote.rest.jaxb.JaxbTaskSummaryList;
 import org.kie.services.remote.rest.jaxb.general.JaxbGenericResponse;
 import org.slf4j.Logger;
@@ -56,27 +56,27 @@ public class TaskResource extends ResourceBase {
     private static String[] allowedOperations = { "activate", "claim", "claimnextavailable", "complete", "delegate", "exit",
             "fail", "forward", "release", "resume", "skip", "start", "stop", "suspend", "nominate" };
 
-    @GET
-    @Produces(MediaType.APPLICATION_XML)
-    @Path("/")
-    public JaxbGenericResponse getTaskInstanceInfo(@PathParam("oper") String operation) {
-        return null;
-    }
-
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
-    public JaxbGenericResponse execute(JaxbCommandMessage<?> cmdMsg) {
+    public JaxbGenericResponse execute(JaxbCommandMessage cmdMsg) {
         List<Object> results = new ArrayList<Object>();
         for (Object cmdObj : cmdMsg.getCommands()) {
             Command<?> cmd = (Command<?>) cmdObj;
-            if( ! cmd.getClass().getPackage().getName().startsWith("org.jbpm.services.task") ) {
-               throw new IncorrectRequestException("Command " + cmd.getClass().getSimpleName() + " is not supported for the TaskService."); 
+            if( ! (cmd instanceof TaskCommand<?>) ) {
+               throw new BadRequestException("Command " + cmd.getClass().getSimpleName() + " is not supported for the TaskService."); 
             }
             Object result = processRequestBean.doTaskOperation((Command<?>) cmd);
             results.add(result);
         }
+        return null;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/")
+    public JaxbGenericResponse getTaskInstanceInfo(@PathParam("oper") String operation) {
         return null;
     }
 
@@ -238,7 +238,7 @@ public class TaskResource extends ResourceBase {
             List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params);
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
         } else {
-            throw new IncorrectRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
+            throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
         processRequestBean.doTaskOperation(cmd);
     }

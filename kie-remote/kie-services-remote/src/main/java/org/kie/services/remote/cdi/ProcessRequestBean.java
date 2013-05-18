@@ -31,7 +31,11 @@ public class ProcessRequestBean {
     private TaskService taskService;
 
     public Object doKieSessionOperation(Command cmd, String deploymentId) {
-        KieSession kieSession = getRuntimeEngine(deploymentId).getKieSession();
+        return doKieSessionOperation(cmd, deploymentId, null);
+    }
+    
+    public Object doKieSessionOperation(Command cmd, String deploymentId, Long processInstanceId) {
+        KieSession kieSession = getRuntimeEngine(deploymentId, processInstanceId).getKieSession();
         Object result = kieSession.execute(cmd);
         return result;
     }
@@ -41,32 +45,16 @@ public class ProcessRequestBean {
         return result;
     }
 
-    /**
-     * Retrieves the {@link RuntimeEngine}.
-     * 
-     * @param domainName
-     * @return
-     */
-    protected RuntimeEngine getRuntimeEngine(String domainName) {
-        return getRuntimeEngine(domainName, null);
-    }
-
     protected RuntimeEngine getRuntimeEngine(String domainName, Long processInstanceId) {
         RuntimeManager runtimeManager = runtimeMgrMgr.getRuntimeManager(domainName);
-        Context<?> runtimeContext = getRuntimeManagerContext(processInstanceId);
+        Context<?> runtimeContext;
+        if (processInstanceId != null) {
+            runtimeContext = new ProcessInstanceIdContext(processInstanceId);
+        } else {
+            runtimeContext = EmptyContext.get();
+        }
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
 
-    private Context<?> getRuntimeManagerContext(Long processInstanceId) {
-        Context<?> managerContext;
-
-        if (processInstanceId != null) {
-            managerContext = new ProcessInstanceIdContext(processInstanceId);
-        } else {
-            managerContext = EmptyContext.get();
-        }
-
-        return managerContext;
-    }
 
 }

@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.kie.services.remote.rest.exception.IncorrectRequestException;
+import org.jboss.resteasy.spi.BadRequestException;
 
 @XmlRootElement(name = "message")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -52,7 +52,7 @@ public class JaxbGenericResponse {
     public JaxbGenericResponse(HttpServletRequest request, Exception e) {
         this.url = getUrl(request);
         this.error = e.getMessage();
-        if( ! (e instanceof IncorrectRequestException) ) { 
+        if( ! (e instanceof BadRequestException) ) { 
             this.status = JaxbRequestStatus.FAILURE;
             StringWriter stringWriter = new StringWriter();
             PrintWriter writer = new PrintWriter(stringWriter);
