@@ -1,4 +1,4 @@
-package org.kie.services.client.api.command.serialization.jaxb.impl;
+package org.kie.services.client.serialization.jaxb;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;

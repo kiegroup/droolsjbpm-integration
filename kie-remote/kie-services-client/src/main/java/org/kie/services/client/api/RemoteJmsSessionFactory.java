@@ -1,13 +1,14 @@
-package org.kie.services.client.api.command;
+package org.kie.services.client.api;
 
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.services.client.api.command.RemoteRuntimeManager;
 
-public class RemoteSessionFactory {
+public class RemoteJmsSessionFactory {
 
     private String url;
     private String deploymentId;
     
-    public RemoteSessionFactory(String url, String deploymentId) {
+    public RemoteJmsSessionFactory(String url, String deploymentId) {
         this.url = url;
         this.deploymentId = deploymentId;
     }

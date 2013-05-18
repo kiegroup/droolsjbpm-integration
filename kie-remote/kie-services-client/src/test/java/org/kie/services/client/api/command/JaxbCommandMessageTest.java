@@ -5,8 +5,8 @@ import javax.xml.bind.JAXBException;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.junit.Test;
 import org.kie.api.command.Command;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbSerializationProvider;
+import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 
 public class JaxbCommandMessageTest {
 	

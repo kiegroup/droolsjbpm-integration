@@ -40,4 +40,12 @@ public class RemoteRuntimeManager implements RuntimeManager {
 		// do nothing
 	}
 
+    public String getUrl() {
+        return url;
+    }
+
+    public String getDeploymentId() {
+        return deploymentId;
+    }
+
 }

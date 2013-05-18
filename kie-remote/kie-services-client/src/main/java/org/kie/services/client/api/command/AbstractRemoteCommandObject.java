@@ -3,37 +3,33 @@ package org.kie.services.client.api.command;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.drools.core.command.CommandService;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.kie.api.command.Command;
-import org.kie.internal.command.Context;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbSerializationProvider;
+import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
 
-public class RemoteCommandService implements CommandService {
+public abstract class AbstractRemoteCommandObject {
 
-	private String url;
-	private String deploymentId;
-	
-	public RemoteCommandService(String url, String deploymentId) {
-		this.url = url;
-		this.deploymentId = deploymentId;
-	}
-	
-	public <T> T execute(Command<T> command) {
+    protected String url;
+    protected String deploymentId;
+
+    public AbstractRemoteCommandObject(String url, String deploymentId) { 
+        this.url = url;
+        this.deploymentId = deploymentId;
+    }
+    
+    public <T> T execute(Command<T> command) {
         ClientRequest restRequest = new ClientRequest(url);
         try {
-            restRequest.body(MediaType.APPLICATION_XML, 
-        		new JaxbCommandMessage<T>(deploymentId, 1, command));
+            restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandMessage<T>(deploymentId, 1, command));
             ClientResponse<Object> response = restRequest.post(Object.class);
             if (response.getResponseStatus() == Status.OK) {
-            	// TODO result
+                // TODO result
                 return (T) response.getEntity();
             } else if (response.getResponseStatus() == Status.NO_CONTENT) {
-            	return null;
+                return null;
             } else {
-            	// TODO error handling
+                // TODO error handling
                 throw new RuntimeException("REST request error code " + response.getResponseStatus());
             }
         } catch (Exception e) {
@@ -41,8 +37,4 @@ public class RemoteCommandService implements CommandService {
         }
     }
 
-	public Context getContext() {
-		return null;
-	}
-    
 }
