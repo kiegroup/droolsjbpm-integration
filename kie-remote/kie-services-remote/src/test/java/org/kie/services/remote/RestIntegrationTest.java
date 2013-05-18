@@ -40,9 +40,9 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.internal.runtime.manager.context.EmptyContext;
-import org.kie.services.client.api.command.RemoteSessionFactory;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbSerializationProvider;
+import org.kie.services.client.api.RemoteJmsSessionFactory;
+import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.remote.setup.ArquillianJbossServerSetupTask;
 
 @RunAsClient
@@ -175,7 +175,7 @@ public class RestIntegrationTest extends IntegrationBase {
     public void clientRestRequest() throws Exception {
         System.out.println("clientRestRequest()");
         // create REST request
-        RuntimeManager runtimeManager = new RemoteSessionFactory(
+        RuntimeManager runtimeManager = new RemoteJmsSessionFactory(
             "http://127.0.0.1:8080/arquillian-test", "test").newRuntimeManager();
         RuntimeEngine engine = runtimeManager.getRuntimeEngine(EmptyContext.get());
         KieSession ksession = engine.getKieSession();

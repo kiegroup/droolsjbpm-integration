@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.services.remote.rest.jaxb.general.JaxbProcess;
 
 @XmlRootElement(name="processInstance")
 @XmlAccessorType(XmlAccessType.FIELD)

@@ -30,11 +30,11 @@ import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.api.command.serialization.jaxb.impl.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.IncorrectRequestException;
-import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.kie.services.remote.rest.jaxb.JaxbTaskSummaryList;
+import org.kie.services.remote.rest.jaxb.general.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

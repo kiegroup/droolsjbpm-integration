@@ -9,6 +9,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBException;
+
+import org.kie.services.remote.rest.jaxb.general.JaxbGenericResponse;
 
 @Provider
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
@@ -19,21 +22,12 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(Exception e) {
         ResponseBuilder responseBuilder = Response.serverError();
-        String url = request.getRequestURI();
-        if( request.getQueryString() != null ) { 
-            url += "?" + request.getQueryString();
+        JaxbGenericResponse response = new JaxbGenericResponse(request, e);
+        try {
+            responseBuilder.entity(response.prettyPrint());
+        } catch (JAXBException jaxb) {
+            responseBuilder.entity(JaxbGenericResponse.convertStackTraceToString(jaxb));
         }
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-        e.printStackTrace(writer);
-        String msg = "<errorResponse>\n"
-                + "<link>" + url + "</link>\n"
-                + "<error>" + e.getMessage() + "</error>\n"
-                + "<stackTrace>" + stringWriter.toString() + "</stackTrace>\n"
-                + "</errorResponse>";
-        responseBuilder.entity(msg);
-        // TODO: jaxb object for ^^
-        // TODO: stack trace
         return responseBuilder.build();
     }
 

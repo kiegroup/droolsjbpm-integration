@@ -18,7 +18,7 @@ import org.kie.api.command.Command;
 
 @XmlRootElement(name="command-message")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbCommandMessage<T> {
+public class JaxbCommandMessage {
 
     @XmlElement
     @XmlSchemaType(name="string")
@@ -26,7 +26,7 @@ public class JaxbCommandMessage<T> {
     
     @XmlElement
     @XmlSchemaType(name="long")
-    private String processInstanceId; 
+    private Long processInstanceId; 
     
 	@XmlElement(name="ver")
     @XmlSchemaType(name="int")
@@ -116,20 +116,20 @@ public class JaxbCommandMessage<T> {
         @XmlElement(name = "stop-task", type = StopTaskCommand.class),
         @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class)
     })
-    protected List<Command<T>> commands;    
+    protected List<Command<?>> commands;    
 
     public JaxbCommandMessage() { 
         // Default constructor
     }
     
-    public JaxbCommandMessage(String deploymentId, int version, Command<T> command) { 
+    public JaxbCommandMessage(String deploymentId, int version, Command<?> command) { 
         this.deploymentId = deploymentId;
         this.version = version;
-        this.commands = new ArrayList<Command<T>>();
+        this.commands = new ArrayList<Command<?>>();
         this.commands.add(command);
      }
      
-    public JaxbCommandMessage(String deploymentId, int version, List<Command<T>> commands) { 
+    public JaxbCommandMessage(String deploymentId, int version, List<Command<?>> commands) { 
        this.deploymentId = deploymentId;
        this.version = version;
        this.commands = commands;
@@ -143,11 +143,11 @@ public class JaxbCommandMessage<T> {
         this.deploymentId = deploymentId;
     }
 
-    public String getProcessInstanceId() {
+    public Long getProcessInstanceId() {
 		return processInstanceId;
 	}
 
-	public void setProcessInstanceId(String processInstanceId) {
+	public void setProcessInstanceId(Long processInstanceId) {
 		this.processInstanceId = processInstanceId;
 	}
 
@@ -159,11 +159,11 @@ public class JaxbCommandMessage<T> {
         this.version = version;
     }
 
-    public void setCommands(List<Command<T>> commands) {
+    public void setCommands(List<Command<?>> commands) {
         this.commands = commands;
     }
 
-    public List<Command<T>> getCommands() { 
+    public List<Command<?>> getCommands() { 
         return this.commands;
     }
     

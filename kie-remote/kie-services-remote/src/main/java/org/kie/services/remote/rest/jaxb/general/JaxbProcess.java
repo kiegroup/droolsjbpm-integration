@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb;
+package org.kie.services.remote.rest.jaxb.general;
 
 import java.util.Map;
 

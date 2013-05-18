@@ -17,7 +17,7 @@ public class JaxbCommandMessageTest {
 	
 	public <T> void testRoundtrip(Command<T> command) throws JAXBException {
 		String commandXml = JaxbSerializationProvider.convertJaxbObjectToString(
-			new JaxbCommandMessage<T>("test", 1, command));
+			new JaxbCommandMessage("test", 1, command));
 		System.out.println(commandXml);
 		JaxbSerializationProvider.convertStringToJaxbObject(commandXml);
 	}

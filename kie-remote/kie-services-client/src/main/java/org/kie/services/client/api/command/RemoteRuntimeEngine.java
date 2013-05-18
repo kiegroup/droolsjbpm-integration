@@ -25,7 +25,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 		if (this.contextId != null) {
 			url += "?contextId=" + contextId;
 		}
-		CommandService commandService = new RemoteRestCommandService(url, deploymentId);
+		CommandService commandService = new RemoteSessionCommandService(url, deploymentId);
 		return new CommandBasedStatefulKnowledgeSession(commandService);
 	}
 

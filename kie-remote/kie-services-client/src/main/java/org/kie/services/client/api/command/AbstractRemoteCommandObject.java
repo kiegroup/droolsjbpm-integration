@@ -21,7 +21,7 @@ public abstract class AbstractRemoteCommandObject {
     public <T> T execute(Command<T> command) {
         ClientRequest restRequest = new ClientRequest(url);
         try {
-            restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandMessage<T>(deploymentId, 1, command));
+            restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandMessage(deploymentId, 1, command));
             ClientResponse<Object> response = restRequest.post(Object.class);
             if (response.getResponseStatus() == Status.OK) {
                 // TODO result
