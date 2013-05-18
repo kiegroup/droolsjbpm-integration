@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb.adapter;
+package org.kie.services.client.serialization.jaxb.impl.adapter;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

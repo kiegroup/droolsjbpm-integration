@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb.general;
+package org.kie.services.client.serialization.jaxb.impl;
 
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.kie.api.definition.process.Process;
 import org.kie.api.io.Resource;
 import org.kie.api.task.model.User;
-import org.kie.services.remote.rest.jaxb.adapter.KnowledgeTypeXmlAdapter;
+import org.kie.services.client.serialization.jaxb.impl.adapter.KnowledgeTypeXmlAdapter;
 
 @XmlRootElement(name="processInstance")
 @XmlAccessorType(XmlAccessType.FIELD)

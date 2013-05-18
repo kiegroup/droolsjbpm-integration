@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb;
+package org.kie.services.client.serialization.jaxb.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;

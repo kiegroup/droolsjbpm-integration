@@ -16,7 +16,7 @@ import org.jboss.resteasy.spi.NotFoundException;
 import org.jboss.resteasy.spi.ReaderException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.resteasy.spi.WriterException;
-import org.kie.services.remote.rest.jaxb.general.JaxbGenericResponse;
+import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 
 @Provider
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {

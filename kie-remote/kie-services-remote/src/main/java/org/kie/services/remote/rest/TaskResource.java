@@ -32,9 +32,9 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryList;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.rest.jaxb.JaxbTaskSummaryList;
-import org.kie.services.remote.rest.jaxb.general.JaxbGenericResponse;
+import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -28,9 +28,9 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstance;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.rest.jaxb.JaxbProcessInstance;
-import org.kie.services.remote.rest.jaxb.general.JaxbGenericResponse;
+import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

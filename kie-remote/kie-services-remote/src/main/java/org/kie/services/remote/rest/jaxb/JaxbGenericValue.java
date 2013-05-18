@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb.general;
+package org.kie.services.remote.rest.jaxb;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
