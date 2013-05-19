@@ -14,7 +14,7 @@ import org.kie.api.io.Resource;
 import org.kie.api.task.model.User;
 import org.kie.services.client.serialization.jaxb.impl.adapter.KnowledgeTypeXmlAdapter;
 
-@XmlRootElement(name="processInstance")
+@XmlRootElement(name="process")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbProcess implements Process {
 
@@ -30,7 +30,7 @@ public class JaxbProcess implements Process {
     @XmlSchemaType(name="string")
     private String version;
 
-    @XmlElement
+    @XmlElement(name="package-name")
     @XmlSchemaType(name="string")
     private String packageName;
 
@@ -46,7 +46,7 @@ public class JaxbProcess implements Process {
     @XmlSchemaType(name="string")
     private String namespace;
 
-    @XmlElement
+    @XmlElement(name="knowledge-type")
     @XmlJavaTypeAdapter(value=KnowledgeTypeXmlAdapter.class, type=User.class)
     private KnowledgeType knowledgeType;
     

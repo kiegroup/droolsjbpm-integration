@@ -12,12 +12,12 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.jbpm.services.task.query.TaskSummaryImpl;
 
-@XmlRootElement(name="taskSummaryList")
+@XmlRootElement(name="task-summary-list")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={TaskSummaryImpl.class})
 public class JaxbTaskSummaryList {
 
-    @XmlElement(name="taskSummary")
+    @XmlElement(name="task-summary")
     private List<TaskSummaryImpl> taskSummaryList;
 
     public JaxbTaskSummaryList() { 

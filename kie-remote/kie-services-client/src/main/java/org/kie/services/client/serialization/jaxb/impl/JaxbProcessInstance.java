@@ -13,12 +13,12 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
 
-@XmlRootElement(name="processInstance")
+@XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={JaxbProcess.class})
-public class JaxbProcessInstance implements ProcessInstance {
+public class JaxbProcessInstance extends AbstractJaxbCommandResponse implements ProcessInstance {
 
-    @XmlElement
+    @XmlElement(name="process-id")
     @XmlSchemaType(name="string")
     private String processId;
 
@@ -26,7 +26,7 @@ public class JaxbProcessInstance implements ProcessInstance {
     @XmlSchemaType(name="long")
     private Long id;
 
-    @XmlElement
+    @XmlElement(name="process-name")
     @XmlSchemaType(name="string")
     private String processName;
 
@@ -37,7 +37,7 @@ public class JaxbProcessInstance implements ProcessInstance {
     @XmlElement
     private JaxbProcess process;
     
-    @XmlElement(name="potentialOwner")
+    @XmlElement(name="event-types")
     private List<String> eventTypes;
     
     @Override

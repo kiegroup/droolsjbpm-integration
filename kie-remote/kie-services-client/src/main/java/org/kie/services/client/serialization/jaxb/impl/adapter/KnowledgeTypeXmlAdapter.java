@@ -7,13 +7,19 @@ import org.kie.api.definition.KieDefinition.KnowledgeType;
 public class KnowledgeTypeXmlAdapter extends XmlAdapter<String, KnowledgeType> {
 
     @Override
-    public KnowledgeType unmarshal(String arg0) throws Exception {
-        return Enum.valueOf(KnowledgeType.class, arg0);
+    public KnowledgeType unmarshal(String v) throws Exception {
+        if( v != null ) { 
+        return Enum.valueOf(KnowledgeType.class, v);
+        }
+        return null;
     }
 
     @Override
     public String marshal(KnowledgeType v) throws Exception {
-        return v.name();
+        if( v != null ) { 
+            return v.name();
+        } 
+        return null;
     }
 
 }

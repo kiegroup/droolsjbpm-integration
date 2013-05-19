@@ -12,7 +12,7 @@ import javax.xml.bind.Unmarshaller;
 public class JaxbSerializationProvider {
    
     private static Class<?> [] jaxbClasses = { 
-        JaxbCommandMessage.class
+        JaxbCommandsRequest.class
     };
     
     public static String convertJaxbObjectToString(Object object) throws JAXBException {

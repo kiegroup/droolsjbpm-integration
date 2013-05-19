@@ -5,7 +5,7 @@ import javax.xml.bind.JAXBException;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.junit.Test;
 import org.kie.api.command.Command;
-import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 
 public class JaxbCommandMessageTest {
@@ -17,7 +17,7 @@ public class JaxbCommandMessageTest {
 	
 	public <T> void testRoundtrip(Command<T> command) throws JAXBException {
 		String commandXml = JaxbSerializationProvider.convertJaxbObjectToString(
-			new JaxbCommandMessage("test", 1, command));
+			new JaxbCommandsRequest("test", command));
 		System.out.println(commandXml);
 		JaxbSerializationProvider.convertStringToJaxbObject(commandXml);
 	}
