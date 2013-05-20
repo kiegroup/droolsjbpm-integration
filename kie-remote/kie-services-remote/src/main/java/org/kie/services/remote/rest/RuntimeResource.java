@@ -27,7 +27,7 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstance;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
@@ -54,7 +54,7 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Path("/execute")
-    public JaxbGenericResponse execute(JaxbCommandMessage cmdMsg) {
+    public JaxbGenericResponse execute(JaxbCommandsRequest cmdMsg) {
         // TODO: add "ExecuteResource" for general execute mehod that differentiates based on package name?
         List<Object> results = new ArrayList<Object>();
         for( Object cmdObj : cmdMsg.getCommands() ) {

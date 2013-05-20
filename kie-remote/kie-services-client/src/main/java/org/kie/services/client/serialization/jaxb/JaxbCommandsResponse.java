@@ -5,8 +5,12 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+
+import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
+import org.kie.services.client.serialization.jaxb.impl.JaxbTaskResponse;
 
 @XmlRootElement(name = "command-response")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -24,7 +28,9 @@ public class JaxbCommandsResponse {
     @XmlSchemaType(name = "int")
     private Integer version;
 
-    @XmlElement(name = "response")
+    @XmlElements({
+        @XmlElement(name = "task-response", type = JaxbTaskResponse.class)
+    })
     private List<JaxbCommandsResponse> responses;
 
     public JaxbCommandsResponse() {

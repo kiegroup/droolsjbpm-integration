@@ -41,7 +41,7 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.services.client.api.RemoteJmsSessionFactory;
-import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.remote.setup.ArquillianJbossServerSetupTask;
 
@@ -97,8 +97,7 @@ public class RestIntegrationTest extends IntegrationBase {
         System.out.println( ">> " + urlString );
         
         ClientRequest restRequest = new ClientRequest(urlString);
-        JaxbCommandMessage commandMessage = new JaxbCommandMessage("test", 1, 
-            new StartProcessCommand("org.jbpm.humantask"));
+        JaxbCommandsRequest commandMessage = new JaxbCommandsRequest("test", new StartProcessCommand("org.jbpm.humantask"));
         String body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, body);
@@ -116,8 +115,7 @@ public class RestIntegrationTest extends IntegrationBase {
         System.out.println( ">> " + urlString );
         
         restRequest = new ClientRequest(urlString);
-        commandMessage = new JaxbCommandMessage(null, 1, 
-            new StartTaskCommand(1, "salaboy"));
+        commandMessage = new JaxbCommandsRequest(new StartTaskCommand(1, "salaboy"));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, commandMessage);
@@ -135,8 +133,7 @@ public class RestIntegrationTest extends IntegrationBase {
         System.out.println( ">> " + urlString );
         
         restRequest = new ClientRequest(urlString);
-        commandMessage = new JaxbCommandMessage(null, 1, 
-            new CompleteTaskCommand(1, "salaboy", null));
+        commandMessage = new JaxbCommandsRequest(new CompleteTaskCommand(1, "salaboy", null));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, commandMessage);

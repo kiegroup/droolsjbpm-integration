@@ -35,6 +35,9 @@ public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandRespo
     @XmlSchemaType(name="string")
     private String commandName;
 
+    @XmlElement(name="task")
+    private JaxbTask task;
+
     public JaxbTaskResponse() {
         // DBG Auto-generated constructor stub
     }

@@ -31,7 +31,7 @@ import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryList;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
@@ -60,7 +60,7 @@ public class TaskResource extends ResourceBase {
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
-    public JaxbGenericResponse execute(JaxbCommandMessage cmdMsg) {
+    public JaxbGenericResponse execute(JaxbCommandsRequest cmdMsg) {
         List<Object> results = new ArrayList<Object>();
         for (Object cmdObj : cmdMsg.getCommands()) {
             Command<?> cmd = (Command<?>) cmdObj;

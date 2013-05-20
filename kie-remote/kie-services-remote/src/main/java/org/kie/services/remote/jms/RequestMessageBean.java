@@ -14,7 +14,7 @@ import javax.jms.Session;
 
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
-import org.kie.services.client.serialization.jaxb.JaxbCommandMessage;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.remote.UnfinishedError;
 import org.kie.services.remote.cdi.ProcessRequestBean;
@@ -43,18 +43,18 @@ public class RequestMessageBean implements MessageListener {
 
     public void onMessage(Message message) {
         logger.info("Message received: " + message.toString());
-        JaxbCommandMessage cmdMsg = null;
+        JaxbCommandsRequest cmdMsg = null;
         try {
             int serializationtype = message.getIntProperty("serialization");
 
             if( serializationtype == 0 ) { 
                 String msgStrContent = ((BytesMessage) message).readUTF();
-                cmdMsg = (JaxbCommandMessage) JaxbSerializationProvider.convertStringToJaxbObject(msgStrContent);
+                cmdMsg = (JaxbCommandsRequest) JaxbSerializationProvider.convertStringToJaxbObject(msgStrContent);
             } else { 
                 throw new UnfinishedError("Unknown serialization type : " + serializationtype);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Unable to read " + JaxbCommandMessage.class.getSimpleName() + " from "
+            throw new RuntimeException("Unable to read " + JaxbCommandsRequest.class.getSimpleName() + " from "
                     + BytesMessage.class.getSimpleName());
         }
 
