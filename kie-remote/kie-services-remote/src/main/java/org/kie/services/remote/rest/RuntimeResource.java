@@ -28,7 +28,7 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstance;
+import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.slf4j.Logger;
@@ -85,10 +85,10 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}")
-    public JaxbProcessInstance getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
+    public JaxbProcessInstanceResponse getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
-        return new JaxbProcessInstance((ProcessInstance) result);
+        return new JaxbProcessInstanceResponse((ProcessInstance) result);
     }
 
     @POST

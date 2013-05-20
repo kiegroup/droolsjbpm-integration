@@ -12,7 +12,8 @@ import javax.xml.bind.Unmarshaller;
 public class JaxbSerializationProvider {
    
     private static Class<?> [] jaxbClasses = { 
-        JaxbCommandsRequest.class
+        JaxbCommandsRequest.class, 
+        JaxbCommandsResponse.class
     };
     
     public static String convertJaxbObjectToString(Object object) throws JAXBException {

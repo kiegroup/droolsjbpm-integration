@@ -56,6 +56,7 @@ public class IntegrationBase {
             }
             if( depSet.contains(depFile.getParent()) ) { 
                 iter.remove();
+                continue;
             }
             depSet.add(depFile.getParent());
         }
@@ -67,7 +68,8 @@ public class IntegrationBase {
                 .addClass(UnfinishedError.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsServiceProvider(FileSystemProvider.class, SimpleFileSystemProvider.class)
-                .addAsWebInfResource("WEB-INF/beans.xml", "beans.xml")
+                .addAsWebInfResource("WEB-INF/test-beans.xml", "beans.xml")
+                .addAsWebInfResource("WEB-INF/ejb-jar.xml", "ejb-jar.xml")
                 .setWebXML("WEB-INF/web.xml")
                 .addAsLibraries(libs);
         

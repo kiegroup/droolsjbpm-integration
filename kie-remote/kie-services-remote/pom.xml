@@ -23,6 +23,12 @@
     <arquillian.launch>jboss</arquillian.launch>
     <jboss.version>7.1.1.Final</jboss.version>
     <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
+    <jboss.server.version>7.1.1.Final</jboss.server.version>
+    <!--  eap integration
+    <jboss.version>7.2.0.Final</jboss.version>
+    <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version>
+    <jboss.server.name>jboss-eap-6.1</jboss.server.name>
+    -->
     <arquillian.version>1.0.3.Final</arquillian.version>
   </properties>
 
@@ -271,7 +277,7 @@
                     <artifactItem>
                       <groupId>org.jboss.as</groupId>
                       <artifactId>jboss-as-dist</artifactId>
-                      <version>${jboss.version}</version>
+                      <version>${jboss.server.version}</version>
                       <type>zip</type>
                       <overWrite>false</overWrite>
                       <outputDirectory>${project.build.directory}</outputDirectory>

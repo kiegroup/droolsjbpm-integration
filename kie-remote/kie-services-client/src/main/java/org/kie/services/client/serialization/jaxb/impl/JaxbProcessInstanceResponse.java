@@ -10,13 +10,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
+import org.kie.api.command.Command;
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={JaxbProcess.class})
-public class JaxbProcessInstance extends AbstractJaxbCommandResponse implements ProcessInstance {
+public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<ProcessInstance> implements ProcessInstance {
 
     @XmlElement(name="process-id")
     @XmlSchemaType(name="string")
@@ -70,11 +71,20 @@ public class JaxbProcessInstance extends AbstractJaxbCommandResponse implements 
         return eventTypes.toArray(new String[eventTypes.size()]);
     }
 
-    public JaxbProcessInstance() { 
+    public JaxbProcessInstanceResponse() { 
         // Default Constructor
     }
     
-    public JaxbProcessInstance(ProcessInstance processInstance) { 
+    public JaxbProcessInstanceResponse(ProcessInstance processInstance, int i, Command<?> cmd) { 
+        super(i, cmd);
+        initialize(processInstance);
+    }
+    
+    public JaxbProcessInstanceResponse(ProcessInstance processInstance) { 
+        initialize(processInstance);
+    }
+    
+    private void initialize(ProcessInstance processInstance) { 
         this.eventTypes = Arrays.asList(processInstance.getEventTypes());
         this.id = processInstance.getId();
         this.process = new JaxbProcess(processInstance.getProcess());
@@ -89,4 +99,10 @@ public class JaxbProcessInstance extends AbstractJaxbCommandResponse implements 
         throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
     }
 
+    @Override
+    public ProcessInstance getResult() {
+        return this;
+    }
+
+    
 }

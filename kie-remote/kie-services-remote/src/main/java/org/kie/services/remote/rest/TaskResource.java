@@ -32,7 +32,7 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryList;
+import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.slf4j.Logger;
@@ -83,7 +83,7 @@ public class TaskResource extends ResourceBase {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/query")
-    public JaxbTaskSummaryList query(@Context UriInfo uriInfo) {
+    public JaxbTaskSummaryListResponse query(@Context UriInfo uriInfo) {
         MultivaluedMap<String, String> multiParams = uriInfo.getQueryParameters();
         Map<String, List<String>> params = getRequestParams(request);
         List<Long> workItemIdList = getLongListParam("workItemId", false, params, "query", true);
@@ -190,7 +190,7 @@ public class TaskResource extends ResourceBase {
             }
         }
 
-        return new JaxbTaskSummaryList(results);
+        return new JaxbTaskSummaryListResponse(results);
     }
 
     @POST

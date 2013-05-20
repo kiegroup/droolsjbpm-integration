@@ -7,7 +7,7 @@
   <enterprise-beans>
     <message-driven>
       <ejb-name>KieSessionRequesMessageBean</ejb-name>
-      <ejb-class>org.jbpm.console.ng.services.jms.RequestMessageBean</ejb-class>
+      <ejb-class>org.kie.services.remote.jms.RequestMessageBean</ejb-class>
       <transaction-type>Container</transaction-type>
       <activation-config>
         <activation-config-property>
@@ -16,13 +16,13 @@
         </activation-config-property>
         <activation-config-property>
           <activation-config-property-name>destination</activation-config-property-name>
-          <activation-config-property-value>java:/queue/JBPM.SESSION</activation-config-property-value>
+          <activation-config-property-value>java:/queue/KIE.SESSION</activation-config-property-value>
         </activation-config-property> 
       </activation-config>
     </message-driven>  
     <message-driven>
       <ejb-name>TaskServiceRequesMessageBean</ejb-name>
-      <ejb-class>org.jbpm.console.ng.services.jms.RequestMessageBean</ejb-class>
+      <ejb-class>org.kie.services.remote.jms.RequestMessageBean</ejb-class>
       <transaction-type>Container</transaction-type>
       <activation-config>
         <activation-config-property>
@@ -31,7 +31,7 @@
         </activation-config-property>
         <activation-config-property>
           <activation-config-property-name>destination</activation-config-property-name>
-          <activation-config-property-value>java:/queue/JBPM.TASK</activation-config-property-value>
+          <activation-config-property-value>java:/queue/KIE.TASK</activation-config-property-value>
         </activation-config-property> 
       </activation-config>
     </message-driven>  

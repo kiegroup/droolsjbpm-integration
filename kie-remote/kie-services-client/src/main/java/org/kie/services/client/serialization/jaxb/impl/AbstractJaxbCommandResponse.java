@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import org.kie.api.command.Command;
 
 
-public abstract class AbstractJaxbCommandResponse implements JaxbCommandResponse {
+public abstract class AbstractJaxbCommandResponse<T> implements JaxbCommandResponse<T> {
 
     @XmlAttribute
     @XmlSchemaType(name="int")

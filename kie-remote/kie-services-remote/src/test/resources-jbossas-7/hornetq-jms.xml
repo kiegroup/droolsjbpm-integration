@@ -2,60 +2,44 @@
 <messaging-deployment xmlns="urn:jboss:messaging-deployment:1.0">
   <hornetq-server>
     <jms-destinations>
-      <!-- general session -->
-      <jms-queue name="JBPM.SESSION">
-        <entry name="queue/JBPM.SESSION.ALL" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.SESSION" />
+      
+      <!-- general session, task, response -->
+      <jms-queue name="KIE.SESSION">
+        <entry name="queue/KIE.SESSION.ALL" />
+        <entry name="java:jboss/exported/jms/queue/KIE.SESSION" />
       </jms-queue>
-      <jms-queue name="JBPM.RESPONSE.SESSION">
-        <entry name="queue/JBPM.RESPONSE.SESSION.ALL" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.RESPONSE.SESSION" />
+      <jms-queue name="KIE.TASK">
+        <entry name="queue/KIE.TASK.ALL" />
+        <entry name="java:jboss/exported/jms/queue/KIE.TASK" />
+      </jms-queue>
+      <jms-queue name="KIE.RESPONSE">
+        <entry name="queue/KIE.RESPONSE.ALL" />
+        <entry name="java:jboss/exported/jms/queue/KIE.RESPONSE" />
       </jms-queue>
       
-      <!-- general tasks -->
-      <jms-queue name="JBPM.TASK">
-        <entry name="queue/JBPM.TASK.ALL" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.TASK" />
+      <!-- wildcard session, task, response -->
+      <jms-queue name="KIE.SESSION.#">
+        <entry name="queue/KIE.SESSION" />
       </jms-queue>
-      <jms-queue name="JBPM.RESPONSE.TASK">
-        <entry name="queue/JBPM.RESPONSE.TASK.ALL" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.RESPONSE.TASK" />
+      <jms-queue name="KIE.TASK.#">
+        <entry name="queue/KIE.TASK" />
       </jms-queue>
-      
-      <!-- wildcard session -->
-      <jms-queue name="JBPM.SESSION.#">
-        <entry name="queue/JBPM.SESSION" />
-      </jms-queue>
-      <jms-queue name="JBPM.RESPONSE.SESSION.#">
-        <entry name="queue/JBPM.RESPONSE.SESSION" />
+      <jms-queue name="KIE.RESPONSE.#">
+        <entry name="queue/KIE.RESPONSE" />
       </jms-queue>
       
-      <!-- wildcard tasks -->
-      <jms-queue name="JBPM.TASK.#">
-        <entry name="queue/JBPM.TASK" />
+      <!-- domain test: sessions, task, response -->
+      <jms-queue name="KIE.SESSION.DOMAIN.TEST">
+        <entry name="queue/KIE.SESSION.DOMAIN" />
+        <entry name="java:jboss/exported/jms/queue/KIE.SESSION.DOMAIN.TEST" />
       </jms-queue>
-      <jms-queue name="JBPM.RESPONSE.TASK.#">
-        <entry name="queue/JBPM.RESPONSE.TASK" />
+      <jms-queue name="KIE.TASK.DOMAIN.TEST">
+        <entry name="queue/KIE.TASK.DOMAIN.TEST" />
+        <entry name="java:jboss/exported/jms/queue/KIE.TASK.DOMAIN.TEST" />
       </jms-queue>
-      
-      <!-- domain test: sessions -->
-      <jms-queue name="JBPM.SESSION.DOMAIN.TEST">
-        <entry name="queue/JBPM.SESSION.DOMAIN" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.SESSION.DOMAIN.TEST" />
-      </jms-queue>
-      <jms-queue name="JBPM.RESPONSE.SESSION.DOMAIN.TEST">
-        <entry name="queue/JBPM.RESPONSE.SESSION.DOMAIN" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.RESPONSE.SESSION.DOMAIN.TEST" />
-      </jms-queue>
-      
-      <!--  domain test: tasks -->
-      <jms-queue name="JBPM.TASK.DOMAIN.TEST">
-        <entry name="queue/JBPM.TASK.DOMAIN.TEST" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.TASK.DOMAIN.TEST" />
-      </jms-queue>
-      <jms-queue name="JBPM.RESPONSE.TASK.DOMAIN.TEST">
-        <entry name="queue/JBPM.RESPONSE.TASK.DOMAIN.TEST" />
-        <entry name="java:jboss/exported/jms/queue/JBPM.RESPONSE.TASK.DOMAIN.TEST" />
+      <jms-queue name="KIE.RESPONSE.DOMAIN.TEST">
+        <entry name="queue/KIE.RESPONSE.DOMAIN.TEST" />
+        <entry name="java:jboss/exported/jms/queue/KIE.RESPONSE.DOMAIN.TEST" />
       </jms-queue>
     </jms-destinations>
   </hornetq-server>
