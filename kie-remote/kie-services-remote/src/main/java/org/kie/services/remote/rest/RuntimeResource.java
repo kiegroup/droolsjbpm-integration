@@ -1,6 +1,7 @@
 package org.kie.services.remote.rest;
 
-import java.util.ArrayList;
+import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
+
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,10 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.jboss.resteasy.spi.BadRequestException;
-import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
@@ -53,26 +54,15 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
-    public JaxbGenericResponse execute(JaxbCommandsRequest cmdMsg) {
-        // TODO: add "ExecuteResource" for general execute mehod that differentiates based on package name?
-        List<Object> results = new ArrayList<Object>();
-        for( Object cmdObj : cmdMsg.getCommands() ) {
-            Command<?> cmd = (Command<?>) cmdObj;
-            if( cmd instanceof TaskCommand<?> ) {
-                throw new BadRequestException("Command " + cmd.getClass().getSimpleName() + " is not supported for the KieSession."); 
-            }
-            Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
-            results.add(result);
-        }
-        
-        // TODO: jaxb object for results
-        return null;
+    public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
+        return processJaxbCommandsRequest(cmdsRequest, processRequestBean);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/process/{processDefId}/start")
+    @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]}/start")
     public JaxbGenericResponse startNewProcess(@PathParam("processDefId") String processId) { 
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");

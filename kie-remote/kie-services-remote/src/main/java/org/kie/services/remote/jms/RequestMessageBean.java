@@ -1,5 +1,6 @@
 package org.kie.services.remote.jms;
 
+import static org.kie.services.remote.util.CommandsRequestUtil.*;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -58,12 +59,12 @@ public class RequestMessageBean implements MessageListener {
     public void onMessage(Message message) {
         // 1. get request
         int[] serializationTypeHolder = new int[1];
-        JaxbCommandsRequest cmdMsg = deserializeRequest(message, serializationTypeHolder);
+        JaxbCommandsRequest cmdsRequest = deserializeRequest(message, serializationTypeHolder);
 
         // 2. process request
         JaxbCommandsResponse jaxbResponse;
-        if (cmdMsg != null) {
-            jaxbResponse = processRequest(cmdMsg);
+        if (cmdsRequest != null) {
+            jaxbResponse = processJaxbCommandsRequest(cmdsRequest, processRequestBean);
         } else {
             jaxbResponse = null;
             // TODO
@@ -147,33 +148,6 @@ public class RequestMessageBean implements MessageListener {
                     + BytesMessage.class.getSimpleName());
         }
         return cmdMsg;
-    }
-
-    private JaxbCommandsResponse processRequest(JaxbCommandsRequest cmdMsg) {
-        String deploymentId = cmdMsg.getDeploymentId();
-        Long processInstanceId = cmdMsg.getProcessInstanceId();
-        JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(cmdMsg);
-        List<Command<?>> commands = cmdMsg.getCommands();
-        for (int i = 0; i < commands.size(); ++i) {
-            Command<?> cmd = commands.get(i);
-            boolean exceptionThrown = false;
-            Object cmdResult = null;
-            try {
-                if (cmd instanceof TaskCommand<?>) {
-                    cmdResult = processRequestBean.doTaskOperation(cmd);
-                } else {
-                    cmdResult = processRequestBean.doKieSessionOperation(cmd, deploymentId, processInstanceId);
-                }
-            } catch (Exception e) {
-                // TODO: log exception
-                jaxbResponse.addException(e, i, cmd);
-            }
-            if (!exceptionThrown) {
-                // addResult could possibly throw an exception, which is why it's here and not above
-                jaxbResponse.addResult(cmdResult, i, cmd);
-            }
-        }
-        return jaxbResponse;
     }
 
     private Message serializeResponse(Session session, int serializationtype, JaxbCommandsResponse jaxbResponse) {

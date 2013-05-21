@@ -1,6 +1,7 @@
 package org.kie.services.remote.rest;
 
-import java.util.ArrayList;
+import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,15 +27,17 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
+import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,24 +63,8 @@ public class TaskResource extends ResourceBase {
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
-    public JaxbGenericResponse execute(JaxbCommandsRequest cmdMsg) {
-        List<Object> results = new ArrayList<Object>();
-        for (Object cmdObj : cmdMsg.getCommands()) {
-            Command<?> cmd = (Command<?>) cmdObj;
-            if( ! (cmd instanceof TaskCommand<?>) ) {
-               throw new BadRequestException("Command " + cmd.getClass().getSimpleName() + " is not supported for the TaskService."); 
-            }
-            Object result = processRequestBean.doTaskOperation((Command<?>) cmd);
-            results.add(result);
-        }
-        return null;
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_XML)
-    @Path("/")
-    public JaxbGenericResponse getTaskInstanceInfo(@PathParam("oper") String operation) {
-        return null;
+    public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
+        return processJaxbCommandsRequest(cmdsRequest, processRequestBean);
     }
 
     @GET
@@ -191,6 +178,15 @@ public class TaskResource extends ResourceBase {
         }
 
         return new JaxbTaskSummaryListResponse(results);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/{id: [0-9-]+}")
+    public JaxbTask getTaskInstanceInfo(@PathParam("id") long taskId) { 
+        Command<?> cmd = new GetTaskCommand(taskId);
+        Task task = (Task) processRequestBean.doTaskOperation(cmd);
+        return new JaxbTask(task);
     }
 
     @POST
