@@ -21,15 +21,15 @@
 
   <properties>
     <arquillian.launch>jboss</arquillian.launch>
+    
     <jboss.version>7.1.1.Final</jboss.version>
     <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
     <jboss.server.version>7.1.1.Final</jboss.server.version>
-    <!--  eap integration
-    <jboss.version>7.2.0.Final</jboss.version>
-    <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version>
+    <!-- eap integration 
+    <jboss.version>7.2.0.Final</jboss.version> 
+    <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version> 
     <jboss.server.name>jboss-eap-6.1</jboss.server.name>
-    -->
-    <arquillian.version>1.0.3.Final</arquillian.version>
+     -->
   </properties>
 
   <dependencies>
@@ -162,6 +162,13 @@
       <artifactId>jboss-logmanager</artifactId>
       <groupId>org.jboss.logmanager</groupId>
       <version>1.4.0.Final</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- necessary when using hornetq 2.2.x -->
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty</artifactId>
+      <version>3.6.2.Final</version>
       <scope>test</scope>
     </dependency>
 

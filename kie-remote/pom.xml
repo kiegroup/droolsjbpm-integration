@@ -33,10 +33,12 @@
   <properties>
     <!--  eap 6.1 versions -->
     <resteasy.version>2.3.6.Final</resteasy.version>
+    <!--  eap 6.1 version not compatible with as7 
     <hornetq.version>2.3.0.Final</hornetq.version>
-    <camel.version>2.10.3</camel.version>
+     -->
+    <hornetq.version>2.2.21.Final</hornetq.version> 
 
-    <arquillian.version>1.0.0.Final</arquillian.version>
+    <arquillian.version>1.0.3.Final</arquillian.version>
     <shrinkwrap.version>2.0.0-beta-2</shrinkwrap.version>
   </properties>
 

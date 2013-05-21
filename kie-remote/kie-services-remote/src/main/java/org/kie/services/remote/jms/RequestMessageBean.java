@@ -15,6 +15,7 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.naming.InitialContext;
 
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
@@ -44,29 +45,25 @@ public class RequestMessageBean implements MessageListener {
     private ProcessRequestBean processRequestBean;
 
     @Resource
-    private MessageDrivenContext context;
+    // TODO: set tx to rollback in some cases?
+    private MessageDrivenContext msgContext;
     
-    @Resource(name="jms/queue/KIE.RESPONSE.ALL")
-    private Queue responseQueue;
-
     private String RESPONSE_QUEUE_NAME = null;
 
     @PostConstruct
     public void init() {
-        RESPONSE_QUEUE_NAME = System.getProperty("kie.services.jms.queues.response", "java:/jms/queue/KIE.RESPONSE.ALL");
+        RESPONSE_QUEUE_NAME = System.getProperty("kie.services.jms.queues.response", "queue/KIE.RESPONSE.ALL");
     }
 
     public void onMessage(Message message) {
         // 1. get request
         int[] serializationTypeHolder = new int[1];
         JaxbCommandsRequest cmdMsg = deserializeRequest(message, serializationTypeHolder);
-System.out.println("TEST 1");
 
         // 2. process request
         JaxbCommandsResponse jaxbResponse;
         if (cmdMsg != null) {
             jaxbResponse = processRequest(cmdMsg);
-System.out.println("TEST 2: " + jaxbResponse.getResponses().size());
         } else {
             jaxbResponse = null;
             // TODO
@@ -80,7 +77,6 @@ System.out.println("TEST 2: " + jaxbResponse.getResponses().size());
             connection = connectionFactory.createConnection();
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-System.out.println("TEST 3");
         } catch (Exception e) {
             // TODO: log exception
             failure = true;
@@ -103,16 +99,16 @@ System.out.println("TEST 3");
         Message msg = null;
         if (!failure) {
             msg = serializeResponse(session, serializationTypeHolder[0], jaxbResponse);
-System.out.println("TEST 4");
         }
 
+        
         // 5. send response message
         if (!failure) {
             try {
+                InitialContext context = new InitialContext();
                 Queue responseQueue = (Queue) context.lookup(RESPONSE_QUEUE_NAME);
                 MessageProducer producer = session.createProducer(responseQueue);
                 producer.send(msg);
-System.out.println("TEST 5");
             } catch (Exception e) {
                 // TODO: log exception
                 String errorMsg = "Unable to send msg to " + RESPONSE_QUEUE_NAME;

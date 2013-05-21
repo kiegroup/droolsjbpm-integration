@@ -1,4 +1,4 @@
-package org.kie.services.remote.cdi;
+package org.kie.services.remote.war;
 
 import java.util.logging.Logger;
 
