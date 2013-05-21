@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd">
+
+
+  <!--
+      Inappropriate order of listeners; required order is:
+      1) agenda
+      2) process
+      3) working memory
+
+      But when configured this way, order does not matter:
+
+      <kie:eventListeners id="listeners">
+          <kie:agendaEventListener>
+              <bean class="org.kie.container.container.spring.MockAgendaEventListener"/>
+          </kie:agendaEventListener>
+          <kie:workingMemoryEventListener>
+              <bean class="org.kie.container.container.spring.MockWorkingMemoryEventListener" />
+          </kie:workingMemoryEventListener>
+          <kie:processEventListener>
+              <bean class="org.kie.container.container.spring.MockProcessEventListener" />
+          </kie:processEventListener>
+      </kie:eventListeners>
+
+      <kie:ksession id="session2" type="stateful" listeners="listeners" kbase="kbase"/>
+
+      This behavior should be united.
+  -->
+  <kie:ksession-ref id="ksession2">
+    <kie:agendaEventListener>
+      <bean class="org.kie.spring.mocks.MockAgendaEventListener"/>
+    </kie:agendaEventListener>
+    <kie:workingMemoryEventListener>
+      <bean class="org.kie.spring.mocks.MockWorkingMemoryEventListener"/>
+    </kie:workingMemoryEventListener>
+    <kie:processEventListener>
+      <bean class="org.kie.spring.mocks.MockProcessEventListener"/>
+    </kie:processEventListener>
+  </kie:ksession-ref>
+
+</beans>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <bean name="myDroolsBean" class="org.kie.spring.timer.MyDroolsBean">
+    <property name="emf" ref="entityManagerFactory"/>
+    <property name="kbase" ref="drl_timer_flow"/>
+    <property name="kstore" ref="knowledgeStore"/>
+    <property name="txm" ref="transactionManager"/>
+  </bean>
+
+  <context:annotation-config/>
+
+  <kie:kstore id="knowledgeStore"/>
+
+  <kie:kbase-ref id="drl_timer_flow"/>
+
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory"/>
+  </bean>
+
+  <bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="org.h2.Driver"/>
+    <property name="url" value="jdbc:h2:mem:drools-spring-workflow"/>
+    <property name="username" value="sa"/>
+    <property name="password" value=""/>
+  </bean>
+
+  <bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local"/>
+    <property name="dataSource" ref="datasource"/>
+  </bean>
+
+
+</beans>

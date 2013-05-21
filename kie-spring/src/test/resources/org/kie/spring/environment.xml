@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd">
+
+  <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="org.h2.Driver"/>
+    <property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow"/>
+    <property name="username" value="sa"/>
+    <property name="password" value=""/>
+  </bean>
+
+  <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource" ref="ds"/>
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local"/>
+  </bean>
+
+  <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="myEmf"/>
+  </bean>
+
+  <bean id="my-globals" class="org.drools.core.base.MapGlobalResolver"/>
+  <bean id="my-date-formats" class="org.drools.core.type.DateFormatsImpl"/>
+  <bean id="my-calendars" class="org.drools.core.base.CalendarsImpl"/>
+
+  <bean id="mock-custom-strategy" class="org.kie.spring.mocks.MockObjectMarshallingStrategy"/>
+
+  <kie:environment id="drools-env">
+
+    <kie:entity-manager-factory ref="myEmf"/>
+    <kie:transaction-manager ref="txManager"/>
+    <kie:globals ref="my-globals"/>
+    <kie:date-formats ref="my-date-formats"/>
+    <kie:calendars ref="my-calendars"/>
+
+    <kie:object-marshalling-strategies>
+      <kie:serializable-placeholder-resolver-strategy strategy-acceptor-ref="default-acceptor"/>
+      <kie:identity-placeholder-resolver-strategy strategy-acceptor-ref="default-acceptor"/>
+      <kie:jpa-placeholder-resolver-strategy env-ref="drools-env-embedded"/>
+      <kie:process-instance-resolver-strategy/>
+    </kie:object-marshalling-strategies>
+
+    <!--
+    <kie:scoped-entity-manager scope="app" >
+        </kie:scoped-entity-manager>
+    -->
+
+  </kie:environment>
+
+  <kie:environment id="drools-env-embedded">
+    <kie:entity-manager-factory ref="myEmf"/>
+
+    <kie:transaction-manager>
+      <bean class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="myEmf"/>
+      </bean>
+    </kie:transaction-manager>
+
+    <kie:globals>
+      <bean class="org.drools.core.base.MapGlobalResolver"/>
+    </kie:globals>
+
+    <kie:date-formats>
+      <bean class="org.drools.core.type.DateFormatsImpl"/>
+    </kie:date-formats>
+
+    <kie:calendars>
+      <bean class="org.drools.core.base.CalendarsImpl"/>
+    </kie:calendars>
+
+    <kie:object-marshalling-strategies>
+      <kie:serializable-placeholder-resolver-strategy>
+        <kie:strategy-acceptor>
+          <bean class="org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+            <constructor-arg>
+              <list>
+                <value>*.*</value>
+              </list>
+            </constructor-arg>
+          </bean>
+        </kie:strategy-acceptor>
+      </kie:serializable-placeholder-resolver-strategy>
+
+      <kie:process-instance-resolver-strategy/>
+
+    </kie:object-marshalling-strategies>
+
+    <!--
+    <kie:scoped-entity-manager scope="app|cmd" >
+      <bean class="..."/>
+    </kie:scoped-entity-manager>
+    -->
+
+  </kie:environment>
+
+  <kie:environment id="drools-env-custom-marshaller-ref">
+
+    <kie:entity-manager-factory ref="myEmf"/>
+
+    <kie:object-marshalling-strategies>
+      <kie:custom-marshalling-strategy ref="mock-custom-strategy"/>
+    </kie:object-marshalling-strategies>
+
+  </kie:environment>
+
+  <kie:environment id="drools-env-custom-marshaller-nested">
+
+    <kie:entity-manager-factory ref="myEmf"/>
+
+    <kie:object-marshalling-strategies>
+      <kie:custom-marshalling-strategy>
+        <bean class="org.kie.spring.mocks.MockObjectMarshallingStrategy"/>
+      </kie:custom-marshalling-strategy>
+    </kie:object-marshalling-strategies>
+
+  </kie:environment>
+
+  <kie:environment id="drools-env-custom-marshaller-mixed">
+
+    <kie:entity-manager-factory ref="myEmf"/>
+
+    <kie:object-marshalling-strategies>
+      <kie:serializable-placeholder-resolver-strategy strategy-acceptor-ref="default-acceptor"/>
+      <kie:identity-placeholder-resolver-strategy strategy-acceptor-ref="default-acceptor"/>
+      <kie:jpa-placeholder-resolver-strategy env-ref="drools-env-embedded"/>
+      <kie:custom-marshalling-strategy>
+        <bean class="org.kie.spring.mocks.MockObjectMarshallingStrategy"/>
+      </kie:custom-marshalling-strategy>
+      <kie:process-instance-resolver-strategy/>
+    </kie:object-marshalling-strategies>
+
+  </kie:environment>
+
+  <bean id="default-acceptor" class="org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor">
+    <constructor-arg>
+      <list>
+        <value>*.*</value>
+      </list>
+    </constructor-arg>
+  </bean>
+</beans>
+
