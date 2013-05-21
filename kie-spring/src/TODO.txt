@@ -1,0 +1,5 @@
+TODO: kie-spring: env-ref attribute for ksession
+TODO: kie-spring: inner tag 'environment' for ksession
+
+
+
