@@ -16,6 +16,9 @@ public class JaxbPrimitiveResponse extends AbstractJaxbCommandResponse<Object> {
     @XmlSchemaType(name="base64Binary")
     private Object result;
     
+    public JaxbPrimitiveResponse() {
+    }
+    
     public JaxbPrimitiveResponse(Object result, int i, Command<?> cmd) {
        super(i, cmd);
        this.result = result;

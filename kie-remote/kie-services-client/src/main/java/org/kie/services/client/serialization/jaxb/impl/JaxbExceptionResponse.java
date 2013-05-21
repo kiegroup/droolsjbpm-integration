@@ -15,6 +15,9 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<Object> {
     @XmlSchemaType(name="string")
     private String causeMessage;
     
+    public JaxbExceptionResponse() {
+    }
+    
     public JaxbExceptionResponse(Exception e, int i, Command<?> cmd) {
        super(i, cmd);
        this.message = e.getClass().getSimpleName() + " thrown with message '" + e.getMessage() + "'";

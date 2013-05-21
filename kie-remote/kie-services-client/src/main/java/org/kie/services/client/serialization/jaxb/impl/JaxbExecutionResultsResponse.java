@@ -14,6 +14,9 @@ public class JaxbExecutionResultsResponse extends AbstractJaxbCommandResponse<Ex
     })
     private ExecutionResults results;
     
+    public JaxbExecutionResultsResponse() {
+    }
+    
     public JaxbExecutionResultsResponse(ExecutionResults results, int i, Command<?> cmd) { 
         super(i, cmd);
         this.results = results;
