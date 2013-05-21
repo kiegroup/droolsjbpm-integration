@@ -2,8 +2,6 @@ package org.kie.services.remote.rest.jaxb;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
@@ -17,7 +15,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.jboss.resteasy.spi.BadRequestException;
 
-@XmlRootElement(name = "message")
+@XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbGenericResponse {
 
@@ -36,9 +34,10 @@ public class JaxbGenericResponse {
     @XmlSchemaType(name="string")
     private String stackTrace;
     
-    @XmlElement(name = "value")
-    private List<JaxbGenericValue> values = new ArrayList<JaxbGenericValue>();
-
+    public JaxbGenericResponse() { 
+       // Default constructor 
+    }
+    
     public JaxbGenericResponse(HttpServletRequest request ) { 
         this.url = getUrl(request);
         this.status = JaxbRequestStatus.SUCCESS;
@@ -88,14 +87,6 @@ public class JaxbGenericResponse {
         return writer.toString();
     }
     
-    public List<JaxbGenericValue> getValues() {
-        return values;
-    }
-
-    public void setValues(List<JaxbGenericValue> values) {
-        this.values = values;
-    }
-
     public JaxbRequestStatus getStatus() {
         return status;
     }
