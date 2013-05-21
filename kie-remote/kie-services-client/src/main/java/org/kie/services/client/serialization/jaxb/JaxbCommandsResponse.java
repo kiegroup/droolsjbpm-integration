@@ -85,10 +85,17 @@ public class JaxbCommandsResponse {
         } else if (result instanceof Task) {
             this.responses.add(new JaxbTaskResponse((Task) result, i, cmd));
         } else if (result instanceof List) {
-            Type[] generics = result.getClass().getGenericInterfaces();
-            if (generics.length == 1 && generics[0] instanceof Class && ((Class) generics[0]).isInstance(TaskSummary.class)) {
-                this.responses.add(new JaxbTaskSummaryListResponse((List<TaskSummary>) result, i, cmd));
-            } else {
+        	List<?> list = (List<?>) result;
+        	boolean tasks = true;
+        	for (Object o: list) {
+        		if (!(o instanceof TaskSummary)) {
+        			tasks = false;
+        		}
+            }
+        	// TODO what about other types?
+        	if (tasks) {
+        		this.responses.add(new JaxbTaskSummaryListResponse((List<TaskSummary>) result, i, cmd));
+        	} else {
                 unknownResultType = true;
             }
         } else if (result.getClass().isPrimitive()) {

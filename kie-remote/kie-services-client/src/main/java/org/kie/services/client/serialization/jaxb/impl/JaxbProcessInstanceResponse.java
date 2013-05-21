@@ -104,5 +104,15 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         return this;
     }
 
+    public String toString() {
+        final StringBuilder b = new StringBuilder( "ProcessInstance " );
+        b.append( this.id );
+        b.append( " [processId=" );
+        b.append( this.processId );
+        b.append( ",state=" );
+        b.append( this.state );
+        b.append( "]" );
+        return b.toString();
+    }
     
 }

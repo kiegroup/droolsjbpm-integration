@@ -92,7 +92,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "unregister-channel", type = UnregisterChannelCommand.class),
 
             @XmlElement(name = "activate-task", type = ActivateTaskCommand.class),
-            @XmlElement(name = "add-task", type = AddTaskCommand.class),
+//            @XmlElement(name = "add-task", type = AddTaskCommand.class),
             @XmlElement(name = "claim-next-available-task", type = ClaimNextAvailableTaskCommand.class),
             @XmlElement(name = "claim-task", type = ClaimTaskCommand.class),
             @XmlElement(name = "complete-task", type = CompleteTaskCommand.class),
@@ -109,7 +109,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-tasks-by-processinstanceid", type = GetTasksByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
-            @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
+//            @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),
             @XmlElement(name = "resume-task", type = ResumeTaskCommand.class),
             @XmlElement(name = "skip-task", type = SkipTaskCommand.class),

@@ -18,6 +18,8 @@
 package org.kie.services.remote;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
@@ -38,7 +40,10 @@ import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.Status;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.services.client.api.RemoteJmsSessionFactory;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
@@ -58,6 +63,7 @@ public class RestIntegrationTest extends IntegrationBase {
     @ArquillianResource
     URL deploymentUrl;
 
+    @Ignore
     @Test
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
@@ -176,11 +182,35 @@ public class RestIntegrationTest extends IntegrationBase {
             "http://127.0.0.1:8080/arquillian-test", "test").newRuntimeManager();
         RuntimeEngine engine = runtimeManager.getRuntimeEngine(EmptyContext.get());
         KieSession ksession = engine.getKieSession();
-        ksession.startProcess("org.jbpm.humantask");
+        ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
+        System.out.println("Started process instance: " + processInstance + " " + (processInstance == null? "" : processInstance.getId()));
         TaskService taskService = engine.getTaskService();
-        taskService.start(1, "salaboy");
-        taskService.complete(1, "salaboy", null);
-//        taskService.complete(1, "salaboy", null);
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("salaboy", "en-UK");
+        if (tasks.size() != 1) {
+        	throw new RuntimeException("Expecting one task " + tasks.size());
+        }
+        long taskId = tasks.get(0).getId();
+        System.out.println("Found task " + taskId);
+        System.out.println(taskService.getTaskById(taskId));
+        taskService.start(taskId, "salaboy");
+        taskService.complete(taskId, "salaboy", null);
+        boolean failure = false;
+        System.out.println("Now expecting failure");
+        try {
+        	taskService.complete(taskId, "salaboy", null);
+        } catch (Throwable t) {
+        	t.printStackTrace();
+        	failure = true;
+        }
+        if (!failure) {
+        	throw new RuntimeException("Cannot claim task twice");
+    	}
+        List<Status> statuses = new ArrayList<Status>();
+        statuses.add(Status.Reserved);
+        List<TaskSummary> taskIds = taskService.getTasksByStatusByProcessInstanceId(processInstance.getId(), statuses, "en-UK");
+        if (taskIds.size() != 2) {
+        	throw new RuntimeException("Expecting two tasks");
+        }
     }
     
 }

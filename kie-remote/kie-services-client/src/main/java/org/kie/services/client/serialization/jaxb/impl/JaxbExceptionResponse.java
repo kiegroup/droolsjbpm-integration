@@ -26,8 +26,12 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<Object> {
            this.causeMessage = t.getClass().getSimpleName() + " thrown with message '" + t.getMessage() + "'";
        }
     }
+    
+    public String getMessage() {
+    	return message;
+    }
 
-    public String getCauseMEssage() {
+    public String getCauseMessage() {
         return causeMessage;
     }
 

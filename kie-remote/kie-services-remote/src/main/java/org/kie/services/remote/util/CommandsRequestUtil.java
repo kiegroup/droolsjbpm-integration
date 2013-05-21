@@ -27,11 +27,14 @@ public class CommandsRequestUtil {
                 }
             } catch (Exception e) {
                 // TODO: log exception
+            	e.printStackTrace();
                 jaxbResponse.addException(e, i, cmd);
             }
             if (!exceptionThrown) {
-                // addResult could possibly throw an exception, which is why it's here and not above
-                jaxbResponse.addResult(cmdResult, i, cmd);
+            	if (cmdResult != null) {
+            		// addResult could possibly throw an exception, which is why it's here and not above
+            		jaxbResponse.addResult(cmdResult, i, cmd);
+            	}
             }
         }
         return jaxbResponse;
