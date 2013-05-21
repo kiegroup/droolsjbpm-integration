@@ -59,6 +59,7 @@ public class RestIntegrationTest extends IntegrationBase {
     URL deploymentUrl;
 
     @Test
+    @Ignore
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
         String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.humantask/start").toExternalForm();
