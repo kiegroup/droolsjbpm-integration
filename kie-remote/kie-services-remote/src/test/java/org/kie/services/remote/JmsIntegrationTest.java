@@ -22,6 +22,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
@@ -36,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * This is a simple test that tests whether the war can be succesfully deployed on WildFly (AS 7).
  */
 
-@RunWith(Arquillian.class)
-@ServerSetup(ArquillianJbossServerSetupTask.class)
+//@RunWith(Arquillian.class)
+//@ServerSetup(ArquillianJbossServerSetupTask.class)
 public class JmsIntegrationTest extends IntegrationBase {
 
     private static Logger logger = LoggerFactory.getLogger(JmsIntegrationTest.class);
@@ -83,6 +84,7 @@ public class JmsIntegrationTest extends IntegrationBase {
     }
     
     @Test
+    @Ignore
     public void shouldBeAbleToGetMessageBack() throws Exception {
         Message response = sendStartProcessMessage(TASK_QUEUE_NAME);
     }

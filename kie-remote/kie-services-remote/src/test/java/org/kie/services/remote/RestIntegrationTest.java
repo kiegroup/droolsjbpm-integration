@@ -45,9 +45,9 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.remote.setup.ArquillianJbossServerSetupTask;
 
-@RunAsClient
-@RunWith(Arquillian.class)
-@ServerSetup(ArquillianJbossServerSetupTask.class)
+//@RunAsClient
+//@RunWith(Arquillian.class)
+//@ServerSetup(ArquillianJbossServerSetupTask.class)
 public class RestIntegrationTest extends IntegrationBase {
 
     @Deployment(testable = false)
@@ -59,7 +59,6 @@ public class RestIntegrationTest extends IntegrationBase {
     URL deploymentUrl;
 
     @Test
-    @Ignore
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
         String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.humantask/start").toExternalForm();
