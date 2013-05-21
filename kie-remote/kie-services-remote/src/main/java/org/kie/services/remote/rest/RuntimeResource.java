@@ -42,7 +42,7 @@ public class RuntimeResource extends ResourceBase {
     private Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
 
     @Inject
-    protected ProcessRequestBean processRequestBean;
+    private ProcessRequestBean processRequestBean;
 
     @PathParam("id")
     private String deploymentId;
@@ -62,7 +62,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]}/start")
+    @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]+}/start")
     public JaxbGenericResponse startNewProcess(@PathParam("processDefId") String processId) { 
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
