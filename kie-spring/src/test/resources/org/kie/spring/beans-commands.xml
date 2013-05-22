@@ -22,11 +22,11 @@
 
   <bean id="personsList" class="java.util.ArrayList"/>
 
-  <kie:ksession-ref id="ksession2">
+  <kie:ksession id="ksession2" kbase-ref="drl_kiesample" type="stateful">
     <kie:batch>
       <kie:insert-object ref="person"/>
     </kie:batch>
-  </kie:ksession-ref>
+  </kie:ksession>
 
   <kie:ksession id="ksessionForCommands" type="stateful" kbase-ref="drl_kiesample">
     <kie:batch>

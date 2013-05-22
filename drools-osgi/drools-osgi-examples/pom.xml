@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-camel</artifactId>
+      <artifactId>drools-camel-legacy5</artifactId>
     </dependency>
 
     <!-- POI - Excell -->

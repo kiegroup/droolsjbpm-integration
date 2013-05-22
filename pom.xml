@@ -51,7 +51,7 @@
   <modules>
     <module>drools-benchmark</module>
     <module>drools-spring</module>
-    <module>drools-camel</module>
+    <module>drools-camel-legacy5</module>
     <module>drools-camel-server-example</module>
     <module>drools-osgi</module>
     <!--module>drools-grid</module-->
@@ -61,6 +61,7 @@
     <module>jbpm-simulation</module>
     <module>kie-remote</module>
     <module>kie-spring</module>
+    <module>kie-camel</module>
     <module>drools-jboss-integration</module>
   </modules>
 

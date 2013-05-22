@@ -9,17 +9,21 @@
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-camel-server-example</artifactId>
-  <packaging>war</packaging>
-  
-  <name>Drools Camel server example</name>
-  <description>A webapp that runs the Drools Camel integration.</description>
+  <artifactId>drools-camel-legacy5</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>Drools Camel integration Legacy5</name>
+  <description>Legacy Drools 5.x integration for Camel that provides an integration framework based on known Enterprise Integration Pattern.</description>
 
   <dependencies>
     <!-- Drools -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -30,34 +34,17 @@
       <artifactId>drools-compiler</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-decisiontables</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-persistence-jpa</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-workitems</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-bpmn2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-templates</artifactId>
+      <artifactId>jbpm-flow-builder</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-spring</artifactId>
     </dependency>
-    <dependency>
+    <!-- dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
-    </dependency>
-
+      <artifactId>drools-grid-impl</artifactId>
+    </dependency -->
     <!-- Camel -->
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -66,10 +53,6 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-spring</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -85,8 +68,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-core</artifactId>
-      <type>test-jar</type>
+      <artifactId>camel-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-test-spring</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -99,10 +86,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
@@ -113,9 +96,17 @@
     <!-- CXF deps -->
     <dependency>
       <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
       <!-- TODO JBRULES-3026 use cxf-rt-frontend-jaxrs and cxf-rt-transports-http-jetty instead -->
       <artifactId>cxf-bundle-jaxrs</artifactId>
       <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>xerces</groupId>
           <artifactId>xercesImpl</artifactId>
@@ -142,30 +133,29 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--
-       When deploying to EAP 5.1 with the CXF extension installed,
-       the following jars must be added too (without transitive dependencies):
-       cxf-rt-transports-jms
-       cxf-rt-management (is a dependency of cxf-rt-transports-jms)
-       cxf-rt-bindings-corba
-     -->
+
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-xjc</artifactId>
+      <optional>true</optional>
     </dependency>
 
-
-    <!-- web app deps -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- Logging -->
@@ -179,11 +169,49 @@
       <scope>test</scope>
     </dependency>
 
-     <!-- HSQLDB -->
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- web app deps -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <_removeheaders>Ignore-Package</_removeheaders>
+            <Bundle-SymbolicName>org.kie.camel</Bundle-SymbolicName>
+            <Bundle-Name>Drools Camel</Bundle-Name>
+            <Import-Package>
+              !org.kie.camel.component,
+              !org.kie.jax*,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.kie.camel.component,
+              org.kie.jax*
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
