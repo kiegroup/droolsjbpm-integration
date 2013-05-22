@@ -16,8 +16,6 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 
 public abstract class AbstractRemoteCommandObject {
 

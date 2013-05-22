@@ -25,11 +25,12 @@
     <jboss.version>7.1.1.Final</jboss.version>
     <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
     <jboss.server.version>7.1.1.Final</jboss.server.version>
-    <!-- eap integration 
+    <!-- eap integration
     <jboss.version>7.2.0.Final</jboss.version> 
     <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version> 
     <jboss.server.name>jboss-eap-6.1</jboss.server.name>
      -->
+    <hornetq.vesion>2.2.13.Final</hornetq.vesion>
   </properties>
 
   <dependencies>
@@ -249,6 +250,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
+          <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>

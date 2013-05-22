@@ -17,6 +17,7 @@
  */
 package org.kie.services.remote;
 
+import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +28,15 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -47,12 +51,14 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.services.client.api.RemoteJmsSessionFactory;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
+import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 import org.kie.services.remote.setup.ArquillianJbossServerSetupTask;
 
-//@RunAsClient
-//@RunWith(Arquillian.class)
-//@ServerSetup(ArquillianJbossServerSetupTask.class)
+@RunAsClient
+@RunWith(Arquillian.class)
+@ServerSetup(ArquillianJbossServerSetupTask.class)
 public class RestIntegrationTest extends IntegrationBase {
 
     @Deployment(testable = false)
@@ -63,8 +69,9 @@ public class RestIntegrationTest extends IntegrationBase {
     @ArquillianResource
     URL deploymentUrl;
 
-    @Ignore
     @Test
+    @Ignore
+    @InSequence(1)
     public void shouldBeAbleToDeployAndProcessSimpleRestRequest() throws Exception { 
         // create REST request
         String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/process/org.jbpm.humantask/start").toExternalForm();
@@ -72,52 +79,67 @@ public class RestIntegrationTest extends IntegrationBase {
         
         ClientRequest restRequest = new ClientRequest(urlString);
 
-        // Get response
+        // Get and check response
         ClientResponse responseObj = restRequest.post();
+        assertEquals(200, responseObj.getStatus());
 
-        // Check response
-//        assertEquals(200, responseObj.getStatus());
-//        Object result = responseObj.getEntity();
-//        System.out.println(result);
+        urlString = deploymentUrl.toExternalForm() + "/rest/task/query?taskOwner=salaboy";
+        restRequest = new ClientRequest(urlString);
+        responseObj = restRequest.post();
+        assertEquals(200, responseObj.getStatus());
+        // TODO: iterate through
+        JaxbTaskSummaryListResponse list = (JaxbTaskSummaryListResponse) responseObj.getEntity(JaxbTaskSummaryListResponse.class);
+        long taskId = list.getResult().get(0).getId();
         
-        urlString = new URL(deploymentUrl, "/arquillian-test/rest/task/1/start?userId=salaboy").toExternalForm();
+        
+        urlString = new URL(deploymentUrl, "/arquillian-test/rest/task/" + taskId + "/start?userId=salaboy").toExternalForm();
         System.out.println( ">> " + urlString );
-        
         restRequest = new ClientRequest(urlString);
 
         // Get response
         responseObj = restRequest.post();
 
         // Check response
-//        assertEquals(200, responseObj.getStatus());
-//        Object result = responseObj.getEntity();
+        assertEquals(200, responseObj.getStatus());
+//        result = responseObj.getEntity();
 //        System.out.println(result);
 
     }
     
-    @Ignore
     @Test
+    @Ignore
+    @InSequence(2)
     public void executeRestRequest() throws Exception { 
-        // create REST request
+        // Start process
         String urlString = new URL(deploymentUrl, "/arquillian-test/rest/runtime/test/execute").toExternalForm();
         System.out.println( ">> " + urlString );
         
         ClientRequest restRequest = new ClientRequest(urlString);
         JaxbCommandsRequest commandMessage = new JaxbCommandsRequest("test", new StartProcessCommand("org.jbpm.humantask"));
         String body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
-        System.out.println(body);
         restRequest.body(MediaType.APPLICATION_XML, body);
 
-        // Get response
         ClientResponse responseObj = restRequest.post();
 
-        // Check response
-        System.out.println(responseObj.getStatus());
-//        assertEquals(200, responseObj.getStatus());
+        assertEquals(200, responseObj.getStatus());
 //        Object result = responseObj.getEntity();
 //        System.out.println(result);
+
+        // query tasks
+        System.out.println( ">> " + urlString );
         
-        urlString = new URL(deploymentUrl, "/arquillian-test/rest/task/execute").toExternalForm();
+        restRequest = new ClientRequest(urlString);
+        commandMessage = new JaxbCommandsRequest("test", new GetTasksOwnedCommand("salaboy", "en-UK"));
+        body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
+        restRequest.body(MediaType.APPLICATION_XML, body);
+
+        responseObj = restRequest.post();
+        assertEquals(200, responseObj.getStatus());
+        JaxbCommandsResponse cmdResponse = (JaxbCommandsResponse) responseObj.getEntity(JaxbCommandsResponse.class);
+        body = JaxbSerializationProvider.convertJaxbObjectToString(cmdResponse);
+        System.out.println(body);
+        
+        // start task
         System.out.println( ">> " + urlString );
         
         restRequest = new ClientRequest(urlString);
@@ -130,8 +152,7 @@ public class RestIntegrationTest extends IntegrationBase {
         responseObj = restRequest.post();
 
         // Check response
-        System.out.println(responseObj.getStatus());
-//        assertEquals(200, responseObj.getStatus());
+        assertEquals(200, responseObj.getStatus());
 //        Object result = responseObj.getEntity();
 //        System.out.println(result);
 

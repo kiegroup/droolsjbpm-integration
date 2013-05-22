@@ -32,8 +32,12 @@ public class CommandsRequestUtil {
             }
             if (!exceptionThrown) {
             	if (cmdResult != null) {
+            	    try { 
             		// addResult could possibly throw an exception, which is why it's here and not above
             		jaxbResponse.addResult(cmdResult, i, cmd);
+            	    } catch( Exception e ) { 
+            	        e.printStackTrace();
+            	    }
             	}
             }
         }
