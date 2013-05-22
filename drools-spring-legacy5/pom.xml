@@ -9,11 +9,11 @@
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-spring</artifactId>
+  <artifactId>drools-spring-legacy5</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Drools Spring</name>
-  <description>Drools and jBPM integration for Spring.</description>
+  <name>Drools Spring Legacy5</name>
+  <description>Legacy Drools 5.x integration for Spring.</description>
 
   <dependencies>
     <dependency>

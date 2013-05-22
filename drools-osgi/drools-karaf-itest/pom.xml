@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-spring</artifactId>
+      <artifactId>drools-spring-legacy5</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
