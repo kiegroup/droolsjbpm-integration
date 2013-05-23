@@ -7,16 +7,23 @@ import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
+import org.kie.services.client.api.RemoteRestSessionFactory.AuthenticationType;
 
 public class RemoteRuntimeEngine implements RuntimeEngine {
 
 	private String url;
 	private String deploymentId;
+	private AuthenticationType authenticationType;
+	private String username;
+	private String password;
 	private String contextId;
 	
-	public RemoteRuntimeEngine(String url, String deploymentId, String contextId) {
+	public RemoteRuntimeEngine(String url, String deploymentId, AuthenticationType authenticationType, String username, String password, String contextId) {
 		this.url = url;
 		this.deploymentId = deploymentId;
+		this.authenticationType = authenticationType;
+		this.username = username;
+		this.password = password;
 		this.contextId = contextId;
 	}
 	
@@ -25,7 +32,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 		if (this.contextId != null) {
 			url += "?contextId=" + contextId;
 		}
-		CommandService commandService = new RemoteSessionCommandService(url, deploymentId);
+		CommandService commandService = new RemoteSessionCommandService(this.url, url, deploymentId, authenticationType, username, password);
 		return new CommandBasedStatefulKnowledgeSession(commandService);
 	}
 
@@ -34,7 +41,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 		if (this.contextId != null) {
 			url += "?contextId=" + contextId;
 		}
-		CommandExecutor executor = new RemoteTaskCommandExecutor(url, deploymentId);
+		CommandExecutor executor = new RemoteTaskCommandExecutor(this.url, url, deploymentId, authenticationType, username, password);
 		return new CommandBasedTaskService(executor);
 	}
 

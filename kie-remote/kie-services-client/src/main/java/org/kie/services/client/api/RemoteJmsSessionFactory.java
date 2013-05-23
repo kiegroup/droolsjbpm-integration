@@ -14,7 +14,7 @@ public class RemoteJmsSessionFactory {
     }
     
     public RuntimeManager newRuntimeManager() {
-    	return new RemoteRuntimeManager("Remote Runtime Manager", url, deploymentId);
+    	return new RemoteRuntimeManager("Remote Runtime Manager", url, deploymentId, null, null, null);
     }
     
 }
