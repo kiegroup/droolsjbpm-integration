@@ -31,120 +31,19 @@
   </modules>
 
   <properties>
-    <!--  eap 6.1 versions -->
-    <resteasy.version>2.3.6.Final</resteasy.version>
     <!--  eap 6.1 version not compatible with as7 
     <hornetq.version>2.3.0.Final</hornetq.version>
      -->
-    <hornetq.version>2.2.21.Final</hornetq.version> 
-
-    <arquillian.version>1.0.3.Final</arquillian.version>
-    <shrinkwrap.version>2.0.0-beta-2</shrinkwrap.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <!-- this module -->
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-services-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-services-remote</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!--  jms -->
-      <dependency>
-        <groupId>org.hornetq</groupId>
-        <artifactId>hornetq-core-client</artifactId>
-        <version>${hornetq.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hornetq</groupId>
-        <artifactId>hornetq-jms-client</artifactId>
-        <version>${hornetq.version}</version>
-      </dependency>
-
-      <!-- rest -->
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>jaxrs-api</artifactId>
-        <version>${resteasy.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
-        <version>${resteasy.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxb-provider</artifactId>
-        <version>${resteasy.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-cdi</artifactId>
-        <version>${resteasy.version}</version>
-      </dependency>
-
-<!-- 
-      // general 
-      <dependency>
-        <groupId>org.jboss.spec.javax.ejb</groupId>
-        <artifactId>jboss-ejb-api_3.1_spec</artifactId>
-        <version>1.0.2.Final</version>
-      </dependency>
-
-      // camel 
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-restlet</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-ejb</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-cdi</artifactId>
-        <version>${camel.version}</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>geronimo-jcdi_1.0_spec</artifactId>
-            <groupId>org.apache.geronimo.specs</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>geronimo-atinject_1.0_spec</artifactId>
-            <groupId>org.apache.geronimo.specs</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>deltaspike-core-api</artifactId>
-            <groupId>org.apache.deltaspike.core</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>geronimo-interceptor_1.1_spec</artifactId>
-            <groupId>org.apache.geronimo.specs</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-jms</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
--->
-
       <!-- arquillian -->
       <!-- Override dependency resolver with test version. This must go *BEFORE* the Arquillian BOM. -->
       <dependency>
         <groupId>org.jboss.shrinkwrap.resolver</groupId>
         <artifactId>shrinkwrap-resolver-bom</artifactId>
-        <version>${shrinkwrap.version}</version>
+        <version>${shrinkwrap.resolver.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -158,4 +57,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  
 </project>
