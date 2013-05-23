@@ -3,14 +3,23 @@ package org.kie.services.client.api.command;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
@@ -30,6 +39,7 @@ public abstract class AbstractRemoteCommandObject {
     protected AuthenticationType authenticationType;
     protected String username;
     protected String password;
+    boolean authorized = false;
 
     public AbstractRemoteCommandObject(String baseUrl, String url, String deploymentId, AuthenticationType authenticationType, String username, String password) {
     	this.baseUrl = baseUrl;
@@ -42,16 +52,43 @@ public abstract class AbstractRemoteCommandObject {
     
     public <T> T execute(Command<T> command) {
     	ClientRequest restRequest = null;
+        DefaultHttpClient client = new DefaultHttpClient();
     	if (AuthenticationType.BASIC == authenticationType) {
-	        DefaultHttpClient client = new DefaultHttpClient();
 	        client.getCredentialsProvider().setCredentials(
 	            new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
 	            new UsernamePasswordCredentials(username, password));
-	        ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-	        restRequest = new ClientRequest(url, executor);
-    	} else {
-    		restRequest = new ClientRequest(url);
+    	} else if (AuthenticationType.FORM_BASED == authenticationType && !authorized) {
+    		HttpPost method = new HttpPost(url);
+			try {
+				HttpResponse response = client.execute(method);
+				if (response.getStatusLine().getStatusCode() == 200) {
+					throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
+				}
+				EntityUtils.consume(response.getEntity());
+			} catch (ClientProtocolException e) {
+        		throw new RuntimeException("Could not initialize form-based authentication", e);
+			} catch (IOException e) {
+        		throw new RuntimeException("Could not initialize form-based authentication", e);
+			}
+    		HttpPost authMethod = new HttpPost(baseUrl + "/j_security_check");
+    		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+    		nameValuePairs.add(new BasicNameValuePair("j_username", username));
+    		nameValuePairs.add(new BasicNameValuePair("j_password", password));
+            try {
+				authMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				HttpResponse response = client.execute(authMethod);
+				EntityUtils.consume(response.getEntity());
+			} catch (UnsupportedEncodingException e) {
+        		throw new RuntimeException("Could not initialize form-based authentication", e);
+			} catch (ClientProtocolException e) {
+        		throw new RuntimeException("Could not initialize form-based authentication", e);
+			} catch (IOException e) {
+        		throw new RuntimeException("Could not initialize form-based authentication", e);
+			}
+            authorized = true;
     	}
+        ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
+        restRequest = new ClientRequest(url, executor);
         try {
             restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandsRequest(deploymentId, command));
             ClientResponse<Object> response = restRequest.post(Object.class);
@@ -76,10 +113,10 @@ public abstract class AbstractRemoteCommandObject {
             	}
             } else {
                 // TODO error handling
-                throw new RuntimeException("REST request error code " + response.getResponseStatus());
+                throw new RuntimeException("Error invoking REST " + url + " " + response.getResponseStatus());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Unable to execute REST request: " + e.getMessage(), e);
+            throw new RuntimeException("Error invoking REST " + url + " " + e.getMessage(), e);
         }
     }
     
