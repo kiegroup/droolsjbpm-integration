@@ -23,4 +23,5 @@
 
   </kie:ksession-ref>
 
+  <kie:ksession id="ksession99" kbase-ref="drl_kiesample"/>
 </beans>
