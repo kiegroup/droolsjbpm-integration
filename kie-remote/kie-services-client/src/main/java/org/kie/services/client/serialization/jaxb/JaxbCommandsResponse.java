@@ -118,7 +118,15 @@ public class JaxbCommandsResponse {
             } else {
                 unknownResultType = true;
             }
-        } else if (result.getClass().isPrimitive()) {
+        } else if (result.getClass().isPrimitive() 
+        		|| "java.lang.Boolean".equals(result.getClass().getName())
+        		|| "java.lang.Byte".equals(result.getClass().getName())
+        		|| "java.lang.Short".equals(result.getClass().getName())
+        		|| "java.lang.Integer".equals(result.getClass().getName())
+        		|| "java.lang.Character".equals(result.getClass().getName())
+        		|| "java.lang.Long".equals(result.getClass().getName())
+        		|| "java.lang.Float".equals(result.getClass().getName())
+        		|| "java.lang.Double".equals(result.getClass().getName())) {
             this.responses.add(new JaxbPrimitiveResponse(result, i, cmd));
         } else {
             unknownResultType = true;

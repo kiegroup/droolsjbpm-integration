@@ -61,7 +61,7 @@ public abstract class AbstractRemoteCommandObject {
     		HttpPost method = new HttpPost(url);
 			try {
 				HttpResponse response = client.execute(method);
-				if (response.getStatusLine().getStatusCode() == 200) {
+				if (response.getStatusLine().getStatusCode() != 200) {
 					throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
 				}
 				EntityUtils.consume(response.getEntity());
@@ -77,6 +77,9 @@ public abstract class AbstractRemoteCommandObject {
             try {
 				authMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 				HttpResponse response = client.execute(authMethod);
+				if (response.getStatusLine().getStatusCode() != 302) {
+					throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
+				}
 				EntityUtils.consume(response.getEntity());
 			} catch (UnsupportedEncodingException e) {
         		throw new RuntimeException("Could not initialize form-based authentication", e);
