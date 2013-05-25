@@ -13,7 +13,6 @@ import org.jboss.as.controller.client.helpers.standalone.DeploymentPlan;
 import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentActionResult;
 import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentManager;
 import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentPlanResult;
-import org.kie.services.remote.JmsIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,7 @@ public class ArquillianJbossServerSetupTask implements ServerSetupTask {
 
     protected static Properties arquillianLaunchProperties = getArquillianLaunchProperties();
 
-    private static Logger logger = LoggerFactory.getLogger(JmsIntegrationTest.class);
+    private static Logger logger = LoggerFactory.getLogger(ArquillianJbossServerSetupTask.class);
 
     public static final String HORNETQ_JMS_XML = "/hornetq-jms.xml";
     public static final String JBPM_DS_XML = "/jbpm-ds.xml";
@@ -29,7 +28,7 @@ public class ArquillianJbossServerSetupTask implements ServerSetupTask {
     protected static Properties getArquillianLaunchProperties() {
         Properties properties = new Properties();
         try {
-            InputStream arquillianLaunchFile = JmsIntegrationTest.class.getResourceAsStream("/arquillian.launch");
+            InputStream arquillianLaunchFile = ArquillianJbossServerSetupTask.class.getResourceAsStream("/arquillian.launch");
             properties.load(arquillianLaunchFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -41,8 +40,8 @@ public class ArquillianJbossServerSetupTask implements ServerSetupTask {
     public void setup(ManagementClient managementClient, String containerId) throws Exception {
         logger.info("Deploying JMS Queues");
 
-        URL hornetqJmsXmlUrl = JmsIntegrationTest.class.getResource(HORNETQ_JMS_XML);
-        URL jbpmDSXmlUrl = JmsIntegrationTest.class.getResource(JBPM_DS_XML);
+        URL hornetqJmsXmlUrl = this.getClass().getResource(HORNETQ_JMS_XML);
+        URL jbpmDSXmlUrl = this.getClass().getResource(JBPM_DS_XML);
 
         URL[] urls = { hornetqJmsXmlUrl, jbpmDSXmlUrl };
 

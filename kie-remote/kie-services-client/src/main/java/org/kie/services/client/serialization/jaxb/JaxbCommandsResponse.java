@@ -1,6 +1,5 @@
 package org.kie.services.client.serialization.jaxb;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +11,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
@@ -32,6 +32,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceRespon
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 
+@SuppressWarnings("rawtypes")
 @XmlRootElement(name = "command-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbCommandsResponse {
@@ -49,12 +50,13 @@ public class JaxbCommandsResponse {
     private Integer version;
 
     @XmlElements({ 
+            @XmlElement(name = "exception", type = JaxbExceptionResponse.class),
             @XmlElement(name = "execution-results", type = JaxbExecutionResultsResponse.class),
+            @XmlElement(name = "long-list", type = JaxbLongListResponse.class),
             @XmlElement(name = "primitive", type = JaxbPrimitiveResponse.class),
             @XmlElement(name = "process-instance", type = JaxbProcessInstanceResponse.class),
             @XmlElement(name = "task", type = JaxbTaskResponse.class),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
-            @XmlElement(name = "exception", type = JaxbExceptionResponse.class)
             })
     private List<JaxbCommandResponse<?>> responses;
 
@@ -86,6 +88,7 @@ public class JaxbCommandsResponse {
         this.responses.add(new JaxbExceptionResponse(exception, i, cmd));
     }
 
+    @XmlTransient
     private static Map<Class, Class> cmdListTypes;
     static { 
         cmdListTypes = new HashMap<Class, Class>();
@@ -100,10 +103,12 @@ public class JaxbCommandsResponse {
         cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
     }
     
+    @SuppressWarnings("unchecked")
     public void addResult(Object result, int i, Command<?> cmd) {
         lazyInitResponseList();
         boolean unknownResultType = false;
         
+        String className = result.getClass().getName();
         if (result instanceof ProcessInstance) {
             this.responses.add(new JaxbProcessInstanceResponse((ProcessInstance) result, i, cmd));
         } else if (result instanceof Task) {
@@ -119,14 +124,14 @@ public class JaxbCommandsResponse {
                 unknownResultType = true;
             }
         } else if (result.getClass().isPrimitive() 
-        		|| "java.lang.Boolean".equals(result.getClass().getName())
-        		|| "java.lang.Byte".equals(result.getClass().getName())
-        		|| "java.lang.Short".equals(result.getClass().getName())
-        		|| "java.lang.Integer".equals(result.getClass().getName())
-        		|| "java.lang.Character".equals(result.getClass().getName())
-        		|| "java.lang.Long".equals(result.getClass().getName())
-        		|| "java.lang.Float".equals(result.getClass().getName())
-        		|| "java.lang.Double".equals(result.getClass().getName())) {
+        		|| Boolean.class.getName().equals(className)
+        		|| Byte.class.getName().equals(className)
+        		|| Short.class.getName().equals(className)
+        		|| Integer.class.getName().equals(className)
+        		|| Character.class.getName().equals(className)
+        		|| Long.class.getName().equals(className)
+        		|| Float.class.getName().equals(className)
+        		|| Double.class.getName().equals(className) ) {
             this.responses.add(new JaxbPrimitiveResponse(result, i, cmd));
         } else {
             unknownResultType = true;

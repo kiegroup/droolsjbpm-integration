@@ -25,13 +25,15 @@
     <jboss.version>7.1.1.Final</jboss.version>
     <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
     <jboss.server.version>7.1.1.Final</jboss.server.version>
+    <!-- 2.2.14+ is incompatible with 7.1.1.Final : HORNETQ-1035 -->
+    <hornetq.version>2.2.13.Final</hornetq.version>
+    
     <!-- eap integration
     <jboss.version>7.2.0.Final</jboss.version> 
     <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version> 
     <jboss.server.name>jboss-eap-6.1</jboss.server.name>
-    <hornetq.vesion>2.3.0.Final</hornetq.vesion>
+    <hornetq.version>2.3.0.Final</hornetq.version>
      -->
-    <hornetq.vesion>2.2.21.Final</hornetq.vesion>
   </properties>
 
   <dependencies>
@@ -80,6 +82,13 @@
     </dependency>
 
     <!-- jms -->
+    <dependency>
+        <!-- remove when integrating with EAP -->
+        <groupId>org.jboss.as</groupId>
+        <artifactId>jboss-as-jms-client-bom</artifactId>
+        <version>7.1.1.Final</version>
+        <type>pom</type>
+    </dependency>
     <dependency>
       <groupId>javax.jms</groupId>
       <artifactId>jms</artifactId>
@@ -141,7 +150,12 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
     <!-- arquillian -->
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
