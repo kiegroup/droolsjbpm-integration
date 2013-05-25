@@ -182,5 +182,15 @@ public class JaxbCommandsRequest {
     public List<Command<?>> getCommands() {
         return this.commands;
     }
+    
+    public String toString() {
+    	String result = "JaxbCommandsRequest " + deploymentId + "\n";
+    	if (commands != null) {
+	    	for (Command command: commands) {
+	    		result += command + "\n";
+	    	}
+    	}
+    	return result;
+    }
 
 }
