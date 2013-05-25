@@ -29,8 +29,9 @@
     <jboss.version>7.2.0.Final</jboss.version> 
     <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version> 
     <jboss.server.name>jboss-eap-6.1</jboss.server.name>
+    <hornetq.vesion>2.3.0.Final</hornetq.vesion>
      -->
-    <hornetq.vesion>2.2.13.Final</hornetq.vesion>
+    <hornetq.vesion>2.2.21.Final</hornetq.vesion>
   </properties>
 
   <dependencies>
@@ -39,7 +40,14 @@
       <artifactId>kie-services-client</artifactId>
     </dependency>
 
-    <!-- kie/drools/jbpm -->
+    <!-- jbpm (graph func)-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
+    <!-- kie -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-kie-services</artifactId>
@@ -185,11 +193,6 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-persistence-jpa</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-audit</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
