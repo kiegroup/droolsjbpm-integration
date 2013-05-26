@@ -116,7 +116,8 @@ public abstract class AbstractRemoteCommandObject {
             	}
             } else {
                 // TODO error handling
-                throw new RuntimeException("Error invoking REST " + url + " " + response.getResponseStatus());
+                throw new RuntimeException("Error invoking REST " + url + " " 
+            		+ response.getResponseStatus() + " " + response.getEntity(String.class));
             }
         } catch (Exception e) {
             throw new RuntimeException("Error invoking REST " + url + " " + e.getMessage(), e);
