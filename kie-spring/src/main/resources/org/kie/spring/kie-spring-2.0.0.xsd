@@ -92,7 +92,7 @@
         </xsd:choice>
       </xsd:sequence>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
-      <xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
+      <xsd:attribute name="type" use="optional"  default="stateful" type="knowledgeSessionTypeEnum"/>
       <xsd:attribute name="kbase-ref" use="required" type="xsd:string"/>
       <xsd:attribute name="releaseId" use="optional" type="xsd:IDREF"/>
       <xsd:attribute name="listeners-ref" use="optional" type="xsd:string"/>

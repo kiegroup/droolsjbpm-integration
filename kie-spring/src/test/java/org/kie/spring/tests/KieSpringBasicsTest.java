@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.spring.beans.Person;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -59,15 +60,20 @@ public class KieSpringBasicsTest {
     @Test
     public void testKieSessionRef() throws Exception {
         StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
-        System.out.println("testKieSessionRef ksession == " + ksession);
         assertNotNull(ksession);
     }
 
     @Test
     public void testKieSession() throws Exception {
         StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession9");
-        System.out.println("testKieSession ksession == " + ksession);
         assertNotNull(ksession);
+    }
+
+    @Test
+    public void testKieSessionDefaultType() throws Exception {
+        Object obj = context.getBean("ksession99");
+        assertNotNull(obj);
+        assertTrue(obj instanceof KieSession);
     }
 
 
@@ -75,7 +81,6 @@ public class KieSpringBasicsTest {
     public void testKSessionExecution() throws Exception {
         StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
         assertNotNull(ksession);
-        System.out.println("testKSessionExecution ksession == " + ksession);
         Person person = new Person("HAL", 42);
         person.setHappy(false);
         ksession.execute(person);
