@@ -17,6 +17,14 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="kcontainer-ref">
+    <xsd:complexType>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="releaseId" use="optional" type="xsd:IDREF"/>
+    </xsd:complexType>
+  </xsd:element>
+
+
   <xsd:element name="kbase-ref">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>

@@ -22,6 +22,8 @@
 
   <kie:releaseId id="dummyReleaseId" groupId="dummyGroup" artifactId="dummyArtifact" version="dummyVersion"/>
 
+  <kie:kcontainer-ref id="defaultContainer"/>
+
   <kie:kbase-ref id="drl_kiesample" releaseId="dummyReleaseId"/>
 
   <kie:kstore id="sampleKstore"/>

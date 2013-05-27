@@ -56,7 +56,8 @@ public class KContainerFactoryBean
         KieServices ks = KieServices.Factory.get();
         if ( releaseId == null) {
             kContainer = ks.getKieClasspathContainer();
+        } else {
+            kContainer = ks.newKieContainer(releaseId);
         }
-        kContainer = ks.newKieContainer(releaseId);
     }
 }
