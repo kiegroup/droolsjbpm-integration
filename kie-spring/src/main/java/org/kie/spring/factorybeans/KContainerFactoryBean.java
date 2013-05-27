@@ -15,31 +15,29 @@
  */
 package org.kie.spring.factorybeans;
 
-import org.drools.core.util.StringUtils;
+
 import org.kie.api.KieServices;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.enterprise.inject.spi.BeanManager;
 
-@Deprecated
-public class KModuleFactoryBean
+
+public class KContainerFactoryBean
         implements
         FactoryBean,
         InitializingBean {
 
-    private String mode;
+    private ReleaseId releaseId;
     private KieContainer kContainer;
 
-    public static BeanManager beanManager;
-
-    public String getMode() {
-        return mode;
+    public ReleaseId getReleaseId() {
+        return releaseId;
     }
 
-    public void setMode(String mode) {
-        this.mode = mode;
+    public void setReleaseId(ReleaseId releaseId) {
+        this.releaseId = releaseId;
     }
 
     public Object getObject() throws Exception {
@@ -55,14 +53,7 @@ public class KModuleFactoryBean
     }
 
     public void afterPropertiesSet() throws Exception {
-        if (StringUtils.isEmpty(mode)) {
-            throw new Exception("KModule Mode is missing");
-        }
-        if ("API".equals(mode)) {
-            KieServices ks = KieServices.Factory.get();
-            kContainer = ks.getKieClasspathContainer();
-        } else if ("CDI".equalsIgnoreCase(mode)) {
-            System.out.println("beanManager from KModuleFactoryBean == " + beanManager);
-        }
+        KieServices ks = KieServices.Factory.get();
+        kContainer = ks.getKieClasspathContainer();
     }
 }
