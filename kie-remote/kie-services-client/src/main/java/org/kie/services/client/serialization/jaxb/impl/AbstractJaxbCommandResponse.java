@@ -15,7 +15,7 @@ public abstract class AbstractJaxbCommandResponse<T> implements JaxbCommandRespo
     
     @XmlElement(name="command-name")
     @XmlSchemaType(name="string")
-    private String commandName;
+    protected String commandName;
 
     public AbstractJaxbCommandResponse() { 
        // Default constructor 
