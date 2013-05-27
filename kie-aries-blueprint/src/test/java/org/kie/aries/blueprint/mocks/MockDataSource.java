@@ -91,11 +91,6 @@ public class MockDataSource implements DataSource {
     }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
-    }
-
-    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         return null;
     }
