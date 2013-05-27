@@ -36,8 +36,6 @@ import org.kie.api.definition.process.WorkflowProcess;
 import org.kie.services.remote.rest.graph.jaxb.ActiveNodeInfo;
 import org.kie.services.remote.rest.graph.jaxb.DiagramInfo;
 import org.kie.services.remote.rest.graph.jaxb.DiagramNodeInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This code needs to be finished -- it was pulled from the old jbpm-gwt module and the bpm-console projec. 
@@ -51,7 +49,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GraphViewerPluginImpl {
     
-	private static final Logger logger = LoggerFactory.getLogger(GraphViewerPluginImpl.class);
 	private KieBase kbase;
 	
 

@@ -30,16 +30,12 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
 public class RuntimeResource extends ResourceBase {
-
-    private Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
 
     @Inject
     private ProcessRequestBean processRequestBean;
@@ -63,13 +59,14 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]+}/start")
-    public JaxbGenericResponse startNewProcess(@PathParam("processDefId") String processId) { 
+    public JaxbProcessInstanceResponse startNewProcess(@PathParam("processDefId") String processId) { 
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
         
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
-        return new JaxbGenericResponse(request);
+        ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        JaxbProcessInstanceResponse resp = new JaxbProcessInstanceResponse(procInst, request);
+        return resp;
     }
 
     @GET
@@ -85,13 +82,13 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
     public JaxbGenericResponse doProcessInstanceOperation(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) { 
-        Map<String, List<String>> formParams = getRequestParams(request);
+        Map<String, List<String>> params = getRequestParams(request);
         Command<?> cmd = null;
         if ("start".equals(operation.toLowerCase().trim())) {
             cmd = new StartProcessInstanceCommand(procInstId);
         } else if ("signal".equals(operation.toLowerCase().trim())) {
-            String eventType = getStringParam("eventType", true, formParams, operation);
-            Object event = getObjectParam("event", false, formParams, operation);
+            String eventType = getStringParam("eventType", true, params, operation);
+            Object event = getObjectParam("event", false, params, operation);
             cmd = new SignalEventCommand(procInstId, eventType, event);
         } else if ("abort".equals(operation.toLowerCase().trim())) {
             cmd = new AbortProcessInstanceCommand();

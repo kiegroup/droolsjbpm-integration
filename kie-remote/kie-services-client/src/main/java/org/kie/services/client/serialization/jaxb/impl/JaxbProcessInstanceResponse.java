@@ -3,6 +3,7 @@ package org.kie.services.client.serialization.jaxb.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -13,6 +14,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import org.kie.api.command.Command;
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -40,6 +42,51 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     
     @XmlElement(name="event-types")
     private List<String> eventTypes;
+    
+    @XmlElement
+    private JaxbRequestStatus status;
+    
+    @XmlElement
+    @XmlSchemaType(name="anyURI")
+    private String url;
+    
+    public JaxbProcessInstanceResponse() { 
+        // Default Constructor
+    }
+
+    public JaxbProcessInstanceResponse(ProcessInstance processInstance, int i, Command<?> cmd) { 
+        super(i, cmd);
+        initialize(processInstance);
+    }
+
+    public JaxbProcessInstanceResponse(ProcessInstance processInstance) { 
+        initialize(processInstance);
+    }
+
+    public JaxbProcessInstanceResponse(ProcessInstance processInstance, HttpServletRequest request) { 
+        initialize(processInstance);
+        this.url = getUrl(request);
+        this.status = JaxbRequestStatus.SUCCESS;
+    }
+
+    private void initialize(ProcessInstance processInstance) { 
+        if( processInstance != null ) { 
+            this.eventTypes = Arrays.asList(processInstance.getEventTypes());
+            this.id = processInstance.getId();
+            this.process = new JaxbProcess(processInstance.getProcess());
+            this.processId = processInstance.getProcessId();
+            this.processName = processInstance.getProcessName();
+            this.state = processInstance.getState();
+        }
+    }
+
+    private String getUrl(HttpServletRequest request) { 
+        String url = request.getRequestURI();
+        if( request.getQueryString() != null ) { 
+            url += "?" + request.getQueryString();
+        }
+        return url;
+    }
     
     @Override
     public String getProcessId() {
@@ -71,28 +118,6 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         return eventTypes.toArray(new String[eventTypes.size()]);
     }
 
-    public JaxbProcessInstanceResponse() { 
-        // Default Constructor
-    }
-    
-    public JaxbProcessInstanceResponse(ProcessInstance processInstance, int i, Command<?> cmd) { 
-        super(i, cmd);
-        initialize(processInstance);
-    }
-    
-    public JaxbProcessInstanceResponse(ProcessInstance processInstance) { 
-        initialize(processInstance);
-    }
-    
-    private void initialize(ProcessInstance processInstance) { 
-        this.eventTypes = Arrays.asList(processInstance.getEventTypes());
-        this.id = processInstance.getId();
-        this.process = new JaxbProcess(processInstance.getProcess());
-        this.processId = processInstance.getProcessId();
-        this.processName = processInstance.getProcessName();
-        this.state = processInstance.getState();
-    }
-    
     @Override
     public void signalEvent(String type, Object event) {
         String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
@@ -102,6 +127,14 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     @Override
     public ProcessInstance getResult() {
         return this;
+    }
+
+    public JaxbRequestStatus getStatus() {
+        return status;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     public String toString() {

@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb;
+package org.kie.services.client.serialization.jaxb.rest;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
