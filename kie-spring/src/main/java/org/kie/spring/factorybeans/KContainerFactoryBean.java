@@ -54,6 +54,9 @@ public class KContainerFactoryBean
 
     public void afterPropertiesSet() throws Exception {
         KieServices ks = KieServices.Factory.get();
-        kContainer = ks.getKieClasspathContainer();
+        if ( releaseId == null) {
+            kContainer = ks.getKieClasspathContainer();
+        }
+        kContainer = ks.newKieContainer(releaseId);
     }
 }
