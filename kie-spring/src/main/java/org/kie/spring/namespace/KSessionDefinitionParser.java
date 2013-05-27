@@ -74,7 +74,9 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
         String type = "";
         if (KSESSION_ELEMENT_NAME.equalsIgnoreCase(element.getLocalName())) {
             type = element.getAttribute(TYPE_ATTRIBUTE);
-            emptyAttributeCheck(element.getLocalName(), TYPE_ATTRIBUTE, type);
+            if ( !StringUtils.hasLength(type) ) {
+                type = "stateful";
+            }
             factory.addPropertyValue("refLookup", Boolean.FALSE);
         } else {
             factory.addPropertyValue("refLookup", Boolean.TRUE);

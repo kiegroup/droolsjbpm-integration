@@ -16,14 +16,22 @@
 package org.kie.aries.blueprint.factorybeans;
 
 import org.drools.compiler.kproject.ReleaseIdImpl;
+import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
+import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.event.KieRuntimeEventManager;
+import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
+import org.kie.aries.blueprint.helpers.JPAPlaceholderResolverStrategyHelper;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class KieObjectsFactoryBean {
@@ -77,4 +85,34 @@ public class KieObjectsFactoryBean {
         return new ReleaseIdImpl(groupId, artifactId, version);
     }
 
+    public static Environment createEnvironment(String id, HashMap<String, Object> parameters, List<Object> marshallingStrategies){
+        Environment environment = EnvironmentFactory.newEnvironment();
+        if ( parameters != null) {
+            for (String key : parameters.keySet()){
+                environment.set(key, parameters.get(key));
+            }
+        }
+        for (int i=0; i<marshallingStrategies.size(); i++){
+            Object object = marshallingStrategies.get(i);
+            if ( object instanceof JPAPlaceholderResolverStrategyHelper) {
+                JPAPlaceholderResolverStrategy jpaPlaceholderResolverStrategy;
+                Environment refEnv = ((JPAPlaceholderResolverStrategyHelper)object).getEnvironment();
+                if ( refEnv == null) {
+                    jpaPlaceholderResolverStrategy = new JPAPlaceholderResolverStrategy(environment);
+                } else {
+                    jpaPlaceholderResolverStrategy = new JPAPlaceholderResolverStrategy(refEnv);
+                }
+                marshallingStrategies.set(i, jpaPlaceholderResolverStrategy);
+                break;
+            }
+        }
+        if ( marshallingStrategies != null){
+            environment.set(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES, marshallingStrategies.toArray(new ObjectMarshallingStrategy[]{}));
+        }
+        return environment;
+    }
+
+    public static ClassObjectMarshallingStrategyAcceptor createDefaultAcceptor(){
+        return ClassObjectMarshallingStrategyAcceptor.DEFAULT;
+    }
 }

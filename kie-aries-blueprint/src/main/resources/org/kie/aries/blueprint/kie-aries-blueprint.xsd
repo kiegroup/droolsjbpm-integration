@@ -147,7 +147,7 @@
     <!--<xsd:choice minOccurs="0" maxOccurs="1">
       <xsd:element ref="bean"/>
     </xsd:choice>-->
-    <xsd:attribute name="ref" use="required" type="xsd:IDREF"/>
+    <xsd:attribute name="ref" use="required" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:complexType name="generic-scoped-entitymanager">

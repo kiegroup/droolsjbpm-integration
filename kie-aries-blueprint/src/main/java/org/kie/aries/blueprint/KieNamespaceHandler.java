@@ -76,9 +76,6 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
         if ( elementParser == null) {
             throw new ComponentDefinitionException("Unsupported Kie Blueprint Element '"+elementName+"'");
         }
-
-        System.out.println("parse ::"+element.getNodeName()+"  "+elementParser);
-
         return elementParser.parseElement(parserContext, element);
     }
 
