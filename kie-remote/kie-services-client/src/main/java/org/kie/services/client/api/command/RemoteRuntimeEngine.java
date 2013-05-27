@@ -28,7 +28,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 	}
 	
 	public KieSession getKieSession() {
-		String url = this.url + "/rest/runtime/" + deploymentId + "/execute";
+		String url = this.url + "/runtime/" + deploymentId + "/execute";
 		if (this.contextId != null) {
 			url += "?contextId=" + contextId;
 		}
@@ -37,7 +37,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 	}
 
 	public TaskService getTaskService() {
-		String url = this.url + "/rest/task/execute";
+		String url = this.url + "/task/execute";
 		if (this.contextId != null) {
 			url += "?contextId=" + contextId;
 		}

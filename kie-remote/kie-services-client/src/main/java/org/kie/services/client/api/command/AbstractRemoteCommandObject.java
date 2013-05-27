@@ -5,20 +5,25 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.ProtocolException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
@@ -58,29 +63,52 @@ public abstract class AbstractRemoteCommandObject {
 	            new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
 	            new UsernamePasswordCredentials(username, password));
     	} else if (AuthenticationType.FORM_BASED == authenticationType && !authorized) {
-    		HttpPost method = new HttpPost(url);
-			try {
-				HttpResponse response = client.execute(method);
-				if (response.getStatusLine().getStatusCode() != 200) {
-					throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
-				}
-				EntityUtils.consume(response.getEntity());
-			} catch (ClientProtocolException e) {
-        		throw new RuntimeException("Could not initialize form-based authentication", e);
-			} catch (IOException e) {
-        		throw new RuntimeException("Could not initialize form-based authentication", e);
-			}
-    		HttpPost authMethod = new HttpPost(baseUrl + "/j_security_check");
-    		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-    		nameValuePairs.add(new BasicNameValuePair("j_username", username));
-    		nameValuePairs.add(new BasicNameValuePair("j_password", password));
-            try {
+    	    // first challenge authentication to be enforced - return logon form
+    	    // currently pointing to a non existing resource
+    	    HttpPost mainMethod = new HttpPost(baseUrl);    	    
+            List<NameValuePair> nameValuePairsEmpty = new ArrayList<NameValuePair>(1);            
+    	    try {
+                mainMethod.setEntity(new UrlEncodedFormEntity(nameValuePairsEmpty));
+        	    HttpResponse response = client.execute(mainMethod);
+        	    
+        	    if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
+                }
+            
+                EntityUtils.consume(response.getEntity());
+   
+                // next authenticate the request
+        		HttpPost authMethod = new HttpPost(baseUrl + "/j_security_check");
+        		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+        		nameValuePairs.add(new BasicNameValuePair("j_username", username));
+        		nameValuePairs.add(new BasicNameValuePair("j_password", password));
+            
 				authMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-				HttpResponse response = client.execute(authMethod);
-				if (response.getStatusLine().getStatusCode() != 302) {
-					throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
-				}
-				EntityUtils.consume(response.getEntity());
+				// make sure that request will be redirected request has been authenticated and authorized
+				client.setRedirectStrategy(new DefaultRedirectStrategy() {                
+			        public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)  {
+			            boolean isRedirect=false;
+			            try {
+			                isRedirect = super.isRedirected(request, response, context);
+			            } catch (ProtocolException e) {
+			                e.printStackTrace();
+			            }
+			            if (!isRedirect) {
+			                int responseCode = response.getStatusLine().getStatusCode();
+			                if (responseCode == 301 || responseCode == 302) {
+			                    return true;
+			                }
+			            }
+			            return isRedirect;
+			        }	
+			    });
+				HttpResponse authresponse = client.execute(authMethod);
+				List<Integer> invalidCodes = Arrays.asList(new Integer[]{500, 401, 403});
+				if (invalidCodes.contains(response.getStatusLine().getStatusCode())) {
+	                throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
+	            }
+				EntityUtils.consume(authresponse.getEntity());
+				
 			} catch (UnsupportedEncodingException e) {
         		throw new RuntimeException("Could not initialize form-based authentication", e);
 			} catch (ClientProtocolException e) {
@@ -122,6 +150,8 @@ public abstract class AbstractRemoteCommandObject {
         } catch (Exception e) {
             throw new RuntimeException("Error invoking REST " + url + " " + e.getMessage(), e);
         }
+    	
+    	
     }
     
     public void readExternal(ObjectInput arg0) throws IOException, ClassNotFoundException {
