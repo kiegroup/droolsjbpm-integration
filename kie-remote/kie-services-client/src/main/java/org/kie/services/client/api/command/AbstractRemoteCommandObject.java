@@ -44,7 +44,6 @@ public abstract class AbstractRemoteCommandObject {
     protected AuthenticationType authenticationType;
     protected String username;
     protected String password;
-    boolean authorized = false;
 
     public AbstractRemoteCommandObject(String baseUrl, String url, String deploymentId, AuthenticationType authenticationType, String username, String password) {
     	this.baseUrl = baseUrl;
@@ -55,6 +54,7 @@ public abstract class AbstractRemoteCommandObject {
         this.password = password;
     }
     
+    @SuppressWarnings("unchecked")
     public <T> T execute(Command<T> command) {
     	ClientRequest restRequest = null;
         DefaultHttpClient client = new DefaultHttpClient();
@@ -62,7 +62,7 @@ public abstract class AbstractRemoteCommandObject {
 	        client.getCredentialsProvider().setCredentials(
 	            new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
 	            new UsernamePasswordCredentials(username, password));
-    	} else if (AuthenticationType.FORM_BASED == authenticationType && !authorized) {
+    	} else if (AuthenticationType.FORM_BASED == authenticationType) {
     	    // first challenge authentication to be enforced - return logon form
     	    // currently pointing to a non existing resource
     	    HttpPost mainMethod = new HttpPost(baseUrl);    	    
@@ -116,7 +116,6 @@ public abstract class AbstractRemoteCommandObject {
 			} catch (IOException e) {
         		throw new RuntimeException("Could not initialize form-based authentication", e);
 			}
-            authorized = true;
     	}
         ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
         restRequest = new ClientRequest(url, executor);
