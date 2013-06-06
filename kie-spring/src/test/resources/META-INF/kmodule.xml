@@ -24,4 +24,6 @@
     <ksession name="knowledgeBase"/>
   </kbase>
 
+  <kbase name="csv_kiesample" />
+
 </kmodule>

@@ -1,0 +1,12 @@
+,
+"RuleSet","kiesample"
+"Import","org.kie.spring.beans.Person"
+"Notes",
+,
+"RuleTable ID change",
+"CONDITION","ACTION"
+"person:Person","person"
+"name == $param","setName($param)"
+"name","new name"
+0,1
+1,2
