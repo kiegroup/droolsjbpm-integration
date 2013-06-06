@@ -37,6 +37,7 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
 
     public static final String ELEMENT_RELEASE_ID = "releaseId";
     public static final String ELEMENT_KBASE = "kbase-ref";
+    public static final String ELEMENT_KCONTAINER = "kcontainer-ref";
     public static final String ELEMENT_KSTORE = "kstore";
     public static final String ELEMENT_KSESSION = "ksession";
     public static final String ELEMENT_KSESSION_REF = "ksession-ref";
@@ -52,7 +53,9 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
         droolsElementParserMap.put(ELEMENT_EVENT_LISTENERS, new KieEventListenersElementParser());
         droolsElementParserMap.put(ELEMENT_KSTORE, new KieStoreElementParser());
         droolsElementParserMap.put(ELEMENT_ENVIRONMENT, new KieEnvironmentElementParser());
+        droolsElementParserMap.put(ELEMENT_KCONTAINER, new KieContainerElementParser());
     }
+
 
     @Override
     public URL getSchemaLocation(String namespace) {

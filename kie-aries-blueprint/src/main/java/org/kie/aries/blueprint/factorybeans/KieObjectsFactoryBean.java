@@ -21,12 +21,14 @@ import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.aries.blueprint.helpers.JPAPlaceholderResolverStrategyHelper;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
@@ -40,6 +42,16 @@ public class KieObjectsFactoryBean {
         System.out.println("fetchKBase :: "+id+", releaseId:: "+releaseId );
         KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
         return kieObjectsResolver.resolveKBase(id, null);
+    }
+
+    public static KieContainer fetchKContainer(ReleaseId releaseId){
+        System.out.println("fetchKContainer :: releaseId:: "+releaseId );
+        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
+        KieServices ks = KieServices.Factory.get();
+        if ( releaseId == null) {
+            return ks.getKieClasspathContainer();
+        }
+        return ks.newKieContainer(releaseId);
     }
 
     public static Object createKieSessionRef(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands){
@@ -61,7 +73,6 @@ public class KieObjectsFactoryBean {
     public static Object createKieSession(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands, String kbaseRef, String type){
         KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
         Object obj ;
-        System.out.println(id+"  "+commands);
         if ("stateless".equalsIgnoreCase(type)) {
             obj = kieObjectsResolver.newStatelessSession(kbaseRef, releaseId, null);
         } else {

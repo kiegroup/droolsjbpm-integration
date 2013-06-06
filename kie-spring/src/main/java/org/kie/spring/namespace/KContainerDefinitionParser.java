@@ -15,24 +15,25 @@
  */
 package org.kie.spring.namespace;
 
-import org.kie.spring.factorybeans.KModuleFactoryBean;
+import org.drools.core.util.StringUtils;
+import org.kie.spring.factorybeans.KContainerFactoryBean;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-@Deprecated
-public class KModuleDefinitionParser extends AbstractBeanDefinitionParser {
+public class KContainerDefinitionParser extends AbstractBeanDefinitionParser {
 
     @SuppressWarnings("unchecked")
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KModuleFactoryBean.class);
+        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KContainerFactoryBean.class);
 
-        String mode = element.getAttribute("mode");
-        DefinitionParserHelper.emptyAttributeCheck(element.getTagName(), "mode", mode);
-        factory.addPropertyValue("mode", mode);
+        String mode = element.getAttribute("releaseId");
+        if (!StringUtils.isEmpty(mode)) {
+            factory.addPropertyReference("releaseId", mode);
+        }
 
         return factory.getBeanDefinition();
     }
