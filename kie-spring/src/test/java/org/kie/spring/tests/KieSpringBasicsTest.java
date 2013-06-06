@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.spring.beans.Person;
@@ -38,12 +39,12 @@ public class KieSpringBasicsTest {
         context = new ClassPathXmlApplicationContext("org/kie/spring/kie-beans.xml");
     }
 
-//    @Test
-//    public void testKContainer() throws Exception {
-//        KieContainer kieContainer = (KieContainer) context.getBean("kmodule");
-//        assertNotNull(kieContainer);
-//        System.out.println("kieContainer.getReleaseId() == "+kieContainer.getReleaseId());
-//    }
+    @Test
+    public void testKContainer() throws Exception {
+        KieContainer kieContainer = (KieContainer) context.getBean("defaultContainer");
+        assertNotNull(kieContainer);
+        System.out.println("kieContainer.getReleaseId() == "+kieContainer.getReleaseId());
+    }
 
     @Test
     public void testKieBase() throws Exception {

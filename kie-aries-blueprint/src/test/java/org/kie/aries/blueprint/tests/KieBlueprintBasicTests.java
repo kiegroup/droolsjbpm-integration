@@ -19,6 +19,7 @@ package org.kie.aries.blueprint.tests;
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.persistence.jpa.KieStoreServices;
+import org.kie.api.runtime.KieContainer;
 import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -56,6 +57,12 @@ public class KieBlueprintBasicTests {
     public void testKieBase() throws Exception {
         KieBase kbase = (KieBase) container.getComponentInstance("drl_kiesample");
         assertNotNull(kbase);
+    }
+
+    @Test
+    public void testKieContainer() throws Exception {
+        KieContainer kieContainer = (KieContainer) container.getComponentInstance("defaultContainer");
+        assertNotNull(kieContainer);
     }
 
     @Test
