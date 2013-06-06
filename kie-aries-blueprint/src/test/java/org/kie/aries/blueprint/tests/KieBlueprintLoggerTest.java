@@ -35,14 +35,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-public class KieBlueprintLoggerTests {
+public class KieBlueprintLoggerTest {
 
     static BlueprintContainerImpl container = null;
 
     @BeforeClass
     public static void runBeforeClass() throws Exception {
         List<URL> urls = new ArrayList<URL>();
-        urls.add(KieBlueprintListenerTests.class.getResource("/org/kie/aries/blueprint/loggers.xml"));
+        urls.add(KieBlueprintListenerTest.class.getResource("/org/kie/aries/blueprint/loggers.xml"));
         container = new KieBlueprintContainer(ClassLoader.getSystemClassLoader(), urls);
     }
 

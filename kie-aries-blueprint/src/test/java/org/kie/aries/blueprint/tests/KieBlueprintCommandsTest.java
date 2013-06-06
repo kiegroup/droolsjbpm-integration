@@ -38,7 +38,7 @@ public class KieBlueprintCommandsTest {
     @BeforeClass
     public static void runBeforeClass() throws Exception {
         List<URL> urls = new ArrayList<URL>();
-        urls.add(KieBlueprintListenerTests.class.getResource("/org/kie/aries/blueprint/beans-commands.xml"));
+        urls.add(KieBlueprintCommandsTest.class.getResource("/org/kie/aries/blueprint/beans-commands.xml"));
         container = new KieBlueprintContainer(ClassLoader.getSystemClassLoader(), urls);
     }
 
