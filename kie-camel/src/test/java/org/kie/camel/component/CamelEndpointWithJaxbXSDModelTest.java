@@ -51,7 +51,7 @@ import com.sun.tools.xjc.Options;
 
 public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
 
-    private CompositeClassLoader    classLoader;
+    private ClassLoader    classLoader;
 
     @Test
     public void testSessionInsert() throws Exception {

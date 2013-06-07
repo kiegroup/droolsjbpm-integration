@@ -52,9 +52,9 @@ import com.sun.tools.xjc.Options;
 
 public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
-    private JAXBContext                jaxbContext;
-    private CompositeClassLoader    classLoader;
-    private RouteBuilder routeBuilder;
+    private JAXBContext                 jaxbContext;
+    private ClassLoader                 classLoader;
+    private RouteBuilder                routeBuilder;
 
     @Test
     public void testSessionInsert() throws Exception {
