@@ -35,6 +35,13 @@
     <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
   </feature>
 
+  <feature name="kie-spring" version="${drools.version}">
+    <feature version="${drools.version}">drools-jpa</feature>
+    <feature version="${drools.version}">jbpm</feature>
+    <feature version="${drools.version}">jbpm-human-task</feature>
+    <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
+  </feature>
+
   <feature name="drools-spring" version="${drools.version}" description="Drools Spring">
     <feature version="[3.0,4.0)">spring</feature>
     <bundle>mvn:org.drools/drools-spring/${drools.version}</bundle>
@@ -67,7 +74,7 @@
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
     <feature version="[3.0,4.0)">spring-orm</feature>
-    <feature version="${aries.jpa.version}">jpa</feature>
+    <feature version="[${aries.jpa.version},2.0)">jpa</feature>
     <bundle>mvn:org.drools/drools-persistence-jpa/${drools.version}</bundle>
   </feature>
 
@@ -93,7 +100,7 @@
     <bundle>mvn:org.kie.commons/kie-commons-cdi/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-validation/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-data/${drools.version}</bundle>
-    <bundle>mvn:org.kie.commons/kie-commons-io/${drools.version}</bundle>
+    <bundle>wrap:mvn:org.kie.commons/kie-commons-io/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-shared-services/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${drools.version}</bundle>
