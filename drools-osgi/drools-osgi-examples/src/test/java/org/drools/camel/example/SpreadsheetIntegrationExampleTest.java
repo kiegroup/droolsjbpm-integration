@@ -38,7 +38,7 @@ public class SpreadsheetIntegrationExampleTest {
     public void testExecuteUsingKieAPI() throws Exception {
         // get the resource
         Resource dt = ResourceFactory.newClassPathResource("/data/IntegrationExampleTest.xls", getClass());
-        
+
         // create the builder
         KieSession ksession = getKieSession( dt );
 

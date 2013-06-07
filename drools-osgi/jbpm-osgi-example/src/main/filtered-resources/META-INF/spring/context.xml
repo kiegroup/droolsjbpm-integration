@@ -1,0 +1,84 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi    http://www.springframework.org/schema/osgi/spring-osgi.xsd
+
+    ">
+
+  <bean id="ruleTaskExample" class="org.jbpm.osgi.example.RuleTaskExample"
+        init-method="configure"/>
+
+  <bean id="evaluationProcessExample" class="org.jbpm.osgi.example.EvaluationProcessExample"
+        init-method="configure2"/>
+
+  <bean id="humanTaskExample" class="org.jbpm.osgi.example.HumanTaskExample"
+        init-method="configure" depends-on="jBPMHelper"/>
+
+  <bean id="jBPMHelper" class="org.jbpm.osgi.example.JBPMHelper"
+      init-method="startUp">
+    <property name="emf" ref="entityManagerFactory"/>
+  </bean>
+
+  <!--
+  <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource"
+      init-method="init">
+    <property name="uniqueName" value="jdbc/jbpm-ds"/>
+    <property name="className" value=""/>
+    <property name="maxPoolSize" value="5"/>
+    <property name="allowLocalTransactions" value="true"/>
+    <property name="driverProperties">
+      <props>
+        <prop key="user">sa</prop>
+        <prop key="password"></prop>
+        <prop key="url">jdbc:h2:tcp://localhost/~/jbpm-db;MVCC=TRUE</prop>
+        <prop key="driverClassName">org.h2.driver</prop>
+      </props>
+    </property>
+  </bean>
+  -->
+
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="org.h2.Driver" />
+    <property name="url" value="jdbc:h2:tcp://localhost/~/jbpm-db;MVCC=TRUE" />
+    <property name="username" value="sa" />
+    <property name="password" value="" />
+  </bean>
+  
+  <osgi:service interface="javax.sql.DataSource">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="jdbc/jbpm-ds"/>
+    </service-properties>
+  </osgi:service>
+
+  <bean class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+  </bean>
+
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="persistenceUnitName" value="org.jbpm.persistence.jpa"/>
+    <property name="dataSource" ref="dataSource"/>
+    <property name="jpaVendorAdapter">
+
+      <bean id="hibernateAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="database" value="H2"/>
+        <property name="showSql" value="true"/>
+      </bean>
+
+      <!--
+      <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
+        <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary"/>
+        <property name="showSql" value="true"/>
+        <property name="database" value="H2"/>
+      </bean>
+      -->
+    </property>
+  </bean>
+
+  <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+
+</beans>

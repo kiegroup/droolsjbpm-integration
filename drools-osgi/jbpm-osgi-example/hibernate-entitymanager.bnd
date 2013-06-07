@@ -1,0 +1,95 @@
+Bundle-Version:\
+  3.6.0.Final
+
+Bundle-Name:\
+  Hibernate :: Entitymanager
+
+Bundle-SymbolicName:\
+  hibernate-entitymanager
+
+Import-Package:\
+  javassist.bytecode;resolution:=optional,\
+  javassist.bytecode.annotation;resolution:=optional,\
+  javax.naming;resolution:=optional,\
+  javax.naming.event;resolution:=optional,\
+  javax.naming.spi;resolution:=optional,\
+  javax.persistence;resolution:=optional,\
+  javax.persistence.criteria;resolution:=optional,\
+  javax.persistence.metamodel;resolution:=optional,\
+  javax.persistence.spi;resolution:=optional,\
+  javax.sql;resolution:=optional,\
+  javax.transaction;resolution:=optional,\
+  javax.xml.parsers;resolution:=optional,\
+  javax.xml.transform;resolution:=optional,\
+  javax.xml.transform.dom;resolution:=optional,\
+  javax.xml.transform.stream;resolution:=optional,\
+  javax.xml.validation;resolution:=optional,\
+  org.dom4j;resolution:=optional,\
+  org.hibernate;resolution:=optional,\
+  org.hibernate.annotations.common;resolution:=optional,\
+  org.hibernate.annotations.common.reflection;resolution:=optional,\
+  org.hibernate.annotations.common.util;resolution:=optional,\
+  org.hibernate.bytecode;resolution:=optional,\
+  org.hibernate.bytecode.util;resolution:=optional,\
+  org.hibernate.cfg;resolution:=optional,\
+  org.hibernate.cfg.annotations.reflection;resolution:=optional,\
+  org.hibernate.classic;resolution:=optional,\
+  org.hibernate.collection;resolution:=optional,\
+  org.hibernate.connection;resolution:=optional,\
+  org.hibernate.dialect;resolution:=optional,\
+  org.hibernate.ejb;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.connection;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.criteria;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.criteria.expression;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.criteria.expression.function;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.criteria.path;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.criteria.predicate;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.event;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.instrument;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.metamodel;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.packaging;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.transaction;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.ejb.util;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.engine;resolution:=optional;version="[3.6,4.0)",\
+  org.hibernate.engine.query;resolution:=optional,\
+  org.hibernate.engine.query.sql;resolution:=optional,\
+  org.hibernate.event;resolution:=optional,\
+  org.hibernate.event.def;resolution:=optional,\
+  org.hibernate.hql;resolution:=optional,\
+  org.hibernate.impl;resolution:=optional,\
+  org.hibernate.intercept;resolution:=optional,\
+  org.hibernate.jdbc;resolution:=optional,\
+  org.hibernate.mapping;resolution:=optional,\
+  org.hibernate.metadata;resolution:=optional,\
+  org.hibernate.persister.collection;resolution:=optional,\
+  org.hibernate.persister.entity;resolution:=optional,\
+  org.hibernate.property;resolution:=optional,\
+  org.hibernate.proxy;resolution:=optional,\
+  org.hibernate.secure;resolution:=optional,\
+  org.hibernate.transaction;resolution:=optional,\
+  org.hibernate.transaction.synchronization;resolution:=optional,\
+  org.hibernate.transform;resolution:=optional,\
+  org.hibernate.tuple;resolution:=optional,\
+  org.hibernate.tuple.entity;resolution:=optional,\
+  org.hibernate.type;resolution:=optional,\
+  org.hibernate.util;resolution:=optional,\
+  org.hibernate.util.xml;resolution:=optional,\
+  org.slf4j;resolution:=optional,\
+  org.w3c.dom;resolution:=optional,\
+  org.xml.sax;resolution:=optional 
+  
+Export-Package:\
+  org.hibernate.ejb.metamodel; version="3.6.0.Final",\
+  org.hibernate.engine; version="3.6.0.Final",\
+  org.hibernate.ejb.criteria; version="3.6.0.Final",\
+  org.hibernate.ejb.criteria.path; version="3.6.0.Final",\
+  org.hibernate.ejb.event; version="3.6.0.Final",\
+  org.hibernate.ejb.criteria.expression; version="3.6.0.Final",\
+  org.hibernate.ejb.criteria.predicate; version="3.6.0.Final",\
+  org.hibernate.ejb.criteria.expression.function; version="3.6.0.Final",\
+  org.hibernate.ejb.connection; version="3.6.0.Final",\
+  org.hibernate.ejb.packaging; version="3.6.0.Final",\
+  org.hibernate.ejb.instrument; version="3.6.0.Final",\
+  org.hibernate.ejb.util; version="3.6.0.Final",\
+  org.hibernate.ejb.transaction; version="3.6.0.Final",\
+  org.hibernate.ejb; version="3.6.0.Final"
