@@ -47,6 +47,154 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+
+  <dependency>
+      <groupId>org.kie.commons</groupId>
+      <artifactId>kie-commons-io</artifactId>
+  </dependency>
+
+  <dependency>
+      <groupId>org.kie.commons</groupId>
+      <artifactId>kie-commons-cdi</artifactId>
+  </dependency>
+
+      <!-- Guvnor -->
+
+      <dependency>
+          <groupId>org.guvnor</groupId>
+          <artifactId>guvnor-m2repo-editor-api</artifactId>
+      </dependency>
+
+
+      <dependency>
+          <groupId>org.kie.commons</groupId>
+          <artifactId>kie-nio2-api</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model</artifactId>
+      </dependency>
+
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-project-api</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-project-backend</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-project-backend</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-datamodel-api</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-datamodel-backend</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.drools</groupId>
+          <artifactId>drools-workbench-models-commons</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-services-api</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.workbench.services</groupId>
+          <artifactId>kie-wb-common-data</artifactId>
+      </dependency>
+
+      <!-- UberFire -->
+
+      <dependency>
+          <groupId>org.uberfire</groupId>
+          <artifactId>uberfire-backend-api</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.uberfire</groupId>
+          <artifactId>uberfire-backend-server</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.uberfire</groupId>
+          <artifactId>uberfire-server</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.uberfire</groupId>
+          <artifactId>uberfire-security-client</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.uberfire</groupId>
+          <artifactId>uberfire-security-server</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.uberfire</groupId>
+          <artifactId>uberfire-client-api</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.commons</groupId>
+          <artifactId>kie-nio2-jgit</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.commons</groupId>
+          <artifactId>kie-nio2-fs</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.kie.commons</groupId>
+          <artifactId>kie-commons-cdi</artifactId>
+      </dependency>
+
+      <!-- Metadata -->
+      <dependency>
+          <groupId>org.kie.commons</groupId>
+          <artifactId>kieora-commons-io</artifactId>
+      </dependency>
+
+      <!-- Errai Core -->
+      <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-bus</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-ioc</artifactId>
+      </dependency>
+
+      <!-- CDI Integration Modules -->
+      <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-cdi-client</artifactId>
+      </dependency>
+
+
+      <dependency>
+          <groupId>org.jboss.errai</groupId>
+          <artifactId>errai-weld-integration</artifactId>
+      </dependency>
+
+
   </dependencies>
 
   <dependencyManagement>

@@ -7,6 +7,8 @@
 
   <kie:releaseId id="dummyReleaseId" groupId="dummyGroup" artifactId="dummyArtifact" version="dummyVersion"/>
 
+  <kie:kcontainer-ref id="defaultContainer"/>
+
   <kie:kbase-ref id="drl_kiesample"/>
 
   <kie:ksession id="ksession9" type="stateless" kbase-ref="drl_kiesample"/>
