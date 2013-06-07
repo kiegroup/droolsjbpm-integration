@@ -11,16 +11,20 @@ To run this project use
 
     mvn camel:run
 
-To deploy this project into [Fuse ESB](http://fusesource.com/downloads) or [Apache Karaf](http://karaf.apache.org/index/community/download.html)
+To deploy this project into :
 
-Start Fuse ESB or Apache Karaf
+[JBoss Fuse](http://access.redhat.com/downloads) or
+[Apache Karaf](http://karaf.apache.org/index/community/download.html)
 
-    <Fuse ESB Home>/bin/fuseesb  or <Karaf Home>/bin/karaf
+Start JBoss Fuse or Apache Karaf
+
+    <JBoss Fuse Home>/bin/fuse  or <Karaf Home>/bin/karaf
 
 In the console, use the following commands
 
     features:addurl mvn:org.drools/drools-karaf-features/6.0.0-SNAPSHOT/xml/features
     features:install drools-module
+    features:install drools-spring
     features:install drools-camel
     features:install drools-camel-example
 
@@ -28,8 +32,7 @@ To see the results tail the Fuse ESB log
 
     tail -f <Fuse ESB Home> or <Karaf Home>/data/log/fuseesb.log
     
-    2013-02-22 17:52:51,192 | INFO  | imer://testRoute | Home  | ... | Person Young Person is staying home
-    2013-02-22 17:52:52,133 | INFO  | imer://testRoute | Bar   | ... | Person Old Person can go to the bar
-    2013-02-22 17:52:53,130 | INFO  | imer://testRoute | Bar   | ... | Person Old Person can go to the bar
-    2013-02-22 17:52:54,134 | INFO  | imer://testRoute | Home  | ... | Person Young Person is staying home
-    2013-02-22 17:52:55,130 | INFO  | imer://testRoute | Home  | ... | Person Young Person is staying home
+    2013-06-07 17:26:12,717 | INFO  | uteDecisionTable | Chilton   | 249 - org.apache.camel.camel-core - 2.10.3 | Cheese Stilton costs 10 EUR.
+    2013-06-07 17:26:12,842 | INFO  | imer://testRoute | Home      | 249 - org.apache.camel.camel-core - 2.10.3 | Person Young Person is staying home
+    2013-06-07 17:26:22,716 | INFO  | uteDecisionTable | Chilton   | 249 - org.apache.camel.camel-core - 2.10.3 | Cheese Stilton costs 10 EUR.
+    2013-06-07 17:26:22,839 | INFO  | imer://testRoute | Bar       | 249 - org.apache.camel.camel-core - 2.10.3 | Person Old Person can go to the bar
