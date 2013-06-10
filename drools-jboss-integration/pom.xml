@@ -90,11 +90,6 @@
 
       <dependency>
           <groupId>org.kie.workbench.services</groupId>
-          <artifactId>kie-wb-common-project-backend</artifactId>
-      </dependency>
-
-      <dependency>
-          <groupId>org.kie.workbench.services</groupId>
           <artifactId>kie-wb-common-datamodel-api</artifactId>
       </dependency>
 
@@ -158,11 +153,6 @@
       <dependency>
           <groupId>org.kie.commons</groupId>
           <artifactId>kie-nio2-fs</artifactId>
-      </dependency>
-
-      <dependency>
-          <groupId>org.kie.commons</groupId>
-          <artifactId>kie-commons-cdi</artifactId>
       </dependency>
 
       <!-- Metadata -->
