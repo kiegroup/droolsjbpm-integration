@@ -29,6 +29,20 @@
       <artifactId>drools-camel-legacy5</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- TODO : Check if we can remove it
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-core</artifactId>
+      <version>1.2.1</version>
+      <scope>test</scope>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>org.apache.camel.karaf</groupId>
@@ -37,6 +51,16 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.assemblies.features</groupId>
+      <artifactId>standard</artifactId>
+      <scope>test</scope>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <version>2.3.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test</artifactId>
@@ -54,6 +78,19 @@
           <artifactId>org.apache.karaf.client</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.apache.karaf</groupId>
+      <artifactId>apache-karaf</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-core</artifactId>
+      <version>1.2.1</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -119,5 +156,12 @@
       </plugin>
     </plugins>
   </build>
+
+  <repositories>
+    <repository>
+      <id>apache</id>
+      <url>http://repo1.maven.org/maven2/</url>
+    </repository>
+  </repositories>
 
 </project>
