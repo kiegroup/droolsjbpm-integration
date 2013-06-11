@@ -23,10 +23,10 @@ import javax.inject.Inject;
 
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieContainer;
-import org.ops4j.pax.exam.ExamSystem;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
@@ -68,7 +68,7 @@ public class KieSpringOnKarafTest {
         return new OsgiBundleXmlApplicationContext(new String[]{"org/kie/spring/kie-beans.xml"});
     }
 
-    @Test
+    @Test @Ignore
     public void testKContainer() throws Exception {
         refresh();
         KieContainer kieContainer = (KieContainer) applicationContext.getBean("defaultContainer");
