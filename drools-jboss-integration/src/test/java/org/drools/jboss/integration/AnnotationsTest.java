@@ -1,6 +1,7 @@
 package org.drools.jboss.integration;
 
 import org.jboss.arquillian.junit.Arquillian;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.commons.io.IOService;
@@ -21,7 +22,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 
-@RunWith(Arquillian.class)
+@Ignore @RunWith(Arquillian.class)
 public class AnnotationsTest extends FullDistributionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationsTest.class);
