@@ -39,7 +39,7 @@
     <feature version="${drools.version}">drools-jpa</feature>
     <feature version="${drools.version}">jbpm</feature>
     <feature version="${drools.version}">jbpm-human-task</feature>
-    <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
+    <bundle>mvn:org.kie/kie-spring/${drools.version}</bundle>
   </feature>
 
   <feature name="drools-spring" version="${drools.version}" description="Drools Spring">
