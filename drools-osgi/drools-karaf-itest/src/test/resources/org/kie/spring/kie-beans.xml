@@ -3,8 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://drools.org/schema/kie-spring           http://drools.org/schema/kie-spring.xsd">
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://drools.org/schema/kie-spring
+       http://drools.org/schema/kie-spring-2.0.0.xsd">
 
   <kie:releaseId id="dummyReleaseId"
                  groupId="dummyGroup"
