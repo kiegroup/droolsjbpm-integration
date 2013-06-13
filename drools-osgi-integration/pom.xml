@@ -13,6 +13,7 @@
 
   <groupId>org.drools</groupId>
   <artifactId>drools-osgi-integration</artifactId>
+  <name>Drools :: OSGI Integration</name>
 
   <dependencies>
     <dependency>
