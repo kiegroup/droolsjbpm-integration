@@ -35,6 +35,11 @@
       <artifactId>kie-spring</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-osgi-integration</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- TODO : Check if we can remove it
     <dependency>

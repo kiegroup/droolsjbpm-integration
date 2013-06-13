@@ -7,4 +7,21 @@
     <ksession name="statelessWithGroupedListeners" type="stateless"/>
   </kbase>
 
+  <kbase name="drl_kiesample2">
+    <ksession name="ksession3" type="stateless"/>
+    <ksession name="loggerSession" type="stateless"/>
+  </kbase>
+
+  <kbase name="drl_persistence">
+    <ksession name="jpaSingleSessionCommandService2"/>
+  </kbase>
+
+  <kbase name="drl_persistence_rb">
+    <ksession name="jpaSingleSessionCommandServiceRollback"/>
+  </kbase>
+
+  <kbase name="drl_timer_flow">
+    <ksession name="knowledgeBase"/>
+  </kbase>
+
 </kmodule>

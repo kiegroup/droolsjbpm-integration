@@ -28,6 +28,7 @@
     <feature version="${drools.version}">kie</feature>
     <bundle>mvn:org.drools/drools-core/${drools.version}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${drools.version}</bundle>
+    <bundle>mvn:org.drools/drools-osgi-integration/${drools.version}</bundle>
   </feature>
 
   <feature name="kie" version="${drools.version}">
