@@ -17,17 +17,5 @@
 
   <kie:ksession id="ksession9" type="stateless" kbase-ref="drl_kiesample"/>
 
-  <kie:ksession-ref id="ksession1">
-
-    <kie:workingMemoryEventListener>
-      <bean class="org.kie.spring.mocks.MockWorkingMemoryEventListener"/>
-    </kie:workingMemoryEventListener>
-
-    <kie:agendaEventListener>
-      <bean class="org.kie.spring.mocks.MockAgendaEventListener"/>
-    </kie:agendaEventListener>
-
-  </kie:ksession-ref>
-
   <kie:ksession id="ksession99" kbase-ref="drl_kiesample"/>
 </beans>

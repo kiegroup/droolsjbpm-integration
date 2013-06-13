@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 
@@ -20,54 +21,65 @@ import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 public class OsgiKieModule extends AbstractKieModule {
 
     private final Bundle bundle;
+    private final String bundleUrlPrefix;
 
-    public OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle) {
+    private Collection<String> fileNames;
+
+    public OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle, String bundleUrlPrefix) {
         super(releaseId, kModuleModel);
         this.bundle = bundle;
+        this.bundleUrlPrefix = bundleUrlPrefix;
     }
 
     @Override
     public byte[] getBytes() {
-        throw new UnsupportedOperationException("org.drools.osgi.compiler.OsgiKieModule.getBytes -> TODO");
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isAvailable(String pResourceName) {
-        throw new UnsupportedOperationException("org.drools.osgi.compiler.OsgiKieModule.isAvailable -> TODO");
-
+        return fileNames.contains(pResourceName);
     }
 
     @Override
     public byte[] getBytes(String pResourceName) {
-        throw new UnsupportedOperationException("org.drools.osgi.compiler.OsgiKieModule.getBytes -> TODO");
-
+        URL url = bundle.getEntry(pResourceName);
+        return readUrlAsBytes(url);
     }
 
     @Override
     public Collection<String> getFileNames() {
-        throw new UnsupportedOperationException("org.drools.osgi.compiler.OsgiKieModule.getFileNames -> TODO");
-
+        if (fileNames != null) {
+            return fileNames;
+        }
+        fileNames = new ArrayList<String>();
+        Enumeration<URL> e = bundle.findEntries("", "*", true);
+        while (e.hasMoreElements()) {
+            URL url = e.nextElement();
+            String urlString = url.toString();
+            if (urlString.endsWith("/")) {
+                continue;
+            }
+            fileNames.add(urlString.substring(bundleUrlPrefix.length()));
+        }
+        return fileNames;
     }
 
     @Override
     public File getFile() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public static OsgiKieModule create(URL url) {
         KieModuleModel kieProject = KieModuleModelImpl.fromXML(url);
-        long bundleId = getBundleIdFromUrl(url);
+        String urlString = url.toString();
+        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
+        long bundleId = Long.parseLong(id);
+
         Bundle bundle = FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
         String pomProperties = getPomProperties( bundle );
         ReleaseId releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
-        return new OsgiKieModule(releaseId, kieProject, bundle);
-    }
-
-    private static long getBundleIdFromUrl(URL url) {
-        String urlString = url.toString();
-        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
-        return Long.parseLong(id);
+        return new OsgiKieModule(releaseId, kieProject, bundle, urlString.substring(0, urlString.indexOf("META-INF")));
     }
 
     private static String getPomProperties(Bundle bundle) {
@@ -79,10 +91,14 @@ public class OsgiKieModule extends AbstractKieModule {
     }
 
     private static String readUrlAsString(URL url) {
+        return new String(readUrlAsBytes(url));
+    }
+
+    private static byte[] readUrlAsBytes(URL url) {
         InputStream is = null;
         try {
             is = url.openStream();
-            return new String(readBytesFromInputStream(is));
+            return readBytesFromInputStream(is);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
