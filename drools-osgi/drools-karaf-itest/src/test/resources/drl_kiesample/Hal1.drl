@@ -1,6 +1,6 @@
 package kiesample;
 
-import org.kie.spring.beans.Person;
+import org.drools.camel.example.Person;
 
 global java.util.ArrayList persons;
 
