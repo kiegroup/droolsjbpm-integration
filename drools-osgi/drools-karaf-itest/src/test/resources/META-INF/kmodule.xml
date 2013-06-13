@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+
+  <kbase name="drl_kiesample">
+    <ksession name="ksession1" type="stateless"/>
+    <ksession name="ksession2"/>
+    <ksession name="statelessWithGroupedListeners" type="stateless"/>
+  </kbase>
+
+</kmodule>

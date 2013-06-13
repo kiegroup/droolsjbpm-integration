@@ -12,6 +12,7 @@
   <artifactId>drools-karaf-itest</artifactId>
 
   <name>Drools :: Karaf iTest</name>
+ <!-- <packaging>bundle</packaging> -->
 
   <dependencies>
     <dependency>
@@ -154,6 +155,20 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>org.drools.test.osgi.kie-spring</Bundle-SymbolicName>
+            <Bundle-Name>Drools OSGI :: Test :: Kie Spring</Bundle-Name>
+            <Import-Package>*</Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
