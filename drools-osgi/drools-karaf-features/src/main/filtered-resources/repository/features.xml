@@ -81,7 +81,7 @@
 
   <feature name="jbpm" version="${project.version}" description="jBPM engine">
     <feature version="${project.version}">drools-module</feature>
-    <bundle>mvn:joda-time/joda-time/1.6</bundle>
+    <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow-builder/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-bpmn2/${drools.version}</bundle>
