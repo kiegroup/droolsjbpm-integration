@@ -9,6 +9,7 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.cdi.KSession;
@@ -22,7 +23,7 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
-@RunWith(Arquillian.class)
+@Ignore @RunWith(Arquillian.class)
 public class KieArchiveTest {
 
     @Deployment
