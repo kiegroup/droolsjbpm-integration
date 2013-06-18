@@ -44,7 +44,7 @@ public class OsgiKieModule extends AbstractKieModule {
     @Override
     public byte[] getBytes(String pResourceName) {
         URL url = bundle.getEntry(pResourceName);
-        return readUrlAsBytes(url);
+        return url == null ? null : readUrlAsBytes(url);
     }
 
     @Override
