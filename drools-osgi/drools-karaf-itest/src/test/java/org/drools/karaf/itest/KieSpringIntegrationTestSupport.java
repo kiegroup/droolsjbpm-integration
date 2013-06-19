@@ -19,12 +19,18 @@ package org.drools.karaf.itest;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.ops4j.pax.exam.options.UrlReference;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
+import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 public class KieSpringIntegrationTestSupport {
@@ -32,8 +38,18 @@ public class KieSpringIntegrationTestSupport {
     protected static final transient Logger LOG = LoggerFactory.getLogger(KieSpringIntegrationTestSupport.class);
     protected static final String DroolsVersion = "6.0.0-SNAPSHOT";
 
-    public static MavenArtifactProvisionOption getFeatureUrl(String groupId, String camelId) {
-        return mavenBundle().groupId(groupId).artifactId(camelId);
+    protected OsgiBundleXmlApplicationContext applicationContext;
+
+    @Inject
+    protected BundleContext bc;
+
+    protected void refresh() {
+        applicationContext.setBundleContext(bc);
+        applicationContext.refresh();
+    }
+
+    public static MavenArtifactProvisionOption getFeatureUrl(String groupId, String version) {
+        return mavenBundle().groupId(groupId).artifactId(version);
     }
 
     public static UrlReference getCamelKarafFeatureUrl(String version) {

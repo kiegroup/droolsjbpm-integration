@@ -13,7 +13,7 @@
   <artifactId>kie-camel</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Kie Camel</name>
+  <name>Kie :: Camel</name>
   <description>Drools integration for Camel that provides an integration framework  based on known Enterprise Integration Pattern.</description>
 
   <dependencies>

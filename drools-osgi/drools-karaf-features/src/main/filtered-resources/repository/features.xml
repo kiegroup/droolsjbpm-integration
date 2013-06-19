@@ -102,7 +102,7 @@
     <bundle>mvn:org.kie.commons/kie-commons-cdi/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-validation/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-data/${drools.version}</bundle>
-    <bundle>wrap:mvn:org.kie.commons/kie-commons-io/${drools.version}</bundle>
+    <bundle>mvn:org.kie.commons/kie-commons-io/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-shared-services/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${drools.version}</bundle>
@@ -116,7 +116,12 @@
     <feature version="${drools.version}">drools-decisiontable</feature>
     <feature version="${drools.version}">drools-spring</feature>
     <feature version="${drools.version}">drools-camel</feature>
-    <bundle>mvn:org.drools/drools-osgi-examples/${drools.version}</bundle>
+    <bundle>mvn:org.drools/drools-camel-example/${drools.version}</bundle>
+  </feature>
+
+  <feature name="jbpm-example" version="${drools.version}" description="jBPM Spring Example">
+    <feature version="${drools.version}">jbpm</feature>
+    <bundle>mvn:org.drools/jbpm-osgi-example/${drools.version}</bundle>
   </feature>
 
 </features>
