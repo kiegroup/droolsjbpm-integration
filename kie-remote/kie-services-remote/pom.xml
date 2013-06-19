@@ -178,6 +178,7 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty</artifactId>
+      <version>3.6.2.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -374,7 +375,7 @@
                     &lt;/bindings&gt;</value>
                 </replacement>
                 <replacement>
-                  <!-- Service jboss.pojo."io.netty.internal.LoggerConfigurator".DESCRIBED is already registered -->
+                  <!-- Service jboss.pojo."org.jboss.netty.internal.LoggerConfigurator".DESCRIBED is already registered -->
                   <token>&lt;extension module="org.jboss.as.pojo"/&gt;</token>
                   <value></value>
                 </replacement>
