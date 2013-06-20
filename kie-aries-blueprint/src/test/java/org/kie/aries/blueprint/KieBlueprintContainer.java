@@ -49,7 +49,7 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
     protected NamespaceHandlerSet createNamespaceHandlerSet(Set<URI> namespaces) {
         NamespaceHandlerSet handlerSet = new SimpleNamespaceHandlerSet();
         try {
-            URI namespaceURL = URI.create("http://drools.org/schema/kie-aries-blueprint");
+            URI namespaceURL = URI.create("http://drools.org/schema/kie-aries-blueprint/1.0.0");
             URL schemaURL = getResource("org/kie/aries/blueprint/kie-aries-blueprint.xsd");
             KieNamespaceHandler namespaceHandler = new KieNamespaceHandler();
             ((SimpleNamespaceHandlerSet)handlerSet).addNamespace(namespaceURL, schemaURL, namespaceHandler);
