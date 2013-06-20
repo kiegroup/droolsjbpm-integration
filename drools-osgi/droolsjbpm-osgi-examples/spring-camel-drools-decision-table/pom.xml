@@ -37,12 +37,12 @@
       <artifactId>drools-decisiontables</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-camel</artifactId>
     </dependency>
 
     <!-- POI - Excell -->
@@ -135,13 +135,19 @@
             <Import-Package>
               !org.drools.camel.example,
               org.apache.camel;version="[2.8,3)",
+              org.drools.core;version="[6.0,7)",
               org.drools.core.command.runtime;version="[6.0,7)",
               org.drools.core.command.runtime.rule;version="[6.0,7)",
-              org.drools.camel.component;version="[6.0,7)",
-              org.drools.container.spring;version="[6.0,7)",
+              org.drools.core.conflict;version="[6.0,7)",
+              org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
               org.kie.api,
-              org.kie.internal
+              org.kie.internal,
+              org.kie.camel.component;version="[6.0,7)",
             </Import-Package>
+            <Dynamic-ImportPackage>
+              org.drools.core,
+              org.drools.Compiler
+            </Dynamic-ImportPackage>
             <Private-Package>
               org.drools.camel.example
             </Private-Package>

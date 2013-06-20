@@ -22,12 +22,7 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
+      <artifactId>drools-osgi-integration</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -36,8 +31,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-osgi-integration</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-camel</artifactId>
       <scope>test</scope>
     </dependency>
 

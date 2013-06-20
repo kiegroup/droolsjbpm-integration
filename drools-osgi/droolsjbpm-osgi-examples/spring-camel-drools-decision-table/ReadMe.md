@@ -24,8 +24,9 @@ In the console, use the following commands
 
     features:addurl mvn:org.drools/drools-karaf-features/6.0.0-SNAPSHOT/xml/features
     features:install drools-module
-    features:install drools-spring
-    features:install drools-camel
+    features:install drools-decisiontable
+    features:install kie-spring
+    features:install kie-camel
     features:install drools-camel-example
 
 To see the results tail the Fuse ESB log

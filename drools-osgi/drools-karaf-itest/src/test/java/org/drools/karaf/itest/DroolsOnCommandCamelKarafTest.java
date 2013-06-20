@@ -109,11 +109,11 @@ public class DroolsOnCommandCamelKarafTest extends OSGiIntegrationSpringTestSupp
                 keepRuntimeFolder(),
                 logLevel(LogLevelOption.LogLevel.INFO),
 
-                // Load camel-core, camel-sprig, camel-test & camel-cxf Features
+                // Load camel-core, camel-spring, camel-test & camel-cxf Features
                 loadCamelFeatures("camel-cxf"),
 
-                // Load drools-module (= core + compiler + knowledge), drools-camel & drools-spring
-                loadDroolsFeatures("drools-camel", "drools-spring")
+                // Load drools-module (= core + compiler + knowledge), drools-came & drools-spring
+                loadDroolsFeatures("drools5-spring","drools5-camel")
 
         };
 
