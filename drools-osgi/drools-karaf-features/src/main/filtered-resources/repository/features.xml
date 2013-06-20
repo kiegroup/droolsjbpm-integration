@@ -80,6 +80,14 @@
     <bundle>mvn:org.kie/kie-spring/${drools.version}</bundle>
   </feature>
 
+  <feature name="kie-aries-blueprint" version="${drools.version}">
+    <feature version="${drools.version}">kie</feature>
+    <feature version="${drools.version}">drools-jpa</feature>
+    <feature version="${drools.version}">jbpm</feature>
+    <feature version="${drools.version}">jbpm-human-task</feature>
+    <bundle>mvn:org.kie/kie-aries-blueprint/${drools.version}</bundle>
+  </feature>
+
   <feature name="kie-camel" version="${drools.version}">
     <feature version="${drools.version}">kie</feature>
     <feature version="${drools.version}">kie-spring</feature>
@@ -138,6 +146,14 @@
     <feature version="${drools.version}">kie-spring</feature>
     <feature version="${drools.version}">kie-camel</feature>
     <bundle>mvn:org.drools/drools-camel-example/${drools.version}</bundle>
+  </feature>
+
+  <feature name="drools-blueprint-camel-example" version="${drools.version}" description="Drools Kie Blueprint Camel Example">
+    <feature version="${drools.version}">drools-module</feature>
+    <feature version="${drools.version}">drools-decisiontable</feature>
+    <feature version="${drools.version}">kie-aries-blueprint</feature>
+    <feature version="${drools.version}">kie-camel</feature>
+    <bundle>mvn:org.drools/drools-blueprint-camel-example/${drools.version}</bundle>
   </feature>
 
   <feature name="jbpm-example" version="${drools.version}" description="jBPM Spring Example">
