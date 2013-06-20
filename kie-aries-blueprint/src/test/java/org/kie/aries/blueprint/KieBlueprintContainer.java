@@ -15,10 +15,6 @@
  */
 package org.kie.aries.blueprint;
 
-import org.apache.aries.blueprint.container.BlueprintContainerImpl;
-import org.apache.aries.blueprint.container.SimpleNamespaceHandlerSet;
-import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
-
 import java.net.URI;
 import java.net.URL;
 import java.util.LinkedHashSet;
@@ -26,7 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.aries.blueprint.container.BlueprintContainerImpl;
+import org.apache.aries.blueprint.container.SimpleNamespaceHandlerSet;
+import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
+
 public class KieBlueprintContainer extends BlueprintContainerImpl {
+
     public KieBlueprintContainer(ClassLoader loader, List<URL> resources) throws Exception {
         super(loader, resources);
     }
