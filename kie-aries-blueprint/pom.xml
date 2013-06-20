@@ -122,6 +122,7 @@
             <Bundle-Name>Kie Aries Blueprint</Bundle-Name>
             <Import-Package>
               !org.kie.aries.blueprint*,
+              org.apache.aries.blueprint.reflect;resolution:=optional,
               *
             </Import-Package>
             <Export-Package>
