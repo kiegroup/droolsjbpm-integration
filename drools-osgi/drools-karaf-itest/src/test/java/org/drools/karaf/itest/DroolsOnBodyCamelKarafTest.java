@@ -82,11 +82,17 @@ public class DroolsOnBodyCamelKarafTest extends OSGiIntegrationSpringTestSupport
                 keepRuntimeFolder(),
                 logLevel(LogLevelOption.LogLevel.INFO),
 
-                // Load camel-core, camel-sprig, camel-test & camel-cxf Features
+                // Load Spring DM Karaf Feature
+                scanFeatures(
+                        maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
+                        "spring", "spring-dm"
+                ),
+
+                // Load camel-core, camel-spring, camel-test & camel-cxf Features
                 loadCamelFeatures("camel-cxf"),
 
-                // Load drools-module (= core + compiler + knowledge), drools-camel & drools-spring
-                loadDroolsFeatures("drools5-spring","drools5-camel")
+                // Load drools-module (= core + compiler + knowledge), kie-camel & kie-spring
+                loadDroolsFeatures("kie-spring","kie-camel")
 
         };
 
