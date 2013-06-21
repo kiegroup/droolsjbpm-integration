@@ -21,6 +21,7 @@ public class Person {
     private String name;
     private int age;
     private boolean canDrink = false;
+    private boolean happy;
 
     public String getName() {
         return name;
@@ -50,5 +51,13 @@ public class Person {
     public String toString() {
         return "Person{" + "name='" + name + '\'' + ", age=" + age
                 + ", canDrink=" + canDrink + '}';
+    }
+
+    public boolean isHappy() {
+        return happy;
+    }
+
+    public void setHappy(boolean happy) {
+        this.happy = happy;
     }
 }

@@ -1,0 +1,27 @@
+package kiesample;
+
+import org.kie.spring.beans.Person;
+
+global java.util.ArrayList persons;
+
+rule "rule 1" when
+    m : Person( )
+then
+    System.out.println( m.getName() + ",  " +  m.getAge());
+end
+
+rule "rule 2" when
+    p: Person( name == "HAL" )
+then
+    p.setHappy(true);
+end
+
+
+rule "rule 3" when
+    p: Person( name == "HAL2" )
+then
+    p.setHappy(true);
+    if (persons != null){
+        persons.add(p);
+    }
+end

@@ -30,6 +30,7 @@ import org.jbpm.simulation.impl.events.EndSimulationEvent;
 import org.jbpm.simulation.impl.events.GenericSimulationEvent;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.ResourceType;
@@ -221,7 +222,7 @@ public class SimulateProcessTest {
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithRunRulesOnEveryEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
@@ -275,7 +276,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithSinglePath() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-UserTaskWithSimulationMetaData.bpmn2"));
@@ -297,7 +298,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithSinglePathAndCatchingEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SinglePathWithCatchingEvent.bpmn2"));
@@ -319,7 +320,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithSinglePathAndThrowingEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SinglePathWithThrowingEvent.bpmn2"));
@@ -341,7 +342,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithBoundaryEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SimpleWithBoundaryEvent.bpmn2"));
@@ -363,7 +364,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithScriptRuleXor() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-ScriptRuleXor.bpmn2"));
@@ -392,7 +393,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test
+    @Test @Ignore
     public void testSimulationRunnerWithLoop() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-loop-sim.bpmn2"));

@@ -28,7 +28,7 @@ public class GreeterTest {
     Greeter greeter;
 
     @Test
-    public void should_create_greeting() {
+    public void testShouldCreateGreeting() {
         Assert.assertEquals("Hello, Earthling!",
                             greeter.createGreeting("Earthling"));
         greeter.greet(System.out, "Earthling");

@@ -16,6 +16,10 @@
 
 package org.kie.aries.blueprint.tests;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -24,10 +28,6 @@ import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.kie.aries.blueprint.beans.Person;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 

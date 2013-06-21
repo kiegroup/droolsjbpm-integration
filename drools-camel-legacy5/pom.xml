@@ -12,7 +12,7 @@
   <artifactId>drools-camel-legacy5</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Drools Camel integration Legacy5</name>
+  <name>Drools :: Camel integration Legacy5</name>
   <description>Legacy Drools 5.x integration for Camel that provides an integration framework based on known Enterprise Integration Pattern.</description>
 
   <dependencies>
@@ -200,13 +200,13 @@
             <Bundle-SymbolicName>org.kie.camel</Bundle-SymbolicName>
             <Bundle-Name>Drools Camel</Bundle-Name>
             <Import-Package>
-              !org.kie.camel.component,
-              !org.kie.jax*,
+              !org.drools.camel.component,
+              !org.drools.jax*,
               *
             </Import-Package>
             <Export-Package>
-              org.kie.camel.component,
-              org.kie.jax*
+              org.drools.camel.component,
+              org.drools.jax*
             </Export-Package>
           </instructions>
         </configuration>

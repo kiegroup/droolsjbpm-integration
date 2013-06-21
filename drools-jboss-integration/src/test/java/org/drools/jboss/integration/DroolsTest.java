@@ -28,7 +28,8 @@ public class DroolsTest {
     @Deployment
     public static WebArchive createDeployment() {
         File[] libs = Maven.resolver()
-                           .loadPomFromFile("pom.xml").resolve("org.drools:drools-compiler")
+                           .loadPomFromFile("pom.xml").resolve("org.drools:drools-compiler",
+                                                               "com.google.protobuf:protobuf-java")
                            .withTransitivity().asFile();
 
         WebArchive drools = ShrinkWrap.create(WebArchive.class)

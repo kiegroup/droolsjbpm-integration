@@ -176,9 +176,9 @@
     </dependency>
     <!-- necessary when using hornetq 2.2.x -->
     <dependency>
-      <groupId>io.netty</groupId>
+      <groupId>org.jboss.netty</groupId>
       <artifactId>netty</artifactId>
-      <version>3.6.2.Final</version>
+      <version>3.2.0.Final</version>
       <scope>test</scope>
     </dependency>
 

@@ -15,23 +15,23 @@
  */
 package org.kie.aries.blueprint.tests;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.persistence.jpa.KieStoreServices;
-import org.kie.api.runtime.KieContainer;
-import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
+import org.kie.api.builder.ReleaseId;
+import org.kie.api.persistence.jpa.KieStoreServices;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.aries.blueprint.KieBlueprintContainer;
+import org.kie.aries.blueprint.beans.Person;
 import org.kie.aries.blueprint.factorybeans.KieObjectsResolver;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -101,18 +101,18 @@ public class KieBlueprintBasicTest {
         fail();
     }
 
-//    @Test
-//    public void testKSessionExecution() throws Exception {
-//        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession1");
-//        assertNotNull(ksession);
-//
-//        Person person = (Person) container.getComponentInstance("person1");
-//        assertNotNull(person);
-//        assertFalse(person.isHappy());
-//
-//        ksession.execute(person);
-//        assertTrue(person.isHappy());
-//    }
+    @Test
+    public void testKSessionExecution() throws Exception {
+        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession1");
+        assertNotNull(ksession);
+
+        Person person = (Person) container.getComponentInstance("person1");
+        assertNotNull(person);
+        assertFalse(person.isHappy());
+
+        ksession.execute(person);
+        assertTrue(person.isHappy());
+    }
 
     @AfterClass
     public static void tearDown(){

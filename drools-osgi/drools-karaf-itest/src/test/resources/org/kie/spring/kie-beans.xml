@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://drools.org/schema/kie-spring
+       http://drools.org/schema/kie-spring-2.0.0.xsd">
+
+  <kie:releaseId id="dummyReleaseId"
+                 groupId="dummyGroup"
+                 artifactId="dummyArtifact"
+                 version="dummyVersion"/>
+
+  <kie:kcontainer-ref id="defaultContainer"/>
+
+  <kie:kbase-ref id="drl_kiesample"/>
+
+  <kie:ksession id="ksession9" type="stateless" kbase-ref="drl_kiesample"/>
+
+  <kie:ksession id="ksession99" kbase-ref="drl_kiesample"/>
+</beans>

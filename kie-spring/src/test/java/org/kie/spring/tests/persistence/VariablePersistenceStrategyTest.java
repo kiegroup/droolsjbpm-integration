@@ -51,6 +51,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
+@Ignore("serialized packages used in test are no longer compatible with drools")
 public class VariablePersistenceStrategyTest {
 
     private static final String TMPDIR = System.getProperty("java.io.tmpdir");

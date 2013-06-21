@@ -24,7 +24,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.drools.camel.example.Person;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.MavenUtils;
@@ -52,7 +51,7 @@ public class DroolsOnCommandCamelKarafTest extends OSGiIntegrationSpringTestSupp
         return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/camel-context.xml"});
     }
 
-    @Test @Ignore("Test fails - chm007 will take a look at fixing it") // TODO fix test
+    @Test
     public void testRuleOnCommand() throws Exception {
         Person person = new Person();
         person.setName("Young Scott");
@@ -110,11 +109,17 @@ public class DroolsOnCommandCamelKarafTest extends OSGiIntegrationSpringTestSupp
                 keepRuntimeFolder(),
                 logLevel(LogLevelOption.LogLevel.INFO),
 
-                // Load camel-core, camel-sprig, camel-test & camel-cxf Features
+                // Load Spring DM Karaf Feature
+                scanFeatures(
+                        maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
+                        "spring", "spring-dm"
+                ),
+
+                // Load camel-core, camel-spring, camel-test & camel-cxf Features
                 loadCamelFeatures("camel-cxf"),
 
-                // Load drools-module (= core + compiler + knowledge), drools-camel & drools-spring
-                loadDroolsFeatures("drools-camel", "drools-spring")
+                // Load drools-module (= core + compiler + knowledge), kie-camel & kie-spring
+                loadDroolsFeatures("kie-spring","kie-camel")
 
         };
 

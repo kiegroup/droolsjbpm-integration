@@ -52,6 +52,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
+@Ignore("serialized packages used in test are no longer compatible with drools")
 public class JPASingleSessionCommandServiceFactoryEnvTest {
     private static final String TMPDIR = System.getProperty("java.io.tmpdir");
     private static final Logger log = LoggerFactory.getLogger(JPASingleSessionCommandServiceFactoryEnvTest.class);

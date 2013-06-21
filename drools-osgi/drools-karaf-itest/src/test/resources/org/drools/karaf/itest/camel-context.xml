@@ -1,94 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:drools="http://drools.org/schema/drools-spring"
+       xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
-       http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd">
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://drools.org/schema/kie-spring
+       http://drools.org/schema/kie-spring-2.0.0.xsd
+       http://camel.apache.org/schema/spring
+       http://camel.apache.org/schema/spring/camel-spring.xsd">
 
+  <kie:releaseId id="dummyReleaseId"
+                 groupId="dummyGroup"
+                 artifactId="dummyArtifact"
+                 version="dummyVersion"/>
 
-    <drools:grid-node id="node1"/>
+  <kie:kcontainer-ref id="defaultContainer"/>
 
-    <drools:kbase id="kbase1" node="node1">
-        <drools:configuration>
-            <drools:mbeans enabled="true"/>
-        </drools:configuration>
-        <drools:resources>
-            <drools:resource type="DRL" source="classpath:testSpring.drl"/>
-        </drools:resources>
-    </drools:kbase>
+  <kie:kbase-ref id="drl_camelsample"/>
 
-    <drools:ksession id="ksession1"
-                     type="stateless"
-                     name="ksession1"
-                     kbase="kbase1"
-                     node="node1"/>
+  <kie:ksession id="ksession1" type="stateless" kbase-ref="drl_camelsample"/>
 
-    <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
+  <bean id="kieHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
 
-    <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
+  <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
 
-    <bean id="drools" class="org.drools.camel.component.DroolsComponent"/>
+  <bean id="kie" class="org.kie.camel.component.KieComponent"/>
 
-    <camelContext xmlns="http://camel.apache.org/schema/spring">
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
 
-        <endpoint id="ruleOnBodyEndpoint" uri="direct-vm://ruleOnBody"/>
-        <endpoint id="ruleOnCommandEndpoint" uri="direct-vm://ruleOnCommand"/>
+    <endpoint id="ruleOnBodyEndpoint" uri="direct-vm://ruleOnBody"/>
+    <endpoint id="ruleOnCommandEndpoint" uri="direct-vm://ruleOnCommand"/>
 
-        <route trace="false" id="testRoute">
-            <description>Example route that will regularly create a Person with a random age and verify their age
-            </description>
-            <from uri="timer:testRoute"/>
-            <bean method="createTestPerson" ref="personHelper"/>
-            <to uri="drools:node1/ksession1?action=insertBody" id="AgeVerification">
-                <description>valid 'action' values are:
-                    'execute' that takes a 'Command' object (default)
-                    'insertBody' that inserts the Exchange.in.body, and executes rules
-                    'insertMessage' that inserts the Exchange.in (type org.apache.camel.Message), and executes rules
-                    'insertExchange' that inserts the Exchange (type org.apache.camel.Exchange), and executes rules
-                </description>
-            </to>
-            <choice>
-                <when id="CanDrink">
-                    <simple>${body.canDrink}</simple>
-                    <log logName="Bar" message="Person ${body.name} can go to the bar"/>
-                </when>
-                <otherwise>
-                    <log logName="Home" message="Person ${body.name} is staying home"/>
-                </otherwise>
-            </choice>
-        </route>
-        <route trace="false" id="ruleOnBody">
-            <description>This route shows an example of passing (inserting) the Body of the message as a POJO to Drools
-                for execution
-            </description>
-            <from ref="ruleOnBodyEndpoint"/>
-            <to uri="drools:node1/ksession1?action=insertBody">
-                <description>valid 'action' values are:
-                    'execute' that takes a 'Command' object (default)
-                    'insertBody' that inserts the Exchange.in.body, and executes rules
-                    'insertMessage' that inserts the Exchange.in (type org.apache.camel.Message), and executes rules
-                    'insertExchange' that inserts the Exchange (type org.apache.camel.Exchange), and executes rules
-                </description>
-            </to>
-        </route>
-        <route trace="false" id="ruleOnCommand">
-            <description>This route shows an example of creating a Drools Command wrapping the Body of the message with
-                the help of the custom DroolsCommandHelperBean (included in this project), and passing this Drools
-                Command to the ruleset for execution.
-            </description>
-            <from ref="ruleOnCommandEndpoint"/>
-            <bean method="insertAndFireAll" ref="droolsHelper"/>
-            <to uri="drools:node1/ksession1?action=execute">
-                <description>valid 'action' values are:
-                    'execute' that takes a 'Command' object (default)
-                    'insertBody' that inserts the Exchange.in.body, and executes rules
-                    'insertMessage' that inserts the Exchange.in (type org.apache.camel.Message), and executes rules
-                    'insertExchange' that inserts the Exchange (type org.apache.camel.Exchange), and executes rules
-                </description>
-            </to>
-        </route>
-    </camelContext>
+    <route trace="false" id="testRoute">
+      <description>Example route that will regularly create a Person with a random age and verify their age
+      </description>
+      <from uri="timer:testRoute"/>
+      <bean method="createTestPerson" ref="personHelper"/>
+      <to uri="kie:node1/ksession1?action=insertBody" id="AgeVerification">
+        <description>valid 'action' values are:
+          'execute' that takes a 'Command' object (default)
+          'insertBody' that inserts the Exchange.in.body, and executes rules
+          'insertMessage' that inserts the Exchange.in (type org.apache.camel.Message), and executes rules
+          'insertExchange' that inserts the Exchange (type org.apache.camel.Exchange), and executes rules
+        </description>
+      </to>
+      <choice>
+        <when id="CanDrink">
+          <simple>${body.canDrink}</simple>
+          <log logName="Bar" message="Person ${body.name} can go to the bar"/>
+        </when>
+        <otherwise>
+          <log logName="Home" message="Person ${body.name} is staying home"/>
+        </otherwise>
+      </choice>
+    </route>
+
+    <route trace="false" id="ruleOnBody">
+      <description>This route shows an example of passing (inserting) the Body of the message as a POJO to kie
+        for execution
+      </description>
+      <from ref="ruleOnBodyEndpoint"/>
+      <to uri="kie:node1/ksession1?action=insertBody">
+        <description>valid 'action' values are:
+          'execute' that takes a 'Command' object (default)
+          'insertBody' that inserts the Exchange.in.body, and executes rules
+          'insertMessage' that inserts the Exchange.in (type org.apache.camel.Message), and executes rules
+          'insertExchange' that inserts the Exchange (type org.apache.camel.Exchange), and executes rules
+        </description>
+      </to>
+    </route>
+
+    <route trace="false" id="ruleOnCommand">
+      <description>This route shows an example of creating a kie Command wrapping the Body of the message with
+        the help of the custom kieCommandHelperBean (included in this project), and passing this kie
+        Command to the ruleset for execution.
+      </description>
+      <from ref="ruleOnCommandEndpoint"/>
+      <bean method="insertAndFireAll" ref="kieHelper"/>
+      <to uri="kie:node1/ksession1?action=execute">
+        <description>valid 'action' values are:
+          'execute' that takes a 'Command' object (default)
+          'insertBody' that inserts the Exchange.in.body, and executes rules
+          'insertMessage' that inserts the Exchange.in (type org.apache.camel.Message), and executes rules
+          'insertExchange' that inserts the Exchange (type org.apache.camel.Exchange), and executes rules
+        </description>
+      </to>
+    </route>
+  </camelContext>
 
 </beans>
