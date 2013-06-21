@@ -11,13 +11,13 @@
   <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
   <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
 
-  <!-- Drools Camel Component -->
-  <bean id="drools" class="org.kie.camel.component.KieComponent"/>
-
-  <!-- Kie Knowledge base & Session -->
-  <kie:kbase-ref id="drl_sample"/>
-
-  <kie:ksession id="ksession-dt-1" type="stateless" kbase-ref="drl_sample"/>
+  <kie:ksession-ref id="ksession-dt-1">
+    <kie:batch>
+      <kie:set-global identifier="list" >
+        <bean class="java.util.ArrayList" />
+      </kie:set-global>
+    </kie:batch>
+  </kie:ksession-ref>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
 
@@ -25,7 +25,7 @@
 
       <from uri="timer:testRouteDecisionTable?period=10s"/>
       <bean method="createTestCheese" ref="cheeseHelper"/>
-      <to uri="drools:node-dt-1/ksession-dt-1?action=insertBody" id="AgeVerification"/>
+      <to uri="hie:ksession-dt-1?action=insertBody" id="AgeVerification"/>
       <choice>
         <when id="CheeseType">
           <simple>${body.type}</simple>
@@ -39,13 +39,13 @@
 
     <route trace="false" id="ruleOnBodyDT">
       <from uri="direct://ruleOnBodyDT"/>
-      <to uri="drools:node-dt-1/ksession-dt-1?action=insertBody"/>
+      <to uri="hie:ksession-dt-1?action=insertBody"/>
     </route>
 
     <route trace="false" id="ruleOnCommandDT">
       <from uri="direct://ruleOnCommandDT"/>
       <bean method="insertAndFireAll" ref="droolsHelper"/>
-      <to uri="drools:node-dt-1/ksession-dt-1?action=execute"/>
+      <to uri="hie:ksession-dt-1?action=execute"/>
     </route>
   </camelContext>
 

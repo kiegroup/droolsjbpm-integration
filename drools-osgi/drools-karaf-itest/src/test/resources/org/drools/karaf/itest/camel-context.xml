@@ -6,7 +6,9 @@
        http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://drools.org/schema/kie-spring
-       http://drools.org/schema/kie-spring-2.0.0.xsd">
+       http://drools.org/schema/kie-spring-2.0.0.xsd
+       http://camel.apache.org/schema/spring
+       http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <kie:releaseId id="dummyReleaseId"
                  groupId="dummyGroup"
@@ -53,6 +55,7 @@
         </otherwise>
       </choice>
     </route>
+
     <route trace="false" id="ruleOnBody">
       <description>This route shows an example of passing (inserting) the Body of the message as a POJO to kie
         for execution
@@ -67,6 +70,7 @@
         </description>
       </to>
     </route>
+
     <route trace="false" id="ruleOnCommand">
       <description>This route shows an example of creating a kie Command wrapping the Body of the message with
         the help of the custom kieCommandHelperBean (included in this project), and passing this kie

@@ -11,14 +11,19 @@
   <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
   <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
 
-  <!-- Drools Camel Component -->
-  <bean id="drools" class="org.kie.camel.component.KieComponent"/>
-
-  <kie:releaseId id="dummyReleaseId" groupId="dummyGroup" artifactId="dummyArtifact" version="dummyVersion"/>
-
-  <kie:kcontainer-ref id="defaultContainer"/>
-
+  <!-- WHY CAN't WE USE THIS SYNTAX  & HOW the drl
   <kie:kbase-ref id="drl_sample"/>
+
+  <kie:ksession id="kession1" kbase-ref="drl_sample"/>
+  -->
+
+  <kie:ksession-ref id="ksession1">
+    <kie:batch>
+      <kie:set-global identifier="list" >
+        <bean class="java.util.ArrayList" />
+      </kie:set-global>
+    </kie:batch>
+  </kie:ksession-ref>
 
   <!-- Camel Route -->
   <camelContext xmlns="http://camel.apache.org/schema/spring">
@@ -27,7 +32,7 @@
       </description>
       <from uri="timer:testRoute?period=10s"/>
       <bean method="createTestPerson" ref="personHelper"/>
-      <to uri="drools:ksession1?action=insertBody" id="AgeVerification">
+      <to uri="kie:ksession1?action=insertBody" id="AgeVerification">
         <description>valid 'action' values are:
           'execute' that takes a 'Command' object (default)
           'insertBody' that inserts the Exchange.in.body, and executes rules
@@ -50,7 +55,7 @@
         for execution
       </description>
       <from uri="direct://ruleOnBody"/>
-      <to uri="drools:ksession1?action=insertBody">
+      <to uri="kie:ksession1?action=insertBody">
         <description>valid 'action' values are:
           'execute' that takes a 'Command' object (default)
           'insertBody' that inserts the Exchange.in.body, and executes rules
@@ -66,7 +71,7 @@
       </description>
       <from uri="direct://ruleOnCommand"/>
       <bean method="insertAndFireAll" ref="droolsHelper"/>
-      <to uri="drools:ksession1?action=execute">
+      <to uri="kie:ksession1?action=execute">
         <description>valid 'action' values are:
           'execute' that takes a 'Command' object (default)
           'insertBody' that inserts the Exchange.in.body, and executes rules
