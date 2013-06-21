@@ -147,11 +147,12 @@
               org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
               org.kie.api,
               org.kie.internal,
+              org.kie.spring,
               org.kie.camel.component;version="[6.0,7)",
             </Import-Package>
             <Dynamic-ImportPackage>
               org.drools.core,
-              org.drools.Compiler
+              org.drools.compiler
             </Dynamic-ImportPackage>
             <Private-Package>
               org.drools.camel.example
