@@ -1,5 +1,5 @@
-Drools-Camel Example
-=====================
+Drools-Camel Spring Example
+===========================
 
 To build this project use
 

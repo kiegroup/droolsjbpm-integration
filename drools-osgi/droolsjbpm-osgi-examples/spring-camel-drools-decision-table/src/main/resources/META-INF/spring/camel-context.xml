@@ -14,16 +14,11 @@
   <!-- Drools Camel Component -->
   <bean id="drools" class="org.kie.camel.component.KieComponent"/>
 
-  <!-- Kie Knowledge base & Session
-  <kie:releaseId id="drools-camel-example" groupId="org.drools" artifactId="drools-camel-example" version="6.0.0-SNAPSHOT"/>
-    <kie:kbase-ref id="drl_sample" releaseId="drools-camel-example"/>
-  -->
-
   <kie:releaseId id="dummyReleaseId" groupId="dummyGroup" artifactId="dummyArtifact" version="dummyVersion"/>
 
   <kie:kcontainer-ref id="defaultContainer"/>
 
-  <kie:kbase-ref id="drl_sample" releaseId="dummyReleaseId"/>
+  <kie:kbase-ref id="drl_sample"/>
 
   <!-- Camel Route -->
   <camelContext xmlns="http://camel.apache.org/schema/spring">

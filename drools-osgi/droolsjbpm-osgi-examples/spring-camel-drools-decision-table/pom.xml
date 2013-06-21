@@ -139,6 +139,7 @@
               org.drools.core.command.runtime;version="[6.0,7)",
               org.drools.core.command.runtime.rule;version="[6.0,7)",
               org.drools.core.conflict;version="[6.0,7)",
+              org.drools.osgi.compiler;version="[6.0,7)",
               org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
               org.kie.api,
               org.kie.internal,
