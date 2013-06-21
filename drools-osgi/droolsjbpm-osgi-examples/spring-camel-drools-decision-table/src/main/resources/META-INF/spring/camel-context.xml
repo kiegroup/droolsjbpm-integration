@@ -27,6 +27,7 @@
 
   <!-- Camel Route -->
   <camelContext xmlns="http://camel.apache.org/schema/spring">
+
     <route trace="false" id="testRoute">
       <description>Example route that will regularly create a Person with a random age and verify their age
       </description>
@@ -50,6 +51,7 @@
         </otherwise>
       </choice>
     </route>
+
     <route trace="false" id="ruleOnBody">
       <description>This route shows an example of passing (inserting) the Body of the message as a POJO to Drools
         for execution
@@ -64,6 +66,7 @@
         </description>
       </to>
     </route>
+
     <route trace="false" id="ruleOnCommand">
       <description>This route shows an example of creating a Drools Command wrapping the Body of the message with
         the help of the custom DroolsCommandHelperBean (included in this project), and passing this Drools
