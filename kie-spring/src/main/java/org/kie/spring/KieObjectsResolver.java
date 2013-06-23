@@ -18,11 +18,15 @@ package org.kie.spring;
 
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieProject;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieModule;
+import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
 
@@ -80,12 +84,17 @@ public class KieObjectsResolver {
             if (defaultClasspathKContainer == null) {
                 throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
             }
-
         } else {
             if (!gavs.containsKey(releaseId)) {
-                throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
+                KieServices ks = KieServices.Factory.get();
+                kieContainer = ks.newKieContainer(releaseId);
+                if ( kieContainer == null) {
+                    throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
+                }
+                gavs.put(releaseId, kieContainer);
+            } else {
+                kieContainer = gavs.get(releaseId);
             }
-            kieContainer = gavs.get(releaseId);
         }
         return kieContainer;
     }
