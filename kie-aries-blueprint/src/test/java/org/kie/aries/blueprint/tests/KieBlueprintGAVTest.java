@@ -20,6 +20,7 @@ import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.drools.example.api.namedkiesession.Message;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
@@ -35,6 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@Ignore
 public class KieBlueprintGAVTest {
 
     static BlueprintContainerImpl container = null;
