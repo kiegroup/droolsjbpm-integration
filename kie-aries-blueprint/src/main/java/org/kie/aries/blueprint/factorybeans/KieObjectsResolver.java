@@ -85,12 +85,17 @@ public class KieObjectsResolver {
             if (defaultClasspathKContainer == null) {
                 throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
             }
-
         } else {
             if (!gavs.containsKey(releaseId)) {
-                throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
+                KieServices ks = KieServices.Factory.get();
+                kieContainer = ks.newKieContainer(releaseId);
+                if ( kieContainer == null) {
+                    throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
+                }
+                gavs.put(releaseId, kieContainer);
+            } else {
+                kieContainer = gavs.get(releaseId);
             }
-            kieContainer = gavs.get(releaseId);
         }
         return kieContainer;
     }
