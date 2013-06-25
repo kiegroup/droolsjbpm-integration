@@ -117,7 +117,8 @@
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
     <bundle>wrap:mvn:org.apache.geronimo.specs/geronimo-jacc_1.1_spec/1.0</bundle>
     <bundle>wrap:mvn:org.jboss.seam.transaction/seam-transaction-api/3.1.0.Final</bundle>
-    <bundle>wrap:mvn:org.jboss.weld/weld-core/1.1.8.Final</bundle>
+    <bundle>wrap:mvn:org.jboss.weld/weld-core/${weld.version}</bundle>
+    <bundle>wrap:mvn:org.jboss.solder/solder-api/3.2.0.Final</bundle>
     <bundle>wrap:mvn:org.apache.helix/helix-core/0.6.1-incubating</bundle>
     <bundle>mvn:org.kie.commons/kie-nio2-model/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-cdi/${drools.version}</bundle>
