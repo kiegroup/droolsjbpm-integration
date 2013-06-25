@@ -16,8 +16,10 @@
 
 package org.kie.spring.tests;
 
+import org.drools.example.api.namedkiesession.Message;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
@@ -27,71 +29,59 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.kie.spring.beans.Person;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class KieSpringBasicsTest {
+@Ignore
+public class KieSpringGAVTest {
 
     static ClassPathXmlApplicationContext context = null;
 
     @BeforeClass
     public static void setup() {
-        context = new ClassPathXmlApplicationContext("org/kie/spring/kie-beans.xml");
-    }
-
-    @Test
-    public void testKContainer() throws Exception {
-        KieContainer kieContainer = (KieContainer) context.getBean("defaultContainer");
-        assertNotNull(kieContainer);
-        System.out.println("kieContainer.getReleaseId() == "+kieContainer.getReleaseId());
+        context = new ClassPathXmlApplicationContext("org/kie/spring/gav.xml");
     }
 
     @Test
     public void testKieBase() throws Exception {
-        KieBase kbase = (KieBase) context.getBean("drl_kiesample");
+        KieBase kbase = (KieBase) context.getBean("namedkiesession");
         assertNotNull(kbase);
     }
 
     @Test
     public void testReleaseId() throws Exception {
-        ReleaseId releaseId = (ReleaseId) context.getBean("dummyReleaseId");
+        ReleaseId releaseId = (ReleaseId) context.getBean("rId");
         assertNotNull(releaseId);
     }
 
     @Test
-    public void testStatelessKieSessionRef() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
-        assertNotNull(ksession);
-    }
-
-    @Test
     public void testKieSessionRef() throws Exception {
-        KieSession ksession = (KieSession) context.getBean("statefulSession");
+        KieSession ksession = (KieSession) context.getBean("ksession1");
         assertNotNull(ksession);
     }
-    //
-    @Test
-    public void testKieSession() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession9");
-        assertNotNull(ksession);
-    }
-
-    @Test
-    public void testKieSessionDefaultType() throws Exception {
-        Object obj = context.getBean("ksession99");
-        assertNotNull(obj);
-        assertTrue(obj instanceof KieSession);
-    }
-
 
     @Test
     public void testKSessionExecution() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
-        assertNotNull(ksession);
-        Person person = new Person("HAL", 42);
-        person.setHappy(false);
-        ksession.execute(person);
-        assertTrue(person.isHappy());
+        KieSession kSession = (KieSession) context.getBean("ksession1");
+        assertNotNull(kSession);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+
+        kSession.setGlobal("out", ps);
+        kSession.insert(new Message("Dave", "Hello, HAL. Do you read me, HAL?"));
+        kSession.fireAllRules();
+        ps.close();
+
+        String lineSeparator = System.getProperty("line.separator");
+        String actual = new String(baos.toByteArray());
+        String expected = "" +
+                "Dave: Hello, HAL. Do you read me, HAL?" +lineSeparator+
+                "HAL: Dave. I read you."+lineSeparator;
+        assertEquals(expected, actual);
     }
 
     @AfterClass

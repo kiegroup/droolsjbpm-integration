@@ -82,11 +82,24 @@ public class KieObjectsResolver {
         KieContainer kieContainer = null;
         if (releaseId == null) {
             kieContainer = defaultClasspathKContainer;
+            if (defaultClasspathKContainer == null) {
+                throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
+            }
         } else {
-            kieContainer = gavs.get(releaseId);
+            if (!gavs.containsKey(releaseId)) {
+                KieServices ks = KieServices.Factory.get();
+                kieContainer = ks.newKieContainer(releaseId);
+                if ( kieContainer == null) {
+                    throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
+                }
+                gavs.put(releaseId, kieContainer);
+            } else {
+                kieContainer = gavs.get(releaseId);
+            }
         }
         return kieContainer;
     }
+
 
     public StatelessKieSession newStatelessSession(String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf) {
         KieBase kieBase = resolveKBase(kbaseName, releaseId);

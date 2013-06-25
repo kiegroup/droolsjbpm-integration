@@ -38,14 +38,14 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class KieBlueprintListenerTests {
+public class KieBlueprintListenerTest {
 
     static BlueprintContainerImpl container = null;
 
     @BeforeClass
     public static void setup() throws Exception {
         List<URL> urls = new ArrayList<URL>();
-        urls.add(KieBlueprintListenerTests.class.getResource("/org/kie/aries/blueprint/listeners.xml"));
+        urls.add(KieBlueprintListenerTest.class.getResource("/org/kie/aries/blueprint/listeners.xml"));
         container = new KieBlueprintContainer(ClassLoader.getSystemClassLoader(), urls);
     }
 

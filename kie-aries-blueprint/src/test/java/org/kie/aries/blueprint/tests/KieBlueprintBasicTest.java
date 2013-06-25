@@ -35,14 +35,14 @@ import org.osgi.service.blueprint.container.ComponentDefinitionException;
 
 import static org.junit.Assert.*;
 
-public class KieBlueprintBasicTests {
+public class KieBlueprintBasicTest {
 
     static BlueprintContainerImpl container = null;
 
     @BeforeClass
     public static void setup() throws Exception {
         List<URL> urls = new ArrayList<URL>();
-        urls.add(KieBlueprintBasicTests.class.getResource("/org/kie/aries/blueprint/basics.xml"));
+        urls.add(KieBlueprintBasicTest.class.getResource("/org/kie/aries/blueprint/basics.xml"));
         container = new KieBlueprintContainer(ClassLoader.getSystemClassLoader(), urls);
     }
 

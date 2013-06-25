@@ -89,7 +89,12 @@
       <version>1.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>named-kiesession</artifactId>
+      <version>${drools.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- test persistence -->
     <!--<dependency>
       <groupId>org.hibernate</groupId>
