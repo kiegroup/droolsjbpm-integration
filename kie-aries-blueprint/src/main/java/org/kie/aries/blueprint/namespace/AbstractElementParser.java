@@ -100,7 +100,7 @@ public abstract class AbstractElementParser {
         return m;
     }
 
-    public static RefMetadata createRef(ParserContext context, String value) {
+    public static MutableRefMetadata createRef(ParserContext context, String value) {
         MutableRefMetadata m = context.createMetadata(MutableRefMetadata.class);
         m.setComponentId(value);
         return m;

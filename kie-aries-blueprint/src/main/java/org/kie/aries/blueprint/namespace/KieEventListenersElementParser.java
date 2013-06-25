@@ -15,31 +15,32 @@
  */
 package org.kie.aries.blueprint.namespace;
 
+import java.util.ArrayList;
+
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.*;
-import org.kie.aries.blueprint.factorybeans.KieListenerAdaptor;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.aries.blueprint.factorybeans.KieListenerAdaptor;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-
 public class KieEventListenersElementParser extends AbstractElementParser {
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
         String id = getId(context, element);
-        BeanMetadataImpl componentMetadata = getBeanMetadata(context, element);
+        MutableBeanMetadata componentMetadata = getBeanMetadata(context, element);
         componentMetadata.setId(id);
         return componentMetadata;
     }
 
-    protected static BeanMetadataImpl getBeanMetadata(ParserContext context, Element element) {
+    protected static MutableBeanMetadata getBeanMetadata(ParserContext context, Element element) {
         NodeList nodeList = element.getChildNodes();
-        CollectionMetadataImpl collectionMetadata = context.createMetadata(CollectionMetadataImpl.class);
+        MutableCollectionMetadata collectionMetadata = context.createMetadata(MutableCollectionMetadata.class);
         collectionMetadata.setCollectionClass(ArrayList.class);
         for (int i=0; i < nodeList.getLength(); i++){
             Node node = nodeList.item(i);
@@ -47,7 +48,7 @@ public class KieEventListenersElementParser extends AbstractElementParser {
             if ( localName == null) {
                 continue;
             }
-            BeanMetadataImpl beanMetadata = context.createMetadata(BeanMetadataImpl.class);
+            MutableBeanMetadata beanMetadata = context.createMetadata(MutableBeanMetadata.class);
             beanMetadata.setClassName(KieListenerAdaptor.class.getName());
             beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
 
@@ -61,25 +62,30 @@ public class KieEventListenersElementParser extends AbstractElementParser {
                 type = AgendaEventListener.class.getName();
             }
 
-            BeanArgumentImpl argument = new BeanArgumentImpl();
+            /*BeanArgumentImpl argument = new BeanArgumentImpl();
             argument.setIndex(0);
             argument.setValue(createValue(context, type));
-            beanMetadata.addArgument(argument);
+            beanMetadata.addArgument(argument);*/
+            beanMetadata.addArgument(createValue(context, type), null, 0);
 
-            argument = new BeanArgumentImpl();
+            /*argument = new BeanArgumentImpl();
             argument.setIndex(1);
             argument.setValue(createRef(context, refValue.getTextContent()));
-            beanMetadata.addArgument(argument);
+            beanMetadata.addArgument(argument);*/
+            beanMetadata.addArgument(createValue(context, refValue.getTextContent()), null, 1);
+
 
             collectionMetadata.addValue(beanMetadata);
         }
 
-        BeanMetadataImpl componentMetadata = context.createMetadata(BeanMetadataImpl.class);
+        MutableBeanMetadata componentMetadata = context.createMetadata(MutableBeanMetadata.class);
         componentMetadata.setClassName("java.util.ArrayList");
-        BeanArgumentImpl argument = new BeanArgumentImpl();
+        /*BeanArgumentImpl argument = new BeanArgumentImpl();
         argument.setIndex(0);
         argument.setValue(collectionMetadata);
-        componentMetadata.addArgument(argument);
+        componentMetadata.addArgument(argument); */
+        componentMetadata.addArgument(collectionMetadata, null, 0);
+
         return componentMetadata;
     }
 }

@@ -16,8 +16,7 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.BeanArgumentImpl;
-import org.apache.aries.blueprint.reflect.BeanMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.drools.core.util.StringUtils;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -32,24 +31,27 @@ public class KieBaseElementParser extends AbstractElementParser {
 
         String releaseIdRef = element.getAttribute("releaseId");
 
-        BeanMetadataImpl beanMetadata = (BeanMetadataImpl) context.createMetadata(BeanMetadata.class);
+        MutableBeanMetadata beanMetadata = (MutableBeanMetadata) context.createMetadata(BeanMetadata.class);
         beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
         beanMetadata.setFactoryMethod("fetchKBase");
         beanMetadata.setId(id);
 
-        BeanArgumentImpl argument = new BeanArgumentImpl();
+        /* BeanArgumentImpl argument = new BeanArgumentImpl();
         argument.setIndex(0);
         argument.setValue(createValue(context, id));
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument); */
+        beanMetadata.addArgument(createValue(context, id),null,0);
 
-        argument = new BeanArgumentImpl();
-        argument.setIndex(1);
+        // argument = new BeanArgumentImpl();
+        // argument.setIndex(1);
         if (!StringUtils.isEmpty(releaseIdRef)) {
-            argument.setValue(createRef(context, releaseIdRef));
+            // argument.setValue(createRef(context, releaseIdRef));
+            beanMetadata.addArgument(createValue(context, releaseIdRef),null,1);
         } else {
-            argument.setValue(createNullMetadata());
+            // argument.setValue(createNullMetadata());
+            beanMetadata.addArgument(createNullMetadata(),null,1);
         }
-        beanMetadata.addArgument(argument);
+        // beanMetadata.addArgument(argument);
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
         return beanMetadata;

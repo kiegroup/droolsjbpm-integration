@@ -15,26 +15,21 @@
  */
 package org.kie.aries.blueprint.namespace;
 
+import java.util.ArrayList;
+
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.BeanArgumentImpl;
-import org.apache.aries.blueprint.reflect.BeanMetadataImpl;
-import org.apache.aries.blueprint.reflect.CollectionMetadataImpl;
-import org.apache.aries.blueprint.reflect.RefMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.util.StringUtils;
-import org.kie.aries.blueprint.factorybeans.KieLoggerAdaptor;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
-import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class KieSessionBatchElementParser {
 
@@ -44,9 +39,9 @@ class KieSessionBatchElementParser {
     public static final String LOGGER_ATTRIBUTE_LOGGER_TYPE = "loggerType";
     public static final String LOGGER_ATTRIBUTE_INTERVAL = "interval";
 
-    public static CollectionMetadata parseBatchElement(KieSessionElementParser kieSessionElementParser, ParserContext context, Element element){
+    public static MutableCollectionMetadata parseBatchElement(KieSessionElementParser kieSessionElementParser, ParserContext context, Element element){
 
-        CollectionMetadataImpl collectionMetadata = context.createMetadata(CollectionMetadataImpl.class);
+        MutableCollectionMetadata collectionMetadata = context.createMetadata(MutableCollectionMetadata.class);
         collectionMetadata.setCollectionClass(ArrayList.class);
         String prefix = element.getPrefix();
         NodeList batchNodeList = element.getElementsByTagName(prefix+":batch");
@@ -58,17 +53,20 @@ class KieSessionBatchElementParser {
                 Node n = batchNode.getChildNodes().item(i);
                 if (n instanceof Element) {
                     Element e = (Element) n;
-                    BeanMetadataImpl componentMetadata = context.createMetadata(BeanMetadataImpl.class);
+                    MutableBeanMetadata componentMetadata = context.createMetadata(MutableBeanMetadata.class);
                     if ("insert-object".equals(e.getLocalName())) {
                         String ref = e.getAttribute("ref");
                         if (StringUtils.isEmpty(ref)){
                             throw new ComponentDefinitionException("'ref' attribute is missing for insert-object for bean definition ("+ kieSessionElementParser.getId(context, element)+")");
                         }
                         componentMetadata.setClassName(InsertObjectCommand.class.getName());
+                        /*
                         BeanArgumentImpl argument = new BeanArgumentImpl();
                         argument.setIndex(0);
                         argument.setValue(kieSessionElementParser.createRef(context, ref));
                         componentMetadata.addArgument(argument);
+                        */
+                        componentMetadata.addArgument(kieSessionElementParser.createRef(context, ref), null, 0);
                     } else if ("set-global".equals(e.getLocalName())) {
                         String ref = e.getAttribute("ref");
                         if (StringUtils.isEmpty(ref)){
@@ -79,15 +77,20 @@ class KieSessionBatchElementParser {
                             throw new ComponentDefinitionException("'identifier' attribute is missing for set-global for bean definition ("+ kieSessionElementParser.getId(context, element)+")");
                         }
                         componentMetadata.setClassName(SetGlobalCommand.class.getName());
+                        /*
                         BeanArgumentImpl argument = new BeanArgumentImpl();
                         argument.setIndex(0);
                         argument.setValue(kieSessionElementParser.createValue(context, identifier));
                         componentMetadata.addArgument(argument);
+                        */
+                        componentMetadata.addArgument(kieSessionElementParser.createValue(context, identifier), null, 0);
 
-                        argument = new BeanArgumentImpl();
-                        argument.setIndex(1);
-                        argument.setValue(kieSessionElementParser.createRef(context, ref));
-                        componentMetadata.addArgument(argument);
+                        //argument = new BeanArgumentImpl();
+                        //argument.setIndex(1);
+                        //argument.setValue(kieSessionElementParser.createRef(context, ref));
+                        //componentMetadata.addArgument(argument);
+                        componentMetadata.addArgument(kieSessionElementParser.createRef(context, ref), null, 1);
+
 
                     } else if ("fire-until-halt".equals(e.getLocalName())) {
                         componentMetadata.setClassName(FireUntilHaltCommand.class.getName());
@@ -96,10 +99,11 @@ class KieSessionBatchElementParser {
                         String max = e.getAttribute("max");
                         if (!StringUtils.isEmpty(max)) {
                             try {
-                                BeanArgumentImpl argument = new BeanArgumentImpl();
-                                argument.setIndex(0);
-                                argument.setValue(kieSessionElementParser.createValue(context, Integer.parseInt(max)));
-                                componentMetadata.addArgument(argument);
+                                // BeanArgumentImpl argument = new BeanArgumentImpl();
+                                // argument.setIndex(0);
+                                // argument.setValue(kieSessionElementParser.createValue(context, Integer.parseInt(max)));
+                                // componentMetadata.addArgument(argument);
+                                componentMetadata.addArgument(kieSessionElementParser.createValue(context, Integer.parseInt(max)), null, 0);
                             }catch (NumberFormatException e1){
                                 //xsd will prevent this from happening.
                             }
@@ -122,16 +126,17 @@ class KieSessionBatchElementParser {
                     } else if ("signal-event".equals(e.getLocalName())) {
                         componentMetadata.setClassName(SignalEventCommand.class.getName());
                         String processInstanceId = e.getAttribute("process-instance-id");
-                        BeanArgumentImpl argument = null;
+                        //BeanArgumentImpl argument = null;
                         int index = 0;
                         if (!StringUtils.isEmpty(processInstanceId)) {
-                            argument = new BeanArgumentImpl();
+                            //argument = new BeanArgumentImpl();
                             try{
-                                argument.setValue(kieSessionElementParser.createValue(context, Integer.parseInt(processInstanceId)));
-                            }catch (NumberFormatException e1){
+                                // argument.setValue(kieSessionElementParser.createValue(context, Integer.parseInt(processInstanceId)));
+                                componentMetadata.addArgument(kieSessionElementParser.createValue(context, Integer.parseInt(processInstanceId)), null, 0);
+                            } catch (NumberFormatException e1){
                                 //xsd will prevent this from happening.
                             }
-                            componentMetadata.addArgument(argument);
+                            // componentMetadata.addArgument(argument);
                             index++;
                         }
                         String ref = e.getAttribute("ref");
@@ -142,15 +147,17 @@ class KieSessionBatchElementParser {
                         if (StringUtils.isEmpty(eventType)){
                             throw new ComponentDefinitionException("'event-type' attribute is missing for signal-event for bean definition ("+ kieSessionElementParser.getId(context, element)+")");
                         }
-                        argument = new BeanArgumentImpl();
-                        argument.setIndex(index++);
-                        argument.setValue(kieSessionElementParser.createRef(context, ref));
-                        componentMetadata.addArgument(argument);
 
-                        argument = new BeanArgumentImpl();
+                        /*argument = new BeanArgumentImpl();
+                        argument.setIndex(index++);
+                        argument.setValue(kieSessionElementParser.createRef(context, ref)); */
+                        componentMetadata.addArgument(kieSessionElementParser.createValue(context, ref), null, index++);
+
+                        /*argument = new BeanArgumentImpl();
                         argument.setIndex(index++);
                         argument.setValue(kieSessionElementParser.createValue(context, eventType));
-                        componentMetadata.addArgument(argument);
+                        componentMetadata.addArgument(argument);*/
+                        componentMetadata.addArgument(kieSessionElementParser.createValue(context, eventType), null, index++);
                     } else {
                         throw new ComponentDefinitionException("Unknown child element found in batch element.");
                     }

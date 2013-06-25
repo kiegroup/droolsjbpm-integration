@@ -16,12 +16,7 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.BeanMetadataImpl;
-import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
-import org.drools.core.util.StringUtils;
-import org.kie.api.KieServices;
-import org.kie.api.runtime.KieContainer;
-import org.osgi.service.blueprint.container.ComponentDefinitionException;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
@@ -32,7 +27,7 @@ public class KieStoreElementParser extends AbstractElementParser {
     public ComponentMetadata parseElement(ParserContext context, Element element) {
         String id = getId(context, element);
 
-        BeanMetadataImpl beanMetadata = (BeanMetadataImpl) context.createMetadata(BeanMetadata.class);
+        MutableBeanMetadata beanMetadata = (MutableBeanMetadata) context.createMetadata(BeanMetadata.class);
         beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
         beanMetadata.setFactoryMethod("createKieStore");
         beanMetadata.setId(id);

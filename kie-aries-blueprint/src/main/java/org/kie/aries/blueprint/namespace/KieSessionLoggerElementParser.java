@@ -15,22 +15,18 @@
  */
 package org.kie.aries.blueprint.namespace;
 
+import java.util.ArrayList;
+
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.BeanArgumentImpl;
-import org.apache.aries.blueprint.reflect.BeanMetadataImpl;
-import org.apache.aries.blueprint.reflect.CollectionMetadataImpl;
-import org.apache.aries.blueprint.reflect.RefMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
+import org.apache.aries.blueprint.mutable.MutableRefMetadata;
 import org.drools.core.util.StringUtils;
 import org.kie.aries.blueprint.factorybeans.KieLoggerAdaptor;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
-import org.osgi.service.blueprint.reflect.BeanMetadata;
-import org.osgi.service.blueprint.reflect.CollectionMetadata;
-import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.ArrayList;
 
 class KieSessionLoggerElementParser {
 
@@ -40,22 +36,22 @@ class KieSessionLoggerElementParser {
     public static final String LOGGER_ATTRIBUTE_LOGGER_TYPE = "loggerType";
     public static final String LOGGER_ATTRIBUTE_INTERVAL = "interval";
 
-    public static CollectionMetadata parseConsoleLoggers(KieSessionElementParser kieLoggerElementParser, ParserContext context, Element element){
+    public static MutableCollectionMetadata parseConsoleLoggers(KieSessionElementParser kieLoggerElementParser, ParserContext context, Element element){
 
-        CollectionMetadataImpl collectionMetadata = context.createMetadata(CollectionMetadataImpl.class);
+        MutableCollectionMetadata collectionMetadata = context.createMetadata(MutableCollectionMetadata.class);
         collectionMetadata.setCollectionClass(ArrayList.class);
         String prefix = element.getPrefix();
         NodeList consoleLoggerList = element.getElementsByTagName(prefix+":consoleLogger");
         if ( consoleLoggerList != null && consoleLoggerList.getLength() > 0){
             for (int i=0; i < consoleLoggerList.getLength(); i++){
                 Node loggerNode = consoleLoggerList.item(i);
-                BeanMetadataImpl componentMetadata = context.createMetadata(BeanMetadataImpl.class);
+                MutableBeanMetadata componentMetadata = context.createMetadata(MutableBeanMetadata.class);
                 componentMetadata.setId(kieLoggerElementParser.getId(context, loggerNode));
                 kieLoggerElementParser.generateIdIfNeeded(context, componentMetadata);
                 componentMetadata.setClassName(KieLoggerAdaptor.class.getName());
                 context.getComponentDefinitionRegistry().registerComponentDefinition(componentMetadata);
 
-                RefMetadataImpl refMetadata = context.createMetadata(RefMetadataImpl.class);
+                MutableRefMetadata refMetadata = context.createMetadata(MutableRefMetadata.class);
                 refMetadata.setComponentId(componentMetadata.getId());
                 collectionMetadata.addValue(refMetadata);
             }
@@ -65,7 +61,7 @@ class KieSessionLoggerElementParser {
         if ( fileLoggerList != null && fileLoggerList.getLength() > 0){
             for (int i=0; i < fileLoggerList.getLength(); i++){
                 Node loggerNode = fileLoggerList.item(i);
-                BeanMetadataImpl componentMetadata = context.createMetadata(BeanMetadataImpl.class);
+                MutableBeanMetadata componentMetadata = context.createMetadata(MutableBeanMetadata.class);
                 String id = kieLoggerElementParser.getId(context, loggerNode);
                 if ( id != null) {
                     componentMetadata.setId(id);
@@ -102,7 +98,7 @@ class KieSessionLoggerElementParser {
                     componentMetadata.addProperty("loggerType", kieLoggerElementParser.createValue(context, KieLoggerAdaptor.KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_FILE.toString()));
                 }
 
-                RefMetadataImpl refMetadata = context.createMetadata(RefMetadataImpl.class);
+                MutableRefMetadata refMetadata = context.createMetadata(MutableRefMetadata.class);
                 refMetadata.setComponentId(componentMetadata.getId());
                 collectionMetadata.addValue(refMetadata);
             }

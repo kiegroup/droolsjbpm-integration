@@ -15,23 +15,30 @@
  */
 package org.kie.aries.blueprint;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.aries.blueprint.ParserContext;
-import org.kie.aries.blueprint.namespace.*;
+import org.kie.aries.blueprint.namespace.AbstractElementParser;
+import org.kie.aries.blueprint.namespace.KieBaseElementParser;
+import org.kie.aries.blueprint.namespace.KieContainerElementParser;
+import org.kie.aries.blueprint.namespace.KieEnvironmentElementParser;
+import org.kie.aries.blueprint.namespace.KieEventListenersElementParser;
+import org.kie.aries.blueprint.namespace.KieSessionElementParser;
+import org.kie.aries.blueprint.namespace.KieStoreElementParser;
+import org.kie.aries.blueprint.namespace.ReleaseIdElementParser;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 public class KieNamespaceHandler implements org.apache.aries.blueprint.NamespaceHandler {
 
     /** The Drools Aries Blueprint namespace */
-    public static final String NS_URI = "http://drools.org/schema/drools-aries-blueprint";
+    public static final String NS_URI = "http://drools.org/schema/kie-aries-blueprint/1.0.0";
     /** The standard blueprint namespace */
     private static final String BLUEPRINT_NS = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
 
@@ -60,7 +67,7 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
     @Override
     public URL getSchemaLocation(String namespace) {
         if(NS_URI.equals(namespace)) {
-            return getClass().getResource("org/kie/aries/blueprint/kie-aries-blueprint.xsd");
+            return getClass().getResource("kie-aries-blueprint.xsd");
         } else {
             return null;
         }
@@ -68,7 +75,7 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
 
     @Override
     public Set<Class> getManagedClasses() {
-        System.out.println("getManagedClasses ::");
+        //System.out.println("getManagedClasses ::");
         return null;
     }
 
@@ -84,7 +91,7 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
 
     @Override
     public ComponentMetadata decorate(Node node, ComponentMetadata componentMetadata, ParserContext parserContext) {
-        System.out.println("decorate ::"+node.getNodeName());
+        //System.out.println("decorate :: "+ node.getNodeName());
         return null;
     }
 }

@@ -15,26 +15,25 @@
  */
 package org.kie.aries.blueprint.namespace;
 
+import java.util.ArrayList;
+
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.*;
-import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
+import org.apache.aries.blueprint.mutable.MutableRefMetadata;
+import org.apache.aries.blueprint.reflect.MapMetadataImpl;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.core.util.StringUtils;
-import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
-import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
 import org.kie.aries.blueprint.helpers.JPAPlaceholderResolverStrategyHelper;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.RefMetadata;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.ArrayList;
 
 public class KieEnvironmentElementParser extends AbstractElementParser {
 
@@ -91,7 +90,7 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_DATE_FORMATS, EnvironmentName.DATE_FORMATS, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_CALENDARS, EnvironmentName.CALENDARS, ATTRIBUTE_REF);
 
-        CollectionMetadataImpl strategiesCollectionMetadata = context.createMetadata(CollectionMetadataImpl.class);
+        MutableCollectionMetadata strategiesCollectionMetadata = context.createMetadata(MutableCollectionMetadata.class);
         strategiesCollectionMetadata.setCollectionClass(ArrayList.class);
         NodeList nodeList = element.getElementsByTagName(element.getPrefix()+":"+ELEMENT_OBJECT_MARSHALLING_STRATEGIES);
         if (nodeList != null && nodeList.getLength() > 0){
@@ -107,60 +106,68 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
 
                         if (ELEMENT_SERIALIZABLE_PLACEHOLDER_RESOLVER_STRATEGY.equalsIgnoreCase(localName)) {
                             String ref = child.getAttribute(ATTRIBUTE_STRATEGY_ACCEPTOR_REF);
-                            BeanMetadataImpl beanMetadata = context.createMetadata(BeanMetadataImpl.class);
+                            MutableBeanMetadata beanMetadata = context.createMetadata(MutableBeanMetadata.class);
                             beanMetadata.setClassName(SerializablePlaceholderResolverStrategy.class.getName());
-                            beanMetadata.setActivation(BeanMetadataImpl.ACTIVATION_LAZY);
+                            beanMetadata.setActivation(MutableBeanMetadata.ACTIVATION_LAZY);
 
-                            BeanArgumentImpl argument = new BeanArgumentImpl();
-                            argument.setIndex(0);
+                            // BeanArgumentImpl argument = new BeanArgumentImpl();
+                            // argument.setIndex(0);
                             if (!StringUtils.isEmpty(ref)) {
-                                argument.setValue(createRef(context, ref));
+                                //argument.setValue(createRef(context, ref));
+                                beanMetadata.addArgument(createValue(context, ref), null, 0);
+
                             } else {
-                                BeanMetadataImpl defaultStrategyAcceptor = new BeanMetadataImpl();
+                                MutableBeanMetadata defaultStrategyAcceptor = context.createMetadata(MutableBeanMetadata.class);
                                 defaultStrategyAcceptor.setClassName(KieObjectsFactoryBean.class.getName());
                                 defaultStrategyAcceptor.setFactoryMethod("createDefaultAcceptor");
-                                argument.setValue(defaultStrategyAcceptor);
+                                beanMetadata.addArgument(defaultStrategyAcceptor, null, 0);
+
+                                //argument.setValue(defaultStrategyAcceptor);
                             }
-                            beanMetadata.addArgument(argument);
+                            //beanMetadata.addArgument(argument);
                             strategiesCollectionMetadata.addValue(beanMetadata);
                         } else if (ELEMENT_IDENTITY_PLACEHOLDER_RESOLVER_STRATEGY.equalsIgnoreCase(localName)) {
                             String ref = child.getAttribute(ATTRIBUTE_STRATEGY_ACCEPTOR_REF);
-                            BeanMetadataImpl beanMetadata = context.createMetadata(BeanMetadataImpl.class);
+                            MutableBeanMetadata beanMetadata = context.createMetadata(MutableBeanMetadata.class);
                             beanMetadata.setClassName(IdentityPlaceholderResolverStrategy.class.getName());
-                            beanMetadata.setActivation(BeanMetadataImpl.ACTIVATION_LAZY);
+                            beanMetadata.setActivation(MutableBeanMetadata.ACTIVATION_LAZY);
 
-                            BeanArgumentImpl argument = new BeanArgumentImpl();
-                            argument.setIndex(0);
+                            //BeanArgumentImpl argument = new BeanArgumentImpl();
+                            //argument.setIndex(0);
                             if (!StringUtils.isEmpty(ref)) {
-                                argument.setValue(createRef(context, ref));
+                                //argument.setValue(createRef(context, ref));
+                                beanMetadata.addArgument(createValue(context, ref), null, 0);
+
                             } else {
-                                BeanMetadataImpl defaultStrategyAcceptor = new BeanMetadataImpl();
+                                MutableBeanMetadata defaultStrategyAcceptor = context.createMetadata(MutableBeanMetadata.class);
                                 defaultStrategyAcceptor.setClassName(KieObjectsFactoryBean.class.getName());
                                 defaultStrategyAcceptor.setFactoryMethod("createDefaultAcceptor");
-                                argument.setValue(defaultStrategyAcceptor);
+                                // argument.setValue(defaultStrategyAcceptor);
+                                beanMetadata.addArgument(defaultStrategyAcceptor, null, 0);
                             }
-                            beanMetadata.addArgument(argument);
+                            //beanMetadata.addArgument(argument);
                             strategiesCollectionMetadata.addValue(beanMetadata);
                         } else if (ELEMENT_PROCESS_INSTANCE_RESOLVER_STRATEGY.equalsIgnoreCase(localName)) {
-                            BeanMetadataImpl beanMetadata = context.createMetadata(BeanMetadataImpl.class);
+                            MutableBeanMetadata beanMetadata = context.createMetadata(MutableBeanMetadata.class);
                             beanMetadata.setClassName(ProcessInstanceResolverStrategy.class.getName());
-                            beanMetadata.setActivation(BeanMetadataImpl.ACTIVATION_LAZY);
+                            beanMetadata.setActivation(MutableBeanMetadata.ACTIVATION_LAZY);
                             strategiesCollectionMetadata.addValue(beanMetadata);
                         } else if (ELEMENT_JPA_PLACEHOLDER_RESOLVER_STRATEGY.equalsIgnoreCase(localName)) {
-                            BeanMetadataImpl beanMetadata = context.createMetadata(BeanMetadataImpl.class);
+                            MutableBeanMetadata beanMetadata = context.createMetadata(MutableBeanMetadata.class);
                             /*
                             JPAPlaceholderResolverStrategyHelper is required to be used because the original
                             JPAPlaceholderResolverStrategy takes a reference to a environment, and if it refers to the same environemnt
                             it causes a circular dependency.
                              */
                             beanMetadata.setClassName(JPAPlaceholderResolverStrategyHelper.class.getName());
-                            beanMetadata.setActivation(BeanMetadataImpl.ACTIVATION_LAZY);
+                            beanMetadata.setActivation(MutableBeanMetadata.ACTIVATION_LAZY);
                             String ref = child.getAttribute(ATTRIBUTE_REF);
                             if (!StringUtils.isEmpty(ref)) {
-                                BeanArgumentImpl argument = new BeanArgumentImpl();
+                                /*BeanArgumentImpl argument = new BeanArgumentImpl();
                                 argument.setIndex(0);
                                 argument.setValue(createRef(context, id));
-                                beanMetadata.addArgument(argument);
+                                beanMetadata.addArgument(argument);*/
+                                beanMetadata.addArgument(createValue(context, id), null, 0);
                             }
                             strategiesCollectionMetadata.addValue(beanMetadata);
                         } else if (ELEMENT_CUSTOM_MARSHALLING_STRATEGY.equalsIgnoreCase(localName)) {
@@ -175,25 +182,28 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
                 }
             }
         }
-        BeanMetadataImpl beanMetadata = context.createMetadata(BeanMetadataImpl.class);
+        MutableBeanMetadata beanMetadata = context.createMetadata(MutableBeanMetadata.class);
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
         beanMetadata.setId(id);
         beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
 
-        BeanArgumentImpl argument = new BeanArgumentImpl();
+        /*BeanArgumentImpl argument = new BeanArgumentImpl();
         argument.setIndex(0);
         argument.setValue(createValue(context, id));
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument);*/
+        beanMetadata.addArgument(createValue(context, id), null, 0);
 
-        argument = new BeanArgumentImpl();
+        /*argument = new BeanArgumentImpl();
         argument.setIndex(1);
         argument.setValue(envParamMetadata);
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument); */
+        beanMetadata.addArgument(envParamMetadata, null, 1);
 
-        argument = new BeanArgumentImpl();
+        /*argument = new BeanArgumentImpl();
         argument.setIndex(2);
         argument.setValue(strategiesCollectionMetadata);
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument);*/
+        beanMetadata.addArgument(strategiesCollectionMetadata, null, 2);
 
         beanMetadata.setFactoryMethod("createEnvironment");
         return beanMetadata;
@@ -210,8 +220,10 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
                 String ref = childElement.getAttribute(refAttribute);
                 if (!StringUtils.isEmpty(ref)){
                    // envParamMetadata.
-                    RefMetadata refData = createRef(context, ref);
-                    //((RefMetadataImpl)refData).setComponentId(propName);
+                    MutableRefMetadata refData = context.createMetadata(MutableRefMetadata.class);
+                    refData.setComponentId(ref);
+                    // createRef(context, ref);
+                    // ((RefMetadataImpl)refData).setComponentId(propName);
                     envParamMetadata.addEntry(createValue(context, propName), refData);
                 }
             }

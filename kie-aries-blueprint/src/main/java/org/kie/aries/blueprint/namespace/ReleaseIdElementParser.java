@@ -16,8 +16,7 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.aries.blueprint.reflect.BeanArgumentImpl;
-import org.apache.aries.blueprint.reflect.BeanMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.drools.core.util.StringUtils;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
@@ -25,7 +24,6 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
 
 public class ReleaseIdElementParser extends AbstractElementParser {
-
 
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
@@ -44,30 +42,34 @@ public class ReleaseIdElementParser extends AbstractElementParser {
             throw new ComponentDefinitionException("version attribute is missing for releaseId ("+id+")");
         }
 
-        BeanMetadataImpl beanMetadata = (BeanMetadataImpl) context.createMetadata(BeanMetadata.class);
+        MutableBeanMetadata beanMetadata = (MutableBeanMetadata) context.createMetadata(BeanMetadata.class);
         beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
         beanMetadata.setFactoryMethod("createReleaseId");
         beanMetadata.setId(id);
 
-        BeanArgumentImpl argument = new BeanArgumentImpl();
+        /*BeanArgumentImpl argument = new BeanArgumentImpl();
         argument.setIndex(0);
         argument.setValue(createValue(context, id));
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument);*/
+        beanMetadata.addArgument(createValue(context, id), null, 0);
 
-        argument = new BeanArgumentImpl();
+        /*argument = new BeanArgumentImpl();
         argument.setIndex(1);
         argument.setValue(createValue(context, groupId));
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument);*/
+        beanMetadata.addArgument(createValue(context, groupId), null, 1);
 
-        argument = new BeanArgumentImpl();
+        /*argument = new BeanArgumentImpl();
         argument.setIndex(2);
         argument.setValue(createValue(context, artifactId));
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument); */
+        beanMetadata.addArgument(createValue(context, artifactId), null, 2);
 
-        argument = new BeanArgumentImpl();
+        /*argument = new BeanArgumentImpl();
         argument.setIndex(3);
         argument.setValue(createValue(context, version));
-        beanMetadata.addArgument(argument);
+        beanMetadata.addArgument(argument);*/
+        beanMetadata.addArgument(createValue(context, version), null, 3);
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
         return beanMetadata;
