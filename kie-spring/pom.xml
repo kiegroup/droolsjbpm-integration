@@ -170,6 +170,14 @@
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>named-kiesession</artifactId>
+      <version>${drools.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

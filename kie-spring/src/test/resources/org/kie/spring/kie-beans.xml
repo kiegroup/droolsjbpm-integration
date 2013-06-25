@@ -13,6 +13,8 @@
 
   <kie:ksession id="ksession9" type="stateless" kbase-ref="drl_kiesample"/>
 
+  <kie:ksession id="statefulSession" type="stateful" kbase-ref="drl_kiesample2"/>
+
   <kie:ksession-ref id="ksession1">
 
     <kie:workingMemoryEventListener>

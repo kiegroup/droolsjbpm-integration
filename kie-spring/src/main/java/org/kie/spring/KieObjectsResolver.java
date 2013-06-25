@@ -18,11 +18,15 @@ package org.kie.spring;
 
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieProject;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieModule;
+import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
 
@@ -63,7 +67,6 @@ public class KieObjectsResolver {
     public Object resolveKSession(String id, ReleaseId releaseId) {
         KieContainer kieContainer = resolveKContainer(releaseId);
 
-        // KieBase kbase = resolveKBase(kbaseName, releaseId);
         KieProject kProject = ((KieContainerImpl) kieContainer).getKieProject();
         KieSessionModel kieSessionModel = kProject.getKieSessionModel(id);
         if (kieSessionModel.getType() == KieSessionModel.KieSessionType.STATEFUL) {
@@ -74,13 +77,24 @@ public class KieObjectsResolver {
         return null;
     }
 
-
     private KieContainer resolveKContainer(ReleaseId releaseId) {
         KieContainer kieContainer = null;
         if (releaseId == null) {
             kieContainer = defaultClasspathKContainer;
+            if (defaultClasspathKContainer == null) {
+                throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
+            }
         } else {
-            kieContainer = gavs.get(releaseId);
+            if (!gavs.containsKey(releaseId)) {
+                KieServices ks = KieServices.Factory.get();
+                kieContainer = ks.newKieContainer(releaseId);
+                if ( kieContainer == null) {
+                    throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
+                }
+                gavs.put(releaseId, kieContainer);
+            } else {
+                kieContainer = gavs.get(releaseId);
+            }
         }
         return kieContainer;
     }
