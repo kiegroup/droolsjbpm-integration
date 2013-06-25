@@ -2,35 +2,30 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:kie="http://drools.org/schema/kie-aries-blueprint/1.0.0"
-           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+           xsi:schemaLocation="
+           http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
            http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
 
   <!-- Beans used by camel in the example -->
   <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
   <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
 
-  <!-- Drools Camel Component -->
-  <bean id="drools" class="org.kie.camel.component.KieComponent"/>
+  <bean id="aList" class="java.util.ArrayList"/>
 
-  <!-- Kie Knowledge base & Session
-  <kie:releaseId id="drools-camel-example" groupId="org.drools" artifactId="drools-camel-example" version="6.0.0-SNAPSHOT"/>
-    <kie:kbase-ref id="drl_sample" releaseId="drools-camel-example"/>
-  -->
-  <kie:releaseId id="dummyReleaseId" groupId="dummyGroup" artifactId="dummyArtifact" version="dummyVersion" xmlns="http://drools.org/schema/kie-aries-blueprint/1.0.0"/>
-
-  <kie:kcontainer-ref id="defaultContainer"/>
-
-  <kie:kbase-ref id="drl_ample" releaseId="dummyReleaseId"/>
+  <kie:ksession-ref id="ksession1">
+    <kie:batch>
+      <kie:set-global identifier="list" ref="aList"/>
+    </kie:batch>
+  </kie:ksession-ref>
 
   <!-- Camel Route -->
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
 
     <route trace="false" id="testRoute">
-      <description>Example route that will regularly create a Person with a random age and verify their age
-      </description>
+      <description>Example route that will regularly create a Person with a random age and verify their age</description>
       <from uri="timer:testRoute?period=10s"/>
       <bean method="createTestPerson" ref="personHelper"/>
-      <to uri="drools:ksession1?action=insertBody" id="AgeVerification">
+      <to uri="kie:ksession1?action=insertBody" id="AgeVerification">
         <description>valid 'action' values are:
           'execute' that takes a 'Command' object (default)
           'insertBody' that inserts the Exchange.in.body, and executes rules
@@ -54,7 +49,7 @@
         for execution
       </description>
       <from uri="direct://ruleOnBody"/>
-      <to uri="drools:ksession1?action=insertBody">
+      <to uri="kie:ksession1?action=insertBody">
         <description>valid 'action' values are:
           'execute' that takes a 'Command' object (default)
           'insertBody' that inserts the Exchange.in.body, and executes rules
@@ -71,7 +66,7 @@
       </description>
       <from uri="direct://ruleOnCommand"/>
       <bean method="insertAndFireAll" ref="droolsHelper"/>
-      <to uri="drools:ksession1?action=execute">
+      <to uri="kie:ksession1?action=execute">
         <description>valid 'action' values are:
           'execute' that takes a 'Command' object (default)
           'insertBody' that inserts the Exchange.in.body, and executes rules

@@ -108,16 +108,20 @@
           <instructions>
             <Import-Package>
               !org.drools.camel.example,
-              org.apache.camel;version="[2.8,3)",
+              org.apache.camel;version="[2.10,3)",
+              org.apache.camel.spi;version="[2.10,3)",
+              org.apache.camel.model;version="[2.10,3)",
               org.drools.core;version="[6.0,7)",
               org.drools.core.command.runtime;version="[6.0,7)",
               org.drools.core.command.runtime.rule;version="[6.0,7)",
               org.drools.core.conflict;version="[6.0,7)",
               org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
               org.osgi.service.blueprint,
-              org.kie.api,
-              org.kie.internal,
-              org.kie.camel.component;version="[6.0,7)",
+              org.kie.api;version="[6.0,7)",
+              org.kie.internal;version="[6.0,7)",
+              org.kie.aries.blueprint;version="[6.0,7)",
+              org.kie.aries.blueprint.factorybeans;version="[6.0,7)",
+              org.kie.camel.component;version="[6.0,7)"
             </Import-Package>
             <Dynamic-ImportPackage>
               org.drools.core,
