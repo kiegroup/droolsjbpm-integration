@@ -64,13 +64,9 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
         template.sendBody( "direct:test-no-ep", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
-        
+
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) oie.getValue().getObject(), is( person ) );
-        
-        verify( ael ).matchCreated( ace.capture() );
-        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule1") );
     }
 
     @Test
@@ -81,13 +77,9 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
         template.sendBody( "direct:test-with-ep", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
-        
+
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) oie.getValue().getObject(), is( person ) );
-        
-        verify( ael ).matchCreated( ace.capture() );
-        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule2") );
     }
 
     @Test
@@ -98,13 +90,9 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
         template.sendBody( "direct:test-message", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
-        
+
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) ((Message) oie.getValue().getObject()).getBody(), is( person ) );
-        
-        verify( ael ).matchCreated( ace.capture() );
-        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule3") );
     }
 
     @Test
@@ -115,13 +103,9 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
         template.sendBody( "direct:test-exchange", person );
         
         ArgumentCaptor<ObjectInsertedEvent> oie = ArgumentCaptor.forClass( ObjectInsertedEvent.class );
-        ArgumentCaptor<MatchCreatedEvent> ace = ArgumentCaptor.forClass( MatchCreatedEvent.class );
-        
+
         verify( wmel ).objectInserted( oie.capture() );
         assertThat( (Person) ((Exchange) oie.getValue().getObject()).getIn().getBody(), is( person ) );
-        
-        verify( ael ).matchCreated( ace.capture() );
-        assertThat( ace.getValue().getMatch().getRule().getName(), is("rule4") );
     }
 
     @Override
