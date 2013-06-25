@@ -20,10 +20,24 @@ public class EvaluationProcessExample {
 
     private StatefulKnowledgeSession ksession;
 
+    public static void main(String[] args) throws Exception {
+        EvaluationProcessExample pr = new EvaluationProcessExample();
+        pr.init();
+        pr.destroy();
+    }
+
     public void init() throws Exception {
         logger.info("Loading EvaluationProcess.bpmn2");
-        KnowledgeBase kbase = createKnowledgeBase();
+
+        /*KnowledgeBase kbase = createKnowledgeBase();
         ksession = createKnowledgeSession(kbase);
+
+        RuntimeManager manager = getRuntimeManager("bpmn/EvaluationProcess.bpmn2");
+        RuntimeEngine runtime = manager.getRuntimeEngine(EmptyContext.get());
+        ksession = runtime.getKieSession();*/
+
+        KnowledgeBase kbase = readKnowledgeBase();
+        ksession = kbase.newStatefulKnowledgeSession();
 
         logger.info("Register tasks");
         ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new SystemOutWorkItemHandler());
@@ -40,16 +54,30 @@ public class EvaluationProcessExample {
         this.ksession.destroy();
     }
 
+    private static KnowledgeBase readKnowledgeBase() throws Exception {
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        kbuilder.add(ResourceFactory.newClassPathResource("bpmn/EvaluationProcess.bpmn2"), ResourceType.BPMN2);
+        return kbuilder.newKnowledgeBase();
+    }
+
+    /*
     private KnowledgeBase createKnowledgeBase() {
         logger.info("Loading process " + "EvaluationProcess.bpmn2");
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add(ResourceFactory.newClassPathResource("bpmn/" + "EvaluationProcess.bpmn2"), ResourceType.BPMN2);
         return kbuilder.newKnowledgeBase();
     }
 
-    private StatefulKnowledgeSession createKnowledgeSession(KnowledgeBase kbase) {
+    private static RuntimeManager getRuntimeManager(String process) {
+        RuntimeEnvironment environment = RuntimeEnvironmentBuilder.getDefault()
+                .addAsset(ResourceFactory.newClassPathResource(process), ResourceType.BPMN2)
+                .get();
+        return RuntimeManagerFactory.Factory.get().newSingletonRuntimeManager(environment);
+    }
+
+   private StatefulKnowledgeSession createKnowledgeSession(KnowledgeBase kbase) {
         this.ksession = kbase.newStatefulKnowledgeSession();
         return this.ksession;
     }
+    */
 
 }

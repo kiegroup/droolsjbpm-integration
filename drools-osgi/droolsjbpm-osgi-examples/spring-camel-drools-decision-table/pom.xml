@@ -106,19 +106,6 @@
   </dependencies>
 
   <build>
-    <!--
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/filtered-resources</directory>
-        <includes>
-          <include>data/*.xls</include>
-          <include>META-INF/spring/*.xml</include>
-          <include>*.xml</include>
-          <include>*.drl</include>
-        </includes>
-      </resource>
-    </resources>
-    -->
 
     <plugins>
       <plugin>
@@ -139,6 +126,8 @@
             <Import-Package>
               !org.drools.camel.example,
               org.apache.camel;version="[2.8,3)",
+              org.apache.camel.spi;version="[2.8,3)",
+              org.apache.camel.model;version="[2.8,3)",
               org.drools.core;version="[6.0,7)",
               org.drools.core.command.runtime;version="[6.0,7)",
               org.drools.core.command.runtime.rule;version="[6.0,7)",
@@ -148,7 +137,7 @@
               org.kie.api,
               org.kie.internal,
               org.kie.spring,
-              org.kie.camel.component;version="[6.0,7)",
+              org.kie.camel.component;version="[6.0,7)"
             </Import-Package>
             <Dynamic-ImportPackage>
               org.drools.core,
