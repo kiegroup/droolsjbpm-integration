@@ -4,21 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
+import org.jbpm.runtime.manager.impl.RuntimeEnvironmentBuilder;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.manager.RuntimeEnvironment;
+import org.kie.internal.runtime.manager.RuntimeManagerFactory;
+import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EvaluationProcessExample {
 
     private static final Logger logger = LoggerFactory.getLogger(EvaluationProcessExample.class);
-
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
+    private RuntimeManager rt;
+    private RuntimeEngine re;
 
     public static void main(String[] args) throws Exception {
         EvaluationProcessExample pr = new EvaluationProcessExample();
@@ -29,15 +33,9 @@ public class EvaluationProcessExample {
     public void init() throws Exception {
         logger.info("Loading EvaluationProcess.bpmn2");
 
-        /*KnowledgeBase kbase = createKnowledgeBase();
-        ksession = createKnowledgeSession(kbase);
-
-        RuntimeManager manager = getRuntimeManager("bpmn/EvaluationProcess.bpmn2");
-        RuntimeEngine runtime = manager.getRuntimeEngine(EmptyContext.get());
-        ksession = runtime.getKieSession();*/
-
-        KnowledgeBase kbase = readKnowledgeBase();
-        ksession = kbase.newStatefulKnowledgeSession();
+        rt = getRuntimeManager("bpmn/EvaluationProcess.bpmn2");
+        re = rt.getRuntimeEngine(EmptyContext.get());
+        ksession = re.getKieSession();
 
         logger.info("Register tasks");
         ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new SystemOutWorkItemHandler());
@@ -51,33 +49,15 @@ public class EvaluationProcessExample {
     }
 
     public void destroy() {
-        this.ksession.destroy();
-    }
-
-    private static KnowledgeBase readKnowledgeBase() throws Exception {
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newClassPathResource("bpmn/EvaluationProcess.bpmn2"), ResourceType.BPMN2);
-        return kbuilder.newKnowledgeBase();
-    }
-
-    /*
-    private KnowledgeBase createKnowledgeBase() {
-        logger.info("Loading process " + "EvaluationProcess.bpmn2");
-        kbuilder.add(ResourceFactory.newClassPathResource("bpmn/" + "EvaluationProcess.bpmn2"), ResourceType.BPMN2);
-        return kbuilder.newKnowledgeBase();
+        ksession.destroy();
+        rt.disposeRuntimeEngine(re);
     }
 
     private static RuntimeManager getRuntimeManager(String process) {
-        RuntimeEnvironment environment = RuntimeEnvironmentBuilder.getDefault()
+        RuntimeEnvironment environment = RuntimeEnvironmentBuilder.getEmpty()
                 .addAsset(ResourceFactory.newClassPathResource(process), ResourceType.BPMN2)
                 .get();
         return RuntimeManagerFactory.Factory.get().newSingletonRuntimeManager(environment);
     }
-
-   private StatefulKnowledgeSession createKnowledgeSession(KnowledgeBase kbase) {
-        this.ksession = kbase.newStatefulKnowledgeSession();
-        return this.ksession;
-    }
-    */
 
 }

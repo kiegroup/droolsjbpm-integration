@@ -81,22 +81,6 @@
   </dependencies>
 
   <build>
-    <!--
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/resources</directory>
-        <includes>
-          <include>**/*.xml</include>
-          <include>**/*.bpmn</include>
-          <include>**/*.bpmn2</include>
-          <include>**/*.drl</include>
-          <include>**/*.png</include>
-          <include>**/*.ftl</include>
-          <include>**/*.properties</include>
-        </includes>
-      </resource>
-    </resources>
-    -->
 
     <plugins>
       <plugin>
@@ -117,10 +101,59 @@
             <Bundle-SymbolicName>jbpm-osgi-example</Bundle-SymbolicName>
             <Bundle-Name>jBPM-Example</Bundle-Name>
             <Import-Package>
-              org.jbpm.process.instance.event,
-              org.jbpm.process.instance.impl,
-              *
+              org.slf4j,
+              org.drools.core;version="[6.0,7)",
+              org.drools.core.base;version="[6.0,7)",
+              org.drools.core.base.accumulators;version="[6.0,7)",
+              org.drools.core.base.evaluators;version="[6.0,7)",
+              org.drools.core.base.extractors;version="[6.0,7)",
+              org.drools.core.common;version="[6.0,7)",
+              org.drools.core.command.runtime;version="[6.0,7)",
+              org.drools.core.command.runtime.rule;version="[6.0,7)",
+              org.drools.core.conflict;version="[6.0,7)",
+              org.drools.core.reteoo;version="[6.0,7)",
+              org.drools.core.rule.builder.dialect.asm;version="[6.0,7)",
+              org.drools.core.spi;version="[6.0,7)",
+              org.drools.compiler.compiler;version="[6.0,7)",
+              org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
+              org.jbpm.process.instance.event;version="[6.0,7)",
+              org.jbpm.process.instance.impl;version="[6.0,7)",
+              org.jbpm.process.instance.impl.demo;version="[6.0,7)",
+              org.jbpm.runtime.manager.impl;version="[6.0,7)",
+              org.jbpm.bpmn2;version="[6.0,7)",
+              org.kie.api;version="[6.0,7)",
+              org.kie.api.definition.rule;version="[6.0,7)",
+              org.kie.api.runtime.rule;version="[6.0,7)",
+              org.kie.api.io;version="[6.0,7)",
+              org.kie.api.runtime;version="[6.0,7)",
+              org.kie.api.runtime.manager;version="[6.0,7)",
+              org.kie.api.runtime.process;version="[6.0,7)",
+              org.kie.internal.io;version="[6.0,7)",
+              org.kie.internal.runtime;version="[6.0,7)",
+              org.kie.internal.runtime.manager;version="[6.0,7)",
+              org.kie.internal.runtime.manager.context;version="[6.0,7)",
+              org.kie.internal;version="[6.0,7)",
+              org.kie.spring;version="[6.0,7)",
+              org.eclipse.jdt.internal.compiler
             </Import-Package>
+            <!--
+                          org.apache.camel;version="[2.10,3)",
+              org.apache.camel.spi;version="[2.10,3)",
+              org.apache.camel.model;version="[2.10,3)",
+              org.drools.core;version="[6.0,7)",
+              org.drools.core.base;version="[6.0,7)",
+              org.drools.core.base.accumulators;version="[6.0,7)",
+              org.drools.core.base.evaluators;version="[6.0,7)",
+              org.drools.core.base.extractors;version="[6.0,7)",
+              org.drools.core.command.runtime;version="[6.0,7)",
+              org.drools.core.command.runtime.rule;version="[6.0,7)",
+              org.drools.core.conflict;version="[6.0,7)",
+              org.drools.core.reteoo;version="[6.0,7)",
+              org.drools.core.rule.builder.dialect.asm;version="[6.0,7)",
+              org.drools.core.spi;version="[6.0,7)",
+              org.drools.compiler.compiler;version="[6.0,7)",
+              org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
+              -->
           </instructions>
         </configuration>
       </plugin>
