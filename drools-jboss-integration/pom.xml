@@ -71,14 +71,6 @@
       <artifactId>kie-commons-cdi</artifactId>
     </dependency>
 
-    <!-- Guvnor -->
-
-    <dependency>
-      <groupId>org.guvnor</groupId>
-      <artifactId>guvnor-m2repo-editor-api</artifactId>
-    </dependency>
-
-
     <dependency>
       <groupId>org.kie.commons</groupId>
       <artifactId>kie-nio2-api</artifactId>
