@@ -9,7 +9,6 @@
 
   <!-- Beans used by camel in the example -->
   <bean id="cheeseHelper" class="org.drools.camel.example.CheeseHelper"/>
-  <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
 
   <kie:ksession-ref id="ksession-dt-1">
     <kie:batch>

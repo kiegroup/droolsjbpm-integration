@@ -125,24 +125,33 @@
           <instructions>
             <Import-Package>
               !org.drools.camel.example,
-              org.apache.camel;version="[2.8,3)",
-              org.apache.camel.spi;version="[2.8,3)",
-              org.apache.camel.model;version="[2.8,3)",
+              org.apache.camel;version="[2.10,3)",
+              org.apache.camel.spi;version="[2.10,3)",
+              org.apache.camel.model;version="[2.10,3)",
               org.drools.core;version="[6.0,7)",
+              org.drools.core.base;version="[6.0,7)",
+              org.drools.core.base.accumulators;version="[6.0,7)",
+              org.drools.core.base.evaluators;version="[6.0,7)",
+              org.drools.core.base.extractors;version="[6.0,7)",
               org.drools.core.command.runtime;version="[6.0,7)",
               org.drools.core.command.runtime.rule;version="[6.0,7)",
               org.drools.core.conflict;version="[6.0,7)",
-              org.drools.osgi.compiler;version="[6.0,7)",
+              org.drools.core.reteoo;version="[6.0,7)",
+              org.drools.core.rule.builder.dialect.asm;version="[6.0,7)",
+              org.drools.core.spi;version="[6.0,7)",
+              org.drools.compiler.compiler;version="[6.0,7)",
               org.drools.compiler.rule.builder.dialect.mvel;version="[6.0,7)",
-              org.kie.api,
-              org.kie.internal,
-              org.kie.spring,
-              org.kie.camel.component;version="[6.0,7)"
+              org.jbpm.process.instance.impl;version="[6.0,7)",
+              org.jbpm.process.instance.event;version="[6.0,7)",
+              org.jbpm.bpmn2;version="[6.0,7)",
+              org.kie.api;version="[6.0,7)",
+              org.kie.api.definition.rule;version="[6.0,7)",
+              org.kie.api.runtime.rule;version="[6.0,7)",
+              org.kie.internal;version="[6.0,7)",
+              org.kie.spring;version="[6.0,7)",
+              org.kie.camel.component;version="[6.0,7)",
+              org.eclipse.jdt.internal.compiler
             </Import-Package>
-            <Dynamic-ImportPackage>
-              org.drools.core,
-              org.drools.compiler
-            </Dynamic-ImportPackage>
             <Private-Package>
               org.drools.camel.example
             </Private-Package>
