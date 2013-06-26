@@ -8,7 +8,7 @@
   </kbase>
 
   <kbase name="drl_camelsample">
-    <ksession name="ksession1" type="stateless"/>
+    <ksession name="ksession10" type="stateless"/>
   </kbase>
 
   <kbase name="drl_kiesample2">
