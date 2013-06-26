@@ -117,13 +117,13 @@ public class KieSessionElementParser extends AbstractElementParser {
             argument.setIndex(5);
             argument.setValue(createValue(context, kbaseRef));
             beanMetadata.addArgument(argument);*/
-            beanMetadata.addArgument(createRef(context, kbaseRef), null, 5);
+            beanMetadata.addArgument(createValue(context, kbaseRef), null, 5);
 
             /*argument = new BeanArgumentImpl();
             argument.setIndex(6);
             argument.setValue(createValue(context, type));
             beanMetadata.addArgument(argument);*/
-            beanMetadata.addArgument(createRef(context, type), null, 6);
+            beanMetadata.addArgument(createValue(context, type), null, 6);
             beanMetadata.setFactoryMethod("createKieSession");
         } else {
             beanMetadata.setFactoryMethod("createKieSessionRef");

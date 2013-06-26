@@ -72,7 +72,7 @@ public class KieEventListenersElementParser extends AbstractElementParser {
             argument.setIndex(1);
             argument.setValue(createRef(context, refValue.getTextContent()));
             beanMetadata.addArgument(argument);*/
-            beanMetadata.addArgument(createValue(context, refValue.getTextContent()), null, 1);
+            beanMetadata.addArgument(createRef(context, refValue.getTextContent()), null, 1);
 
 
             collectionMetadata.addValue(beanMetadata);

@@ -46,7 +46,7 @@ public class KieBaseElementParser extends AbstractElementParser {
         // argument.setIndex(1);
         if (!StringUtils.isEmpty(releaseIdRef)) {
             // argument.setValue(createRef(context, releaseIdRef));
-            beanMetadata.addArgument(createValue(context, releaseIdRef),null,1);
+            beanMetadata.addArgument(createRef(context, releaseIdRef),null,1);
         } else {
             // argument.setValue(createNullMetadata());
             beanMetadata.addArgument(createNullMetadata(),null,1);

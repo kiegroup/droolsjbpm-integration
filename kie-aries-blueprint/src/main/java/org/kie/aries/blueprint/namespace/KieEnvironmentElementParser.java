@@ -114,7 +114,7 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
                             // argument.setIndex(0);
                             if (!StringUtils.isEmpty(ref)) {
                                 //argument.setValue(createRef(context, ref));
-                                beanMetadata.addArgument(createValue(context, ref), null, 0);
+                                beanMetadata.addArgument(createRef(context, ref), null, 0);
 
                             } else {
                                 MutableBeanMetadata defaultStrategyAcceptor = context.createMetadata(MutableBeanMetadata.class);
@@ -136,7 +136,7 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
                             //argument.setIndex(0);
                             if (!StringUtils.isEmpty(ref)) {
                                 //argument.setValue(createRef(context, ref));
-                                beanMetadata.addArgument(createValue(context, ref), null, 0);
+                                beanMetadata.addArgument(createRef(context, ref), null, 0);
 
                             } else {
                                 MutableBeanMetadata defaultStrategyAcceptor = context.createMetadata(MutableBeanMetadata.class);
@@ -167,7 +167,7 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
                                 argument.setIndex(0);
                                 argument.setValue(createRef(context, id));
                                 beanMetadata.addArgument(argument);*/
-                                beanMetadata.addArgument(createValue(context, id), null, 0);
+                                beanMetadata.addArgument(createRef(context, id), null, 0);
                             }
                             strategiesCollectionMetadata.addValue(beanMetadata);
                         } else if (ELEMENT_CUSTOM_MARSHALLING_STRATEGY.equalsIgnoreCase(localName)) {
