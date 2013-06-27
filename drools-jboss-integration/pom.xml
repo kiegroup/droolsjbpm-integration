@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.0.Beta4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -82,82 +82,82 @@
     </dependency>
 
 
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-project-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.workbench.services</groupId>-->
+      <!--<artifactId>kie-wb-common-project-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-project-backend</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.workbench.services</groupId>-->
+      <!--<artifactId>kie-wb-common-project-backend</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-datamodel-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.workbench.services</groupId>-->
+      <!--<artifactId>kie-wb-common-datamodel-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-datamodel-backend</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.workbench.services</groupId>-->
+      <!--<artifactId>kie-wb-common-datamodel-backend</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-commons</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.drools</groupId>-->
+      <!--<artifactId>drools-workbench-models-commons</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-services-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.workbench.services</groupId>-->
+      <!--<artifactId>kie-wb-common-services-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-data</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.workbench.services</groupId>-->
+      <!--<artifactId>kie-wb-common-data</artifactId>-->
+    <!--</dependency>-->
 
-    <!-- UberFire -->
+    <!--&lt;!&ndash; UberFire &ndash;&gt;-->
 
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-backend-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.uberfire</groupId>-->
+      <!--<artifactId>uberfire-backend-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-backend-server</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.uberfire</groupId>-->
+      <!--<artifactId>uberfire-backend-server</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-server</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.uberfire</groupId>-->
+      <!--<artifactId>uberfire-server</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-security-client</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.uberfire</groupId>-->
+      <!--<artifactId>uberfire-security-client</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-security-server</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.uberfire</groupId>-->
+      <!--<artifactId>uberfire-security-server</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-client-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.uberfire</groupId>-->
+      <!--<artifactId>uberfire-client-api</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.commons</groupId>
-      <artifactId>kie-nio2-jgit</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.commons</groupId>-->
+      <!--<artifactId>kie-nio2-jgit</artifactId>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.kie.commons</groupId>
-      <artifactId>kie-nio2-fs</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.kie.commons</groupId>-->
+      <!--<artifactId>kie-nio2-fs</artifactId>-->
+    <!--</dependency>-->
 
     <!-- Metadata -->
     <dependency>
