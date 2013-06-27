@@ -20,9 +20,10 @@ import org.slf4j.LoggerFactory;
 public class EvaluationProcessExample {
 
     private static final Logger logger = LoggerFactory.getLogger(EvaluationProcessExample.class);
+    private static RuntimeManager runtimeManager;
+
     private KieSession ksession;
-    private RuntimeManager rt;
-    private RuntimeEngine re;
+    private RuntimeEngine runtimeEngine;
 
     public static void main(String[] args) throws Exception {
         EvaluationProcessExample pr = new EvaluationProcessExample();
@@ -33,9 +34,9 @@ public class EvaluationProcessExample {
     public void init() throws Exception {
         logger.info("Loading EvaluationProcess.bpmn2");
 
-        rt = getRuntimeManager("bpmn/EvaluationProcess.bpmn2");
-        re = rt.getRuntimeEngine(EmptyContext.get());
-        ksession = re.getKieSession();
+        runtimeManager = getRuntimeManager("bpmn/EvaluationProcess.bpmn2");
+        runtimeEngine = runtimeManager.getRuntimeEngine(EmptyContext.get());
+        ksession = runtimeEngine.getKieSession();
 
         logger.info("Register tasks");
         ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new SystemOutWorkItemHandler());
@@ -50,7 +51,8 @@ public class EvaluationProcessExample {
 
     public void destroy() {
         ksession.destroy();
-        rt.disposeRuntimeEngine(re);
+        runtimeManager.disposeRuntimeEngine(runtimeEngine);
+        runtimeManager.close();
     }
 
     private static RuntimeManager getRuntimeManager(String process) {
