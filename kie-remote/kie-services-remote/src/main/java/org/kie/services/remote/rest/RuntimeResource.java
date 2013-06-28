@@ -75,7 +75,11 @@ public class RuntimeResource extends ResourceBase {
     public JaxbProcessInstanceResponse getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
-        return new JaxbProcessInstanceResponse((ProcessInstance) result);
+        if( result != null ) { 
+            return new JaxbProcessInstanceResponse((ProcessInstance) result);
+        } else { 
+            throw new BadRequestException("Unable to retrieve process instance " + procInstId + " since it has been completed. Please see the history operations." );
+        }
     }
 
     @POST
