@@ -23,8 +23,18 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<Object> {
     public JaxbExceptionResponse() {
     }
     
+    public JaxbExceptionResponse(Exception e, Command<?> cmd) {
+       super();
+       this.commandName = cmd.getClass().getSimpleName();
+       initializeExceptionInfo(e);
+    }
+    
     public JaxbExceptionResponse(Exception e, int i, Command<?> cmd) {
        super(i, cmd);
+       initializeExceptionInfo(e);
+    }
+    
+    private void initializeExceptionInfo(Exception e) { 
        this.message = e.getClass().getSimpleName() + " thrown with message '" + e.getMessage() + "'";
        if( e.getCause() != null ) { 
            Throwable t = e.getCause();

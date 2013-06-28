@@ -1,5 +1,8 @@
 package org.kie.services.remote.cdi;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -9,20 +12,16 @@ import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
-import org.kie.internal.KieInternalServices;
-import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 
 @ApplicationScoped
 public class ProcessRequestBean {
 
-    private static Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);
-
-    private static CorrelationKeyFactory keyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+    @Inject
+    private Logger logger;
 
     @Inject
     private RuntimeManagerManager runtimeMgrMgr;
@@ -30,18 +29,32 @@ public class ProcessRequestBean {
     @Inject
     private TaskService taskService;
 
-    public Object doKieSessionOperation(Command cmd, String deploymentId) {
+    public Object doKieSessionOperation(Command<?> cmd, String deploymentId) {
         return doKieSessionOperation(cmd, deploymentId, null);
     }
     
-    public Object doKieSessionOperation(Command cmd, String deploymentId, Long processInstanceId) {
+    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId) {
         KieSession kieSession = getRuntimeEngine(deploymentId, processInstanceId).getKieSession();
-        Object result = kieSession.execute(cmd);
+        Object result = null;
+        try { 
+            result = kieSession.execute(cmd);
+        } catch( Exception e ) { 
+            JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
+            logger.log(Level.WARNING, "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
+            result = exceptResp;
+        }
         return result;
     }
     
-    public Object doTaskOperation(Command cmd) {
-        Object result = ((InternalTaskService) taskService).execute(cmd);
+    public Object doTaskOperation(Command<?> cmd) {
+        Object result = null;
+        try { 
+            result = ((InternalTaskService) taskService).execute(cmd);
+        } catch( Exception e ) { 
+            JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
+            logger.log(Level.WARNING, "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
+            result = exceptResp;
+        }
         return result;
     }
 
@@ -56,5 +69,7 @@ public class ProcessRequestBean {
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
 
-
+    public Logger getLogger() { 
+        return logger;
+    }
 }

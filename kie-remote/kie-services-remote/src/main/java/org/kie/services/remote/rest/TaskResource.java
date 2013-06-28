@@ -36,16 +36,12 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.rest.jaxb.JaxbGenericResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/task")
 @RequestScoped
 public class TaskResource extends ResourceBase {
-
-    private Logger logger = LoggerFactory.getLogger(TaskResource.class);
 
     @Inject
     private ProcessRequestBean processRequestBean;

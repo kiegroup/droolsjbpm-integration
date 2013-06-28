@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb;
+package org.kie.services.client.serialization.jaxb.rest;
 
 import javax.xml.bind.annotation.XmlEnum;
 
