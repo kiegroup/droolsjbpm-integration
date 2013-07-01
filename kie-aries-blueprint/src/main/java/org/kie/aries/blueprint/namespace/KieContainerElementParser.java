@@ -24,7 +24,6 @@ import org.w3c.dom.Element;
 
 public class KieContainerElementParser extends AbstractElementParser {
 
-
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
         String id = getId(context, element);
@@ -36,18 +35,12 @@ public class KieContainerElementParser extends AbstractElementParser {
         beanMetadata.setFactoryMethod("fetchKContainer");
         beanMetadata.setId(id);
 
-        //BeanArgumentImpl argument = new BeanArgumentImpl();
-        //argument.setIndex(0);
         if (!StringUtils.isEmpty(releaseIdRef)) {
-            //argument.setValue(createRef(context, releaseIdRef));
             beanMetadata.addArgument(createRef(context, releaseIdRef), null, 0);
 
         } else {
-            //argument.setValue(createNullMetadata());
             beanMetadata.addArgument(createNullMetadata(), null, 0);
-
         }
-        //beanMetadata.addArgument(argument);
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
         return beanMetadata;

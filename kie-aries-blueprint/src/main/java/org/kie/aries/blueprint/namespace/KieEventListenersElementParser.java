@@ -62,28 +62,15 @@ public class KieEventListenersElementParser extends AbstractElementParser {
                 type = AgendaEventListener.class.getName();
             }
 
-            /*BeanArgumentImpl argument = new BeanArgumentImpl();
-            argument.setIndex(0);
-            argument.setValue(createValue(context, type));
-            beanMetadata.addArgument(argument);*/
             beanMetadata.addArgument(createValue(context, type), null, 0);
 
-            /*argument = new BeanArgumentImpl();
-            argument.setIndex(1);
-            argument.setValue(createRef(context, refValue.getTextContent()));
-            beanMetadata.addArgument(argument);*/
             beanMetadata.addArgument(createRef(context, refValue.getTextContent()), null, 1);
-
 
             collectionMetadata.addValue(beanMetadata);
         }
 
         MutableBeanMetadata componentMetadata = context.createMetadata(MutableBeanMetadata.class);
         componentMetadata.setClassName("java.util.ArrayList");
-        /*BeanArgumentImpl argument = new BeanArgumentImpl();
-        argument.setIndex(0);
-        argument.setValue(collectionMetadata);
-        componentMetadata.addArgument(argument); */
         componentMetadata.addArgument(collectionMetadata, null, 0);
 
         return componentMetadata;

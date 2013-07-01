@@ -26,6 +26,8 @@ import org.kie.aries.blueprint.namespace.KieBaseElementParser;
 import org.kie.aries.blueprint.namespace.KieContainerElementParser;
 import org.kie.aries.blueprint.namespace.KieEnvironmentElementParser;
 import org.kie.aries.blueprint.namespace.KieEventListenersElementParser;
+import org.kie.aries.blueprint.namespace.KieRuntimeManagerElementParser;
+import org.kie.aries.blueprint.namespace.KieRuntimeManagerSessionElementParser;
 import org.kie.aries.blueprint.namespace.KieSessionElementParser;
 import org.kie.aries.blueprint.namespace.KieStoreElementParser;
 import org.kie.aries.blueprint.namespace.ReleaseIdElementParser;
@@ -50,6 +52,8 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
     public static final String ELEMENT_KSESSION_REF = "ksession-ref";
     public static final String ELEMENT_EVENT_LISTENERS = "eventListeners";
     public static final String ELEMENT_ENVIRONMENT = "environment";
+    public static final String ELEMENT_KRUNTIMEMANAGER = "kruntimeManager";
+    public static final String ELEMENT_KSESSION_RUNTIMEMANAGER = "kruntimeManagerSession";
 
     protected static Map<String, AbstractElementParser> droolsElementParserMap = new HashMap<String, AbstractElementParser>();
     static {
@@ -61,8 +65,9 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
         droolsElementParserMap.put(ELEMENT_KSTORE, new KieStoreElementParser());
         droolsElementParserMap.put(ELEMENT_ENVIRONMENT, new KieEnvironmentElementParser());
         droolsElementParserMap.put(ELEMENT_KCONTAINER, new KieContainerElementParser());
+        droolsElementParserMap.put(ELEMENT_KRUNTIMEMANAGER, new KieRuntimeManagerElementParser());
+        droolsElementParserMap.put(ELEMENT_KSESSION_RUNTIMEMANAGER, new KieRuntimeManagerSessionElementParser());
     }
-
 
     @Override
     public URL getSchemaLocation(String namespace) {

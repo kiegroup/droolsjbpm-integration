@@ -18,29 +18,30 @@ package org.kie.aries.blueprint.namespace;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.drools.core.util.StringUtils;
+import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
 
-public class KieBaseElementParser extends AbstractElementParser {
+public class KieRuntimeManagerSessionElementParser extends AbstractElementParser {
+
+    public static final String ATTRIBUTE_KRUNTIME_MANAGER_REF = "kruntimeManager-ref";
 
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
-        String id = getId(context, element);
 
-        String releaseIdRef = element.getAttribute("releaseId");
+        String id = getId(context, element);
+        String ref = element.getAttribute(ATTRIBUTE_KRUNTIME_MANAGER_REF);
 
         MutableBeanMetadata beanMetadata = (MutableBeanMetadata) context.createMetadata(BeanMetadata.class);
-        beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
-        beanMetadata.setFactoryMethod("fetchKBase");
+        beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieRuntimeManagerFactoryBean");
+        beanMetadata.setFactoryMethod("createSession");
         beanMetadata.setId(id);
 
-        beanMetadata.addArgument(createValue(context, id),null,0);
-
-        if (!StringUtils.isEmpty(releaseIdRef)) {
-            beanMetadata.addArgument(createRef(context, releaseIdRef),null,1);
+        if (!StringUtils.isEmpty(ref)) {
+            beanMetadata.addArgument(createRef(context, ref), null, 0);
         } else {
-            beanMetadata.addArgument(createNullMetadata(),null,1);
+            throw new ComponentDefinitionException("Mandatory attribute 'kruntimeManager-ref' missing for ksession. Cannot continue.");
         }
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);

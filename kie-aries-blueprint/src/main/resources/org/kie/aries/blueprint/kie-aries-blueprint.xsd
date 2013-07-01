@@ -24,7 +24,6 @@
     </xsd:complexType>
   </xsd:element>
 
-
   <xsd:element name="kbase-ref">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
@@ -35,6 +34,22 @@
   <xsd:element name="kstore">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="kruntimeManager">
+    <xsd:complexType>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="type" use="optional" default="empty" type="runtimeManagerTypeEnum"/>
+      <xsd:attribute name="asset" use="required" type="xsd:string"/>
+      <xsd:attribute name="assetType" use="required" type="assetTypeEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="kruntimeManagerSession">
+    <xsd:complexType>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="kruntimeManager-ref" use="required" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -325,6 +340,21 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="stateful"/>
       <xsd:enumeration value="stateless"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="runtimeManagerTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="empty"/>
+      <xsd:enumeration value="default"/>
+      <xsd:enumeration value="defaultInMemory"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="assetTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="BPMN2"/>
+      <xsd:enumeration value="DRL"/>
     </xsd:restriction>
   </xsd:simpleType>
 </xsd:schema>

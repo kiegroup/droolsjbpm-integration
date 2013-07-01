@@ -16,6 +16,9 @@
 
 package org.kie.aries.blueprint.factorybeans;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieProject;
 import org.kie.api.KieBase;
@@ -25,14 +28,15 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.blueprint.container.BlueprintEvent;
+import org.osgi.service.blueprint.container.BlueprintListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class KieObjectsResolver {
+public class KieObjectsResolver implements BlueprintListener {
 
     private Map<ReleaseId, KieContainer> gavs;
 
+    private BundleContext bundleContext;
     private KieContainerImpl defaultClasspathKContainer;
     private KieServices ks;
 
@@ -135,5 +139,10 @@ public class KieObjectsResolver {
                 return kieBase.newKieSession(conf, null);
             }
         }
+    }
+
+    @Override public void blueprintEvent(BlueprintEvent event) {
+        //TODO
+        System.out.println(">> Something happen : " + event.getType());
     }
 }

@@ -18,29 +18,43 @@ package org.kie.aries.blueprint.namespace;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.drools.core.util.StringUtils;
+import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
 
-public class KieBaseElementParser extends AbstractElementParser {
+public class KieRuntimeManagerElementParser extends AbstractElementParser {
+
 
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
-        String id = getId(context, element);
 
-        String releaseIdRef = element.getAttribute("releaseId");
+        String id = getId(context, element);
+        String type = element.getAttribute("type");
+        String asset = element.getAttribute("asset");
+        String assetType = element.getAttribute("assetType");
 
         MutableBeanMetadata beanMetadata = (MutableBeanMetadata) context.createMetadata(BeanMetadata.class);
-        beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
-        beanMetadata.setFactoryMethod("fetchKBase");
+        beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieRuntimeManagerFactoryBean");
+        beanMetadata.setFactoryMethod("createRuntime");
         beanMetadata.setId(id);
 
-        beanMetadata.addArgument(createValue(context, id),null,0);
-
-        if (!StringUtils.isEmpty(releaseIdRef)) {
-            beanMetadata.addArgument(createRef(context, releaseIdRef),null,1);
+        if (!StringUtils.isEmpty(type)) {
+            beanMetadata.addArgument(createValue(context, type), null, 0);
         } else {
-            beanMetadata.addArgument(createNullMetadata(),null,1);
+            beanMetadata.addArgument(createValue(context, "empty"), null, 0);
+        }
+
+        if (!StringUtils.isEmpty(asset)) {
+            beanMetadata.addArgument(createValue(context, asset), null, 1);
+        } else {
+            throw new ComponentDefinitionException("'asset' attribute is missing for custom marshaller definition.");
+        }
+
+        if (!StringUtils.isEmpty(assetType)) {
+            beanMetadata.addArgument(createValue(context, assetType), null, 2);
+        } else {
+            beanMetadata.addArgument(createValue(context, "BPMN2"), null, 2);
         }
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);

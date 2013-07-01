@@ -64,65 +64,31 @@ public class KieSessionElementParser extends AbstractElementParser {
         beanMetadata.setId(id);
         beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
 
-        //(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, String kbaseRef, String type){
-        /*BeanArgumentImpl argument = new BeanArgumentImpl();
-        argument.setIndex(0);
-        argument.setValue(createValue(context, id));
-        beanMetadata.addArgument(argument);*/
         beanMetadata.addArgument(createValue(context, id), null, 0);
 
-
-        //argument = new BeanArgumentImpl();
-        //argument.setIndex(1);
         if (StringUtils.isEmpty(releaseId)) {
-            //argument.setValue(createNullMetadata());
             beanMetadata.addArgument(createNullMetadata(), null, 1);
         } else {
-            //argument.setValue(createRef(context, releaseId));
             beanMetadata.addArgument(createRef(context, releaseId), null, 1);
         }
-        // beanMetadata.addArgument(argument);
 
-        //argument = new BeanArgumentImpl();
-        //argument.setIndex(2);
         if (!StringUtils.isEmpty(listenersRef)) {
-            // argument.setValue(createRef(context, listenersRef));
             beanMetadata.addArgument(createRef(context, listenersRef), null, 2);
         }else{
-            //check if there are any child listener nodes
             Metadata metadata = checkForChildListeners(context, element);
-            // argument.setValue(metadata);
             beanMetadata.addArgument(metadata, null, 2);
         }
-        // beanMetadata.addArgument(argument);
 
         MutableCollectionMetadata collectionMetadata = KieSessionLoggerElementParser.parseConsoleLoggers(this, context, element);
-        //argument = new BeanArgumentImpl();
-        //argument.setIndex(3);
-        //argument.setValue(collectionMetadata);
-        //beanMetadata.addArgument(argument);
         beanMetadata.addArgument(collectionMetadata, null, 3);
 
         collectionMetadata = KieSessionBatchElementParser.parseBatchElement(this, context, element);
-        // argument = new BeanArgumentImpl();
-        // argument.setIndex(4);
-        // argument.setValue(collectionMetadata);
-        // beanMetadata.addArgument(argument);
         beanMetadata.addArgument(collectionMetadata, null, 4);
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
 
         if ( ELEMENT_NAME_KSESSION.equalsIgnoreCase(localName)) {
-            /*argument = new BeanArgumentImpl();
-            argument.setIndex(5);
-            argument.setValue(createValue(context, kbaseRef));
-            beanMetadata.addArgument(argument);*/
             beanMetadata.addArgument(createValue(context, kbaseRef), null, 5);
-
-            /*argument = new BeanArgumentImpl();
-            argument.setIndex(6);
-            argument.setValue(createValue(context, type));
-            beanMetadata.addArgument(argument);*/
             beanMetadata.addArgument(createValue(context, type), null, 6);
             beanMetadata.setFactoryMethod("createKieSession");
         } else {
