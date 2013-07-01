@@ -3,10 +3,12 @@ import java.util.List;
 
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
+import org.jbpm.process.core.validation.ProcessValidatorRegistry;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
+import org.jbpm.simulation.impl.SimulationProcessValidator;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -27,6 +29,10 @@ import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationRunner {
+    
+    static {
+        ProcessValidatorRegistry.getInstance().registerAdditonalValidator(new SimulationProcessValidator());
+    }
 
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, String... rules) {
         
@@ -114,7 +120,7 @@ public class SimulationRunner {
             String type = types[i].getDefaultExtension();
 
             kfs.write("src/main/resources/" + id.replaceAll("\\.", "/")
-                    + "/org/test/res" + i + "." + type, res);
+                    + "/org/test/res" + i + ".bpsim." + type, res);
         }
 
         KieBaseModel kBase1 = kproj.newKieBaseModel(id)
@@ -127,7 +133,8 @@ public class SimulationRunner {
                 .setClockType(ClockTypeOption.get("pseudo"));
 
         kfs.writeKModuleXML(kproj.toXML());
-
+//        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration());
+//        kbuilder.
         KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
         if(!kieBuilder.getResults().getMessages().isEmpty()) {
             for (Message msg : kieBuilder.getResults().getMessages()) {
