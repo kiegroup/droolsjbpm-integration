@@ -5,10 +5,11 @@ package simulation
 import org.jbpm.simulation.impl.events.*;
 import java.util.Date;
 import org.jbpm.simulation.AggregatedSimulationEvent;
-
+import org.jbpm.simulation.impl.SystemOutLogger;
 
 //declare any global variables here
 global java.util.List simulation;
+global SystemOutLogger logger;
 
 
 declare ActivityName
@@ -62,6 +63,8 @@ no-loop
         $max : max( $duration ),
         $count : count( $duration ) )
     then
+        logger.log("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
+    
         simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, ""));
 
 end
@@ -97,6 +100,10 @@ no-loop
         $maxrc : max( $resourceCost ) )
         
     then
+        logger.log("Duration for human activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" 
+        + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
+         + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count + " avg cost " + $avgrc + " min cost " + $minrc + " max cost " + $maxrc);
+           
         simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, 
         (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc, (Double)$minrc, (Double)$maxrc, "userTask"));
 
@@ -114,6 +121,8 @@ no-loop
         $max : max( $processDuration ),
         $count : count( $processDuration ) )
     then
+        logger.log("Duration for end event is avg: " + $avg + "; min: " + $min + "; max:" + $max);
+    
         AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, "endEvent");
         simulation.add(aggEvent);
 end
@@ -131,6 +140,8 @@ no-loop
         $pathIds : collectList($pathId) )
         eval($processSet.size() > 0)
     then
+        logger.log("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
+    
         AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
         aggEvent.calculatePaths($pathIds);
         simulation.add(aggEvent);

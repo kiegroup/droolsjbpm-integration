@@ -46,8 +46,9 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
         this.ksession = kbuilder.newKnowledgeBase().newKieSession();
         try {
             // register global for aggregated events
+            ksession.setGlobal("logger", new SystemOutLogger());
             ksession.setGlobal("simulation", new ArrayList<AggregatedActivitySimulationEvent>());
-            ksession.setGlobal("summary", new ArrayList<AggregatedActivitySimulationEvent>());
+            ksession.setGlobal("summary", new ArrayList<AggregatedActivitySimulationEvent>());            
             AggregatedProcessSimulationEvent init = new AggregatedProcessSimulationEvent("", 0, 0, 0);
             List processOnlyList = new ArrayList<AggregatedSimulationEvent>();
             processOnlyList.add(init);
@@ -71,6 +72,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
         
         this.ksession = kbuilder.newKnowledgeBase().newKieSession();
         try {
+            ksession.setGlobal("logger", new SystemOutLogger());
             // register global for aggregated events
             ksession.setGlobal("simulation", new ArrayList<AggregatedActivitySimulationEvent>());
         } catch (Exception e) {

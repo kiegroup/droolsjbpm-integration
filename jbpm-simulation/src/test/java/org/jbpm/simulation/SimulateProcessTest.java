@@ -30,7 +30,7 @@ import org.jbpm.simulation.impl.events.EndSimulationEvent;
 import org.jbpm.simulation.impl.events.GenericSimulationEvent;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.ResourceType;
@@ -39,6 +39,12 @@ import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulateProcessTest {
 
+    @Before
+    public void configure() {
+        // enable logging
+        //System.setProperty("jbpm.simulation.log.enabled", "true");
+    }
+    
     @Test
     public void testSimpleExclusiveGatewayTest() throws Exception {
         
@@ -222,7 +228,7 @@ public class SimulateProcessTest {
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithRunRulesOnEveryEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
@@ -259,8 +265,8 @@ public class SimulateProcessTest {
             if (event instanceof AggregatedProcessSimulationEvent) {
                 Map<String, Integer> numberOfInstancePerPath = ((AggregatedProcessSimulationEvent) event).getPathNumberOfInstances();
                 assertNotNull(numberOfInstancePerPath);
-                assertTrue(1 == numberOfInstancePerPath.get("Path800898475"));
-                assertTrue(4 == numberOfInstancePerPath.get("Path-960633761"));
+                assertEquals(1, (int)numberOfInstancePerPath.get("Path800898475"));
+                assertEquals(4, (int)numberOfInstancePerPath.get("Path-960633761"));
             }
         }
         
@@ -276,7 +282,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithSinglePath() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-UserTaskWithSimulationMetaData.bpmn2"));
@@ -298,7 +304,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithSinglePathAndCatchingEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SinglePathWithCatchingEvent.bpmn2"));
@@ -320,7 +326,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithSinglePathAndThrowingEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SinglePathWithThrowingEvent.bpmn2"));
@@ -342,7 +348,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithBoundaryEvent() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-SimpleWithBoundaryEvent.bpmn2"));
@@ -364,7 +370,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithScriptRuleXor() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-ScriptRuleXor.bpmn2"));
@@ -393,7 +399,7 @@ public class SimulateProcessTest {
         wmRepo.close();
     }
     
-    @Test @Ignore
+    @Test
     public void testSimulationRunnerWithLoop() throws IOException {
         
         InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-loop-sim.bpmn2"));

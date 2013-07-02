@@ -131,8 +131,14 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
             
             for (String entry : entires) {
                 String[] keyValue = entry.split("=");
-                
-                pathInstances.put(keyValue[0], Integer.valueOf(keyValue[1]));
+                int current = 0;
+                int nextValue = Integer.valueOf(keyValue[1]);
+                if (pathInstances.containsKey(keyValue[0])) {
+                    current = pathInstances.get(keyValue[0]);
+                }
+                if (current < nextValue) {
+                    pathInstances.put(keyValue[0], nextValue);
+                }
             }
         }
     }
