@@ -1,12 +1,12 @@
 package org.drools.jboss.integration;
 
+import org.guvnor.common.services.project.builder.events.InvalidateDMOProjectCacheEvent;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Path;
-import org.kie.workbench.common.services.datamodel.events.InvalidateDMOProjectCacheEvent;
 import org.kie.workbench.common.services.datamodel.oracle.ProjectDataModelOracle;
 import org.kie.workbench.common.services.datamodel.service.DataModelService;
 import org.slf4j.Logger;
