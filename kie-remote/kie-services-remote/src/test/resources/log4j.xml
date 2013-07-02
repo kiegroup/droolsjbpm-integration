@@ -40,6 +40,10 @@
 		<level value="WARN"/>
 	</logger>
 
+	<logger name="org.kie.services">
+		<level value="DEBUG"/>
+	</logger>
+
 	<root>
 		<priority value="INFO"/>
 		<appender-ref ref="CONSOLE"/>

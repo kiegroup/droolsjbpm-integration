@@ -14,7 +14,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.kie.commons.java.nio.file.spi.FileSystemProvider;
 import org.kie.commons.java.nio.fs.file.SimpleFileSystemProvider;
 
-public class IntegrationBase {
+public class IntegrationTestBase {
 
     static WebArchive createWebArchive() { 
 
@@ -30,7 +30,7 @@ public class IntegrationBase {
                 "org.jbpm:jbpm-audit",
                 "org.jbpm:jbpm-persistence-jpa",
                 "org.jbpm:jbpm-runtime-manager",
-                // cdi impls
+                // cdi impls (includes core jbpm libs)
                 "org.jbpm:jbpm-kie-services",
                 // services
                 "org.kie.commons:kie-nio2-fs",
@@ -54,7 +54,8 @@ public class IntegrationBase {
                 iter.remove();
                 continue;
             }
-            if( depSet.contains(depFile.getParent()) ) { 
+            String parent = depFile.getParent();
+            if( depSet.contains(parent) && ! "/tmp".equals(parent) && ! parent.contains("jre") ) { 
                 iter.remove();
                 continue;
             }
@@ -65,7 +66,7 @@ public class IntegrationBase {
         WebArchive war =  ShrinkWrap.create(WebArchive.class, "arquillian-test.war")
                 .addPackages(true, "org/kie/services/remote/cdi", "org/kie/services/remote/ejb", "org/kie/services/remote/jms", "org/kie/services/remote/rest", "org/kie/services/remote/util")
                 .addPackages(true, "org/kie/services/remote/war")
-                .addClass(UnfinishedError.class)
+                .addClass(KieRemoteServicesInternalError.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsServiceProvider(FileSystemProvider.class, SimpleFileSystemProvider.class)
                 .addAsWebInfResource("WEB-INF/test-beans.xml", "beans.xml")

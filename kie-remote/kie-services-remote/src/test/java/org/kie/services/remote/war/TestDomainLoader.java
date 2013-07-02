@@ -34,4 +34,5 @@ public class TestDomainLoader {
         DeploymentUnit deploymentUnit = new VFSDeploymentUnit("test", "", "src/test/resources/repo/test/");
         deploymentService.deploy(deploymentUnit);
     }
+    
 }
