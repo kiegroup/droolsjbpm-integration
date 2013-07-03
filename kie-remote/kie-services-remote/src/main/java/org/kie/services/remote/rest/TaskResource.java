@@ -240,43 +240,43 @@ public class TaskResource extends ResourceBase {
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
         Command<?> cmd = null;
-        if ("activate".equals(operation)) {
+        if ("activate".equalsIgnoreCase(operation)) {
             cmd = new ActivateTaskCommand(taskId, userId);
-        } else if ("claim".equals(operation)) {
+        } else if ("claim".equalsIgnoreCase(operation)) {
             cmd = new ClaimTaskCommand(taskId, userId);
-        } else if ("claimnextavailable".equals(operation)) {
+        } else if ("claimnextavailable".equalsIgnoreCase(operation)) {
             String language = getStringParam("language", false, params, operation);
             if (language == null) {
                 language = "en-UK";
             }
             cmd = new ClaimNextAvailableTaskCommand(userId, language);
-        } else if ("complete".equals(operation)) {
+        } else if ("complete".equalsIgnoreCase(operation)) {
             Map<String, Object> data = extractMapFromParams(params, operation);
             cmd = new CompleteTaskCommand(taskId, userId, data);
-        } else if ("delegate".equals(operation)) {
+        } else if ("delegate".equalsIgnoreCase(operation)) {
             String targetEntityId = getStringParam("targetEntityId", true, params, operation);
             cmd = new DelegateTaskCommand(taskId, userId, targetEntityId);
-        } else if ("exit".equals(operation)) {
+        } else if ("exit".equalsIgnoreCase(operation)) {
             cmd = new ExitTaskCommand(taskId, userId);
-        } else if ("fail".equals(operation)) {
+        } else if ("fail".equalsIgnoreCase(operation)) {
             Map<String, Object> data = extractMapFromParams(params, operation);
             cmd = new FailTaskCommand(taskId, userId, data);
-        } else if ("forward".equals(operation)) {
+        } else if ("forward".equalsIgnoreCase(operation)) {
             String targetEntityId = getStringParam("targetEntityId", true, params, operation);
             cmd = new ForwardTaskCommand(taskId, userId, targetEntityId);
-        } else if ("release".equals(operation)) {
+        } else if ("release".equalsIgnoreCase(operation)) {
             cmd = new ReleaseTaskCommand(taskId, userId);
-        } else if ("resume".equals(operation)) {
+        } else if ("resume".equalsIgnoreCase(operation)) {
             cmd = new ResumeTaskCommand(taskId, userId);
-        } else if ("skip".equals(operation)) {
+        } else if ("skip".equalsIgnoreCase(operation)) {
             cmd = new SkipTaskCommand(taskId, userId);
-        } else if ("start".equals(operation)) {
+        } else if ("start".equalsIgnoreCase(operation)) {
             cmd = new StartTaskCommand(taskId, userId);
-        } else if ("stop".equals(operation)) {
+        } else if ("stop".equalsIgnoreCase(operation)) {
             cmd = new StopTaskCommand(taskId, userId);
-        } else if ("suspend".equals(operation)) {
+        } else if ("suspend".equalsIgnoreCase(operation)) {
             cmd = new SuspendTaskCommand(taskId, userId);
-        } else if ("nominate".equals(operation)) {
+        } else if ("nominate".equalsIgnoreCase(operation)) {
             List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params);
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
         } else {

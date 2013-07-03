@@ -14,6 +14,9 @@ import org.kie.api.io.Resource;
 import org.kie.api.task.model.User;
 import org.kie.services.client.serialization.jaxb.impl.adapter.KnowledgeTypeXmlAdapter;
 
+/**
+ * This class is (only) used by the {@link JaxbProcessInstanceResponse} class to store the {@link Process} information. 
+ */
 @XmlRootElement(name="process")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbProcess implements Process {

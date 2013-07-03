@@ -14,7 +14,6 @@ import org.kie.api.task.model.Task;
 
 @XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso(value = { JaxbProcess.class })
 public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandResponse<Task> {
 
     @XmlAttribute
