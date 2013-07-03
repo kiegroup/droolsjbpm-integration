@@ -66,6 +66,7 @@ import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.EmptyContext;
+import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteRestSessionFactory;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
@@ -242,6 +243,17 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         }
         return cmdResponse;
     }
+   
+    private long findTaskId(long procInstId, List<TaskSummary> taskSumList) { 
+        long taskId = -1;
+        for( TaskSummary task : taskSumList ) { 
+            if( task.getProcessInstanceId() == procInstId ) {
+                taskId = task.getId();
+            }
+        }
+        assertNotEquals("Could not determine taskId!", -1, taskId);
+        return taskId;
+    }
     
     @Test
     @InSequence(1)
@@ -265,13 +277,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         assertEquals(200, responseObj.getStatus());
         
         JaxbTaskSummaryListResponse taskSumlistResponse = (JaxbTaskSummaryListResponse) responseObj.getEntity(JaxbTaskSummaryListResponse.class);
-        long taskId = -1;
-        for( TaskSummary task : taskSumlistResponse.getResult() ) { 
-            if( task.getProcessInstanceId() == procInstId ) {
-                taskId = task.getId();
-            }
-        }
-        assertNotEquals("Could not determine taskId!", -1, taskId);
+        long taskId = findTaskId(procInstId, taskSumlistResponse.getResult());
         
         urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/task/" + taskId + "/start?userId=salaboy").toExternalForm();
         restRequest = new ClientRequest(urlString);
@@ -315,7 +321,8 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         responseObj = restRequest.post();
         assertEquals(200, responseObj.getStatus());
         JaxbCommandsResponse cmdResponse = (JaxbCommandsResponse) responseObj.getEntity(JaxbCommandsResponse.class);
-        long taskId = ((JaxbLongListResponse) cmdResponse.getResponses().get(0)).getResult().get(0);
+        List list = (List) cmdResponse.getResponses().get(0).getResult();
+        long taskId = (Long) list.get(0);
         
         // start task
         
@@ -375,8 +382,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     @Ignore
     public void testRestRemoteApiHumanTaskProcess() throws Exception {
         // create REST request
-        RuntimeManager runtimeManager = new RemoteRestSessionFactory("http://127.0.0.1:8080/arquillian-test", "test").newRuntimeManager();
-        RuntimeEngine engine = runtimeManager.getRuntimeEngine(EmptyContext.get());
+        RuntimeEngine engine = new RemoteRestSessionFactory(deploymentUrl.toExternalForm(), "test").newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         
@@ -384,10 +390,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         
         TaskService taskService = engine.getTaskService();
         List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("salaboy", "en-UK");
-        if (tasks.size() != 1) {
-        	throw new RuntimeException("Expecting one task " + tasks.size());
-        }
-        long taskId = tasks.get(0).getId();
+        long taskId = findTaskId(processInstance.getId(), tasks);
         
         logger.debug("Found task " + taskId);
         Task task = taskService.getTaskById(taskId);
@@ -395,12 +398,46 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         taskService.start(taskId, "salaboy");
         taskService.complete(taskId, "salaboy", null);
         
-        System.out.println("Now expecting failure");
+        logger.debug("Now expecting failure");
         try {
         	taskService.complete(taskId, "salaboy", null);
+        	fail( "Should not be able to complete task " + taskId + " a second time.");
         } catch (Throwable t) {
-            t.printStackTrace();
-        	fail( "Unable to complete task " + taskId);
+            // do nothing
+        }
+        
+        List<Status> statuses = new ArrayList<Status>();
+        statuses.add(Status.Reserved);
+        List<TaskSummary> taskIds = taskService.getTasksByStatusByProcessInstanceId(processInstance.getId(), statuses, "en-UK");
+        assertEquals("Expected 2 tasks.", 2, taskIds.size());
+    }
+    
+    @Test
+    @InSequence(4)
+    public void testJmsRemoteApiHumanTaskProcess() throws Exception {
+        // create JMS request
+        RuntimeEngine engine = new RemoteJmsRuntimeEngineFactory("test", getRemoteInitialContext(), "guest", "1234").newRuntimeEngine();
+        KieSession ksession = engine.getKieSession();
+        ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
+        
+        logger.debug("Started process instance: " + processInstance + " " + (processInstance == null? "" : processInstance.getId()));
+        
+        TaskService taskService = engine.getTaskService();
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("salaboy", "en-UK");
+        long taskId = findTaskId(processInstance.getId(), tasks);
+        
+        logger.debug("Found task " + taskId);
+        Task task = taskService.getTaskById(taskId);
+        logger.debug("Got task " + taskId + ": " + task );
+        taskService.start(taskId, "salaboy");
+        taskService.complete(taskId, "salaboy", null);
+        
+        logger.debug("Now expecting failure");
+        try {
+            taskService.complete(taskId, "salaboy", null);
+            fail( "Should not have been able to complete task " + taskId + " a second time.");
+        } catch (Throwable t) {
+            // do nothing
         }
         
         List<Status> statuses = new ArrayList<Status>();

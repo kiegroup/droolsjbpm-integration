@@ -1,36 +1,23 @@
 package org.kie.services.client.api;
 
-import org.kie.api.runtime.manager.RuntimeManager;
-import org.kie.services.client.api.command.RemoteRuntimeManager;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.services.client.api.RemoteConfiguration.AuthenticationType;
+import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
-public class RemoteRestSessionFactory {
+public class RemoteRestSessionFactory implements RemoteRuntimeEngineFactory {
 
-    private String url;
-    private String deploymentId;
-    private AuthenticationType authenticationType;
-    private String username;
-    private String password;
+    private RemoteConfiguration configuration;
     
-    public RemoteRestSessionFactory(String url, String deploymentId) {
-        this.url = url;
-        this.deploymentId = deploymentId;
+    public RemoteRestSessionFactory(String deploymentId, String url) {
+        this.configuration = new RemoteConfiguration(deploymentId, url);
     }
     
-    public RemoteRestSessionFactory(String url, String deploymentId, AuthenticationType authenticationType, String username, String password) {
-        this.url = url;
-        this.deploymentId = deploymentId;
-        this.authenticationType = authenticationType;
-        this.username = username;
-        this.password = password;
+    public RemoteRestSessionFactory(String deploymentId, String url, AuthenticationType authenticationType, String username, String password) {
+        this.configuration = new RemoteConfiguration(deploymentId, url, authenticationType, username, password);
     }
     
-    public RuntimeManager newRuntimeManager() {
-    	return new RemoteRuntimeManager("Remote Runtime Manager", url, deploymentId, authenticationType, username, password);
+    public RuntimeEngine newRuntimeEngine() {
+    	return new RemoteRuntimeEngine(configuration);
     }
-    
-    public enum AuthenticationType {
-    	BASIC,
-    	FORM_BASED
-    }
-    
+
 }

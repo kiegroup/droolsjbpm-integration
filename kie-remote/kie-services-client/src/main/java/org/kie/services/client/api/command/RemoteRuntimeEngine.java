@@ -7,42 +7,36 @@ import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
-import org.kie.services.client.api.RemoteRestSessionFactory.AuthenticationType;
+import org.kie.services.client.api.RemoteConfiguration;
 
 public class RemoteRuntimeEngine implements RuntimeEngine {
 
-	private String url;
-	private String deploymentId;
-	private AuthenticationType authenticationType;
-	private String username;
-	private String password;
-	private String contextId;
-	
-	public RemoteRuntimeEngine(String url, String deploymentId, AuthenticationType authenticationType, String username, String password, String contextId) {
-		this.url = url;
-		this.deploymentId = deploymentId;
-		this.authenticationType = authenticationType;
-		this.username = username;
-		this.password = password;
-		this.contextId = contextId;
-	}
-	
-	public KieSession getKieSession() {
-		String url = this.url + "/runtime/" + deploymentId + "/execute";
-		if (this.contextId != null) {
-			url += "?contextId=" + contextId;
-		}
-		CommandService commandService = new RemoteSessionCommandService(this.url, url, deploymentId, authenticationType, username, password);
-		return new CommandBasedStatefulKnowledgeSession(commandService);
-	}
+    private final RemoteConfiguration config;
 
-	public TaskService getTaskService() {
-		String url = this.url + "/task/execute";
-		if (this.contextId != null) {
-			url += "?contextId=" + contextId;
-		}
-		CommandExecutor executor = new RemoteTaskCommandExecutor(this.url, url, deploymentId, authenticationType, username, password);
-		return new CommandBasedTaskService(executor);
-	}
+    public RemoteRuntimeEngine(RemoteConfiguration configuration) {
+        this.config = configuration;
+    }
+
+    public KieSession getKieSession() {
+        CommandService commandService;
+        if (config.isRest()) {
+            String url = config.getUrl() + "/runtime/" + config.getDeploymentId() + "/execute";
+            commandService = new RemoteSessionCommandService(url, config);
+        } else {
+            commandService = new RemoteSessionCommandService(config);
+        }
+        return new CommandBasedStatefulKnowledgeSession(commandService);
+    }
+
+    public TaskService getTaskService() {
+        CommandExecutor executor;
+        if (config.isRest()) {
+            String url = config.getUrl() + "/task/execute";
+            executor = new RemoteTaskCommandExecutor(url, config);
+        } else {
+            executor = new RemoteTaskCommandExecutor(config);
+        }
+        return new CommandBasedTaskService(executor);
+    }
 
 }

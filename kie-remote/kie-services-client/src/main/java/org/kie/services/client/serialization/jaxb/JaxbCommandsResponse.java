@@ -133,6 +133,8 @@ public class JaxbCommandsResponse {
         		|| Float.class.getName().equals(className)
         		|| Double.class.getName().equals(className) ) {
             this.responses.add(new JaxbPrimitiveResponse(result, i, cmd));
+        } else if( result instanceof JaxbExceptionResponse ) { 
+           this.responses.add((JaxbExceptionResponse) result);
         } else {
             unknownResultType = true;
         }

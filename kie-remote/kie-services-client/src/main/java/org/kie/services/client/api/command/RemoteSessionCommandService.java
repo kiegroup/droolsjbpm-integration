@@ -2,12 +2,16 @@ package org.kie.services.client.api.command;
 
 import org.drools.core.command.CommandService;
 import org.kie.internal.command.Context;
-import org.kie.services.client.api.RemoteRestSessionFactory.AuthenticationType;
+import org.kie.services.client.api.RemoteConfiguration;
 
 public class RemoteSessionCommandService extends AbstractRemoteCommandObject implements CommandService {
 
-	public RemoteSessionCommandService(String baseUrl, String url, String deploymentId, AuthenticationType authenticationType, String username, String password) {
-		super(baseUrl, url, deploymentId, authenticationType, username, password);
+	public RemoteSessionCommandService(RemoteConfiguration config) {
+		super(config);
+	}
+	
+	public RemoteSessionCommandService(String url, RemoteConfiguration config) {
+		super(url, config);
 	}
 	
 	public Context getContext() {
