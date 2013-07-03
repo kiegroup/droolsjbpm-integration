@@ -42,7 +42,7 @@
       <artifactId>kie-services-client</artifactId>
     </dependency>
 
-    <!-- jbpm (graph func)-->
+    <!-- jbpm (cmds, graph func)-->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-audit</artifactId>

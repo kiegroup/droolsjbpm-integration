@@ -4,6 +4,7 @@ import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbComman
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -40,6 +41,9 @@ public class RuntimeResource extends ResourceBase {
     @Inject
     private ProcessRequestBean processRequestBean;
 
+    @Inject
+    private Logger logger;
+    
     @PathParam("id")
     private String deploymentId;
     
