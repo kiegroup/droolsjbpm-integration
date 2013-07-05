@@ -55,10 +55,10 @@ public class RuntimeResource extends ResourceBase {
 
     @Inject
     private Logger logger;
-    
+
     @PathParam("id")
     private String deploymentId;
-    
+
     @Context
     private HttpServletRequest request;
 
@@ -75,11 +75,11 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]+}/start")
-    public JaxbProcessInstanceResponse startNewProcess(@PathParam("processDefId") String processId) { 
+    public JaxbProcessInstanceResponse startNewProcess(@PathParam("processDefId") String processId) {
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
-        
+
         ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
         JaxbProcessInstanceResponse resp = new JaxbProcessInstanceResponse(procInst, request);
         return resp;
@@ -91,39 +91,49 @@ public class RuntimeResource extends ResourceBase {
     public JaxbProcessInstanceResponse getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
-        if( result != null ) { 
+        if (result != null) {
             return new JaxbProcessInstanceResponse((ProcessInstance) result);
-        } else { 
-            throw new BadRequestException("Unable to retrieve process instance " + procInstId + " since it has been completed. Please see the history operations." );
+        } else {
+            throw new BadRequestException("Unable to retrieve process instance " + procInstId
+                    + " since it has been completed. Please see the history operations.");
         }
     }
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/process/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
-    public JaxbGenericResponse doProcessInstanceOperation(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) { 
-        Map<String, List<String>> params = getRequestParams(request);
-        Command<?> cmd = null;
-        if ("start".equalsIgnoreCase(operation.toLowerCase().trim())) {
-            cmd = new StartProcessInstanceCommand(procInstId);
-        } else if ("signal".equalsIgnoreCase(operation.toLowerCase().trim())) {
-            String eventType = getStringParam("eventType", true, params, operation);
-            Object event = getObjectParam("event", false, params, operation);
-            cmd = new SignalEventCommand(procInstId, eventType, event);
-        } else if ("abort".equalsIgnoreCase(operation.toLowerCase().trim())) {
-            cmd = new AbortProcessInstanceCommand();
-            ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
-        } else {
-            throw new BadRequestException("Unsupported operation: /process/instance/" + procInstId + "/" + operation);
-        }
+    @Path("/process/instance/{procInstId: [0-9]+}/abort")
+    public JaxbGenericResponse abortProcessInstanceOperation(@PathParam("procInstId") Long procInstId) {
+        Command<?> cmd = new AbortProcessInstanceCommand();
+        ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
         processRequestBean.doKieSessionOperation(cmd, deploymentId);
         return new JaxbGenericResponse(request);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
+    @Path("/process/instance/{procInstId: [0-9]+}/signal")
+    public JaxbGenericResponse signalProcessInstanceOperation(@PathParam("procInstId") Long procInstId) {
+        Map<String, List<String>> params = getRequestParams(request);
+        String eventType = getStringParam("eventType", true, params, "signal");
+        Object event = getObjectParam("event", false, params, "signal");
+        Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
+        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        return new JaxbGenericResponse(request);
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/process/instance/{procInstId: [0-9]+}/start")
+    public JaxbProcessInstanceResponse startProcessInstanceOperation(@PathParam("procInstId") Long procInstId) {
+        Command<?> cmd = new StartProcessInstanceCommand(procInstId);
+        ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        return new JaxbProcessInstanceResponse(procInst, request);
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
     @Path("/signal/{signal: [a-zA-Z0-9-]+}")
-    public JaxbGenericResponse signalEvent(@PathParam("signal") String signal) { 
+    public JaxbGenericResponse signalEvent(@PathParam("signal") String signal) {
         Map<String, List<String>> formParams = getRequestParams(request);
         Object event = getObjectParam("event", false, formParams, "signal/" + signal);
         Command<?> cmd = new SignalEventCommand(signal, event);
@@ -133,7 +143,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
-    public JaxbGenericResponse doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) { 
+    public JaxbGenericResponse doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
@@ -152,83 +162,93 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/clear")
     public JaxbGenericResponse clearProcessInstanceLogs() {
-       Command<?> cmd = new ClearHistoryLogsCommand();
-       processRequestBean.doKieSessionOperation(cmd, deploymentId);
-       return new JaxbGenericResponse(request);
+        Command<?> cmd = new ClearHistoryLogsCommand();
+        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        return new JaxbGenericResponse(request);
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance")
     public JaxbHistoryLogList getProcessInstanceLogs() {
-       Command<?> cmd = new FindProcessInstancesCommand();
-       List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-       return new JaxbHistoryLogList(procInstLogList);
+        Command<?> cmd = new FindProcessInstancesCommand();
+        List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                deploymentId);
+        return new JaxbHistoryLogList(procInstLogList);
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}")
     public JaxbHistoryLogList getSpecificProcessInstanceLogs(@PathParam("procInstId") long procInstId) {
-       Command<?> cmd = new FindProcessInstanceCommand(procInstId);
-       ProcessInstanceLog procInstLog= (ProcessInstanceLog) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-       List<ProcessInstanceLog> logList = new ArrayList<ProcessInstanceLog>();
-       logList.add(procInstLog);
-       return new JaxbHistoryLogList(logList);
+        Command<?> cmd = new FindProcessInstanceCommand(procInstId);
+        ProcessInstanceLog procInstLog = (ProcessInstanceLog) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        List<ProcessInstanceLog> logList = new ArrayList<ProcessInstanceLog>();
+        logList.add(procInstLog);
+        return new JaxbHistoryLogList(logList);
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
-    public JaxbHistoryLogList getVariableOrNodeHistoryList(@PathParam("procInstId") Long processInstanceId, @PathParam("oper") String operation ) {
+    public JaxbHistoryLogList getVariableOrNodeHistoryList(@PathParam("procInstId") Long processInstanceId,
+            @PathParam("oper") String operation) {
         JaxbHistoryLogList resultList;
         Command<?> cmd;
-       if( "child".equalsIgnoreCase(operation) ) { 
-           cmd = new FindSubProcessInstancesCommand(processInstanceId);
-           List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-           resultList = new JaxbHistoryLogList(procInstLogList);
-       } else if( "node".equalsIgnoreCase(operation) ) {
-           cmd = new FindNodeInstancesCommand(processInstanceId);
-           List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-           resultList = new JaxbHistoryLogList(nodeInstLogList);
-       } else if( "variable".equalsIgnoreCase(operation) ) {
-           cmd = new FindVariableInstancesCommand(processInstanceId);
-           List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-           resultList = new JaxbHistoryLogList(varInstLogList);
-       } else { 
-           throw new BadRequestException("Unsupported operation: /history/instance/" + processInstanceId + "/" + operation);
-       }
-       return resultList;
+        if ("child".equalsIgnoreCase(operation)) {
+            cmd = new FindSubProcessInstancesCommand(processInstanceId);
+            List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                    deploymentId);
+            resultList = new JaxbHistoryLogList(procInstLogList);
+        } else if ("node".equalsIgnoreCase(operation)) {
+            cmd = new FindNodeInstancesCommand(processInstanceId);
+            List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                    deploymentId);
+            resultList = new JaxbHistoryLogList(nodeInstLogList);
+        } else if ("variable".equalsIgnoreCase(operation)) {
+            cmd = new FindVariableInstancesCommand(processInstanceId);
+            List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                    deploymentId);
+            resultList = new JaxbHistoryLogList(varInstLogList);
+        } else {
+            throw new BadRequestException("Unsupported operation: /history/instance/" + processInstanceId + "/" + operation);
+        }
+        return resultList;
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{id: [a-zA-Z0-9-:\\.]+}")
-    public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long processInstanceId, @PathParam("oper") String operation, @PathParam("id") String id ) {
+    public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long processInstanceId,
+            @PathParam("oper") String operation, @PathParam("id") String id) {
         JaxbHistoryLogList resultList;
         Command<?> cmd;
-       if( "node".equalsIgnoreCase(operation) ) {
-           cmd = new FindNodeInstancesCommand(processInstanceId, id);
-           List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-           resultList = new JaxbHistoryLogList(nodeInstLogList);
-       } else if( "variable".equalsIgnoreCase(operation) ) {
-           cmd = new FindVariableInstancesCommand(processInstanceId, id);
-           List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-           resultList = new JaxbHistoryLogList(varInstLogList);
-       } else { 
-           throw new BadRequestException("Unsupported operation: /history/instance/" + processInstanceId + "/" + operation + "/" + id);
-       }
-       return resultList;
+        if ("node".equalsIgnoreCase(operation)) {
+            cmd = new FindNodeInstancesCommand(processInstanceId, id);
+            List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                    deploymentId);
+            resultList = new JaxbHistoryLogList(nodeInstLogList);
+        } else if ("variable".equalsIgnoreCase(operation)) {
+            cmd = new FindVariableInstancesCommand(processInstanceId, id);
+            List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                    deploymentId);
+            resultList = new JaxbHistoryLogList(varInstLogList);
+        } else {
+            throw new BadRequestException("Unsupported operation: /history/instance/" + processInstanceId + "/" + operation + "/"
+                    + id);
+        }
+        return resultList;
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/process/{procId: [a-zA-Z0-9-:\\.]+}")
-    public JaxbHistoryLogList getProcessInstanceLogs(@PathParam("procInstId") String processId) { 
+    public JaxbHistoryLogList getProcessInstanceLogs(@PathParam("procInstId") String processId) {
         JaxbHistoryLogList resultList;
         Command<?> cmd = new FindProcessInstancesCommand(processId);
-        List<ProcessInstanceLog> nodeInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        List<ProcessInstanceLog> nodeInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
+                deploymentId);
         return new JaxbHistoryLogList(nodeInstLogList);
     }
-    
+
 }
