@@ -71,17 +71,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class JPASingleSessionCommandServiceFactoryTest {
     private static final String            TMPDIR = System.getProperty( "java.io.tmpdir" );
     private static final Logger            log    = LoggerFactory.getLogger( JPASingleSessionCommandServiceFactoryTest.class );
-    private static Server                  h2Server;
 
     private ClassPathXmlApplicationContext ctx;
 
     @BeforeClass
     public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
-        h2Server = Server.createTcpServer( new String[0] );
-        h2Server.start();
+        DeleteDbFiles.execute("target", "test", true);
         try {
             log.info( "creating: {}",
                       TMPDIR + "/processWorkItems.pkg" );
@@ -107,15 +102,6 @@ public class JPASingleSessionCommandServiceFactoryTest {
                        e );
             throw new RuntimeException( e );
         }
-    }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        log.info( "stopping database" );
-        h2Server.stop();
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
     }
 
     @Before
@@ -338,7 +324,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         actionNode.setName( "Action" );
         DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect( "java" );
-        action.setConsequence( "System.out.println(\"Executed action\");" );
+        action.setConsequence( "System.out.println(\"1: Executed action\");" );
         actionNode.setAction( action );
         process.addNode( actionNode );
         new ConnectionImpl( start,
@@ -492,7 +478,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         actionNode.setName( "Action" );
         DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect( "java" );
-        action.setConsequence( "System.out.println(\"Executed action\");" );
+        action.setConsequence( "System.out.println(\"2: Executed action\");" );
         actionNode.setAction( action );
         process.addNode( actionNode );
         new ConnectionImpl( start,
@@ -535,7 +521,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         actionNode.setName( "Action" );
         action = new DroolsConsequenceAction();
         action.setDialect( "java" );
-        action.setConsequence( "System.out.println(\"Executed action\");" );
+        action.setConsequence( "System.out.println(\"3: Executed action\");" );
         actionNode.setAction( action );
         process.addNode( actionNode );
         new ConnectionImpl( start,
@@ -610,8 +596,9 @@ public class JPASingleSessionCommandServiceFactoryTest {
                                          null,
                                          env );
         log.info( "---> load session: " + sessionId );
-        Thread.sleep( 3000 );
 
+        Thread.sleep( 3000 );
+        
         log.info( "---> GetProcessInstanceCommand id: " + procId );
         processInstance = service.getProcessInstance( procId );
         log.info( "---> session disposed" );
@@ -644,7 +631,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         actionNode.setName( "Action" );
         DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect( "java" );
-        action.setConsequence( "System.out.println(\"Executed action\");" );
+        action.setConsequence( "System.out.println(\"5: Execute action\");" );
         actionNode.setAction( action );
         process.addNode( actionNode );
         new ConnectionImpl( timerNode,
@@ -722,7 +709,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         actionNode.setName( "Action" );
         DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect( "java" );
-        action.setConsequence( "try { Thread.sleep(1000); } catch (Throwable t) {} System.out.println(\"Executed action\");" );
+        action.setConsequence( "try { Thread.sleep(1000); } catch (Throwable t) {} System.out.println(\"4: Executed action\");" );
         actionNode.setAction( action );
         process.addNode( actionNode );
         new ConnectionImpl( timerNode,

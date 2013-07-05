@@ -69,17 +69,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class JPASingleSessionCommandServiceFactoryEnvTest {
     private static final String            TMPDIR = System.getProperty( "java.io.tmpdir" );
     private static final Logger            log    = LoggerFactory.getLogger( JPASingleSessionCommandServiceFactoryEnvTest.class );
-    private static Server                  h2Server;
 
     private ClassPathXmlApplicationContext ctx;
 
     @BeforeClass
     public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
-        h2Server = Server.createTcpServer( new String[0] );
-        h2Server.start();
+        DeleteDbFiles.execute("target", "test", true);
         try {
             log.info( "creating: {}",
                       TMPDIR + "/processWorkItems.pkg" );
@@ -105,15 +100,6 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                        e );
             throw new RuntimeException( e );
         }
-    }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        log.info( "stopping database" );
-        h2Server.stop();
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
     }
 
     @Before

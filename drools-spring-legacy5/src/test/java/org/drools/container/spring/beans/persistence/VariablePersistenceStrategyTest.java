@@ -69,28 +69,14 @@ public class VariablePersistenceStrategyTest {
 
     private static final String            TMPDIR = System.getProperty( "java.io.tmpdir" );
     private static final Logger            log    = LoggerFactory.getLogger( JPASingleSessionCommandServiceFactoryTest.class );
-    private static Server                  h2Server;
 
     private ClassPathXmlApplicationContext ctx;
 
     @BeforeClass
-    public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
-        h2Server = Server.createTcpServer( new String[0] );
-        h2Server.start();
+    public static void cleanH2Database() throws Exception {
+        DeleteDbFiles.execute("target", "test", true);
     }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        log.info( "stoping database" );
-        h2Server.stop();
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
-    }
-
+    
     @Before
     public void createSpringContext() {
         try {
