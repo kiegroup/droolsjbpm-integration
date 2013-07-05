@@ -17,7 +17,7 @@
 package org.drools.examples.broker
 
 import org.drools.examples.broker.model.PortfolioAction
-import org.kie.runtime.rule.FactHandle
+import org.kie.api.runtime.rule.FactHandle
 
 rule "Portfolio action no longer needed"
         dialect "mvel"
