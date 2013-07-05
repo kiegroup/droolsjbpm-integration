@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.container.spring.beans.persistence;
+package org.kie.spring.persistence;
 
 import org.drools.persistence.TransactionManager;
 import org.drools.persistence.TransactionSynchronization;
@@ -26,7 +26,7 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-public class DroolsSpringTransactionManager
+public class KieSpringTransactionManager
         implements
         TransactionManager {
 
@@ -36,7 +36,7 @@ public class DroolsSpringTransactionManager
     TransactionDefinition td = new DefaultTransactionDefinition();
     TransactionStatus currentTransaction = null;
 
-    public DroolsSpringTransactionManager(AbstractPlatformTransactionManager ptm) {
+    public KieSpringTransactionManager(AbstractPlatformTransactionManager ptm) {
         this.ptm = ptm;
     }
 

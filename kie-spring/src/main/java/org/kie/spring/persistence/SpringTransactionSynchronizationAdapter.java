@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.container.spring.beans.persistence;
+package org.kie.spring.persistence;
 
 import org.drools.persistence.TransactionManager;
 import org.springframework.transaction.support.TransactionSynchronization;
