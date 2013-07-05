@@ -22,9 +22,9 @@ import org.drools.examples.conway.Neighbor;
 import org.drools.examples.conway.Phase;
 import org.drools.examples.conway.CellState;
 
-import org.kie.WorkingMemory;
-import org.kie.common.InternalWorkingMemoryActions;
-import org.kie.RuleBase;
+import org.drools.core.WorkingMemory;
+import org.drools.core.common.InternalWorkingMemoryActions;
+import org.drools.core.RuleBase;
 
 
 rule "register north east"
