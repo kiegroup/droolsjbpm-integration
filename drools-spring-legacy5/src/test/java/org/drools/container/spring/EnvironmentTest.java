@@ -37,23 +37,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class EnvironmentTest {
 
     static ClassPathXmlApplicationContext context = null;
-    private static Server                  h2Server;
 
     @BeforeClass
-    public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute("",
-                "DroolsFlow",
-                true);
-        h2Server = Server.createTcpServer(new String[0]);
-        h2Server.start();
-    }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        h2Server.stop();
-        DeleteDbFiles.execute( "",
-                "DroolsFlow",
-                true );
+    public static void cleanH2Database() throws Exception {
+        DeleteDbFiles.execute("target", "test", true);
     }
 
     @BeforeClass
