@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.container.spring.beans.persistence;
+package org.kie.spring.persistence;
 
 import org.drools.persistence.PersistenceContext;
 import org.drools.persistence.jpa.JpaPersistenceContext;
@@ -31,7 +31,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-public class DroolsSpringJpaManager
+public class KieSpringJpaManager
         implements
         ProcessPersistenceContextManager {
 
@@ -47,7 +47,7 @@ public class DroolsSpringJpaManager
 
     private boolean isJTA;
 
-    public DroolsSpringJpaManager(Environment env) {
+    public KieSpringJpaManager(Environment env) {
         this.env = env;
         this.emf = (EntityManagerFactory) env.get(EnvironmentName.ENTITY_MANAGER_FACTORY);
 
@@ -129,7 +129,7 @@ public class DroolsSpringJpaManager
     }
 
     public void dispose() {
-        logger.trace("Disposing DroolsSpringJpaManager");
+        logger.trace("Disposing KieSpringJpaManager");
         if (internalAppScopedEntityManager) {
             //TransactionSynchronizationManager.unbindResource( "appEM" );
             TransactionSynchronizationManager.unbindResource(this.emf);
