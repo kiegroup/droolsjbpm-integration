@@ -8,10 +8,9 @@
        http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring.xsd
     ">
 
-    <!-- The source should be changed accoring to the version used of Drools -->
     <drools:resource id="guvnor-package"
                      type="PKG"
-                     source="http://localhost:8080/guvnor-6.0.0-SNAPSHOT-tomcat-6.0/org.drools.guvnor.Guvnor/package/mortgages/LATEST"
+                     source="http://localhost:8080/guvnor-${project.version}-tomcat-6.0/org.drools.guvnor.Guvnor/package/mortgages/LATEST"
                      basic-authentication="enabled"
                      username="admin"
                      password="admin"/>

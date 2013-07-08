@@ -16,12 +16,15 @@
 
 package org.drools.karaf.itest;
 
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.ops4j.pax.exam.options.UrlReference;
@@ -30,13 +33,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
-import static org.junit.Assert.assertNotNull;
-import static org.ops4j.pax.exam.CoreOptions.*;
-
 public class KieSpringIntegrationTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(KieSpringIntegrationTestSupport.class);
-    protected static final String DroolsVersion = "6.0.0-SNAPSHOT";
+    protected static final String DroolsVersion;
+    static { 
+        Properties testProps = new Properties();
+        try {
+            testProps.load(KieSpringIntegrationTestSupport.class.getResourceAsStream("/test.properties"));
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
+        }
+        DroolsVersion = testProps.getProperty("project.version");
+    }
 
     protected OsgiBundleXmlApplicationContext applicationContext;
 

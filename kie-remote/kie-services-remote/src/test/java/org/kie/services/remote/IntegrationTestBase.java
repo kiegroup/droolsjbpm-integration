@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -16,6 +17,17 @@ import org.kie.commons.java.nio.fs.file.SimpleFileSystemProvider;
 
 public class IntegrationTestBase {
 
+    protected final static String projectVersion;
+    static { 
+        Properties testProps = new Properties();
+        try {
+            testProps.load(IntegrationTestBase.class.getResourceAsStream("/test.properties"));
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
+        }
+        projectVersion = testProps.getProperty("project.version");
+    }
+    
     static WebArchive createWebArchive() { 
 
         File[] libs = Maven.resolver()
@@ -35,7 +47,7 @@ public class IntegrationTestBase {
                 // services
                 "org.kie.commons:kie-nio2-fs",
                 // test
-                "org.jbpm:jbpm-shared-services:test-jar:6.0.0-SNAPSHOT"
+                "org.jbpm:jbpm-shared-services:test-jar:" + projectVersion
         };
         
         File[] warLibs = Maven.resolver()

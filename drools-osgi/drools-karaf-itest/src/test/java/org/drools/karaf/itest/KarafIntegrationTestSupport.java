@@ -18,6 +18,8 @@ package org.drools.karaf.itest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import javax.inject.Inject;
 
 import org.apache.camel.CamelContext;
@@ -37,8 +39,17 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(KarafIntegrationTestSupport.class);
     private static final String CamelVersion = "2.10.3";
-    protected static final String DroolsVersion = "6.0.0-SNAPSHOT";
-
+    protected static final String DroolsVersion;
+    static { 
+        Properties testProps = new Properties();
+        try {
+            testProps.load(KieSpringIntegrationTestSupport.class.getResourceAsStream("/test.properties"));
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
+        }
+        DroolsVersion = testProps.getProperty("project.version");
+    }
+    
     @Inject
     protected BundleContext bundleContext;
 
