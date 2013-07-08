@@ -106,7 +106,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(modelerService);
             assertNotNull(projectService);
 
-            URI projectUri = new URI("default://master@uf-playground/GuvnorM2RepoDependencyExample1");
+            URI projectUri = new URI("default://master@uf-playground/GuvnorM2RepoDependencyExample2");
 
             Path projectPath = ioService.get(projectUri);
             assertNotNull(projectPath);
@@ -141,7 +141,7 @@ public class AnnotationsTest extends FullDistributionTest {
             DataModelTO reloadedModel = modelerService.loadModel(project);
             assertNotNull(reloadedModel);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             fail("Test failed: " + e.getMessage());
         }
     }
