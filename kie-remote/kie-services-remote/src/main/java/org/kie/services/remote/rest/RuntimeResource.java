@@ -243,8 +243,7 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/process/{procId: [a-zA-Z0-9-:\\.]+}")
-    public JaxbHistoryLogList getProcessInstanceLogs(@PathParam("procInstId") String processId) {
-        JaxbHistoryLogList resultList;
+    public JaxbHistoryLogList getProcessInstanceLogs(@PathParam("procId") String processId) {
         Command<?> cmd = new FindProcessInstancesCommand(processId);
         List<ProcessInstanceLog> nodeInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
                 deploymentId);
