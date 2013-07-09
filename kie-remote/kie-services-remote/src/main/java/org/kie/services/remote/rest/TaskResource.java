@@ -2,6 +2,7 @@ package org.kie.services.remote.rest;
 
 import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
+import org.kie.services.remote.util.Paginator;
 
 @Path("/task")
 @RequestScoped
@@ -93,6 +95,7 @@ public class TaskResource extends ResourceBase {
     @Path("/query")
     public JaxbTaskSummaryListResponse query(@Context UriInfo uriInfo) {
         Map<String, List<String>> params = getRequestParams(request);
+        
         List<Long> workItemIdList = getLongListParam(allowedQueryParams[0], false, params, "query", true);
         List<Long> taskIdList = getLongListParam(allowedQueryParams[1], false, params, "query", true);
         List<String> busAdminList = getStringListParam(allowedQueryParams[2], false, params, "query");
@@ -113,6 +116,9 @@ public class TaskResource extends ResourceBase {
                 throw new BadRequestException(queryParam + " is an unknown and unsupported query param for the task query operation." );
             }
         }
+        
+        int [] pageInfo = getPageNumAndPageSize(params);
+        Paginator<TaskSummaryImpl> paginator = new Paginator<TaskSummaryImpl>();
         
         /**
          * TODO: talk with Mauricio about new query command that accepts all of the above params? 
@@ -142,16 +148,26 @@ public class TaskResource extends ResourceBase {
             }
         }
 
-        Set<TaskSummaryImpl> results = new HashSet<TaskSummaryImpl>();
+        Set<TaskSummaryImpl> alreadyRetrievedSet = new HashSet<TaskSummaryImpl>();
+        List<TaskSummaryImpl> results = new ArrayList<TaskSummaryImpl>();
+        
         Command<?> cmd = null;
         while (!cmds.isEmpty()) {
             cmd = cmds.poll();
             TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(cmd);
             if (task != null) {
-                results.add(convertTaskToTaskSummary(task));
+                TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
+                if( alreadyRetrievedSet.add(taskSum) ) { 
+                    results.add(taskSum);
+                }
             }
         }
 
+        if( results.size() >= pageInfo[2] ) { 
+            results = paginator.paginate(pageInfo, results);
+            return new JaxbTaskSummaryListResponse(results);
+        }
+        
         int assignments = 0;
         assignments += potOwnList.isEmpty() ? 0 : 1;
         assignments += busAdminList.isEmpty() ? 0 : 1;
@@ -172,8 +188,15 @@ public class TaskResource extends ResourceBase {
                             cmd = new GetTaskCommand(taskId);
                             TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(cmd);
                             if (task != null) {
-                                results.add(convertTaskToTaskSummary(task));
+                                TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
+                                if( alreadyRetrievedSet.add(taskSum) ) { 
+                                    results.add(taskSum);
+                                }
                             }
+                        }
+                        if( results.size() >= pageInfo[2] ) { 
+                            results = paginator.paginate(pageInfo, results);
+                            return new JaxbTaskSummaryListResponse(results);
                         }
                     }
                 }
@@ -215,11 +238,19 @@ public class TaskResource extends ResourceBase {
             List<TaskSummary> taskSummaryList = (List<TaskSummary>) processRequestBean.doTaskOperation(cmd);
             if (taskSummaryList != null && !taskSummaryList.isEmpty()) {
                 for (TaskSummary taskSummary : taskSummaryList) {
-                    results.add((TaskSummaryImpl) taskSummary);
+                    TaskSummaryImpl taskSum = (TaskSummaryImpl) taskSummary;
+                    if( alreadyRetrievedSet.add(taskSum) ) { 
+                        results.add(taskSum);
+                    }
                 }
+            }
+            if( results.size() >= pageInfo[2] ) { 
+                results = paginator.paginate(pageInfo, results);
+                return new JaxbTaskSummaryListResponse(results);
             }
         }
         
+        results = paginator.paginate(pageInfo, results);
         return new JaxbTaskSummaryListResponse(results);
     }
 

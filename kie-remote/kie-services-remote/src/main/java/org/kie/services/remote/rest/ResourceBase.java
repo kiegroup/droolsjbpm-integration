@@ -199,4 +199,32 @@ public class ResourceBase {
         }
         return statusList;
     }
+    
+    protected static int [] getPageNumAndPageSize(Map<String, List<String>> params) {
+        int [] pageInfo = new int[3];
+        Number page = getNumberParam("page", false, params, "query", false);
+        Number pageShort = getNumberParam("p", false, params, "query", false);
+        Number pageSize = getNumberParam("pageSize", false, params, "query", false);
+        Number pageSizeShort = getNumberParam("s", false, params, "query", false);
+        
+        int p = 1;
+        int s = 10;
+        if( page != null ) { 
+            p = page.intValue();
+        } else if( pageShort != null ) { 
+            p = pageShort.intValue();
+        }
+        if( pageSize != null ) { 
+            s = pageSize.intValue();
+        } else if( pageSizeShort != null ) { 
+            s = pageSizeShort.intValue();
+        }
+        
+        pageInfo[0] = p;
+        pageInfo[1] = s;
+        pageInfo[2] = pageInfo[0] * pageInfo[1];
+        
+        return pageInfo;
+    }
+    
 }
