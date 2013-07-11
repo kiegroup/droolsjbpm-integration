@@ -56,7 +56,7 @@ public class AnnotationsTest extends FullDistributionTest {
     private Event<InvalidateDMOProjectCacheEvent> invalidateDMOProjectCache;
 
     @Test
-    public void test() {
+    public void testLoadModelWithAnnotatedNonModellerPojos() {
 
         try {
 
@@ -96,12 +96,13 @@ public class AnnotationsTest extends FullDistributionTest {
             assertEquals("Annotations test class: " + annotationTestSerializable + " wasn't loaded", true, isTestSerializableLoaded);
 
         } catch (Exception e) {
-            fail("Test failed: " + e.getMessage());
+            logger.error("Test failed : " + e.getMessage(), e);
+            fail();
         }
     }
 
     @Test
-    public void test2() {
+    public void testLoadModelWithAnnotatedModelledPojos() {
         try {
             assertNotNull(ioService);
             assertNotNull(dataModelService);
@@ -181,10 +182,154 @@ public class AnnotationsTest extends FullDistributionTest {
                     }
                 }
             } else {
-                fail("Test failed: error in fact types");
+                logger.error("Test failed: error in fact types");
+                fail();
             }
         } catch (Throwable e) {
-            fail("Test failed: " + e.getMessage());
+            logger.error("Test failed : " + e.getMessage(), e);
+            fail();
+        }
+    }
+
+    @Test
+    public void testLoadModelledPojoExtension() {
+        try {
+            assertNotNull(ioService);
+            assertNotNull(dataModelService);
+            assertNotNull(paths);
+            assertNotNull(modelerService);
+            assertNotNull(projectService);
+
+            URI projectUri = new URI("default://master@uf-playground/GuvnorM2RepoDependencyExample2");
+
+            Path projectPath = ioService.get(projectUri);
+            assertNotNull(projectPath);
+
+            org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+
+            Project project = projectService.resolveProject(path);
+
+            Map<String, AnnotationDefinitionTO> annotationDefs = modelerService.getAnnotationDefinitions();
+
+            DataModelTO dataModel = modelerService.loadModel(project);
+
+            String parentName = "A";
+            String parentPackage = "a";
+            DataObjectTO parent = new DataObjectTO(parentName, parentPackage, null);
+            dataModel.getDataObjects().add(parent);
+
+            String parentFieldName = "a1";
+            String parentFieldClass = "java.lang.String";
+            ObjectPropertyTO parentProp = new ObjectPropertyTO(parentFieldName, parentFieldClass, false, true);
+            parent.setProperties(Arrays.asList(parentProp));
+
+            String extendingName = "B";
+            String extendingPackage = "a.b";
+            DataObjectTO extending = new DataObjectTO(extendingName, extendingPackage, null);
+            // Extend B from A
+            extending.setSuperClassName(parent.getClassName());
+            dataModel.getDataObjects().add(extending);
+
+            String extendingFieldName = "b1";
+            String extendingFieldClass = "java.lang.String";
+            ObjectPropertyTO extendingProp = new ObjectPropertyTO(extendingFieldName, extendingFieldClass, false, true);
+            extending.setProperties(Arrays.asList(extendingProp));
+
+            GenerationResult result = modelerService.saveModel(dataModel, project);
+            assertNotNull(result);
+            logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
+
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            DataModelTO reloadedModel = modelerService.loadModel(project);
+            assertNotNull(reloadedModel);
+
+        } catch (Throwable e) {
+            logger.error("Test failed : " + e.getMessage(), e);
+            fail();
+        }
+    }
+
+    @Test
+    public void testLoadModelledAnnotatedPojoExtension() {
+        try {
+            assertNotNull(ioService);
+            assertNotNull(dataModelService);
+            assertNotNull(paths);
+            assertNotNull(modelerService);
+            assertNotNull(projectService);
+
+            URI projectUri = new URI("default://master@uf-playground/GuvnorM2RepoDependencyExample2");
+
+            Path projectPath = ioService.get(projectUri);
+            assertNotNull(projectPath);
+
+            org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+
+            Project project = projectService.resolveProject(path);
+
+            Map<String, AnnotationDefinitionTO> annotationDefs = modelerService.getAnnotationDefinitions();
+
+            DataModelTO dataModel = modelerService.loadModel(project);
+
+            String parentName = "A2";
+            String parentPackage = "a";
+            String parentLabelValue = "Parent";
+            String parentDescriptionValue = "This is the parent object";
+            String parentRoleValue = "EVENT";
+            DataObjectTO parent = new DataObjectTO(parentName, parentPackage, null);
+            parent.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentLabelValue);
+            parent.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentDescriptionValue);
+            parent.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentRoleValue);
+            dataModel.getDataObjects().add(parent);
+
+            String parentFieldName = "a1";
+            String parentFieldClass = "java.lang.String";
+            String parentFieldLabelValue = "Attribute A2.1";
+            String parentFieldDescriptionValue = "First attribute of A2";
+            int parentFieldPositionValue = 1;
+            ObjectPropertyTO parentProp = new ObjectPropertyTO(parentFieldName, parentFieldClass, false, true);
+            parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentFieldLabelValue);
+            parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentFieldDescriptionValue);
+            parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, parentFieldPositionValue);
+            parent.setProperties(Arrays.asList(parentProp));
+
+            String extendingName = "B2";
+            String extendingPackage = "a.b";
+            String extendingLabelValue = "Extending";
+            String extendingDescriptionValue = "This is the extending object";
+            String extendingRoleValue = "EVENT";
+            DataObjectTO extending = new DataObjectTO(extendingName, extendingPackage, null);
+            // Extend B from A
+            extending.setSuperClassName(parent.getClassName());
+            extending.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingLabelValue);
+            extending.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingDescriptionValue);
+            extending.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingRoleValue);
+            dataModel.getDataObjects().add(extending);
+
+            String extendingFieldName = "b1";
+            String extendingFieldClass = "java.lang.String";
+            String extendingFieldLabelValue = "Attribute B2.1";
+            String extendingFieldDescriptionValue = "First attribute of B2";
+            int extendingFieldPositionValue = 1;
+            ObjectPropertyTO extendingProp = new ObjectPropertyTO(extendingFieldName, extendingFieldClass, false, true);
+            extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldLabelValue);
+            extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldDescriptionValue);
+            extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldPositionValue);
+            extending.setProperties(Arrays.asList(extendingProp));
+
+            GenerationResult result = modelerService.saveModel(dataModel, project);
+            assertNotNull(result);
+            logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
+
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            DataModelTO reloadedModel = modelerService.loadModel(project);
+            assertNotNull(reloadedModel);
+
+        } catch (Throwable e) {
+            logger.error("Test failed : " + e.getMessage(), e);
+            fail();
         }
     }
 
