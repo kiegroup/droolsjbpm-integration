@@ -1,7 +1,5 @@
 package org.kie.services.remote.cdi;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,12 +14,13 @@ import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class ProcessRequestBean {
 
-    @Inject
-    private Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);
 
     @Inject
     private RuntimeManagerManager runtimeMgrMgr;
@@ -40,7 +39,8 @@ public class ProcessRequestBean {
             result = kieSession.execute(cmd);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
-            logger.log(Level.WARNING, "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
+            logger.warn("Unable to execute {} because of {} ", exceptResp.getCommandName(), e.getClass().getSimpleName());
+            logger.warn("Stacktrace:", e);
             result = exceptResp;
         }
         return result;
@@ -52,7 +52,8 @@ public class ProcessRequestBean {
             result = ((InternalTaskService) taskService).execute(cmd);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
-            logger.log(Level.WARNING, "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
+            logger.warn("Unable to execute {} because of {} ", exceptResp.getCommandName(), e.getClass().getSimpleName());
+            logger.warn("Stacktrace:", e);
             result = exceptResp;
         }
         return result;
@@ -69,7 +70,4 @@ public class ProcessRequestBean {
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
 
-    public Logger getLogger() { 
-        return logger;
-    }
 }

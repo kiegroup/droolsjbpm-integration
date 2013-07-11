@@ -2,9 +2,6 @@ package org.kie.services.remote.jms;
 
 import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.MessageDrivenContext;
@@ -27,6 +24,8 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.remote.KieRemoteServicesInternalError;
 import org.kie.services.remote.cdi.ProcessRequestBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is the link between incoming request (whether via REST or JMS or .. whatever)
@@ -38,8 +37,7 @@ import org.kie.services.remote.cdi.ProcessRequestBean;
  */
 public class RequestMessageBean implements MessageListener {
 
-    @Inject
-    private Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(RequestMessageBean.class);
 
     @Resource(mappedName = "java:/ConnectionFactory")
     private ConnectionFactory connectionFactory;
@@ -65,13 +63,11 @@ public class RequestMessageBean implements MessageListener {
         try {
             msgCorrId = message.getJMSCorrelationID();
         } catch (JMSException jmse) {
-            logger.log(Level.WARNING, 
-                    "Unable to retrieve JMS correlation id from message! This id is needed to be able to match a request to a response message.",
+            logger.warn("Unable to retrieve JMS correlation id from message! This id is needed to be able to match a request to a response message.",
                     jmse);
         }
         if( msgCorrId == null ) { 
-            logger.log(Level.WARNING, 
-                    "JMS correlation id is empty! This id is needed to be able to match a request to a response message.");
+            logger.warn("JMS correlation id is empty! This id is needed to be able to match a request to a response message.");
         }
         
         // 1. get request
@@ -84,7 +80,7 @@ public class RequestMessageBean implements MessageListener {
             jaxbResponse = processJaxbCommandsRequest(cmdsRequest, processRequestBean);
         } else {
             // Failure reasons have been logged in deserializeRequest(). 
-            logger.log(Level.SEVERE, "Stopping processing of request message due to errors: see above.");
+            logger.error("Stopping processing of request message due to errors: see above.");
             return;
         }
 
@@ -96,7 +92,7 @@ public class RequestMessageBean implements MessageListener {
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException jmse) {
-            logger.log(Level.SEVERE, "Unable to open new session to send response message to message " + msgCorrId, jmse);
+            logger.error("Unable to open new session to send response message to message " + msgCorrId, jmse);
             failure = true;
         } finally {
             if (failure) {
@@ -107,7 +103,7 @@ public class RequestMessageBean implements MessageListener {
                         session.close();
                         session = null;
                     } catch (JMSException jmse) {
-                        logger.log(Level.INFO, "Unable to close connection or session after failing to create connection or session.", jmse);
+                        logger.warn("Unable to close connection or session after failing to create connection or session.", jmse);
                     }
                 }
                 // Unable to create connection/session, so no need to try send the message either
@@ -120,7 +116,7 @@ public class RequestMessageBean implements MessageListener {
         try {
             msg.setJMSCorrelationID(msgCorrId);
         } catch (JMSException jmse) {
-            logger.log( Level.WARNING, "Unable to set correlation id of response to msg id " + msgCorrId, jmse );
+            logger.warn("Unable to set correlation id of response to msg id {} due to {}", msgCorrId, jmse );
         }
         
         // 5. send response message
@@ -131,12 +127,11 @@ public class RequestMessageBean implements MessageListener {
                 MessageProducer producer = session.createProducer(responseQueue);
                 producer.send(msg);
             } catch (NamingException ne) {
-                logger.log(Level.SEVERE, 
-                        "Unable to lookup response queue (" + RESPONSE_QUEUE_NAME + ") to send msg " + msgCorrId 
+                logger.error("Unable to lookup response queue (" + RESPONSE_QUEUE_NAME + ") to send msg " + msgCorrId 
                         + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).",
                         ne );
             } catch (JMSException jmse) {
-                logger.log(Level.SEVERE, "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME, jmse );
+                logger.error("Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME, jmse );
             } finally {
                 if (connection != null) {
                     try {
@@ -145,7 +140,7 @@ public class RequestMessageBean implements MessageListener {
                         session.close();
                         session = null;
                     } catch (JMSException jmse) {
-                        logger.log(Level.INFO, "Unable to close connection or session.", jmse);
+                        logger.error("Unable to close connection or session.", jmse);
                     }
                 }
             }
@@ -164,7 +159,7 @@ public class RequestMessageBean implements MessageListener {
                 throw new KieRemoteServicesInternalError("Unknown serialization type when deserializing message " + msgId + ":" + serializationTypeHolder[0]);
             }
         } catch (JMSException jmse) {
-            logger.log(Level.SEVERE, "Unable to read information from message " + msgId + ".", jmse);
+            logger.error("Unable to read information from message " + msgId + ".", jmse);
         } catch( JAXBException jaxbe) { 
             throw new KieRemoteServicesInternalError("Unable to convert String to " + JaxbCommandsRequest.class.getSimpleName() + " [msg id: " + msgId + "].", jaxbe);
         }
@@ -184,7 +179,7 @@ public class RequestMessageBean implements MessageListener {
                 throw new KieRemoteServicesInternalError("Unknown serialization type when deserializing message " + msgId + ":" + serializationType);
             }
         } catch (JMSException jmse) {
-            logger.log(Level.SEVERE, "Unable to create response message or write to it [msg id: " + msgId + "].", jmse);
+            logger.error("Unable to create response message or write to it [msg id: " + msgId + "].", jmse);
         } catch( JAXBException jaxbe) { 
             throw new KieRemoteServicesInternalError("Unable to serialize " + jaxbResponse.getClass().getSimpleName() + " to a String.", jaxbe);
         }

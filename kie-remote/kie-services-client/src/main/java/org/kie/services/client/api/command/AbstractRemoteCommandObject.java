@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.UnsupportedEncodingException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,8 +51,6 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import bitronix.tm.Configuration;
 
 /**
  * This class contains the logic to interact with the REST or JMS api's. It is the basis for all of the remote interface instances.

@@ -1,19 +1,21 @@
 package org.kie.services.remote.util;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommandsRequestUtil {
+    
+    private static final Logger logger = LoggerFactory.getLogger(CommandsRequestUtil.class);
 
     public static JaxbCommandsResponse processJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
-        Logger logger = requestBean.getLogger();
+        
         
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
@@ -32,7 +34,8 @@ public class CommandsRequestUtil {
                     cmdResult = requestBean.doKieSessionOperation(cmd, deploymentId, processInstanceId);
                 }
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i + " because of " + e.getClass().getSimpleName(), e);
+                logger.warn("Unable to execute {}/{} because of {} : {}",
+                        cmd.getClass().getSimpleName(), i, e.getClass().getSimpleName(), e.getMessage());
                 jaxbResponse.addException(e, i, cmd);
             }
             if (!exceptionThrown) {
@@ -41,7 +44,8 @@ public class CommandsRequestUtil {
                         // addResult could possibly throw an exception, which is why it's here and not above
                         jaxbResponse.addResult(cmdResult, i, cmd);
                     } catch (Exception e) {
-                        logger.log(Level.WARNING, "Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i + " because of " + e.getClass().getSimpleName(), e);
+                        logger.warn("Unable to add result from {}/{} because of {} : {}", 
+                                cmd.getClass().getSimpleName(), i, e.getClass().getSimpleName(), e.getMessage());
                     }
                 }
             }

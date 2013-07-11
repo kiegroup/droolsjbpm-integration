@@ -5,7 +5,6 @@ import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbComman
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -19,7 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.drools.compiler.lang.dsl.DSLMapParser.variable_definition_return;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -43,20 +41,21 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
 public class RuntimeResource extends ResourceBase {
 
+    private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
+    
     @Inject
     private ProcessRequestBean processRequestBean;
 
-    @Inject
-    private Logger logger;
 
     @PathParam("id")
     private String deploymentId;

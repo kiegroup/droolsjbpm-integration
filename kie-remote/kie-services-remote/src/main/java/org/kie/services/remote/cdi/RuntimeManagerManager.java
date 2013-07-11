@@ -1,16 +1,16 @@
 package org.kie.services.remote.cdi;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.kie.services.impl.event.Undeploy;
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * {@inheritdoc}
@@ -18,22 +18,21 @@ import org.kie.api.runtime.manager.RuntimeManager;
 @Singleton
 public class RuntimeManagerManager {
 
-    private static ConcurrentHashMap<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();
-   
-    @Inject
-    private Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(RuntimeManagerManager.class);
+    
+    private static ConcurrentHashMap<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();  
     
     public void addOnDeploy(@Observes @Deploy DeploymentEvent event) {
         RuntimeManager runtimeManager = domainRuntimeManagers.put(event.getDeploymentId(), event.getDeployedUnit().getRuntimeManager());
         if( runtimeManager != null ) { 
-            logger.warning("RuntimeManager for domain " + event.getDeploymentId() + " has been replaced.");
+            logger.warn("RuntimeManager for domain {} has been replaced", event.getDeploymentId());
         }
     }
     
     public void removeOnUnDeploy(@Observes @Undeploy DeploymentEvent event) {
         RuntimeManager runtimeManager = domainRuntimeManagers.remove(event.getDeploymentId());
         if( runtimeManager == null ) { 
-            logger.warning("RuntimeManager for domain " + event.getDeploymentId() + " does not exist and can not be undeployed.");
+            logger.warn("RuntimeManager for domain {}  does not exist and can not be undeployed.", event.getDeploymentId());
         }
     }
     
