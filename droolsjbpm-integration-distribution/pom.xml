@@ -70,6 +70,24 @@
       <artifactId>drools-camel-server-example</artifactId>
       <classifier>sources</classifier>
     </dependency>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-spring</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-spring</artifactId>
+        <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-aries-blueprint</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-aries-blueprint</artifactId>
+        <classifier>sources</classifier>
+    </dependency>
     <!--
     <dependency>
       <groupId>org.drools</groupId>

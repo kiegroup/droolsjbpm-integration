@@ -111,6 +111,7 @@
     <dependencySet>
       <includes>
         <include>org.drools:*:jar:sources</include>
+        <include>org.kie:kie-*:jar:sources</include>
       </includes>
       <excludes>
         <exclude>org.drools:droolsjbpm-integration-examples:jar:sources</exclude>
