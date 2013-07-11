@@ -1,8 +1,0 @@
-package test;
-import org.drools.grid.NodeTests.MyObject;
-rule "test2"
-    when
-        $o: MyObject( name == "obj2")
-    then
-        System.out.println("Rule Test2 Fired! ->"+$o.getName());
-end
