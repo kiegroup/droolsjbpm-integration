@@ -162,7 +162,7 @@ public class AnnotationsTest extends FullDistributionTest {
                         // Check type annotations
                         Set<Annotation> annotations = projectDataModelOracle.getTypeAnnotations(type);
                         assertNotNull(annotations);
-                        assertEquals("Type " + type + " should hold 3 annotations", 3, annotations.size());
+                        assertEquals("Type " + type + " should hold 3 annotations: ", 3, annotations.size());
                         checkAnnotation(annotations, AnnotationDefinitionTO.LABEL_ANNOTATION, objectLabelValue);
                         checkAnnotation(annotations, AnnotationDefinitionTO.DESCRIPTION_ANNOTATION, objectDescriptionValue);
                         checkAnnotation(annotations, AnnotationDefinitionTO.ROLE_ANNOTATION, objectRoleValue);
@@ -170,12 +170,12 @@ public class AnnotationsTest extends FullDistributionTest {
                         // Check type field annotations
                         ModelField[] fields = projectDataModelOracle.getModelFields().get(type);
                         assertNotNull(fields);
-                        assertEquals("Type " + type + " should hold 1 field only", 2, fields.length);
+                        assertEquals("Error in type " + type + "'s fields: ", 2, fields.length);
                         Map<String, Set<Annotation>> mFieldAnnotations = projectDataModelOracle.getTypeFieldsAnnotations(type);
                         assertNotNull(mFieldAnnotations);
                         Set fieldAnnotations = mFieldAnnotations.get(fieldName);
                         assertNotNull(fieldAnnotations);
-                        assertEquals("Field " + fieldName + "should have 3 annotations", 3, fieldAnnotations.size());
+                        assertEquals("Field " + fieldName + "should have 3 annotations: ", 3, fieldAnnotations.size());
                         checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.LABEL_ANNOTATION, fieldLabelValue);
                         checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.DESCRIPTION_ANNOTATION, fieldDescriptionValue);
                         checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.POSITION_ANNOTATON, Integer.toString(fieldPositionValue));
@@ -219,7 +219,7 @@ public class AnnotationsTest extends FullDistributionTest {
             DataObjectTO parent = new DataObjectTO(parentName, parentPackage, null);
             dataModel.getDataObjects().add(parent);
 
-            String parentFieldName = "a1";
+            String parentFieldName = "a_1";
             String parentFieldClass = "java.lang.String";
             ObjectPropertyTO parentProp = new ObjectPropertyTO(parentFieldName, parentFieldClass, false, true);
             parent.setProperties(Arrays.asList(parentProp));
@@ -231,7 +231,7 @@ public class AnnotationsTest extends FullDistributionTest {
             extending.setSuperClassName(parent.getClassName());
             dataModel.getDataObjects().add(extending);
 
-            String extendingFieldName = "b1";
+            String extendingFieldName = "b_1";
             String extendingFieldClass = "java.lang.String";
             ObjectPropertyTO extendingProp = new ObjectPropertyTO(extendingFieldName, extendingFieldClass, false, true);
             extending.setProperties(Arrays.asList(extendingProp));
@@ -284,7 +284,7 @@ public class AnnotationsTest extends FullDistributionTest {
             parent.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentRoleValue);
             dataModel.getDataObjects().add(parent);
 
-            String parentFieldName = "a1";
+            String parentFieldName = "a2_1";
             String parentFieldClass = "java.lang.String";
             String parentFieldLabelValue = "Attribute A2.1";
             String parentFieldDescriptionValue = "First attribute of A2";
@@ -308,7 +308,7 @@ public class AnnotationsTest extends FullDistributionTest {
             extending.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingRoleValue);
             dataModel.getDataObjects().add(extending);
 
-            String extendingFieldName = "b1";
+            String extendingFieldName = "b2_1";
             String extendingFieldClass = "java.lang.String";
             String extendingFieldLabelValue = "Attribute B2.1";
             String extendingFieldDescriptionValue = "First attribute of B2";
@@ -326,6 +326,87 @@ public class AnnotationsTest extends FullDistributionTest {
             invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
             DataModelTO reloadedModel = modelerService.loadModel(project);
             assertNotNull(reloadedModel);
+
+        } catch (Throwable e) {
+            logger.error("Test failed : " + e.getMessage(), e);
+            fail();
+        }
+    }
+
+    @Test
+    public void testPojoExtensionAttributes() {
+        try {
+            assertNotNull(ioService);
+            assertNotNull(dataModelService);
+            assertNotNull(paths);
+            assertNotNull(modelerService);
+            assertNotNull(projectService);
+
+            URI projectUri = new URI("default://master@uf-playground/GuvnorM2RepoDependencyExample2");
+
+            Path projectPath = ioService.get(projectUri);
+            assertNotNull(projectPath);
+
+            org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+
+            Project project = projectService.resolveProject(path);
+
+            Map<String, AnnotationDefinitionTO> annotationDefs = modelerService.getAnnotationDefinitions();
+
+            DataModelTO dataModel = modelerService.loadModel(project);
+
+            String parentName = "A3";
+            String parentPackage = "a";
+            DataObjectTO parent = new DataObjectTO(parentName, parentPackage, null);
+            dataModel.getDataObjects().add(parent);
+
+            String parentFieldName = "a3_1";
+            String parentFieldClass = "java.lang.String";
+            ObjectPropertyTO parentProp = new ObjectPropertyTO(parentFieldName, parentFieldClass, false, true);
+            parent.setProperties(Arrays.asList(parentProp));
+
+            String extendingName = "B3";
+            String extendingPackage = "a.b";
+            DataObjectTO extending = new DataObjectTO(extendingName, extendingPackage, null);
+            // Extend B from A
+            extending.setSuperClassName(parent.getClassName());
+            dataModel.getDataObjects().add(extending);
+
+            String extendingFieldName = "b3_1";
+            String extendingFieldClass = "java.lang.String";
+            ObjectPropertyTO extendingProp = new ObjectPropertyTO(extendingFieldName, extendingFieldClass, false, true);
+            extending.setProperties(Arrays.asList(extendingProp));
+
+            GenerationResult result = modelerService.saveModel(dataModel, project);
+            assertNotNull(result);
+            logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
+
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            DataModelTO reloadedModel = modelerService.loadModel(project);
+            assertNotNull(reloadedModel);
+
+            ProjectDataModelOracle projectDataModelOracle = dataModelService.getProjectDataModel(path);
+
+            // TODO for the ProjectDataModelOracle, in fact, the getModelFields() method should only return the declared
+            // TODO fields per fact type, i.e. similar to getClass().getDeclaredFields(), which may including @this
+            Map<String, ModelField[]> modelFields = projectDataModelOracle.getModelFields();
+            if (modelFields != null) {
+                String inheritorFullName = extendingPackage + "." + extendingName;
+                ModelField[] fields = modelFields.get(inheritorFullName);
+
+                assertNotNull(fields);
+                assertEquals("Error in type " + inheritorFullName + "'s fields: ", 2, fields.length);
+
+                for (int i = 0; i < fields.length; i++) {
+                    String fieldName = fields[i].getName();
+                    if ( parentFieldName.equals(fieldName) ) fail("Encountered the parent attribute " + parentFieldName);
+                }
+
+            } else {
+                logger.error("Test failed: error in model fields");
+                fail();
+            }
 
         } catch (Throwable e) {
             logger.error("Test failed : " + e.getMessage(), e);
