@@ -14,9 +14,9 @@ import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
-import org.kie.services.remote.KieServiceBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.kie.services.remote.exception.KieServiceBadRequestException;
 
 @ApplicationScoped
 public class ProcessRequestBean {

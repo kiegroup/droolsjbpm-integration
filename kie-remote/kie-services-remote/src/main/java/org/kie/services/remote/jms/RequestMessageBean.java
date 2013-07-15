@@ -22,10 +22,10 @@ import javax.xml.bind.JAXBException;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
-import org.kie.services.remote.KieRemoteServicesInternalError;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 
 /**
  * This class is the link between incoming request (whether via REST or JMS or .. whatever)

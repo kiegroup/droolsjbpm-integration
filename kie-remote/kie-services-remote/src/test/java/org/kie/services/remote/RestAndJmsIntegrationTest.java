@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.jms.BytesMessage;
@@ -34,7 +33,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 
 import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
@@ -53,19 +51,16 @@ import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteRestSessionFactory;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
@@ -93,29 +88,6 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     @Deployment(testable = false)
     public static Archive<?> createWar() {
        return createWebArchive();
-    }
-    
-    /**
-     * Initializes a (remote) IntialContext instance.
-     * 
-     * @return a remote {@link InitialContext} instance
-     */
-    private static InitialContext getRemoteInitialContext() {
-        Properties initialProps = new Properties();
-        initialProps.setProperty(InitialContext.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
-        initialProps.setProperty(InitialContext.PROVIDER_URL, "remote://localhost:4447");
-        initialProps.setProperty(InitialContext.SECURITY_PRINCIPAL, "guest");
-        initialProps.setProperty(InitialContext.SECURITY_CREDENTIALS, "1234");
-        
-        for (Object keyObj : initialProps.keySet()) {
-            String key = (String) keyObj;
-            System.setProperty(key, (String) initialProps.get(key));
-        }
-        try {
-            return new InitialContext(initialProps);
-        } catch (NamingException e) {
-            throw new RuntimeException("Unable to create " + InitialContext.class.getSimpleName(), e);
-        }
     }
 
     @ArquillianResource
@@ -257,7 +229,6 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     
     @Test
     @InSequence(1)
-    @Ignore("problems related to identity/logging in")
     public void testRestUrlStartHumanTaskProcess() throws Exception { 
         // create REST request
         String urlString = new URL(deploymentUrl,  deploymentUrl.getPath() + "rest/runtime/test/process/org.jbpm.humantask/start").toExternalForm();
@@ -379,10 +350,9 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     
     @Test
     @InSequence(3)
-    @Ignore
     public void testRestRemoteApiHumanTaskProcess() throws Exception {
         // create REST request
-        RuntimeEngine engine = new RemoteRestSessionFactory(deploymentUrl.toExternalForm(), "test").newRuntimeEngine();
+        RuntimeEngine engine = new RemoteRestSessionFactory("test", deploymentUrl.toExternalForm()).newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         

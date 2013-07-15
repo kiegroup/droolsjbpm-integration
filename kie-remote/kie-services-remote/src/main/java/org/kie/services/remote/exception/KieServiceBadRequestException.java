@@ -1,4 +1,4 @@
-package org.kie.services.remote;
+package org.kie.services.remote.exception;
 
 import org.jboss.resteasy.spi.BadRequestException;
 

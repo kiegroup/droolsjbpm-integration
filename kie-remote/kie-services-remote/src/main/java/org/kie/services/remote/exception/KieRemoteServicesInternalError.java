@@ -1,4 +1,4 @@
-package org.kie.services.remote;
+package org.kie.services.remote.exception;
 
 /**
  * This class is meant to be thrown in situations that should never happen. 
