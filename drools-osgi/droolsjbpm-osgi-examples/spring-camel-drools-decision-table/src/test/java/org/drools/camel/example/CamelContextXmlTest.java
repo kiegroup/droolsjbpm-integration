@@ -22,9 +22,11 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+@Ignore
 public class CamelContextXmlTest extends CamelSpringTestSupport {
 
     // templates to send to input endpoints

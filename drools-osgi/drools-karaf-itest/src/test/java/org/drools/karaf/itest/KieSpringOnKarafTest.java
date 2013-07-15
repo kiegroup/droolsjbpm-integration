@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
@@ -41,6 +42,7 @@ import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+@Ignore
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
 public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {

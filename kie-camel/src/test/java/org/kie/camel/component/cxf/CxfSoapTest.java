@@ -25,10 +25,12 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+@Ignore
 public class CxfSoapTest extends CamelSpringTestSupport {
 
     @Override
