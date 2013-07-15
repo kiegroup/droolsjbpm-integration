@@ -116,7 +116,7 @@ public class RequestMessageBean implements MessageListener {
         try {
             msg.setJMSCorrelationID(msgCorrId);
         } catch (JMSException jmse) {
-            logger.warn("Unable to set correlation id of response to msg id {} due to {}", msgCorrId, jmse );
+            logger.warn( "Unable to set correlation id of response to msg id " + msgCorrId, jmse );
         }
         
         // 5. send response message

@@ -14,6 +14,7 @@ import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
+import org.kie.services.remote.KieServiceBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +40,7 @@ public class ProcessRequestBean {
             result = kieSession.execute(cmd);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
-            logger.warn("Unable to execute {} because of {} ", exceptResp.getCommandName(), e.getClass().getSimpleName());
-            logger.warn("Stacktrace:", e);
+            logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
             result = exceptResp;
         }
         return result;
@@ -52,8 +52,7 @@ public class ProcessRequestBean {
             result = ((InternalTaskService) taskService).execute(cmd);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
-            logger.warn("Unable to execute {} because of {} ", exceptResp.getCommandName(), e.getClass().getSimpleName());
-            logger.warn("Stacktrace:", e);
+            logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
             result = exceptResp;
         }
         return result;
@@ -66,6 +65,9 @@ public class ProcessRequestBean {
             runtimeContext = new ProcessInstanceIdContext(processInstanceId);
         } else {
             runtimeContext = EmptyContext.get();
+        }
+        if( runtimeManager == null ) { 
+            throw new KieServiceBadRequestException("No runtime manager could be found for domain '" + domainName + "'.");
         }
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }

@@ -46,6 +46,7 @@ public class RemoteConfiguration {
         url += "rest";
         this.url = url;
         this.type = Type.REST;
+        this.authenticationType = AuthenticationType.NONE;
     }
 
     public RemoteConfiguration(String deploymentId, String url, AuthenticationType authenticationType, String username,
@@ -115,6 +116,10 @@ public class RemoteConfiguration {
         return authenticationType;
     }
 
+    public void setAuthenticationType(AuthenticationType authenticationType) {
+        this.authenticationType = authenticationType;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -177,7 +182,7 @@ public class RemoteConfiguration {
     }
 
     public enum AuthenticationType {
-        BASIC, FORM_BASED
+        NONE, BASIC, FORM_BASED
     }
 
     private enum Type {

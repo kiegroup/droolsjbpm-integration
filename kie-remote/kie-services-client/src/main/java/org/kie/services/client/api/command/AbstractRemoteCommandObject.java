@@ -192,15 +192,17 @@ public abstract class AbstractRemoteCommandObject {
         String baseUrl = config.getUrl();
         String deploymentId = config.getDeploymentId();
         AuthenticationType authenticationType = config.getAuthenticationType();
-        String username = config.getUsername();
-        String password = config.getPassword();
 
         ClientRequest restRequest = null;
         DefaultHttpClient client = new DefaultHttpClient();
         if (AuthenticationType.BASIC == authenticationType) {
+            String username = config.getUsername();
+            String password = config.getPassword();
             client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
                     new UsernamePasswordCredentials(username, password));
         } else if (AuthenticationType.FORM_BASED == authenticationType) {
+            String username = config.getUsername();
+            String password = config.getPassword();
             // first challenge authentication to be enforced - return logon form
             // currently pointing to a non existing resource
             HttpPost mainMethod = new HttpPost(baseUrl);
@@ -255,10 +257,12 @@ public abstract class AbstractRemoteCommandObject {
                 throw new RuntimeException("Could not initialize form-based authentication", e);
             }
         }
+        
         ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
         restRequest = new ClientRequest(url, executor);
         restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandsRequest(deploymentId, command));
         ClientResponse<Object> response = null;
+        
         try {
             response = restRequest.post(Object.class);
         } catch (Exception e) {

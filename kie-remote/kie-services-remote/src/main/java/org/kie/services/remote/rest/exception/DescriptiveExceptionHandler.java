@@ -17,6 +17,7 @@ import org.jboss.resteasy.spi.ReaderException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.resteasy.spi.WriterException;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.remote.KieServiceBadRequestException;
 
 @Provider
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
@@ -28,6 +29,8 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     public Response toResponse(Exception e) {
         ResponseBuilder responseBuilder = null;
         if( e instanceof BadRequestException ) { 
+            responseBuilder = Response.status(400);
+        } else if( e instanceof KieServiceBadRequestException ) { 
             responseBuilder = Response.status(400);
         } else if( e instanceof ReaderException ) { 
             responseBuilder = Response.status(400);

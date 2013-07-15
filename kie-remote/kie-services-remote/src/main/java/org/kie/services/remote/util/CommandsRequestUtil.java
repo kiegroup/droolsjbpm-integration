@@ -23,29 +23,29 @@ public class CommandsRequestUtil {
         Long processInstanceId = request.getProcessInstanceId();
         List<Command<?>> commands = request.getCommands();
         
-        for (int i = 0; i < commands.size(); ++i) {
-            Command<?> cmd = commands.get(i);
-            boolean exceptionThrown = false;
-            Object cmdResult = null;
-            try {
-                if (cmd instanceof TaskCommand<?>) {
-                    cmdResult = requestBean.doTaskOperation(cmd);
-                } else {
-                    cmdResult = requestBean.doKieSessionOperation(cmd, deploymentId, processInstanceId);
+        if( commands != null ) { 
+            for (int i = 0; i < commands.size(); ++i) {
+                Command<?> cmd = commands.get(i);
+                boolean exceptionThrown = false;
+                Object cmdResult = null;
+                try {
+                    if (cmd instanceof TaskCommand<?>) {
+                        cmdResult = requestBean.doTaskOperation(cmd);
+                    } else {
+                        cmdResult = requestBean.doKieSessionOperation(cmd, deploymentId, processInstanceId);
+                    }
+                } catch (Exception e) {
+                    logger.warn( "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i + " because of " + e.getClass().getSimpleName(), e);
+                    jaxbResponse.addException(e, i, cmd);
                 }
-            } catch (Exception e) {
-                logger.warn("Unable to execute {}/{} because of {} : {}",
-                        cmd.getClass().getSimpleName(), i, e.getClass().getSimpleName(), e.getMessage());
-                jaxbResponse.addException(e, i, cmd);
-            }
-            if (!exceptionThrown) {
-                if (cmdResult != null) {
-                    try {
-                        // addResult could possibly throw an exception, which is why it's here and not above
-                        jaxbResponse.addResult(cmdResult, i, cmd);
-                    } catch (Exception e) {
-                        logger.warn("Unable to add result from {}/{} because of {} : {}", 
-                                cmd.getClass().getSimpleName(), i, e.getClass().getSimpleName(), e.getMessage());
+                if (!exceptionThrown) {
+                    if (cmdResult != null) {
+                        try {
+                            // addResult could possibly throw an exception, which is why it's here and not above
+                            jaxbResponse.addResult(cmdResult, i, cmd);
+                        } catch (Exception e) {
+                            logger.warn("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i + " because of " + e.getClass().getSimpleName(), e);
+                        }
                     }
                 }
             }

@@ -76,7 +76,7 @@ public class IntegrationTestBase {
         libs = libList.toArray(new File[libList.size()]);
         
         WebArchive war =  ShrinkWrap.create(WebArchive.class, "arquillian-test.war")
-                .addPackages(true, "org/kie/services/remote/cdi", "org/kie/services/remote/ejb", "org/kie/services/remote/jms", "org/kie/services/remote/rest", "org/kie/services/remote/util")
+                .addPackages(true, "org/kie/services/remote/cdi", "org/kie/services/remote/jms", "org/kie/services/remote/rest", "org/kie/services/remote/util")
                 .addPackages(true, "org/kie/services/remote/war")
                 .addClass(KieRemoteServicesInternalError.class)
                 .addAsResource("META-INF/persistence.xml")

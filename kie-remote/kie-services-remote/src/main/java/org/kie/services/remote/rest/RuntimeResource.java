@@ -49,13 +49,13 @@ import org.slf4j.LoggerFactory;
 
 @Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
+@SuppressWarnings("unchecked")
 public class RuntimeResource extends ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
     
     @Inject
     private ProcessRequestBean processRequestBean;
-
 
     @PathParam("id")
     private String deploymentId;
