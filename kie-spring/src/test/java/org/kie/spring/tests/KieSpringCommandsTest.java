@@ -16,30 +16,38 @@
 
 package org.kie.spring.tests;
 
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
+import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.Person;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
 public class KieSpringCommandsTest {
 
-    static ClassPathXmlApplicationContext context = null;
+    static ApplicationContext context = null;
 
     @BeforeClass
     public static void setup() {
-        context = new ClassPathXmlApplicationContext("org/kie/spring/beans-commands.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("kie-spring-commands","test-spring","0001");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,
+                InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/beans-commands.xml"),
+                new File(InternalKieSpringUtilsTest.class.getResource("/").getFile()));
     }
 
     @Test
     public void testKieBase() throws Exception {
-        KieBase kbase = (KieBase) context.getBean("drl_kiesample");
+        KieBase kbase = (KieBase) context.getBean("drl_kiesample3");
         assertNotNull(kbase);
     }
 
@@ -110,7 +118,6 @@ public class KieSpringCommandsTest {
 
     @AfterClass
     public static void tearDown() {
-        context.destroy();
     }
 
 }
