@@ -30,7 +30,7 @@ import org.springframework.context.ApplicationContext;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-@Ignore
+
 public class KieSpringBasicsTest {
 
     static ApplicationContext context = null;
