@@ -3,10 +3,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd">
+                          http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
-
-  <kie:kbase-ref id="drl_kiesample"/>
 
   <bean id="person" class="org.kie.spring.beans.Person">
     <constructor-arg type="java.lang.String" index="0" value="HAL"/>
@@ -22,18 +20,23 @@
 
   <bean id="personsList" class="java.util.ArrayList"/>
 
-  <kie:ksession id="ksession2" kbase-ref="drl_kiesample" type="stateful">
-    <kie:batch>
-      <kie:insert-object ref="person"/>
-    </kie:batch>
-  </kie:ksession>
+  <kie:kmodule id="kbase_commands">
 
-  <kie:ksession id="ksessionForCommands" type="stateful" kbase-ref="drl_kiesample">
-    <kie:batch>
-      <kie:insert-object ref="person2"/>
-      <kie:set-global identifier="persons" ref="personsList"/>
-      <kie:fire-all-rules max="10"/>
-    </kie:batch>
-  </kie:ksession>
+    <kie:kbase name="drl_kiesample3">
+      <kie:ksession name="ksession2" type="stateful">
+        <kie:batch>
+          <kie:insert-object ref="person"/>
+        </kie:batch>
+      </kie:ksession>
+
+      <kie:ksession name="ksessionForCommands" type="stateful">
+        <kie:batch>
+          <kie:insert-object ref="person2"/>
+          <kie:set-global identifier="persons" ref="personsList"/>
+          <kie:fire-all-rules max="10"/>
+        </kie:batch>
+      </kie:ksession>
+    </kie:kbase>
+  </kie:kmodule>
 
 </beans>

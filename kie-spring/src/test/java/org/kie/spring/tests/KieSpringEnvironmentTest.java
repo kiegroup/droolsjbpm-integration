@@ -15,6 +15,7 @@
  */
 package org.kie.spring.tests;
 
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
@@ -24,17 +25,22 @@ import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
+import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.mocks.MockObjectMarshallingStrategy;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.io.File;
 
 import static org.junit.Assert.*;
 
 public class KieSpringEnvironmentTest {
 
-    static ClassPathXmlApplicationContext context = null;
+    static ApplicationContext context = null;
     private static Server h2Server;
 
     @BeforeClass
@@ -56,7 +62,10 @@ public class KieSpringEnvironmentTest {
 
     @BeforeClass
     public static void runBeforeClass() {
-        context = new ClassPathXmlApplicationContext("org/kie/spring/environment.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("kie-spring-commands","test-spring","0001");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,
+                KieSpringEnvironmentTest.class.getResource("/org/kie/spring/environment.xml"),
+                new File(KieSpringEnvironmentTest.class.getResource("/").getFile()));
     }
 
     @Test
