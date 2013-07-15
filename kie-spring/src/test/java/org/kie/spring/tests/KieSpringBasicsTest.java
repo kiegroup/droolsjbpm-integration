@@ -18,6 +18,7 @@ package org.kie.spring.tests;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
@@ -29,7 +30,7 @@ import org.springframework.context.ApplicationContext;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+@Ignore
 public class KieSpringBasicsTest {
 
     static ApplicationContext context = null;
