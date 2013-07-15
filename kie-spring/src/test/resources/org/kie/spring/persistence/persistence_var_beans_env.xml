@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd">
+                          http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
   <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="org.h2.Driver"/>
@@ -21,27 +22,30 @@
   </bean>
 
   <kie:kstore id="kstore1"/>
-  <kie:kbase-ref id="drl_persistence"/>
-  <kie:kbase-ref id="drl_persistence_rb"/>
 
-  <kie:ksession-ref id="jpaSingleSessionCommandService2">
-    <kie:configuration>
-      <kie:jpa-persistence>
-        <kie:transaction-manager ref="txManager"/>
-        <kie:entity-manager-factory ref="myEmf"/>
+  <kie:kmodule id="var_persistence">
+    <kie:kbase name="drl_persistence">
+      <kie:ksession name="jpaSingleSessionCommandService2">
+        <kie:configuration>
+          <kie:jpa-persistence>
+            <kie:transaction-manager ref="txManager"/>
+            <kie:entity-manager-factory ref="myEmf"/>
+          </kie:jpa-persistence>
+        </kie:configuration>
+      </kie:ksession>
+    </kie:kbase>
 
-      </kie:jpa-persistence>
-    </kie:configuration>
-  </kie:ksession-ref>
-
-  <kie:ksession-ref id="jpaSingleSessionCommandServiceRollback">
-    <kie:configuration>
-      <kie:jpa-persistence>
-        <kie:transaction-manager ref="txManager"/>
-        <kie:entity-manager-factory ref="myEmf"/>
-      </kie:jpa-persistence>
-    </kie:configuration>
-  </kie:ksession-ref>
+    <kie:kbase name="drl_persistence_rb">
+      <kie:ksession name="jpaSingleSessionCommandServiceRollback">
+        <kie:configuration>
+          <kie:jpa-persistence>
+            <kie:transaction-manager ref="txManager"/>
+            <kie:entity-manager-factory ref="myEmf"/>
+          </kie:jpa-persistence>
+        </kie:configuration>
+      </kie:ksession>
+    </kie:kbase>
+  </kie:kmodule>
 
   <!-- additions for environment -->
   <bean id="globals" class="org.drools.core.base.MapGlobalResolver"/>
@@ -77,5 +81,4 @@
     </constructor-arg>
   </bean>
   <!-- end additions for environment -->
-
 </beans>

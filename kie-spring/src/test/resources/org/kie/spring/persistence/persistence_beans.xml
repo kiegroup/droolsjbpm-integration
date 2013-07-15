@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd">
+                          http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
   <kie:kstore id="kstore1"/>
-  <kie:kbase-ref id="drl_persistence"/>
+
+  <kie:kmodule id="persistence_spring_module">
+
+    <kie:kbase name="kb_persistence">
+
+      <kie:ksession name="jpaSingleSessionCommandService">
+
+        <kie:configuration>
+          <kie:jpa-persistence>
+            <kie:transaction-manager ref="txManager"/>
+            <kie:entity-manager-factory ref="myEmf"/>
+          </kie:jpa-persistence>
+
+        </kie:configuration>
+
+      </kie:ksession>
+    </kie:kbase>
+
+    <kie:kbase name="drl_persistence_rb">
+      <kie:ksession name="jpaSingleSessionCommandServiceRollback"/>
+    </kie:kbase>
+
+  </kie:kmodule>
 
   <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <!-- org.h2.jdbcx.JdbcDataSource -->
@@ -26,13 +49,11 @@
     <property name="entityManagerFactory" ref="myEmf"/>
   </bean>
 
-  <kie:ksession-ref id="jpaSingleSessionCommandService2">
-    <kie:configuration>
-      <kie:jpa-persistence>
-        <kie:transaction-manager ref="txManager"/>
-        <kie:entity-manager-factory ref="myEmf"/>
-      </kie:jpa-persistence>
-    </kie:configuration>
-  </kie:ksession-ref>
+  <kie:environment id="env">
+    <kie:entity-manager-factory ref="myEmf"/>
+    <kie:transaction-manager ref="txManager"/>
+  </kie:environment>
+
+
 
 </beans>
