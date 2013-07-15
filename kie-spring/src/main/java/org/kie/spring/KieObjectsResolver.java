@@ -35,24 +35,15 @@ import java.util.Map;
 
 public class KieObjectsResolver {
 
-    private Map<ReleaseId, KieContainer> gavs;
-
     private KieContainerImpl defaultClasspathKContainer;
 
-    private KieObjectsResolver() {
+    public KieObjectsResolver() {
         init();
-    }
-
-    private final static KieObjectsResolver INSTANCE = new KieObjectsResolver();
-
-    public static KieObjectsResolver get() {
-        return INSTANCE;
     }
 
     protected void init() {
         KieServices ks = KieServices.Factory.get();
-        gavs = new HashMap<ReleaseId, KieContainer>();
-        defaultClasspathKContainer = (KieContainerImpl) ks.getKieClasspathContainer();
+        // defaultClasspathKContainer = (KieContainerImpl) ks.getKieClasspathContainer();
     }
 
     public KieBase resolveKBase(String id, ReleaseId releaseId) {
@@ -85,15 +76,10 @@ public class KieObjectsResolver {
                 throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
             }
         } else {
-            if (!gavs.containsKey(releaseId)) {
-                KieServices ks = KieServices.Factory.get();
-                kieContainer = ks.newKieContainer(releaseId);
-                if ( kieContainer == null) {
-                    throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
-                }
-                gavs.put(releaseId, kieContainer);
-            } else {
-                kieContainer = gavs.get(releaseId);
+            KieServices ks = KieServices.Factory.get();
+            kieContainer = ks.newKieContainer(releaseId);
+            if ( kieContainer == null) {
+                throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
             }
         }
         return kieContainer;

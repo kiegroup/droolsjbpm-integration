@@ -16,28 +16,20 @@
 
 package org.kie.spring.factorybeans;
 
-import org.kie.api.KieBase;
-import org.kie.api.builder.ReleaseId;
-import org.kie.spring.KieObjectsResolver;
+import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class KBaseRefFactoryBean
+
+import java.util.List;
+
+public class KModuleFactoryBean
         implements
-        FactoryBean,
+        FactoryBean<KieModuleModelImpl>,
         InitializingBean {
 
-    private KieBase kbase;
+    KieModuleModelImpl kModule = null;
     private String id;
-    private ReleaseId releaseId;
-
-    public ReleaseId getReleaseId() {
-        return releaseId;
-    }
-
-    public void setReleaseId(ReleaseId releaseId) {
-        this.releaseId = releaseId;
-    }
 
     public String getId() {
         return id;
@@ -47,12 +39,20 @@ public class KBaseRefFactoryBean
         this.id = id;
     }
 
-    public Object getObject() throws Exception {
-        return kbase;
+    public KieModuleModelImpl getKModule() {
+        return kModule;
     }
 
-    public Class<? extends KieBase> getObjectType() {
-        return KieBase.class;
+    public void setKModule(KieModuleModelImpl kModule) {
+        this.kModule = kModule;
+    }
+
+    public KieModuleModelImpl getObject() throws Exception {
+        return kModule;
+    }
+
+    public Class<? extends KieModuleModelImpl> getObjectType() {
+        return KieModuleModelImpl.class;
     }
 
     public boolean isSingleton() {
@@ -60,7 +60,6 @@ public class KBaseRefFactoryBean
     }
 
     public void afterPropertiesSet() throws Exception {
-        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
-        kbase = kieObjectsResolver.resolveKBase(id, releaseId);
+        kModule = new KieModuleModelImpl();
     }
 }

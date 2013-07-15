@@ -17,6 +17,7 @@
 package org.kie.spring.tests;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.springframework.context.ApplicationContext;
@@ -31,6 +32,7 @@ import static org.junit.Assert.assertNotNull;
  *
  * @author rsynek
  */
+@Ignore
 public class KieSpringListenersOrderTest {
     private static ApplicationContext ctx;
 
