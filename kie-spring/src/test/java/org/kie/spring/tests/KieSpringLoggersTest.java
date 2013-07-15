@@ -23,6 +23,7 @@ import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.impl.StatelessKnowledgeSessionImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
@@ -35,6 +36,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class KieSpringLoggersTest {
 
     static ClassPathXmlApplicationContext context = null;

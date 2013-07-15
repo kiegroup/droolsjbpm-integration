@@ -15,33 +15,44 @@
  */
 package org.kie.spring.namespace;
 
-import org.drools.core.util.StringUtils;
-import org.kie.spring.factorybeans.KBaseRefFactoryBean;
+
+import org.kie.spring.factorybeans.KBaseFactoryBean;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+
+import java.util.List;
 
 import static org.kie.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
 
-public class KBaseRefDefinitionParser extends AbstractBeanDefinitionParser {
+public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
 
-    private static final String ATTRIBUTE_ID = "id";
+    private static final String ATTRIBUTE_ID = "name";
 
     @SuppressWarnings("unchecked")
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KBaseRefFactoryBean.class);
+        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KBaseFactoryBean.class);
 
         String id = element.getAttribute(ATTRIBUTE_ID);
         emptyAttributeCheck(element.getLocalName(), ATTRIBUTE_ID, id);
-        factory.addPropertyValue(ATTRIBUTE_ID, id);
+        factory.addPropertyValue("kBaseName", id);
+        factory.addPropertyValue("id", id);
 
-        String releaseIdRef = element.getAttribute("releaseId");
-        if (!StringUtils.isEmpty(releaseIdRef)) {
-            factory.addPropertyReference("releaseId", releaseIdRef);
+        element.setAttribute("name", id);
+        List<Element> ksessionElements = DomUtils.getChildElementsByTagName(element, "ksession");
+        if (ksessionElements != null && ksessionElements.size() > 0) {
+            for (Element kbaseElement : ksessionElements){
+                BeanDefinitionHolder obj = (BeanDefinitionHolder) parserContext.getDelegate().parsePropertySubElement(kbaseElement, null);
+                obj.getBeanDefinition().getPropertyValues().addPropertyValue("kBaseName", id);
+                obj.getBeanDefinition().getPropertyValues().addPropertyValue("kBase", new RuntimeBeanReference(id));
+            }
         }
 
         return factory.getBeanDefinition();
