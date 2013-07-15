@@ -17,6 +17,7 @@
 package org.kie.spring.tests.persistence;
 
 import org.drools.compiler.compiler.PackageBuilder;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.impl.WorkImpl;
 import org.drools.core.rule.Package;
@@ -34,31 +35,31 @@ import org.jbpm.workflow.core.node.*;
 import org.jbpm.workflow.instance.node.SubProcessNodeInstance;
 import org.junit.*;
 import org.kie.api.KieBase;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.NodeInstance;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.persistence.TestWorkItemHandler;
+import org.kie.spring.tests.InternalKieSpringUtilsTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
 
 import java.io.*;
 import java.util.Collection;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-@Ignore("serialized packages used in test are no longer compatible with drools")
 public class JPASingleSessionCommandServiceFactoryEnvTest {
-    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
+    private static String TMPDIR = System.getProperty("java.io.tmpdir");
     private static final Logger log = LoggerFactory.getLogger(JPASingleSessionCommandServiceFactoryEnvTest.class);
     private static Server h2Server;
 
-    private ClassPathXmlApplicationContext ctx;
+    private ApplicationContext ctx;
 
     @BeforeClass
     public static void startH2Database() throws Exception {
@@ -68,6 +69,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         h2Server = Server.createTcpServer(new String[0]);
         h2Server.start();
         try {
+            TMPDIR = JPASingleSessionCommandServiceFactoryEnvTest.class.getResource("/kb_persistence").getFile();
             log.info("creating: {}",
                     TMPDIR + "/processWorkItems.pkg");
             writePackage(getProcessWorkItems(),
@@ -107,16 +109,10 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     public void createSpringContext() {
         try {
             log.info("creating spring context");
-            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-            Properties properties = new Properties();
-            properties.setProperty("temp.dir",
-                    TMPDIR);
-            configurer.setProperties(properties);
-            ctx = new ClassPathXmlApplicationContext();
-            ctx.addBeanFactoryPostProcessor(configurer);
-            //ctx.setConfigLocation( "org/drools/container/spring/beans/persistence/beans.xml" );
-            ctx.setConfigLocation("org/kie/spring/persistence/beans_Env.xml");
-            ctx.refresh();
+            ReleaseId releaseId = new ReleaseIdImpl("kie-spring-jpa-env","test-spring","0001");
+            ctx = InternalKieSpringUtils.getSpringContext(releaseId,
+                    InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_beans_env.xml"),
+                    new File(JPASingleSessionCommandServiceFactoryTest.class.getResource("/").getFile()));
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);
@@ -127,7 +123,6 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     @After
     public void destroySpringContext() {
         log.info("destroy spring context");
-        ctx.destroy();
     }
 
     @Test
@@ -157,7 +152,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                  ctx.getBean( "txManager" ) );
         */
         KieStoreServices kstore = (KieStoreServices) ctx.getBean("kstore1");
-        KieBase kbase1 = (KieBase) ctx.getBean("drl_persistence");
+        KieBase kbase1 = (KieBase) ctx.getBean("kb_persistence");
         service = kstore.loadKieSession(sessionId,
                 kbase1,
                 null,
@@ -246,7 +241,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                  ctx.getBean( "txManager" ) );
         */
         KieStoreServices kstore = (KieStoreServices) ctx.getBean("kstore1");
-        KieBase kbase1 = (KieBase) ctx.getBean("drl_persistence");
+        KieBase kbase1 = (KieBase) ctx.getBean("kb_persistence");
         service = kstore.loadKieSession(sessionId,
                 kbase1,
                 null,
@@ -428,7 +423,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                  ctx.getBean( "txManager" ) );
         */
         KieStoreServices kstore = (KieStoreServices) ctx.getBean("kstore1");
-        KieBase kbase1 = (KieBase) ctx.getBean("drl_persistence");
+        KieBase kbase1 = (KieBase) ctx.getBean("kb_persistence");
         service = kstore.loadKieSession(sessionId,
                 kbase1,
                 null,
@@ -582,7 +577,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                  ctx.getBean( "txManager" ) );
         */
         KieStoreServices kstore = (KieStoreServices) ctx.getBean("kstore1");
-        KieBase kbase1 = (KieBase) ctx.getBean("drl_persistence");
+        KieBase kbase1 = (KieBase) ctx.getBean("kb_persistence");
         service = kstore.loadKieSession(sessionId,
                 kbase1,
                 null,
@@ -680,7 +675,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                  ctx.getBean( "txManager" ) );
         */
         KieStoreServices kstore = (KieStoreServices) ctx.getBean("kstore1");
-        KieBase kbase1 = (KieBase) ctx.getBean("drl_persistence");
+        KieBase kbase1 = (KieBase) ctx.getBean("kb_persistence");
         service = kstore.loadKieSession(sessionId,
                 kbase1,
                 null,

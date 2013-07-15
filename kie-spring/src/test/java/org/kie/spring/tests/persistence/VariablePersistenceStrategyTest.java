@@ -16,6 +16,7 @@
 
 package org.kie.spring.tests.persistence;
 
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.base.MapGlobalResolver;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
@@ -24,6 +25,7 @@ import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.*;
 import org.kie.api.KieBase;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
@@ -33,10 +35,13 @@ import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkflowProcessInstance;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.persistence.jpa.JPAKnowledgeService;
+import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.persistence.*;
+import org.kie.spring.tests.InternalKieSpringUtilsTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -47,18 +52,17 @@ import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.*;
+import java.io.File;
 import java.util.*;
 
 import static org.junit.Assert.*;
 
-@Ignore("serialized packages used in test are no longer compatible with drools")
 public class VariablePersistenceStrategyTest {
 
-    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
     private static final Logger log = LoggerFactory.getLogger(JPASingleSessionCommandServiceFactoryTest.class);
     private static Server h2Server;
 
-    private ClassPathXmlApplicationContext ctx;
+    private ApplicationContext ctx;
 
     @BeforeClass
     public static void startH2Database() throws Exception {
@@ -82,15 +86,10 @@ public class VariablePersistenceStrategyTest {
     public void createSpringContext() {
         try {
             log.info("creating spring context");
-            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-            Properties properties = new Properties();
-            properties.setProperty("temp.dir",
-                    TMPDIR);
-            configurer.setProperties(properties);
-            ctx = new ClassPathXmlApplicationContext();
-            ctx.addBeanFactoryPostProcessor(configurer);
-            ctx.setConfigLocation("org/kie/spring/persistence/beansVarPersistence.xml");
-            ctx.refresh();
+            ReleaseId releaseId = new ReleaseIdImpl("kie-spring-var-jpa","test-spring","0001");
+            ctx = InternalKieSpringUtils.getSpringContext(releaseId,
+                    InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_var_beans.xml"),
+                    new File(JPASingleSessionCommandServiceFactoryTest.class.getResource("/").getFile()));
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);
@@ -101,7 +100,6 @@ public class VariablePersistenceStrategyTest {
     @After
     public void destroySpringContext() {
         log.info("destroy spring context");
-        ctx.destroy();
     }
 
     @Test
