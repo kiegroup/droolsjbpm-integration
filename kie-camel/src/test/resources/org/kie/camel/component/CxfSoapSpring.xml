@@ -21,20 +21,24 @@
        xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="
-       http://drools.org/schema/kie-spring org/kie/spring/kie-spring-2.0.0.xsd
+       http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
-    ">
+">
 
-  <kie:ksession-ref id="ksession1">
-    <kie:batch>
-      <kie:set-global identifier="list" >
-        <bean class="java.util.ArrayList" />
-      </kie:set-global>
-    </kie:batch>
-  </kie:ksession-ref>
+  <kie:kmodule id="CxfRsSpring">
+    <kie:kbase name="test1">
+      <kie:ksession name="ksession1">
+        <kie:batch>
+          <kie:set-global identifier="list" >
+            <bean class="java.util.ArrayList" />
+          </kie:set-global>
+        </kie:batch>
+      </kie:ksession>
+    </kie:kbase>
+  </kie:kmodule>
 
   <cxf:cxfEndpoint id="soapServer"
              address="http://localhost:58002/soap"

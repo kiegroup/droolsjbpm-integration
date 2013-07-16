@@ -17,6 +17,7 @@
 package org.kie.camel.component.cxf;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.OutputStream;
 
 import javax.xml.namespace.QName;
@@ -25,17 +26,21 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
+import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-@Ignore
 public class CxfSoapTest extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext( "org/kie/camel/component/CxfSoapSpring.xml" );
+        return (AbstractXmlApplicationContext) InternalKieSpringUtils.getSpringContext(new ReleaseIdImpl("kie-camel", "test-spring", "0001"),
+                                                                                       CxfRestTest.class.getResource("/org/kie/camel/component/CxfSoapSpring.xml"),
+                                                                                       new File(CxfSoapTest.class.getResource("/").getFile()));
     }
 
     @Test
