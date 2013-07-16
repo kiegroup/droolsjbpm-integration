@@ -16,12 +16,17 @@
 
 package org.kie.spring.tests;
 
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
+import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.io.File;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -32,13 +37,15 @@ import static org.junit.Assert.assertNotNull;
  *
  * @author rsynek
  */
-@Ignore
 public class KieSpringListenersOrderTest {
     private static ApplicationContext ctx;
 
     @BeforeClass
     public static void runBeforeClass() {
-        ctx = new ClassPathXmlApplicationContext("org/kie/spring/listenersOrderTest.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("listeners-order-spring","test-spring","0001");
+        ctx = InternalKieSpringUtils.getSpringContext(releaseId,
+                KieSpringListenersTest.class.getResource("/org/kie/spring/listenersOrderTest.xml"),
+                new File(KieSpringListenersTest.class.getResource("/").getFile()));
     }
 
     private KieSession getSession() {

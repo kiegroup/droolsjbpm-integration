@@ -7,31 +7,15 @@
 
   <kie:kmodule id="someid">
 
-    <kie:kbase name="drl_kiesample">
-
-      <kie:ksession name="ksession1" type="stateless"/>
-      <kie:ksession name="ksession2"/>
-      <kie:ksession name="statelessWithGroupedListeners" type="stateless"/>
-
-    </kie:kbase>
-
     <kie:kbase name="drl_kiesample2">
 
-      <kie:ksession name="ksession3" type="stateless">
-        <kie:listeners>
-           <kie:workingMemoryEventListener type=""/>
-        </kie:listeners>
-      </kie:ksession>
-
+      <kie:ksession name="ksession1" type="stateless"/>
+      <kie:ksession name="ksession3" type="stateless"/>
       <kie:ksession name="loggerSession" type="stateless"/>
       <kie:ksession name="statefulSession" type="stateful"/>
 
     </kie:kbase>
 
-
-    <kie:kbase name="drl_timer_flow">
-      <kie:ksession name="knowledgeBase"/>
-    </kie:kbase>
   </kie:kmodule>
 
   <bean id="person" class="org.kie.spring.beans.Person">
