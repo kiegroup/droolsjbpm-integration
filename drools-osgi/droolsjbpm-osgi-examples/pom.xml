@@ -17,6 +17,7 @@
   <modules>
     <module>spring-camel-drools-decision-table</module>
     <module>spring-jbpm</module>
+    <module>blueprint-camel-drools-decision-table</module>
   </modules>
 
 
