@@ -16,37 +16,44 @@
 
 package org.kie.spring.tests;
 
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.WorkingMemoryEventListener;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.Person;
 import org.kie.spring.mocks.MockAgendaEventListener;
 import org.kie.spring.mocks.MockProcessEventListener;
 import org.kie.spring.mocks.MockWorkingMemoryEventListener;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Ignore
 public class KieSpringListenersTest {
 
-    static ClassPathXmlApplicationContext context = null;
+    static ApplicationContext context = null;
     List<Person> list = new ArrayList<Person>();
     static int counterFromListener = 0;
 
     @BeforeClass
     public static void runBeforeClass() {
-        context = new ClassPathXmlApplicationContext("org/kie/spring/listeners.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("sample-group","test-spring","0001");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,
+                KieSpringListenersTest.class.getResource("/org/kie/spring/listeners.xml"),
+                new File(KieSpringListenersTest.class.getResource("/").getFile()));
     }
 
     @Before
@@ -62,6 +69,21 @@ public class KieSpringListenersTest {
      */
     public static void incrementValueFromListener() {
         counterFromListener++;
+    }
+
+
+    @Test
+    public void testStatefulAgendaEventListenerEmbedded() throws Exception {
+        KieSession kSession = (KieSession) context.getBean("ksession1");
+        assertTrue(kSession.getAgendaEventListeners().size() > 0);
+        boolean mockAgendaEventListenerFound = false;
+        for (AgendaEventListener listener : kSession.getAgendaEventListeners()) {
+            if (listener instanceof MockAgendaEventListener) {
+                mockAgendaEventListenerFound = true;
+                break;
+            }
+        }
+        assertTrue(mockAgendaEventListenerFound);
     }
 
     @Test
