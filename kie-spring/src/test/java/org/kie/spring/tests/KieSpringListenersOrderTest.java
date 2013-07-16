@@ -37,7 +37,6 @@ import static org.junit.Assert.assertNotNull;
  *
  * @author rsynek
  */
-@Ignore
 public class KieSpringListenersOrderTest {
     private static ApplicationContext ctx;
 
