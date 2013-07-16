@@ -30,19 +30,12 @@ import java.io.IOException;
 
 public class KModuleSpringMarshaller {
 
-    //private static KieSpringApplicationContext.KieSpringApplicationListener kieSpringApplicationListener;
-
     public static KieModuleModel fromXML(File kModuleFile){
         return fromXML(kModuleFile, null);
     }
 
     public static KieModuleModel fromXML(File kModuleFile, ReleaseId releaseId){
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(kModuleFile.getAbsolutePath());
-        //kieSpringApplicationListener = new KieSpringApplicationContext.KieSpringApplicationListener();
-        //KModuleBeanFactoryPostProcessor beanFactoryPostProcessor = new KModuleBeanFactoryPostProcessor(kModuleFile.getAbsolutePath());
-        //beanFactoryPostProcessor.setReleaseId(releaseId);
-        //context.addBeanFactoryPostProcessor(beanFactoryPostProcessor);
-        //context.addApplicationListener(kieSpringApplicationListener);
         context.setConfigLocation(kModuleFile.getAbsolutePath());
         context.refresh();
         context.registerShutdownHook();
@@ -51,11 +44,9 @@ public class KModuleSpringMarshaller {
 
     public static KieModuleModel fromXML(java.net.URL kModuleUrl, String fixedPath, ReleaseId releaseId){
         FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext();
-        //kieSpringApplicationListener = new KieSpringApplicationContext.KieSpringApplicationListener();
         KModuleBeanFactoryPostProcessor beanFactoryPostProcessor = new KModuleBeanFactoryPostProcessor(kModuleUrl, fixedPath, context);
         beanFactoryPostProcessor.setReleaseId(releaseId);
         context.addBeanFactoryPostProcessor(beanFactoryPostProcessor);
-        //context.addApplicationListener(kieSpringApplicationListener);
         context.setConfigLocation(kModuleUrl.toExternalForm());
         context.refresh();
         context.registerShutdownHook();
