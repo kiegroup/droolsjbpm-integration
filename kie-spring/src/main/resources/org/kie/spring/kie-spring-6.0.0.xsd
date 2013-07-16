@@ -40,10 +40,10 @@
         <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
         <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
-      <xsd:choice minOccurs="0" maxOccurs="1">
-        <xsd:element ref="consoleLogger"/>
-        <xsd:element ref="fileLogger"/>
-      </xsd:choice>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="consoleLogger" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="fileLogger" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
       <xsd:choice minOccurs="0" maxOccurs="1">
         <xsd:element name="batch" minOccurs="0" maxOccurs="1">
           <xsd:complexType>
@@ -280,16 +280,16 @@
 
   <xsd:element name="consoleLogger">
     <xsd:complexType>
-      <xsd:attribute name="name" type="xsd:ID"/>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
     </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="fileLogger">
     <xsd:complexType>
-      <xsd:attribute name="name" type="xsd:ID"/>
       <xsd:attribute name="file" use="required" type="xsd:string"/>
-      <xsd:attribute name="threaded" type="xsd:boolean" default="false"/>
-      <xsd:attribute name="interval" type="xsd:int" default="30"/>
+      <xsd:attribute name="threaded" use="optional" type="xsd:boolean" default="false"/>
+      <xsd:attribute name="interval" use="optional" type="xsd:int" default="30"/>
+      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
     </xsd:complexType>
   </xsd:element>
 

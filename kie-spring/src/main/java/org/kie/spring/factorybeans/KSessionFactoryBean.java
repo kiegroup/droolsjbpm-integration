@@ -17,10 +17,13 @@
 package org.kie.spring.factorybeans;
 
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.command.Command;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.logger.KieLoggers;
+import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
@@ -35,6 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.springframework.beans.factory.support.ManagedList;
 
 import java.util.*;
 
@@ -53,6 +57,7 @@ public class KSessionFactoryBean
     private KieSessionConfiguration conf;
     private StatefulKSessionFactoryBeanHelper.JpaConfiguration jpaConfiguration;
     protected KSessionFactoryBeanHelper helper;
+    protected ManagedList<LoggerAdaptor> loggerAdaptors = new ManagedList<LoggerAdaptor>();
 
     protected List<AgendaEventListener> agendaEventListeners;
     protected List<ProcessEventListener> processEventListeners;
@@ -153,6 +158,7 @@ public class KSessionFactoryBean
             helper = new StatefulKSessionFactoryBeanHelper(this, (KieSession) kSession);
         }
         helper.internalAfterPropertiesSet();
+        attachLoggers((KieRuntimeEventManager) kSession);
         attachListeners((KieRuntimeEventManager) kSession);
     }
 
@@ -177,6 +183,38 @@ public class KSessionFactoryBean
             }
         }
         groupedListeners.addAll(eventListenerList);
+    }
+
+    public List<LoggerAdaptor> getKnowledgeRuntimeLoggers() {
+        return loggerAdaptors;
+    }
+
+    public void setKnowledgeRuntimeLoggers(List<LoggerAdaptor> loggers) {
+        this.loggerAdaptors.addAll(loggers);
+    }
+
+    public void attachLoggers(KieRuntimeEventManager ksession) {
+        if (loggerAdaptors != null && loggerAdaptors.size() > 0) {
+            KieServices ks = KieServices.Factory.get();
+            KieLoggers loggers = ks.getLoggers();
+            for (LoggerAdaptor adaptor : loggerAdaptors) {
+                KieRuntimeLogger runtimeLogger;
+                switch (adaptor.getLoggerType()) {
+                    case LOGGER_TYPE_FILE:
+                        runtimeLogger = loggers.newFileLogger(ksession, adaptor.getFile());
+                        adaptor.setRuntimeLogger(runtimeLogger);
+                        break;
+                    case LOGGER_TYPE_THREADED_FILE:
+                        runtimeLogger = loggers.newThreadedFileLogger(ksession, adaptor.getFile(), adaptor.getInterval());
+                        adaptor.setRuntimeLogger(runtimeLogger);
+                        break;
+                    case LOGGER_TYPE_CONSOLE:
+                        runtimeLogger = loggers.newConsoleLogger(ksession);
+                        adaptor.setRuntimeLogger(runtimeLogger);
+                        break;
+                }
+            }
+        }
     }
 
     public void setEventListeners(Map<String, List> eventListenerMap) {

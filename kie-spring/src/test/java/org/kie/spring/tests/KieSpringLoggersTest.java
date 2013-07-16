@@ -16,6 +16,7 @@
 
 package org.kie.spring.tests;
 
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.audit.ThreadedWorkingMemoryFileLogger;
 import org.drools.core.audit.WorkingMemoryConsoleLogger;
 import org.drools.core.audit.WorkingMemoryFileLogger;
@@ -25,30 +26,35 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.Person;
 import org.kie.spring.factorybeans.LoggerAdaptor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Ignore
 public class KieSpringLoggersTest {
 
-    static ClassPathXmlApplicationContext context = null;
+    static ApplicationContext context = null;
 
     @BeforeClass
     public static void runBeforeClass() {
-        context = new ClassPathXmlApplicationContext("org/kie/spring/loggers.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("kie-spring-loggers","test-spring","0001");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,
+                KieSpringListenersTest.class.getResource("/org/kie/spring/loggers.xml"),
+                new File(KieSpringListenersTest.class.getResource("/").getFile()));
     }
 
     @AfterClass
     public static void runAfterClass() {
-        context.close();
     }
 
     @Test

@@ -86,6 +86,8 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
         }
         EventListenersUtil.parseEventListeners(parserContext, factory, element);
 
+        LoggerUtil.parseRuntimeLoggers(parserContext, factory, element);
+
         Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
         parseSessionConf(factory, ksessionConf);
 
