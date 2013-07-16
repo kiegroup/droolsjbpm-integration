@@ -35,6 +35,11 @@
 
   <xsd:complexType name="ksessionComplexType">
     <xsd:sequence>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
       <xsd:choice minOccurs="0" maxOccurs="1">
         <xsd:element ref="consoleLogger"/>
         <xsd:element ref="fileLogger"/>
@@ -57,6 +62,7 @@
     <xsd:attribute name="default" type="xsd:boolean"/>
     <xsd:attribute name="scope" type="xsd:string"/>
     <xsd:attribute name="clockType" type="clockTypeEnum"/>
+    <xsd:attribute name="listeners-ref" use="optional" type="xsd:IDREF"/>
   </xsd:complexType>
 
   <!-- Persistence -->
@@ -312,24 +318,6 @@
     </xsd:complexType>
   </xsd:element>
 
-  <xsd:element name="workingMemoryEventListener">
-    <xsd:complexType>
-      <xsd:attribute name="type" use="required" type="xsd:string"/>
-    </xsd:complexType>
-  </xsd:element>
-
-  <xsd:element name="agendaEventListener">
-    <xsd:complexType>
-      <xsd:attribute name="type" use="required" type="xsd:string"/>
-    </xsd:complexType>
-  </xsd:element>
-
-  <xsd:element name="processEventListener">
-    <xsd:complexType>
-      <xsd:attribute name="type" use="required" type="xsd:string"/>
-    </xsd:complexType>
-  </xsd:element>
-
   <xsd:simpleType name="ksessionType">
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="stateless"/>
@@ -445,4 +433,27 @@
   <xsd:element name="custom-marshalling-strategy" type="generic-ref-or-nested-type"/>
   <!-- end of additions for environment -->
 
+  <!-- additions for ksession listeners -->
+  <xsd:complexType name="eventListener">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element ref="spring:bean"/>
+    </xsd:choice>
+    <xsd:attribute name="ref" use="optional" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:element name="agendaEventListener" type="eventListener"/>
+  <xsd:element name="workingMemoryEventListener" type="eventListener"/>
+  <xsd:element name="processEventListener" type="eventListener"/>
+
+  <xsd:element name="eventListeners">
+    <xsd:complexType>
+      <xsd:all maxOccurs="1" minOccurs="0">
+        <xsd:element ref="agendaEventListener"/>
+        <xsd:element ref="workingMemoryEventListener"/>
+        <xsd:element ref="processEventListener"/>
+      </xsd:all>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+  <!-- end of additions for ksession listeners -->
 </xsd:schema>

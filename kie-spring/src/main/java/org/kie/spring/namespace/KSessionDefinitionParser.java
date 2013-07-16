@@ -23,7 +23,7 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.core.util.StringUtils;
+import org.springframework.util.StringUtils;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
 import org.kie.spring.factorybeans.helper.StatefulKSessionFactoryBeanHelper;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -48,6 +48,7 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String ATTRIBUTE_ID = "name";
     private static final String ATTRIBUTE_TYPE = "type";
 
+    private static final String LISTENERS_REF_ATTRIBUTE = "listeners-ref";
     private static final String EMF_ATTRIBUTE = "entity-manager-factory";
     private static final String TX_MANAGER_ATTRIBUTE = "transaction-manager";
     private static final String FORCLASS_ATTRIBUTE = "for-class";
@@ -74,10 +75,16 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
         element.setAttribute("id", id);
 
         String type = element.getAttribute(ATTRIBUTE_TYPE);
-        if (StringUtils.isEmpty(type)){
+        if (!StringUtils.hasLength(type)){
             type = "stateful";
         }
         factory.addPropertyValue(ATTRIBUTE_TYPE, type);
+
+        String listeners = element.getAttribute(LISTENERS_REF_ATTRIBUTE);
+        if (StringUtils.hasText(listeners)) {
+            factory.addPropertyValue("eventListenersFromGroup", new RuntimeBeanReference(listeners));
+        }
+        EventListenersUtil.parseEventListeners(parserContext, factory, element);
 
         Element ksessionConf = DomUtils.getChildElementByTagName(element, "configuration");
         parseSessionConf(factory, ksessionConf);
