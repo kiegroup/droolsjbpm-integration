@@ -17,11 +17,7 @@
 
     <kie:kbase name="drl_kiesample2">
 
-      <kie:ksession name="ksession3" type="stateless">
-        <kie:listeners>
-           <kie:workingMemoryEventListener type=""/>
-        </kie:listeners>
-      </kie:ksession>
+      <kie:ksession name="ksession3" type="stateless"/>
 
       <kie:ksession name="loggerSession" type="stateless"/>
       <kie:ksession name="statefulSession" type="stateful"/>
