@@ -9,10 +9,10 @@
     <version>6.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>drools-blueprint-camel-example</artifactId>
+  <artifactId>spring-camel-drools-decision-table-example</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Drools :: OSGI Blueprint Camel Example</name>
+  <name>Drools :: OSGI Camel Example</name>
 
   <dependencies>
 
@@ -23,14 +23,6 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-camel</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-aries-blueprint</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -44,6 +36,14 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-decisiontables</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-camel</artifactId>
+    </dependency>
 
     <!-- POI - Excell -->
     <dependency>
@@ -52,12 +52,29 @@
     </dependency>
 
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-blueprint</artifactId>
+      <artifactId>camel-spring</artifactId>
     </dependency>
 
     <!-- Logging -->
@@ -70,7 +87,7 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
 
-    <!-- testing
+    <!-- testing -->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test-spring</artifactId>
@@ -86,20 +103,20 @@
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
-    -->
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
+    <testResources>
+      <testResource>
         <filtering>false</filtering>
-        <directory>src/main/resources</directory>
-      </resource>
-      <resource>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
         <filtering>true</filtering>
-        <directory>src/main/filtered-resources</directory>
-      </resource>
-    </resources>
+        <directory>src/test/filtered-resources</directory>
+      </testResource>
+    </testResources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -137,12 +154,11 @@
               org.jbpm.process.instance.impl;version="[6.0,7)",
               org.jbpm.process.instance.event;version="[6.0,7)",
               org.jbpm.bpmn2;version="[6.0,7)",
-              org.osgi.service.blueprint,
               org.kie.api;version="[6.0,7)",
+              org.kie.api.definition.rule;version="[6.0,7)",
               org.kie.api.runtime.rule;version="[6.0,7)",
               org.kie.internal;version="[6.0,7)",
-              org.kie.aries.blueprint;version="[6.0,7)",
-              org.kie.aries.blueprint.factorybeans;version="[6.0,7)",
+              org.kie.spring;version="[6.0,7)",
               org.kie.camel.component;version="[6.0,7)",
               org.eclipse.jdt.internal.compiler
             </Import-Package>
@@ -161,8 +177,70 @@
           <applicationContextUri>META-INF/spring/*.xml</applicationContextUri>
         </configuration>
       </plugin>
-    </plugins>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/Guvnor**.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <!-- WAR -->
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>8.1.9.v20130131</version>
+        <configuration>
+          <webAppConfig>
+            <contextPath>/</contextPath>
+          </webAppConfig>
+          <systemProperties>
+            <!-- enable easy JMX connection to JConsole -->
+            <systemProperty>
+              <name>com.sun.management.jmxremote</name>
+              <value/>
+            </systemProperty>
+          </systemProperties>
+          <scanIntervalSeconds>10</scanIntervalSeconds>
+        </configuration>
+      </plugin>
+
+    </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>simple</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-maven-plugin</artifactId>
+            <configuration>
+              <applicationContextUri>META-INF/spring/camel-context.xml</applicationContextUri>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>decision-table</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-maven-plugin</artifactId>
+            <configuration>
+              <applicationContextUri>META-INF/spring/camel-context-decision-table.xml</applicationContextUri>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 
 </project>

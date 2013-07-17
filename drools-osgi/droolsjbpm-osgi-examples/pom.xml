@@ -15,9 +15,9 @@
   <name>Drools jBPPM :: OSGI Examples</name>
 
   <modules>
-    <module>spring-camel-drools-decision-table</module>
-    <module>spring-jbpm</module>
-    <module>blueprint-camel-drools-decision-table</module>
+    <module>spring-camel-drools-decision-table-example</module>
+    <module>spring-jbpm-osgi-example</module>
+    <module>blueprint-camel-drools-decision-table-example</module>
   </modules>
 
 
