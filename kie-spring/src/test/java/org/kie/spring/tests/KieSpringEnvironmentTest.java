@@ -35,6 +35,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.net.URL;
 
 import static org.junit.Assert.*;
 
@@ -63,9 +64,8 @@ public class KieSpringEnvironmentTest {
     @BeforeClass
     public static void runBeforeClass() {
         ReleaseId releaseId = new ReleaseIdImpl("kie-spring-commands","test-spring","0001");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,
-                KieSpringEnvironmentTest.class.getResource("/org/kie/spring/environment.xml"),
-                new File(KieSpringEnvironmentTest.class.getResource("/").getFile()));
+        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/environment.xml");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
     }
 
     @Test
