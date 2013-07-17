@@ -67,7 +67,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         log.debug(":: BeanFactoryPostProcessor::postProcessBeanFactory called ::");
-        if ( releaseId == null) {
+        if ( releaseId == null && configFilePath != null) {
             String pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
             releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
             KieSpringUtils.setDefaultReleaseId(releaseId);
@@ -86,6 +86,10 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     private void addKieModuleToRepo(KieModuleModel kieProject) {
         KieBuilderImpl.setDefaultsforEmptyKieModule(kieProject);
 
+
+        if ( configFilePath == null) {
+            configFilePath = getClass().getResource("/").getPath();
+        }
         String rootPath = configFilePath;
         if ( rootPath.lastIndexOf( ':' ) > 0 ) {
             rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );

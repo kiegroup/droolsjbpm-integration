@@ -5,18 +5,25 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd
-       http://drools.org/schema/kie-spring         http://drools.org/schema/kie-spring-2.0.0.xsd">
+       http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
   <!-- Beans used by camel in the example -->
   <bean id="cheeseHelper" class="org.drools.camel.example.CheeseHelper"/>
+  <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
 
-  <kie:ksession-ref id="ksession-dt-1">
-    <kie:batch>
-      <kie:set-global identifier="list" >
-        <bean class="java.util.ArrayList" />
-      </kie:set-global>
-    </kie:batch>
-  </kie:ksession-ref>
+  <kie:kmodule id="camel-context-decision-table">
+
+    <kie:kbase name="drl_sample">
+      <kie:ksession name="ksession-dt-1" type="stateless">
+        <kie:batch>
+          <kie:set-global identifier="list" >
+            <bean class="java.util.ArrayList" />
+          </kie:set-global>
+        </kie:batch>
+      </kie:ksession>
+    </kie:kbase>
+
+  </kie:kmodule>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
 

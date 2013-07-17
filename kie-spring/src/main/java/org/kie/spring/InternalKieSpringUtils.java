@@ -39,6 +39,10 @@ public final class InternalKieSpringUtils {
         return  KieSpringUtils.applicationContextMap.get(releaseId);
     }
 
+    public static ApplicationContext getSpringContext(ReleaseId releaseId, URL kModuleSpringFileLocation) {
+        KModuleSpringMarshaller.fromXML(kModuleSpringFileLocation, null, releaseId);
+        return  KieSpringUtils.applicationContextMap.get(releaseId);
+    }
     static {
         KieSpringUtils.getDefaultSpringContext();
     }

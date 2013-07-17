@@ -46,6 +46,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.*;
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -80,9 +81,8 @@ public class VariablePersistenceStrategyEnvTest {
         try {
             log.info("creating spring context");
             ReleaseId releaseId = new ReleaseIdImpl("kie-spring-var-jpa-env","test-spring","0001");
-            ctx = InternalKieSpringUtils.getSpringContext(releaseId,
-                    InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_var_beans_env.xml"),
-                    new File(JPASingleSessionCommandServiceFactoryTest.class.getResource("/").getFile()));
+            URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_var_beans_env.xml");
+            ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);
