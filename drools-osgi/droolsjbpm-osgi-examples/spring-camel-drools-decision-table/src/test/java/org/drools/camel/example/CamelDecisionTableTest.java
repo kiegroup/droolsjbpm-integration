@@ -16,14 +16,19 @@
 
 package org.drools.camel.example;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
+import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CamelDecisionTableTest extends CamelSpringTestSupport {
@@ -34,7 +39,7 @@ public class CamelDecisionTableTest extends CamelSpringTestSupport {
     @Produce(uri = "direct://ruleOnCommandDT")
     protected ProducerTemplate ruleOnCommandEndpoint;
 
-    @Test @Ignore
+    @Test
     public void testRuleOnBody() throws Exception {
         Person person = new Person();
         person.setName("Young Scott");
@@ -63,7 +68,7 @@ public class CamelDecisionTableTest extends CamelSpringTestSupport {
         assertTrue(person.isCanDrink());
     }
 
-    @Test @Ignore
+    @Test
     // TODO drools-camel component should be improved to allow to set Global value on the session
     public void testRuleOnCommand() throws Exception {
         Person person = new Person();
@@ -123,6 +128,9 @@ public class CamelDecisionTableTest extends CamelSpringTestSupport {
 
     @Override
     protected ClassPathXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("META-INF/spring/camel-context-decision-table.xml","META-INF/spring/drools-decision-table.xml");
+        //return new ClassPathXmlApplicationContext("META-INF/spring/camel-context-decision-table.xml","META-INF/spring/drools-decision-table.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("osgi-camel-test","decision-table","0001");
+        URL configPathURL = CamelContextXmlTest.class.getResource("/META-INF/spring/camel-context-decision-table.xml");
+        return (ClassPathXmlApplicationContext) InternalKieSpringUtils.getSpringContext(releaseId,configPathURL);
     }
 }
