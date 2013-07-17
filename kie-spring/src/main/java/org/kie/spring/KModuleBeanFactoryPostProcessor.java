@@ -35,20 +35,22 @@ import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
 
 public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     private static final Logger log               = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
-    private URL configFileURL;
-    String configFilePath;
-    ReleaseId releaseId;
-    ApplicationContext context;
+
+    protected URL configFileURL;
+    protected ReleaseId releaseId;
+
+    private String configFilePath;
+    private ApplicationContext context;
 
     public KModuleBeanFactoryPostProcessor(URL configFileURL, String configFilePath, ApplicationContext context) {
         this.configFileURL = configFileURL;
@@ -76,8 +78,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
             if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KModuleFactoryBean.class.getName())){
-                KieModuleModel kieModuleModel = fetchKieModuleModel(beanFactory, beanDef, beanDefinition);
-
+                KieModuleModel kieModuleModel = fetchKieModuleModel(beanFactory);
                 addKieModuleToRepo(kieModuleModel);
             }
         }
@@ -86,30 +87,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     private void addKieModuleToRepo(KieModuleModel kieProject) {
         KieBuilderImpl.setDefaultsforEmptyKieModule(kieProject);
 
-
-        if ( configFilePath == null) {
-            configFilePath = getClass().getResource("/").getPath();
-        }
-        String rootPath = configFilePath;
-        if ( rootPath.lastIndexOf( ':' ) > 0 ) {
-            rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );
-        }
-
-        InternalKieModule kJar;
-        File file = new File( rootPath );
-        if ( configFilePath.endsWith( ".jar" ) ) {
-            kJar = new ZipKieModule( releaseId,
-                    kieProject,
-                    file );
-        } else if ( file.isDirectory() ) {
-            kJar = new FileKieModule( releaseId,
-                    kieProject,
-                    file );
-        } else {
-            // if it's a file it must be zip and end with .jar, otherwise we log an error
-            log.error( "ERROR Unable to build index of kmodule-spring.xml url=" + configFileURL.toExternalForm() + "\n" );
-            kJar = null;
-        }
+        InternalKieModule kJar = createKieModule(kieProject);
 
         if ( kJar != null ) {
             KieServices ks = KieServices.Factory.get();
@@ -119,7 +97,39 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         }
     }
 
-    private KieModuleModel fetchKieModuleModel(ConfigurableListableBeanFactory beanFactory, String beanDefName, BeanDefinition kModuleBeanDef) {
+    protected InternalKieModule createKieModule(KieModuleModel kieProject) {
+        if (configFileURL.toString().startsWith("bundle:")) {
+            return createOsgiKModule(kieProject);
+        }
+
+        if ( configFilePath == null) {
+            configFilePath = getClass().getResource("/").getPath();
+        }
+
+        String rootPath = configFilePath;
+        if ( rootPath.lastIndexOf( ':' ) > 0 ) {
+            rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );
+        }
+
+        return ClasspathKieProject.createInternalKieModule(configFileURL, configFilePath, kieProject, releaseId, rootPath);
+    }
+
+    private InternalKieModule createOsgiKModule(KieModuleModel kieProject) {
+        Method m;
+        try {
+            Class<?> c = Class.forName(ClasspathKieProject.OSGI_KIE_MODULE_CLASS_NAME, true, KieBuilderImpl.class.getClassLoader());
+            m = c.getMethod("create", URL.class, ReleaseId.class, KieModuleModel.class);
+        } catch (Exception e) {
+            throw new RuntimeException("It is necessary to have the drools-osgi-integration module on the path in order to create a KieProject from an ogsi bundle", e);
+        }
+        try {
+            return (InternalKieModule) m.invoke(null, configFileURL, releaseId, kieProject);
+        } catch (Exception e) {
+            throw new RuntimeException("Failure creating a OsgiKieModule caused by: " + e.getMessage(), e);
+        }
+    }
+
+    private KieModuleModel fetchKieModuleModel(ConfigurableListableBeanFactory beanFactory) {
         KieModuleModelImpl kieModuleModel = new KieModuleModelImpl();
         addKieBaseModels(beanFactory, kieModuleModel);
         return kieModuleModel;
@@ -135,12 +145,12 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 kBase.setName(kBaseName);
                 kieModuleModel.getRawKieBaseModels().put( kBase.getName(), kBase );
                 beanDefinition.getPropertyValues().addPropertyValue(new PropertyValue("releaseId", releaseId));
-                addKieSessionModels(beanFactory, kBase, (RootBeanDefinition) beanDefinition);
+                addKieSessionModels(beanFactory, kBase);
             }
         }
     }
 
-    private void addKieSessionModels(ConfigurableListableBeanFactory beanFactory, KieBaseModelImpl kBase, RootBeanDefinition kBaseBeanDefinition) {
+    private void addKieSessionModels(ConfigurableListableBeanFactory beanFactory, KieBaseModelImpl kBase) {
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
             if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KSessionFactoryBean.class.getName())){

@@ -3,23 +3,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:kie="http://drools.org/schema/kie-spring"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://drools.org/schema/kie-spring
-       http://drools.org/schema/kie-spring-2.0.0.xsd
-       http://camel.apache.org/schema/spring
-       http://camel.apache.org/schema/spring/camel-spring.xsd">
+       http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+">
 
-  <kie:releaseId id="dummyReleaseId"
-                 groupId="dummyGroup"
-                 artifactId="dummyArtifact"
-                 version="dummyVersion"/>
-
-  <kie:kcontainer-ref id="defaultContainer"/>
-
-  <kie:kbase-ref id="drl_camelsample"/>
-
-  <kie:ksession id="ksession1" type="stateless" kbase-ref="drl_camelsample"/>
+  <kie:kmodule id="defaultContainer">
+    <kie:kbase name="drl_camelsample">
+      <kie:ksession name="ksession1" type="stateless"/>
+    </kie:kbase>
+  </kie:kmodule>
 
   <bean id="kieHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
 

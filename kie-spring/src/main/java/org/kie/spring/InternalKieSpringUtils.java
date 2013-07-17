@@ -35,7 +35,9 @@ import java.util.Collection;
 
 public final class InternalKieSpringUtils {
     public static ApplicationContext getSpringContext(ReleaseId releaseId, URL kModuleSpringFileLocation, File baseDirectory) {
-        KModuleSpringMarshaller.fromXML(kModuleSpringFileLocation, baseDirectory.getAbsolutePath(), releaseId);
+        KModuleSpringMarshaller.fromXML(kModuleSpringFileLocation,
+                                        baseDirectory.getAbsolutePath(),
+                                        releaseId);
         return  KieSpringUtils.applicationContextMap.get(releaseId);
     }
 

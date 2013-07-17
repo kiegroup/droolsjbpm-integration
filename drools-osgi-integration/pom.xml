@@ -25,6 +25,16 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-core</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -36,7 +46,7 @@
           <instructions>
             <Bundle-SymbolicName>org.drools.osgi.integration</Bundle-SymbolicName>
             <Fragment-Host>org.drools.compiler</Fragment-Host>
-            <Export-Package>org.drools.osgi.compiler</Export-Package>
+            <Export-Package>*</Export-Package>
           </instructions>
         </configuration>
       </plugin>

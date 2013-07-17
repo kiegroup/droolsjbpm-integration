@@ -21,14 +21,14 @@ import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 public class OsgiKieModule extends AbstractKieModule {
 
     private final Bundle bundle;
-    private final String bundleUrlPrefix;
+    private final int bundleUrlPrefixLength;
 
     private Collection<String> fileNames;
 
-    public OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle, String bundleUrlPrefix) {
+    private OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle, int bundleUrlPrefixLength) {
         super(releaseId, kModuleModel);
         this.bundle = bundle;
-        this.bundleUrlPrefix = bundleUrlPrefix;
+        this.bundleUrlPrefixLength = bundleUrlPrefixLength;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class OsgiKieModule extends AbstractKieModule {
             if (urlString.endsWith("/")) {
                 continue;
             }
-            fileNames.add(urlString.substring(bundleUrlPrefix.length()));
+            fileNames.add(urlString.substring(bundleUrlPrefixLength));
         }
         return fileNames;
     }
@@ -79,7 +79,15 @@ public class OsgiKieModule extends AbstractKieModule {
         Bundle bundle = FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
         String pomProperties = getPomProperties( bundle );
         ReleaseId releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
-        return new OsgiKieModule(releaseId, kieProject, bundle, urlString.substring(0, urlString.indexOf("META-INF")));
+        return new OsgiKieModule(releaseId, kieProject, bundle, urlString.indexOf("META-INF"));
+    }
+
+    public static OsgiKieModule create(URL url, ReleaseId releaseId, KieModuleModel kieProject) {
+        String urlString = url.toString();
+        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
+        long bundleId = Long.parseLong(id);
+        Bundle bundle = FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
+        return new OsgiKieModule(releaseId, kieProject, bundle, urlString.indexOf('/', "bundle://".length()+1) + 1);
     }
 
     private static String getPomProperties(Bundle bundle) {

@@ -39,8 +39,7 @@ public class CxfSoapTest extends CamelSpringTestSupport {
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
         return (AbstractXmlApplicationContext) InternalKieSpringUtils.getSpringContext(new ReleaseIdImpl("kie-camel", "test-spring", "0001"),
-                                                                                       CxfRestTest.class.getResource("/org/kie/camel/component/CxfSoapSpring.xml"),
-                                                                                       new File(CxfSoapTest.class.getResource("/").getFile()));
+                                                                                       CxfRestTest.class.getResource("/org/kie/camel/component/CxfSoapSpring.xml"));
     }
 
     @Test

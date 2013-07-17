@@ -23,8 +23,8 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.drools.camel.example.Person;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.MavenUtils;
@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
+import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
-@Ignore
 @RunWith(JUnit4TestRunner.class)
 public class DroolsOnCommandCamelKarafTest extends OSGiIntegrationSpringTestSupport {
 
@@ -50,7 +50,8 @@ public class DroolsOnCommandCamelKarafTest extends OSGiIntegrationSpringTestSupp
 
     @Override
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
-        return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/camel-context.xml"});
+        return getOsgiSpringContext(new ReleaseIdImpl("dummyGroup", "dummyArtifact", "dummyVersion"),
+                                    DroolsOnCommandCamelKarafTest.class.getResource("/org/drools/karaf/itest/camel-context.xml"));
     }
 
     @Test

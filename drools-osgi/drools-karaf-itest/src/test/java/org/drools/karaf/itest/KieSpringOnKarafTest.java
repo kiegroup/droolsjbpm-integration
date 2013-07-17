@@ -19,13 +19,11 @@ package org.drools.karaf.itest;
 import java.io.File;
 
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.ops4j.pax.exam.MavenUtils;
@@ -39,10 +37,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
+import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
-@Ignore
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
 public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
@@ -56,25 +54,10 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
     }
 
     @Test
-    public void testKContainer() throws Exception {
-        refresh();
-        KieContainer kieContainer = (KieContainer) applicationContext.getBean("defaultContainer");
-        assertNotNull(kieContainer);
-        System.out.println("kieContainer.getReleaseId() == " + kieContainer.getReleaseId());
-    }
-
-    @Test
     public void testKieBase() throws Exception {
         refresh();
         KieBase kbase = (KieBase) applicationContext.getBean("drl_kiesample");
         assertNotNull(kbase);
-    }
-
-    @Test
-    public void testReleaseId() throws Exception {
-        refresh();
-        ReleaseId releaseId = (ReleaseId) applicationContext.getBean("dummyReleaseId");
-        assertNotNull(releaseId);
     }
 
     @Test
@@ -106,7 +89,7 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                // debugConfiguration("5005", true),
+                //debugConfiguration("5005", true),
 
                 // Load Spring DM Karaf Feature
                 scanFeatures(
@@ -121,9 +104,8 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
     }
 
-
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
-        return new OsgiBundleXmlApplicationContext(new String[]{"org/kie/spring/kie-beans.xml"});
+        return getOsgiSpringContext(new ReleaseIdImpl("dummyGroup", "dummyArtifact", "dummyVersion"),
+                                    KieSpringOnKarafTest.class.getResource("/org/drools/karaf/itest/kie-beans.xml"));
     }
-
 }
