@@ -43,7 +43,7 @@ public class KModuleSpringMarshaller {
     }
 
     public static KieModuleModel fromXML(java.net.URL kModuleUrl, String fixedPath, ReleaseId releaseId){
-        FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext();
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
         KModuleBeanFactoryPostProcessor beanFactoryPostProcessor = new KModuleBeanFactoryPostProcessor(kModuleUrl, fixedPath, context);
         beanFactoryPostProcessor.setReleaseId(releaseId);
         context.addBeanFactoryPostProcessor(beanFactoryPostProcessor);

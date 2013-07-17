@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
@@ -40,9 +41,8 @@ public class KieSpringCommandsTest {
     @BeforeClass
     public static void setup() {
         ReleaseId releaseId = new ReleaseIdImpl("kie-spring-commands","test-spring","0001");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,
-                InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/beans-commands.xml"),
-                new File(InternalKieSpringUtilsTest.class.getResource("/").getFile()));
+        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/beans-commands.xml");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
     }
 
     @Test

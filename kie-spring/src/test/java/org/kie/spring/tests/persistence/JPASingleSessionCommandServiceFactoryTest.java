@@ -55,6 +55,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -116,9 +117,8 @@ public class JPASingleSessionCommandServiceFactoryTest {
         try {
             log.info("creating spring context");
             ReleaseId releaseId = new ReleaseIdImpl("kie-spring-jpa-singlesession","test-spring","0001");
-            ctx = InternalKieSpringUtils.getSpringContext(releaseId,
-                    InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_beans.xml"),
-                    new File(JPASingleSessionCommandServiceFactoryTest.class.getResource("/").getFile()));
+            URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_beans.xml");
+            ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);

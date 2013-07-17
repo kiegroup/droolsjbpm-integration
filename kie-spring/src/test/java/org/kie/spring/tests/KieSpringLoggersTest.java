@@ -36,6 +36,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +49,8 @@ public class KieSpringLoggersTest {
     @BeforeClass
     public static void runBeforeClass() {
         ReleaseId releaseId = new ReleaseIdImpl("kie-spring-loggers","test-spring","0001");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,
-                KieSpringListenersTest.class.getResource("/org/kie/spring/loggers.xml"),
-                new File(KieSpringListenersTest.class.getResource("/").getFile()));
+        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/loggers.xml");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
     }
 
     @AfterClass

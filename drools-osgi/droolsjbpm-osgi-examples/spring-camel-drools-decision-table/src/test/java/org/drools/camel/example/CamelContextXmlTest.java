@@ -16,17 +16,23 @@
 
 package org.drools.camel.example;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.builder.ReleaseId;
+import org.kie.spring.InternalKieSpringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-@Ignore
 public class CamelContextXmlTest extends CamelSpringTestSupport {
 
     // templates to send to input endpoints
@@ -105,6 +111,8 @@ public class CamelContextXmlTest extends CamelSpringTestSupport {
 
     @Override
     protected ClassPathXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("META-INF/spring/camel-context.xml");
+        ReleaseId releaseId = new ReleaseIdImpl("drools-osgi-test","decision-table","0001");
+        URL configPathURL = CamelContextXmlTest.class.getResource("/META-INF/spring/camel-context.xml");
+        return (ClassPathXmlApplicationContext) InternalKieSpringUtils.getSpringContext(releaseId,configPathURL);
     }
 }

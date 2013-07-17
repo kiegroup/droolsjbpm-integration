@@ -28,6 +28,7 @@ import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
+import java.net.URL;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -39,9 +40,8 @@ public class InternalKieSpringUtilsTest {
     @BeforeClass
     public static void setup() {
         ReleaseId releaseId = new ReleaseIdImpl("sample-group","test-spring","0001");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,
-                InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/beans-internal.xml"),
-                new File(InternalKieSpringUtilsTest.class.getResource("/").getFile()));
+        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/beans-internal.xml");
+        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
     }
 
     @Test
