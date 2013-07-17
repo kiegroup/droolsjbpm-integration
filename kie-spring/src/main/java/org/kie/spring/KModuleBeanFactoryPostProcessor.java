@@ -36,13 +36,15 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
 
-public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
 
     private static final Logger log               = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
 
@@ -51,6 +53,10 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
     private String configFilePath;
     private ApplicationContext context;
+
+    public KModuleBeanFactoryPostProcessor() {
+        configFilePath  = getClass().getResource("/").getPath();
+    }
 
     public KModuleBeanFactoryPostProcessor(URL configFileURL, String configFilePath, ApplicationContext context) {
         this.configFileURL = configFileURL;
@@ -68,7 +74,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     }
 
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        log.debug(":: BeanFactoryPostProcessor::postProcessBeanFactory called ::");
+        log.info(":: BeanFactoryPostProcessor::postProcessBeanFactory called ::");
         if ( releaseId == null && configFilePath != null) {
             String pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
             releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
@@ -165,6 +171,15 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                     beanDefinition.getPropertyValues().addPropertyValue(new PropertyValue("releaseId", releaseId));
                 }
             }
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        try {
+            configFileURL = applicationContext.getResource("classpath:/").getURL();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
