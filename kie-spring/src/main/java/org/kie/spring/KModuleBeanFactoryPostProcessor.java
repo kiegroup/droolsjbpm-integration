@@ -55,7 +55,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     private ApplicationContext context;
 
     public KModuleBeanFactoryPostProcessor() {
-        configFilePath  = getClass().getResource("/").getPath();
+        initConfigFilePath();
     }
 
     public KModuleBeanFactoryPostProcessor(URL configFileURL, String configFilePath, ApplicationContext context) {
@@ -67,6 +67,10 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     public KModuleBeanFactoryPostProcessor(URL configFileURL, String configFilePath) {
         this.configFileURL = configFileURL;
         this.configFilePath = configFilePath;
+    }
+
+    protected void initConfigFilePath() {
+        configFilePath = getClass().getResource("/").getPath();
     }
 
     public void setReleaseId(ReleaseId releaseId) {

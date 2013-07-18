@@ -111,8 +111,6 @@ public class CamelContextXmlTest extends CamelSpringTestSupport {
 
     @Override
     protected ClassPathXmlApplicationContext createApplicationContext() {
-        ReleaseId releaseId = new ReleaseIdImpl("drools-osgi-test","decision-table","0001");
-        URL configPathURL = CamelContextXmlTest.class.getResource("/META-INF/spring/camel-context.xml");
-        return (ClassPathXmlApplicationContext) InternalKieSpringUtils.getSpringContext(releaseId,configPathURL);
+        return new ClassPathXmlApplicationContext("META-INF/spring/camel-context.xml");
     }
 }

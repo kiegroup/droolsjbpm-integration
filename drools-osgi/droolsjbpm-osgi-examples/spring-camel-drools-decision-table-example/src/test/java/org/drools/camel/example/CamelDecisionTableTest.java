@@ -128,9 +128,6 @@ public class CamelDecisionTableTest extends CamelSpringTestSupport {
 
     @Override
     protected ClassPathXmlApplicationContext createApplicationContext() {
-        //return new ClassPathXmlApplicationContext("META-INF/spring/camel-context-decision-table.xml","META-INF/spring/drools-decision-table.xml");
-        ReleaseId releaseId = new ReleaseIdImpl("osgi-camel-test","decision-table","0001");
-        URL configPathURL = CamelContextXmlTest.class.getResource("/META-INF/spring/camel-context-decision-table.xml");
-        return (ClassPathXmlApplicationContext) InternalKieSpringUtils.getSpringContext(releaseId,configPathURL);
+        return new ClassPathXmlApplicationContext("META-INF/spring/camel-context-decision-table.xml");
     }
 }

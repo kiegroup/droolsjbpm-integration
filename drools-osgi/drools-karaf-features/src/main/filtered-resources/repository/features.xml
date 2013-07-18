@@ -146,7 +146,7 @@
     <feature version="${drools.version}">drools-decisiontable</feature>
     <feature version="${drools.version}">kie-spring</feature>
     <feature version="${drools.version}">kie-camel</feature>
-    <bundle start-level="100">mvn:org.drools/drools-camel-example/${drools.version}</bundle>
+    <bundle start-level="100">mvn:org.drools/spring-camel-drools-decision-table-example/${drools.version}</bundle>
   </feature>
 
   <feature name="drools-blueprint-camel-example" version="${drools.version}" description="Drools Kie Blueprint Camel Example">

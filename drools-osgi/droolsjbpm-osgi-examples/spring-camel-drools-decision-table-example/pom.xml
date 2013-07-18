@@ -44,6 +44,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-camel</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-osgi-integration</artifactId>
+    </dependency>
 
     <!-- POI - Excell -->
     <dependency>
@@ -160,7 +164,9 @@
               org.kie.internal;version="[6.0,7)",
               org.kie.spring;version="[6.0,7)",
               org.kie.camel.component;version="[6.0,7)",
-              org.eclipse.jdt.internal.compiler
+              org.eclipse.jdt.internal.compiler,
+              org.drools.osgi.spring,
+              org.drools.osgi.compiler
             </Import-Package>
             <Private-Package>
               org.drools.camel.example

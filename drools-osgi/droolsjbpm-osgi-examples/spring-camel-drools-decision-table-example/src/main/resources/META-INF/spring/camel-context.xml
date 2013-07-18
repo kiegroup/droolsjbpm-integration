@@ -11,11 +11,12 @@
   <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
   <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
 
-  <!-- WHY CAN't WE USE THIS SYNTAX  & HOW the drl
-  <kie:kbase-ref id="drl_sample"/>
 
-  <kie:ksession id="kession1" kbase-ref="drl_sample"/>
-  -->
+  <bean id="kiePostProcessor" class="org.drools.osgi.spring.OsgiKModuleBeanFactoryPostProcessor">
+    <!-- you can optionally define the GAV for this artifact as it follows -->
+    <!--property name="release" value="yourGroup:yourArtifact:yourVersion"/-->
+  </bean>
+
   <kie:kmodule id="camel-context">
 
     <kie:kbase name="drl_sample">

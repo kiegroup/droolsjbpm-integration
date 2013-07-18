@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
-import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
@@ -105,7 +104,10 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
     }
 
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
+        return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/kie-beans.xml"});
+/*
         return getOsgiSpringContext(new ReleaseIdImpl("dummyGroup", "dummyArtifact", "dummyVersion"),
                                     KieSpringOnKarafTest.class.getResource("/org/drools/karaf/itest/kie-beans.xml"));
+*/
     }
 }

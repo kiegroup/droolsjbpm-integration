@@ -7,6 +7,8 @@
        http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd
 ">
 
+  <bean id="kiePostProcessor" class="org.drools.osgi.spring.OsgiKModuleBeanFactoryPostProcessor"/>
+
   <kie:kmodule id="someid">
     <kie:kbase name="drl_kiesample">
       <kie:ksession name="ksession9" type="stateless"/>

@@ -11,6 +11,8 @@
   <bean id="cheeseHelper" class="org.drools.camel.example.CheeseHelper"/>
   <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
 
+  <bean id="kiePostProcessor" class="org.drools.osgi.spring.OsgiKModuleBeanFactoryPostProcessor"/>
+
   <kie:kmodule id="camel-context-decision-table">
 
     <kie:kbase name="drl_sample">
