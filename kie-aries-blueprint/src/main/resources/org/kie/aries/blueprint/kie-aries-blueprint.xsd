@@ -33,6 +33,27 @@
   </xsd:element>
 
   <xsd:complexType name="ksessionComplexType">
+    <xsd:sequence>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="consoleLogger" type="consoleLoggerT" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="fileLogger" type="fileLoggerT" minOccurs="0" maxOccurs="2"/>
+      </xsd:sequence>
+      <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:element name="batch" minOccurs="0" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <!--<xsd:element name="configuration" type="configurationType" minOccurs="0" maxOccurs="1"/>-->
+      </xsd:choice>
+    </xsd:sequence>
     <xsd:attribute name="name" use="required" type="xsd:ID"/>
     <xsd:attribute name="type" type="ksessionType"/>
     <xsd:attribute name="default" type="xsd:boolean"/>
@@ -69,7 +90,6 @@
     </xsd:restriction>
   </xsd:simpleType>
 
-
   <xsd:element name="releaseId">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
@@ -80,13 +100,6 @@
   </xsd:element>
 
   <xsd:element name="kcontainer-ref">
-    <xsd:complexType>
-      <xsd:attribute name="id" use="required" type="xsd:ID"/>
-      <xsd:attribute name="releaseId" use="optional" type="xsd:IDREF"/>
-    </xsd:complexType>
-  </xsd:element>
-
-  <xsd:element name="kbase-ref">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
       <xsd:attribute name="releaseId" use="optional" type="xsd:IDREF"/>
@@ -112,66 +125,6 @@
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
       <xsd:attribute name="kruntimeManager-ref" use="required" type="xsd:string"/>
-    </xsd:complexType>
-  </xsd:element>
-
-  <xsd:element name="ksession-ref">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-          <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
-          <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
-          <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-          <xsd:element name="consoleLogger" type="consoleLoggerT" minOccurs="0" maxOccurs="1"/>
-          <xsd:element name="fileLogger" type="fileLoggerT" minOccurs="0" maxOccurs="2"/>
-        </xsd:sequence>
-        <xsd:choice minOccurs="0" maxOccurs="1">
-          <xsd:element name="batch" minOccurs="0" maxOccurs="1">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
-              </xsd:sequence>
-            </xsd:complexType>
-          </xsd:element>
-          <!--<xsd:element name="configuration" type="configurationType" minOccurs="0" maxOccurs="1"/>-->
-        </xsd:choice>
-      </xsd:sequence>
-      <xsd:attribute name="id" use="required" type="xsd:ID"/>
-      <xsd:attribute name="releaseId" use="optional" type="xsd:IDREF"/>
-      <xsd:attribute name="listeners-ref" use="optional" type="xsd:IDREF"/>
-    </xsd:complexType>
-  </xsd:element>
-
-  <xsd:element name="ksession">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-          <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
-          <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
-          <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-          <xsd:element name="consoleLogger" type="consoleLoggerT" minOccurs="0" maxOccurs="1"/>
-          <xsd:element name="fileLogger" type="fileLoggerT" minOccurs="0" maxOccurs="2"/>
-        </xsd:sequence>
-        <xsd:choice minOccurs="0" maxOccurs="1">
-          <xsd:element name="batch" minOccurs="0" maxOccurs="1">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
-              </xsd:sequence>
-            </xsd:complexType>
-          </xsd:element>
-          <!--<xsd:element name="configuration" type="configurationType" minOccurs="0" maxOccurs="1"/>-->
-        </xsd:choice>
-      </xsd:sequence>
-      <xsd:attribute name="id" use="required" type="xsd:ID"/>
-      <xsd:attribute name="type" use="required" type="knowledgeSessionTypeEnum"/>
-      <xsd:attribute name="kbase-ref" use="required" type="xsd:string"/>
-      <xsd:attribute name="releaseId" use="optional" type="xsd:IDREF"/>
-      <xsd:attribute name="listeners-ref" use="optional" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
