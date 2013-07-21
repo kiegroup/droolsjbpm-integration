@@ -32,6 +32,7 @@ import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.kie.aries.blueprint.beans.Person;
 import org.kie.aries.blueprint.factorybeans.KieObjectsResolver;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
+import org.osgi.service.blueprint.container.NoSuchComponentException;
 
 import static org.junit.Assert.*;
 
@@ -83,10 +84,6 @@ public class KieBlueprintBasicTest {
         StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession1");
         System.out.println(ksession);
         assertNotNull(ksession);
-
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        Object obj = kieObjectsResolver.resolveKSession("ksession1", null);
-        assertSame(ksession, obj);
     }
 
     @Test
@@ -95,7 +92,7 @@ public class KieBlueprintBasicTest {
             StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("should-fail-ksession1");
             assertNull(ksession);
         } catch(Exception e){
-            assertTrue(e instanceof ComponentDefinitionException);
+            assertTrue(e instanceof NoSuchComponentException);
             return;
         }
         fail();

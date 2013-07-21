@@ -22,13 +22,13 @@
 
   <kie:kcontainer-ref id="defaultContainer"/>
 
-  <kie:kbase-ref id="drl_kiesample" releaseId="dummyReleaseId"/>
+  <kie:kmodule id="basics" >
+    <kie:kbase name="drl_kiesample">
+      <kie:ksession name="ksession9" type="stateless"/>
+      <kie:ksession name="ksession1" type="stateless"/>
+    </kie:kbase>
+  </kie:kmodule>
 
   <kie:kstore id="sampleKstore"/>
-
-  <kie:ksession id="ksession9" type="stateless" kbase-ref="drl_kiesample"/>
-  <kie:ksession-ref id="ksession1"/>
-
-  <kie:ksession-ref id="should-fail-ksession1"/>
 
 </blueprint>
