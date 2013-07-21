@@ -5,6 +5,13 @@
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
            http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
 
+  <kie:kmodule id="someid" >
+    <kie:kbase name="drl_kiesample2">
+      <kie:ksession name="ksession9" type="stateful"/>
+      <kie:ksession name="ksession99" type="stateless"/>
+    </kie:kbase>
+  </kie:kmodule>
+
   <bean id="person1" class="org.kie.aries.blueprint.beans.Person">
     <argument value="HAL" type="java.lang.String"/>
   </bean>
@@ -19,16 +26,7 @@
   </bean>
 
   <kie:releaseId id="dummyReleaseId" groupId="dummyGroup" artifactId="dummyArtifact" version="dummyVersion"/>
-
   <kie:kcontainer-ref id="defaultContainer"/>
-
-  <kie:kmodule id="basics" >
-    <kie:kbase name="drl_kiesample">
-      <kie:ksession name="ksession9" type="stateless"/>
-      <kie:ksession name="ksession1" type="stateless"/>
-    </kie:kbase>
-  </kie:kmodule>
-
   <kie:kstore id="sampleKstore"/>
 
 </blueprint>

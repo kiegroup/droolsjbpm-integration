@@ -5,8 +5,6 @@
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
            http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
 
-  <kie:kbase-ref id="drl_kiesample"/>
-
   <bean id="person" class="org.kie.aries.blueprint.beans.Person">
     <argument value="HAL" type="java.lang.String"/>
     <property name="happy" value="false"/>
@@ -19,18 +17,25 @@
 
   <bean id="personsList" class="java.util.ArrayList"/>
 
-  <kie:ksession-ref id="ksession2">
-    <kie:batch>
-      <kie:insert-object ref="person"/>
-    </kie:batch>
-  </kie:ksession-ref>
+  <kie:kmodule id="commands" >
+    <kie:kbase name="drl_kiesample">
 
-  <kie:ksession id="ksessionForCommands" type="stateful" kbase-ref="drl_kiesample">
-    <kie:batch>
-      <kie:insert-object ref="person2"/>
-      <kie:set-global identifier="persons" ref="personsList"/>
-      <kie:fire-all-rules max="10"/>
-    </kie:batch>
-  </kie:ksession>
+      <kie:ksession name="ksession2">
+        <kie:batch>
+          <kie:insert-object ref="person"/>
+        </kie:batch>
+      </kie:ksession>
+
+      <kie:ksession name="ksessionForCommands">
+        <kie:batch>
+          <kie:insert-object ref="person2"/>
+          <kie:set-global identifier="persons" ref="personsList"/>
+          <kie:fire-all-rules max="10"/>
+        </kie:batch>
+      </kie:ksession>
+
+    </kie:kbase>
+  </kie:kmodule>
+
 
 </blueprint>

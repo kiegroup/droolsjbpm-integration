@@ -15,10 +15,6 @@
  */
 package org.kie.aries.blueprint.tests;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -27,6 +23,7 @@ import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.kie.aries.blueprint.beans.Person;
@@ -34,16 +31,20 @@ import org.kie.aries.blueprint.factorybeans.KieObjectsResolver;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.container.NoSuchComponentException;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
-public class KieBlueprintBasicTest {
+public class KieBlueprintKModuleBasicTest {
 
     static BlueprintContainerImpl container = null;
 
     @BeforeClass
     public static void setup() throws Exception {
         List<URL> urls = new ArrayList<URL>();
-        urls.add(KieBlueprintBasicTest.class.getResource("/org/kie/aries/blueprint/basics.xml"));
+        urls.add(KieBlueprintKModuleBasicTest.class.getResource("/org/kie/aries/blueprint/kmodule-basics.xml"));
         container = new KieBlueprintContainer(ClassLoader.getSystemClassLoader(), urls);
     }
 
@@ -56,7 +57,7 @@ public class KieBlueprintBasicTest {
 
     @Test
     public void testKieBase() throws Exception {
-        KieBase kbase = (KieBase) container.getComponentInstance("drl_kiesample");
+        KieBase kbase = (KieBase) container.getComponentInstance("drl_kiesample2");
         assertNotNull(kbase);
     }
 
@@ -74,16 +75,18 @@ public class KieBlueprintBasicTest {
 
     @Test
     public void testKieSession() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession9");
-        System.out.println(ksession);
+        KieSession ksession = (KieSession) container.getComponentInstance("ksession9");
         assertNotNull(ksession);
     }
 
     @Test
     public void testKieSessionRef() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession1");
-        System.out.println(ksession);
+        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession99");
         assertNotNull(ksession);
+//
+//        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
+//        Object obj = kieObjectsResolver.resolveKSession("ksession99", null);
+//        assertSame(ksession, obj);
     }
 
     @Test
@@ -100,7 +103,7 @@ public class KieBlueprintBasicTest {
 
     @Test
     public void testKSessionExecution() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession1");
+        StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession99");
         assertNotNull(ksession);
 
         Person person = (Person) container.getComponentInstance("person1");

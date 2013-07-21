@@ -21,6 +21,8 @@ import org.drools.core.util.StringUtils;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class KieBaseElementParser extends AbstractElementParser {
 
@@ -44,6 +46,20 @@ public class KieBaseElementParser extends AbstractElementParser {
         }
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
+
+        String prefix = element.getPrefix();
+        NodeList ksessionNodeList = element.getElementsByTagName(prefix+":ksession");
+        if (ksessionNodeList != null) {
+            for (int i=0; i < ksessionNodeList.getLength(); i++){
+                Node ksessionNode = ksessionNodeList.item(i);
+                if (ksessionNode instanceof Element) {
+                    Element ksessionElement = (Element) ksessionNode;
+                    ksessionElement.setAttribute(KieSessionElementParser.ID_ATTRIBUTE, ksessionElement.getAttribute("name"));
+                    ksessionElement.setAttribute(KieSessionElementParser.ATTRIBUTE_KBASE_REF, id);
+                    context.getComponentDefinitionRegistry().registerComponentDefinition(new KieSessionElementParser().parseElement(context, ksessionElement));
+                }
+            }
+        }
         return beanMetadata;
     }
 

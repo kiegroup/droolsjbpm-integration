@@ -52,10 +52,7 @@ public class KieSessionElementParser extends AbstractElementParser {
         }
         if ( ELEMENT_NAME_KSESSION.equalsIgnoreCase(localName)) {
             if (StringUtils.isEmpty(type)) {
-                throw new ComponentDefinitionException("Mandatory attribute 'type' missing for ksession. Cannot continue.");
-            }
-            if (StringUtils.isEmpty(kbaseRef)) {
-                throw new ComponentDefinitionException("Mandatory attribute 'kbase-ref' missing for ksession. Cannot continue.");
+                type = "stateful";
             }
         }
 
