@@ -22,7 +22,6 @@ import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.apache.aries.blueprint.reflect.BeanArgumentImpl;
 import org.apache.aries.blueprint.reflect.MetadataUtil;
 import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
-import org.codehaus.jackson.map.deser.impl.PropertyValue;
 import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
@@ -84,14 +83,13 @@ public class KieObjectsInjector implements BeanProcessor {
     public void afterPropertiesSet(){
         log.debug(" :: Starting Blueprint KieObjectsInjector for kmodule ("+contextId+") :: ");
         if ( resources == null || resources.size() == 0) {
-            configFileURL = blueprintContainer.getClass().getResource("/");
+            configFileURL = getClass().getResource("/");
             configFilePath = configFileURL.getPath();
         } else {
             configFileURL = resources.get(0);
             configFilePath = configFileURL.getPath();
             log.debug(" :: Trying to intialize the KieModule from "+configFileURL+" :: ");
         }
-
         if ( configFilePath == null) {
             throw new RuntimeException("Failure creating a KieModule. Unable to determine the Configuration File Path.");
         }
@@ -145,7 +143,7 @@ public class KieObjectsInjector implements BeanProcessor {
                 }
             }
         }
-        return null;
+        return kieModuleModel;
     }
 
     private void addKieSessionModels(KieBaseModelImpl kieBaseModel) {

@@ -84,7 +84,7 @@ public class KieBlueprintBasicTest {
         System.out.println(ksession);
         assertNotNull(ksession);
 
-        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
+        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         Object obj = kieObjectsResolver.resolveKSession("ksession1", null);
         assertSame(ksession, obj);
     }

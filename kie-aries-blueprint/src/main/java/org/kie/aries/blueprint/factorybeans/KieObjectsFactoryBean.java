@@ -40,7 +40,7 @@ public class KieObjectsFactoryBean {
 
     public static KieBase fetchKBase(String id, ReleaseId releaseId){
         KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        return kieObjectsResolver.resolveKBase(id, null);
+        return kieObjectsResolver.resolveKBase(id, releaseId);
     }
 
     public static KieContainer fetchKContainer(ReleaseId releaseId){
