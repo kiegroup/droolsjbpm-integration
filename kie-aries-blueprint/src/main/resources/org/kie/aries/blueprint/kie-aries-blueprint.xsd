@@ -8,6 +8,68 @@
   <xsd:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0"
               schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
 
+  <xsd:element name="kmodule">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="kbase" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="kbase">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element type="ksessionComplexType" name="ksession" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" use="required" type="xsd:ID"/>
+      <xsd:attribute name="includes" type="xsd:string"/>
+      <xsd:attribute name="packages" type="xsd:string"/>
+      <xsd:attribute name="default" type="xsd:boolean"/>
+      <xsd:attribute name="scope" type="xsd:string"/>
+      <xsd:attribute name="equalsBehavior" type="insertBehaviorEnum"/>
+      <xsd:attribute name="eventProcessingMode" type="eventModeEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="ksessionComplexType">
+    <xsd:attribute name="name" use="required" type="xsd:ID"/>
+    <xsd:attribute name="type" type="ksessionType"/>
+    <xsd:attribute name="default" type="xsd:boolean"/>
+    <xsd:attribute name="scope" type="xsd:string"/>
+    <xsd:attribute name="clockType" type="clockTypeEnum"/>
+    <xsd:attribute name="listeners-ref" use="optional" type="xsd:IDREF"/>
+  </xsd:complexType>
+
+  <xsd:simpleType name="ksessionType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="stateless"/>
+      <xsd:enumeration value="stateful"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="eventModeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="stream"/>
+      <xsd:enumeration value="cloud"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="insertBehaviorEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="identity"/>
+      <xsd:enumeration value="equality"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="clockTypeEnum">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="realtime"/>
+      <xsd:enumeration value="pseudo"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
   <xsd:element name="releaseId">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>

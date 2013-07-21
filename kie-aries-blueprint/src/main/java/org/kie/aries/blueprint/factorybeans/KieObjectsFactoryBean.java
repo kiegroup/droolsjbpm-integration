@@ -39,14 +39,12 @@ import java.util.List;
 public class KieObjectsFactoryBean {
 
     public static KieBase fetchKBase(String id, ReleaseId releaseId){
-        System.out.println("fetchKBase :: "+id+", releaseId:: "+releaseId );
-        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
+        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         return kieObjectsResolver.resolveKBase(id, null);
     }
 
     public static KieContainer fetchKContainer(ReleaseId releaseId){
-        System.out.println("fetchKContainer :: releaseId:: "+releaseId );
-        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
+        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         KieServices ks = KieServices.Factory.get();
         if ( releaseId == null) {
             return ks.getKieClasspathContainer();
@@ -55,9 +53,7 @@ public class KieObjectsFactoryBean {
     }
 
     public static Object createKieSessionRef(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands){
-
-        System.out.println(id+"  "+commands);
-        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
+        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         Object obj = kieObjectsResolver.resolveKSession(id, releaseId);
         if ( obj != null) {
             KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);
@@ -71,7 +67,7 @@ public class KieObjectsFactoryBean {
     }
 
     public static Object createKieSession(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands, String kbaseRef, String type){
-        KieObjectsResolver kieObjectsResolver = KieObjectsResolver.get();
+        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         Object obj ;
         if ("stateless".equalsIgnoreCase(type)) {
             obj = kieObjectsResolver.newStatelessSession(kbaseRef, releaseId, null);
@@ -88,7 +84,7 @@ public class KieObjectsFactoryBean {
 
     public static KieStoreServices createKieStore() throws Exception {
 
-        KieObjectsResolver objectsResolver = KieObjectsResolver.get();
+        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         return new KnowledgeStoreServiceImpl();
     }
 
