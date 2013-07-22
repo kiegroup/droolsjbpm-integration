@@ -17,14 +17,15 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.BeanProcessor;
+import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.PassThroughMetadata;
+import org.apache.aries.blueprint.mutable.MutableBeanArgument;
+import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableValueMetadata;
-import org.apache.aries.blueprint.reflect.BeanArgumentImpl;
-import org.apache.aries.blueprint.reflect.MetadataUtil;
-import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
 import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
+import org.drools.compiler.kie.builder.impl.KieRepositoryImpl;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieBaseModelImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
@@ -34,6 +35,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.BeanArgument;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
@@ -41,6 +43,7 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,8 @@ public class KieObjectsInjector implements BeanProcessor {
     private String configFilePath;
     private ReleaseId releaseId;
     private URL configFileURL;
+    private ParserContext parserContext;
+
     /** The list of Aries Blueprint XML files*/
     protected java.util.List<java.net.URL> resources;
 
@@ -64,6 +69,11 @@ public class KieObjectsInjector implements BeanProcessor {
 
     public KieObjectsInjector(String contextId) {
         this.contextId = contextId;
+    }
+
+    public KieObjectsInjector(String contextId, ParserContext parserContext) {
+        this.contextId = contextId;
+        this.parserContext = parserContext;
     }
 
     public KieObjectsInjector(List<URL> resources, String contextId) {
@@ -84,6 +94,10 @@ public class KieObjectsInjector implements BeanProcessor {
         log.debug(" :: Starting Blueprint KieObjectsInjector for kmodule ("+contextId+") :: ");
         if ( resources == null || resources.size() == 0) {
             configFileURL = getClass().getResource("/");
+            if (configFileURL == null) {
+                createOsgiKieModule();
+                return;
+            }
             configFilePath = configFileURL.getPath();
         } else {
             configFileURL = resources.get(0);
@@ -99,6 +113,37 @@ public class KieObjectsInjector implements BeanProcessor {
         KieModuleModel kieModuleModel = getKieModuleModel();
         addKieModuleToRepo(kieModuleModel);
         log.debug(" :: Completed Injecting KieObjects from the Blueprint Bean Processor ("+contextId+") :: ");
+    }
+
+    private void createOsgiKieModule() {
+        configFileURL = FrameworkUtil.getBundle(this.getClass()).getEntry("/");
+        if (releaseId == null) {
+            releaseId = KieRepositoryImpl.INSTANCE.getDefaultReleaseId();
+        }
+        KieModuleModel kieModuleModel = getKieModuleModel();
+        KieBuilderImpl.setDefaultsforEmptyKieModule(kieModuleModel);
+
+        InternalKieModule internalKieModule = createOsgiKModule(kieModuleModel);
+        if ( internalKieModule != null ) {
+            KieServices ks = KieServices.Factory.get();
+            ks.getRepository().addKieModule(internalKieModule);
+            log.info(" :: Added KieModule From KieObjectsInjector ::");
+        }
+    }
+
+    private InternalKieModule createOsgiKModule(KieModuleModel kieProject) {
+        Method m;
+        try {
+            Class<?> c = Class.forName(ClasspathKieProject.OSGI_KIE_MODULE_CLASS_NAME, true, KieBuilderImpl.class.getClassLoader());
+            m = c.getMethod("create", URL.class, ReleaseId.class, KieModuleModel.class);
+        } catch (Exception e) {
+            throw new RuntimeException("It is necessary to have the drools-osgi-integration module on the path in order to create a KieProject from an ogsi bundle", e);
+        }
+        try {
+            return (InternalKieModule) m.invoke(null, configFileURL, releaseId, kieProject);
+        } catch (Exception e) {
+            throw new RuntimeException("Failure creating a OsgiKieModule caused by: " + e.getMessage(), e);
+        }
     }
 
     protected void addKieModuleToRepo(KieModuleModel kieModuleModel) {
@@ -134,9 +179,9 @@ public class KieObjectsInjector implements BeanProcessor {
                         kBase.setName(kBaseName);
                         kieModuleModel.getRawKieBaseModels().put(kBase.getName(), kBase);
 
-                        PassThroughMetadataImpl throughMetadata = (PassThroughMetadataImpl) MetadataUtil.createMetadata(PassThroughMetadata.class);
+                        MutablePassThroughMetadata throughMetadata = parserContext.createMetadata(MutablePassThroughMetadata.class);
                         throughMetadata.setObject(releaseId);
-                        ((BeanArgumentImpl)metadata.getArguments().get(1)).setValue(throughMetadata);
+                        ((MutableBeanArgument)metadata.getArguments().get(1)).setValue(throughMetadata);
 
                         addKieSessionModels(kBase);
                     }
@@ -166,9 +211,9 @@ public class KieObjectsInjector implements BeanProcessor {
                             Map<String, KieSessionModel> rawKieSessionModels = kieBaseModel.getRawKieSessionModels();
                             rawKieSessionModels.put(kSession.getName(), kSession);
 
-                            PassThroughMetadataImpl throughMetadata = (PassThroughMetadataImpl) MetadataUtil.createMetadata(PassThroughMetadata.class);
+                            MutablePassThroughMetadata throughMetadata = parserContext.createMetadata(MutablePassThroughMetadata.class);
                             throughMetadata.setObject(releaseId);
-                            ((BeanArgumentImpl)metadata.getArguments().get(1)).setValue(throughMetadata);
+                            ((MutableBeanArgument)metadata.getArguments().get(1)).setValue(throughMetadata);
                         }
                     }
                 }

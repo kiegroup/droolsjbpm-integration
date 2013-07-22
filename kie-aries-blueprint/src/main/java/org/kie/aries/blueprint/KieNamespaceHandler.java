@@ -112,7 +112,7 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
         String id = elementParser.getId(context, element);
         String contextId = ".kie.processor."+ id;
         beanProcessorFactory.setId(".camelBlueprint.processor.bean.passThrough." + contextId);
-        KieObjectsInjector kieObjectsInjector = new KieObjectsInjector(resources, id);
+        KieObjectsInjector kieObjectsInjector = new KieObjectsInjector(id, context);
         beanProcessorFactory.setObject(new KieModuleElementParser.PassThroughCallable<Object>(kieObjectsInjector));
 
         MutableBeanMetadata beanProcessor = context.createMetadata(MutableBeanMetadata.class);

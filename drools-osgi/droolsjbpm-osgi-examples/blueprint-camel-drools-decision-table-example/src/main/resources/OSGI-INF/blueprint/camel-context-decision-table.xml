@@ -10,7 +10,13 @@
   <!-- Beans used by camel in the example -->
   <bean id="cheeseHelper" class="org.drools.camel.example.CheeseHelper"/>
 
-  <kie:ksession id="ksession-dt-1" type="stateless" kbase-ref="drl_sample"/>
+  <kie:kmodule id="camel-context-decision-table">
+
+    <kie:kbase name="drl_sample_dt" includes="drl_sample">
+      <kie:ksession name="ksession-dt-1" type="stateless"/>
+    </kie:kbase>
+
+  </kie:kmodule>
 
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
 

@@ -10,28 +10,13 @@
   <bean id="droolsHelper" class="org.drools.camel.example.DroolsCommandHelper"/>
   <bean id="personHelper" class="org.drools.camel.example.PersonHelper"/>
 
-  <!--
-  <bean id="aList" class="java.util.ArrayList"/>
+  <kie:kmodule id="camel-context">
 
-  <kie:ksession-ref id="ksession1">
-    <kie:batch>
-      <kie:set-global identifier="list" ref="aList"/>
-    </kie:batch>
-  </kie:ksession-ref>
-  -->
+    <kie:kbase name="drl_sample">
+      <kie:ksession name="ksession1" type="stateless"/>
+    </kie:kbase>
 
-  <kie:releaseId id="dummyReleaseId"
-                 groupId="dummyGroup"
-                 artifactId="dummyArtifact"
-                 version="dummyVersion"/>
-
-  <kie:kcontainer-ref id="defaultContainer"/>
-
-  <kie:kbase-ref id="drl_sample"/>
-
-  <kie:ksession id="ksession1" type="stateless" kbase-ref="drl_sample"/>
-
-  <bean id="kie" class="org.kie.camel.component.KieComponent"/>
+  </kie:kmodule>
 
   <!-- Camel Route -->
   <camelContext xmlns="http://camel.apache.org/schema/blueprint">
