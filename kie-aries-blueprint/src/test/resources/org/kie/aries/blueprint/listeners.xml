@@ -13,26 +13,26 @@
   <bean id="mock-wm-listener"      class="org.kie.aries.blueprint.mocks.MockWorkingMemoryEventListener"/>
   <bean id="mock-process-listener" class="org.kie.aries.blueprint.mocks.MockProcessEventListener"/>
 
-  <kie:ksession-ref id="ksession1">
-    <kie:agendaEventListener ref="mock-agenda-listener"/>
-    <kie:processEventListener ref="mock-process-listener"/>
-    <kie:workingMemoryEventListener ref="mock-wm-listener"/>
-  </kie:ksession-ref>
-
-  <kie:ksession id="ksession99" type="stateful" kbase-ref="drl_kiesample">
-    <kie:agendaEventListener ref="mock-agenda-listener"/>
-    <kie:processEventListener ref="mock-process-listener"/>
-    <kie:workingMemoryEventListener ref="mock-wm-listener"/>
-  </kie:ksession>
-
-  <kie:ksession-ref id="statelessWithGroupedListeners" listeners-ref="debugListeners"/>
+  <kie:kmodule id="basics" >
+    <kie:kbase name="drl_kiesample">
+      <kie:ksession name="ksession99" type="stateful">
+        <kie:agendaEventListener ref="mock-agenda-listener"/>
+        <kie:processEventListener ref="mock-process-listener"/>
+        <kie:workingMemoryEventListener ref="mock-wm-listener"/>
+      </kie:ksession>
+      <kie:ksession name="ksession1" type="stateless">
+        <kie:agendaEventListener ref="mock-agenda-listener"/>
+        <kie:processEventListener ref="mock-process-listener"/>
+        <kie:workingMemoryEventListener ref="mock-wm-listener"/>
+      </kie:ksession>
+      <kie:ksession name="statelessWithGroupedListeners" type="stateless" listeners-ref="debugListeners"/>
+    </kie:kbase>
+  </kie:kmodule>
 
   <kie:eventListeners id="debugListeners">
     <kie:agendaEventListener ref="mock-agenda-listener"/>
     <kie:processEventListener ref="mock-process-listener"/>
     <kie:workingMemoryEventListener ref="mock-wm-listener"/>
   </kie:eventListeners>
-
-  <kie:kbase-ref id="drl_kiesample"/>
 
 </blueprint>

@@ -117,7 +117,7 @@ public class KieBlueprintListenerTest {
     }
 
     @Test
-    public void testStatelessWMEventListener() throws Exception {
+    public void testStatefulWMEventListener() throws Exception {
         KieSession ksession = (KieSession) container.getComponentInstance("ksession99");
         assertNotNull(ksession);
 

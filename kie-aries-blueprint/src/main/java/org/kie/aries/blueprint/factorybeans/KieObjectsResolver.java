@@ -34,25 +34,16 @@ import org.osgi.service.blueprint.container.BlueprintListener;
 
 public class KieObjectsResolver implements BlueprintListener {
 
-    private Map<ReleaseId, KieContainer> gavs;
-
     private BundleContext bundleContext;
     private KieContainerImpl defaultClasspathKContainer;
     private KieServices ks;
 
-    private KieObjectsResolver() {
+    public KieObjectsResolver() {
         init();
-    }
-
-    private final static KieObjectsResolver INSTANCE = new KieObjectsResolver();
-
-    public static KieObjectsResolver get() {
-        return INSTANCE;
     }
 
     protected void init() {
         ks = KieServices.Factory.get();
-        gavs = new HashMap<ReleaseId, KieContainer>();
         defaultClasspathKContainer = (KieContainerImpl) ks.getKieClasspathContainer();
     }
 
@@ -90,15 +81,10 @@ public class KieObjectsResolver implements BlueprintListener {
                 throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
             }
         } else {
-            if (!gavs.containsKey(releaseId)) {
-                KieServices ks = KieServices.Factory.get();
-                kieContainer = ks.newKieContainer(releaseId);
-                if ( kieContainer == null) {
-                    throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
-                }
-                gavs.put(releaseId, kieContainer);
-            } else {
-                kieContainer = gavs.get(releaseId);
+            KieServices ks = KieServices.Factory.get();
+            kieContainer = ks.newKieContainer(releaseId);
+            if ( kieContainer == null) {
+                throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
             }
         }
         return kieContainer;
