@@ -19,6 +19,10 @@ public class JaxbExecutionResultsResponse extends AbstractJaxbCommandResponse<Ex
     })
     private ExecutionResults results;
     
+    public void setResults(ExecutionResults results) {
+        this.results = results;
+    }
+
     public JaxbExecutionResultsResponse() {
     }
     
@@ -30,5 +34,10 @@ public class JaxbExecutionResultsResponse extends AbstractJaxbCommandResponse<Ex
     @Override
     public ExecutionResults getResult() {
         return results;
+    }
+
+    @Override
+    public void setResult(ExecutionResults result) {
+        this.results = result;
     }
 }

@@ -39,4 +39,9 @@ public class JaxbPrimitiveResponse extends AbstractJaxbCommandResponse<Object> {
         return result;
     }
 
+    @Override
+    public void setResult(Object result) {
+        this.result = result;
+    }
+
 }

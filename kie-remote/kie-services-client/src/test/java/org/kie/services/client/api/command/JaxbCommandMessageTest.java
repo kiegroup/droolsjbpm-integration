@@ -1,39 +1,49 @@
 package org.kie.services.client.api.command;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import java.lang.reflect.GenericDeclaration;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import org.drools.core.command.assertion.AssertEquals;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
-import org.jbpm.services.task.query.TaskSummaryImpl;
+import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.command.Context;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 
+
 public class JaxbCommandMessageTest {
 	
 	@Test
-	public void testCommandSerialization() throws JAXBException {
-		testRoundtrip(new StartTaskCommand(1, "krisv"));
+	public void testCommandSerialization() throws Exception {
+	    String userId = "krisv";
+	    long taskId = 1;
+	    Command cmd = new StartTaskCommand(taskId, "krisv");
+		Command newCmd = testRoundtrip(cmd);
+		assertNotNull(newCmd);
+		assertEquals("taskId is not equal", taskId, getField("taskId", TaskCommand.class, newCmd));
+		assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
 	}
 	
-	public <T> void testRoundtrip(Command<T> command) throws JAXBException {
+	private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception { 
+	    Field field = clazz.getDeclaredField(fieldName);
+	    field.setAccessible(true);
+	    return field.get(obj);
+	}
+	
+	public <T> Command<T> testRoundtrip(Command<T> command) throws JAXBException {
 		String commandXml = JaxbSerializationProvider.convertJaxbObjectToString(new JaxbCommandsRequest("test", command));
 		JaxbCommandsRequest newRequest = (JaxbCommandsRequest) JaxbSerializationProvider.convertStringToJaxbObject(commandXml);
+		return (Command<T>) newRequest.getCommands().get(0);
 	}
 
 	@Test

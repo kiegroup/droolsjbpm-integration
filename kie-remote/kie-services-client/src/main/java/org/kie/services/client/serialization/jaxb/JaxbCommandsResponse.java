@@ -60,6 +60,21 @@ public class JaxbCommandsResponse {
             })
     private List<JaxbCommandResponse<?>> responses;
 
+    @XmlTransient
+    private static Map<Class, Class> cmdListTypes;
+    static { 
+        cmdListTypes = new HashMap<Class, Class>();
+        // tasksummary
+        cmdListTypes.put(GetTaskAssignedAsBusinessAdminCommand.class, TaskSummary.class);
+        cmdListTypes.put(GetTaskAssignedAsPotentialOwnerCommand.class, TaskSummary.class);
+        cmdListTypes.put(GetTasksByStatusByProcessInstanceIdCommand.class, TaskSummary.class);
+        cmdListTypes.put(GetTasksOwnedCommand.class, TaskSummary.class);
+        
+        // long
+        cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
+        cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
+    }
+
     public JaxbCommandsResponse() {
         this.version = 1;
         // Default constructor
@@ -75,12 +90,39 @@ public class JaxbCommandsResponse {
         return deploymentId;
     }
 
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
+
     public Long getProcessInstanceId() {
         return processInstanceId;
     }
 
+    public void setProcessInstanceId(Long processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
     public Integer getVersion() {
         return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    private void lazyInitResponseList() { 
+        if( this.responses == null ) { 
+            this.responses = new ArrayList<JaxbCommandResponse<?>>();
+        }
+    }
+
+    public List<JaxbCommandResponse<?>> getResponses() {
+        lazyInitResponseList();
+        return responses;
+    }
+
+    public void setResponses(List<JaxbCommandResponse<?>> responses) {
+        this.responses = responses;
     }
 
     public void addException(Exception exception, int i, Command<?> cmd) {
@@ -88,21 +130,6 @@ public class JaxbCommandsResponse {
         this.responses.add(new JaxbExceptionResponse(exception, i, cmd));
     }
 
-    @XmlTransient
-    private static Map<Class, Class> cmdListTypes;
-    static { 
-        cmdListTypes = new HashMap<Class, Class>();
-        // tasksummary
-        cmdListTypes.put(GetTaskAssignedAsBusinessAdminCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTaskAssignedAsPotentialOwnerCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksByStatusByProcessInstanceIdCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksOwnedCommand.class, TaskSummary.class);
-        
-        // long
-        cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
-        cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
-    }
-    
     @SuppressWarnings("unchecked")
     public void addResult(Object result, int i, Command<?> cmd) {
         lazyInitResponseList();
@@ -141,17 +168,6 @@ public class JaxbCommandsResponse {
         
         if (unknownResultType) {
             throw new UnsupportedOperationException("Result type " + result.getClass().getSimpleName() + " from command " + cmd.getClass().getSimpleName() + " is an unsupported response type.");
-        }
-    }
-    
-    public List<JaxbCommandResponse<?>> getResponses() {
-        lazyInitResponseList();
-        return responses;
-    }
-
-    private void lazyInitResponseList() { 
-        if( this.responses == null ) { 
-            this.responses = new ArrayList<JaxbCommandResponse<?>>();
         }
     }
 }

@@ -124,15 +124,15 @@ public class JaxbCommandsRequest {
     public JaxbCommandsRequest(Command<?> command) {
         this.commands = new ArrayList<Command<?>>();
         this.commands.add(command);
-        checkThatCommandaAreTaskCommands(commands);
+        checkThatCommandsAreTaskCommands(commands);
     }
     
     public JaxbCommandsRequest(List<Command<?>> commands) {
         this.commands = new ArrayList<Command<?>>(); 
-        checkThatCommandaAreTaskCommands(commands);
+        checkThatCommandsAreTaskCommands(commands);
     }
 
-    private void checkThatCommandaAreTaskCommands(List<Command<?>> commands) {
+    private void checkThatCommandsAreTaskCommands(List<Command<?>> commands) {
         for( Command<?> command : commands ) { 
            if( ! (command instanceof TaskCommand<?>) ) { 
                throw new UnsupportedOperationException( "Only commands for the task service are supported when leaving out the deployment id (" + command.getClass().getSimpleName()  + ")" );

@@ -43,4 +43,11 @@ public class JaxbTaskSummaryListResponse extends AbstractJaxbCommandResponse<Lis
         return taskSummaryList;
     }
 
+    @Override
+    public void setResult(List<TaskSummary> result) {
+        this.taskSummaryList = result;
+    }
+    
+    
+
 }

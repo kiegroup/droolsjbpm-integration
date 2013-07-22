@@ -31,4 +31,9 @@ public class JaxbLongListResponse extends AbstractJaxbCommandResponse<List<Long>
         return resultList;
     }
 
+    @Override
+    public void setResult(List<Long> result) {
+        this.resultList = result;
+    }
+
 }

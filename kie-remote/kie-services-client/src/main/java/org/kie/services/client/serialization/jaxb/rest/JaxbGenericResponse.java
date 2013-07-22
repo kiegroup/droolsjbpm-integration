@@ -95,12 +95,28 @@ public class JaxbGenericResponse {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public String getError() {
         return error;
     }
 
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public String getStackTrace() {
         return stackTrace;
+    }
+
+    public void setStackTrace(String stackTrace) {
+        this.stackTrace = stackTrace;
+    }
+
+    public void setStatus(JaxbRequestStatus status) {
+        this.status = status;
     }
 
 }

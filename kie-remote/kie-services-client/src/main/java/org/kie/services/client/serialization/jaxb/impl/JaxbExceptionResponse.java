@@ -10,7 +10,7 @@ import org.kie.api.command.Command;
 
 @XmlRootElement(name="exception")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<Object> {
+public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
 
     @XmlElement
     @XmlSchemaType(name="string")
@@ -51,8 +51,21 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<Object> {
     }
 
     @Override
-    public Object getResult() {
+    public String getResult() {
         return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setCauseMessage(String causeMessage) {
+        this.causeMessage = causeMessage;
+    }
+
+    @Override
+    public void setResult(String result) {
+        this.message = result;
     }
 
 }

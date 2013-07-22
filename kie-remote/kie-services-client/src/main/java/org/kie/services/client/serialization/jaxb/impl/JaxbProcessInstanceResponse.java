@@ -147,5 +147,10 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         b.append( "]" );
         return b.toString();
     }
+
+    @Override
+    public void setResult(ProcessInstance result) {
+        initialize(result);
+    }
     
 }

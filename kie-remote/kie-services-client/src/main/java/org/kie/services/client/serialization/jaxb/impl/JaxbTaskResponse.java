@@ -63,4 +63,20 @@ public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandRespo
         return this;
    }
 
+    @Override
+    public void setIndex(Integer index) {
+        this.index = index;
+        
+    }
+
+    @Override
+    public void setCommandName(String cmdName) {
+        this.commandName = cmdName;
+    }
+
+    @Override
+    public void setResult(Task result) {
+        initialize(result);
+    }
+
 }

@@ -20,7 +20,7 @@
   </licenses>
 
   <dependencies>
-    
+
     <!-- kie/drools/jbpm -->
     <dependency>
       <groupId>org.kie</groupId>
@@ -83,6 +83,12 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
