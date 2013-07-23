@@ -8,5 +8,5 @@
       <property name="serverConfig">${jboss.server.config.file.name:standalone-full.xml}</property>
     </configuration>
   </container>
-
+ 
 </arquillian>

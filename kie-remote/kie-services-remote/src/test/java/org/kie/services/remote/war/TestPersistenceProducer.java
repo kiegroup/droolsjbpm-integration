@@ -28,15 +28,7 @@ public class TestPersistenceProducer {
 
     @PersistenceUnit(unitName="org.jbpm.persistence.jpa")
     private EntityManagerFactory emf;
-    
-    private final IOService ioService = new IOServiceDotFileImpl();
-    
-    @Produces
-    @Named("ioStrategy")
-    public IOService ioService() {
-        return ioService;
-    }
-   
+
     @Produces
     @RequestScoped
     public EntityManager getEntityManager() {

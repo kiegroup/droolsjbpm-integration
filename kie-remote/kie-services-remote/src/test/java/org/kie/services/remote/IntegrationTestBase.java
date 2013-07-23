@@ -19,6 +19,8 @@ import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinate;
 import org.kie.commons.java.nio.file.spi.FileSystemProvider;
 import org.kie.commons.java.nio.fs.file.SimpleFileSystemProvider;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
+import org.uberfire.security.auth.AuthenticationSource;
+import org.uberfire.security.server.auth.source.PropertyUserSource;
 
 public class IntegrationTestBase {
 
@@ -78,7 +80,11 @@ public class IntegrationTestBase {
                 // services
                 "org.kie.commons:kie-nio2-fs",
                 // test
-                "org.jbpm:jbpm-shared-services:test-jar:" + projectVersion
+                "org.jbpm:jbpm-shared-services:test-jar:" + projectVersion,
+                // security
+                "org.uberfire:uberfire-security-server",
+                // salaboy
+                "org.codehaus.btm:btm"
         };
         
         MavenResolvedArtifact [] warArtifacts = Maven.resolver()
@@ -108,6 +114,8 @@ public class IntegrationTestBase {
                 .addClass(KieRemoteServicesInternalError.class)
                 .addAsResource("META-INF/persistence.xml")
                 .addAsServiceProvider(FileSystemProvider.class, SimpleFileSystemProvider.class)
+                .addAsServiceProvider(AuthenticationSource.class, PropertyUserSource.class)
+                .addAsResource("users.properties")
                 .addAsWebInfResource("WEB-INF/test-beans.xml", "beans.xml")
                 .addAsWebInfResource("META-INF/ejb-jar.xml", "ejb-jar.xml")
                 .setWebXML("WEB-INF/web.xml")

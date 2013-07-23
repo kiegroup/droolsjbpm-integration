@@ -40,11 +40,15 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListRespon
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/task")
 @RequestScoped
 public class TaskResource extends ResourceBase {
 
+    private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
+    
     @Inject
     private ProcessRequestBean processRequestBean;
 
@@ -270,6 +274,8 @@ public class TaskResource extends ResourceBase {
         Map<String, List<String>> params = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
+        logger.debug("Executing " + operation + " on task " + taskId + " by user " + userId );
+        
         Command<?> cmd = null;
         if ("activate".equalsIgnoreCase(operation)) {
             cmd = new ActivateTaskCommand(taskId, userId);

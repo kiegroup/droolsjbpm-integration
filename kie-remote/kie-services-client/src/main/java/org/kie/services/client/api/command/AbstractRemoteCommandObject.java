@@ -200,7 +200,7 @@ public abstract class AbstractRemoteCommandObject {
             String password = config.getPassword();
             client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
                     new UsernamePasswordCredentials(username, password));
-        } else if (AuthenticationType.FORM_BASED == authenticationType) {
+        } else if (AuthenticationType.FORM == authenticationType) {
             String username = config.getUsername();
             String password = config.getPassword();
             // first challenge authentication to be enforced - return logon form

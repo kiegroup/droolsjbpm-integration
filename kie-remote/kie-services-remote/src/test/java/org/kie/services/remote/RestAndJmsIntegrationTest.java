@@ -21,7 +21,9 @@ import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.jms.BytesMessage;
@@ -45,12 +47,15 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.core.BaseClientResponse;
+import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
@@ -61,6 +66,7 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.services.client.api.RemoteConfiguration.AuthenticationType;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteRestSessionFactory;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
@@ -84,6 +90,9 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     private static final String CONNECTION_FACTORY_NAME = "jms/RemoteConnectionFactory";
     private static final String TASK_QUEUE_NAME = "jms/queue/KIE.TASK";
     private static final String RESPONSE_QUEUE_NAME = "jms/queue/KIE.RESPONSE";
+
+    private static final String DEPLOYMENT_ID = "test";
+    private static final String USER_ID = "salaboy";
     
     @Deployment(testable = false)
     public static Archive<?> createWar() {
@@ -105,7 +114,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     public void testJmsStartProcess() throws Exception {
         // send cmd
         Command<?> cmd = new StartProcessCommand("org.jbpm.humantask"); 
-        JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
+        JaxbCommandsRequest req = new JaxbCommandsRequest(DEPLOYMENT_ID, cmd);
         JaxbCommandsResponse response = sendJmsJaxbCommandsRequest(TASK_QUEUE_NAME, req);
         
         // check response 
@@ -118,7 +127,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
        
         // send cmd
         cmd = new GetTasksByProcessInstanceIdCommand(procInstId);
-        req = new JaxbCommandsRequest("test", cmd);
+        req = new JaxbCommandsRequest(DEPLOYMENT_ID, cmd);
         response = sendJmsJaxbCommandsRequest(TASK_QUEUE_NAME, req);
         
         // check response 
@@ -129,9 +138,9 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         long taskId = ((JaxbLongListResponse) cmdResponse).getResult().get(0);
         
         // send cmd
-        cmd = new StartTaskCommand(taskId, "salaboy");
-        req = new JaxbCommandsRequest("test", cmd);
-        req.getCommands().add(new CompleteTaskCommand(taskId, "salaboy", null));
+        cmd = new StartTaskCommand(taskId, USER_ID);
+        req = new JaxbCommandsRequest(DEPLOYMENT_ID, cmd);
+        req.getCommands().add(new CompleteTaskCommand(taskId, USER_ID, null));
         response = sendJmsJaxbCommandsRequest(TASK_QUEUE_NAME, req);
         
         // check response 
@@ -139,8 +148,8 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         assertTrue("response list was not empty", response.getResponses().size() == 0);
         
         // send cmd
-        cmd = new GetTasksOwnedCommand("salaboy", "en-UK");
-        req = new JaxbCommandsRequest("test", cmd);
+        cmd = new GetTasksOwnedCommand(USER_ID, "en-UK");
+        req = new JaxbCommandsRequest(DEPLOYMENT_ID, cmd);
         req.getCommands().add(new GetTasksOwnedCommand("bob", "fr-CA"));
         req.getCommands().add(new GetProcessInstanceCommand(procInstId));
         response = sendJmsJaxbCommandsRequest(TASK_QUEUE_NAME, req);
@@ -161,7 +170,6 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         assertTrue( "response is not the proper class type : " + cmdResponse.getClass().getSimpleName(), cmdResponse instanceof JaxbTaskSummaryListResponse );
         taskSummaries = ((JaxbTaskSummaryListResponse) cmdResponse).getResult();
         assertTrue( "task summary list should be empty, but has " + taskSummaries.size() + " elements", taskSummaries.size() == 0);
-        
         cmdResponse = response.getResponses().get(2);
         assertNotNull(cmdResponse);
     }
@@ -241,7 +249,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         JaxbProcessInstanceResponse processInstance = (JaxbProcessInstanceResponse) responseObj.getEntity(JaxbProcessInstanceResponse.class);
         long procInstId = processInstance.getId();
 
-        urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/task/query?taskOwner=salaboy").toExternalForm();
+        urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/task/query?taskOwner=" + USER_ID).toExternalForm();
         restRequest = new ClientRequest(urlString);
         logger.debug( ">> [task/query]" + urlString );
         responseObj = restRequest.get();
@@ -250,7 +258,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         JaxbTaskSummaryListResponse taskSumlistResponse = (JaxbTaskSummaryListResponse) responseObj.getEntity(JaxbTaskSummaryListResponse.class);
         long taskId = findTaskId(procInstId, taskSumlistResponse.getResult());
         
-        urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/task/" + taskId + "/start?userId=salaboy").toExternalForm();
+        urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/task/" + taskId + "/start?userId=" + USER_ID).toExternalForm();
         restRequest = new ClientRequest(urlString);
 
         // Get response
@@ -258,10 +266,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         responseObj = restRequest.post();
 
         // Check response
-        assertEquals(200, responseObj.getStatus());
-//        result = responseObj.getEntity();
-//        System.out.println(result);
-
+        checkResponse(responseObj);
     }
     
     @Test
@@ -271,12 +276,13 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         String urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/runtime/test/execute").toExternalForm();
         
         ClientRequest restRequest = new ClientRequest(urlString);
-        JaxbCommandsRequest commandMessage = new JaxbCommandsRequest("test", new StartProcessCommand("org.jbpm.humantask"));
+        JaxbCommandsRequest commandMessage = new JaxbCommandsRequest(DEPLOYMENT_ID, new StartProcessCommand("org.jbpm.humantask"));
         String body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         restRequest.body(MediaType.APPLICATION_XML, body);
 
         logger.debug( ">> [startProcess] " + urlString );
         ClientResponse responseObj = restRequest.post();
+        
 
         assertEquals(200, responseObj.getStatus());
         JaxbCommandsResponse cmdsResp = (JaxbCommandsResponse) responseObj.getEntity(JaxbCommandsResponse.class);
@@ -284,7 +290,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
 
         // query tasks
         restRequest = new ClientRequest(urlString);
-        commandMessage = new JaxbCommandsRequest("test", new GetTasksByProcessInstanceIdCommand(procInstId));
+        commandMessage = new JaxbCommandsRequest(DEPLOYMENT_ID, new GetTasksByProcessInstanceIdCommand(procInstId));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         restRequest.body(MediaType.APPLICATION_XML, body);
 
@@ -299,7 +305,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         
         logger.debug( ">> [startTask] " + urlString );
         restRequest = new ClientRequest(urlString);
-        commandMessage = new JaxbCommandsRequest(new StartTaskCommand(taskId, "salaboy"));
+        commandMessage = new JaxbCommandsRequest(new StartTaskCommand(taskId, USER_ID));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         restRequest.body(MediaType.APPLICATION_XML, commandMessage);
 
@@ -314,7 +320,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/task/execute").toExternalForm();
         
         restRequest = new ClientRequest(urlString);
-        commandMessage = new JaxbCommandsRequest(new CompleteTaskCommand(taskId, "salaboy", null));
+        commandMessage = new JaxbCommandsRequest(new CompleteTaskCommand(taskId, USER_ID, null));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         restRequest.body(MediaType.APPLICATION_XML, commandMessage);
 
@@ -332,7 +338,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
 //        
 //        restRequest = new ClientRequest(urlString);
 //        commandMessage = new JaxbCommandMessage(null, 1, 
-//          new CompleteTaskCommand(1, "salaboy", null));
+//          new CompleteTaskCommand(1, USER_ID, null));
 //        body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
 //        System.out.println(body);
 //        restRequest.body(MediaType.APPLICATION_XML, commandMessage);
@@ -352,25 +358,26 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     @InSequence(3)
     public void testRestRemoteApiHumanTaskProcess() throws Exception {
         // create REST request
-        RuntimeEngine engine = new RemoteRestSessionFactory("test", deploymentUrl.toExternalForm()).newRuntimeEngine();
+        RemoteRestSessionFactory restSessionFactory = new RemoteRestSessionFactory(DEPLOYMENT_ID, deploymentUrl.toExternalForm(), AuthenticationType.FORM, "guest", "1234");
+        RuntimeEngine engine = restSessionFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         
         logger.debug("Started process instance: " + processInstance + " " + (processInstance == null? "" : processInstance.getId()));
         
         TaskService taskService = engine.getTaskService();
-        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("salaboy", "en-UK");
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner(USER_ID, "en-UK");
         long taskId = findTaskId(processInstance.getId(), tasks);
         
         logger.debug("Found task " + taskId);
         Task task = taskService.getTaskById(taskId);
         logger.debug("Got task " + taskId + ": " + task );
-        taskService.start(taskId, "salaboy");
-        taskService.complete(taskId, "salaboy", null);
+        taskService.start(taskId, USER_ID);
+        taskService.complete(taskId, USER_ID, null);
         
         logger.debug("Now expecting failure");
         try {
-        	taskService.complete(taskId, "salaboy", null);
+        	taskService.complete(taskId, USER_ID, null);
         	fail( "Should not be able to complete task " + taskId + " a second time.");
         } catch (Throwable t) {
             // do nothing
@@ -386,25 +393,25 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     @InSequence(4)
     public void testJmsRemoteApiHumanTaskProcess() throws Exception {
         // create JMS request
-        RuntimeEngine engine = new RemoteJmsRuntimeEngineFactory("test", getRemoteInitialContext(), "guest", "1234").newRuntimeEngine();
+        RuntimeEngine engine = new RemoteJmsRuntimeEngineFactory(DEPLOYMENT_ID, getRemoteInitialContext(), "guest", "1234").newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         
         logger.debug("Started process instance: " + processInstance + " " + (processInstance == null? "" : processInstance.getId()));
         
         TaskService taskService = engine.getTaskService();
-        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("salaboy", "en-UK");
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner(USER_ID, "en-UK");
         long taskId = findTaskId(processInstance.getId(), tasks);
         
         logger.debug("Found task " + taskId);
         Task task = taskService.getTaskById(taskId);
         logger.debug("Got task " + taskId + ": " + task );
-        taskService.start(taskId, "salaboy");
-        taskService.complete(taskId, "salaboy", null);
+        taskService.start(taskId, USER_ID);
+        taskService.complete(taskId, USER_ID, null);
         
         logger.debug("Now expecting failure");
         try {
-            taskService.complete(taskId, "salaboy", null);
+            taskService.complete(taskId, USER_ID, null);
             fail( "Should not have been able to complete task " + taskId + " a second time.");
         } catch (Throwable t) {
             // do nothing
@@ -414,6 +421,54 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         statuses.add(Status.Reserved);
         List<TaskSummary> taskIds = taskService.getTasksByStatusByProcessInstanceId(processInstance.getId(), statuses, "en-UK");
         assertEquals("Expected 2 tasks.", 2, taskIds.size());
+    }
+    
+
+    @Test
+    public void testExecuteTaskCommands() throws Exception {
+        RuntimeEngine engine = new RemoteRestSessionFactory(DEPLOYMENT_ID, deploymentUrl.toExternalForm()).newRuntimeEngine();
+        KieSession ksession = engine.getKieSession();
+        ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
+        
+        long processInstanceId = processInstance.getId();
+        JaxbCommandResponse<?> response = executeTaskCommand(DEPLOYMENT_ID, new GetTasksByProcessInstanceIdCommand(processInstanceId));
+        long taskId = ((JaxbLongListResponse) response).getResult().get(0);
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("userId", USER_ID);
+    }
+    
+    private JaxbCommandResponse<?> executeTaskCommand(String deploymentId, Command<?> command) throws Exception {
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        commands.add(command);
+        
+        String urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/runtime/" + DEPLOYMENT_ID + "/execute").toExternalForm();
+        logger.info("Client request to: " + urlString);
+        ClientRequest restRequest = new ClientRequest(urlString);
+        
+        JaxbCommandsRequest commandMessage = new JaxbCommandsRequest(commands);
+        assertNotNull( "Commands are null!", commandMessage.getCommands() );
+        assertTrue( "Commands are empty!", commandMessage.getCommands().size() > 0 );
+        
+        String body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
+        restRequest.body(MediaType.APPLICATION_XML, body);
+
+        ClientResponse<JaxbCommandsResponse> responseObj = restRequest.post(JaxbCommandsResponse.class);
+        checkResponse(responseObj);
+        
+        JaxbCommandsResponse cmdsResp = responseObj.getEntity();
+        return cmdsResp.getResponses().get(0);
+    }
+    
+    private void checkResponse(ClientResponse<?> responseObj) throws Exception {
+        ClientResponse<?> test = BaseClientResponse.copyFromError(responseObj);
+        responseObj.resetStream();
+        if (test.getResponseStatus() == javax.ws.rs.core.Response.Status.BAD_REQUEST) {
+            throw new BadRequestException(test.getEntity(String.class));
+        } else if (test.getResponseStatus() != javax.ws.rs.core.Response.Status.OK) {
+            throw new Exception("Request operation failed. Response status = " + test.getResponseStatus() + "\n\n" + test.getEntity(String.class));
+        } else {
+            logger.debug( "Response: " + test.getEntity(String.class));
+        }
     }
     
 }

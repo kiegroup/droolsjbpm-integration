@@ -21,13 +21,13 @@
 
   <properties>
     <arquillian.launch>jboss</arquillian.launch>
-    
+
     <jboss.version>7.1.1.Final</jboss.version>
     <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
     <jboss.server.version>7.1.1.Final</jboss.server.version>
     <!-- 2.2.14+ is incompatible with 7.1.1.Final : HORNETQ-1035 -->
     <hornetq.version>2.2.13.Final</hornetq.version>
-    
+
     <!-- eap integration
     <jboss.version>7.2.0.Final</jboss.version> 
     <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version> 
@@ -42,13 +42,13 @@
       <artifactId>kie-services-client</artifactId>
     </dependency>
 
-    <!-- jbpm (cmds, graph func)-->
+    <!-- jbpm (cmds, graph func) -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-audit</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
     <!-- kie -->
     <dependency>
       <groupId>org.jbpm</groupId>
@@ -57,10 +57,6 @@
         <exclusion>
           <groupId>org.jbpm</groupId>
           <artifactId>jbpm-form-services</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>btm</artifactId>
-          <groupId>org.codehaus.btm</groupId>
         </exclusion>
         <exclusion>
           <artifactId>weld-core</artifactId>
@@ -83,11 +79,11 @@
 
     <!-- jms -->
     <dependency>
-        <!-- remove when integrating with EAP -->
-        <groupId>org.jboss.as</groupId>
-        <artifactId>jboss-as-jms-client-bom</artifactId>
-        <version>7.1.1.Final</version>
-        <type>pom</type>
+      <!-- remove when integrating with EAP -->
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-jms-client-bom</artifactId>
+      <version>7.1.1.Final</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>javax.jms</groupId>
@@ -155,7 +151,7 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- arquillian -->
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
@@ -178,7 +174,6 @@
     <dependency>
       <groupId>org.jboss.netty</groupId>
       <artifactId>netty</artifactId>
-      <version>3.2.0.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -225,6 +220,11 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-security-server</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -238,6 +238,26 @@
         <filtering>false</filtering>
       </testResource>
     </testResources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${basedir}</directory>
+                <includes>
+                  <include>repository/</include>
+                  <include>.niogit/</include>
+                  <include>.index/</include>
+                </includes>
+              </fileset>
+            </filesets>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 
     <plugins>
       <!-- testing -->
@@ -260,137 +280,95 @@
           </includes>
         </configuration>
       </plugin>
-    </plugins>
 
-  </build>
-
-  <profiles>
-
-    <!-- testing with jboss AS 7 -->
-    <profile>
-      <id>arquillian-jboss7-managed</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-
-      <build>
-        <plugins>
-          <!-- install server in the build/target dir -->
-          <plugin>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.jboss.as</groupId>
-                      <artifactId>jboss-as-dist</artifactId>
-                      <version>${jboss.server.version}</version>
-                      <type>zip</type>
-                      <overWrite>false</overWrite>
-                      <outputDirectory>${project.build.directory}</outputDirectory>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- install files with user/password information in the server dir -->
-          <plugin>
-            <artifactId>maven-resources-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>copy-user-config</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.directory}/${jboss.server.name}/standalone/configuration</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>src/test/resources-jbossas-7/config</directory>
-                      <filtering>false</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-bpmn2-repo</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.directory}/${jboss.server.name}/bin/repo</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>src/test/resources/repo</directory>
-                      <filtering>false</filtering>
-                    </resource>
-                  </resources>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- modify server configuration -->
-          <plugin>
-            <groupId>com.google.code.maven-replacer-plugin</groupId>
-            <artifactId>replacer</artifactId>
-            <version>1.5.2</version>
-            <executions>
-              <execution>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>replace</goal>
-                </goals>
-              </execution>
-            </executions>
+      <!-- testing with jboss AS 7 -->
+      <!-- 1. install server in the build/target dir -->
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
             <configuration>
-              <file>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</file>
-              <outputFile>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</outputFile>
-              <replacements>
-                <!-- allow jms queue creation via arquillian server task -->
-                <replacement>
-                  <token>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;\n\s*&lt;journal</token>
-                  <value>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;
-                    &lt;jmx-management-enabled&gt;true&lt;/jmx-management-enabled&gt;
-                    &lt;journal</value>
-                </replacement>
-                <replacement>
-                  <!-- variable for DynamicQueueCreationBean -->
-                  <token>&lt;subsystem xmlns="urn:jboss:domain:naming:1.(\d)"&gt;</token>
-                  <value>
-                    &lt;subsystem xmlns="urn:jboss:domain:naming:1.$1"&gt;
-                    &lt;bindings&gt;
-                    &lt;simple
-                    name="java:jboss/jbpm/console/createDynamicQueues" type="java.lang.Boolean" value="true" /&gt;
-                    &lt;/bindings&gt;</value>
-                </replacement>
-                <replacement>
-                  <!-- Service jboss.pojo."org.jboss.netty.internal.LoggerConfigurator".DESCRIBED is already registered -->
-                  <token>&lt;extension module="org.jboss.as.pojo"/&gt;</token>
-                  <value></value>
-                </replacement>
-                <replacement>
-                  <token>&lt;subsystem xmlns="urn:jboss:domain:pojo:1.0"/&gt;</token>
-                  <value></value>
-                </replacement>
-                <!-- @formatter: on -->
-              </replacements>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jboss.as</groupId>
+                  <artifactId>jboss-as-dist</artifactId>
+                  <version>${jboss.server.version}</version>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
             </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 2. install files with user/password information in the server dir -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-user-config</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/${jboss.server.name}/standalone/configuration</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/test/resources-jbossas-7/config</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+              <overwrite>true</overwrite>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 3. modify server configuration -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <version>1.5.2</version>
+        <executions>
+          <execution>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <file>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</file>
+          <outputFile>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</outputFile>
+          <replacements>
+            <!-- allow jms queue creation via arquillian server task -->
+            <replacement>
+              <token>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;\n\s*&lt;journal</token>
+              <value>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;
+                &lt;jmx-management-enabled&gt;true&lt;/jmx-management-enabled&gt;
+                &lt;journal</value>
+            </replacement>
+            <replacement>
+              <!-- Service jboss.pojo."org.jboss.netty.internal.LoggerConfigurator".DESCRIBED is already registered -->
+              <token>&lt;extension module="org.jboss.as.pojo"/&gt;</token>
+              <value></value>
+            </replacement>
+            <replacement>
+              <token>&lt;subsystem xmlns="urn:jboss:domain:pojo:1.0"/&gt;</token>
+              <value></value>
+            </replacement>
+            <!-- @formatter: on -->
+          </replacements>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
 

@@ -182,7 +182,7 @@ public class RemoteConfiguration {
     }
 
     public enum AuthenticationType {
-        NONE, BASIC, FORM_BASED
+        NONE, BASIC, FORM
     }
 
     private enum Type {
