@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
@@ -111,9 +112,9 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
 
         String id = elementParser.getId(context, element);
         String contextId = ".kie.processor."+ id;
-        beanProcessorFactory.setId(".camelBlueprint.processor.bean.passThrough." + contextId);
+        beanProcessorFactory.setId(contextId);
         KieObjectsInjector kieObjectsInjector = new KieObjectsInjector(id, context);
-        beanProcessorFactory.setObject(new KieModuleElementParser.PassThroughCallable<Object>(kieObjectsInjector));
+        beanProcessorFactory.setObject(new PassThroughCallable<Object>(kieObjectsInjector));
 
         MutableBeanMetadata beanProcessor = context.createMetadata(MutableBeanMetadata.class);
         beanProcessor.setId(".droolsBlueprint.processor.bean." + id);
@@ -130,5 +131,19 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
     public ComponentMetadata decorate(Node node, ComponentMetadata componentMetadata, ParserContext parserContext) {
         System.out.println("decorate :: "+ node.getNodeName());
         return null;
+    }
+
+
+    public static class PassThroughCallable<T> implements Callable<T> {
+
+        private T value;
+
+        public PassThroughCallable(T value) {
+            this.value = value;
+        }
+
+        public T call() throws Exception {
+            return value;
+        }
     }
 }

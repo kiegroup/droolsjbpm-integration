@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
@@ -109,6 +110,13 @@ public class KieBlueprintBasicTest {
 
         ksession.execute(person);
         assertTrue(person.isHappy());
+    }
+
+    @Test
+    public void testKieModule() throws Exception {
+        Object  obj = container.getComponentInstance("basics");
+        assertNotNull(obj);
+        assertTrue(obj instanceof KieModuleModel);
     }
 
     @AfterClass

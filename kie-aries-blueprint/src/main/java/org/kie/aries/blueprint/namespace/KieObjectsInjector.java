@@ -111,8 +111,16 @@ public class KieObjectsInjector implements BeanProcessor {
         String pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
         releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
         KieModuleModel kieModuleModel = getKieModuleModel();
+        injectKieModule(kieModuleModel);
         addKieModuleToRepo(kieModuleModel);
         log.debug(" :: Completed Injecting KieObjects from the Blueprint Bean Processor ("+contextId+") :: ");
+    }
+
+    protected void  injectKieModule(KieModuleModel kieModuleModel) {
+        ComponentMetadata componentMetadata = blueprintContainer.getComponentMetadata(contextId);
+        if ( componentMetadata instanceof MutablePassThroughMetadata){
+            ((MutablePassThroughMetadata)componentMetadata).setObject(kieModuleModel);
+        }
     }
 
     private void createOsgiKieModule() {
@@ -122,6 +130,7 @@ public class KieObjectsInjector implements BeanProcessor {
         }
         KieModuleModel kieModuleModel = getKieModuleModel();
         KieBuilderImpl.setDefaultsforEmptyKieModule(kieModuleModel);
+        injectKieModule(kieModuleModel);
 
         InternalKieModule internalKieModule = createOsgiKModule(kieModuleModel);
         if ( internalKieModule != null ) {
@@ -173,7 +182,6 @@ public class KieObjectsInjector implements BeanProcessor {
                     if ("fetchKBase".equalsIgnoreCase(metadata.getFactoryMethod())) {
                         BeanArgument kbRefArg = metadata.getArguments().get(0);
                         String kBaseName = ((MutableValueMetadata) kbRefArg.getValue()).getStringValue();
-
                         KieBaseModelImpl kBase = new KieBaseModelImpl();
                         kBase.setKModule(kieModuleModel);
                         kBase.setName(kBaseName);

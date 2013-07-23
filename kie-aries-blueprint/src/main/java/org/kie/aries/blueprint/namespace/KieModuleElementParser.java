@@ -17,6 +17,7 @@ package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 import org.w3c.dom.Element;
@@ -30,10 +31,11 @@ public class KieModuleElementParser extends AbstractElementParser {
     public Metadata parseElement(ParserContext context, Element element) {
         String id = getId(context, element);
 
-        MutableBeanMetadata beanMetadata = (MutableBeanMetadata) context.createMetadata(BeanMetadata.class);
-        beanMetadata.setClassName("org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean");
-        beanMetadata.setFactoryMethod("createKieStore");
-        beanMetadata.setId(id);
+        MutablePassThroughMetadata passThroughMetadata = context.createMetadata(MutablePassThroughMetadata.class);
+        /* this is a dummy object, set as a placeholder. The KieObjectsInjector will inject the constructed KieModuleModel
+        * into this placeholder. */
+        passThroughMetadata.setObject(Boolean.TRUE);
+        passThroughMetadata.setId(id);
 
         String prefix = element.getPrefix();
         NodeList kbaseNodeList = element.getElementsByTagName(prefix+":kbase");
@@ -47,20 +49,8 @@ public class KieModuleElementParser extends AbstractElementParser {
                 }
             }
         }
-        return beanMetadata;
+        return passThroughMetadata;
     }
 
-    public static class PassThroughCallable<T> implements Callable<T> {
-
-        private T value;
-
-        public PassThroughCallable(T value) {
-            this.value = value;
-        }
-
-        public T call() throws Exception {
-            return value;
-        }
-    }
 
 }
