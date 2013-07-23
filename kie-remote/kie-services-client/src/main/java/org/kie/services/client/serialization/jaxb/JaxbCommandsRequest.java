@@ -129,6 +129,7 @@ public class JaxbCommandsRequest {
     
     public JaxbCommandsRequest(List<Command<?>> commands) {
         this.commands = new ArrayList<Command<?>>(); 
+        this.commands.addAll(commands);
         checkThatCommandsAreTaskCommands(commands);
     }
 
@@ -148,7 +149,8 @@ public class JaxbCommandsRequest {
 
     public JaxbCommandsRequest(String deploymentId, List<Command<?>> commands) {
         this.deploymentId = deploymentId;
-        this.commands = commands;
+        this.commands = new ArrayList<Command<?>>();
+        this.commands.addAll(commands);
     }
 
     public String getDeploymentId() {
