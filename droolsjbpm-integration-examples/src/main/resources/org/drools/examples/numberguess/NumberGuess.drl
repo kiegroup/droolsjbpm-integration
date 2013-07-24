@@ -37,9 +37,10 @@ rule "Get user Guess"
     then
         System.out.println( "You have " + ( rules.allowedGuesses - game.guessCount ) + " out of " + rules.allowedGuesses + " guesses left.\nPlease enter your guess from 0 to " + rules.maxRange );
         br = new BufferedReader( new InputStreamReader( System.in ) );
+        s = br.readLine();
+        i = NumberGuessExample.GameRules.isNumber(s) ? new Integer(s) : 0;
         modify ( game ) { guessCount += 1 }
-        i = br.readLine();        
-        insert( new Guess( new Integer(i) ) );
+        insert( new Guess( i ) );
 end
 
 rule "Record the biggest Guess"

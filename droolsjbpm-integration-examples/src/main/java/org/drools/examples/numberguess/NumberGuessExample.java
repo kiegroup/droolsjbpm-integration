@@ -103,6 +103,14 @@ public class NumberGuessExample {
             return maxRange;
         }
 
+        public static boolean isNumber(String s) {
+            try {
+                Integer.parseInt(s);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
     }
 
     public static class Game {
