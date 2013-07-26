@@ -48,18 +48,18 @@
     <dependency>
       <groupId>org.apache.camel.karaf</groupId>
       <artifactId>apache-camel</artifactId>
-      <scope>test</scope>
-      <classifier>features</classifier>
       <type>xml</type>
+      <classifier>features</classifier>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.karaf.assemblies.features</groupId>
       <artifactId>standard</artifactId>
-      <scope>test</scope>
-      <classifier>features</classifier>
       <type>xml</type>
       <version>2.3.0</version>
+      <classifier>features</classifier>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -71,8 +71,8 @@
     <dependency>
       <groupId>org.apache.karaf</groupId>
       <artifactId>apache-karaf</artifactId>
-      <scope>test</scope>
       <type>tar.gz</type>
+      <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.apache.karaf</groupId>
