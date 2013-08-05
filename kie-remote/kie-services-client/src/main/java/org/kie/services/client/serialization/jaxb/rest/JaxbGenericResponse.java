@@ -17,15 +17,8 @@ import org.jboss.resteasy.spi.BadRequestException;
 
 @XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbGenericResponse {
+public class JaxbGenericResponse extends AbstractJaxbResponse {
 
-    @XmlElement
-    private JaxbRequestStatus status;
-    
-    @XmlElement
-    @XmlSchemaType(name="anyURI")
-    private String url;
-    
     @XmlElement
     @XmlSchemaType(name="string")
     private String error;
@@ -39,8 +32,7 @@ public class JaxbGenericResponse {
     }
     
     public JaxbGenericResponse(HttpServletRequest request ) { 
-        this.url = getUrl(request);
-        this.status = JaxbRequestStatus.SUCCESS;
+        super(request);
     }
     
     /**
@@ -49,7 +41,7 @@ public class JaxbGenericResponse {
      * @param e
      */
     public JaxbGenericResponse(HttpServletRequest request, Exception e) {
-        this.url = getUrl(request);
+        super(request);
         this.error = e.getMessage();
         if( ! (e instanceof BadRequestException) ) { 
             this.status = JaxbRequestStatus.FAILURE;
@@ -60,14 +52,6 @@ public class JaxbGenericResponse {
         } else { 
             this.status = JaxbRequestStatus.BAD_REQUEST;
         }
-    }
-    
-    private String getUrl(HttpServletRequest request) { 
-        String url = request.getRequestURI();
-        if( request.getQueryString() != null ) { 
-            url += "?" + request.getQueryString();
-        }
-        return url;
     }
     
     public static String convertStackTraceToString(Throwable t) { 

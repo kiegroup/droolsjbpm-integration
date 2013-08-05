@@ -81,11 +81,23 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-bpmn2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-bpmn2</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+      <version>${version}</version>
+    </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
