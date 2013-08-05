@@ -3,8 +3,10 @@ package org.kie.services.remote.rest;
 import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -24,7 +26,6 @@ import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
@@ -41,6 +42,8 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
@@ -91,6 +94,8 @@ public class RuntimeResource extends ResourceBase {
     @Path("/process/instance/{procInstId: [0-9]+}")
     public JaxbProcessInstanceResponse getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
+        ((GetProcessInstanceCommand) cmd).setReadOnly(true);
+        
         Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
         if (result != null) {
             return new JaxbProcessInstanceResponse((ProcessInstance) result);
@@ -103,7 +108,7 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
-    public JaxbGenericResponse abortProcessInstanceOperation(@PathParam("procInstId") Long procInstId) {
+    public JaxbGenericResponse abortProcessInstance(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
         processRequestBean.doKieSessionOperation(cmd, deploymentId);
@@ -111,9 +116,10 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
-    public JaxbGenericResponse signalProcessInstanceOperation(@PathParam("procInstId") Long procInstId) {
+    public JaxbGenericResponse signalProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
@@ -122,15 +128,15 @@ public class RuntimeResource extends ResourceBase {
         return new JaxbGenericResponse(request);
     }
 
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/process/instance/{procInstId: [0-9]+}/start")
-    public JaxbProcessInstanceResponse startProcessInstanceOperation(@PathParam("procInstId") Long procInstId) {
-        Command<?> cmd = new StartProcessInstanceCommand(procInstId);
-        ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-        return new JaxbProcessInstanceResponse(procInst, request);
+    @Path("/process/instance/{procInstId: [0-9]+}/variables")
+    public JaxbVariablesResponse getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
+        Map<String, String> vars = getVariables(procInstId);
+            
+        return new JaxbVariablesResponse(new FindVariableInstancesCommand(procInstId), vars);
     }
-
+    
     @POST
     @Produces(MediaType.APPLICATION_XML)
     @Path("/signal/{signal: [a-zA-Z0-9-]+}")
@@ -279,6 +285,91 @@ public class RuntimeResource extends ResourceBase {
         
         procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
         return new JaxbHistoryLogList(procInstLogList);
+    }
+
+    /**
+     * WithVars methods
+     */
+    
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/withvars/process/{processDefId: [a-zA-Z0-9-:\\.]+}/start")
+    public JaxbProcessInstanceWithVariablesResponse startNewProcessWithVars(@PathParam("processDefId") String processId) {
+        Map<String, List<String>> formParams = getRequestParams(request);
+        Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
+        Command<?> cmd = new StartProcessCommand(processId, params);
+
+        ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        
+        Map<String, String> vars = getVariables(procInst.getId());
+        JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
+        
+        return resp;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/withvars/process/instance/{procInstId: [0-9]+}")
+    public JaxbProcessInstanceWithVariablesResponse getProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+        Command<?> cmd = new GetProcessInstanceCommand(procInstId);
+        ((GetProcessInstanceCommand) cmd).setReadOnly(true);
+        
+        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        if (result != null) {
+            ProcessInstance procInst = (ProcessInstance) result;
+            Map<String, String> vars = getVariables(procInstId);
+            return new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
+        } else {
+            throw new BadRequestException("Unable to retrieve process instance " + procInstId
+                    + " since it has been completed. Please see the history operations.");
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
+    public JaxbProcessInstanceWithVariablesResponse signalProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+        Map<String, List<String>> params = getRequestParams(request);
+        String eventType = getStringParam("eventType", true, params, "signal");
+        Object event = getObjectParam("event", false, params, "signal");
+        Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
+        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        
+        cmd = new GetProcessInstanceCommand(procInstId);
+        ((GetProcessInstanceCommand) cmd).setReadOnly(true);
+        ProcessInstance processInstance = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        
+        Map<String, String> vars = getVariables(processInstance.getId());
+        
+        return new JaxbProcessInstanceWithVariablesResponse(processInstance, vars);
+    }
+
+    private Map<String, String> getVariables(long processInstanceId) { 
+        Command<?> cmd = new FindVariableInstancesCommand(processInstanceId);
+        List<VariableInstanceLog> varInstLogList 
+            = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        
+        Map<String, String> vars = new HashMap<String, String>();
+        if( varInstLogList.isEmpty() ) { 
+            return vars;
+        }
+        
+        Map<String, VariableInstanceLog> varLogMap = new HashMap<String, VariableInstanceLog>();
+        for( VariableInstanceLog varLog: varInstLogList ) {
+            String varId = varLog.getVariableId();
+            VariableInstanceLog prevVarLog = varLogMap.put(varId, varLog);
+            if( prevVarLog != null ) { 
+                if( prevVarLog.getDate().after(varLog.getDate()) ) { 
+                  varLogMap.put(varId, prevVarLog);
+                } 
+            }
+        }
+        
+        for( Entry<String, VariableInstanceLog> varEntry : varLogMap.entrySet() ) { 
+            vars.put(varEntry.getKey(), varEntry.getValue().getValue());
+        }
+            
+        return vars;
     }
 
 }

@@ -43,13 +43,6 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     @XmlElement(name="event-types")
     private List<String> eventTypes;
     
-    @XmlElement
-    private JaxbRequestStatus status;
-    
-    @XmlElement
-    @XmlSchemaType(name="anyURI")
-    private String url;
-    
     public JaxbProcessInstanceResponse() { 
         // Default Constructor
     }
@@ -69,7 +62,7 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         this.status = JaxbRequestStatus.SUCCESS;
     }
 
-    private void initialize(ProcessInstance processInstance) { 
+    protected void initialize(ProcessInstance processInstance) { 
         if( processInstance != null ) { 
             this.eventTypes = Arrays.asList(processInstance.getEventTypes());
             this.id = processInstance.getId();
@@ -80,13 +73,7 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         }
     }
 
-    private String getUrl(HttpServletRequest request) { 
-        String url = request.getRequestURI();
-        if( request.getQueryString() != null ) { 
-            url += "?" + request.getQueryString();
-        }
-        return url;
-    }
+
     
     @Override
     public String getProcessId() {

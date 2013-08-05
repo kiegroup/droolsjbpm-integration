@@ -125,7 +125,6 @@ public class RemoteConfiguration {
     }
 
     public String getPassword() {
-        notNullAssert();
         return password;
     }
 

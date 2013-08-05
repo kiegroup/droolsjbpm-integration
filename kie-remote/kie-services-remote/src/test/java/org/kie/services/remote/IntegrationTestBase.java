@@ -24,6 +24,9 @@ import org.uberfire.security.server.auth.source.PropertyUserSource;
 
 public class IntegrationTestBase {
 
+    protected final static String USER="test";
+    protected final static String PASSWORD="12341234";
+    
     protected final static String projectVersion;
     static { 
         Properties testProps = new Properties();
@@ -44,8 +47,8 @@ public class IntegrationTestBase {
         Properties initialProps = new Properties();
         initialProps.setProperty(InitialContext.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
         initialProps.setProperty(InitialContext.PROVIDER_URL, "remote://localhost:4447");
-        initialProps.setProperty(InitialContext.SECURITY_PRINCIPAL, "guest");
-        initialProps.setProperty(InitialContext.SECURITY_CREDENTIALS, "1234");
+        initialProps.setProperty(InitialContext.SECURITY_PRINCIPAL, USER );
+        initialProps.setProperty(InitialContext.SECURITY_CREDENTIALS, PASSWORD );
         
         for (Object keyObj : initialProps.keySet()) {
             String key = (String) keyObj;
@@ -81,8 +84,6 @@ public class IntegrationTestBase {
                 "org.kie.commons:kie-nio2-fs",
                 // test
                 "org.jbpm:jbpm-shared-services:test-jar:" + projectVersion,
-                // security
-                "org.uberfire:uberfire-security-server",
                 // salaboy
                 "org.codehaus.btm:btm"
         };

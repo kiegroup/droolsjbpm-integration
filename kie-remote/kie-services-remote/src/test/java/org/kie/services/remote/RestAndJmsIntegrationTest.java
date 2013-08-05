@@ -185,7 +185,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
         JaxbCommandsResponse cmdResponse = null;
         try {
             // setup
-            connection = factory.createConnection("guest", "1234");
+            connection = factory.createConnection(USER, PASSWORD);
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             MessageProducer producer = session.createProducer(jbpmQueue);
@@ -330,35 +330,13 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
 
         // Check response
         logger.debug("response status: " + responseObj.getStatus());
-//        assertEquals(200, responseObj.getStatus());
-//        Object result = responseObj.getEntity();
-//        System.out.println(result);
-
-//        System.out.println("Failure now ?");
-//        
-//        restRequest = new ClientRequest(urlString);
-//        commandMessage = new JaxbCommandMessage(null, 1, 
-//          new CompleteTaskCommand(1, USER_ID, null));
-//        body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
-//        System.out.println(body);
-//        restRequest.body(MediaType.APPLICATION_XML, commandMessage);
-//
-//        // Get response
-//        responseObj = restRequest.post();
-//
-//        // Check response
-//        System.out.println(responseObj.getStatus());
-//        assertEquals(200, responseObj.getStatus());
-//        Object result = responseObj.getEntity();
-//        System.out.println(result);
-
     }
     
     @Test
     @InSequence(3)
     public void testRestRemoteApiHumanTaskProcess() throws Exception {
         // create REST request
-        RemoteRestSessionFactory restSessionFactory = new RemoteRestSessionFactory(DEPLOYMENT_ID, deploymentUrl.toExternalForm(), AuthenticationType.FORM, "guest", "1234");
+        RemoteRestSessionFactory restSessionFactory = new RemoteRestSessionFactory(DEPLOYMENT_ID, deploymentUrl.toExternalForm());
         RuntimeEngine engine = restSessionFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
@@ -393,7 +371,7 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
     @InSequence(4)
     public void testJmsRemoteApiHumanTaskProcess() throws Exception {
         // create JMS request
-        RuntimeEngine engine = new RemoteJmsRuntimeEngineFactory(DEPLOYMENT_ID, getRemoteInitialContext(), "guest", "1234").newRuntimeEngine();
+        RuntimeEngine engine = new RemoteJmsRuntimeEngineFactory(DEPLOYMENT_ID, getRemoteInitialContext()).newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         
