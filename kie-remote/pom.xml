@@ -29,33 +29,5 @@
     <module>kie-services-client</module>
     <module>kie-services-remote</module>
   </modules>
-
-  <properties>
-    <!--  eap 6.1 version not compatible with as7 
-    <hornetq.version>2.3.0.Final</hornetq.version>
-     -->
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <!-- arquillian -->
-      <!-- Override dependency resolver with test version. This must go *BEFORE* the Arquillian BOM. -->
-      <dependency>
-        <groupId>org.jboss.shrinkwrap.resolver</groupId>
-        <artifactId>shrinkwrap-resolver-bom</artifactId>
-        <version>${shrinkwrap.resolver.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <!-- arquillian: contains all versions for specific arquillian artifacts -->
-      <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-bom</artifactId>
-        <version>${arquillian.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   
 </project>
