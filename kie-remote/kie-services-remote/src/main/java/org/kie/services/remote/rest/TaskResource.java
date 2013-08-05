@@ -27,9 +27,11 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
+import org.kie.api.task.model.Content;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
@@ -323,4 +325,23 @@ public class TaskResource extends ResourceBase {
         return new JaxbGenericResponse(request);
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/{taskId: [0-9-]+}/content")
+    public JaxbContent getTaskContent(@PathParam("taskId") long taskId) { 
+        Command<?> cmd = new GetTaskCommand(taskId);
+        Task task = (Task) processRequestBean.doTaskOperation(cmd);
+        cmd = new GetContentCommand(task.getTaskData().getDocumentContentId());
+        Content content = (Content) processRequestBean.doTaskOperation(cmd);
+        return new JaxbContent(content);
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/content/{contentId: [0-9-]+}")
+    public JaxbContent getContent(@PathParam("contentId") long contentId) { 
+        Command<?> cmd = new GetContentCommand(contentId);
+        Content content = (Content) processRequestBean.doTaskOperation(cmd);
+        return new JaxbContent(content);
+    }
 }
