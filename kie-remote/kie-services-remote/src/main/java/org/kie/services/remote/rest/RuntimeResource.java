@@ -27,6 +27,7 @@ import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
@@ -40,6 +41,7 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
@@ -84,9 +86,8 @@ public class RuntimeResource extends ResourceBase {
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
 
-        ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
-        JaxbProcessInstanceResponse resp = new JaxbProcessInstanceResponse(procInst, request);
-        return resp;
+        Object result = internalDoKieSessionOperation(cmd, "Unable to start process with process definition id '" + processId + "'");
+        return new JaxbProcessInstanceResponse((ProcessInstance) result, request);
     }
 
     @GET
@@ -96,12 +97,12 @@ public class RuntimeResource extends ResourceBase {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
-        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance " + procInstId);
         if (result != null) {
             return new JaxbProcessInstanceResponse((ProcessInstance) result);
         } else {
             throw new BadRequestException("Unable to retrieve process instance " + procInstId
-                    + " since it has been completed. Please see the history operations.");
+                    + " which may have been completed. Please see the history operations.");
         }
     }
 
@@ -111,7 +112,7 @@ public class RuntimeResource extends ResourceBase {
     public JaxbGenericResponse abortProcessInstance(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        internalDoKieSessionOperation(cmd, "Unable to abort process instance " + procInstId);
         return new JaxbGenericResponse(request);
     }
 
@@ -124,7 +125,17 @@ public class RuntimeResource extends ResourceBase {
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        
+        String errorMsg = "Unable to signal process instance";
+        if( eventType == null ) { 
+            errorMsg += " with empty signal";
+        } else { 
+            errorMsg += " with signal type '" + eventType + "'";
+        }
+        if( event != null ) { 
+            errorMsg += " and event '" + event + "'";
+        }
+        internalDoKieSessionOperation(cmd, errorMsg);
         return new JaxbGenericResponse(request);
     }
 
@@ -133,8 +144,7 @@ public class RuntimeResource extends ResourceBase {
     @Path("/process/instance/{procInstId: [0-9]+}/variables")
     public JaxbVariablesResponse getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
         Map<String, String> vars = getVariables(procInstId);
-            
-        return new JaxbVariablesResponse(new FindVariableInstancesCommand(procInstId), vars);
+        return new JaxbVariablesResponse(vars, request);
     }
     
     @POST
@@ -144,7 +154,11 @@ public class RuntimeResource extends ResourceBase {
         Map<String, List<String>> formParams = getRequestParams(request);
         Object event = getObjectParam("event", false, formParams, "signal/" + signal);
         Command<?> cmd = new SignalEventCommand(signal, event);
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        String errorMsg = "Unable to send signal '" + signal + "'";
+        if( event != null ) { 
+            errorMsg += " with event '" + event + "'";
+        }
+        internalDoKieSessionOperation(cmd, errorMsg);
         return new JaxbGenericResponse(request);
     }
 
@@ -161,7 +175,7 @@ public class RuntimeResource extends ResourceBase {
         } else {
             throw new BadRequestException("Unsupported operation: /process/instance/" + workItemId + "/" + operation);
         }
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        internalDoKieSessionOperation(cmd, "Unable to " + operation + " workitem " + workItemId );
         return new JaxbGenericResponse(request);
     }
 
@@ -174,7 +188,7 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/clear")
     public JaxbGenericResponse clearProcessInstanceLogs() {
         Command<?> cmd = new ClearHistoryLogsCommand();
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        internalDoKieSessionOperation(cmd, "Unable to clear process instance logs");
         return new JaxbGenericResponse(request);
     }
 
@@ -186,8 +200,8 @@ public class RuntimeResource extends ResourceBase {
         int [] pageInfo = getPageNumAndPageSize(params);
         
         Command<?> cmd = new FindProcessInstancesCommand();
-        List<ProcessInstanceLog> results = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance logs");
+        List<ProcessInstanceLog> results = (List<ProcessInstanceLog>) result;
         
         results = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, results);
         return new JaxbHistoryLogList(results);
@@ -201,7 +215,9 @@ public class RuntimeResource extends ResourceBase {
         int [] pageInfo = getPageNumAndPageSize(params);
         
         Command<?> cmd = new FindProcessInstanceCommand(procInstId);
-        ProcessInstanceLog procInstLog = (ProcessInstanceLog) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance logs for process instance " + procInstId);
+        ProcessInstanceLog procInstLog = (ProcessInstanceLog) result;
+        
         List<ProcessInstanceLog> logList = new ArrayList<ProcessInstanceLog>();
         logList.add(procInstLog);
         
@@ -212,7 +228,7 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
-    public JaxbHistoryLogList getVariableOrNodeHistoryList(@PathParam("procInstId") Long processInstanceId,
+    public JaxbHistoryLogList getVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
@@ -220,25 +236,25 @@ public class RuntimeResource extends ResourceBase {
         JaxbHistoryLogList resultList;
         Command<?> cmd;
         if ("child".equalsIgnoreCase(operation)) {
-            cmd = new FindSubProcessInstancesCommand(processInstanceId);
-            List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                    deploymentId);
+            cmd = new FindSubProcessInstancesCommand(procInstId);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get child process instance logs for process instance " + procInstId);
+            List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
             procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
             resultList = new JaxbHistoryLogList(procInstLogList);
         } else if ("node".equalsIgnoreCase(operation)) {
-            cmd = new FindNodeInstancesCommand(processInstanceId);
-            List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                    deploymentId);
+            cmd = new FindNodeInstancesCommand(procInstId);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get node instance logs for process instance " + procInstId);
+            List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) result;
             nodeInstLogList = (new Paginator<NodeInstanceLog>()).paginate(pageInfo, nodeInstLogList);
             resultList = new JaxbHistoryLogList(nodeInstLogList);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            cmd = new FindVariableInstancesCommand(processInstanceId);
-            List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                    deploymentId);
+            cmd = new FindVariableInstancesCommand(procInstId);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get variable instance logs for process instance " + procInstId);
+            List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;
             varInstLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varInstLogList);
             resultList = new JaxbHistoryLogList(varInstLogList);
         } else {
-            throw new BadRequestException("Unsupported operation: /history/instance/" + processInstanceId + "/" + operation);
+            throw new BadRequestException("Unsupported operation: /history/instance/" + procInstId + "/" + operation);
         }
         return resultList;
     }
@@ -246,7 +262,7 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{id: [a-zA-Z0-9-:\\.]+}")
-    public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long processInstanceId,
+    public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("id") String id) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
@@ -254,19 +270,19 @@ public class RuntimeResource extends ResourceBase {
         JaxbHistoryLogList resultList;
         Command<?> cmd;
         if ("node".equalsIgnoreCase(operation)) {
-            cmd = new FindNodeInstancesCommand(processInstanceId, id);
-            List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                    deploymentId);
+            cmd = new FindNodeInstancesCommand(procInstId, id);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get node instance logs for node '" + id + "' in process instance " + procInstId);
+            List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) result;
             nodeInstLogList = (new Paginator<NodeInstanceLog>()).paginate(pageInfo, nodeInstLogList);
             resultList = new JaxbHistoryLogList(nodeInstLogList);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            cmd = new FindVariableInstancesCommand(processInstanceId, id);
-            List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                    deploymentId);
+            cmd = new FindVariableInstancesCommand(procInstId, id);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get variable instance logs for variable '" + id + "' in process instance " + procInstId);
+            List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;
             varInstLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varInstLogList);
             resultList = new JaxbHistoryLogList(varInstLogList);
         } else {
-            throw new BadRequestException("Unsupported operation: /history/instance/" + processInstanceId + "/" + operation + "/"
+            throw new BadRequestException("Unsupported operation: /history/instance/" + procInstId + "/" + operation + "/"
                     + id);
         }
         return resultList;
@@ -280,8 +296,8 @@ public class RuntimeResource extends ResourceBase {
         int [] pageInfo = getPageNumAndPageSize(params);
         
         Command<?> cmd = new FindProcessInstancesCommand(processId);
-        List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) processRequestBean.doKieSessionOperation(cmd,
-                deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance logs for process '" + processId + "'");
+        List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
         
         procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
         return new JaxbHistoryLogList(procInstLogList);
@@ -299,7 +315,8 @@ public class RuntimeResource extends ResourceBase {
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
 
-        ProcessInstance procInst = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance logs for process '" + processId + "'");
+        ProcessInstance procInst = (ProcessInstance) result;
         
         Map<String, String> vars = getVariables(procInst.getId());
         JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
@@ -314,7 +331,7 @@ public class RuntimeResource extends ResourceBase {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
-        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance " + procInstId);
         if (result != null) {
             ProcessInstance procInst = (ProcessInstance) result;
             Map<String, String> vars = getVariables(procInstId);
@@ -333,21 +350,43 @@ public class RuntimeResource extends ResourceBase {
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
-        processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        String errorMsg = "Unable to signal process instance " + procInstId;
+        if( eventType == null ) { 
+            errorMsg += " with empty signal";
+        } else { 
+            errorMsg += " with signal type '" + eventType + "'";
+        }
+        if( event != null ) { 
+            errorMsg += " and event '" + event + "'";
+        }
+        internalDoKieSessionOperation(cmd, errorMsg);
         
         cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
-        ProcessInstance processInstance = (ProcessInstance) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance " + procInstId);
+        ProcessInstance processInstance = (ProcessInstance) result;
         
         Map<String, String> vars = getVariables(processInstance.getId());
         
         return new JaxbProcessInstanceWithVariablesResponse(processInstance, vars);
     }
 
+    // Helper methods --------------------------------------------------------------------------------------------------------------
+
+    private Object internalDoKieSessionOperation(Command<?> cmd, String errorMsg) { 
+        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        if( result instanceof JaxbExceptionResponse ) { 
+           throw new InternalServerErrorException(errorMsg, 
+                   ((JaxbExceptionResponse) result).getCause());
+        }
+        return result;
+    }
+    
     private Map<String, String> getVariables(long processInstanceId) { 
         Command<?> cmd = new FindVariableInstancesCommand(processInstanceId);
-        List<VariableInstanceLog> varInstLogList 
-            = (List<VariableInstanceLog>) processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        
+        Object result = internalDoKieSessionOperation(cmd, "Unable to retrieve process variables from process instance " + processInstanceId);
+        List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;
         
         Map<String, String> vars = new HashMap<String, String>();
         if( varInstLogList.isEmpty() ) { 
@@ -371,5 +410,4 @@ public class RuntimeResource extends ResourceBase {
             
         return vars;
     }
-
 }

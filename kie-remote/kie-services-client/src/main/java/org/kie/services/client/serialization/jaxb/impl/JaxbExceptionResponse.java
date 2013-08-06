@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.kie.api.command.Command;
 
@@ -20,11 +21,15 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
     @XmlSchemaType(name="string")
     private String causeMessage;
     
+    @XmlTransient
+    public Exception cause;
+    
     public JaxbExceptionResponse() {
     }
     
     public JaxbExceptionResponse(Exception e, Command<?> cmd) {
        super();
+       this.cause = e;
        this.commandName = cmd.getClass().getSimpleName();
        initializeExceptionInfo(e);
     }
@@ -55,6 +60,10 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
         return message;
     }
 
+    public Exception getCause() {
+        return cause;
+    }
+    
     public void setMessage(String message) {
         this.message = message;
     }
@@ -67,5 +76,6 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
     public void setResult(String result) {
         this.message = result;
     }
+    
 
 }
