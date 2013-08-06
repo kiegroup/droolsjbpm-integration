@@ -265,8 +265,8 @@ public class TaskResource extends ResourceBase {
 
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/{id: [0-9-]+}")
-    public JaxbTask getTaskInstanceInfo(@PathParam("id") long taskId) { 
+    @Path("/{taskId: [0-9-]+}")
+    public JaxbTask getTaskInstanceInfo(@PathParam("taskId") long taskId) { 
         Command<?> cmd = new GetTaskCommand(taskId);
         Task task = (Task) doTaskOperation(taskId, "Unable to get task " + taskId);
         if( task == null ) { 
@@ -277,8 +277,8 @@ public class TaskResource extends ResourceBase {
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/{id: [0-9-]+}/{oper: [a-zA-Z]+}")
-    public JaxbGenericResponse doTaskOperation(@PathParam("id") long taskId, @PathParam("oper") String operation) { 
+    @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    public JaxbGenericResponse doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> params = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();

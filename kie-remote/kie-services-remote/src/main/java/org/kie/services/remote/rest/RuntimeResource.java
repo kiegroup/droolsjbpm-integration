@@ -261,29 +261,29 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{id: [a-zA-Z0-9-:\\.]+}")
+    @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\.]+}")
     public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
-            @PathParam("oper") String operation, @PathParam("id") String id) {
+            @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
         JaxbHistoryLogList resultList;
         Command<?> cmd;
         if ("node".equalsIgnoreCase(operation)) {
-            cmd = new FindNodeInstancesCommand(procInstId, id);
-            Object result = internalDoKieSessionOperation(cmd, "Unable to get node instance logs for node '" + id + "' in process instance " + procInstId);
+            cmd = new FindNodeInstancesCommand(procInstId, logId);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get node instance logs for node '" + logId + "' in process instance " + procInstId);
             List<NodeInstanceLog> nodeInstLogList = (List<NodeInstanceLog>) result;
             nodeInstLogList = (new Paginator<NodeInstanceLog>()).paginate(pageInfo, nodeInstLogList);
             resultList = new JaxbHistoryLogList(nodeInstLogList);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            cmd = new FindVariableInstancesCommand(procInstId, id);
-            Object result = internalDoKieSessionOperation(cmd, "Unable to get variable instance logs for variable '" + id + "' in process instance " + procInstId);
+            cmd = new FindVariableInstancesCommand(procInstId, logId);
+            Object result = internalDoKieSessionOperation(cmd, "Unable to get variable instance logs for variable '" + logId + "' in process instance " + procInstId);
             List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;
             varInstLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varInstLogList);
             resultList = new JaxbHistoryLogList(varInstLogList);
         } else {
             throw new BadRequestException("Unsupported operation: /history/instance/" + procInstId + "/" + operation + "/"
-                    + id);
+                    + logId);
         }
         return resultList;
     }

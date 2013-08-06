@@ -49,6 +49,10 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.audit.xml.AbstractJaxbHistoryObject;
+import org.jbpm.process.audit.xml.JaxbHistoryLog;
+import org.jbpm.process.audit.xml.JaxbVariableInstanceLog;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
@@ -71,6 +75,7 @@ import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
@@ -436,6 +441,35 @@ public class RestAndJmsIntegrationTest extends IntegrationTestBase {
             throw new Exception("Request operation failed. Response status = " + test.getResponseStatus() + "\n\n" + test.getEntity(String.class));
         } else {
             logger.debug( "Response: " + test.getEntity(String.class));
+        }
+    }
+    
+    @Test
+    public void testRestHistoryLogs() throws Exception {
+        String urlString = new URL(deploymentUrl,  deploymentUrl.getPath() + "rest/runtime/test/process/var-proc/start?map_x=initVal").toExternalForm();
+        ClientRequest restRequest = new ClientRequest(urlString);
+
+        // Get and check response
+        logger.debug( ">> " + urlString );
+        ClientResponse responseObj = restRequest.post();
+        assertEquals(200, responseObj.getStatus());
+        JaxbProcessInstanceResponse processInstance = (JaxbProcessInstanceResponse) responseObj.getEntity(JaxbProcessInstanceResponse.class);
+        long procInstId = processInstance.getId();
+
+        urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/runtime/test/history/instance/" + procInstId + "/variable/x").toExternalForm();
+        restRequest = new ClientRequest(urlString);
+        logger.debug( ">> [history/variables]" + urlString );
+        responseObj = restRequest.get();
+        assertEquals(200, responseObj.getStatus());
+        JaxbHistoryLogList logList = (JaxbHistoryLogList) responseObj.getEntity(JaxbHistoryLogList.class);
+        List<AbstractJaxbHistoryObject> varLogList = logList.getHistoryLogList();
+        assertEquals("Incorrect number of variable logs", 4, varLogList.size());
+        
+        for( AbstractJaxbHistoryObject<?> log : logList.getHistoryLogList() ) {
+           JaxbVariableInstanceLog varLog = (JaxbVariableInstanceLog) log;
+           assertEquals( "Incorrect variable id", "x", varLog.getVariableId() );
+           assertEquals( "Incorrect process id", "var-proc", varLog.getProcessId() );
+           assertEquals( "Incorrect process instance id", "var-proc", varLog.getProcessId() );
         }
     }
     
