@@ -24,6 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jboss.resteasy.spi.InternalServerErrorException;
+import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.TaskImpl;
@@ -38,6 +40,7 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
@@ -265,7 +268,10 @@ public class TaskResource extends ResourceBase {
     @Path("/{id: [0-9-]+}")
     public JaxbTask getTaskInstanceInfo(@PathParam("id") long taskId) { 
         Command<?> cmd = new GetTaskCommand(taskId);
-        Task task = (Task) processRequestBean.doTaskOperation(cmd);
+        Task task = (Task) doTaskOperation(taskId, "Unable to get task " + taskId);
+        if( task == null ) { 
+            throw new NotFoundException("Task " + taskId + " could not be found.");
+        }
         return new JaxbTask(task);
     }
 
@@ -277,8 +283,12 @@ public class TaskResource extends ResourceBase {
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
         logger.debug("Executing " + operation + " on task " + taskId + " by user " + userId );
-        
+       
         Command<?> cmd = null;
+        cmd = new GetTaskCommand(taskId);
+        if( doTaskOperation(taskId, "Unable to check if task " + taskId + " exists") == null ) { 
+            throw new NotFoundException("Task " + taskId + " could not be found.");
+        }
         if ("activate".equalsIgnoreCase(operation)) {
             cmd = new ActivateTaskCommand(taskId, userId);
         } else if ("claim".equalsIgnoreCase(operation)) {
@@ -321,7 +331,7 @@ public class TaskResource extends ResourceBase {
         } else {
             throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
-        processRequestBean.doTaskOperation(cmd);
+        internalDoTaskOperation(cmd, "Unable to " + operation + " task " + taskId);
         return new JaxbGenericResponse(request);
     }
 
@@ -330,9 +340,17 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}/content")
     public JaxbContent getTaskContent(@PathParam("taskId") long taskId) { 
         Command<?> cmd = new GetTaskCommand(taskId);
-        Task task = (Task) processRequestBean.doTaskOperation(cmd);
-        cmd = new GetContentCommand(task.getTaskData().getDocumentContentId());
-        Content content = (Content) processRequestBean.doTaskOperation(cmd);
+        Object result = internalDoTaskOperation(cmd, "Unable to get task " + taskId);
+        if( result == null ) { 
+            throw new NotFoundException("Task " + taskId + " could not be found.");
+        }
+        long contentId = ((Task) result).getTaskData().getDocumentContentId();
+        Content content = null;
+        if( contentId > -1 ) { 
+            cmd = new GetContentCommand(contentId);
+            result = internalDoTaskOperation(cmd, "Unable get content " + contentId + " (from task " + taskId + ")");
+            content = (Content) result;
+        }
         return new JaxbContent(content);
     }
     
@@ -341,7 +359,22 @@ public class TaskResource extends ResourceBase {
     @Path("/content/{contentId: [0-9-]+}")
     public JaxbContent getContent(@PathParam("contentId") long contentId) { 
         Command<?> cmd = new GetContentCommand(contentId);
-        Content content = (Content) processRequestBean.doTaskOperation(cmd);
+        Content content = (Content) internalDoTaskOperation(cmd, "Unable to get task content " + contentId);
+        if( content == null ) { 
+            throw new NotFoundException("Content " + contentId + " could not be found.");
+        }
         return new JaxbContent(content);
     }
+    
+    // Helper methods --------------------------------------------------------------------------------------------------------------
+
+    private Object internalDoTaskOperation(Command<?> cmd, String errorMsg) { 
+        Object result = processRequestBean.doTaskOperation(cmd);
+        if( result instanceof JaxbExceptionResponse ) { 
+           throw new InternalServerErrorException(errorMsg, 
+                   ((JaxbExceptionResponse) result).getCause());
+        }
+        return result;
+    }
+    
 }
