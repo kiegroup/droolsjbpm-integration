@@ -9,7 +9,7 @@
 ">
 
   <kie:kmodule id="defaultContainer">
-    <kie:kbase name="drl_camelsample">
+    <kie:kbase name="drl_camelsample" packages="drl_camelsample">
       <kie:ksession name="ksession1" type="stateless"/>
     </kie:kbase>
   </kie:kmodule>

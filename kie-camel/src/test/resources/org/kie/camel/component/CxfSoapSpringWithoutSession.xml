@@ -29,7 +29,7 @@
     ">
 
   <kie:kmodule id="CxfSoapSpringWithoutSession">
-    <kie:kbase name="test1">
+    <kie:kbase name="test1" packages="test1">
       <kie:ksession name="ksession1">
         <kie:batch>
           <kie:set-global identifier="list" >

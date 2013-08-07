@@ -38,7 +38,7 @@ import java.util.List;
 
 public class KieObjectsFactoryBean {
 
-    public static KieBase fetchKBase(String id, ReleaseId releaseId){
+    public static KieBase fetchKBase(String id, ReleaseId releaseId, String packages, String includes){
         KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         return kieObjectsResolver.resolveKBase(id, releaseId);
     }

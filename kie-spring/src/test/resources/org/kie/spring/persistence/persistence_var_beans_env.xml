@@ -24,7 +24,7 @@
   <kie:kstore id="kstore1"/>
 
   <kie:kmodule id="var_persistence">
-    <kie:kbase name="drl_persistence">
+    <kie:kbase name="drl_persistence" packages="drl_persistence">
       <kie:ksession name="jpaSingleSessionCommandService2">
         <kie:configuration>
           <kie:jpa-persistence>
@@ -35,7 +35,7 @@
       </kie:ksession>
     </kie:kbase>
 
-    <kie:kbase name="drl_persistence_rb">
+    <kie:kbase name="drl_persistence_rb" packages="drl_persistence_rb">
       <kie:ksession name="jpaSingleSessionCommandServiceRollback">
         <kie:configuration>
           <kie:jpa-persistence>

@@ -22,7 +22,7 @@
 
   <kie:kmodule id="kbase_commands">
 
-    <kie:kbase name="drl_kiesample3">
+    <kie:kbase name="drl_kiesample3" packages="drl_kiesample3">
       <kie:ksession name="ksession2" type="stateful">
         <kie:batch>
           <kie:insert-object ref="person"/>

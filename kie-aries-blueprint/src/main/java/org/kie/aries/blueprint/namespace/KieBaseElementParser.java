@@ -26,6 +26,14 @@ import org.w3c.dom.NodeList;
 
 public class KieBaseElementParser extends AbstractElementParser {
 
+    private static final String ATTRIBUTE_ID = "name";
+    private static final String ATTRIBUTE_PACKAGES = "packages";
+    private static final String ATTRIBUTE_INCLUDES = "includes";
+    private static final String ATTRIBUTE_EVENT_MODE = "eventProcessingMode";
+    private static final String ATTRIBUTE_EQUALS = "equalsBehavior";
+    private static final String ATTRIBUTE_SCOPE = "scope";
+    private static final String ATTRIBUTE_DEFAULT = "default";
+
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
         String id = getId(context, element);
@@ -44,6 +52,9 @@ public class KieBaseElementParser extends AbstractElementParser {
         } else {
             beanMetadata.addArgument(createNullMetadata(),null,1);
         }
+
+        beanMetadata.addArgument(createValue(context, element.getAttribute(ATTRIBUTE_PACKAGES)), null, 2);
+        beanMetadata.addArgument(createValue(context, element.getAttribute(ATTRIBUTE_INCLUDES)), null, 3);
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
 

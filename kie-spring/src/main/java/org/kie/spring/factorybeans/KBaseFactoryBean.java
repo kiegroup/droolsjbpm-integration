@@ -30,6 +30,13 @@ public class KBaseFactoryBean
 
     private String id;
     private String kBaseName;
+    private String packages;
+    private String includes;
+    private String eventProcessingMode;
+    private String equalsBehavior;
+    private String scope;
+    private String def;
+
     private KieBase kBase;
     private ReleaseId releaseId;
 
@@ -58,6 +65,53 @@ public class KBaseFactoryBean
         this.id = id;
     }
 
+    public String getPackages() {
+        return packages;
+    }
+
+    public void setPackages(String packages) {
+        this.packages = packages;
+    }
+
+    public String getIncludes() {
+        return includes;
+    }
+
+    public void setIncludes(String includes) {
+        this.includes = includes;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public String getDef() {
+        return def;
+    }
+
+    public void setDef(String def) {
+        this.def = def;
+    }
+
+    public String getEqualsBehavior() {
+        return equalsBehavior;
+    }
+
+    public void setEqualsBehavior(String equalsBehavior) {
+        this.equalsBehavior = equalsBehavior;
+    }
+
+    public String getEventProcessingMode() {
+        return eventProcessingMode;
+    }
+
+    public void setEventProcessingMode(String eventProcessingMode) {
+        this.eventProcessingMode = eventProcessingMode;
+    }
 
     public KieBase getObject() throws Exception {
         return kBase;
@@ -75,5 +129,4 @@ public class KBaseFactoryBean
         KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         kBase = kieObjectsResolver.resolveKBase(kBaseName, releaseId);
     }
-
 }

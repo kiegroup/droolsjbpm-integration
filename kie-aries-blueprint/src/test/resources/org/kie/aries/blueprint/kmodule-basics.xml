@@ -6,7 +6,7 @@
            http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
 
   <kie:kmodule id="someid" >
-    <kie:kbase name="drl_kiesample2">
+    <kie:kbase name="drl_kiesample2" packages="drl_kiesample2">
       <kie:ksession name="ksession9" type="stateful"/>
       <kie:ksession name="ksession99" type="stateless"/>
     </kie:kbase>
