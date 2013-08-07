@@ -286,7 +286,7 @@ public class TaskResource extends ResourceBase {
        
         Command<?> cmd = null;
         cmd = new GetTaskCommand(taskId);
-        if( doTaskOperation(taskId, "Unable to check if task " + taskId + " exists") == null ) { 
+        if( internalDoTaskOperation(cmd, "Unable to check if task " + taskId + " exists") == null ) { 
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
         if ("activate".equalsIgnoreCase(operation)) {
