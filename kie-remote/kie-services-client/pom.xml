@@ -34,11 +34,7 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-audit</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-persistence-jpa</artifactId>
-    </dependency>
-
+ 
     <!-- jms -->
     <dependency>
       <groupId>javax.jms</groupId>
@@ -47,10 +43,9 @@
     </dependency>
 
     <!-- rest -->
-    <dependency><!-- TODO use javax.servlet:servlet-api from kie-parent-with-dependencies -->
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-      <version>1.0.0.Final</version>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -86,7 +81,6 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
-      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

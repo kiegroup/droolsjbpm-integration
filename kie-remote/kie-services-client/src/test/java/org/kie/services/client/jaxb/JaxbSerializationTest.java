@@ -12,14 +12,12 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.SerializationTest;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
-import org.yaml.snakeyaml.Yaml;
 
 public class JaxbSerializationTest extends SerializationTest {
 
     public Object testRoundtrip(Object in) throws Exception {
         String xmlObject = JaxbSerializationProvider.convertJaxbObjectToString(in);
         log.debug(xmlObject);
-        System.out.println(xmlObject);
         return JaxbSerializationProvider.convertStringToJaxbObject(xmlObject);
     }
  
