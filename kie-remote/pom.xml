@@ -17,14 +17,6 @@
     Remote services (REST, JMS, etc.) for various kie projects
   </description>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
   <modules>
     <module>kie-services-client</module>
     <module>kie-services-remote</module>
