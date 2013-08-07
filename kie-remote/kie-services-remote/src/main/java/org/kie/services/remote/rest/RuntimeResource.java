@@ -80,7 +80,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]+}/start")
+    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public JaxbProcessInstanceResponse startNewProcess(@PathParam("processDefId") String processId) {
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
@@ -309,7 +309,7 @@ public class RuntimeResource extends ResourceBase {
     
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/withvars/process/{processDefId: [a-zA-Z0-9-:\\.]+}/start")
+    @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public JaxbProcessInstanceWithVariablesResponse startNewProcessWithVars(@PathParam("processDefId") String processId) {
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
