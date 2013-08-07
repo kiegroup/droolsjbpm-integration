@@ -11,14 +11,6 @@
   <artifactId>kie-services-client</artifactId>
   <name>KIE Remote Services :: Client</name>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
   <dependencies>
 
     <!-- kie/drools/jbpm -->
@@ -55,7 +47,7 @@
     </dependency>
 
     <!-- rest -->
-    <dependency>
+    <dependency><!-- TODO use javax.servlet:servlet-api from kie-parent-with-dependencies -->
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.0_spec</artifactId>
       <version>1.0.0.Final</version>
@@ -96,7 +88,6 @@
       <artifactId>jbpm-bpmn2</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
-      <version>${version}</version>
     </dependency>
     <dependency>
       <groupId>org.yaml</groupId>

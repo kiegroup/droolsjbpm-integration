@@ -11,28 +11,17 @@
   <artifactId>kie-services-remote</artifactId>
   <name>KIE Remote Services :: Services</name>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
   <properties>
     <arquillian.launch>jboss</arquillian.launch>
 
-    <jboss.version>7.1.1.Final</jboss.version>
-    <jboss.server.name>jboss-as-${jboss.version}</jboss.server.name>
-    <jboss.server.version>7.1.1.Final</jboss.server.version>
+    <jboss.server.name>jboss-as-${version.org.jboss.as}</jboss.server.name>
     <!-- 2.2.14+ is incompatible with 7.1.1.Final : HORNETQ-1035 -->
-    <hornetq.version>2.2.13.Final</hornetq.version>
+    <version.org.hornetq.override>2.2.13.Final</version.org.hornetq.override><!-- TODO Don't override the version of kie-parent-with-dependencies -->
 
     <!-- eap integration
-    <jboss.version>7.2.0.Final</jboss.version> 
-    <jboss.server.version>7.2.0.Final-redhat-8</jboss.server.version> 
+    <version.org.jboss.as>7.2.0.Final-redhat-8</version.org.jboss.as>
     <jboss.server.name>jboss-eap-6.1</jboss.server.name>
-    <hornetq.version>2.3.0.Final</hornetq.version>
+    <version.org.hornetq.override>2.3.0.Final</version.org.hornetq.override>
      -->
   </properties>
 
@@ -78,12 +67,12 @@
     </dependency>
 
     <!-- jms -->
-    <dependency>
+    <dependency><!-- TODO remove this altogether. Depending on a pom (in scope non-import) is pointless  -->
       <!-- remove when integrating with EAP -->
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-jms-client-bom</artifactId>
-      <version>7.1.1.Final</version>
       <type>pom</type>
+      <version>${version.org.jboss.as}</version>
     </dependency>
     <dependency>
       <groupId>javax.jms</groupId>
@@ -92,12 +81,12 @@
     <dependency>
       <groupId>org.hornetq</groupId>
       <artifactId>hornetq-core-client</artifactId>
-      <version>${hornetq.version}</version>
+      <version>${version.org.hornetq.override}</version><!-- TODO Don't override the version of kie-parent-with-dependencies -->
     </dependency>
     <dependency>
       <groupId>org.hornetq</groupId>
       <artifactId>hornetq-jms-client</artifactId>
-      <version>${hornetq.version}</version>
+      <version>${version.org.hornetq.override}</version><!-- TODO Don't override the version of kie-parent-with-dependencies -->
     </dependency>
 
     <!-- Rest -->
@@ -123,11 +112,6 @@
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>jsr250-api</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <!-- persistence -->
@@ -169,7 +153,6 @@
     <dependency>
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-arquillian-container-managed</artifactId>
-      <version>${jboss.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- necessary when using hornetq 2.2.x -->
@@ -306,7 +289,7 @@
                 <artifactItem>
                   <groupId>org.jboss.as</groupId>
                   <artifactId>jboss-as-dist</artifactId>
-                  <version>${jboss.server.version}</version>
+                  <version>${version.org.jboss.as}</version>
                   <type>zip</type>
                   <overWrite>false</overWrite>
                   <outputDirectory>${project.build.directory}</outputDirectory>
