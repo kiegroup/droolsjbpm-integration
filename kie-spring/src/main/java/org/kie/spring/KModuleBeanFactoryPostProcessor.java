@@ -25,6 +25,8 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
 
+import org.kie.api.conf.EqualityBehaviorOption;
+import org.kie.api.conf.EventProcessingOption;
 import org.kie.spring.factorybeans.KBaseFactoryBean;
 import org.kie.spring.factorybeans.KModuleFactoryBean;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
@@ -39,7 +41,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
@@ -151,8 +152,39 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KBaseFactoryBean.class.getName())){
                 KieBaseModelImpl kBase = new KieBaseModelImpl();
                 kBase.setKModule(kieModuleModel);
-                String kBaseName = (String) beanDefinition.getPropertyValues().getPropertyValue("kBaseName").getValue();
-                kBase.setName(kBaseName);
+
+                kBase.setName( getPropertyValue( beanDefinition, "kBaseName" ));
+                kBase.setDefault( "true".equals( getPropertyValue(beanDefinition, "default") ) );
+
+                String packages = getPropertyValue( beanDefinition, "packages" );
+                if ( !packages.isEmpty() ) {
+                    for ( String pkg : packages.split( "," ) ) {
+                        kBase.addPackage( pkg.trim() );
+                    }
+                }
+
+                String includes = getPropertyValue( beanDefinition, "includes" );
+                if ( !includes.isEmpty() ) {
+                    for ( String include : includes.split( "," ) ) {
+                        kBase.addInclude( include.trim() );
+                    }
+                }
+
+                String eventMode = getPropertyValue(beanDefinition, "eventProcessingMode");
+                if ( !eventMode.isEmpty() ) {
+                    kBase.setEventProcessingMode( EventProcessingOption.determineEventProcessingMode(eventMode) );
+                }
+
+                String equalsBehavior = getPropertyValue(beanDefinition, "equalsBehavior");
+                if ( !equalsBehavior.isEmpty() ) {
+                    kBase.setEqualsBehavior( EqualityBehaviorOption.valueOf(equalsBehavior.toUpperCase()) );
+                }
+
+                String scope = getPropertyValue(beanDefinition, "scope");
+                if ( !scope.isEmpty() ) {
+                    kBase.setScope( scope.trim() );
+                }
+
                 kieModuleModel.getRawKieBaseModels().put( kBase.getName(), kBase );
                 beanDefinition.getPropertyValues().addPropertyValue(new PropertyValue("releaseId", releaseId));
                 addKieSessionModels(beanFactory, kBase);
@@ -160,16 +192,21 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         }
     }
 
+    private String getPropertyValue(BeanDefinition beanDefinition, String propertyName) {
+        PropertyValue propertyValue = beanDefinition.getPropertyValues().getPropertyValue(propertyName);
+        return propertyValue != null ? (String) propertyValue.getValue() : "";
+    }
+
     private void addKieSessionModels(ConfigurableListableBeanFactory beanFactory, KieBaseModelImpl kBase) {
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
             if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KSessionFactoryBean.class.getName())){
-                String name = (String) beanDefinition.getPropertyValues().getPropertyValue("name").getValue();
-                String type = (String) beanDefinition.getPropertyValues().getPropertyValue("type").getValue();
-                String kBaseName = (String) beanDefinition.getPropertyValues().getPropertyValue("kBaseName").getValue();
+                String name = getPropertyValue(beanDefinition, "name");
+                String type = getPropertyValue(beanDefinition, "type");
+                String kBaseName = getPropertyValue(beanDefinition, "kBaseName");
                 if ( kBase.getName().equalsIgnoreCase(kBaseName)) {
                     KieSessionModelImpl kSession = new KieSessionModelImpl(kBase, name);
-                    kSession.setType(type != null ? KieSessionModel.KieSessionType.valueOf(type.toUpperCase()) : KieSessionModel.KieSessionType.STATEFUL);
+                    kSession.setType(!type.isEmpty() ? KieSessionModel.KieSessionType.valueOf(type.toUpperCase()) : KieSessionModel.KieSessionType.STATEFUL);
                     Map<String, KieSessionModel> rawKieSessionModels = kBase.getRawKieSessionModels();
                     rawKieSessionModels.put(kSession.getName(), kSession);
                     beanDefinition.getPropertyValues().addPropertyValue(new PropertyValue("releaseId", releaseId));

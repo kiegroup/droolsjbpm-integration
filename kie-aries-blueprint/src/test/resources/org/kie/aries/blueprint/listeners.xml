@@ -14,7 +14,7 @@
   <bean id="mock-process-listener" class="org.kie.aries.blueprint.mocks.MockProcessEventListener"/>
 
   <kie:kmodule id="basics" >
-    <kie:kbase name="drl_kiesample">
+    <kie:kbase name="drl_kiesample" packages="drl_kiesample">
       <kie:ksession name="ksession99" type="stateful">
         <kie:agendaEventListener ref="mock-agenda-listener"/>
         <kie:processEventListener ref="mock-process-listener"/>

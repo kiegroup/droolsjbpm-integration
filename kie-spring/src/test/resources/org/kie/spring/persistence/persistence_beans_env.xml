@@ -26,7 +26,7 @@
 
   <kie:kmodule id="persistence_spring_module">
 
-    <kie:kbase name="kb_persistence">
+    <kie:kbase name="kb_persistence" packages="kb_persistence">
       <kie:ksession name="jpaSingleSessionCommandService2">
         <kie:configuration>
           <kie:jpa-persistence>

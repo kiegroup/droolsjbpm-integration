@@ -7,7 +7,7 @@
 
   <kie:kmodule id="someid">
 
-    <kie:kbase name="drl_kiesample2">
+    <kie:kbase name="drl_kiesample2" packages="drl_kiesample2">
 
       <kie:ksession name="ksession1" type="stateless"/>
       <kie:ksession name="ksession3" type="stateless"/>

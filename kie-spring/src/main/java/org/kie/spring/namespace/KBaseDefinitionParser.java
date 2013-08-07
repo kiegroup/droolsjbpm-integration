@@ -34,6 +34,12 @@ import static org.kie.spring.namespace.DefinitionParserHelper.emptyAttributeChec
 public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String ATTRIBUTE_ID = "name";
+    private static final String ATTRIBUTE_PACKAGES = "packages";
+    private static final String ATTRIBUTE_INCLUDES = "includes";
+    private static final String ATTRIBUTE_EVENT_MODE = "eventProcessingMode";
+    private static final String ATTRIBUTE_EQUALS = "equalsBehavior";
+    private static final String ATTRIBUTE_SCOPE = "scope";
+    private static final String ATTRIBUTE_DEFAULT = "default";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -44,6 +50,12 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
         emptyAttributeCheck(element.getLocalName(), ATTRIBUTE_ID, id);
         factory.addPropertyValue("kBaseName", id);
         factory.addPropertyValue("id", id);
+        factory.addPropertyValue("packages", element.getAttribute(ATTRIBUTE_PACKAGES));
+        factory.addPropertyValue("includes", element.getAttribute(ATTRIBUTE_INCLUDES));
+        factory.addPropertyValue("eventProcessingMode", element.getAttribute(ATTRIBUTE_EVENT_MODE));
+        factory.addPropertyValue("equalsBehavior", element.getAttribute(ATTRIBUTE_EQUALS));
+        factory.addPropertyValue("scope", element.getAttribute(ATTRIBUTE_SCOPE));
+        factory.addPropertyValue("def", element.getAttribute(ATTRIBUTE_DEFAULT));
 
         element.setAttribute("name", id);
         List<Element> ksessionElements = DomUtils.getChildElementsByTagName(element, "ksession");

@@ -185,6 +185,21 @@ public class KieObjectsInjector implements BeanProcessor {
                         KieBaseModelImpl kBase = new KieBaseModelImpl();
                         kBase.setKModule(kieModuleModel);
                         kBase.setName(kBaseName);
+
+                        String packages = ((MutableValueMetadata) metadata.getArguments().get(2).getValue()).getStringValue();
+                        if ( !packages.isEmpty() ) {
+                            for ( String pkg : packages.split( "," ) ) {
+                                kBase.addPackage( pkg.trim() );
+                            }
+                        }
+
+                        String includes = ((MutableValueMetadata) metadata.getArguments().get(3).getValue()).getStringValue();
+                        if ( !includes.isEmpty() ) {
+                            for ( String include : includes.split( "," ) ) {
+                                kBase.addInclude( include.trim() );
+                            }
+                        }
+
                         kieModuleModel.getRawKieBaseModels().put(kBase.getName(), kBase);
 
                         MutablePassThroughMetadata throughMetadata = parserContext.createMetadata(MutablePassThroughMetadata.class);

@@ -6,7 +6,7 @@
                           http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
   <kie:kmodule id="loggers_module">
-    <kie:kbase name="drl_kiesample2">
+    <kie:kbase name="drl_kiesample2" packages="drl_kiesample2">
 
       <kie:ksession name="loggerSession" type="stateless">
         <kie:consoleLogger/>

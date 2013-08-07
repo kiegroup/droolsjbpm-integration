@@ -9,7 +9,7 @@
 
   <kie:kmodule id="persistence_spring_module">
 
-    <kie:kbase name="kb_persistence">
+    <kie:kbase name="kb_persistence" packages="kb_persistence">
 
       <kie:ksession name="jpaSingleSessionCommandService">
 
@@ -24,7 +24,7 @@
       </kie:ksession>
     </kie:kbase>
 
-    <kie:kbase name="drl_persistence_rb">
+    <kie:kbase name="drl_persistence_rb" packages="drl_persistence_rb">
       <kie:ksession name="jpaSingleSessionCommandServiceRollback"/>
     </kie:kbase>
 

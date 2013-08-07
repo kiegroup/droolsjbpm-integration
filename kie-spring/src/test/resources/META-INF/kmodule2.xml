@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
 
-  <kbase name="drl_kiesample">
+  <kbase name="drl_kiesample" packages="drl_kiesample">
     <ksession name="ksession1" type="stateless"/>
     <ksession name="ksession2"/>
     <ksession name="statelessWithGroupedListeners" type="stateless"/>
   </kbase>
 
-  <kbase name="drl_kiesample2">
+  <kbase name="drl_kiesample2" packages="drl_kiesample2">
     <ksession name="ksession3" type="stateless"/>
     <ksession name="loggerSession" type="stateless"/>
     <ksession name="statefulSession" type="stateful"/>
   </kbase>
 
-  <kbase name="drl_persistence">
+  <kbase name="drl_persistence" packages="drl_persistence">
     <ksession name="jpaSingleSessionCommandService2"/>
   </kbase>
 
-  <kbase name="drl_persistence_rb">
+  <kbase name="drl_persistence_rb" packages="drl_persistence_rb">
     <ksession name="jpaSingleSessionCommandServiceRollback"/>
   </kbase>
 
-  <kbase name="drl_timer_flow">
+  <kbase name="drl_timer_flow" packages="drl_timer_flow">
     <ksession name="knowledgeBase"/>
   </kbase>
 
