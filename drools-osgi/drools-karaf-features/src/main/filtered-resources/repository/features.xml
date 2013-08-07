@@ -43,8 +43,8 @@
   <feature name="drools5-camel" version="${drools.version}" description="Drools5 Camel">
     <feature version="${drools.version}">drools-module</feature>
     <feature version="${drools.version}">drools5-spring</feature>
-    <feature version>camel</feature>
-    <feature version>camel-cxf</feature>
+    <feature version="${version.org.apache.camel}">camel</feature>
+    <feature version="${version.org.apache.camel}">camel-cxf</feature>
     <feature version="[2.6,3.0)">cxf-specs</feature>
     <feature version="[2.6,3.0)">cxf-core</feature>
     <feature version="[2.6,3.0)">cxf-jaxrs</feature>
@@ -92,8 +92,8 @@
     <feature version="${drools.version}">kie</feature>
     <feature version="${drools.version}">kie-spring</feature>
     <feature version="${drools.version}">jbpm</feature>
-    <feature version>camel</feature>
-    <feature version>camel-cxf</feature>
+    <feature version="${version.org.apache.camel}">camel</feature>
+    <feature version="${version.org.apache.camel}">camel-cxf</feature>
     <feature version="[2.6,3.0)">cxf-specs</feature>
     <feature version="[2.6,3.0)">cxf-core</feature>
     <feature version="[2.6,3.0)">cxf-jaxrs</feature>
