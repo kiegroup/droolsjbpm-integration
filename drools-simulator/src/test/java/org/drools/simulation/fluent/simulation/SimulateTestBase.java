@@ -28,11 +28,12 @@ public class SimulateTestBase {
             String id = pairs[i];
             String rule = pairs[i + 1];
 
-            kfs.write( "src/main/resources/" + id.replaceAll( "\\.", "/" ) + "/org/test/rule" + i + ".drl", rule );
+            kfs.write( "src/main/resources/" + id.replaceAll( "\\.", "/" ) + "/rule" + i + ".drl", rule );
 
             KieBaseModel kBase1 = kproj.newKieBaseModel( id )
                     .setEqualsBehavior( EqualityBehaviorOption.EQUALITY )
-                    .setEventProcessingMode( EventProcessingOption.STREAM );
+                    .setEventProcessingMode( EventProcessingOption.STREAM )
+                    .addPackage( id );
 
             KieSessionModel ksession1 = kBase1.newKieSessionModel(id + ".KSession1")
                     .setType(KieSessionModel.KieSessionType.STATEFUL)
