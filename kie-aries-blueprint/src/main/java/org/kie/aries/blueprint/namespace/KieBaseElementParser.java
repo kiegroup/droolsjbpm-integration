@@ -17,7 +17,9 @@ package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
 import org.drools.core.util.StringUtils;
+import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
@@ -53,10 +55,18 @@ public class KieBaseElementParser extends AbstractElementParser {
             beanMetadata.addArgument(createNullMetadata(),null,1);
         }
 
-        beanMetadata.addArgument(createValue(context, element.getAttribute(ATTRIBUTE_PACKAGES)), null, 2);
-        beanMetadata.addArgument(createValue(context, element.getAttribute(ATTRIBUTE_INCLUDES)), null, 3);
+        KBaseOptions kBaseOptionsAdaptor = new KBaseOptions();
+        kBaseOptionsAdaptor.setPackages(element.getAttribute(ATTRIBUTE_PACKAGES));
+        kBaseOptionsAdaptor.setIncludes(element.getAttribute(ATTRIBUTE_INCLUDES));
+        kBaseOptionsAdaptor.setEventProcessingMode(element.getAttribute(ATTRIBUTE_EVENT_MODE));
+        kBaseOptionsAdaptor.setEqualsBehavior(element.getAttribute(ATTRIBUTE_EQUALS));
+        kBaseOptionsAdaptor.setScope(element.getAttribute(ATTRIBUTE_SCOPE));
+        kBaseOptionsAdaptor.setDef(element.getAttribute(ATTRIBUTE_DEFAULT));
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
+        PassThroughMetadataImpl passThroughMetadata = context.createMetadata(PassThroughMetadataImpl.class);
+        passThroughMetadata.setObject(kBaseOptionsAdaptor);
+        beanMetadata.addArgument(passThroughMetadata, null, 2);
 
         String prefix = element.getPrefix();
         NodeList ksessionNodeList = element.getElementsByTagName(prefix+":ksession");
