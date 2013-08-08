@@ -34,6 +34,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.blueprint.container.BlueprintContainer;
@@ -186,14 +187,17 @@ public class KieObjectsInjector implements BeanProcessor {
                         kBase.setKModule(kieModuleModel);
                         kBase.setName(kBaseName);
 
-                        String packages = ((MutableValueMetadata) metadata.getArguments().get(2).getValue()).getStringValue();
-                        if ( !packages.isEmpty() ) {
+                        BeanArgument kbOptionsArg = metadata.getArguments().get(2);
+                        PassThroughMetadata passThroughMetadata = (PassThroughMetadata) kbOptionsArg.getValue();
+                        KBaseOptions kBaseOptions = (KBaseOptions) passThroughMetadata.getObject();
+                        String packages = kBaseOptions.getPackages();
+                        if ( !kBaseOptions.getPackages().isEmpty()) {
                             for ( String pkg : packages.split( "," ) ) {
                                 kBase.addPackage( pkg.trim() );
                             }
                         }
 
-                        String includes = ((MutableValueMetadata) metadata.getArguments().get(3).getValue()).getStringValue();
+                        String includes = kBaseOptions.getIncludes();
                         if ( !includes.isEmpty() ) {
                             for ( String include : includes.split( "," ) ) {
                                 kBase.addInclude( include.trim() );
