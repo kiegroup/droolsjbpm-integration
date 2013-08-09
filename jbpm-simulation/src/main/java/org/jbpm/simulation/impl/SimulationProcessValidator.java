@@ -17,7 +17,8 @@ public class SimulationProcessValidator implements ProcessValidator {
 
     @Override
     public boolean accept(Process process, Resource resource) {
-        if (RuleFlowProcess.RULEFLOW_TYPE.equals(process.getType())
+        if (process != null && RuleFlowProcess.RULEFLOW_TYPE.equals(process.getType())
+                && resource.getSourcePath() != null
                 && resource.getSourcePath().matches(".+\\.bpsim\\.bpmn[2]?$")) {
             return true;
         }
