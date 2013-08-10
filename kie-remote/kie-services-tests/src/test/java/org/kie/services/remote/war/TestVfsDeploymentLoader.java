@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @Startup
-public class TestDeploymentLoader {
+public class TestVfsDeploymentLoader {
     
-    private static final Logger logger = LoggerFactory.getLogger(TestDeploymentLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestVfsDeploymentLoader.class);
 
     @Inject
     @Vfs
