@@ -10,11 +10,19 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jbpm.console.ng.bd.service.AdministrationService;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
+import org.kie.services.remote.rest.exception.TooEarlyException;
 public class ResourceBase {
+
+    protected void checkReadiness(AdministrationService adminService) { 
+        if( ! adminService.getBootstrapDeploymentsDone() ) { 
+            throw new TooEarlyException("Deployments have not yet been bootstrapped.");
+        }
+    }
 
     protected static String checkThatOperationExists(String operation, String[] possibleOperations) {
         for (String oper : possibleOperations) {
@@ -226,5 +234,4 @@ public class ResourceBase {
         
         return pageInfo;
     }
-    
 }

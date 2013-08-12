@@ -28,6 +28,7 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.InternalServerErrorException;
+import org.jbpm.console.ng.bd.service.AdministrationService;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
@@ -49,16 +50,12 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
 @SuppressWarnings("unchecked")
 public class RuntimeResource extends ResourceBase {
 
-    private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
-    
     @Inject
     private ProcessRequestBean processRequestBean;
 
@@ -67,7 +64,10 @@ public class RuntimeResource extends ResourceBase {
 
     @Context
     private HttpServletRequest request;
-
+    
+    @Inject
+    private AdministrationService adminService;
+    
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
     @POST
@@ -75,6 +75,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
+        checkReadiness(adminService);
         return processJaxbCommandsRequest(cmdsRequest, processRequestBean);
     }
 
@@ -82,6 +83,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public JaxbProcessInstanceResponse startNewProcess(@PathParam("processDefId") String processId) {
+        checkReadiness(adminService);
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
@@ -94,6 +96,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}")
     public JaxbProcessInstanceResponse getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
+        checkReadiness(adminService);
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
@@ -110,6 +113,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
     public JaxbGenericResponse abortProcessInstance(@PathParam("procInstId") Long procInstId) {
+        checkReadiness(adminService);
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
         internalDoKieSessionOperation(cmd, "Unable to abort process instance " + procInstId);
@@ -121,6 +125,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
     public JaxbGenericResponse signalProcessInstance(@PathParam("procInstId") Long procInstId) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
@@ -143,6 +148,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/variables")
     public JaxbVariablesResponse getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
+        checkReadiness(adminService);
         Map<String, String> vars = getVariables(procInstId);
         return new JaxbVariablesResponse(vars, request);
     }
@@ -151,6 +157,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/signal/{signal: [a-zA-Z0-9-]+}")
     public JaxbGenericResponse signalEvent(@PathParam("signal") String signal) {
+        checkReadiness(adminService);
         Map<String, List<String>> formParams = getRequestParams(request);
         Object event = getObjectParam("event", false, formParams, "signal/" + signal);
         Command<?> cmd = new SignalEventCommand(signal, event);
@@ -165,6 +172,7 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public JaxbGenericResponse doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
@@ -187,6 +195,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/clear")
     public JaxbGenericResponse clearProcessInstanceLogs() {
+        checkReadiness(adminService);
         Command<?> cmd = new ClearHistoryLogsCommand();
         internalDoKieSessionOperation(cmd, "Unable to clear process instance logs");
         return new JaxbGenericResponse(request);
@@ -196,6 +205,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance")
     public JaxbHistoryLogList getProcessInstanceLogs() {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -211,6 +221,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}")
     public JaxbHistoryLogList getSpecificProcessInstanceLogs(@PathParam("procInstId") long procInstId) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -230,6 +241,7 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
     public JaxbHistoryLogList getVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -264,6 +276,7 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\.]+}")
     public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -292,6 +305,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/history/process/{procId: [a-zA-Z0-9-:\\.]+}")
     public JaxbHistoryLogList getProcessInstanceLogs(@PathParam("procId") String processId) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -311,6 +325,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public JaxbProcessInstanceWithVariablesResponse startNewProcessWithVars(@PathParam("processDefId") String processId) {
+        checkReadiness(adminService);
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
@@ -328,6 +343,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
     public JaxbProcessInstanceWithVariablesResponse getProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+        checkReadiness(adminService);
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
@@ -346,6 +362,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
     public JaxbProcessInstanceWithVariablesResponse signalProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");

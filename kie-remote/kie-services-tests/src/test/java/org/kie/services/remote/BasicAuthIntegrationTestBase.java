@@ -72,6 +72,9 @@ public class BasicAuthIntegrationTestBase {
                 .asResolvedArtifact();
         assertEquals( "Too many jars!", 1, kieServicesRemoteArtifact.length);
         war.addAsLibraries(kieServicesRemoteArtifact[0].asFile());
+       
+        // Add data service resource for tests
+        war.addPackage("org/kie/services/remote/basic/services");
         
         if( useExecServerWebXml ) { 
             war.delete("WEB-INF/web.xml");

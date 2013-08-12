@@ -100,4 +100,10 @@ public class BasicAuthIntegrationTest extends BasicAuthIntegrationTestBase {
         ClientRequestFactory requestFactory = createBasicAuthRequestFactory(deploymentUrl, USER, PASSWORD);
         restTests.restHistoryLogs(deploymentUrl, requestFactory);
     }
+    
+    @Test
+    public void testRestDataServicesCoupling() throws Exception {
+        ClientRequestFactory requestFactory = createBasicAuthRequestFactory(deploymentUrl, USER, PASSWORD);
+        restTests.restDataServiceCoupling(deploymentUrl, requestFactory, USER);
+    }
 }
