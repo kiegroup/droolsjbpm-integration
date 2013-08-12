@@ -49,6 +49,19 @@ public class NoAuthIntegrationTestBase {
                 .asResolvedArtifact();
         artifacts.addAll(Arrays.asList(warArtifacts));
         
+        String [] noTransDeps = { 
+                "org.jbpm:jbpm-console-ng-business-domain-api",
+                "org.jbpm:jbpm-console-ng-process-runtime-api",
+                "org.uberfire:uberfire-backend-api"
+        };
+        
+        warArtifacts = Maven.resolver()
+                .loadPomFromFile("pom.xml")
+                .resolve(noTransDeps)
+                .withoutTransitivity()
+                .asResolvedArtifact();
+        artifacts.addAll(Arrays.asList(warArtifacts));
+        
         List<File> libList = new ArrayList<File>();
         HashSet<String> depSet = new HashSet<String>();
         for( MavenResolvedArtifact artifact : artifacts ) { 

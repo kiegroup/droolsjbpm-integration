@@ -28,22 +28,22 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(Exception e) {
         ResponseBuilder responseBuilder = null;
-        if( e instanceof BadRequestException ) { 
-            responseBuilder = Response.status(400);
-        } else if( e instanceof KieServiceBadRequestException ) { 
-            responseBuilder = Response.status(400);
+        if( e instanceof TooEarlyException ) { 
+            responseBuilder = Response.status(412); // 412: precondition failed
+        } else if( e instanceof BadRequestException ) { 
+            responseBuilder = Response.status(400); // 400: Bad request (due to syntax)
         } else if( e instanceof ReaderException ) { 
             responseBuilder = Response.status(400);
         } else if( e instanceof UnauthorizedException ) { 
-            responseBuilder = Response.status(401);
+            responseBuilder = Response.status(401); // 401: Unauthorized
         } else if( e instanceof NotFoundException ) { 
-            responseBuilder = Response.status(404);
+            responseBuilder = Response.status(404); // 404: Not found
         } else if( e instanceof MethodNotAllowedException ) { 
-            responseBuilder = Response.status(405);
+            responseBuilder = Response.status(405); // 405: (POST, GET, etc.) Method not allowed
         } else if( e instanceof NotAcceptableException ) { 
-            responseBuilder = Response.status(406);
+            responseBuilder = Response.status(406); // 406: Not acceptable (form of request)
         } else if( e instanceof WriterException ) { 
-            responseBuilder = Response.status(500);
+            responseBuilder = Response.status(500); // 500: internal server error
         } else if( e instanceof InternalServerErrorException ) { 
             responseBuilder = Response.status(500);
         } else {

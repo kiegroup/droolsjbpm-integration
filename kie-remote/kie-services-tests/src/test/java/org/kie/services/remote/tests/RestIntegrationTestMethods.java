@@ -270,5 +270,23 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
            assertEquals( "Incorrect process instance id", "var-proc", varLog.getProcessId() );
         }
     }
-    
+ 
+    public void restDataServiceCoupling(URL deploymentUrl, ClientRequestFactory requestFactory, String user) throws Exception {
+        String urlString = new URL(deploymentUrl,  deploymentUrl.getPath() + "rest/runtime/" + deploymentId + "/process/var-proc/start?map_x=initVal").toExternalForm();
+        ClientRequest restRequest = requestFactory.createRequest(urlString);
+
+        // Get and check response
+        logger.debug( ">> " + urlString );
+        ClientResponse<?> responseObj = checkResponse(restRequest.post());
+        JaxbProcessInstanceResponse processInstance = (JaxbProcessInstanceResponse) responseObj.getEntity(JaxbProcessInstanceResponse.class);
+        long procInstId = processInstance.getId();
+
+        urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/data/process/instance/" + procInstId ).toExternalForm();
+        restRequest = requestFactory.createRequest(urlString);
+        logger.debug( ">> [data/process instance]" + urlString );
+        responseObj = checkResponse(restRequest.get());
+        JaxbProcessInstanceSummary summary = (JaxbProcessInstanceSummary) responseObj.getEntity(JaxbProcessInstanceSummary.class);
+        assertEquals("Incorrect initiator.", user, summary.getInitiator());
+    }
+        
 }
