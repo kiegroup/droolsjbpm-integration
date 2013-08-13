@@ -17,6 +17,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
 import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinate;
+import org.jbpm.console.ng.bd.service.AdministrationService;
+import org.jbpm.console.ng.bd.service.TestAdministrationServiceImpl;
 import org.kie.commons.java.nio.file.spi.FileSystemProvider;
 import org.kie.commons.java.nio.fs.file.SimpleFileSystemProvider;
 
@@ -49,19 +51,6 @@ public class NoAuthIntegrationTestBase {
                 .asResolvedArtifact();
         artifacts.addAll(Arrays.asList(warArtifacts));
         
-        String [] noTransDeps = { 
-                "org.jbpm:jbpm-console-ng-business-domain-api",
-                "org.jbpm:jbpm-console-ng-process-runtime-api",
-                "org.uberfire:uberfire-backend-api"
-        };
-        
-        warArtifacts = Maven.resolver()
-                .loadPomFromFile("pom.xml")
-                .resolve(noTransDeps)
-                .withoutTransitivity()
-                .asResolvedArtifact();
-        artifacts.addAll(Arrays.asList(warArtifacts));
-        
         List<File> libList = new ArrayList<File>();
         HashSet<String> depSet = new HashSet<String>();
         for( MavenResolvedArtifact artifact : artifacts ) { 
@@ -86,7 +75,9 @@ public class NoAuthIntegrationTestBase {
                 .addAsWebInfResource("WEB-INF/test-beans.xml", "beans.xml")
                 .addAsWebInfResource("META-INF/ejb-jar.xml", "ejb-jar.xml")
                 .setWebXML("WEB-INF/web.xml")
-                .addAsLibraries(libs);
+                .addAsLibraries(libs)
+                .addClasses(AdministrationService.class, TestAdministrationServiceImpl.class);
+        
         
         // export in order to inspect it
         war.as(ZipExporter.class).exportTo(new File("target/" + war.getName()), true);

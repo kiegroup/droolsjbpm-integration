@@ -138,13 +138,22 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- UI info -->
+    <!-- data service -->
     <dependency>
       <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-console-ng-business-domain-backend</artifactId>
+      <artifactId>jbpm-console-ng-business-domain-api</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>errai-bus</artifactId>
+          <groupId>org.jboss.errai</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jbpm-console-ng-human-tasks-api</artifactId>
+          <groupId>org.jbpm</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
-
   </dependencies>
 
   <dependencyManagement>
@@ -238,7 +247,7 @@
                 </filesets>
               </configuration>
             </plugin>
-            
+
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-surefire-plugin</artifactId>
@@ -336,35 +345,39 @@
             <version>1.5.2</version>
             <executions>
               <execution>
+                <id>fix-jboss-standalone-xml</id>
                 <phase>process-test-resources</phase>
                 <goals>
                   <goal>replace</goal>
                 </goals>
+                <configuration>
+                  <file>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</file>
+                  <outputFile>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</outputFile>
+                  <replacements>
+                    <!-- allow jms queue creation via arquillian server task -->
+                    <replacement>
+                      <token>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;\n\s*&lt;journal</token>
+                      <value>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;
+                        &lt;jmx-management-enabled&gt;true&lt;/jmx-management-enabled&gt;
+                        &lt;journal</value>
+                    </replacement>
+                    <replacement>
+                      <!-- Service jboss.pojo."org.jboss.netty.internal.LoggerConfigurator".DESCRIBED is already registered -->
+                      <token>&lt;extension module="org.jboss.as.pojo"/&gt;</token>
+                      <value></value>
+                    </replacement>
+                    <replacement>
+                      <token>&lt;subsystem xmlns="urn:jboss:domain:pojo:1.0"/&gt;</token>
+                      <value></value>
+                    </replacement>
+                    <!-- @formatter: on -->
+                  </replacements>
+                </configuration>
               </execution>
+              <!-- This won't fire if the tests don't run.. <execution> <id>fix-broken-junit-reports</id> <phase>test</phase> <goals> 
+                <goal>replace</goal> </goals> <configuration> <includes> <include>${project.build.directory}/surefire-reports/TEST*.xml</include> </includes> 
+                <tokenFile>replace-tokenFile.txt</tokenFile> </configuration> </execution> -->
             </executions>
-            <configuration>
-              <file>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</file>
-              <outputFile>${project.build.directory}/${jboss.server.name}/standalone/configuration/standalone-full.xml</outputFile>
-              <replacements>
-                <!-- allow jms queue creation via arquillian server task -->
-                <replacement>
-                  <token>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;\n\s*&lt;journal</token>
-                  <value>&lt;persistence-enabled&gt;true&lt;/persistence-enabled&gt;
-                    &lt;jmx-management-enabled&gt;true&lt;/jmx-management-enabled&gt;
-                    &lt;journal</value>
-                </replacement>
-                <replacement>
-                  <!-- Service jboss.pojo."org.jboss.netty.internal.LoggerConfigurator".DESCRIBED is already registered -->
-                  <token>&lt;extension module="org.jboss.as.pojo"/&gt;</token>
-                  <value></value>
-                </replacement>
-                <replacement>
-                  <token>&lt;subsystem xmlns="urn:jboss:domain:pojo:1.0"/&gt;</token>
-                  <value></value>
-                </replacement>
-                <!-- @formatter: on -->
-              </replacements>
-            </configuration>
           </plugin>
         </plugins>
       </build>
