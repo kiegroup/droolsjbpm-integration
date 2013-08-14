@@ -11,11 +11,13 @@
   <artifactId>kie-services-tests</artifactId>
   <name>KIE Remote Services :: Tests</name>
 
-  <!-- DO NOT TOUCH THESE PROPERTIES -->
-  <!-- If you want to modify these, please contact mriet first! -->
   <properties>
+    <!-- DO NOT TOUCH THESE PROPERTIES -->
+    <!-- If you want to modify these, please contact mriet first! -->
     <arquillian.version>1.1.1.Final</arquillian.version>
     <shrinkwrap.resolver.version>2.0.0</shrinkwrap.resolver.version>
+
+    <skip.integration.tests>true</skip.integration.tests>
   </properties>
 
   <dependencies>
@@ -195,7 +197,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
-          <skipTests>true</skipTests>
+          <skipTests>${skip.integration.tests}</skipTests>
         </configuration>
       </plugin>
     </plugins>
@@ -215,6 +217,8 @@
         <!-- If you want to modify this, please contact mriet first! -->
         <version.org.jboss.as.dist>7.2.0.Final-redhat-8</version.org.jboss.as.dist>
         <jboss.server.name>jboss-eap-6.1</jboss.server.name>
+
+        <skip.integration.tests>false</skip.integration.tests>
       </properties>
 
       <dependencies>
@@ -250,16 +254,24 @@
 
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
+              <artifactId>maven-failsafe-plugin</artifactId>
               <version>2.15</version>
+              <executions>
+                <execution>
+                  <id>integration-test</id>
+                  <goals>
+                    <goal>integration-test</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>verify</id>
+                  <goals>
+                    <goal>verify</goal>
+                  </goals>
+                </execution>
+              </executions>
               <configuration>
                 <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
-                <includes>
-                  <include>**/*IntegrationTest.java</include>
-                </includes>
-                <excludes>
-                  <exclude>nothing</exclude>
-                </excludes>
               </configuration>
             </plugin>
           </plugins>
@@ -374,9 +386,24 @@
                   </replacements>
                 </configuration>
               </execution>
-              <!-- This won't fire if the tests don't run.. <execution> <id>fix-broken-junit-reports</id> <phase>test</phase> <goals> 
-                <goal>replace</goal> </goals> <configuration> <includes> <include>${project.build.directory}/surefire-reports/TEST*.xml</include> </includes> 
-                <tokenFile>replace-tokenFile.txt</tokenFile> </configuration> </execution> -->
+              <execution>
+                <id>fix-broken-junit-reports</id>
+                <!-- 
+                <phase>validate</phase>
+                -->
+                <phase>post-integration-test</phase> 
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+                <configuration>
+                  <basedir>${project.build.directory}/failsafe-reports</basedir>
+                  <includes>
+                    <include>TEST*xml</include>
+                  </includes>
+                  <unescape>true</unescape>
+                  <tokenValueMap>replace-tokenFile.txt</tokenValueMap>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -384,4 +411,3 @@
     </profile>
   </profiles>
 </project>
-
