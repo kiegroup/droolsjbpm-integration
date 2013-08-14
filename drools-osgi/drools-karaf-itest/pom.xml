@@ -57,7 +57,6 @@
       <groupId>org.apache.karaf.assemblies.features</groupId>
       <artifactId>standard</artifactId>
       <type>xml</type>
-      <version>2.3.0</version>
       <classifier>features</classifier>
       <scope>test</scope>
     </dependency>
