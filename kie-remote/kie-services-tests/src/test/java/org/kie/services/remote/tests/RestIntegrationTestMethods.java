@@ -18,7 +18,6 @@
 package org.kie.services.remote.tests;
 
 import static org.junit.Assert.*;
-import static org.kie.services.remote.setup.TestConstants.VFS_DEPLOYMENT_ID;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -75,7 +74,7 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
         responseObj.resetStream();
         int status = responseObj.getStatus(); 
         if( status != 200 ) { 
-            logger.warn(responseObj.getEntity(String.class));
+            logger.warn("Response with exception:\n" + responseObj.getEntity(String.class));
             assertEquals( "Incorrect status", 200, status);
         } 
         return responseObj;
@@ -117,7 +116,7 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
         String urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/runtime/" + deploymentId + "/execute").toExternalForm();
         
         ClientRequest restRequest = requestFactory.createRequest(urlString);
-        JaxbCommandsRequest commandMessage = new JaxbCommandsRequest(VFS_DEPLOYMENT_ID, new StartProcessCommand("org.jbpm.humantask"));
+        JaxbCommandsRequest commandMessage = new JaxbCommandsRequest(deploymentId, new StartProcessCommand("org.jbpm.humantask"));
         String body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         restRequest.body(MediaType.APPLICATION_XML, body);
 
@@ -129,7 +128,7 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
 
         // query tasks
         restRequest = requestFactory.createRequest(urlString);
-        commandMessage = new JaxbCommandsRequest(VFS_DEPLOYMENT_ID, new GetTasksByProcessInstanceIdCommand(procInstId));
+        commandMessage = new JaxbCommandsRequest(deploymentId, new GetTasksByProcessInstanceIdCommand(procInstId));
         body = JaxbSerializationProvider.convertJaxbObjectToString(commandMessage);
         restRequest.body(MediaType.APPLICATION_XML, body);
 
@@ -166,14 +165,14 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
     }
 
     public void remoteApiHumanTaskProcess(URL deploymentUrl) throws Exception {
-        RemoteRestSessionFactory restSessionFactory = new RemoteRestSessionFactory(VFS_DEPLOYMENT_ID, deploymentUrl.toExternalForm());
+        RemoteRestSessionFactory restSessionFactory = new RemoteRestSessionFactory(deploymentId, deploymentUrl.toExternalForm());
         internalRemoteApiHumanTaskProcess(restSessionFactory);
     }
     
     public void remoteApiHumanTaskProcess(URL deploymentUrl, AuthenticationType authType, String user, String password) throws Exception {
         // create REST request
         RemoteRestSessionFactory restSessionFactory 
-            = new RemoteRestSessionFactory(VFS_DEPLOYMENT_ID, deploymentUrl.toExternalForm(), authType, user, password);
+            = new RemoteRestSessionFactory(deploymentId, deploymentUrl.toExternalForm(), authType, user, password);
         internalRemoteApiHumanTaskProcess(restSessionFactory);
     }
     
@@ -211,12 +210,12 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
     }
     
     public void executeTaskCommands(URL deploymentUrl, ClientRequestFactory requestFactory) throws Exception {
-        RuntimeEngine engine = new RemoteRestSessionFactory(VFS_DEPLOYMENT_ID, deploymentUrl.toExternalForm()).newRuntimeEngine();
+        RuntimeEngine engine = new RemoteRestSessionFactory(deploymentId, deploymentUrl.toExternalForm()).newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         
         long processInstanceId = processInstance.getId();
-        JaxbCommandResponse<?> response = executeTaskCommand(deploymentUrl, requestFactory, VFS_DEPLOYMENT_ID, new GetTasksByProcessInstanceIdCommand(processInstanceId));
+        JaxbCommandResponse<?> response = executeTaskCommand(deploymentUrl, requestFactory, deploymentId, new GetTasksByProcessInstanceIdCommand(processInstanceId));
         
         long taskId = ((JaxbLongListResponse) response).getResult().get(0);
         Map<String, Object> params = new HashMap<String, Object>();
@@ -227,7 +226,7 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
         List<Command<?>> commands = new ArrayList<Command<?>>();
         commands.add(command);
         
-        String urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/runtime/" + VFS_DEPLOYMENT_ID + "/execute").toExternalForm();
+        String urlString = new URL(deploymentUrl, deploymentUrl.getPath() + "rest/runtime/" + deploymentId + "/execute").toExternalForm();
         logger.info("Client request to: " + urlString);
         ClientRequest restRequest = requestFactory.createRequest(urlString);
         

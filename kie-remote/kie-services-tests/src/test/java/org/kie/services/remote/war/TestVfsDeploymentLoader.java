@@ -24,7 +24,7 @@ public class TestVfsDeploymentLoader {
     
     @PostConstruct
     public void init() { 
-        logger.warn("Initializing the 'test' domain.");
+        logger.info("Initializing the 'test' domain.");
         DeploymentUnit deploymentUnit = new VFSDeploymentUnit("test", "", "src/test/resources/repo/test/");
         deploymentService.deploy(deploymentUnit);
     }
