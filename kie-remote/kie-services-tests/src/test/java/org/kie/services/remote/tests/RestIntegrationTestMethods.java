@@ -211,7 +211,15 @@ public class RestIntegrationTestMethods extends AbstractIntegrationTestMethods {
     
     public void executeTaskCommands(URL deploymentUrl, ClientRequestFactory requestFactory) throws Exception {
         RuntimeEngine engine = new RemoteRestSessionFactory(deploymentId, deploymentUrl.toExternalForm()).newRuntimeEngine();
-        KieSession ksession = engine.getKieSession();
+        internalExecuteTaskCommands(deploymentUrl, requestFactory, engine);
+    }
+    public void executeTaskCommands(URL deploymentUrl, ClientRequestFactory requestFactory, AuthenticationType authType, String user, String password) throws Exception {
+        RuntimeEngine engine = new RemoteRestSessionFactory(deploymentId, deploymentUrl.toExternalForm(), authType, user, password).newRuntimeEngine();
+        internalExecuteTaskCommands(deploymentUrl, requestFactory, engine);
+    }
+    
+    private void internalExecuteTaskCommands(URL deploymentUrl, ClientRequestFactory requestFactory, RuntimeEngine runtimeEngine) throws Exception {
+        KieSession ksession = runtimeEngine.getKieSession();
         ProcessInstance processInstance = ksession.startProcess("org.jbpm.humantask");
         
         long processInstanceId = processInstance.getId();

@@ -388,9 +388,6 @@
               </execution>
               <execution>
                 <id>fix-broken-junit-reports</id>
-                <!-- 
-                <phase>validate</phase>
-                -->
                 <phase>post-integration-test</phase> 
                 <goals>
                   <goal>replace</goal>
@@ -401,7 +398,7 @@
                     <include>TEST*xml</include>
                   </includes>
                   <unescape>true</unescape>
-                  <tokenValueMap>replace-tokenFile.txt</tokenValueMap>
+                  <tokenValueMap>${basedir}/replace-tokenFile.txt</tokenValueMap>
                 </configuration>
               </execution>
             </executions>
