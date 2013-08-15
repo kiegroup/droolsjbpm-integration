@@ -92,7 +92,7 @@ public class BasicAuthIntegrationTest extends BasicAuthIntegrationTestBase {
     @Test
     public void testRestExecuteTaskCommands() throws Exception  {
         ClientRequestFactory requestFactory = createBasicAuthRequestFactory(deploymentUrl, USER, PASSWORD);
-        restTests.executeTaskCommands(deploymentUrl, requestFactory);
+        restTests.executeTaskCommands(deploymentUrl, requestFactory, AuthenticationType.BASIC, USER, PASSWORD);
     }
     
     @Test
