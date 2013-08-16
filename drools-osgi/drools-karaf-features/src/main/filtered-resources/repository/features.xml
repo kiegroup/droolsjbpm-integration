@@ -4,23 +4,23 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
-  <repository>mvn:org.apache.camel.karaf/apache-camel/${version.org.apache.camel}/xml/features</repository>
-  <repository>mvn:org.apache.cxf.karaf/apache-cxf/${version.org.apache.cxf}/xml/features</repository>
+  <repository>mvn:org.apache.camel.karaf/apache-camel/${karaf.version.org.apache.camel}/xml/features</repository>
+  <repository>mvn:org.apache.cxf.karaf/apache-cxf/${karaf.version.org.apache.cxf}/xml/features</repository>
 
   <feature name="drools-common" version="${drools.version}" description="Drools Commons">
     <feature version="[2.6,3.0)">cxf-specs</feature>
-    <bundle>mvn:com.google.protobuf/protobuf-java/${version.com.google.protobuf}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${servicemix-antlr-bundle.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${servicemix-xstream-bundle.version}</bundle>
-    <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${servicemix-jaxb-spec.version}</bundle>
-    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${servicemix-jaxb.version}</bundle>
-    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${servicemix-jaxb.version}</bundle>
-    <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
-    <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${eclipse-jdt.version}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${eclipse-jdt.version}</bundle>
-    <bundle>wrap:mvn:org.codehaus.janino/janino/${janino.version}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${janino.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${servicemix-quartz-bundle.version}</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${javax-inject.version}</bundle>
-    <bundle>wrap:mvn:javax.enterprise/cdi-api/1.0-SP4</bundle>
+    <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
+    <bundle>mvn:org.mvel/mvel2/${karaf.version.org.mvel}</bundle>
+    <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${karaf.version.org.eclipse.jdt.core.compiler}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt.core.compiler}</bundle>
+    <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
+    <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
   </feature>
 
   <feature name="drools-module" version="${drools.version}" description="Drools core">
@@ -43,8 +43,8 @@
   <feature name="drools5-camel" version="${drools.version}" description="Drools5 Camel">
     <feature version="${drools.version}">drools-module</feature>
     <feature version="${drools.version}">drools5-spring</feature>
-    <feature version="${version.org.apache.camel}">camel</feature>
-    <feature version="${version.org.apache.camel}">camel-cxf</feature>
+    <feature version="${karaf.version.org.apache.camel}">camel</feature>
+    <feature version="${karaf.version.org.apache.camel}">camel-cxf</feature>
     <feature version="[2.6,3.0)">cxf-specs</feature>
     <feature version="[2.6,3.0)">cxf-core</feature>
     <feature version="[2.6,3.0)">cxf-jaxrs</feature>
@@ -54,16 +54,15 @@
   <feature name="drools-decisiontable" description="Drools Decision Tables" version="${drools.version}">
     <feature version="${drools.version}">drools-module</feature>
     <feature version="${drools.version}">drools-templates</feature>
-    <bundle>wrap:mvn:net.sourceforge.jexcelapi/jxl/${jexcelapi.version}</bundle>
-    <bundle>mvn:commons-codec/commons-codec/1.7</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/3.9_2</bundle>
+    <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${drools.version}</bundle>
   </feature>
 
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
     <feature version="[3.0,4.0)">spring-orm</feature>
-    <feature version="[${aries.jpa.version},2.0)">jpa</feature>
+    <feature version="[${karaf.version.org.apache.aries.jpa},2.0)">jpa</feature>
     <bundle>mvn:org.drools/drools-persistence-jpa/${drools.version}</bundle>
   </feature>
 
@@ -92,8 +91,8 @@
     <feature version="${drools.version}">kie</feature>
     <feature version="${drools.version}">kie-spring</feature>
     <feature version="${drools.version}">jbpm</feature>
-    <feature version="${version.org.apache.camel}">camel</feature>
-    <feature version="${version.org.apache.camel}">camel-cxf</feature>
+    <feature version="${karaf.version.org.apache.camel}">camel</feature>
+    <feature version="${karaf.version.org.apache.camel}">camel-cxf</feature>
     <feature version="[2.6,3.0)">cxf-specs</feature>
     <feature version="[2.6,3.0)">cxf-core</feature>
     <feature version="[2.6,3.0)">cxf-jaxrs</feature>
@@ -102,10 +101,10 @@
 
   <feature name="jbpm" version="${project.version}" description="jBPM engine">
     <feature version="${project.version}">drools-module</feature>
-    <bundle>mvn:joda-time/joda-time/${version.joda-time}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-flow-builder/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-flow/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-bpmn2/${drools.version}</bundle>
+    <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-flow-builder/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-flow/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-bpmn2/${jbpm.version}</bundle>
   </feature>
 
   <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
@@ -116,21 +115,21 @@
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
     <bundle>wrap:mvn:org.apache.geronimo.specs/geronimo-jacc_1.1_spec/1.0</bundle>
-    <bundle>wrap:mvn:org.jboss.seam.transaction/seam-transaction-api/3.1.0.Final</bundle>
-    <bundle>wrap:mvn:org.jboss.weld/weld-core/${version.org.jboss.weld}</bundle>
-    <bundle>wrap:mvn:org.jboss.solder/solder-api/3.2.0.Final</bundle>
-    <bundle>wrap:mvn:org.apache.helix/helix-core/0.6.1-incubating</bundle>
+    <bundle>wrap:mvn:org.jboss.seam.transaction/seam-transaction-api/${karaf.version.org.jboss.seam}</bundle>
+    <bundle>wrap:mvn:org.jboss.weld/weld-core/${karaf.version.org.jboss.weld}</bundle>
+    <bundle>wrap:mvn:org.jboss.solder/solder-api/${karaf.version.org.jboss.solder}</bundle>
+    <bundle>wrap:mvn:org.apache.helix/helix-core/${karaf.version.org.apache.helix}</bundle>
     <bundle>mvn:org.kie.commons/kie-nio2-model/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-cdi/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-validation/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-data/${drools.version}</bundle>
     <bundle>mvn:org.kie.commons/kie-commons-io/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-audit/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-shared-services/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-runtime-manager/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-human-task-core/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${drools.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${drools.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-audit/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-shared-services/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-runtime-manager/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${jbpm.version}</bundle>
   </feature>
 
   <feature name="drools5-camel-example" version="${drools.version}" description="Drools5 Spring Camel Example">

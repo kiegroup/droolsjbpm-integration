@@ -14,18 +14,39 @@
   <name>Drools :: Karaf Features</name>
 
   <properties>
-    <aries.jpa.version>1.0.1</aries.jpa.version>
-    <jexcelapi.version>2.6.12</jexcelapi.version>
-    <javax-inject.version>1.0</javax-inject.version>
-    <eclipse-jdt.version>4.2.1</eclipse-jdt.version>
-    <janino.version>2.6.1</janino.version>
-    <servicemix-antlr-bundle.version>3.5_1</servicemix-antlr-bundle.version>
-    <servicemix-jaxb.version>2.2.1.1_2</servicemix-jaxb.version>
-    <servicemix-jaxb-spec.version>1.9.0</servicemix-jaxb-spec.version>
-    <servicemix-quartz-bundle.version>2.1.6_1</servicemix-quartz-bundle.version>
-    <servicemix-protobuf-google-bundle.version>2.4.1_1</servicemix-protobuf-google-bundle.version>
-    <servicemix-xstream-bundle.version>1.4.3_1</servicemix-xstream-bundle.version>
-    <servicemix-woodstock-bundle.version>3.2.9_3</servicemix-woodstock-bundle.version>
+    <!--
+      CONVENTIONS:
+      - All properties used in features.xml are declared here with the prefix "karaf.".
+      - If a property relates to a version property in kie-parent-with-dependencies or jboss-integration-platform-bom,
+        then it must follow the pattern "karaf.[servicemix.]{relatedVersionPropertyName}".
+    -->
+    <!-- Normal reuses -->
+    <karaf.version.org.apache.camel>${version.org.apache.camel}</karaf.version.org.apache.camel>
+    <karaf.version.org.apache.cxf>${version.org.apache.cxf}</karaf.version.org.apache.cxf>
+    <karaf.version.org.apache.helix>${version.org.apache.helix}</karaf.version.org.apache.helix>
+    <karaf.version.com.google.protobuf>${version.com.google.protobuf}</karaf.version.com.google.protobuf>
+    <karaf.version.joda-time>${version.joda-time}</karaf.version.joda-time>
+    <karaf.version.org.jboss.solder>${version.org.jboss.solder}</karaf.version.org.jboss.solder>
+    <karaf.version.org.jboss.seam>${version.org.jboss.seam}</karaf.version.org.jboss.seam>
+    <karaf.version.org.jboss.weld>${version.org.jboss.weld}</karaf.version.org.jboss.weld>
+    <karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>
+    <!-- Overwrites with a different Maven version -->
+    <karaf.version.commons-codec>1.7</karaf.version.commons-codec>
+    <karaf.version.javax.enterprise.cdi>1.0-SP4</karaf.version.javax.enterprise.cdi>
+    <karaf.version.javax.inject>1.0</karaf.version.javax.inject>
+    <karaf.version.org.codehaus.janino>2.6.1</karaf.version.org.codehaus.janino>
+    <karaf.version.org.eclipse.jdt.core.compiler>4.2.1</karaf.version.org.eclipse.jdt.core.compiler>
+    <!-- Overwrites with a servicemix version -->
+    <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
+    <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.2.1.1_2</karaf.servicemix.version.com.sun.xml.bind.jaxb>
+    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.3_1</karaf.servicemix.version.com.thoughtworks.xstream>
+    <karaf.servicemix.version.javax.xml.bind.jaxb>1.9.0</karaf.servicemix.version.javax.xml.bind.jaxb>
+    <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
+    <karaf.servicemix.version.org.apache.poi>3.9_2</karaf.servicemix.version.org.apache.poi>
+    <karaf.servicemix.version.org.codehaus.woodstox>3.2.9_3</karaf.servicemix.version.org.codehaus.woodstox>
+    <karaf.servicemix.version.org.quartz-scheduler>2.1.6_1</karaf.servicemix.version.org.quartz-scheduler>
+    <!-- Special overwrites -->
+    <karaf.version.org.apache.aries.jpa>1.0.1</karaf.version.org.apache.aries.jpa>
   </properties>
 
   <build>
