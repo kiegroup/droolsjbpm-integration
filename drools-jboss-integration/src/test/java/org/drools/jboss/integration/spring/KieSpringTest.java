@@ -21,8 +21,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Basic test of kie-spring in JBoss AS container.
- *
- * @author mwinkler
  */
 @RunWith(Arquillian.class)
 @Ignore
