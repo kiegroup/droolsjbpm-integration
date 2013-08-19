@@ -41,6 +41,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>javax.ejb</groupId>
+      <artifactId>javax.ejb-api</artifactId>
+      <version>3.2</version>
+    </dependency>
+    
     <!-- test -->
     <dependency>
       <groupId>junit</groupId>
@@ -387,7 +393,7 @@
               </execution>
               <execution>
                 <id>fix-broken-junit-reports</id>
-                <phase>post-integration-test</phase> 
+                <phase>post-integration-test</phase>
                 <goals>
                   <goal>replace</goal>
                 </goals>
