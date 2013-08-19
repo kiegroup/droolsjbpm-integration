@@ -21,7 +21,6 @@ public class KieSpringNamespaceHandler extends NamespaceHandlerSupport {
 
     public void init() {
         registerBeanDefinitionParser("kstore", new KStoreDefinitionParser());
-        registerBeanDefinitionParser("releaseId", new ReleaseIdDefinitionParser());
         registerBeanDefinitionParser("kmodule", new KModuleDefinitionParser());
         registerBeanDefinitionParser("kbase", new KBaseDefinitionParser());
         registerBeanDefinitionParser("ksession", new KSessionDefinitionParser());
