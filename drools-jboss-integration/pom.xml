@@ -109,6 +109,13 @@
       <artifactId>kie-wb-common-services-api</artifactId>
     </dependency>
 
+    <!-- Kie Spring -->
+    
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
+    </dependency>
+
     <!-- UberFire -->
 
     <dependency>
