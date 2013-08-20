@@ -147,7 +147,7 @@ public class KieObjectsInjector implements BeanProcessor {
             Class<?> c = Class.forName(ClasspathKieProject.OSGI_KIE_MODULE_CLASS_NAME, true, KieBuilderImpl.class.getClassLoader());
             m = c.getMethod("create", URL.class, ReleaseId.class, KieModuleModel.class);
         } catch (Exception e) {
-            throw new RuntimeException("It is necessary to have the drools-osgi-integration module on the path in order to create a KieProject from an ogsi bundle", e);
+            throw new RuntimeException("It is necessary to have the drools-osgi-integration module on the path in order to create a KieProject from an osgi bundle", e);
         }
         try {
             return (InternalKieModule) m.invoke(null, configFileURL, releaseId, kieProject);
