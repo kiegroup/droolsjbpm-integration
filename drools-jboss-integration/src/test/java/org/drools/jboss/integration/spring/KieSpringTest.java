@@ -54,7 +54,7 @@ public class KieSpringTest {
 
         assertNotNull("KieBase should not be null", kbase);
         assertEquals("Unexpected number of packages in kbase",
-                2, kbase.getKiePackages().size());
+                1, kbase.getKiePackages().size());
     }
 
     /**
