@@ -51,13 +51,6 @@
       <scope>provided</scope>
     </dependency>
     
-    <!-- administration service -->
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-console-ng-business-domain-backend</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- jms -->
     <dependency>
       <groupId>javax.jms</groupId>
