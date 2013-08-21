@@ -33,15 +33,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-wb-distribution-wars</artifactId>
-      <version>${project.version}</version>
-      <classifier>jboss-as7</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>javax.ejb</groupId>
       <artifactId>javax.ejb-api</artifactId>
       <version>3.2</version>
@@ -213,10 +204,7 @@
     <profile>
       <id>integration-tests</id>
       <activation>
-        <property>
-          <name>env.USER</name>
-          <value>hudson</value>
-        </property>
+        <!-- these tests will move to kie-tests -->
       </activation>
       <properties>
         <!-- DO NOT TOUCH! -->
