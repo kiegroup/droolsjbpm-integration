@@ -20,7 +20,6 @@
   <modules>
     <module>kie-services-client</module>
     <module>kie-services-remote</module>
-    <module>kie-services-tests</module>
   </modules>
   
 </project>
