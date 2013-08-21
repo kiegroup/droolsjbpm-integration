@@ -26,7 +26,6 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.NotFoundException;
-import org.jbpm.console.ng.bd.service.AdministrationService;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.TaskImpl;
@@ -64,9 +63,6 @@ public class TaskResource extends ResourceBase {
     @Inject
     private IdentityProvider identityProvider;
    
-    @Inject
-    private AdministrationService adminService;
-    
     private static String[] allowedOperations = { 
         "activate", 
         "claim", 
@@ -102,7 +98,6 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        checkReadiness(adminService);
         return processJaxbCommandsRequest(cmdsRequest, processRequestBean);
     }
 
@@ -110,7 +105,6 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/query")
     public JaxbTaskSummaryListResponse query(@Context UriInfo uriInfo) {
-        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         
         List<Long> workItemIdList = getLongListParam(allowedQueryParams[0], false, params, "query", true);
@@ -275,7 +269,6 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}")
     public JaxbTask getTaskInstanceInfo(@PathParam("taskId") long taskId) { 
-        checkReadiness(adminService);
         Command<?> cmd = new GetTaskCommand(taskId);
         Task task = (Task) internalDoTaskOperation(cmd, "Unable to get task " + taskId);
         if( task == null ) { 
@@ -288,7 +281,6 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public JaxbGenericResponse doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
-        checkReadiness(adminService);
         Map<String, List<String>> params = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
@@ -349,7 +341,6 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}/content")
     public JaxbContent getTaskContent(@PathParam("taskId") long taskId) { 
-        checkReadiness(adminService);
         Command<?> cmd = new GetTaskCommand(taskId);
         Object result = internalDoTaskOperation(cmd, "Unable to get task " + taskId);
         if( result == null ) { 
@@ -369,7 +360,6 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/content/{contentId: [0-9-]+}")
     public JaxbContent getContent(@PathParam("contentId") long contentId) { 
-        checkReadiness(adminService);
         Command<?> cmd = new GetContentCommand(contentId);
         Content content = (Content) internalDoTaskOperation(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 
