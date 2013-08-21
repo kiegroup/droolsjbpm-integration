@@ -20,13 +20,16 @@ import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieBaseModelImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.compiler.kproject.models.KieSessionModelImpl;
+import org.drools.core.ClockType;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
 
+import org.kie.api.conf.DeclarativeAgendaOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
+import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.spring.factorybeans.KBaseFactoryBean;
 import org.kie.spring.factorybeans.KModuleFactoryBean;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
@@ -154,7 +157,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 kBase.setKModule(kieModuleModel);
 
                 kBase.setName( getPropertyValue( beanDefinition, "kBaseName" ));
-                kBase.setDefault( "true".equals( getPropertyValue(beanDefinition, "default") ) );
+                kBase.setDefault( "true".equals( getPropertyValue(beanDefinition, "def") ) );
 
                 String packages = getPropertyValue( beanDefinition, "packages" );
                 if ( !packages.isEmpty() ) {
@@ -166,7 +169,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 String includes = getPropertyValue( beanDefinition, "includes" );
                 if ( !includes.isEmpty() ) {
                     for ( String include : includes.split( "," ) ) {
-                        kBase.addInclude( include.trim() );
+                        kBase.addInclude(include.trim());
                     }
                 }
 
@@ -177,7 +180,12 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
                 String equalsBehavior = getPropertyValue(beanDefinition, "equalsBehavior");
                 if ( !equalsBehavior.isEmpty() ) {
-                    kBase.setEqualsBehavior( EqualityBehaviorOption.valueOf(equalsBehavior.toUpperCase()) );
+                    kBase.setEqualsBehavior( EqualityBehaviorOption.determineEqualityBehavior(equalsBehavior) );
+                }
+
+                String declarativeAgenda = getPropertyValue(beanDefinition, "declarativeAgenda");
+                if ( !declarativeAgenda.isEmpty() ) {
+                    kBase.setDeclarativeAgenda(DeclarativeAgendaOption.determineDeclarativeAgenda(declarativeAgenda));
                 }
 
                 String scope = getPropertyValue(beanDefinition, "scope");
@@ -201,15 +209,28 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
             if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KSessionFactoryBean.class.getName())){
-                String name = getPropertyValue(beanDefinition, "name");
-                String type = getPropertyValue(beanDefinition, "type");
                 String kBaseName = getPropertyValue(beanDefinition, "kBaseName");
                 if ( kBase.getName().equalsIgnoreCase(kBaseName)) {
+                    String name = getPropertyValue(beanDefinition, "name");
+                    String type = getPropertyValue(beanDefinition, "type");
                     KieSessionModelImpl kSession = new KieSessionModelImpl(kBase, name);
+
                     kSession.setType(!type.isEmpty() ? KieSessionModel.KieSessionType.valueOf(type.toUpperCase()) : KieSessionModel.KieSessionType.STATEFUL);
                     Map<String, KieSessionModel> rawKieSessionModels = kBase.getRawKieSessionModels();
                     rawKieSessionModels.put(kSession.getName(), kSession);
                     beanDefinition.getPropertyValues().addPropertyValue(new PropertyValue("releaseId", releaseId));
+
+                    kSession.setDefault( "true".equals( getPropertyValue(beanDefinition, "def") ) );
+
+                    String clockType = getPropertyValue(beanDefinition, "clockType");
+                    if ( !clockType.isEmpty() ) {
+                        kSession.setClockType( ClockTypeOption.get(clockType) );
+                    }
+
+                    String scope = getPropertyValue(beanDefinition, "scope");
+                    if ( !scope.isEmpty() ) {
+                        kSession.setScope( scope.trim() );
+                    }
                 }
             }
         }

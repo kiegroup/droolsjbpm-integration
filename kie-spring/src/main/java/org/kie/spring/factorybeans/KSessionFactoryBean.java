@@ -66,6 +66,8 @@ public class KSessionFactoryBean
 
     private ReleaseId releaseId;
 
+    private String def;
+
     public KSessionFactoryBean() {
         agendaEventListeners = new ArrayList<AgendaEventListener>();
         processEventListeners = new ArrayList<ProcessEventListener>();
@@ -134,6 +136,14 @@ public class KSessionFactoryBean
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getDef() {
+        return def;
+    }
+
+    public void setDef(String def) {
+        this.def = def;
     }
 
     public Object getObject() throws Exception {

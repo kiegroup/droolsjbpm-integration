@@ -8,6 +8,7 @@ public class KBaseOptions {
     private String includes;
     private String eventProcessingMode;
     private String equalsBehavior;
+    private String declarativeAgenda;
     private String scope;
     private String def;
 
@@ -60,5 +61,13 @@ public class KBaseOptions {
 
     public void setDef(String def) {
         this.def = def;
+    }
+
+    public String getDeclarativeAgenda() {
+        return declarativeAgenda;
+    }
+
+    public void setDeclarativeAgenda(String declarativeAgenda) {
+        this.declarativeAgenda = declarativeAgenda;
     }
 }

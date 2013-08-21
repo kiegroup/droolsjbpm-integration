@@ -61,6 +61,8 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String WORK_ITEM = "work-item-handler";
     private static final String ID_ATTRIBUTE = "id";
 
+    private static final String ATTRIBUTE_DEFAULT = "default";
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -73,6 +75,7 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
 
         element.setAttribute("name", id);
         element.setAttribute("id", id);
+        factory.addPropertyValue("def", element.getAttribute(ATTRIBUTE_DEFAULT));
 
         String type = element.getAttribute(ATTRIBUTE_TYPE);
         if (!StringUtils.hasLength(type)){

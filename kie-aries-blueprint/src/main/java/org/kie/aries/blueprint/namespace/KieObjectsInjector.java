@@ -34,6 +34,9 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.conf.DeclarativeAgendaOption;
+import org.kie.api.conf.EqualityBehaviorOption;
+import org.kie.api.conf.EventProcessingOption;
 import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
 import org.osgi.framework.FrameworkUtil;
@@ -202,6 +205,21 @@ public class KieObjectsInjector implements BeanProcessor {
                             for ( String include : includes.split( "," ) ) {
                                 kBase.addInclude( include.trim() );
                             }
+                        }
+
+                        String equalsBehavior = kBaseOptions.getEqualsBehavior();
+                        if ( !equalsBehavior.isEmpty() ) {
+                            kBase.setEqualsBehavior( EqualityBehaviorOption.determineEqualityBehavior(equalsBehavior) );
+                        }
+
+                        String eventProcessingMode = kBaseOptions.getEventProcessingMode();
+                        if ( !eventProcessingMode.isEmpty() ) {
+                            kBase.setEventProcessingMode( EventProcessingOption.determineEventProcessingMode(eventProcessingMode) );
+                        }
+
+                        String declarativeAgenda = kBaseOptions.getDeclarativeAgenda();
+                        if ( !declarativeAgenda.isEmpty() ) {
+                            kBase.setDeclarativeAgenda( DeclarativeAgendaOption.determineDeclarativeAgenda(declarativeAgenda) );
                         }
 
                         kieModuleModel.getRawKieBaseModels().put(kBase.getName(), kBase);
