@@ -38,6 +38,7 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String ATTRIBUTE_INCLUDES = "includes";
     private static final String ATTRIBUTE_EVENT_MODE = "eventProcessingMode";
     private static final String ATTRIBUTE_EQUALS = "equalsBehavior";
+    private static final String ATTRIBUTE_DECLARATIVE_AGENDA = "declarativeAgenda";
     private static final String ATTRIBUTE_SCOPE = "scope";
     private static final String ATTRIBUTE_DEFAULT = "default";
 
@@ -54,6 +55,7 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
         factory.addPropertyValue("includes", element.getAttribute(ATTRIBUTE_INCLUDES));
         factory.addPropertyValue("eventProcessingMode", element.getAttribute(ATTRIBUTE_EVENT_MODE));
         factory.addPropertyValue("equalsBehavior", element.getAttribute(ATTRIBUTE_EQUALS));
+        factory.addPropertyValue("declarativeAgenda", element.getAttribute(ATTRIBUTE_DECLARATIVE_AGENDA));
         factory.addPropertyValue("scope", element.getAttribute(ATTRIBUTE_SCOPE));
         factory.addPropertyValue("def", element.getAttribute(ATTRIBUTE_DEFAULT));
 

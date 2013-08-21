@@ -34,6 +34,7 @@ public class KBaseFactoryBean
     private String includes;
     private String eventProcessingMode;
     private String equalsBehavior;
+    private String declarativeAgenda;
     private String scope;
     private String def;
 
@@ -111,6 +112,14 @@ public class KBaseFactoryBean
 
     public void setEventProcessingMode(String eventProcessingMode) {
         this.eventProcessingMode = eventProcessingMode;
+    }
+
+    public String getDeclarativeAgenda() {
+        return declarativeAgenda;
+    }
+
+    public void setDeclarativeAgenda(String declarativeAgenda) {
+        this.declarativeAgenda = declarativeAgenda;
     }
 
     public KieBase getObject() throws Exception {

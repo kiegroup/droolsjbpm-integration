@@ -33,6 +33,7 @@ public class KieBaseElementParser extends AbstractElementParser {
     private static final String ATTRIBUTE_INCLUDES = "includes";
     private static final String ATTRIBUTE_EVENT_MODE = "eventProcessingMode";
     private static final String ATTRIBUTE_EQUALS = "equalsBehavior";
+    private static final String ATTRIBUTE_DECLARATIVE_AGENDA = "declarativeAgenda";
     private static final String ATTRIBUTE_SCOPE = "scope";
     private static final String ATTRIBUTE_DEFAULT = "default";
 
@@ -60,6 +61,7 @@ public class KieBaseElementParser extends AbstractElementParser {
         kBaseOptionsAdaptor.setIncludes(element.getAttribute(ATTRIBUTE_INCLUDES));
         kBaseOptionsAdaptor.setEventProcessingMode(element.getAttribute(ATTRIBUTE_EVENT_MODE));
         kBaseOptionsAdaptor.setEqualsBehavior(element.getAttribute(ATTRIBUTE_EQUALS));
+        kBaseOptionsAdaptor.setDeclarativeAgenda(element.getAttribute(ATTRIBUTE_DECLARATIVE_AGENDA));
         kBaseOptionsAdaptor.setScope(element.getAttribute(ATTRIBUTE_SCOPE));
         kBaseOptionsAdaptor.setDef(element.getAttribute(ATTRIBUTE_DEFAULT));
 
