@@ -67,6 +67,7 @@ public class KSessionFactoryBean
     private ReleaseId releaseId;
 
     private String def;
+    private String scope;
 
     public KSessionFactoryBean() {
         agendaEventListeners = new ArrayList<AgendaEventListener>();
@@ -112,6 +113,14 @@ public class KSessionFactoryBean
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     public KieBase getKBase() {
