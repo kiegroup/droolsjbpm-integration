@@ -45,16 +45,14 @@
         <xsd:element ref="consoleLogger" minOccurs="0" maxOccurs="unbounded"/>
         <xsd:element ref="fileLogger" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
-      <xsd:choice minOccurs="0" maxOccurs="1">
-        <xsd:element name="batch" minOccurs="0" maxOccurs="1">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="configuration" type="configurationType" minOccurs="0" maxOccurs="1"/>
-      </xsd:choice>
+      <xsd:element name="batch" minOccurs="0" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="configuration" type="configurationType" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="workItemHandlers" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="listeners" minOccurs="0" maxOccurs="1"/>
     </xsd:sequence>
