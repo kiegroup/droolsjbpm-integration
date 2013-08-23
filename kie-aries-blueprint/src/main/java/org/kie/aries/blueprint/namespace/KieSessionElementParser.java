@@ -18,7 +18,9 @@ package org.kie.aries.blueprint.namespace;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
+import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
 import org.drools.core.util.StringUtils;
+import org.kie.aries.blueprint.factorybeans.KSessionOptions;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -35,6 +37,10 @@ public class KieSessionElementParser extends AbstractElementParser {
 
     public static final String ELEMENT_NAME_KSESSION_REF = "ksession-ref";
     public static final String ELEMENT_NAME_KSESSION = "ksession";
+
+    private static final String ATTRIBUTE_DEFAULT = "default";
+    private static final String ATTRIBUTE_CLOCK_TYPE = "clock-type";
+    private static final String ATTRIBUTE_SCOPE = "scope";
 
     @Override
     public ComponentMetadata parseElement(ParserContext context, Element element) {
@@ -63,6 +69,7 @@ public class KieSessionElementParser extends AbstractElementParser {
 
         beanMetadata.addArgument(createValue(context, id), null, 0);
 
+
         if (StringUtils.isEmpty(releaseId)) {
             beanMetadata.addArgument(createNullMetadata(), null, 1);
         } else {
@@ -71,7 +78,7 @@ public class KieSessionElementParser extends AbstractElementParser {
 
         if (!StringUtils.isEmpty(listenersRef)) {
             beanMetadata.addArgument(createRef(context, listenersRef), null, 2);
-        }else{
+        } else {
             Metadata metadata = checkForChildListeners(context, element);
             beanMetadata.addArgument(metadata, null, 2);
         }
@@ -84,13 +91,24 @@ public class KieSessionElementParser extends AbstractElementParser {
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
 
+        KSessionOptions kSessionOptions = new KSessionOptions();
+
         if ( ELEMENT_NAME_KSESSION.equalsIgnoreCase(localName)) {
-            beanMetadata.addArgument(createValue(context, kbaseRef), null, 5);
-            beanMetadata.addArgument(createValue(context, type), null, 6);
+            kSessionOptions.setkBaseRef(kbaseRef);
+            kSessionOptions.setType(type);
             beanMetadata.setFactoryMethod("createKieSession");
         } else {
             beanMetadata.setFactoryMethod("createKieSessionRef");
         }
+
+        kSessionOptions.setDef(element.getAttribute(ATTRIBUTE_DEFAULT));
+        kSessionOptions.setClockType(element.getAttribute(ATTRIBUTE_SCOPE));
+        kSessionOptions.setScope(element.getAttribute(ATTRIBUTE_CLOCK_TYPE));
+
+        beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
+        PassThroughMetadataImpl passThroughMetadata = context.createMetadata(PassThroughMetadataImpl.class);
+        passThroughMetadata.setObject(kSessionOptions);
+        beanMetadata.addArgument(passThroughMetadata, null, 5);
 
         return beanMetadata;
     }
