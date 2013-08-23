@@ -56,6 +56,7 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String KEEP_REFERENCE = "keep-reference";
     private static final String CLOCK_TYPE = "clock-type";
+    private static final String SCOPE = "scope";
 
     private static final String WORK_ITEMS = "work-item-handlers";
     private static final String WORK_ITEM = "work-item-handler";
@@ -82,6 +83,11 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
             type = "stateful";
         }
         factory.addPropertyValue(ATTRIBUTE_TYPE, type);
+
+        String scope = element.getAttribute(SCOPE);
+        if (!StringUtils.hasLength(scope)){
+            factory.addPropertyValue(SCOPE, type);
+        }
 
         String listeners = element.getAttribute(LISTENERS_REF_ATTRIBUTE);
         if (StringUtils.hasText(listeners)) {
