@@ -66,13 +66,13 @@ public class KieObjectsFactoryBean {
         throw new ComponentDefinitionException("No KSession found in kmodule.xml with id '"+id+"'.");
     }
 
-    public static Object createKieSession(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands, String kbaseRef, String type){
+    public static Object createKieSession(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands, KSessionOptions kSessionOptions){
         KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         Object obj ;
-        if ("stateless".equalsIgnoreCase(type)) {
-            obj = kieObjectsResolver.newStatelessSession(kbaseRef, releaseId, null);
+        if ("stateless".equalsIgnoreCase(kSessionOptions.getType())) {
+            obj = kieObjectsResolver.newStatelessSession(kSessionOptions.getkBaseRef(), releaseId, null);
         } else {
-            obj = kieObjectsResolver.newStatefulSession(kbaseRef, releaseId, null);
+            obj = kieObjectsResolver.newStatefulSession(kSessionOptions.getkBaseRef(), releaseId, null);
             KieSessionFactoryBeanHelper.executeCommands((KieSession)obj, commands);
         }
 

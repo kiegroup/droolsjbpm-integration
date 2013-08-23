@@ -37,7 +37,9 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.conf.DeclarativeAgendaOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
+import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.aries.blueprint.factorybeans.KBaseOptions;
+import org.kie.aries.blueprint.factorybeans.KSessionOptions;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.blueprint.container.BlueprintContainer;
@@ -244,15 +246,28 @@ public class KieObjectsInjector implements BeanProcessor {
                 BeanMetadata metadata = (BeanMetadata)componentMetadata;
                 if (KieObjectsFactoryBean.class.getName().equals(metadata.getClassName())) {
                     if ("createKieSession".equalsIgnoreCase(metadata.getFactoryMethod())){
-                        BeanArgument beanArgument = metadata.getArguments().get(5);
-                        String kbaseRef = ((MutableValueMetadata) beanArgument.getValue()).getStringValue();
-                        beanArgument = metadata.getArguments().get(0);
+                        BeanArgument beanArgument = metadata.getArguments().get(0);
                         String ksessionName = ((MutableValueMetadata)beanArgument.getValue()).getStringValue();
-                        beanArgument = metadata.getArguments().get(6);
-                        String type = ((MutableValueMetadata) beanArgument.getValue()).getStringValue();
+
+                        BeanArgument kbOptionsArg = metadata.getArguments().get(5);
+                        PassThroughMetadata passThroughMetadata = (PassThroughMetadata) kbOptionsArg.getValue();
+                        KSessionOptions kSessionOptions = (KSessionOptions) passThroughMetadata.getObject();
+                        String type = kSessionOptions.getType();
+                        String kbaseRef = kSessionOptions.getkBaseRef();
+
                         if( kbaseRef.equalsIgnoreCase(kieBaseModel.getName())) {
                             KieSessionModelImpl kSession = new KieSessionModelImpl(kieBaseModel, ksessionName);
                             kSession.setType(type != null ? KieSessionModel.KieSessionType.valueOf(type.toUpperCase()) : KieSessionModel.KieSessionType.STATEFUL);
+
+                            kSession.setDefault( "true".equals( kSessionOptions.getDef() ) );
+                            String clockType = kSessionOptions.getClockType();
+                            if ( clockType != null && !clockType.isEmpty() ) {
+                                kSession.setClockType( ClockTypeOption.get(clockType) );
+                            }
+                            String scope = kSessionOptions.getScope();
+                            if ( scope !=null && !scope.isEmpty() ) {
+                                kSession.setScope( scope.trim() );
+                            }
                             Map<String, KieSessionModel> rawKieSessionModels = kieBaseModel.getRawKieSessionModels();
                             rawKieSessionModels.put(kSession.getName(), kSession);
 
