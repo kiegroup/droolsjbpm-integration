@@ -1,0 +1,9 @@
+package org.drools.jboss.integration.spring
+
+rule "sample rule"
+	@output("\"Hello world!\"")
+	when
+        s: String()
+	then
+		System.out.println("\"Hello world!\"");
+end

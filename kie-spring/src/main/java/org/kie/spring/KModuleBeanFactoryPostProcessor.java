@@ -84,6 +84,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         log.info(":: BeanFactoryPostProcessor::postProcessBeanFactory called ::");
         if ( releaseId == null && configFilePath != null) {
+            fixConfigFilePathForVfs();
             String pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
             releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
             KieSpringUtils.setDefaultReleaseId(releaseId);
@@ -96,6 +97,39 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 addKieModuleToRepo(kieModuleModel);
             }
         }
+    }
+
+    private void fixConfigFilePathForVfs() {
+        if (configFileURL != null && configFileURL.toExternalForm().startsWith("vfs:")) {
+            String contextPath = ClasspathKieProject.fixURLFromKProjectPath(configFileURL);
+            File contextFile = new File(contextPath);
+            if (contextFile.exists()) {
+                // the spring context file is 2 folders under the temp folder where the war is unzipped
+                contextFile = contextFile.getParentFile().getParentFile();
+                File mavenFolder = recurseToMavenFolder(contextFile);
+                if (mavenFolder != null) {
+                    // remove /META-INF/maven since drools pom.properties lookup adds it back
+                    configFilePath = mavenFolder.getParentFile().getParent();
+                }
+            }
+        }
+    }
+
+    private File recurseToMavenFolder(File file) {
+        if( file.isDirectory() ) {
+            for ( java.io.File child : file.listFiles() ) {
+                if ( child.isDirectory() ) {
+                    if ( child.getName().endsWith( "maven" ) ) {
+                        return child;
+                    }
+                    File returnedFile = recurseToMavenFolder( child );
+                    if ( returnedFile != null ) {
+                        return returnedFile;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private void addKieModuleToRepo(KieModuleModel kieProject) {
