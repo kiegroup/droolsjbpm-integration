@@ -1,7 +1,6 @@
 package org.kie.services.client;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.bpmn2.objects.TestWorkItemHandler;
 import org.jbpm.process.audit.VariableInstanceLog;
@@ -36,11 +36,13 @@ import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -124,14 +126,14 @@ public abstract class SerializationTest {
         testRoundtrip(resp);
     }
 
-
-
     protected KieSession createKnowledgeSession(String processFile) throws Exception {
-        Resource process = ResourceFactory.newClassPathResource(processFile);
         KieServices ks = KieServices.Factory.get();
         KieRepository kr = ks.getRepository();
         KieFileSystem kfs = ks.newKieFileSystem();
-        kfs.write(process);
+        if( processFile != null ) { 
+            Resource process = ResourceFactory.newClassPathResource(processFile);
+            kfs.write(process);
+        }
 
         KieBuilder kb = ks.newKieBuilder(kfs);
         kb.buildAll();

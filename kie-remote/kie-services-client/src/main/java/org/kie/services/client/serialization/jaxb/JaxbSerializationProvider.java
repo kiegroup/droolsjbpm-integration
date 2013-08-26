@@ -8,6 +8,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
@@ -22,7 +23,8 @@ public class JaxbSerializationProvider {
         JaxbVariablesResponse.class,
         JaxbGenericResponse.class,
         JaxbProcessInstanceResponse.class,
-        JaxbProcessInstanceWithVariablesResponse.class
+        JaxbProcessInstanceWithVariablesResponse.class,
+        JaxbOtherResponse.class
     };
     
     public static String convertJaxbObjectToString(Object object) throws JAXBException {

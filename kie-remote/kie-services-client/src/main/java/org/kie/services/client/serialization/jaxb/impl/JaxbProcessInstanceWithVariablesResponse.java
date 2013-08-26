@@ -7,15 +7,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.adapter.StringMapXmlAdapater;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name="process-instance-with-vars")
 @XmlAccessorType(XmlAccessType.FIELD)

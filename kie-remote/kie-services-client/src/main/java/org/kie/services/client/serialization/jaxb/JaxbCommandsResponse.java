@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.drools.core.common.DefaultFactHandle;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
@@ -27,6 +28,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExecutionResultsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbTaskResponse;
@@ -57,6 +59,7 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "process-instance", type = JaxbProcessInstanceResponse.class),
             @XmlElement(name = "task", type = JaxbTaskResponse.class),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
+            @XmlElement(name = "other", type = JaxbOtherResponse.class),
             })
     private List<JaxbCommandResponse<?>> responses;
 
@@ -160,6 +163,8 @@ public class JaxbCommandsResponse {
         		|| Float.class.getName().equals(className)
         		|| Double.class.getName().equals(className) ) {
             this.responses.add(new JaxbPrimitiveResponse(result, i, cmd));
+        } else if( result instanceof DefaultFactHandle ) { 
+           this.responses.add(new JaxbOtherResponse(result, i, cmd));
         } else if( result instanceof JaxbExceptionResponse ) { 
            this.responses.add((JaxbExceptionResponse) result);
         } else {
