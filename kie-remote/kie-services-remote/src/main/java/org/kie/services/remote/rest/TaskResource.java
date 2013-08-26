@@ -1,6 +1,6 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
+import static org.kie.services.remote.util.CommandsRequestUtil.restProcessJaxbCommandsRequest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -98,7 +98,7 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        return processJaxbCommandsRequest(cmdsRequest, processRequestBean);
+        return restProcessJaxbCommandsRequest(cmdsRequest, processRequestBean);
     }
 
     @GET
