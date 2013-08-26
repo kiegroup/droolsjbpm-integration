@@ -5,6 +5,7 @@ import javax.jms.Queue;
 import javax.naming.InitialContext;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory {

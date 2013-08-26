@@ -3,9 +3,6 @@ package org.kie.services.client.api.command;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,28 +19,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
-import org.kie.services.client.api.RemoteConfiguration;
-import org.kie.services.client.api.RemoteConfiguration.AuthenticationType;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
@@ -59,20 +40,30 @@ public abstract class AbstractRemoteCommandObject {
 
     protected static Logger logger = LoggerFactory.getLogger(AbstractRemoteCommandObject.class);
 
-    protected final String url;
     protected final RemoteConfiguration config;
 
     public AbstractRemoteCommandObject(RemoteConfiguration config) {
-        this.url = null;
         this.config = config;
     }
 
-    public AbstractRemoteCommandObject(String url, RemoteConfiguration config) {
-        this.url = url;
-        this.config = config;
+    protected boolean isTaskService = false;
+
+    // Compatibility methods -----------------------------------------------------------------------------------------------------
+
+    public void readExternal(ObjectInput arg0) throws IOException, ClassNotFoundException {
+        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
+        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + Task.class.getSimpleName()
+                + " implementation.");
     }
 
-    @SuppressWarnings("unchecked")
+    public void writeExternal(ObjectOutput arg0) throws IOException {
+        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
+        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + Task.class.getSimpleName()
+                + " implementation.");
+    }
+
+    // Execute methods -----------------------------------------------------------------------------------------------------
+
     public <T> T execute(Command<T> command) {
         if (config.isRest()) {
             return executeRestCommand(command);
@@ -81,7 +72,13 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    public <T> T executeJmsCommand(Command<T> command) {
+    /**
+     * Method to communicate with the backend via JMS.
+     * 
+     * @param command The {@link Command} object to be executed.
+     * @return The result of the {@link Command} object execution.
+     */
+    private <T> T executeJmsCommand(Command<T> command) {
         JaxbCommandsRequest req = new JaxbCommandsRequest(config.getDeploymentId(), command);
 
         ConnectionFactory factory = config.getConnectionFactory();
@@ -104,9 +101,9 @@ public abstract class AbstractRemoteCommandObject {
             MessageProducer producer;
             MessageConsumer consumer;
             try {
-                if( config.getPassword() != null ) { 
+                if (config.getPassword() != null) {
                     connection = factory.createConnection(config.getUsername(), config.getPassword());
-                } else { 
+                } else {
                     connection = factory.createConnection();
                 }
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -174,100 +171,47 @@ public abstract class AbstractRemoteCommandObject {
             }
         }
         List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
-        if( responses.size() > 0 ) { 
+        if (responses.size() > 0) {
             JaxbCommandResponse<?> response = responses.get(0);
-            if( response instanceof JaxbExceptionResponse ) { 
+            if (response instanceof JaxbExceptionResponse) {
                 JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) response;
                 throw new RemoteRuntimeException(exceptionResponse.getMessage());
-            } else { 
+            } else {
                 return (T) response.getResult();
             }
-        } else { 
-            assert responses.size() == 0 : "There shouldn't be more than 1 response [" + responses.size() + "] returned by a command!";
+        } else {
+            assert responses.size() == 0 : "There should only be 1 response, "
+                    + "not " + responses.size() + ", returned by a command!";
             return null;
         }
     }
 
-    public <T> T executeRestCommand(Command<T> command) {
-        String baseUrl = config.getUrl();
+    /**
+     * Method to communicate with the backend via REST.
+     * 
+     * @param command The {@link Command} object to be executed.
+     * @return The result of the {@link Command} object execution.
+     */
+    private <T> T executeRestCommand(Command<T> command) {
         String deploymentId = config.getDeploymentId();
-        AuthenticationType authenticationType = config.getAuthenticationType();
-
-        ClientRequest restRequest = null;
-        DefaultHttpClient client = new DefaultHttpClient();
-        if (AuthenticationType.BASIC == authenticationType) {
-            String username = config.getUsername();
-            String password = config.getPassword();
-            client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                    new UsernamePasswordCredentials(username, password));
-        } else if (AuthenticationType.FORM == authenticationType) {
-            String username = config.getUsername();
-            String password = config.getPassword();
-            // first challenge authentication to be enforced - return logon form
-            // currently pointing to a non existing resource
-            HttpPost mainMethod = new HttpPost(baseUrl);
-            List<NameValuePair> nameValuePairsEmpty = new ArrayList<NameValuePair>(1);
-            try {
-                mainMethod.setEntity(new UrlEncodedFormEntity(nameValuePairsEmpty));
-                HttpResponse response = client.execute(mainMethod);
-
-                if (response.getStatusLine().getStatusCode() != 200) {
-                    throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
-                }
-
-                EntityUtils.consume(response.getEntity());
-
-                // next authenticate the request
-                HttpPost authMethod = new HttpPost(baseUrl + "/j_security_check");
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                nameValuePairs.add(new BasicNameValuePair("j_username", username));
-                nameValuePairs.add(new BasicNameValuePair("j_password", password));
-
-                authMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                // make sure that request will be redirected request has been authenticated and authorized
-                client.setRedirectStrategy(new DefaultRedirectStrategy() {
-                    public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context) {
-                        boolean isRedirect = false;
-                        try {
-                            isRedirect = super.isRedirected(request, response, context);
-                        } catch (ProtocolException e) {
-                            e.printStackTrace();
-                        }
-                        if (!isRedirect) {
-                            int responseCode = response.getStatusLine().getStatusCode();
-                            if (responseCode == 301 || responseCode == 302) {
-                                return true;
-                            }
-                        }
-                        return isRedirect;
-                    }
-                });
-                HttpResponse authresponse = client.execute(authMethod);
-                List<Integer> invalidCodes = Arrays.asList(new Integer[] { 500, 401, 403 });
-                if (invalidCodes.contains(response.getStatusLine().getStatusCode())) {
-                    throw new RuntimeException("Error invoking REST " + url + " " + response.getStatusLine());
-                }
-                EntityUtils.consume(authresponse.getEntity());
-
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Could not initialize form-based authentication", e);
-            } catch (ClientProtocolException e) {
-                throw new RuntimeException("Could not initialize form-based authentication", e);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not initialize form-based authentication", e);
-            }
+        ClientRequestFactory requestFactory = config.getRequestFactory();
+        ClientRequest restRequest;
+        if (isTaskService) {
+            restRequest = requestFactory.createRelativeRequest("/task/execute");
+        } else {
+            restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
         }
-        
-        ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-        restRequest = new ClientRequest(url, executor);
         restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandsRequest(deploymentId, command));
+
         ClientResponse<Object> response = null;
-        
+        String requestUrl;
         try {
+            requestUrl = restRequest.getUri();
             response = restRequest.post(Object.class);
         } catch (Exception e) {
             throw new RuntimeException("Unable to post request: " + e.getMessage(), e);
         }
+
         if (response.getResponseStatus() == Status.OK) {
             JaxbCommandsResponse commandResponse = response.getEntity(JaxbCommandsResponse.class);
             List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
@@ -284,26 +228,12 @@ public abstract class AbstractRemoteCommandObject {
                     return (T) responseObject.getResult();
                 }
             } else {
-                throw new RuntimeException("Unexpected number of results: " + responses.size());
+                throw new RuntimeException("Unexpected number of results from " + command.getClass().getSimpleName() + ":"
+                        + responses.size() + " results instead of only 1");
             }
         } else {
-            // TODO error handling
-            throw new RuntimeException("Error invoking REST " + url + " " + response.getResponseStatus() + " "
+            throw new RuntimeException("Error invoking " + command.getClass().getSimpleName() + " via REST (" + requestUrl + "):\n"
                     + response.getEntity(String.class));
         }
-
     }
-
-    public void readExternal(ObjectInput arg0) throws IOException, ClassNotFoundException {
-        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
-        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + Task.class.getSimpleName()
-                + " implementation.");
-    }
-
-    public void writeExternal(ObjectOutput arg0) throws IOException {
-        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
-        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + Task.class.getSimpleName()
-                + " implementation.");
-    }
-
 }

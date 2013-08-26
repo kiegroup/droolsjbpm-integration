@@ -34,7 +34,7 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-audit</artifactId>
     </dependency>
- 
+
     <!-- jms -->
     <dependency>
       <groupId>javax.jms</groupId>
@@ -55,7 +55,18 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxb-provider</artifactId>
+    </dependency>
+    <dependency>
+      <!-- resteasy logging -->
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1</version>
+    </dependency>
 
+    <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
