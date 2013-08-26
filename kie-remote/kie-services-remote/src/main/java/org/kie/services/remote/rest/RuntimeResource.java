@@ -1,6 +1,6 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
+import static org.kie.services.remote.util.CommandsRequestUtil.restProcessJaxbCommandsRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        return processJaxbCommandsRequest(cmdsRequest, processRequestBean);
+        return restProcessJaxbCommandsRequest(cmdsRequest, processRequestBean);
     }
 
     @POST
@@ -118,7 +118,7 @@ public class RuntimeResource extends ResourceBase {
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
     public JaxbGenericResponse signalProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
-        String eventType = getStringParam("eventType", true, params, "signal");
+        String eventType = getStringParam("signal", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
         
@@ -145,12 +145,13 @@ public class RuntimeResource extends ResourceBase {
     
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    @Path("/signal/{signal: [a-zA-Z0-9-]+}")
-    public JaxbGenericResponse signalEvent(@PathParam("signal") String signal) {
+    @Path("/signal")
+    public JaxbGenericResponse signalEvent() {
         Map<String, List<String>> formParams = getRequestParams(request);
-        Object event = getObjectParam("event", false, formParams, "signal/" + signal);
-        Command<?> cmd = new SignalEventCommand(signal, event);
-        String errorMsg = "Unable to send signal '" + signal + "'";
+        String eventType = getStringParam("signal", true, formParams, "signal");
+        Object event = getObjectParam("event", false, formParams, "signal");
+        Command<?> cmd = new SignalEventCommand(eventType, event);
+        String errorMsg = "Unable to send signal '" + eventType + "'";
         if( event != null ) { 
             errorMsg += " with event '" + event + "'";
         }
@@ -380,6 +381,7 @@ public class RuntimeResource extends ResourceBase {
     
     private Map<String, String> getVariables(long processInstanceId) { 
         Command<?> cmd = new FindVariableInstancesCommand(processInstanceId);
+        
         
         Object result = internalDoKieSessionOperation(cmd, "Unable to retrieve process variables from process instance " + processInstanceId);
         List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;

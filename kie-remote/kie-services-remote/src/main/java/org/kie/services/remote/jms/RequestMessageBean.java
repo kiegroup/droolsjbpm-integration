@@ -1,6 +1,6 @@
 package org.kie.services.remote.jms;
 
-import static org.kie.services.remote.util.CommandsRequestUtil.processJaxbCommandsRequest;
+import static org.kie.services.remote.util.CommandsRequestUtil.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -77,7 +77,7 @@ public class RequestMessageBean implements MessageListener {
         // 2. process request
         JaxbCommandsResponse jaxbResponse;
         if (cmdsRequest != null) {
-            jaxbResponse = processJaxbCommandsRequest(cmdsRequest, processRequestBean);
+            jaxbResponse = jmsProcessJaxbCommandsRequest(cmdsRequest, processRequestBean);
         } else {
             // Failure reasons have been logged in deserializeRequest(). 
             logger.error("Stopping processing of request message due to errors: see above.");
