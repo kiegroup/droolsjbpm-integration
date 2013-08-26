@@ -15,7 +15,7 @@ import org.kie.api.command.Command;
 import org.kie.services.client.serialization.jaxb.impl.adapter.StringMapXmlAdapater;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
-@XmlRootElement(name="exception")
+@XmlRootElement(name="variables")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbVariablesResponse extends AbstractJaxbCommandResponse<Map<String,String>> {
 
