@@ -1,6 +1,5 @@
 package org.kie.services.client.serialization.jaxb.rest;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,10 +9,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-
-import org.jboss.resteasy.spi.BadRequestException;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AbstractJaxbResponse {
