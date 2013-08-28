@@ -17,7 +17,8 @@ import org.jboss.resteasy.spi.ReaderException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.resteasy.spi.WriterException;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.exception.KieServiceBadRequestException;
+import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
+import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
 
 @Provider
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
@@ -28,7 +29,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(Exception e) {
         ResponseBuilder responseBuilder = null;
-        if( e instanceof TooEarlyException ) { 
+        if( e instanceof KieRemoteServicesPreConditionException ) { 
             responseBuilder = Response.status(412); // 412: precondition failed
         } else if( e instanceof BadRequestException ) { 
             responseBuilder = Response.status(400); // 400: Bad request (due to syntax)
