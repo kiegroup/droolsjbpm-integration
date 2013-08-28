@@ -2,7 +2,12 @@ package org.kie.services.client.jaxb;
 
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
@@ -14,6 +19,8 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.services.client.SerializationTest;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 
 public class JaxbSerializationTest extends SerializationTest {
@@ -55,5 +62,26 @@ public class JaxbSerializationTest extends SerializationTest {
         
         JaxbProcessInstanceWithVariablesResponse jpiwvr = new JaxbProcessInstanceWithVariablesResponse(processInstance, map);
         testRoundtrip(jpiwvr);
+        
+        JaxbProcessInstanceListResponse jpilp = new JaxbProcessInstanceListResponse();
+        List<ProcessInstance> procInstList = new ArrayList<ProcessInstance>();
+        procInstList.add(new JaxbProcessInstanceResponse(processInstance));
+        jpilp.setResult(procInstList);
+        testRoundtrip(jpilp);
+    }
+    
+    @Test 
+    public void commandsSerializationTest() throws Exception { 
+        KieSession ksession = createKnowledgeSession("BPMN2-StringStructureRef.bpmn2");
+        TestWorkItemHandler workItemHandler = new TestWorkItemHandler();
+        ksession.getWorkItemManager().registerWorkItemHandler("Human Task", workItemHandler);
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        String val = "initial-val";
+        params.put("test", val);
+        ProcessInstance processInstance = ksession.startProcess("StructureRef");
+        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
+        
+        
     }
 }

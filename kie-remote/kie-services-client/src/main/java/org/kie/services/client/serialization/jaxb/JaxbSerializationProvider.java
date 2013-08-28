@@ -9,9 +9,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 // TODO: Add object version checking
@@ -24,6 +26,8 @@ public class JaxbSerializationProvider {
         JaxbGenericResponse.class,
         JaxbProcessInstanceResponse.class,
         JaxbProcessInstanceWithVariablesResponse.class,
+        JaxbProcessInstanceListResponse.class,
+        JaxbWorkItem.class,
         JaxbOtherResponse.class
     };
     
