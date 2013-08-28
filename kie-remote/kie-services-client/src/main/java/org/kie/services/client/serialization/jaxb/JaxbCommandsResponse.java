@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.core.common.DefaultFactHandle;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
@@ -22,17 +23,10 @@ import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdComman
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbExecutionResultsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
+import org.kie.services.client.serialization.jaxb.impl.*;
 
 @SuppressWarnings("rawtypes")
 @XmlRootElement(name = "command-response")
@@ -53,12 +47,12 @@ public class JaxbCommandsResponse {
 
     @XmlElements({ 
             @XmlElement(name = "exception", type = JaxbExceptionResponse.class),
-            @XmlElement(name = "execution-results", type = JaxbExecutionResultsResponse.class),
             @XmlElement(name = "long-list", type = JaxbLongListResponse.class),
             @XmlElement(name = "primitive", type = JaxbPrimitiveResponse.class),
             @XmlElement(name = "process-instance", type = JaxbProcessInstanceResponse.class),
             @XmlElement(name = "task", type = JaxbTaskResponse.class),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
+            @XmlElement(name = "work-item", type = JaxbWorkItem.class),
             @XmlElement(name = "other", type = JaxbOtherResponse.class),
             })
     private List<JaxbCommandResponse<?>> responses;
@@ -76,6 +70,9 @@ public class JaxbCommandsResponse {
         // long
         cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
         cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
+        
+        // processInstance
+        cmdListTypes.put(GetProcessInstancesCommand.class, ProcessInstance.class);
     }
 
     public JaxbCommandsResponse() {
@@ -150,6 +147,12 @@ public class JaxbCommandsResponse {
                 this.responses.add(new JaxbTaskSummaryListResponse((List<TaskSummary>) result, i, cmd));
             } else if( listType.equals(Long.class) ) {
                 this.responses.add(new JaxbLongListResponse((List<Long>)result, i, cmd));
+            } else if( listType.equals(ProcessInstance.class) ) {
+               List<JaxbProcessInstanceResponse> procInstList = new ArrayList<JaxbProcessInstanceResponse>();
+               for( ProcessInstance procInst : (List<ProcessInstance>) result) { 
+                   procInstList.add(new JaxbProcessInstanceResponse(procInst));
+               }
+                this.responses.add(new JaxbProcessInstanceListResponse(procInstList, i, cmd));
             } else {
                 unknownResultType = true;
             }
@@ -163,9 +166,13 @@ public class JaxbCommandsResponse {
         		|| Float.class.getName().equals(className)
         		|| Double.class.getName().equals(className) ) {
             this.responses.add(new JaxbPrimitiveResponse(result, i, cmd));
+        } else if( result instanceof WorkItem ) { 
+           this.responses.add(new JaxbWorkItem((WorkItem) result, i, cmd));
         } else if( result instanceof DefaultFactHandle ) { 
            this.responses.add(new JaxbOtherResponse(result, i, cmd));
-        } else if( result instanceof JaxbExceptionResponse ) { 
+        } 
+        // Other
+        else if( result instanceof JaxbExceptionResponse ) { 
            this.responses.add((JaxbExceptionResponse) result);
         } else {
             unknownResultType = true;
