@@ -24,8 +24,10 @@ import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
+import org.drools.core.command.runtime.process.GetWorkItemCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.process.instance.WorkItem;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jbpm.process.audit.NodeInstanceLog;
@@ -46,6 +48,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
@@ -159,6 +162,15 @@ public class RuntimeResource extends ResourceBase {
         return new JaxbGenericResponse(request);
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("/workitem/{workItemId: [0-9-]+}")
+    public JaxbWorkItem getWorkItem(@PathParam("workItemId") Long workItemId) { 
+        Command<?> cmd = new GetWorkItemCommand(workItemId);
+        WorkItem workItem = (WorkItem) internalDoKieSessionOperation(cmd, "Unable to get work item " +  workItemId );
+        return new JaxbWorkItem(workItem);
+    }
+    
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public JaxbGenericResponse doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
@@ -371,17 +383,20 @@ public class RuntimeResource extends ResourceBase {
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
     private Object internalDoKieSessionOperation(Command<?> cmd, String errorMsg) { 
-        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId);
+        Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId, null);
         if( result instanceof JaxbExceptionResponse ) { 
-           throw new InternalServerErrorException(errorMsg, 
-                   ((JaxbExceptionResponse) result).getCause());
+            Exception e = ((JaxbExceptionResponse) result).getCause();
+            if( e instanceof RuntimeException ) { 
+                throw (RuntimeException) e;
+            } else {
+                throw new InternalServerErrorException(errorMsg, e);
+            }
         }
         return result;
     }
     
     private Map<String, String> getVariables(long processInstanceId) { 
         Command<?> cmd = new FindVariableInstancesCommand(processInstanceId);
-        
         
         Object result = internalDoKieSessionOperation(cmd, "Unable to retrieve process variables from process instance " + processInstanceId);
         List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;

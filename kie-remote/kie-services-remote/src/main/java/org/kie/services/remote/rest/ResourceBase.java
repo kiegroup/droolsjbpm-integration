@@ -10,7 +10,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jbpm.services.task.impl.model.GroupImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
@@ -46,7 +48,6 @@ public class ResourceBase {
                     + "' operation (" + paramValues.size() + " passed).");
         }
         return paramValues.get(0);
-        
     }
 
     protected static List<String> getStringListParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
@@ -166,7 +167,17 @@ public class ResourceBase {
     protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, List<String>> params) {
         List<OrganizationalEntity> orgEntList = new ArrayList<OrganizationalEntity>();
 
-        throw new UnsupportedOperationException("//TODO: getOrganizationalEntityListFromParams");
+        List<String> users = getStringListParam("user", true, params, "nominate");
+        List<String> groups = getStringListParam("group", true, params, "nominate");
+
+        for( String user : users ) { 
+            orgEntList.add(new UserImpl(user));
+        }
+        for( String group : groups ) { 
+            orgEntList.add(new GroupImpl(group));
+        }
+        
+        return orgEntList;
     }
     
     protected static TaskSummaryImpl convertTaskToTaskSummary(TaskImpl task) { 

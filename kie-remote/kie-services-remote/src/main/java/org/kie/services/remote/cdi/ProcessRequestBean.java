@@ -16,7 +16,7 @@ import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kie.services.remote.exception.KieServiceBadRequestException;
+import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 
 @ApplicationScoped
 public class ProcessRequestBean {
@@ -29,14 +29,10 @@ public class ProcessRequestBean {
     @Inject
     private TaskService taskService;
 
-    public Object doKieSessionOperation(Command<?> cmd, String deploymentId) {
-        return doKieSessionOperation(cmd, deploymentId, null);
-    }
-    
     public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId) {
-        KieSession kieSession = getRuntimeEngine(deploymentId, processInstanceId).getKieSession();
         Object result = null;
         try { 
+            KieSession kieSession = getRuntimeEngine(deploymentId, processInstanceId).getKieSession();
             result = kieSession.execute(cmd);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
@@ -67,7 +63,7 @@ public class ProcessRequestBean {
             runtimeContext = EmptyContext.get();
         }
         if( runtimeManager == null ) { 
-            throw new KieServiceBadRequestException("No runtime manager could be found for domain '" + domainName + "'.");
+            throw new DomainNotFoundBadRequestException("No runtime manager could be found for domain '" + domainName + "'.");
         }
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }

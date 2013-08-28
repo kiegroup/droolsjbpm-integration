@@ -165,7 +165,7 @@ public class TaskResource extends ResourceBase {
         Command<?> cmd = null;
         while (!cmds.isEmpty()) {
             cmd = cmds.poll();
-            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(cmd);
+            TaskImpl task = (TaskImpl) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
             if (task != null) {
                 TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
                 if( alreadyRetrievedSet.add(taskSum) ) { 
@@ -194,10 +194,10 @@ public class TaskResource extends ResourceBase {
                     for (Long procInstId : procInstIdList) {
                         cmd = new GetTasksByProcessInstanceIdCommand(procInstId);
                         @SuppressWarnings("unchecked")
-                        List<Long> procInstTaskIdList = (List<Long>) processRequestBean.doTaskOperation(cmd);
+                        List<Long> procInstTaskIdList = (List<Long>) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
                         for (Long taskId : procInstTaskIdList) {
                             cmd = new GetTaskCommand(taskId);
-                            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(cmd);
+                            TaskImpl task = (TaskImpl) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
                             if (task != null) {
                                 TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
                                 if( alreadyRetrievedSet.add(taskSum) ) { 
@@ -246,7 +246,7 @@ public class TaskResource extends ResourceBase {
         while (!cmds.isEmpty()) {
             cmd = cmds.poll();
             @SuppressWarnings("unchecked")
-            List<TaskSummary> taskSummaryList = (List<TaskSummary>) processRequestBean.doTaskOperation(cmd);
+            List<TaskSummary> taskSummaryList = (List<TaskSummary>) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
             if (taskSummaryList != null && !taskSummaryList.isEmpty()) {
                 for (TaskSummary taskSummary : taskSummaryList) {
                     TaskSummaryImpl taskSum = (TaskSummaryImpl) taskSummary;
@@ -373,8 +373,12 @@ public class TaskResource extends ResourceBase {
     private Object internalDoTaskOperation(Command<?> cmd, String errorMsg) { 
         Object result = processRequestBean.doTaskOperation(cmd);
         if( result instanceof JaxbExceptionResponse ) { 
-           throw new InternalServerErrorException(errorMsg, 
-                   ((JaxbExceptionResponse) result).getCause());
+           Exception cause = ((JaxbExceptionResponse) result).getCause();
+           if( cause instanceof RuntimeException ) { 
+               throw (RuntimeException) cause;
+           } else { 
+               throw new InternalServerErrorException(errorMsg, cause);
+           }
         }
         return result;
     }
