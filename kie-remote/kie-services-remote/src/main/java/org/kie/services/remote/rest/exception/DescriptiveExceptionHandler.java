@@ -17,7 +17,6 @@ import org.jboss.resteasy.spi.ReaderException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.resteasy.spi.WriterException;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
 
 @Provider

@@ -4,6 +4,8 @@ package org.kie.services.remote.cdi;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.jboss.resteasy.spi.UnauthorizedException;
+import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.Context;
@@ -44,8 +46,10 @@ public class ProcessRequestBean {
     
     public Object doTaskOperation(Command<?> cmd) {
         Object result = null;
-        try { 
+        try {  
             result = ((InternalTaskService) taskService).execute(cmd);
+        } catch( PermissionDeniedException pde ) { 
+            throw new UnauthorizedException(pde.getMessage(), pde);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
             logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
