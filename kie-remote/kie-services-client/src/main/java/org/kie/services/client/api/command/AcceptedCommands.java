@@ -2,7 +2,6 @@ package org.kie.services.client.api.command;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.drools.core.command.GetVariableCommand;
@@ -15,44 +14,43 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
-import org.kie.api.command.Command;
 
 
 public class AcceptedCommands {
 
-    private static Set<Class<? extends Command>> acceptedCommands = new HashSet<Class<? extends Command>>();
+    private static Set<String> acceptedCommands = new HashSet<String>();
     static {
 
-        acceptedCommands.add(AbortWorkItemCommand.class);
-        acceptedCommands.add(CompleteWorkItemCommand.class);
-        acceptedCommands.add(GetWorkItemCommand.class);
-        acceptedCommands.add(RegisterWorkItemHandlerCommand.class);
+        acceptedCommands.add(AbortWorkItemCommand.class.getName());
+        acceptedCommands.add(CompleteWorkItemCommand.class.getName());
+        acceptedCommands.add(GetWorkItemCommand.class.getName());
+        acceptedCommands.add(RegisterWorkItemHandlerCommand.class.getName());
 
-        acceptedCommands.add(AbortProcessInstanceCommand.class);
-        acceptedCommands.add(GetProcessIdsCommand.class);
-        acceptedCommands.add(GetProcessInstanceByCorrelationKeyCommand.class);
-        acceptedCommands.add(GetProcessInstanceCommand.class);
-        acceptedCommands.add(GetProcessInstancesCommand.class);
-        acceptedCommands.add(SetProcessInstanceVariablesCommand.class);
-        acceptedCommands.add(SignalEventCommand.class);
-        acceptedCommands.add(StartCorrelatedProcessCommand.class);
-        acceptedCommands.add(StartProcessCommand.class);
+        acceptedCommands.add(AbortProcessInstanceCommand.class.getName());
+        acceptedCommands.add(GetProcessIdsCommand.class.getName());
+        acceptedCommands.add(GetProcessInstanceByCorrelationKeyCommand.class.getName());
+        acceptedCommands.add(GetProcessInstanceCommand.class.getName());
+        acceptedCommands.add(GetProcessInstancesCommand.class.getName());
+        acceptedCommands.add(SetProcessInstanceVariablesCommand.class.getName());
+        acceptedCommands.add(SignalEventCommand.class.getName());
+        acceptedCommands.add(StartCorrelatedProcessCommand.class.getName());
+        acceptedCommands.add(StartProcessCommand.class.getName());
 
-        acceptedCommands.add(GetVariableCommand.class);
-        acceptedCommands.add(GetFactCountCommand.class);
-        acceptedCommands.add(GetGlobalCommand.class);
-        acceptedCommands.add(GetIdCommand.class);
-        acceptedCommands.add(SetGlobalCommand.class);
+        acceptedCommands.add(GetVariableCommand.class.getName());
+        acceptedCommands.add(GetFactCountCommand.class.getName());
+        acceptedCommands.add(GetGlobalCommand.class.getName());
+        acceptedCommands.add(GetIdCommand.class.getName());
+        acceptedCommands.add(SetGlobalCommand.class.getName());
         
-        acceptedCommands.add(DeleteCommand.class);
-        acceptedCommands.add(FireAllRulesCommand.class);
-        acceptedCommands.add(InsertObjectCommand.class);
-        acceptedCommands.add(UpdateCommand.class);
+        acceptedCommands.add(DeleteCommand.class.getName());
+        acceptedCommands.add(FireAllRulesCommand.class.getName());
+        acceptedCommands.add(InsertObjectCommand.class.getName());
+        acceptedCommands.add(UpdateCommand.class.getName());
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
     
-    public static Set<Class<? extends Command>> getSet() { 
+    public static Set<String> getSet() { 
        return acceptedCommands; 
     }
 }
