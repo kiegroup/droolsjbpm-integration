@@ -18,39 +18,39 @@ import org.drools.core.command.runtime.rule.UpdateCommand;
 
 public class AcceptedCommands {
 
-    private static Set<String> acceptedCommands = new HashSet<String>();
+    private static Set<Class> acceptedCommands = new HashSet<Class>();
     static {
 
-        acceptedCommands.add(AbortWorkItemCommand.class.getName());
-        acceptedCommands.add(CompleteWorkItemCommand.class.getName());
-        acceptedCommands.add(GetWorkItemCommand.class.getName());
-        acceptedCommands.add(RegisterWorkItemHandlerCommand.class.getName());
+        acceptedCommands.add(AbortWorkItemCommand.class);
+        acceptedCommands.add(CompleteWorkItemCommand.class);
+        acceptedCommands.add(GetWorkItemCommand.class);
+        acceptedCommands.add(RegisterWorkItemHandlerCommand.class);
 
-        acceptedCommands.add(AbortProcessInstanceCommand.class.getName());
-        acceptedCommands.add(GetProcessIdsCommand.class.getName());
-        acceptedCommands.add(GetProcessInstanceByCorrelationKeyCommand.class.getName());
-        acceptedCommands.add(GetProcessInstanceCommand.class.getName());
-        acceptedCommands.add(GetProcessInstancesCommand.class.getName());
-        acceptedCommands.add(SetProcessInstanceVariablesCommand.class.getName());
-        acceptedCommands.add(SignalEventCommand.class.getName());
-        acceptedCommands.add(StartCorrelatedProcessCommand.class.getName());
-        acceptedCommands.add(StartProcessCommand.class.getName());
+        acceptedCommands.add(AbortProcessInstanceCommand.class);
+        acceptedCommands.add(GetProcessIdsCommand.class);
+        acceptedCommands.add(GetProcessInstanceByCorrelationKeyCommand.class);
+        acceptedCommands.add(GetProcessInstanceCommand.class);
+        acceptedCommands.add(GetProcessInstancesCommand.class);
+        acceptedCommands.add(SetProcessInstanceVariablesCommand.class);
+        acceptedCommands.add(SignalEventCommand.class);
+        acceptedCommands.add(StartCorrelatedProcessCommand.class);
+        acceptedCommands.add(StartProcessCommand.class);
 
-        acceptedCommands.add(GetVariableCommand.class.getName());
-        acceptedCommands.add(GetFactCountCommand.class.getName());
-        acceptedCommands.add(GetGlobalCommand.class.getName());
-        acceptedCommands.add(GetIdCommand.class.getName());
-        acceptedCommands.add(SetGlobalCommand.class.getName());
+        acceptedCommands.add(GetVariableCommand.class);
+        acceptedCommands.add(GetFactCountCommand.class);
+        acceptedCommands.add(GetGlobalCommand.class);
+        acceptedCommands.add(GetIdCommand.class);
+        acceptedCommands.add(SetGlobalCommand.class);
         
-        acceptedCommands.add(DeleteCommand.class.getName());
-        acceptedCommands.add(FireAllRulesCommand.class.getName());
-        acceptedCommands.add(InsertObjectCommand.class.getName());
-        acceptedCommands.add(UpdateCommand.class.getName());
+        acceptedCommands.add(DeleteCommand.class);
+        acceptedCommands.add(FireAllRulesCommand.class);
+        acceptedCommands.add(InsertObjectCommand.class);
+        acceptedCommands.add(UpdateCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
     
-    public static Set<String> getSet() { 
+    public static Set<Class> getSet() { 
        return acceptedCommands; 
     }
 }
