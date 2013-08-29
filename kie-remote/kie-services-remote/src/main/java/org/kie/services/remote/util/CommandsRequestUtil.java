@@ -26,7 +26,7 @@ public class CommandsRequestUtil {
         if (commands != null) {
             for (int i = 0; i < commands.size(); ++i) {
                 Command<?> cmd = commands.get(i);
-                if (AcceptedCommands.getSet().contains(cmd.getClass())) {
+                if (AcceptedCommands.getSet().contains(cmd.getClass().getName())) {
                     throw new NotAcceptableException("The execute REST operation does not accept " + cmd.getClass().getSimpleName()
                             + " instances.");
                 }
@@ -74,7 +74,7 @@ public class CommandsRequestUtil {
         if (commands != null) {
             for (int i = 0; i < commands.size(); ++i) {
                 Command<?> cmd = commands.get(i);
-                if (AcceptedCommands.getSet().contains(cmd)) {
+                if (AcceptedCommands.getSet().contains(cmd.getClass().getName())) {
                     UnsupportedOperationException uoe = new UnsupportedOperationException(cmd.getClass().getSimpleName()
                             + " is not a supported command.");
                     jaxbResponse.addException(uoe, i, cmd);
