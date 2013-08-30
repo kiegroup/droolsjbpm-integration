@@ -58,7 +58,7 @@ public class KieBlueprintLoggerTest {
         KieLoggerAdaptor kieLoggerAdaptor = (KieLoggerAdaptor) container.getComponentInstance("ConsoleSessionLogger");
         assertNotNull(kieLoggerAdaptor);
         assertNotNull(kieLoggerAdaptor.getRuntimeLogger());
-        for (Object listener : impl.getWorkingMemoryEventListeners()) {
+        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
         }
     }
@@ -103,7 +103,7 @@ public class KieBlueprintLoggerTest {
     public void testStatelessKnowledgeConsoleLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) container.getComponentInstance("ConsoleLogger-statelessSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.workingMemoryEventSupport.getEventListeners()) {
+        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
         }
     }
@@ -112,7 +112,7 @@ public class KieBlueprintLoggerTest {
     public void testStatelessKnowledgeFileLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) container.getComponentInstance("FileLogger-statelessSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.workingMemoryEventSupport.getEventListeners()) {
+        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
             assertTrue(listener instanceof WorkingMemoryFileLogger);
         }
         KieLoggerAdaptor adaptor = (KieLoggerAdaptor) container.getComponentInstance("ss_fl_logger");
@@ -124,7 +124,7 @@ public class KieBlueprintLoggerTest {
     public void testStatelessKnowledgeThreadedFileLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) container.getComponentInstance("ThreadedFileLogger-statelessSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.workingMemoryEventSupport.getEventListeners()) {
+        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
             assertTrue(listener instanceof ThreadedWorkingMemoryFileLogger);
         }
         KieLoggerAdaptor loggerAdaptor = (KieLoggerAdaptor) container.getComponentInstance("ss_tfl_logger");
@@ -137,7 +137,7 @@ public class KieBlueprintLoggerTest {
     public void testSessionLoggersFromGroupAndNested() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) container.getComponentInstance("k1");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        assertEquals(2, impl.workingMemoryEventSupport.getEventListeners().size());
+        assertEquals(2, impl.mappedWorkingMemoryListeners.values().size());
 
         List list = new ArrayList();
         statelessKnowledgeSession.setGlobal("persons", list);
@@ -158,7 +158,7 @@ public class KieBlueprintLoggerTest {
     public void testStatelessNoNameFileLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) container.getComponentInstance("FileLogger-statelessSession-noNameLogger");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.workingMemoryEventSupport.getEventListeners()) {
+        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
             assertTrue(listener instanceof WorkingMemoryFileLogger);
         }
     }
