@@ -14,7 +14,7 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
-
+import org.jbpm.services.task.commands.*;
 
 public class AcceptedCommands {
 
@@ -41,16 +41,43 @@ public class AcceptedCommands {
         acceptedCommands.add(GetGlobalCommand.class);
         acceptedCommands.add(GetIdCommand.class);
         acceptedCommands.add(SetGlobalCommand.class);
-        
+
         acceptedCommands.add(DeleteCommand.class);
         acceptedCommands.add(FireAllRulesCommand.class);
         acceptedCommands.add(InsertObjectCommand.class);
         acceptedCommands.add(UpdateCommand.class);
-        
+
+        // Task commands
+        acceptedCommands.add(ActivateTaskCommand.class);
+        acceptedCommands.add(AddTaskCommand.class);
+        acceptedCommands.add(ClaimNextAvailableTaskCommand.class);
+        acceptedCommands.add(ClaimTaskCommand.class);
+        acceptedCommands.add(CompleteTaskCommand.class);
+        acceptedCommands.add(DelegateTaskCommand.class);
+        acceptedCommands.add(ExitTaskCommand.class);
+        acceptedCommands.add(FailTaskCommand.class);
+        acceptedCommands.add(ForwardTaskCommand.class);
+        acceptedCommands.add(GetAttachmentCommand.class);
+        acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
+        acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
+        acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
+        acceptedCommands.add(GetTaskCommand.class);
+        acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
+        acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
+        acceptedCommands.add(GetTasksOwnedCommand.class);
+        acceptedCommands.add(NominateTaskCommand.class);
+        acceptedCommands.add(ReleaseTaskCommand.class);
+        acceptedCommands.add(ResumeTaskCommand.class);
+        acceptedCommands.add(SkipTaskCommand.class);
+        acceptedCommands.add(StartTaskCommand.class);
+        acceptedCommands.add(StopTaskCommand.class);
+        acceptedCommands.add(SuspendTaskCommand.class);
+
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
-    
-    public static Set<Class> getSet() { 
-       return acceptedCommands; 
+
+    public static Set<Class> getSet() {
+        return acceptedCommands;
     }
 }
