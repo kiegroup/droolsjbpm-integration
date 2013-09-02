@@ -116,7 +116,6 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
     public JaxbGenericResponse signalProcessInstance(@PathParam("procInstId") Long procInstId) {
