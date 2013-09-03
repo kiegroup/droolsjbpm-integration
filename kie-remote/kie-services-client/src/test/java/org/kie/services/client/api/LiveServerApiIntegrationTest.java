@@ -21,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Ignore
-public class LiveServeApiIntegrationTest {
+public class LiveServerApiIntegrationTest {
 
-    protected static Logger logger = LoggerFactory.getLogger(LiveServeApiIntegrationTest.class);
+    protected static Logger logger = LoggerFactory.getLogger(LiveServerApiIntegrationTest.class);
 
     String deploymentId = "org.jbpm:Evaluation:1.0";
     URL deploymentUrl; 
@@ -33,7 +33,7 @@ public class LiveServeApiIntegrationTest {
     
     String taskUserId = "mary";
     
-    public LiveServeApiIntegrationTest() throws Exception { 
+    public LiveServerApiIntegrationTest() throws Exception { 
         this.deploymentUrl = new URL( "http://localhost:8080/kie-wb/" );
     }
     

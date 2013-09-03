@@ -16,7 +16,7 @@ import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-with-vars")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso(value={JaxbProcess.class, JaxbProcessInstanceResponse.class})
+@XmlSeeAlso(value={JaxbProcessInstanceResponse.class})
 public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbResponse {
 
     @XmlElement
