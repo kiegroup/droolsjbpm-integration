@@ -1,10 +1,11 @@
 package org.kie.services.remote.jms;
 
-import static org.kie.services.remote.util.CommandsRequestUtil.*;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.ejb.MessageDrivenContext;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -19,13 +20,19 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.xml.bind.JAXBException;
 
+import org.jboss.resteasy.spi.UnauthorizedException;
+import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.exception.PermissionDeniedException;
+import org.kie.api.command.Command;
+import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 import org.kie.services.remote.cdi.ProcessRequestBean;
+import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
+import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 
 /**
  * This class is the link between incoming request (whether via REST or JMS or .. whatever)
@@ -53,6 +60,7 @@ public class RequestMessageBean implements MessageListener {
         RESPONSE_QUEUE_NAME = System.getProperty(RESPONSE_QUEUE_NAME_PROPERTY, "queue/KIE.RESPONSE.ALL");
     }
 
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void onMessage(Message message) {
         boolean failure = false;
         String msgCorrId = null;
@@ -73,7 +81,7 @@ public class RequestMessageBean implements MessageListener {
         // 2. process request
         JaxbCommandsResponse jaxbResponse;
         if (cmdsRequest != null) {
-            jaxbResponse = jmsProcessJaxbCommandsRequest(cmdsRequest, processRequestBean);
+            jaxbResponse = processJaxbCommandsRequest(cmdsRequest, processRequestBean);
         } else {
             // Failure reasons have been logged in deserializeRequest(). 
             logger.error("Stopping processing of request message due to errors: see above.");
@@ -182,4 +190,75 @@ public class RequestMessageBean implements MessageListener {
         return byteMsg;
     }
 
+    public JaxbCommandsResponse processJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
+        // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
+        JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
+        List<Command<?>> commands = request.getCommands();
+
+        if (commands != null) {
+            for (int i = 0; i < commands.size(); ++i) {
+                Command<?> cmd = commands.get(i);
+                if( ! AcceptedCommands.getSet().contains(cmd.getClass())) {
+                    UnsupportedOperationException uoe = new UnsupportedOperationException(cmd.getClass().getName()
+                            + " is not a supported command.");
+                    jaxbResponse.addException(uoe, i, cmd);
+                    continue;
+                }
+
+                Object cmdResult = null;
+                if (cmd instanceof TaskCommand<?>) {
+                    cmdResult = internalDoTaskOperation(requestBean, cmd, jaxbResponse, i);
+                } else {
+                    cmdResult = internalDoKieSessionOperation(requestBean, cmd, request, jaxbResponse, i);
+                }
+                if (cmdResult != null) {
+                    try {
+                        // addResult could possibly throw an exception, which is why it's here and not above
+                        jaxbResponse.addResult(cmdResult, i, cmd);
+                    } catch (Exception e) {
+                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i + " because of "
+                                + e.getClass().getSimpleName(), e);
+                        jaxbResponse.addException(e, i, cmd);
+                    }
+                }
+            }
+        }
+
+        if (commands == null || commands.isEmpty()) {
+            logger.info("Commands request object with no commands sent!");
+        }
+
+        return jaxbResponse;
+    }
+    
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public Object internalDoTaskOperation(ProcessRequestBean requestBean, Command<?> cmd, JaxbCommandsResponse jaxbResponse, int i) { 
+        Object cmdResult;
+        try { 
+            cmdResult = requestBean.doTaskOperation(cmd);
+        } catch( UnauthorizedException ue ) { 
+           Throwable cause = ue.getCause(); 
+           if( cause instanceof PermissionDeniedException ) { 
+               PermissionDeniedException pde = (PermissionDeniedException) cause;
+               logger.warn(pde.getMessage());
+               jaxbResponse.addException(pde, i, cmd);
+               return null;
+           }
+           throw ue;
+        }
+        return cmdResult;
+    }
+    
+    @TransactionAttribute(TransactionAttributeType.NEVER)
+    public Object internalDoKieSessionOperation(ProcessRequestBean requestBean, Command<?> cmd, JaxbCommandsRequest request, JaxbCommandsResponse jaxbResponse, int i) { 
+        Object cmdResult;
+        try { 
+            cmdResult = requestBean.doKieSessionOperation(cmd, request.getDeploymentId(), request.getProcessInstanceId());
+        } catch( DomainNotFoundBadRequestException dnfbre ) { 
+            logger.warn( dnfbre.getMessage() );
+            jaxbResponse.addException(dnfbre, i, cmd);
+            return null;
+        }
+        return cmdResult;
+    }
 }
