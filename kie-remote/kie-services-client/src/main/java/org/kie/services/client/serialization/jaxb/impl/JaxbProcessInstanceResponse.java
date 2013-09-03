@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.kie.api.command.Command;
 import org.kie.api.definition.process.Process;
@@ -18,7 +17,6 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso(value={JaxbProcess.class})
 public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<ProcessInstance> implements ProcessInstance {
 
     @XmlElement(name="process-id")
@@ -29,17 +27,10 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     @XmlSchemaType(name="long")
     private Long id;
 
-    @XmlElement(name="process-name")
-    @XmlSchemaType(name="string")
-    private String processName;
-
     @XmlElement
     @XmlSchemaType(name="int")
     private Integer state; 
 
-    @XmlElement
-    private JaxbProcess process;
-    
     @XmlElement(name="event-types")
     private List<String> eventTypes;
     
@@ -66,9 +57,7 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         if( processInstance != null ) { 
             this.eventTypes = Arrays.asList(processInstance.getEventTypes());
             this.id = processInstance.getId();
-            this.process = new JaxbProcess(processInstance.getProcess());
             this.processId = processInstance.getProcessId();
-            this.processName = processInstance.getProcessName();
             this.state = processInstance.getState();
         }
     }
@@ -87,7 +76,8 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     
     @Override
     public String getProcessName() {
-        return processName;
+        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
+        throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
     }
     
     @Override
@@ -97,7 +87,8 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     
     @Override
     public Process getProcess() {
-        return process;
+        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
+        throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
     }
 
     @Override
