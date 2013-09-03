@@ -62,6 +62,7 @@
     <module>kie-spring</module>
     <module>kie-camel</module>
     <module>kie-aries-blueprint</module>
+    <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
     <module>drools-osgi-integration</module>
   </modules>
