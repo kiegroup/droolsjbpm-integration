@@ -3,16 +3,13 @@ package org.kie.services.remote.util;
 import java.util.List;
 
 import org.jboss.resteasy.spi.NotAcceptableException;
-import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,61 +66,5 @@ public class CommandsRequestUtil {
         return jaxbResponse;
     }
 
-    public static JaxbCommandsResponse jmsProcessJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
-        // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
-        JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
-        List<Command<?>> commands = request.getCommands();
 
-        if (commands != null) {
-            for (int i = 0; i < commands.size(); ++i) {
-                Command<?> cmd = commands.get(i);
-                if( ! AcceptedCommands.getSet().contains(cmd.getClass())) {
-                    UnsupportedOperationException uoe = new UnsupportedOperationException(cmd.getClass().getName()
-                            + " is not a supported command.");
-                    jaxbResponse.addException(uoe, i, cmd);
-                    continue;
-                }
-
-                Object cmdResult = null;
-                if (cmd instanceof TaskCommand<?>) {
-                    try { 
-                        cmdResult = requestBean.doTaskOperation(cmd);
-                    } catch( UnauthorizedException ue ) { 
-                       Throwable cause = ue.getCause(); 
-                       if( cause instanceof PermissionDeniedException ) { 
-                           PermissionDeniedException pde = (PermissionDeniedException) cause;
-                           logger.warn(pde.getMessage());
-                           jaxbResponse.addException(pde, i, cmd);
-                           continue;
-                       }
-                       throw ue;
-                    }
-                } else {
-                    try { 
-                        cmdResult = requestBean.doKieSessionOperation(cmd, request.getDeploymentId(), request.getProcessInstanceId());
-                    } catch( DomainNotFoundBadRequestException dnfbre ) { 
-                        logger.warn( dnfbre.getMessage() );
-                        jaxbResponse.addException(dnfbre, i, cmd);
-                        continue;
-                    }
-                }
-                if (cmdResult != null) {
-                    try {
-                        // addResult could possibly throw an exception, which is why it's here and not above
-                        jaxbResponse.addResult(cmdResult, i, cmd);
-                    } catch (Exception e) {
-                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i + " because of "
-                                + e.getClass().getSimpleName(), e);
-                        jaxbResponse.addException(e, i, cmd);
-                    }
-                }
-            }
-        }
-
-        if (commands == null || commands.isEmpty()) {
-            logger.info("Commands request object with no commands sent!");
-        }
-
-        return jaxbResponse;
-    }
 }
