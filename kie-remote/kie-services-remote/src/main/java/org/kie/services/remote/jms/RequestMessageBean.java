@@ -45,10 +45,6 @@ public class RequestMessageBean implements MessageListener {
     @Inject
     private ProcessRequestBean processRequestBean;
 
-    @Resource
-    // TODO: set tx to rollback in some cases?
-    private MessageDrivenContext msgContext;
-    
     private String RESPONSE_QUEUE_NAME = null;
     private static String RESPONSE_QUEUE_NAME_PROPERTY = "kie.services.jms.queues.response";
 

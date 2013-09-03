@@ -16,9 +16,9 @@ import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
+import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 
 @ApplicationScoped
 public class ProcessRequestBean {
@@ -38,7 +38,8 @@ public class ProcessRequestBean {
             result = kieSession.execute(cmd);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
-            logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
+            logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            logger.trace("Stack trace: \n", e);
             result = exceptResp;
         }
         return result;
@@ -52,7 +53,8 @@ public class ProcessRequestBean {
             throw new UnauthorizedException(pde.getMessage(), pde);
         } catch( Exception e ) { 
             JaxbExceptionResponse exceptResp = new JaxbExceptionResponse(e, cmd);
-            logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName(), e);
+            logger.warn( "Unable to execute " + exceptResp.getCommandName() + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            logger.trace("Stack trace: \n", e);
             result = exceptResp;
         }
         return result;
