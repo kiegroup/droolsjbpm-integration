@@ -18,7 +18,7 @@ package org.kie.aries.blueprint.namespace;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
-import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.drools.core.util.StringUtils;
 import org.kie.aries.blueprint.factorybeans.KSessionOptions;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
@@ -106,7 +106,7 @@ public class KieSessionElementParser extends AbstractElementParser {
         kSessionOptions.setScope(element.getAttribute(ATTRIBUTE_CLOCK_TYPE));
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
-        PassThroughMetadataImpl passThroughMetadata = context.createMetadata(PassThroughMetadataImpl.class);
+        MutablePassThroughMetadata passThroughMetadata = context.createMetadata(MutablePassThroughMetadata.class);
         passThroughMetadata.setObject(kSessionOptions);
         beanMetadata.addArgument(passThroughMetadata, null, 5);
 
