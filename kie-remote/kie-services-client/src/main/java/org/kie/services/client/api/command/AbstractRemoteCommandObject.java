@@ -65,6 +65,12 @@ public abstract class AbstractRemoteCommandObject {
     // Execute methods -----------------------------------------------------------------------------------------------------
 
     public <T> T execute(Command<T> command) {
+        if( ! AcceptedCommands.getSet().contains(command.getClass()) ) {
+            StackTraceElement [] st = Thread.currentThread().getStackTrace();
+            String methodName = st[2].getMethodName();
+            throw new UnsupportedOperationException( "The ." + methodName + "(..) method is not supported on the remote api." );
+        }
+        
         if (config.isRest()) {
             return executeRestCommand(command);
         } else {
