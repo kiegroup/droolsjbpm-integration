@@ -24,7 +24,6 @@ public class AcceptedCommands {
         acceptedCommands.add(AbortWorkItemCommand.class);
         acceptedCommands.add(CompleteWorkItemCommand.class);
         acceptedCommands.add(GetWorkItemCommand.class);
-        acceptedCommands.add(RegisterWorkItemHandlerCommand.class);
 
         acceptedCommands.add(AbortProcessInstanceCommand.class);
         acceptedCommands.add(GetProcessIdsCommand.class);
