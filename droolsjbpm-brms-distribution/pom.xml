@@ -68,6 +68,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-spring</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>knowledge-api</artifactId>
+    </dependency>
     
     <!-- The old assembly also included this optional dependency -->
     <dependency>
