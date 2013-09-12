@@ -1,5 +1,20 @@
 package org.drools.jboss.integration;
 
+import static junit.framework.Assert.fail;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+
+import org.drools.workbench.models.datamodel.model.Annotation;
+import org.drools.workbench.models.datamodel.model.ModelField;
+import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.guvnor.common.services.project.builder.events.InvalidateDMOProjectCacheEvent;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
@@ -9,26 +24,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Path;
-import org.kie.workbench.common.screens.datamodeller.model.*;
+import org.kie.workbench.common.screens.datamodeller.model.AnnotationDefinitionTO;
+import org.kie.workbench.common.screens.datamodeller.model.DataModelTO;
+import org.kie.workbench.common.screens.datamodeller.model.DataObjectTO;
+import org.kie.workbench.common.screens.datamodeller.model.GenerationResult;
+import org.kie.workbench.common.screens.datamodeller.model.ObjectPropertyTO;
 import org.kie.workbench.common.screens.datamodeller.service.DataModelerService;
-import org.kie.workbench.common.services.datamodel.model.Annotation;
-import org.kie.workbench.common.services.datamodel.model.ModelField;
-import org.kie.workbench.common.services.datamodel.oracle.ProjectDataModelOracle;
 import org.kie.workbench.common.services.datamodel.service.DataModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
-
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
-import static junit.framework.Assert.fail;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
 
 
 @Ignore
