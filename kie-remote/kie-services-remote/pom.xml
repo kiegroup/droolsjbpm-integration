@@ -65,6 +65,10 @@
       <artifactId>resteasy-jaxrs</artifactId>
       <scope>provided</scope> <!-- for AS 7 -->
     </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>jaxrs-api</artifactId>
+    </dependency>
 
     <!-- general -->
     <dependency>
