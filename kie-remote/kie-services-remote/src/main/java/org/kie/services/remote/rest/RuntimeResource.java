@@ -172,6 +172,7 @@ public class RuntimeResource extends ResourceBase {
     
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    @Produces(MediaType.APPLICATION_XML)
     public JaxbGenericResponse doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         Command<?> cmd = null;
