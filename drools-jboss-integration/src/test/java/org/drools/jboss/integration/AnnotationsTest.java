@@ -12,9 +12,9 @@ import java.util.Set;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.drools.workbench.models.datamodel.model.Annotation;
-import org.drools.workbench.models.datamodel.model.ModelField;
-import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
+import org.drools.workbench.models.commons.shared.oracle.model.Annotation;
+import org.drools.workbench.models.commons.shared.oracle.model.ModelField;
+import org.drools.workbench.models.commons.shared.oracle.ProjectDataModelOracle;
 import org.guvnor.common.services.project.builder.events.InvalidateDMOProjectCacheEvent;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
