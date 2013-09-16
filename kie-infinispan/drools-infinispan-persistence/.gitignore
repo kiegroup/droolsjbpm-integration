@@ -8,3 +8,7 @@
 /*.ipr
 /*.iws
 /*.iml
+
+# Test data
+/btm*log
+/org.drools.*/

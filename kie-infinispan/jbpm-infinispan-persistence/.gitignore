@@ -8,3 +8,8 @@
 /*.ipr
 /*.iws
 /*.iml
+
+# Test data
+/btm*.tlog
+/org.jbpm.*/
+/org.drools.*/
