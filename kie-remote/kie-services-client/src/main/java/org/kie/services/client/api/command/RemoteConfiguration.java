@@ -74,34 +74,30 @@ public class RemoteConfiguration {
 
     // REST ----------------------------------------------------------------------------------------------------------------------
 
-    protected RemoteConfiguration() { 
+    protected RemoteConfiguration() {
         type = Type.HELPER;
     }
-    
-    public RemoteConfiguration(String deploymentId, String url) {
-        this.type = Type.REST;
-        String urlString = initialize(deploymentId, url);
-        try {
-            URL realUrl = new URL(urlString);
-            this.requestFactory = new ClientRequestFactory(realUrl.toURI());
-        } catch (MalformedURLException murle) {
-            throw new IllegalArgumentException("url argument (" + urlString + ") was not a proper url: " + murle.getMessage());
-        } catch (URISyntaxException urise) {
-            throw new IllegalArgumentException("url argument (" + urlString + ") was not a proper url: " + urise.getMessage());
-        }
 
+    public RemoteConfiguration(String deploymentId, URL url) {
+        this.type = Type.REST;
+        URL realUrl = initialize(deploymentId, url);
+        try { 
+            this.requestFactory = new ClientRequestFactory(realUrl.toURI());
+        } catch (URISyntaxException urise) {
+            throw new IllegalArgumentException("URL (" + realUrl.toExternalForm() + ") is incorrectly formatted: " + urise.getMessage(), urise);
+        }
     }
 
-    public RemoteConfiguration(String deploymentId, String url, String username, String password) {
+    public RemoteConfiguration(String deploymentId, URL url, String username, String password) {
         this(deploymentId, url, username, password, 5);
     }
 
-    public RemoteConfiguration(String deploymentId, String url, String username, String password, int timeout) {
+    public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout) {
         this.type = Type.REST;
-        String urlString = initialize(deploymentId, url);
-        this.requestFactory = createAuthenticatingRequestFactory(urlString, username, password, timeout);
+        URL serverPlusRestUrl = initialize(deploymentId, url);
+        this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
 
-        if (username == null || url.trim().isEmpty()) {
+        if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
         }
         if (password == null) {
@@ -111,33 +107,44 @@ public class RemoteConfiguration {
         this.password = password;
     }
 
-    private String initialize(String deploymentId, String urlString) {
+    private URL initialize(String deploymentId, URL url) {
         if (deploymentId == null || deploymentId.trim().isEmpty()) {
             throw new IllegalArgumentException("The deployment id may not be empty or null.");
         }
-        if (urlString == null || urlString.trim().isEmpty()) {
+        if (url == null ) {
             throw new IllegalArgumentException("The url may not be empty or null.");
         }
+        try { 
+            url.toURI();
+        } catch( URISyntaxException urise) { 
+            throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is incorrectly formatted: " + urise.getMessage(), urise);
+        }
         this.deploymentId = deploymentId;
+       
+        String urlString = url.toExternalForm();
         if (!urlString.endsWith("/")) {
             urlString += "/";
         }
         urlString += "rest";
+        
+        URL serverPlusRestUrl;
+        try {
+            serverPlusRestUrl = new URL(urlString);
+        } catch (MalformedURLException murle) {
+            throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is incorrectly formatted: " + murle.getMessage(), murle);
+        }
 
-        return urlString;
+        return serverPlusRestUrl;
     }
 
-    protected static ClientRequestFactory createAuthenticatingRequestFactory(String urlString, String username, String password, int timeout) {
+    protected static ClientRequestFactory createAuthenticatingRequestFactory(URL url, String username, String password, int timeout) {
+        BasicHttpContext localContext = new BasicHttpContext();
+        HttpClient preemptiveAuthClient = createPreemptiveAuthHttpClient(username, password, timeout, localContext);
+        ClientExecutor clientExecutor = new ApacheHttpClient4Executor(preemptiveAuthClient, localContext);
         try {
-            URL realUrl = new URL(urlString);
-            BasicHttpContext localContext = new BasicHttpContext();
-            HttpClient preemptiveAuthClient = createPreemptiveAuthHttpClient(username, password, timeout, localContext);
-            ClientExecutor clientExecutor = new ApacheHttpClient4Executor(preemptiveAuthClient, localContext);
-            return new ClientRequestFactory(clientExecutor, realUrl.toURI());
-        } catch (MalformedURLException murle) {
-            throw new IllegalArgumentException("url argument (" + urlString + ") was not a proper url: " + murle.getMessage());
+            return new ClientRequestFactory(clientExecutor, url.toURI());
         } catch (URISyntaxException urise) {
-            throw new IllegalArgumentException("url argument (" + urlString + ") was not a proper url: " + urise.getMessage());
+            throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is not formatted correctly.", urise);
         }
     }
 
@@ -154,7 +161,7 @@ public class RemoteConfiguration {
                     new UsernamePasswordCredentials(userName, password));
             // Generate BASIC scheme object and stick it to the local execution context
             BasicScheme basicAuth = new BasicScheme();
-           
+
             String contextId = UUID.randomUUID().toString();
             localContext.setAttribute(contextId, basicAuth);
 
@@ -178,12 +185,13 @@ public class RemoteConfiguration {
     }
 
     static class PreemptiveAuth implements HttpRequestInterceptor {
-        
+
         private final String contextId;
-        public PreemptiveAuth(String contextId) { 
+
+        public PreemptiveAuth(String contextId) {
             this.contextId = contextId;
         }
-        
+
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
 
             AuthState authState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);

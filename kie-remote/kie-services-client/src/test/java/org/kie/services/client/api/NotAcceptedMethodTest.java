@@ -13,7 +13,7 @@ public class NotAcceptedMethodTest extends Assert {
     public void remoteRestApi() throws Exception { 
         URL deploymentUrl = new URL( "http://localhost:8080/kie-wb/" );
         RemoteRestSessionFactory restSessionFactory 
-            = new RemoteRestSessionFactory("deployment", deploymentUrl.toExternalForm(), "mary", "pass");
+            = new RemoteRestSessionFactory("deployment", deploymentUrl, "mary", "pass");
         
         WorkItemHandler wih = new DoNothingWorkItemHandler();
         try { 

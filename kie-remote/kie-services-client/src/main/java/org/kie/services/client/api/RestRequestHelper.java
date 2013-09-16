@@ -1,5 +1,9 @@
 package org.kie.services.client.api;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.kie.services.client.api.command.RemoteConfiguration;
@@ -15,6 +19,30 @@ public class RestRequestHelper extends RemoteConfiguration {
     private static int DEFAULT_TIMEOUT = 5;
 
     /**
+     * Helper methods
+     */
+    
+    private URL addRestToPath(URL origUrl) { 
+        StringBuilder urlString = new StringBuilder(origUrl.toExternalForm());
+        if (!urlString.toString().endsWith("/")) {
+            urlString.append("/");
+        }
+        urlString.append("rest/");
+        URL origPlusRestUrl = convertStringToUrl(urlString.toString());
+        return origPlusRestUrl;
+    }
+
+    private static URL convertStringToUrl(String urlString) { 
+        URL realUrl;
+        try { 
+            realUrl = new URL(urlString);
+        } catch (MalformedURLException murle) {
+            throw new IllegalArgumentException("URL (" + urlString + ") is incorrectly formatted: " + murle.getMessage(), murle);
+        }
+        return realUrl;
+    }
+
+    /**
      * Creates a {@link RestRequestHelper} instance.
      * 
      * @param serverPortUrl in the format of "http://server:port/"
@@ -22,9 +50,10 @@ public class RestRequestHelper extends RemoteConfiguration {
      * @param password The password associated with the username.
      * @param timeout The timeout used for REST requests.
      */
-    public RestRequestHelper(String serverPortUrl, String username, String password, int timeout) {
+    public RestRequestHelper(URL serverPortUrl, String username, String password, int timeout) {
         super();
-        this.requestFactory = createAuthenticatingRequestFactory(serverPortUrl + "rest/", username, password, timeout);
+        URL serverPlusRestUrl = addRestToPath(serverPortUrl);
+        this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
     }
 
     /**
@@ -35,12 +64,10 @@ public class RestRequestHelper extends RemoteConfiguration {
      * @param password The password associated with the username.
      * 
      */
-    public RestRequestHelper(String serverPortUrl, String username, String password) {
+    public RestRequestHelper(URL serverPortUrl, String username, String password) {
         super();
-        if (!serverPortUrl.endsWith("/")) {
-            serverPortUrl = serverPortUrl + "/";
-        }
-        this.requestFactory = createAuthenticatingRequestFactory(serverPortUrl + "rest/", username, password, DEFAULT_TIMEOUT);
+        URL serverPlusRestUrl = addRestToPath(serverPortUrl);
+        this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, DEFAULT_TIMEOUT);
     }
 
     /**
@@ -82,12 +109,28 @@ public class RestRequestHelper extends RemoteConfiguration {
      * @return A {@link ClientRequestFactory} in order to create REST request ( {@link ClientRequest} ) instances
      * to interact with the REST api. 
      */
-    public static ClientRequestFactory createRestRequest(String restBaseUrl, String username, String password, int timeout) {
-        return createAuthenticatingRequestFactory(restBaseUrl, username, password, timeout);
+    public static ClientRequestFactory createRestRequestFactory(String restBaseUrlString, String username, String password, int timeout) {
+        URL url = convertStringToUrl(restBaseUrlString);
+        return createAuthenticatingRequestFactory(url, username, password, timeout);
     }
 
     /**
-     * See {@link RestRequestHelper#createRestRequest(String, String, String, int)}. This method uses a default timeout of 
+     * See {@link RestRequestHelper#createRestRequestFactory(String, String, String, int)}. This method uses a default timeout of 
+     * 5 seconds, whereas the referred method allows users to pass the value for the timeout. 
+     * 
+     * @param restBaseUrlString The base URL of the rest server, which will have this format: "http://server[:port]/rest". 
+     * @param username The username to use when authenticating.
+     * @param password The password to use when authenticating.
+     * @return A {@link ClientRequestFactory} in order to create REST request ( {@link ClientRequest} ) instances
+     * to interact with the REST api. 
+     */
+    public static ClientRequestFactory createRestRequestFactory(String restBaseUrlString, String username, String password) {
+        URL url = convertStringToUrl(restBaseUrlString);
+        return createAuthenticatingRequestFactory(url, username, password, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * See {@link RestRequestHelper#createRestRequestFactory(String, String, String, int)}. This method uses a default timeout of 
      * 5 seconds, whereas the referred method allows users to pass the value for the timeout. 
      * 
      * @param restBaseUrl The base URL of the rest server, which will have this format: "http://server[:port]/rest". 
@@ -96,8 +139,7 @@ public class RestRequestHelper extends RemoteConfiguration {
      * @return A {@link ClientRequestFactory} in order to create REST request ( {@link ClientRequest} ) instances
      * to interact with the REST api. 
      */
-    public static ClientRequestFactory createRestRequest(String restBaseUrl, String username, String password) {
+    public static ClientRequestFactory createRestRequestFactory(URL restBaseUrl, String username, String password) {
         return createAuthenticatingRequestFactory(restBaseUrl, username, password, DEFAULT_TIMEOUT);
     }
-
 }
