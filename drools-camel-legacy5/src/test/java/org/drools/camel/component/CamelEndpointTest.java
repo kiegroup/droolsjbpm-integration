@@ -33,11 +33,14 @@ package org.drools.camel.component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.mock.MockEndpoint;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.GetObjectCommand;
@@ -47,10 +50,10 @@ import org.drools.pipeline.camel.Person;
 import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
-import org.kie.internal.command.CommandFactory;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.command.CommandFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class CamelEndpointTest extends DroolsCamelTestSupport {
     private String handle;
@@ -72,6 +75,44 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
         assertTrue( "ExecutionResults missing expected fact",
                     response.getFactHandle( "salaboy" ) instanceof FactHandle);
     }
+    
+    @Test
+    public void testSessionInsertWithHeaders() throws Exception {
+        
+        MockEndpoint mockResult = context.getEndpoint("mock:resultWithHeader",MockEndpoint.class);
+        
+        String headerName ="testHeaderName";
+        String headerValue ="testHeaderValue";
+        
+        Person person = new Person();
+        person.setName( "Mauricio" );
+
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert( person,
+                                                                                  "salaboy" );
+        Map<String,Object> headers= new HashMap<String, Object>();
+        headers.put(headerName,headerValue);
+        headers.put( DroolsComponent.DROOLS_LOOKUP,"ksession1");
+        
+        // set mock expectations
+        mockResult.expectedMessageCount(1);
+        mockResult.expectedHeaderReceived(headerName,headerValue);
+        
+        
+        template.requestBodyAndHeaders( "direct:test-with-session-withHeader",
+                                                                             cmd,headers );
+        
+        ExecutionResults response = mockResult.getReceivedExchanges().get(0).getIn().getBody(ExecutionResults.class);
+        
+        assertTrue( "Expected valid ExecutionResults object",
+                    response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) instanceof FactHandle);
+        
+       mockResult.assertIsSatisfied();
+    }
+
 
     @Test
     public void testNoSessionInsert() throws Exception {
@@ -90,6 +131,42 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
         assertTrue( "ExecutionResults missing expected fact",
                     response.getFactHandle( "salaboy" ) != null );
     }
+    
+    @Test
+    public void testNoSessionInsertWithHeaders() throws Exception {
+        
+    	MockEndpoint mockResult = context.getEndpoint("mock:resultWithHeader",MockEndpoint.class);
+    	
+    	String headerName ="testHeaderName";
+        String headerValue ="testHeaderValue";
+        
+        Person person = new Person();
+        person.setName( "Mauricio" );
+
+        InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert( person,
+                                                                                  "salaboy" );
+
+        Map<String,Object> headers= new HashMap<String, Object>();
+        headers.put(headerName,headerValue);
+        headers.put( DroolsComponent.DROOLS_LOOKUP,"ksession1");
+        
+        // set mock expectations
+        mockResult.expectedMessageCount(1);
+        mockResult.expectedHeaderReceived(headerName,headerValue);
+        
+        template.requestBodyAndHeaders("direct:test-no-session-withHeader",
+                cmd,headers);
+        
+        ExecutionResults response = mockResult.getReceivedExchanges().get(0).getIn().getBody(ExecutionResults.class);
+        
+        assertTrue( "Expected valid ExecutionResults object",
+                    response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                    response.getFactHandle( "salaboy" ) != null );
+        
+        mockResult.assertIsSatisfied();
+    }
+
 
     @Test
     public void testSessionBatchExecutionCommand() throws Exception {
@@ -109,7 +186,46 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
         assertTrue( "ExecutionResults missing expected fact",
                 response.getFactHandle( "john" ) instanceof FactHandle);
     }
+    
+    @Test
+    public void testSessionBatchExecutionCommandWithHeader() throws Exception {
+        
+    	MockEndpoint mockResult = context.getEndpoint("mock:resultWithHeader",MockEndpoint.class);
+    	
+    	String headerName ="testHeaderName";
+        String headerValue ="testHeaderValue";
+        
+    	Person john = new Person();
+        john.setName("John Smith");
 
+        List<Command> commands = new ArrayList<Command>();
+        commands.add(CommandFactory.newInsert(john, "john"));
+        BatchExecutionCommand batchExecutionCommand = CommandFactory.newBatchExecution(commands);
+
+        Map<String,Object> headers= new HashMap<String, Object>();
+        headers.put(headerName,headerValue);
+        
+        // set mock expectations
+        mockResult.expectedMessageCount(1);
+        mockResult.expectedHeaderReceived(headerName,headerValue);
+        
+        //do test
+        template.requestBodyAndHeaders("direct:test-with-session-withHeader",
+                batchExecutionCommand,headers);
+        
+        ExecutionResults response = mockResult.getReceivedExchanges().get(0).getIn().getBody(ExecutionResults.class);
+        
+        assertTrue( "Expected valid ExecutionResults object",
+                response != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                response.getFactHandle( "john" ) != null );
+        assertTrue( "ExecutionResults missing expected fact",
+                response.getFactHandle( "john" ) instanceof FactHandle);
+        
+        mockResult.assertIsSatisfied();
+    }
+
+    
     @Test
     public void testSessionGetObject() throws Exception {
         FactHandle factHandle = new DefaultFactHandle( handle );
@@ -134,6 +250,8 @@ public class CamelEndpointTest extends DroolsCamelTestSupport {
             public void configure() throws Exception {
                 from( "direct:test-with-session" ).to( "drools://node/ksession1" );
                 from( "direct:test-no-session" ).to( "drools://node" );
+                from( "direct:test-with-session-withHeader" ).to( "drools://node/ksession1" ).to("mock:resultWithHeader");
+                from( "direct:test-no-session-withHeader" ).to( "drools://node/ksession1" ).to("mock:resultWithHeader");
             }
         };
     }
