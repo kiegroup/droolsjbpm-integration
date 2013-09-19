@@ -65,7 +65,6 @@
     <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
     <module>drools-osgi-integration</module>
-    <module>kie-infinispan</module>
   </modules>
 
   <profiles>
