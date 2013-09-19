@@ -99,5 +99,6 @@ public class DroolsExecuteProducer extends DefaultProducer {
 
         ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
         exchange.getOut().setBody( results );
+        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
     }
 }
