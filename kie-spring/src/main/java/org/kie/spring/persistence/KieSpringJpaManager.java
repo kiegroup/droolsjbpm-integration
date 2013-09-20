@@ -124,7 +124,12 @@ public class KieSpringJpaManager
             if (this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER) != null) {
                 getCommandScopedPersistenceContext().close();
             }
-
+            
+            // Code formerly in the clearPersistenceContext method.
+            EntityManager cmdScopedEntityManager = (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
+            if (cmdScopedEntityManager != null) {
+                cmdScopedEntityManager.clear();
+            }
         }
     }
 
@@ -146,16 +151,6 @@ public class KieSpringJpaManager
 
     public ProcessPersistenceContext getProcessPersistenceContext() {
         return new JpaProcessPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER));
-    }
-
-    public void clearPersistenceContext() {
-        if (TransactionSynchronizationManager.hasResource("cmdEM")) {
-            EntityManager cmdScopedEntityManager = (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
-            if (cmdScopedEntityManager != null) {
-                cmdScopedEntityManager.clear();
-            }
-
-        }
     }
 
 }
