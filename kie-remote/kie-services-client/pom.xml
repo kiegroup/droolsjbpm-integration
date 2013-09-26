@@ -66,6 +66,12 @@
       <version>1.1</version>
     </dependency>
 
+    <!-- json -->
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+    </dependency>
+
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
