@@ -10,9 +10,17 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.runtime.*;
 import org.drools.core.command.runtime.process.*;
 import org.drools.core.command.runtime.rule.*;
+import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
+import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindNodeInstancesCommand;
+import org.jbpm.process.audit.command.FindProcessInstanceCommand;
+import org.jbpm.process.audit.command.FindProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 import org.kie.api.command.Command;
 
@@ -32,64 +40,34 @@ public class JaxbCommandsRequest {
     @XmlSchemaType(name = "int")
     private Integer version = 1;
 
+    // This list should match the list in AcceptedCommands
     @XmlElements({
-            @XmlElement(name = "abort-process-instance", type = AbortProcessInstanceCommand.class),
-            @XmlElement(name = "abort-work-item", type = AbortWorkItemCommand.class),
             @XmlElement(name = "complete-work-item", type = CompleteWorkItemCommand.class),
-            @XmlElement(name = "create-correlated-process-instance", type = CreateCorrelatedProcessInstanceCommand.class),
-            @XmlElement(name = "create-process-instance", type = CreateProcessInstanceCommand.class),
-            @XmlElement(name = "get-process-event-listeners", type = GetProcessEventListenersCommand.class),
-            @XmlElement(name = "get-process-instance", type = GetProcessInstanceCommand.class),
-            @XmlElement(name = "get-process-instance-by-correlation-key", type = GetProcessInstanceByCorrelationKeyCommand.class),
-            @XmlElement(name = "get-process-instances", type = GetProcessInstancesCommand.class),
+            @XmlElement(name = "abort-work-item", type = AbortWorkItemCommand.class),
             @XmlElement(name = "get-workitem", type = GetWorkItemCommand.class),
-            @XmlElement(name = "register-workitem-handler", type = RegisterWorkItemHandlerCommand.class),
+            
+            @XmlElement(name = "abort-process-instance", type = AbortProcessInstanceCommand.class),
+            @XmlElement(name = "get-process-ids", type = GetProcessIdsCommand.class),
+            @XmlElement(name = "get-process-instance-by-correlation-key", type = GetProcessInstanceByCorrelationKeyCommand.class),
+            @XmlElement(name = "get-process-instance", type = GetProcessInstanceCommand.class),
+            @XmlElement(name = "get-process-instances", type = GetProcessInstancesCommand.class),
+            @XmlElement(name = "set-process-instance-vars", type = SetProcessInstanceVariablesCommand.class),
             @XmlElement(name = "signal-event", type = SignalEventCommand.class),
             @XmlElement(name = "start-correlated-process", type = StartCorrelatedProcessCommand.class),
             @XmlElement(name = "start-process", type = StartProcessCommand.class),
-            @XmlElement(name = "start-process-instance", type = StartProcessInstanceCommand.class),
-
-            @XmlElement(name = "agenda-group-set-focus", type = AgendaGroupSetFocusCommand.class),
-            @XmlElement(name = "clear-activation-group", type = ClearActivationGroupCommand.class),
-            @XmlElement(name = "clear-agenda", type = ClearAgendaCommand.class),
-            @XmlElement(name = "clear-agenda-group", type = ClearAgendaGroupCommand.class),
-            @XmlElement(name = "clear-ruleflow-group", type = ClearRuleFlowGroupCommand.class),
-            @XmlElement(name = "delete", type = DeleteCommand.class),
-            @XmlElement(name = "fire-all-rules", type = FireAllRulesCommand.class),
-            @XmlElement(name = "fire-until-halt", type = FireUntilHaltCommand.class),
-            @XmlElement(name = "from-external-fact-handle", type = FromExternalFactHandleCommand.class),
-            @XmlElement(name = "get-agenda-event-listeners", type = GetAgendaEventListenersCommand.class),
-            @XmlElement(name = "get-entry-point", type = GetEntryPointCommand.class),
-            @XmlElement(name = "get-entry-points", type = GetEntryPointsCommand.class),
-            @XmlElement(name = "get-fact-handle", type = GetFactHandleCommand.class),
-            @XmlElement(name = "get-fact-handles", type = GetFactHandlesCommand.class),
-            @XmlElement(name = "get-object", type = GetObjectCommand.class),
-            @XmlElement(name = "get-objects", type = GetObjectsCommand.class),
-            @XmlElement(name = "get-working-memory-event-listeners", type = GetWorkingMemoryEventListenersCommand.class),
-            @XmlElement(name = "halt", type = HaltCommand.class),
-            @XmlElement(name = "insert-elements", type = InsertElementsCommand.class),
-            @XmlElement(name = "insert-object", type = InsertObjectCommand.class),
-            @XmlElement(name = "insert-object-in-entry-point", type = InsertObjectInEntryPointCommand.class),
-            @XmlElement(name = "modify", type = ModifyCommand.class),
-            @XmlElement(name = "query", type = QueryCommand.class),
-            @XmlElement(name = "update", type = UpdateCommand.class),
-
-            @XmlElement(name = "destroy-session", type = DestroySessionCommand.class),
-            @XmlElement(name = "dispose", type = DisposeCommand.class),
-            @XmlElement(name = "get-calendars", type = GetCalendarsCommand.class),
-            @XmlElement(name = "get-channels", type = GetChannelsCommand.class),
-            @XmlElement(name = "get-environment", type = GetEnvironmentCommand.class),
+            
+            @XmlElement(name = "get-variable", type = GetVariableCommand.class),
             @XmlElement(name = "get-fact-count", type = GetFactCountCommand.class),
             @XmlElement(name = "get-global", type = GetGlobalCommand.class),
-            @XmlElement(name = "get-globals", type = GetGlobalsCommand.class),
             @XmlElement(name = "get-id", type = GetIdCommand.class),
-            @XmlElement(name = "get-knowledge-base", type = GetKnowledgeBaseCommand.class),
-            @XmlElement(name = "kbuilder-set-property", type = KBuilderSetPropertyCommand.class),
-            @XmlElement(name = "register-channel", type = RegisterChannelCommand.class),
-            @XmlElement(name = "remove-event-listener", type = RemoveEventListenerCommand.class),
             @XmlElement(name = "set-global", type = SetGlobalCommand.class),
-            @XmlElement(name = "unregister-channel", type = UnregisterChannelCommand.class),
-
+            
+            @XmlElement(name = "delete", type = DeleteCommand.class),
+            @XmlElement(name = "fire-all-rules", type = FireAllRulesCommand.class),
+            @XmlElement(name = "insert-object", type = InsertObjectCommand.class),
+            @XmlElement(name = "update", type = UpdateCommand.class),
+           
+            // task
             @XmlElement(name = "activate-task", type = ActivateTaskCommand.class),
             @XmlElement(name = "add-task", type = AddTaskCommand.class),
             @XmlElement(name = "claim-next-available-task", type = ClaimNextAvailableTaskCommand.class),
@@ -114,7 +92,17 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "skip-task", type = SkipTaskCommand.class),
             @XmlElement(name = "start-task", type = StartTaskCommand.class),
             @XmlElement(name = "stop-task", type = StopTaskCommand.class),
-            @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class) })
+            @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class),
+            
+            // audit
+            @XmlElement(name = "clear-history-logs", type = ClearHistoryLogsCommand.class),
+            @XmlElement(name = "find-active-process-instances", type = FindActiveProcessInstancesCommand.class),
+            @XmlElement(name = "find-node-instances", type = FindNodeInstancesCommand.class),
+            @XmlElement(name = "find-process-instance", type = FindProcessInstanceCommand.class),
+            @XmlElement(name = "find-process-instances", type = FindProcessInstancesCommand.class),
+            @XmlElement(name = "find-subprocess-instances", type = FindSubProcessInstancesCommand.class),
+            @XmlElement(name = "find-variable-instances", type = FindVariableInstancesCommand.class)
+    })
     protected List<Command<?>> commands;
 
     public JaxbCommandsRequest() {

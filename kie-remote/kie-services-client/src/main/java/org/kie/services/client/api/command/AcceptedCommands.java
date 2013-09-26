@@ -14,13 +14,19 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
+import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
+import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindNodeInstancesCommand;
+import org.jbpm.process.audit.command.FindProcessInstanceCommand;
+import org.jbpm.process.audit.command.FindProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 
 public class AcceptedCommands {
 
     private static Set<Class> acceptedCommands = new HashSet<Class>();
     static {
-
         acceptedCommands.add(AbortWorkItemCommand.class);
         acceptedCommands.add(CompleteWorkItemCommand.class);
         acceptedCommands.add(GetWorkItemCommand.class);
@@ -73,6 +79,15 @@ public class AcceptedCommands {
         acceptedCommands.add(StopTaskCommand.class);
         acceptedCommands.add(SuspendTaskCommand.class);
 
+        // audit commands
+        acceptedCommands.add(ClearHistoryLogsCommand.class);
+        acceptedCommands.add(FindActiveProcessInstancesCommand.class);
+        acceptedCommands.add(FindNodeInstancesCommand.class);
+        acceptedCommands.add(FindProcessInstanceCommand.class);
+        acceptedCommands.add(FindProcessInstancesCommand.class);
+        acceptedCommands.add(FindSubProcessInstancesCommand.class);
+        acceptedCommands.add(FindVariableInstancesCommand.class);
+        
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
