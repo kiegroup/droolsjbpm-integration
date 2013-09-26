@@ -65,6 +65,10 @@ public class JaxbHistoryLogList {
         lazyInitResponseList();
         return historyLogList;
     }
+    
+    public void setHistoryLogList(List<AbstractJaxbHistoryObject> list) {
+        this.historyLogList = list;
+    }
 
     private void lazyInitResponseList() { 
         if( this.historyLogList == null ) { 

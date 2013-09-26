@@ -3,7 +3,10 @@ package org.kie.services.client;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +18,14 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.bpmn2.objects.TestWorkItemHandler;
+import org.jbpm.process.audit.NodeInstanceLog;
+import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
+import org.jbpm.process.audit.xml.JaxbNodeInstanceLog;
+import org.jbpm.process.audit.xml.JaxbProcessInstanceLog;
+import org.jbpm.process.audit.xml.JaxbVariableInstanceLog;
 import org.jbpm.process.instance.event.DefaultSignalManagerFactory;
 import org.jbpm.process.instance.impl.DefaultProcessInstanceManagerFactory;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
@@ -42,6 +51,7 @@ import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
@@ -54,8 +64,48 @@ public abstract class SerializationTest {
 
     protected static final Logger log = LoggerFactory.getLogger(SerializationTest.class);
 
+    private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(obj);
+    }
+
+    protected KieSession createKnowledgeSession(String processFile) throws Exception {
+        KieServices ks = KieServices.Factory.get();
+        KieRepository kr = ks.getRepository();
+        KieFileSystem kfs = ks.newKieFileSystem();
+        if( processFile != null ) { 
+            Resource process = ResourceFactory.newClassPathResource(processFile);
+            kfs.write(process);
+        }
+    
+        KieBuilder kb = ks.newKieBuilder(kfs);
+        kb.buildAll();
+    
+        if (kb.getResults().hasMessages(Level.ERROR)) {
+            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
+        }
+    
+        KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
+        KieBase kbase = kContainer.getKieBase();
+    
+        Environment env = EnvironmentFactory.newEnvironment();
+    
+        Properties defaultProps = new Properties();
+        defaultProps.setProperty("drools.processSignalManagerFactory", DefaultSignalManagerFactory.class.getName());
+        defaultProps.setProperty("drools.processInstanceManagerFactory", DefaultProcessInstanceManagerFactory.class.getName());
+        SessionConfiguration conf = new SessionConfiguration(defaultProps);
+    
+        KieSession ksession = (StatefulKnowledgeSession) kbase.newKieSession(conf, env);
+        return ksession;
+    }
+
     public abstract Object testRoundtrip(Object in) throws Exception;
 
+    /*
+     * Tests
+     */
+    
     @Test
     public void testCommandSerialization() throws Exception {
         String userId = "krisv";
@@ -66,12 +116,6 @@ public abstract class SerializationTest {
         assertNotNull(newCmd);
         assertEquals("taskId is not equal", taskId, getField("taskId", TaskCommand.class, newCmd));
         assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
-    }
-
-    private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception {
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return field.get(obj);
     }
 
     @Test
@@ -86,7 +130,7 @@ public abstract class SerializationTest {
         List<Long> resultTwo = new ArrayList<Long>();
         resp.addResult(resultTwo, 1, cmd);
 
-        testRoundtrip(resp);
+        Object newResp = testRoundtrip(resp);
     }
 
     @Test
@@ -110,7 +154,7 @@ public abstract class SerializationTest {
         req.setVersion(2);
         cmds.add(new StartProcessCommand("test.proc.yaml"));
 
-        testRoundtrip(req);
+        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundtrip(req);
     }
 
     @Test
@@ -126,34 +170,60 @@ public abstract class SerializationTest {
         testRoundtrip(resp);
     }
 
-    protected KieSession createKnowledgeSession(String processFile) throws Exception {
-        KieServices ks = KieServices.Factory.get();
-        KieRepository kr = ks.getRepository();
-        KieFileSystem kfs = ks.newKieFileSystem();
-        if( processFile != null ) { 
-            Resource process = ResourceFactory.newClassPathResource(processFile);
-            kfs.write(process);
-        }
+    @Test
+    public void historyLogListTest() throws Exception {
+        JaxbHistoryLogList resp = new JaxbHistoryLogList();
 
-        KieBuilder kb = ks.newKieBuilder(kfs);
-        kb.buildAll();
+        testRoundtrip(resp);
 
-        if (kb.getResults().hasMessages(Level.ERROR)) {
-            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
-        }
+        // vLog
+        VariableInstanceLog vLog = new VariableInstanceLog(23, "process", "varInst", "var", "two", "one");
+        vLog.setExternalId("domain");
+        Field dateField = VariableInstanceLog.class.getDeclaredField("date");
+        dateField.setAccessible(true);
+        dateField.set(vLog, new Date());
+        Field idField = VariableInstanceLog.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(vLog, 32l);
+        resp.getHistoryLogList().add(new JaxbVariableInstanceLog(vLog));
+       
+        // pLog
+        ProcessInstanceLog pLog = new ProcessInstanceLog(23, "process");
+        pLog.setDuration(2000l);
+        pLog.setEnd(new Date());
+        pLog.setExternalId("domain");
+        pLog.setIdentity("id");
+        pLog.setOutcome("error");
+        pLog.setParentProcessInstanceId(42);
+        pLog.setProcessName("name");
+        pLog.setProcessVersion("1-SNAP");
+        pLog.setStatus(2);
+        idField = ProcessInstanceLog.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(pLog, 32l);
+        resp.getHistoryLogList().add(new JaxbProcessInstanceLog(pLog));
 
-        KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
-        KieBase kbase = kContainer.getKieBase();
-
-        Environment env = EnvironmentFactory.newEnvironment();
-
-        Properties defaultProps = new Properties();
-        defaultProps.setProperty("drools.processSignalManagerFactory", DefaultSignalManagerFactory.class.getName());
-        defaultProps.setProperty("drools.processInstanceManagerFactory", DefaultProcessInstanceManagerFactory.class.getName());
-        SessionConfiguration conf = new SessionConfiguration(defaultProps);
-
-        KieSession ksession = (StatefulKnowledgeSession) kbase.newKieSession(conf, env);
-        return ksession;
+        // nLog
+        NodeInstanceLog nLog = new NodeInstanceLog(0, 23, "process", "nodeInst", "node", "wally");
+        idField = NodeInstanceLog.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(nLog, 32l);
+        dateField = NodeInstanceLog.class.getDeclaredField("date");
+        dateField.setAccessible(true);
+        dateField.set(nLog, new Date());
+        nLog.setNodeType("type");
+        nLog.setWorkItemId(88l);
+        nLog.setConnection("connex");
+        nLog.setExternalId("domain");
+        resp.getHistoryLogList().add(new JaxbNodeInstanceLog(nLog));
+        
+        testRoundtrip(resp);
     }
     
+    @Test
+    public void auditCommandsTest() throws Exception {
+       FindProcessInstanceCommand cmd = new FindProcessInstanceCommand(23);
+       
+       testRoundtrip(cmd);
+    }
 }
