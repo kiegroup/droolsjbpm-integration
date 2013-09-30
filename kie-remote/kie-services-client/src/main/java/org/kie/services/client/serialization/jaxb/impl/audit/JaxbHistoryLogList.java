@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.impl;
+package org.kie.services.client.serialization.jaxb.impl.audit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.xml.AbstractJaxbHistoryObject;
-import org.jbpm.process.audit.xml.JaxbNodeInstanceLog;
-import org.jbpm.process.audit.xml.JaxbProcessInstanceLog;
-import org.jbpm.process.audit.xml.JaxbVariableInstanceLog;
 
 @XmlRootElement(name="log-instance-list")
 @XmlAccessorType(XmlAccessType.FIELD)

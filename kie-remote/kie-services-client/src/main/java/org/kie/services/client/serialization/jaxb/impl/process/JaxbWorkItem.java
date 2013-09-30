@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.impl;
+package org.kie.services.client.serialization.jaxb.impl.process;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +8,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 
 @XmlRootElement(name = "work-item")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -31,11 +31,9 @@ public class JaxbWorkItem extends AbstractJaxbCommandResponse<WorkItem> implemen
     private Integer state = 0;
     
     @XmlElement(name="param-map")
-    @XmlJavaTypeAdapter(StringObjectMapXmlAdapter.class)
     private Map<String, Object> parameters = new HashMap<String, Object>();
     
     @XmlElement(name="results-map")
-    @XmlJavaTypeAdapter(StringObjectMapXmlAdapter.class)
     private Map<String, Object> results = new HashMap<String, Object>();
     
     @XmlElement

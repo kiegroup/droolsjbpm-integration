@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.impl;
+package org.kie.services.client.serialization.jaxb.impl.process;
 
 import java.util.Map;
 
@@ -8,10 +8,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.services.client.serialization.jaxb.impl.adapter.StringMapXmlAdapater;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-with-vars")
@@ -20,7 +19,6 @@ import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbResponse {
 
     @XmlElement
-    @XmlJavaTypeAdapter(StringMapXmlAdapater.class)
     private Map<String, String> variables;
     
     @XmlElement

@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb;
+package org.kie.services.client.serialization.jaxb.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.drools.core.command.GetVariableCommand;
-import org.drools.core.command.runtime.*;
+import org.drools.core.command.runtime.GetFactCountCommand;
+import org.drools.core.command.runtime.GetGlobalCommand;
+import org.drools.core.command.runtime.GetIdCommand;
+import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.*;
-import org.drools.core.command.runtime.rule.*;
+import org.drools.core.command.runtime.rule.DeleteCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
 import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindNodeInstancesCommand;

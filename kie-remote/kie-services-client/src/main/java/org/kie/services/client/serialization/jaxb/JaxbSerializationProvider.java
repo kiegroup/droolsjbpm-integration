@@ -2,21 +2,21 @@ package org.kie.services.client.serialization.jaxb;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.kie.services.client.api.command.AcceptedCommands;
-import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceListResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 // TODO: Add object version checking

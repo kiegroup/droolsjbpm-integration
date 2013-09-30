@@ -3,35 +3,39 @@ package org.kie.services.client;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 
 import org.drools.core.SessionConfiguration;
+import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.bpmn2.objects.TestWorkItemHandler;
+import org.jbpm.persistence.correlation.CorrelationKeyInfo;
+import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
-import org.jbpm.process.audit.command.FindVariableInstancesCommand;
-import org.jbpm.process.audit.xml.JaxbNodeInstanceLog;
-import org.jbpm.process.audit.xml.JaxbProcessInstanceLog;
-import org.jbpm.process.audit.xml.JaxbVariableInstanceLog;
 import org.jbpm.process.instance.event.DefaultSignalManagerFactory;
 import org.jbpm.process.instance.impl.DefaultProcessInstanceManagerFactory;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.impl.model.xml.JaxbTask;
+import org.junit.Assume;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -46,15 +50,23 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
+import org.kie.services.client.api.command.AcceptedCommands;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.slf4j.Logger;
@@ -63,6 +75,12 @@ import org.slf4j.LoggerFactory;
 public abstract class SerializationTest {
 
     protected static final Logger log = LoggerFactory.getLogger(SerializationTest.class);
+    
+    protected enum TestType { 
+       JAXB, JSON, YAML; 
+    }
+    
+    abstract public TestType getType();
 
     private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception {
         Field field = clazz.getDeclaredField(fieldName);
@@ -107,7 +125,10 @@ public abstract class SerializationTest {
      */
     
     @Test
-    public void testCommandSerialization() throws Exception {
+    public void commandRequestTest() throws Exception {
+        // Don't run with JSON: /execute is only JAXB
+        Assume.assumeTrue( ! getType().equals(TestType.JSON));  
+        
         String userId = "krisv";
         long taskId = 1;
         Command<?> cmd = new StartTaskCommand(taskId, "krisv");
@@ -116,10 +137,27 @@ public abstract class SerializationTest {
         assertNotNull(newCmd);
         assertEquals("taskId is not equal", taskId, getField("taskId", TaskCommand.class, newCmd));
         assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
+        
+        req = new JaxbCommandsRequest();
+        List<Command<?>> cmds = new ArrayList<Command<?>>();
+        req.setCommands(cmds);
+        req.setDeploymentId("depId");
+        req.setProcessInstanceId(43l);
+        req.setVersion(2);
+        StartProcessCommand spCmd = new StartProcessCommand("test.proc.yaml");
+        cmds.add(spCmd);
+        spCmd.getParameters().put("one", "a");
+        spCmd.getParameters().put("two", "B");
+    
+        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundtrip(req);
+        assertEquals( ((StartProcessCommand) newReq.getCommands().get(0)).getParameters().get("two"), "B");
+        
+        req = new JaxbCommandsRequest("deployment", new StartProcessCommand("org.jbpm.humantask")); 
+        newReq = (JaxbCommandsRequest) testRoundtrip(req);
     }
-
+    
     @Test
-    public void testTaskSummaryList() throws Exception {
+    public void taskSummaryListTest() throws Exception {
         Command<?> cmd = new GetTaskAssignedAsBusinessAdminCommand();
         List<TaskSummary> result = new ArrayList<TaskSummary>();
 
@@ -142,19 +180,6 @@ public abstract class SerializationTest {
         resp.setUrl("http://here");
 
         testRoundtrip(resp);
-    }
-
-    @Test
-    public void commandsRequestTest() throws Exception {
-        JaxbCommandsRequest req = new JaxbCommandsRequest();
-        List<Command<?>> cmds = new ArrayList<Command<?>>();
-        req.setCommands(cmds);
-        req.setDeploymentId("depId");
-        req.setProcessInstanceId(43l);
-        req.setVersion(2);
-        cmds.add(new StartProcessCommand("test.proc.yaml"));
-
-        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundtrip(req);
     }
 
     @Test
@@ -225,5 +250,104 @@ public abstract class SerializationTest {
        FindProcessInstanceCommand cmd = new FindProcessInstanceCommand(23);
        
        testRoundtrip(cmd);
+    }
+    
+    @Test 
+    public void commandsResponseTest() throws Exception { 
+        KieSession ksession = createKnowledgeSession("BPMN2-StringStructureRef.bpmn2");
+        TestWorkItemHandler workItemHandler = new TestWorkItemHandler();
+        ksession.getWorkItemManager().registerWorkItemHandler("Human Task", workItemHandler);
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        String val = "initial-val";
+        params.put("test", val);
+        StartProcessCommand cmd = new StartProcessCommand("StructureRef");
+        cmd.setParameters(params);
+        ProcessInstance processInstance = ksession.execute(cmd);
+        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
+        
+        JaxbCommandsResponse resp = new JaxbCommandsResponse();
+        resp.setDeploymentId("deploy");
+        resp.setProcessInstanceId(processInstance.getId());
+        resp.addResult(processInstance, 0, cmd);
+        
+        testRoundtrip(resp);
+    }
+    
+    @Test 
+    public void xmlAdapterTest() throws Exception { 
+        // Don't run with JSON: /execute is only JAXB
+        Assume.assumeTrue( ! getType().equals(TestType.JSON)); 
+        
+        CorrelationKeyInfo corrKey = new CorrelationKeyInfo();
+        corrKey.addProperty(new CorrelationPropertyInfo("null","val"));
+            
+        GetProcessInstanceByCorrelationKeyCommand cmd = new GetProcessInstanceByCorrelationKeyCommand(corrKey);
+        JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
+        testRoundtrip(req);
+    }
+    
+    @Test
+    public void acceptedCommandsCanBeSerializedTest() throws Exception { 
+       Field commandsField = JaxbCommandsRequest.class.getDeclaredField("commands");
+       XmlElements xmlElemsAnno = (XmlElements) commandsField.getAnnotations()[0];
+       XmlElement [] xmlElems = xmlElemsAnno.value();
+       Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
+       assertEquals(cmdSet.size(), xmlElems.length);
+       Set<String> xmlElemNameSet = new HashSet<String>();
+       for( XmlElement xmlElemAnno : xmlElems ) {
+           Class cmdClass = xmlElemAnno.type();
+           String name = xmlElemAnno.name();
+           assertTrue( name + " is used twice as a name.", xmlElemNameSet.add(name));
+           assertTrue( cmdClass.getSimpleName() + " is present in " + JaxbCommandsRequest.class.getSimpleName() + " but not in " + AcceptedCommands.class.getSimpleName(),
+                   cmdSet.remove(cmdClass) );
+       }
+       for( Class cmdClass : cmdSet ) { 
+           System.out.println( "Missing: " + cmdClass.getSimpleName());
+       }
+       assertTrue( "See output for classes in " + AcceptedCommands.class.getSimpleName() + " that are not in " + JaxbCommandsRequest.class.getSimpleName(),
+               cmdSet.size() == 0);
+    }
+    
+    @Test
+    public void factHandleTest() throws Exception { 
+        // Don't run with YAML? 
+        Assume.assumeTrue( ! getType().equals(TestType.YAML)); 
+        
+        KieSession ksession = createKnowledgeSession(null);
+        
+        InsertObjectCommand cmd = new InsertObjectCommand("The Sky is Green");
+        FactHandle factHandle = ksession.execute(cmd);
+        JaxbOtherResponse jor = new JaxbOtherResponse(factHandle, 0, cmd);
+        testRoundtrip(jor);
+    }
+    
+    @Test
+    public void processInstanceWithVariablesTest() throws Exception {
+        KieSession ksession = createKnowledgeSession("BPMN2-StringStructureRef.bpmn2");
+        TestWorkItemHandler workItemHandler = new TestWorkItemHandler();
+        ksession.getWorkItemManager().registerWorkItemHandler("Human Task", workItemHandler);
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        String val = "initial-val";
+        params.put("test", val);
+        ProcessInstance processInstance = ksession.startProcess("StructureRef");
+        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
+
+        Map<String, Object> res = new HashMap<String, Object>();
+        res.put("testHT", "test value");
+        ksession.getWorkItemManager().completeWorkItem(workItemHandler.getWorkItem().getId(), res);
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("test", "initial-val");
+        
+        JaxbProcessInstanceWithVariablesResponse jpiwvr = new JaxbProcessInstanceWithVariablesResponse(processInstance, map);
+        testRoundtrip(jpiwvr);
+        
+        JaxbProcessInstanceListResponse jpilp = new JaxbProcessInstanceListResponse();
+        List<ProcessInstance> procInstList = new ArrayList<ProcessInstance>();
+        procInstList.add(new JaxbProcessInstanceResponse(processInstance));
+        jpilp.setResult(procInstList);
+        testRoundtrip(jpilp);
     }
 }

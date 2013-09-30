@@ -19,6 +19,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
@@ -30,6 +32,7 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.InternalServerErrorException;
+import org.jboss.resteasy.spi.UnsupportedMediaTypeException;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
@@ -41,14 +44,14 @@ import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbHistoryLogList;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
@@ -67,6 +70,9 @@ public class RuntimeResource extends ResourceBase {
     @Context
     private HttpServletRequest request;
     
+    @Context
+    private Request restRequest;
+
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
     @POST
@@ -78,27 +84,28 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
-    public JaxbProcessInstanceResponse startNewProcess(@PathParam("processDefId") String processId) {
+    public Response startNewProcess(@PathParam("processDefId") String processId) {
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
 
         Object result = internalDoKieSessionOperation(cmd, "Unable to start process with process definition id '" + processId + "'");
-        return new JaxbProcessInstanceResponse((ProcessInstance) result, request);
+        JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result, request);
+        return createCorrectVariant(responseObj, restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}")
-    public JaxbProcessInstanceResponse getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
+    public Response getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
         Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance " + procInstId);
+        Object responseObj = null;
         if (result != null) {
-            return new JaxbProcessInstanceResponse((ProcessInstance) result);
+            responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result);
+            return createCorrectVariant(responseObj, restRequest);
         } else {
             throw new BadRequestException("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
@@ -106,19 +113,17 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
-    public JaxbGenericResponse abortProcessInstance(@PathParam("procInstId") Long procInstId) {
+    public Response abortProcessInstance(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
         internalDoKieSessionOperation(cmd, "Unable to abort process instance " + procInstId);
-        return new JaxbGenericResponse(request);
+        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
-    public JaxbGenericResponse signalProcessInstance(@PathParam("procInstId") Long procInstId) {
+    public Response signalProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("signal", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
@@ -134,21 +139,19 @@ public class RuntimeResource extends ResourceBase {
             errorMsg += " and event '" + event + "'";
         }
         internalDoKieSessionOperation(cmd, errorMsg);
-        return new JaxbGenericResponse(request);
+        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/process/instance/{procInstId: [0-9]+}/variables")
-    public JaxbVariablesResponse getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
+    public Response getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
         Map<String, String> vars = getVariables(procInstId);
-        return new JaxbVariablesResponse(vars, request);
+        return createCorrectVariant(new JaxbVariablesResponse(vars, request), restRequest);
     }
     
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/signal")
-    public JaxbGenericResponse signalEvent() {
+    public Response signalEvent() {
         Map<String, List<String>> formParams = getRequestParams(request);
         String eventType = getStringParam("signal", true, formParams, "signal");
         Object event = getObjectParam("event", false, formParams, "signal");
@@ -158,22 +161,20 @@ public class RuntimeResource extends ResourceBase {
             errorMsg += " with event '" + event + "'";
         }
         internalDoKieSessionOperation(cmd, errorMsg);
-        return new JaxbGenericResponse(request);
+        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/workitem/{workItemId: [0-9-]+}")
-    public JaxbWorkItem getWorkItem(@PathParam("workItemId") Long workItemId) { 
+    public Response getWorkItem(@PathParam("workItemId") Long workItemId) { 
         Command<?> cmd = new GetWorkItemCommand(workItemId);
         WorkItem workItem = (WorkItem) internalDoKieSessionOperation(cmd, "Unable to get work item " +  workItemId );
-        return new JaxbWorkItem(workItem);
+        return createCorrectVariant(new JaxbWorkItem(workItem), restRequest);
     }
     
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
-    @Produces(MediaType.APPLICATION_XML)
-    public JaxbGenericResponse doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
+    public Response doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
@@ -185,7 +186,7 @@ public class RuntimeResource extends ResourceBase {
             throw new BadRequestException("Unsupported operation: /process/instance/" + workItemId + "/" + operation);
         }
         internalDoKieSessionOperation(cmd, "Unable to " + operation + " workitem " + workItemId );
-        return new JaxbGenericResponse(request);
+        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
     /**
@@ -193,18 +194,16 @@ public class RuntimeResource extends ResourceBase {
      */
     
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/history/clear")
-    public JaxbGenericResponse clearProcessInstanceLogs() {
+    public Response clearProcessInstanceLogs() {
         Command<?> cmd = new ClearHistoryLogsCommand();
         internalDoKieSessionOperation(cmd, "Unable to clear process instance logs");
-        return new JaxbGenericResponse(request);
+        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance")
-    public JaxbHistoryLogList getProcessInstanceLogs() {
+    public Response getProcessInstanceLogs() {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -213,13 +212,12 @@ public class RuntimeResource extends ResourceBase {
         List<ProcessInstanceLog> results = (List<ProcessInstanceLog>) result;
         
         results = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, results);
-        return new JaxbHistoryLogList(results);
+        return createCorrectVariant(new JaxbHistoryLogList(results), restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}")
-    public JaxbHistoryLogList getSpecificProcessInstanceLogs(@PathParam("procInstId") long procInstId) {
+    public Response getSpecificProcessInstanceLogs(@PathParam("procInstId") long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -231,13 +229,12 @@ public class RuntimeResource extends ResourceBase {
         logList.add(procInstLog);
         
         logList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, logList);
-        return new JaxbHistoryLogList(logList);
+        return createCorrectVariant(new JaxbHistoryLogList(logList), restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
-    public JaxbHistoryLogList getVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
+    public Response getVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
@@ -265,13 +262,12 @@ public class RuntimeResource extends ResourceBase {
         } else {
             throw new BadRequestException("Unsupported operation: /history/instance/" + procInstId + "/" + operation);
         }
-        return resultList;
+        return createCorrectVariant(resultList, restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\.]+}")
-    public JaxbHistoryLogList getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
+    public Response getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
@@ -294,13 +290,12 @@ public class RuntimeResource extends ResourceBase {
             throw new BadRequestException("Unsupported operation: /history/instance/" + procInstId + "/" + operation + "/"
                     + logId);
         }
-        return resultList;
+        return createCorrectVariant(resultList, restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/history/process/{procId: [a-zA-Z0-9-:\\.]+}")
-    public JaxbHistoryLogList getProcessInstanceLogs(@PathParam("procId") String processId) {
+    public Response getProcessInstanceLogs(@PathParam("procId") String processId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -309,7 +304,7 @@ public class RuntimeResource extends ResourceBase {
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
         
         procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
-        return new JaxbHistoryLogList(procInstLogList);
+        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), restRequest);
     }
 
     /**
@@ -317,9 +312,8 @@ public class RuntimeResource extends ResourceBase {
      */
     
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
-    public JaxbProcessInstanceWithVariablesResponse startNewProcessWithVars(@PathParam("processDefId") String processId) {
+    public Response startNewProcessWithVars(@PathParam("processDefId") String processId) {
         Map<String, List<String>> formParams = getRequestParams(request);
         Map<String, Object> params = extractMapFromParams(formParams, "process/" + processId + "/start");
         Command<?> cmd = new StartProcessCommand(processId, params);
@@ -330,31 +324,30 @@ public class RuntimeResource extends ResourceBase {
         Map<String, String> vars = getVariables(procInst.getId());
         JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
         
-        return resp;
+        return createCorrectVariant(resp, restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
-    public JaxbProcessInstanceWithVariablesResponse getProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+    public Response getProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
-        
+        JaxbProcessInstanceWithVariablesResponse responseObj = null;
         Object result = internalDoKieSessionOperation(cmd, "Unable to get process instance " + procInstId);
         if (result != null) {
             ProcessInstance procInst = (ProcessInstance) result;
             Map<String, String> vars = getVariables(procInstId);
-            return new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
+            responseObj = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
         } else {
             throw new BadRequestException("Unable to retrieve process instance " + procInstId
                     + " since it has been completed. Please see the history operations.");
         }
+        return createCorrectVariant(responseObj, restRequest);
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
-    public JaxbProcessInstanceWithVariablesResponse signalProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+    public Response signalProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
@@ -377,7 +370,8 @@ public class RuntimeResource extends ResourceBase {
         
         Map<String, String> vars = getVariables(processInstance.getId());
         
-        return new JaxbProcessInstanceWithVariablesResponse(processInstance, vars);
+        return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars),
+                restRequest);
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------

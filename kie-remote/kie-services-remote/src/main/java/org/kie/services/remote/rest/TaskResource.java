@@ -21,6 +21,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.spi.BadRequestException;
@@ -38,10 +40,10 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbTaskSummaryListResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.util.Paginator;
@@ -59,6 +61,9 @@ public class TaskResource extends ResourceBase {
 
     @Context
     private HttpServletRequest request;
+    
+    @Context
+    private Request restRequest;
     
     @Inject
     private IdentityProvider identityProvider;
@@ -102,9 +107,9 @@ public class TaskResource extends ResourceBase {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/query")
-    public JaxbTaskSummaryListResponse query(@Context UriInfo uriInfo) {
+    public Response query(@Context UriInfo uriInfo) {
+        JaxbTaskSummaryListResponse responseObj = null;
         Map<String, List<String>> params = getRequestParams(request);
         
         List<Long> workItemIdList = getLongListParam(allowedQueryParams[0], false, params, "query", true);
@@ -165,6 +170,7 @@ public class TaskResource extends ResourceBase {
         Command<?> cmd = null;
         while (!cmds.isEmpty()) {
             cmd = cmds.poll();
+            logger.debug( "query: " + cmd.getClass().getSimpleName());
             TaskImpl task = (TaskImpl) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
             if (task != null) {
                 TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
@@ -176,7 +182,8 @@ public class TaskResource extends ResourceBase {
 
         if( results.size() >= pageInfo[2] ) { 
             results = paginator.paginate(pageInfo, results);
-            return new JaxbTaskSummaryListResponse(results);
+            responseObj = new JaxbTaskSummaryListResponse(results);
+            return createCorrectVariant(responseObj, restRequest);
         }
         
         int assignments = 0;
@@ -193,6 +200,7 @@ public class TaskResource extends ResourceBase {
                 } else {
                     for (Long procInstId : procInstIdList) {
                         cmd = new GetTasksByProcessInstanceIdCommand(procInstId);
+                        logger.debug( "query: " + cmd.getClass().getSimpleName());
                         @SuppressWarnings("unchecked")
                         List<Long> procInstTaskIdList = (List<Long>) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
                         for (Long taskId : procInstTaskIdList) {
@@ -207,7 +215,8 @@ public class TaskResource extends ResourceBase {
                         }
                         if( results.size() >= pageInfo[2] ) { 
                             results = paginator.paginate(pageInfo, results);
-                            return new JaxbTaskSummaryListResponse(results);
+                            responseObj = new JaxbTaskSummaryListResponse(results);
+                            return createCorrectVariant(responseObj, restRequest);
                         }
                     }
                 }
@@ -245,6 +254,7 @@ public class TaskResource extends ResourceBase {
 
         while (!cmds.isEmpty()) {
             cmd = cmds.poll();
+            logger.debug( "query: " + cmd.getClass().getSimpleName());
             @SuppressWarnings("unchecked")
             List<TaskSummary> taskSummaryList = (List<TaskSummary>) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
             if (taskSummaryList != null && !taskSummaryList.isEmpty()) {
@@ -257,30 +267,31 @@ public class TaskResource extends ResourceBase {
             }
             if( results.size() >= pageInfo[2] ) { 
                 results = paginator.paginate(pageInfo, results);
-                return new JaxbTaskSummaryListResponse(results);
+                responseObj = new JaxbTaskSummaryListResponse(results);
+                return createCorrectVariant(responseObj, restRequest);
             }
         }
         
         results = paginator.paginate(pageInfo, results);
-        return new JaxbTaskSummaryListResponse(results);
+        responseObj= new JaxbTaskSummaryListResponse(results);
+        return createCorrectVariant(responseObj, restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}")
-    public JaxbTask getTaskInstanceInfo(@PathParam("taskId") long taskId) { 
+    public Response getTaskInstanceInfo(@PathParam("taskId") long taskId) { 
         Command<?> cmd = new GetTaskCommand(taskId);
         Task task = (Task) internalDoTaskOperation(cmd, "Unable to get task " + taskId);
         if( task == null ) { 
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
-        return new JaxbTask(task);
+        return createCorrectVariant(new JaxbTask(task), restRequest);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
-    public JaxbGenericResponse doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
+    public Response doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> params = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
@@ -334,13 +345,12 @@ public class TaskResource extends ResourceBase {
             throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
         internalDoTaskOperation(cmd, "Unable to " + operation + " task " + taskId);
-        return new JaxbGenericResponse(request);
+        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}/content")
-    public JaxbContent getTaskContent(@PathParam("taskId") long taskId) { 
+    public Response getTaskContent(@PathParam("taskId") long taskId) { 
         Command<?> cmd = new GetTaskCommand(taskId);
         Object result = internalDoTaskOperation(cmd, "Unable to get task " + taskId);
         if( result == null ) { 
@@ -353,19 +363,18 @@ public class TaskResource extends ResourceBase {
             result = internalDoTaskOperation(cmd, "Unable get content " + contentId + " (from task " + taskId + ")");
             content = (Content) result;
         }
-        return new JaxbContent(content);
+        return createCorrectVariant(new JaxbContent(content), restRequest);
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/content/{contentId: [0-9-]+}")
-    public JaxbContent getContent(@PathParam("contentId") long contentId) { 
+    public Response getContent(@PathParam("contentId") long contentId) { 
         Command<?> cmd = new GetContentCommand(contentId);
         Content content = (Content) internalDoTaskOperation(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 
             throw new NotFoundException("Content " + contentId + " could not be found.");
         }
-        return new JaxbContent(content);
+        return createCorrectVariant(new JaxbContent(content), restRequest);
     }
     
     // Helper methods --------------------------------------------------------------------------------------------------------------

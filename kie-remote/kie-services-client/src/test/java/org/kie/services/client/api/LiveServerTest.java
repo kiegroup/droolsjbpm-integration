@@ -27,7 +27,7 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

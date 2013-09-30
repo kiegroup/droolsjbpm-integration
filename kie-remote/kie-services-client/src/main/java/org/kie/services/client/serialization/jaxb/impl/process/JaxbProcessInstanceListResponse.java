@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.impl;
+package org.kie.services.client.serialization.jaxb.impl.process;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 
 @XmlRootElement(name="task-summary-list")
 @XmlAccessorType(XmlAccessType.FIELD)

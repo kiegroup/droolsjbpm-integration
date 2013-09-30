@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb;
+package org.kie.services.client.serialization.jaxb.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +13,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.drools.core.command.runtime.process.GetProcessIdsCommand;
 import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.core.common.DefaultFactHandle;
+import org.jbpm.process.audit.ProcessInstanceLog;
+import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
@@ -26,11 +29,15 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.jaxb.impl.*;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 
-@SuppressWarnings("rawtypes")
 @XmlRootElement(name = "command-response")
 @XmlAccessorType(XmlAccessType.FIELD)
+@SuppressWarnings("rawtypes")
 public class JaxbCommandsResponse {
 
     @XmlElement(name = "deployment-id")
@@ -71,8 +78,14 @@ public class JaxbCommandsResponse {
         cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
         cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
         
+        // string
+        cmdListTypes.put(GetProcessIdsCommand.class, String.class);
+        
         // processInstance
         cmdListTypes.put(GetProcessInstancesCommand.class, ProcessInstance.class);
+        
+        // processInstanceLog
+        cmdListTypes.put(FindActiveProcessInstancesCommand.class, ProcessInstanceLog.class);
     }
 
     public JaxbCommandsResponse() {
