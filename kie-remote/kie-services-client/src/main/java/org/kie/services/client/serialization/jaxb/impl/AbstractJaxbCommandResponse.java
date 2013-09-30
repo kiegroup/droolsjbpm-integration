@@ -12,11 +12,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.command.Command;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties({"result"})
 public abstract class AbstractJaxbCommandResponse<T> implements JaxbCommandResponse<T> {
 
     @XmlAttribute

@@ -1,5 +1,6 @@
-package org.kie.services.client.serialization.jaxb.impl;
+package org.kie.services.client.serialization.jaxb.impl.process;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,13 +11,16 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.command.Command;
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties({"processName", "process", "result"})
 public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<ProcessInstance> implements ProcessInstance {
 
     @XmlElement(name="process-id")
@@ -25,14 +29,14 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
 
     @XmlElement
     @XmlSchemaType(name="long")
-    private Long id;
+    private long id;
 
     @XmlElement
     @XmlSchemaType(name="int")
-    private Integer state; 
+    private int state; 
 
     @XmlElement(name="event-types")
-    private List<String> eventTypes;
+    private List<String> eventTypes = new ArrayList<String>();
     
     public JaxbProcessInstanceResponse() { 
         // Default Constructor
@@ -61,28 +65,39 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
             this.state = processInstance.getState();
         }
     }
-
-
     
-    @Override
     public String getProcessId() {
         return processId;
     }
-    
-    @Override
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
+    }
+
     public long getId() {
         return id;
     }
-    
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+    public void setEventTypes(List<String> eventTypes) {
+        this.eventTypes = eventTypes;
+    }
+
     @Override
     public String getProcessName() {
         String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
         throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
-    }
-    
-    @Override
-    public int getState() {
-        return state;
     }
     
     @Override
@@ -91,7 +106,6 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
     }
 
-    @Override
     public String[] getEventTypes() {
         return eventTypes.toArray(new String[eventTypes.size()]);
     }
@@ -105,14 +119,6 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     @Override
     public ProcessInstance getResult() {
         return this;
-    }
-
-    public JaxbRequestStatus getStatus() {
-        return status;
-    }
-
-    public String getUrl() {
-        return url;
     }
 
     public String toString() {

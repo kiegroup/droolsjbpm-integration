@@ -1,6 +1,5 @@
 package org.kie.services.client.serialization.jaxb.impl;
 
-import org.kie.services.client.serialization.jaxb.JaxbCommandsRequest;
 
 public interface JaxbCommandResponse<T> {
 

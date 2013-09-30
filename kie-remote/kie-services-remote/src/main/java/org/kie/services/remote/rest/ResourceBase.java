@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.services.task.impl.model.GroupImpl;
@@ -18,6 +22,22 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 public class ResourceBase {
 
+    private static List<Variant> variants 
+        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).build();
+    
+    protected Variant getVariant(Request restRequest) { 
+        return restRequest.selectVariant(variants);
+    }
+    
+    protected Response createCorrectVariant(Object responseObj, Request restRequest) { 
+        Variant v = getVariant(restRequest);
+        if( v != null ) { 
+            return Response.ok(responseObj, v).build();
+        } else { 
+            return Response.notAcceptable(variants).build();
+        }
+    }
+    
     protected static String checkThatOperationExists(String operation, String[] possibleOperations) {
         for (String oper : possibleOperations) {
             if (oper.equals(operation.trim().toLowerCase())) {

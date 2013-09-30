@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.jboss.resteasy.spi.BadRequestException;
 
 @XmlRootElement(name = "response")

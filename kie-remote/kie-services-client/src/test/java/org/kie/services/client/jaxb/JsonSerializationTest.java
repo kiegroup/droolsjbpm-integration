@@ -5,10 +5,14 @@ import org.kie.services.client.serialization.jaxb.JsonSerializationProvider;
 
 public class JsonSerializationTest extends SerializationTest {
 
+    public TestType getType() { 
+        return TestType.JSON;
+    }
+    
     public Object testRoundtrip(Object in) throws Exception {
         String jsonStr = JsonSerializationProvider.convertJaxbObjectToJsonString(in);
-        log.debug(jsonStr);
-        return JsonSerializationProvider.convertJsonStringToJaxbObject(jsonStr);
+        log.info(jsonStr);
+        return JsonSerializationProvider.convertJsonStringToJaxbObject(jsonStr, in.getClass());
     }
  
 }

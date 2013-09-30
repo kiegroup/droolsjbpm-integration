@@ -1,57 +1,50 @@
 package org.kie.services.client.serialization.jaxb;
 
-import static org.kie.services.client.serialization.jaxb.JaxbSerializationProvider.jaxbClasses;
+import java.io.IOException;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.codehaus.jettison.mapped.MappedXMLStreamReader;
-import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
-import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceListResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbWorkItem;
-import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 // TODO: Add object version checking
 public class JsonSerializationProvider {
    
-    public static String convertJaxbObjectToJsonString(Object object) throws JAXBException {
-        Marshaller marshaller = JAXBContext.newInstance(jaxbClasses).createMarshaller();
-        StringWriter stringWriter = new StringWriter();
-        XMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(
-                new MappedNamespaceConvention(new Configuration()), stringWriter);
-        
-        marshaller.marshal(object, xmlStreamWriter);
-        String output = stringWriter.toString();
-        
-        return output;
+    private static ObjectMapper mapper = new JaxbJacksonObjectMapper();
+    
+    static { 
+      AnnotationIntrospector jaxbAnnotationIntrospector = new JaxbAnnotationIntrospector();
+      mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+
     }
     
-    public static Object convertJsonStringToJaxbObject(String jsonStr) throws JAXBException, JSONException, XMLStreamException {
-        Unmarshaller unmarshaller = JAXBContext.newInstance(jaxbClasses).createUnmarshaller();
-        
-        JSONObject jsonObg = new JSONObject(jsonStr);
-        XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(jsonObg, 
-                 new MappedNamespaceConvention(new Configuration()));
-        
-        Object jaxbObj = unmarshaller.unmarshal(xmlStreamReader);
-        
-        return jaxbObj;
+    public static String convertJaxbObjectToJsonString(Object object) throws JsonGenerationException, JsonMappingException, IOException {
+        return mapper.writeValueAsString(object);
+    }
+    
+    public static Object convertJsonStringToJaxbObject(String jsonStr, Class<?> type) throws JsonParseException, JsonMappingException, IOException {
+        return mapper.readValue(jsonStr, type);
     }
 
+    private static class JaxbJacksonObjectMapper extends ObjectMapper {
+
+        public JaxbJacksonObjectMapper() {
+            super();
+
+            final AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
+
+            this.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
+            this.configure(org.codehaus.jackson.map.SerializationConfig.Feature.WRAP_ROOT_VALUE, true);
+
+            this.setDeserializationConfig(this.getDeserializationConfig().withAnnotationIntrospector(introspector));
+            this.setSerializationConfig(this.getSerializationConfig().withAnnotationIntrospector(introspector));
+            
+            this.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        }
+    }
+    
 }
