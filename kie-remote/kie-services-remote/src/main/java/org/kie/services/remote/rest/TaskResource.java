@@ -1,7 +1,5 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.remote.util.CommandsRequestUtil.restProcessJaxbCommandsRequest;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,7 +24,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.spi.BadRequestException;
-import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
@@ -42,10 +39,9 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.cdi.ProcessRequestBean;
+import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.util.Paginator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +53,7 @@ public class TaskResource extends ResourceBase {
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
     
     @Inject
-    private ProcessRequestBean processRequestBean;
+    private RestProcessRequestBean processRequestBean;
 
     @Context
     private HttpServletRequest request;
@@ -152,7 +148,7 @@ public class TaskResource extends ResourceBase {
         List<Status> statusList = convertStringListToStatusList(statusStrList);
 
         // process params/cmds
-        Queue<Command<?>> cmds = new LinkedList<Command<?>>();
+        Queue<TaskCommand<?>> cmds = new LinkedList<TaskCommand<?>>();
         if (!workItemIdList.isEmpty()) {
             for (Long workItemId : workItemIdList) {
                 cmds.add(new GetTaskByWorkItemIdCommand(workItemId));
@@ -167,11 +163,13 @@ public class TaskResource extends ResourceBase {
         Set<TaskSummaryImpl> alreadyRetrievedSet = new HashSet<TaskSummaryImpl>();
         List<TaskSummaryImpl> results = new ArrayList<TaskSummaryImpl>();
         
-        Command<?> cmd = null;
+        TaskCommand<?> cmd = null;
         while (!cmds.isEmpty()) {
             cmd = cmds.poll();
             logger.debug( "query: " + cmd.getClass().getSimpleName());
-            TaskImpl task = (TaskImpl) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
+            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(
+                    cmd, 
+                    "Unable to execute " + cmd.getClass().getSimpleName());
             if (task != null) {
                 TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
                 if( alreadyRetrievedSet.add(taskSum) ) { 
@@ -202,10 +200,14 @@ public class TaskResource extends ResourceBase {
                         cmd = new GetTasksByProcessInstanceIdCommand(procInstId);
                         logger.debug( "query: " + cmd.getClass().getSimpleName());
                         @SuppressWarnings("unchecked")
-                        List<Long> procInstTaskIdList = (List<Long>) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
+                        List<Long> procInstTaskIdList = (List<Long>) processRequestBean.doTaskOperation(
+                                cmd, 
+                                "Unable to execute " + cmd.getClass().getSimpleName());
                         for (Long taskId : procInstTaskIdList) {
                             cmd = new GetTaskCommand(taskId);
-                            TaskImpl task = (TaskImpl) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
+                            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(
+                                    cmd, 
+                                    "Unable to execute " + cmd.getClass().getSimpleName());
                             if (task != null) {
                                 TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
                                 if( alreadyRetrievedSet.add(taskSum) ) { 
@@ -256,7 +258,9 @@ public class TaskResource extends ResourceBase {
             cmd = cmds.poll();
             logger.debug( "query: " + cmd.getClass().getSimpleName());
             @SuppressWarnings("unchecked")
-            List<TaskSummary> taskSummaryList = (List<TaskSummary>) internalDoTaskOperation(cmd, "Unable to execute " + cmd.getClass().getSimpleName());
+            List<TaskSummary> taskSummaryList = (List<TaskSummary>) processRequestBean.doTaskOperation(
+                    cmd, 
+                    "Unable to execute " + cmd.getClass().getSimpleName());
             if (taskSummaryList != null && !taskSummaryList.isEmpty()) {
                 for (TaskSummary taskSummary : taskSummaryList) {
                     TaskSummaryImpl taskSum = (TaskSummaryImpl) taskSummary;
@@ -280,8 +284,10 @@ public class TaskResource extends ResourceBase {
     @GET
     @Path("/{taskId: [0-9-]+}")
     public Response getTaskInstanceInfo(@PathParam("taskId") long taskId) { 
-        Command<?> cmd = new GetTaskCommand(taskId);
-        Task task = (Task) internalDoTaskOperation(cmd, "Unable to get task " + taskId);
+        TaskCommand<?> cmd = new GetTaskCommand(taskId);
+        Task task = (Task) processRequestBean.doTaskOperation(
+                cmd, 
+                "Unable to get task " + taskId);
         if( task == null ) { 
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
@@ -297,11 +303,8 @@ public class TaskResource extends ResourceBase {
         String userId = identityProvider.getName();
         logger.debug("Executing " + operation + " on task " + taskId + " by user " + userId );
        
-        Command<?> cmd = null;
-        cmd = new GetTaskCommand(taskId);
-        if( internalDoTaskOperation(cmd, "Unable to check if task " + taskId + " exists") == null ) { 
-            throw new NotFoundException("Task " + taskId + " could not be found.");
-        }
+        TaskCommand<?> cmd = null;
+        
         if ("activate".equalsIgnoreCase(operation)) {
             cmd = new ActivateTaskCommand(taskId, userId);
         } else if ("claim".equalsIgnoreCase(operation)) {
@@ -344,15 +347,49 @@ public class TaskResource extends ResourceBase {
         } else {
             throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
-        internalDoTaskOperation(cmd, "Unable to " + operation + " task " + taskId);
+        
+        internalCheckAndDoTaskOperation(cmd, taskId, "Unable to " + operation + " task " + taskId);
         return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
     }
 
+    private static String checkThatOperationExists(String operation, String[] possibleOperations) {
+        for (String oper : possibleOperations) {
+            if (oper.equals(operation.trim().toLowerCase())) {
+                return oper;
+            }
+        }
+        throw new BadRequestException("Operation '" + operation + "' is not supported on tasks.");
+    }
+    
+    private Object internalCheckAndDoTaskOperation(TaskCommand<?> cmd, Long taskId, String errorMsg) { 
+        assert taskId != null : "Submitted task id should always have a value.";
+
+        if( cmd instanceof CompleteTaskCommand
+            || cmd instanceof ExitTaskCommand
+            || cmd instanceof FailTaskCommand
+            || cmd instanceof SkipTaskCommand ) { 
+            TaskCommand<?> getTaskCmd = new GetTaskCommand(taskId);
+            Task task = (Task) processRequestBean.doTaskOperation(
+                    getTaskCmd, 
+                    "Task " + taskId + " does not exist or unable to check if it exists");
+            if( task == null ) {  
+                throw new NotFoundException("Task " + taskId + " could not be found.");
+            }
+            String deploymentId = task.getTaskData().getDeploymentId();
+            return processRequestBean.doTaskOperationOnDeployment(cmd, errorMsg, deploymentId);    
+        } else { 
+            return processRequestBean.doTaskOperation(cmd, errorMsg);
+        }
+    }
+    
+    
     @GET
     @Path("/{taskId: [0-9-]+}/content")
     public Response getTaskContent(@PathParam("taskId") long taskId) { 
-        Command<?> cmd = new GetTaskCommand(taskId);
-        Object result = internalDoTaskOperation(cmd, "Unable to get task " + taskId);
+        TaskCommand<?> cmd = new GetTaskCommand(taskId);
+        Object result = processRequestBean.doTaskOperation(
+                cmd, 
+                "Unable to get task " + taskId);
         if( result == null ) { 
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
@@ -360,7 +397,9 @@ public class TaskResource extends ResourceBase {
         Content content = null;
         if( contentId > -1 ) { 
             cmd = new GetContentCommand(contentId);
-            result = internalDoTaskOperation(cmd, "Unable get content " + contentId + " (from task " + taskId + ")");
+            result = processRequestBean.doTaskOperation(
+                    cmd, 
+                    "Unable get content " + contentId + " (from task " + taskId + ")");
             content = (Content) result;
         }
         return createCorrectVariant(new JaxbContent(content), restRequest);
@@ -369,27 +408,12 @@ public class TaskResource extends ResourceBase {
     @GET
     @Path("/content/{contentId: [0-9-]+}")
     public Response getContent(@PathParam("contentId") long contentId) { 
-        Command<?> cmd = new GetContentCommand(contentId);
-        Content content = (Content) internalDoTaskOperation(cmd, "Unable to get task content " + contentId);
+        TaskCommand<?> cmd = new GetContentCommand(contentId);
+        Content content = (Content) processRequestBean.doTaskOperation(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 
             throw new NotFoundException("Content " + contentId + " could not be found.");
         }
         return createCorrectVariant(new JaxbContent(content), restRequest);
-    }
-    
-    // Helper methods --------------------------------------------------------------------------------------------------------------
-
-    private Object internalDoTaskOperation(Command<?> cmd, String errorMsg) { 
-        Object result = processRequestBean.doTaskOperation(cmd);
-        if( result instanceof JaxbExceptionResponse ) { 
-           Exception cause = ((JaxbExceptionResponse) result).getCause();
-           if( cause instanceof RuntimeException ) { 
-               throw (RuntimeException) cause;
-           } else { 
-               throw new InternalServerErrorException(errorMsg, cause);
-           }
-        }
-        return result;
     }
     
 }

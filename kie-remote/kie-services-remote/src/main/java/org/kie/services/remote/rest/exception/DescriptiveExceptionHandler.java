@@ -1,7 +1,9 @@
 package org.kie.services.remote.rest.exception;
 
+import static org.kie.services.remote.rest.ResourceBase.variants;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -24,6 +26,9 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
 
     @Context
     HttpServletRequest request; 
+   
+    @Context
+    Request restRequest;
     
     @Override
     public Response toResponse(Exception e) {
@@ -57,6 +62,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         } catch (JAXBException jaxb) {
             responseBuilder.entity(JaxbGenericResponse.convertStackTraceToString(jaxb));
         }
+        responseBuilder.variant(restRequest.selectVariant(variants));
         return responseBuilder.build();
     }
 

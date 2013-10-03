@@ -14,22 +14,114 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jboss.resteasy.spi.NotAcceptableException;
+import org.jboss.resteasy.spi.NotFoundException;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.ExitTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
+import org.jbpm.services.task.commands.GetTaskCommand;
+import org.jbpm.services.task.commands.SkipTaskCommand;
+import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.impl.model.GroupImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.query.TaskSummaryImpl;
+import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
+import org.kie.api.task.model.Task;
+import org.kie.services.client.api.command.AcceptedCommands;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
+import org.kie.services.remote.cdi.RuntimeManagerManager;
+import org.kie.services.remote.exception.KieRemoteServicesInternalError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ResourceBase {
 
-    private static List<Variant> variants 
+    private static final Logger logger = LoggerFactory.getLogger(ResourceBase.class);
+    
+    // Seam-Transaction ----------------------------------------------------------------------------------------------------------
+    
+    public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, RestProcessRequestBean requestBean) {
+        // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
+        JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
+        List<Command<?>> commands = request.getCommands();
+
+        if (commands != null) {
+            int cmdListSize = commands.size(); 
+            for (int i = 0; i < cmdListSize; ++i) {
+                boolean restartTx = !( i == cmdListSize - 1 ); // restart tx for all cmds except the last one
+                Command<?> cmd = commands.get(i);
+                if (!AcceptedCommands.getSet().contains(cmd.getClass())) {
+                    throw new NotAcceptableException("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
+                }
+                logger.debug("Processing command " + cmd.getClass().getSimpleName());
+                Object cmdResult = null;
+                try { 
+                    if (cmd instanceof TaskCommand<?>) {
+                        String errorMsg = "Unable to execute command " + cmd.getClass().getSimpleName();
+                        TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
+                        if( cmd instanceof CompleteTaskCommand
+                            || cmd instanceof ExitTaskCommand
+                            || cmd instanceof FailTaskCommand
+                            || cmd instanceof SkipTaskCommand ) { 
+                            cmdResult = requestBean.doTaskOperationOnDeployment(
+                                    taskCmd, 
+                                    errorMsg, 
+                                    request.getDeploymentId(), 
+                                    restartTx); // restart commit
+                        } else { 
+                            cmdResult = requestBean.doTaskOperation(taskCmd, errorMsg);
+                        }
+                    } else {
+                        cmdResult = requestBean.doKieSessionOperation(
+                                cmd, 
+                                request.getDeploymentId(), 
+                                request.getProcessInstanceId(),
+                                "Unable to execute command " + cmd.getClass().getSimpleName(), 
+                                true, // commit
+                                restartTx); // restart commit
+                    }
+                } catch(Exception e) { 
+                    jaxbResponse.addException(e, i, cmd);
+                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() 
+                            + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                    logger.trace("Stack trace: \n", e);
+                }
+                if (cmdResult != null) {
+                    try {
+                        // addResult could possibly throw an exception, which is why it's here and not above
+                        jaxbResponse.addResult(cmdResult, i, cmd);
+                    } catch (Exception e) {
+                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i + " because of "
+                                + e.getClass().getSimpleName(), e);
+                        logger.trace("Stack trace: \n", e);
+                        jaxbResponse.addException(e, i, cmd);
+                    }
+                }
+            }
+        }
+
+        if (commands == null || commands.isEmpty()) {
+            logger.info("Commands request object with no commands sent!");
+        }
+
+        return jaxbResponse;
+    }
+    
+    // JSON / JAXB ---------------------------------------------------------------------------------------------------------------
+    
+    public static List<Variant> variants 
         = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).build();
     
-    protected Variant getVariant(Request restRequest) { 
+    protected static Variant getVariant(Request restRequest) { 
         return restRequest.selectVariant(variants);
     }
     
-    protected Response createCorrectVariant(Object responseObj, Request restRequest) { 
+    protected static Response createCorrectVariant(Object responseObj, Request restRequest) { 
         Variant v = getVariant(restRequest);
         if( v != null ) { 
             return Response.ok(responseObj, v).build();
@@ -37,16 +129,9 @@ public class ResourceBase {
             return Response.notAcceptable(variants).build();
         }
     }
-    
-    protected static String checkThatOperationExists(String operation, String[] possibleOperations) {
-        for (String oper : possibleOperations) {
-            if (oper.equals(operation.trim().toLowerCase())) {
-                return oper;
-            }
-        }
-        throw new BadRequestException("Operation '" + operation + "' is not supported on tasks.");
-    }
 
+    // Request Params -------------------------------------------------------------------------------------------------------------
+    
     protected static Map<String, List<String>> getRequestParams(HttpServletRequest request) {
         Map<String, List<String>> parameters = new HashMap<String, List<String>>();
         Enumeration<String> names = request.getParameterNames();
@@ -230,6 +315,8 @@ public class ResourceBase {
         }
         return statusList;
     }
+    
+    // Pagination ----------------------------------------------------------------------------------------------------------------
     
     protected static int [] getPageNumAndPageSize(Map<String, List<String>> params) {
         int [] pageInfo = new int[3];
