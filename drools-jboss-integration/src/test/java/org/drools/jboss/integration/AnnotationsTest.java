@@ -1,20 +1,15 @@
 package org.drools.jboss.integration;
 
-import static junit.framework.Assert.fail;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.drools.workbench.models.commons.shared.oracle.model.Annotation;
-import org.drools.workbench.models.commons.shared.oracle.model.ModelField;
-import org.drools.workbench.models.commons.shared.oracle.ProjectDataModelOracle;
+import org.drools.workbench.models.datamodel.oracle.Annotation;
+import org.drools.workbench.models.datamodel.oracle.ModelField;
+import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.guvnor.common.services.project.builder.events.InvalidateDMOProjectCacheEvent;
 import org.guvnor.common.services.project.model.Project;
 import org.guvnor.common.services.project.service.ProjectService;
@@ -34,6 +29,10 @@ import org.kie.workbench.common.services.datamodel.service.DataModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
+
+import static junit.framework.Assert.fail;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 
 
 @Ignore
