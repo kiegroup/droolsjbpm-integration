@@ -120,15 +120,15 @@ public class KieSpringJpaManager
 
     public void endCommandScopedEntityManager() {
         if (TransactionSynchronizationManager.hasResource("cmdEM")) {
-            TransactionSynchronizationManager.unbindResource("cmdEM");
-            if (this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER) != null) {
-                getCommandScopedPersistenceContext().close();
-            }
-            
             // Code formerly in the clearPersistenceContext method.
             EntityManager cmdScopedEntityManager = (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
             if (cmdScopedEntityManager != null) {
                 cmdScopedEntityManager.clear();
+            }
+            
+            TransactionSynchronizationManager.unbindResource("cmdEM");
+            if (this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER) != null) {
+                getCommandScopedPersistenceContext().close();
             }
         }
     }
