@@ -25,4 +25,9 @@ public class SimulationProcessValidator implements ProcessValidator {
         return false;
     }
 
+    @Override
+    public boolean compilationSupported() {
+        return false;
+    }
+
 }
