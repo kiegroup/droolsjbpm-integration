@@ -290,7 +290,7 @@
 @end{}
 
 @declare{"testQuery.expected.1"}
-{"execution-results":{"results":{"result":{"identifier":"cheeses","value":{"query-results":{"identifiers":{"string":["cheddar","stilton"]},"row":[{"item":[{"external-form":"0:3:29292935:742337872:3:DEFAULT","object":{"org.drools.camel.testdomain.Cheese":{"type":"cheddar","price":2,"oldPrice":0}}},{"external-form":"0:1:18538167:-1889974386:1:DEFAULT","object":{"org.drools.camel.testdomain.Cheese":{"type":"stilton","price":2,"oldPrice":0}}}]},{"item":[{"external-form":"0:2:2419450:742337841:2:DEFAULT","object":{"org.drools.camel.testdomain.Cheese":{"type":"cheddar","price":1,"oldPrice":0}}},{"external-form":"0:4:15736146:-1889974417:4:DEFAULT","object":{"org.drools.camel.testdomain.Cheese":{"type":"stilton","price":1,"oldPrice":0}}}]}]}}}}}}
+{"execution-results":{"results":{"result":{"identifier":"cheeses","value":{"query-results":{"identifiers":{"string":["cheddar","stilton"]},"row":[{"item":[{"external-form":"0:3:29292935:742337872:3:DEFAULT:true:NON_TRAIT","object":{"org.drools.camel.testdomain.Cheese":{"type":"cheddar","price":2,"oldPrice":0}}},{"external-form":"0:1:18538167:-1889974386:1:DEFAULT:true:NON_TRAIT","object":{"org.drools.camel.testdomain.Cheese":{"type":"stilton","price":2,"oldPrice":0}}}]},{"item":[{"external-form":"0:2:2419450:742337841:2:DEFAULT:true:NON_TRAIT","object":{"org.drools.camel.testdomain.Cheese":{"type":"cheddar","price":1,"oldPrice":0}}},{"external-form":"0:4:15736146:-1889974417:4:DEFAULT:true:NON_TRAIT","object":{"org.drools.camel.testdomain.Cheese":{"type":"stilton","price":1,"oldPrice":0}}}]}]}}}}}}
 @end{}
 
 @declare{"testManualFireAllRules.in.1"}
