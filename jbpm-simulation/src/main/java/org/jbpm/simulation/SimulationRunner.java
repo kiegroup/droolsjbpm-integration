@@ -133,8 +133,7 @@ public class SimulationRunner {
                 .setClockType(ClockTypeOption.get("pseudo"));
 
         kfs.writeKModuleXML(kproj.toXML());
-//        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration());
-//        kbuilder.
+
         KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
         if(!kieBuilder.getResults().getMessages().isEmpty()) {
             for (Message msg : kieBuilder.getResults().getMessages()) {

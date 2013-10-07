@@ -27,8 +27,11 @@ public class HandlerRegistry {
         } else if (flowElement instanceof Activity) {
             
             return new ActivityElementHandler();
-        } else if (flowElement instanceof IntermediateThrowEvent || flowElement instanceof EndEvent) {
+        } else if (flowElement instanceof IntermediateThrowEvent) {
             
+            return new ThrowEventElementHandler();
+        } else if (flowElement instanceof EndEvent) {
+
             return new EventElementHandler();
         }
         return null;

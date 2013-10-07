@@ -46,6 +46,8 @@ public class MainElementHandler implements ElementHandler {
                 }
             } else if (element instanceof Activity) {
                 handled = HandlerRegistry.getHandler(element).handle(element, manager);
+            } else if (element instanceof IntermediateThrowEvent) {
+                handled = HandlerRegistry.getHandler(element).handle(element, manager);
             } else {
                 handled = HandlerRegistry.getHandler().handle(element, manager);
             }
