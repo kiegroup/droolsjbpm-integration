@@ -74,7 +74,7 @@ public class AnnotationsTest extends FullDistributionTest {
             Path projectPath = ioService.get(projectUri);
             assertNotNull(projectPath);
 
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(paths.convert(projectPath)));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, paths.convert(projectPath)));
 
             ProjectDataModelOracle projectDataModelOracle = dataModelService.getProjectDataModel(paths.convert(projectPath));
 
@@ -120,7 +120,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(projectPath);
 
             org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
 
             Project project = projectService.resolveProject(path);
 
@@ -154,7 +154,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(result);
             logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
 
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
             DataModelTO reloadedModel = modelerService.loadModel(project);
             assertNotNull(reloadedModel);
 
@@ -210,7 +210,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(projectPath);
 
             org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
 
             Project project = projectService.resolveProject(path);
 
@@ -244,7 +244,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(result);
             logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
 
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
             DataModelTO reloadedModel = modelerService.loadModel(project);
             assertNotNull(reloadedModel);
 
@@ -269,7 +269,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(projectPath);
 
             org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
 
             Project project = projectService.resolveProject(path);
 
@@ -327,7 +327,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(result);
             logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
 
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
             DataModelTO reloadedModel = modelerService.loadModel(project);
             assertNotNull(reloadedModel);
 
@@ -352,7 +352,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(projectPath);
 
             org.uberfire.backend.vfs.Path path = paths.convert(projectPath);
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
 
             Project project = projectService.resolveProject(path);
 
@@ -386,7 +386,7 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(result);
             logger.info("**************************** -> Model saved in " + result.getGenerationTimeSeconds() + " seconds");
 
-            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(path));
+            invalidateDMOProjectCache.fire(new InvalidateDMOProjectCacheEvent(null, null, path));
             DataModelTO reloadedModel = modelerService.loadModel(project);
             assertNotNull(reloadedModel);
 
