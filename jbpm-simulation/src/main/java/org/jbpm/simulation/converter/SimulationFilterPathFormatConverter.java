@@ -6,8 +6,15 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.CompensateEventDefinition;
+import org.eclipse.bpmn2.ErrorEventDefinition;
+import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.LinkEventDefinition;
+import org.eclipse.bpmn2.MessageEventDefinition;
 import org.eclipse.bpmn2.SequenceFlow;
+import org.eclipse.bpmn2.SignalEventDefinition;
+import org.eclipse.bpmn2.ThrowEvent;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathFormatConverter;
 import org.jbpm.simulation.SimulationDataProvider;
@@ -42,6 +49,13 @@ public class SimulationFilterPathFormatConverter implements
                   simPath.addBoundaryEventId(fe.getId());  
                 } else {
                     simPath.addActivity(fe.getId());
+                    if (fe instanceof ThrowEvent) {
+                        String ref = processEventDefinitions(((ThrowEvent) fe).getEventDefinitions());
+                        if (ref != null) {
+                            simPath.addThrowEvent(fe.getId(), ref);
+                        }
+
+                    }
                 }
             }
             allPaths.add(simPath);
@@ -65,5 +79,32 @@ public class SimulationFilterPathFormatConverter implements
         });
         
         return allPaths;
+    }
+
+    protected String processEventDefinitions(List<EventDefinition> eventDefinitions) {
+        String key = null;
+        if (eventDefinitions != null) {
+            for (EventDefinition edef : eventDefinitions) {
+                if (edef instanceof SignalEventDefinition) {
+                    key = ((SignalEventDefinition) edef)
+                            .getSignalRef();
+                } else if (edef instanceof MessageEventDefinition) {
+                    key = "Message-" + ((MessageEventDefinition) edef)
+                            .getMessageRef().getId();
+                } else if (edef instanceof LinkEventDefinition) {
+                    key = ((LinkEventDefinition) edef).getName();
+                } else if (edef instanceof CompensateEventDefinition) {
+                    key = ((CompensateEventDefinition) edef)
+                            .getActivityRef().getId();
+                } else if (edef instanceof ErrorEventDefinition) {
+                    key = "Error-" + ((ErrorEventDefinition) edef)
+                            .getErrorRef().getId();
+                }
+                if (key != null) {
+                    break;
+                }
+            }
+        }
+        return key;
     }
 }

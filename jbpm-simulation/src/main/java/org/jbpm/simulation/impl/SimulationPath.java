@@ -1,7 +1,9 @@
 package org.jbpm.simulation.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jbpm.simulation.PathContext;
 
@@ -12,6 +14,8 @@ public class SimulationPath {
     private List<String> activityIds = new ArrayList<String>();
     private List<String> boundaryEventIds = new ArrayList<String>();
     private List<PathContext> origPaths = new ArrayList<PathContext>();
+    private Map<String, String> catchEvents = new HashMap<String, String>();
+    private Map<String, String> throwEvents = new HashMap<String, String>();
     
     private double probability;
     
@@ -60,5 +64,22 @@ public class SimulationPath {
     public void addBoundaryEventId(String id) {
         this.boundaryEventIds.add(id);
     }
-    
+    public Map<String, String> getCatchEvents() {
+        return catchEvents;
+    }
+    public void setCatchEvents(Map<String, String> catchEvents) {
+        this.catchEvents = catchEvents;
+    }
+    public void addCatchEvent(String ref, String activityId) {
+        this.catchEvents.put(ref, activityId);
+    }
+    public Map<String, String> getThrowEvents() {
+        return throwEvents;
+    }
+    public void setThrowEvents(Map<String, String> throwEvents) {
+        this.throwEvents = throwEvents;
+    }
+    public void addThrowEvent(String activityId, String ref) {
+        this.throwEvents.put(activityId, ref);
+    }
 }

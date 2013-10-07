@@ -69,7 +69,7 @@ public class SimulationNodeInstanceFactoryRegistry extends NodeInstanceFactoryRe
       register( ForEachNode.class,
                 new CreateNewNodeFactory( SimulationNodeInstance.class ) );
       register( EventNode.class,
-                new CreateNewNodeFactory( SimulationNodeInstance.class ) );
+                new CreateNewNodeFactory( SimulationEventNodeInstance.class ) );
       register( StateNode.class,
                 new CreateNewNodeFactory( SimulationNodeInstance.class ) );
       register( DynamicNode.class,
