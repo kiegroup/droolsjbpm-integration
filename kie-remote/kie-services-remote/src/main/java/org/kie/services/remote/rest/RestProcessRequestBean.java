@@ -11,6 +11,9 @@ import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 
+import org.drools.core.command.CommandService;
+import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.persistence.SingleSessionCommandService;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.seam.transaction.DefaultTransaction;
@@ -85,8 +88,10 @@ public class RestProcessRequestBean {
         Object result = null;
         try {
             RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, processInstanceId);
-            synchronized (runtimeEngine) {
-                KieSession kieSession = runtimeEngine.getKieSession();
+            KieSession kieSession = runtimeEngine.getKieSession();
+            SingleSessionCommandService sscs 
+                = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
+            synchronized (sscs) { 
                 try {
                     result = kieSession.execute(cmd);
                 } finally {
@@ -149,7 +154,10 @@ public class RestProcessRequestBean {
         try {
             if( deploymentId != null ) { 
                 RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, null);
-                synchronized (runtimeEngine) {
+                KieSession kieSession = runtimeEngine.getKieSession();
+                SingleSessionCommandService sscs 
+                    = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
+                synchronized (sscs) {
                     try {
                         ((InternalTaskService) taskService).execute(cmd);
                     } finally {
