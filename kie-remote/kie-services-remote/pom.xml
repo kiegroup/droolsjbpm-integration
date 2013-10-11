@@ -28,10 +28,6 @@
       <artifactId>jbpm-kie-services</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jbpm</groupId>
-          <artifactId>jbpm-form-services</artifactId>
-        </exclusion>
-        <exclusion>
           <artifactId>weld-core</artifactId>
           <groupId>org.jboss.weld</groupId>
         </exclusion>
