@@ -34,6 +34,7 @@ import org.eclipse.bpmn2.Relationship;
 import org.eclipse.bpmn2.RootElement;
 import org.eclipse.bpmn2.ScriptTask;
 import org.eclipse.bpmn2.SendTask;
+import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.bpmn2.SignalEventDefinition;
 import org.eclipse.bpmn2.StartEvent;
@@ -80,8 +81,24 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         		for(ElementParameters eleType : scenario.getElementParameters()) {
         			if(eleType.getElementRef().equals(nodeId)) {
         				if(eleType.getControlParameters() != null && eleType.getControlParameters().getProbability() != null) {
-        					FloatingParameterType valType = (FloatingParameterType) eleType.getControlParameters().getProbability().getParameterValue().get(0);
-                			properties.put("probability", valType.getValue());
+
+                            FlowElement element = null;
+                            for (RootElement root : def.getRootElements()) {
+                                if (root instanceof Process) {
+                                    element = findElementInContainer((FlowElementsContainer) root, nodeId);
+                                    if (element != null && element instanceof SequenceFlow) {
+                                        element = ((SequenceFlow)element).getSourceRef();
+                                    }
+                                    break;
+                                }
+                            }
+                            if (element != null && element instanceof ParallelGateway) {
+                                // probability should be ignored for parallel gateways so use default value
+                                properties.put("probability", 100.0);
+                            } else {
+                                FloatingParameterType valType = (FloatingParameterType) eleType.getControlParameters().getProbability().getParameterValue().get(0);
+                                properties.put("probability", valType.getValue());
+                            }
         				}
         				if(eleType.getTimeParameters() != null) {
         					if(eleType.getTimeParameters().getProcessingTime() != null) {
