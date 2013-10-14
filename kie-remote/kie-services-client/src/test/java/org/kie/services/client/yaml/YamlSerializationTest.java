@@ -13,7 +13,7 @@ public class YamlSerializationTest extends SerializationTest {
     
     public Object testRoundtrip(Object in) throws Exception {
         String output = yaml.dump(in);
-        System.out.println(output);
+        log.debug(output);
         return yaml.load(output);
     }
     

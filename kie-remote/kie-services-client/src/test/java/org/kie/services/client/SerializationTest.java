@@ -354,6 +354,9 @@ public abstract class SerializationTest {
 
     @Test
     public void workItemObjectTest() throws Exception { 
+        // Don't run with YAML? 
+        Assume.assumeTrue( ! getType().equals(TestType.YAML)); 
+        
         JaxbWorkItem workitemObject = new JaxbWorkItem();
         workitemObject.setId(35l);
         workitemObject.setName("Clau");
