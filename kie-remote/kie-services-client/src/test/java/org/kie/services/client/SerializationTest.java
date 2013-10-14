@@ -66,6 +66,7 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanc
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
@@ -350,4 +351,19 @@ public abstract class SerializationTest {
         jpilp.setResult(procInstList);
         testRoundtrip(jpilp);
     }
+
+    @Test
+    public void workItemObjectTest() throws Exception { 
+        JaxbWorkItem workitemObject = new JaxbWorkItem();
+        workitemObject.setId(35l);
+        workitemObject.setName("Clau");
+        workitemObject.setState(0);
+        workitemObject.setProcessInstanceId(1l);
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("test", "driving");
+        workitemObject.setParameters(params);
+        testRoundtrip(workitemObject);
+    }
+   
+
 }
