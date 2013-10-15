@@ -7,8 +7,10 @@ import java.util.Set;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import org.drools.workbench.models.commons.backend.oracle.ProjectDataModelOracleUtils;
 import org.drools.workbench.models.datamodel.oracle.Annotation;
 import org.drools.workbench.models.datamodel.oracle.ModelField;
+
 import org.drools.workbench.models.datamodel.oracle.ProjectDataModelOracle;
 import org.guvnor.common.services.project.builder.events.InvalidateDMOProjectCacheEvent;
 import org.guvnor.common.services.project.model.Project;
@@ -17,18 +19,19 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.commons.io.IOService;
-import org.kie.commons.java.nio.file.Path;
 import org.kie.workbench.common.screens.datamodeller.model.AnnotationDefinitionTO;
 import org.kie.workbench.common.screens.datamodeller.model.DataModelTO;
 import org.kie.workbench.common.screens.datamodeller.model.DataObjectTO;
 import org.kie.workbench.common.screens.datamodeller.model.GenerationResult;
 import org.kie.workbench.common.screens.datamodeller.model.ObjectPropertyTO;
 import org.kie.workbench.common.screens.datamodeller.service.DataModelerService;
-import org.kie.workbench.common.services.datamodel.service.DataModelService;
+
+import org.kie.workbench.common.services.datamodel.backend.server.service.DataModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
+import org.uberfire.io.IOService;
+import org.uberfire.java.nio.file.Path;
 
 import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertEquals;
@@ -84,7 +87,7 @@ public class AnnotationsTest extends FullDistributionTest {
             boolean isTestLoaded = false;
             boolean isTestSerializableLoaded = false;
 
-            String types[] = projectDataModelOracle.getFactTypes();
+            String types[] = ProjectDataModelOracleUtils.getFactTypes(projectDataModelOracle);
             if (types != null) {
                 for (int i = 0; i < types.length; i++) {
                     logger.info("**************************** -> Loading type: " + types[i]);
@@ -159,12 +162,12 @@ public class AnnotationsTest extends FullDistributionTest {
             assertNotNull(reloadedModel);
 
             ProjectDataModelOracle projectDataModelOracle = dataModelService.getProjectDataModel(path);
-            String types[] = projectDataModelOracle.getFactTypes();
+            String types[] = ProjectDataModelOracleUtils.getFactTypes(projectDataModelOracle);
             if (types != null) {
                 for (String type : types) {
                     if ((objectPackage + "." + objectName).equals(type)) {
                         // Check type annotations
-                        Set<Annotation> annotations = projectDataModelOracle.getTypeAnnotations(type);
+                        Set<Annotation> annotations = ProjectDataModelOracleUtils.getTypeAnnotations(projectDataModelOracle, type);
                         assertNotNull(annotations);
                         assertEquals("Type " + type + " should hold 3 annotations: ", 3, annotations.size());
                         checkAnnotation(annotations, AnnotationDefinitionTO.LABEL_ANNOTATION, objectLabelValue);
@@ -172,10 +175,10 @@ public class AnnotationsTest extends FullDistributionTest {
                         checkAnnotation(annotations, AnnotationDefinitionTO.ROLE_ANNOTATION, objectRoleValue);
 
                         // Check type field annotations
-                        ModelField[] fields = projectDataModelOracle.getModelFields().get(type);
+                        ModelField[] fields = projectDataModelOracle.getProjectModelFields().get(type);
                         assertNotNull(fields);
                         assertEquals("Error in type " + type + "'s fields: ", 2, fields.length);
-                        Map<String, Set<Annotation>> mFieldAnnotations = projectDataModelOracle.getTypeFieldsAnnotations(type);
+                        Map<String, Set<Annotation>> mFieldAnnotations = ProjectDataModelOracleUtils.getTypeFieldsAnnotations(projectDataModelOracle, type);
                         assertNotNull(mFieldAnnotations);
                         Set fieldAnnotations = mFieldAnnotations.get(fieldName);
                         assertNotNull(fieldAnnotations);
@@ -394,7 +397,7 @@ public class AnnotationsTest extends FullDistributionTest {
 
             // TODO for the ProjectDataModelOracle, in fact, the getModelFields() method should only return the declared
             // TODO fields per fact type, i.e. similar to getClass().getDeclaredFields(), which may including @this
-            Map<String, ModelField[]> modelFields = projectDataModelOracle.getModelFields();
+            Map<String, ModelField[]> modelFields = projectDataModelOracle.getProjectModelFields();
             if (modelFields != null) {
                 String inheritorFullName = extendingPackage + "." + extendingName;
                 ModelField[] fields = modelFields.get(inheritorFullName);
