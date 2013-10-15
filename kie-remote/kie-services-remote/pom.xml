@@ -47,6 +47,18 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- seam-transaction (for tx/concurrency problems)-->
+    <dependency>
+      <groupId>org.jboss.seam.transaction</groupId>
+      <artifactId>seam-transaction-api</artifactId>
+      <!-- remove once seam-transaction-api is added to jboss-integration pom -->
+      <version>3.1.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.solder</groupId>
+      <artifactId>solder-api</artifactId>
+    </dependency>
+    
     <!-- jms -->
     <dependency>
       <groupId>javax.jms</groupId>
