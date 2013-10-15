@@ -8,18 +8,19 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jboss.resteasy.core.request.ServerDrivenNegotiation;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotAcceptableException;
-import org.jboss.resteasy.spi.NotFoundException;
+import org.jboss.resteasy.util.HttpHeaderNames;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.impl.model.GroupImpl;
@@ -29,13 +30,9 @@ import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
-import org.kie.api.task.model.Task;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
-import org.kie.services.remote.cdi.RuntimeManagerManager;
-import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,18 +111,44 @@ public class ResourceBase {
     
     // JSON / JAXB ---------------------------------------------------------------------------------------------------------------
     
-    public static List<Variant> variants 
+    private static List<Variant> variants 
         = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).build();
+    private static Variant defaultVariant 
+        = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE).build().get(0);
     
-    protected static Variant getVariant(Request restRequest) { 
-        return restRequest.selectVariant(variants);
+    public static Variant getVariant(HttpHeaders headers) { 
+        // copied (except for the acceptHeaders fix) from RestEasy's RequestImpl class
+        ServerDrivenNegotiation negotiation = new ServerDrivenNegotiation();
+        MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
+        List<String> acceptHeaders = requestHeaders.get(HttpHeaderNames.ACCEPT);
+        if( acceptHeaders != null && ! acceptHeaders.isEmpty() ) { 
+            List<String> fixedAcceptHeaders = new ArrayList<String>();
+            for(String header : acceptHeaders ) { 
+                fixedAcceptHeaders.add(header.replaceAll("q=\\.", "q=0.")); 
+            }
+            acceptHeaders = fixedAcceptHeaders;
+        }
+        negotiation.setAcceptHeaders(acceptHeaders);
+        negotiation.setAcceptCharsetHeaders(requestHeaders.get(HttpHeaderNames.ACCEPT_CHARSET));
+        negotiation.setAcceptEncodingHeaders(requestHeaders.get(HttpHeaderNames.ACCEPT_ENCODING));
+        negotiation.setAcceptLanguageHeaders(requestHeaders.get(HttpHeaderNames.ACCEPT_LANGUAGE));
+
+        return negotiation.getBestMatch(variants);
+        // ** use below instead of above when RESTEASY-960 is fixed **
+        // return restRequest.selectVariant(variants); 
     }
     
-    protected static Response createCorrectVariant(Object responseObj, Request restRequest) { 
-        Variant v = getVariant(restRequest);
+    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) { 
+        return createCorrectVariant(responseObj, headers, true);
+    }
+    
+    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, boolean useDefault) { 
+        Variant v = getVariant(headers);
         if( v != null ) { 
             return Response.ok(responseObj, v).build();
-        } else { 
+        } else if( useDefault ) { 
+            return Response.ok(responseObj, defaultVariant).build();
+        } else {
             return Response.notAcceptable(variants).build();
         }
     }

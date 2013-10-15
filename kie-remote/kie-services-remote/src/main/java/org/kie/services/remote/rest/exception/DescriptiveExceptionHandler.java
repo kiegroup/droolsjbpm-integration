@@ -1,8 +1,10 @@
 package org.kie.services.remote.rest.exception;
 
-import static org.kie.services.remote.rest.ResourceBase.variants;
+import static org.kie.services.remote.rest.ResourceBase.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -10,6 +12,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
+import org.drools.core.command.GetVariableCommand;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.MethodNotAllowedException;
@@ -28,7 +31,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     HttpServletRequest request; 
    
     @Context
-    Request restRequest;
+    HttpHeaders headers;
     
     @Override
     public Response toResponse(Exception e) {
@@ -62,8 +65,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         } catch (JAXBException jaxb) {
             responseBuilder.entity(JaxbGenericResponse.convertStackTraceToString(jaxb));
         }
-        responseBuilder.variant(restRequest.selectVariant(variants));
-        return responseBuilder.build();
+        return responseBuilder.variant(getVariant(headers)).build();
     }
 
 }

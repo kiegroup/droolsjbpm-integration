@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -52,15 +53,20 @@ public class TaskResource extends ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
     
-    @Inject
-    private RestProcessRequestBean processRequestBean;
-
+    /* REST information */
+    @Context
+    private HttpHeaders headers;
+    
     @Context
     private HttpServletRequest request;
     
     @Context
     private Request restRequest;
-    
+
+    /* KIE information and processing */
+    @Inject
+    private RestProcessRequestBean processRequestBean;
+
     @Inject
     private IdentityProvider identityProvider;
    
@@ -181,7 +187,7 @@ public class TaskResource extends ResourceBase {
         if( results.size() >= pageInfo[2] ) { 
             results = paginator.paginate(pageInfo, results);
             responseObj = new JaxbTaskSummaryListResponse(results);
-            return createCorrectVariant(responseObj, restRequest);
+            return createCorrectVariant(responseObj, headers);
         }
         
         int assignments = 0;
@@ -218,7 +224,7 @@ public class TaskResource extends ResourceBase {
                         if( results.size() >= pageInfo[2] ) { 
                             results = paginator.paginate(pageInfo, results);
                             responseObj = new JaxbTaskSummaryListResponse(results);
-                            return createCorrectVariant(responseObj, restRequest);
+                            return createCorrectVariant(responseObj, headers);
                         }
                     }
                 }
@@ -272,13 +278,13 @@ public class TaskResource extends ResourceBase {
             if( results.size() >= pageInfo[2] ) { 
                 results = paginator.paginate(pageInfo, results);
                 responseObj = new JaxbTaskSummaryListResponse(results);
-                return createCorrectVariant(responseObj, restRequest);
+                return createCorrectVariant(responseObj, headers);
             }
         }
         
         results = paginator.paginate(pageInfo, results);
         responseObj= new JaxbTaskSummaryListResponse(results);
-        return createCorrectVariant(responseObj, restRequest);
+        return createCorrectVariant(responseObj, headers);
     }
 
     @GET
@@ -291,7 +297,7 @@ public class TaskResource extends ResourceBase {
         if( task == null ) { 
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
-        return createCorrectVariant(new JaxbTask(task), restRequest);
+        return createCorrectVariant(new JaxbTask(task), headers);
     }
 
     @POST
@@ -349,7 +355,7 @@ public class TaskResource extends ResourceBase {
         }
         
         internalCheckAndDoTaskOperation(cmd, taskId, "Unable to " + operation + " task " + taskId);
-        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
     private static String checkThatOperationExists(String operation, String[] possibleOperations) {
@@ -402,7 +408,7 @@ public class TaskResource extends ResourceBase {
                     "Unable get content " + contentId + " (from task " + taskId + ")");
             content = (Content) result;
         }
-        return createCorrectVariant(new JaxbContent(content), restRequest);
+        return createCorrectVariant(new JaxbContent(content), headers);
     }
     
     @GET
@@ -413,7 +419,7 @@ public class TaskResource extends ResourceBase {
         if( content == null ) { 
             throw new NotFoundException("Content " + contentId + " could not be found.");
         }
-        return createCorrectVariant(new JaxbContent(content), restRequest);
+        return createCorrectVariant(new JaxbContent(content), headers);
     }
     
 }

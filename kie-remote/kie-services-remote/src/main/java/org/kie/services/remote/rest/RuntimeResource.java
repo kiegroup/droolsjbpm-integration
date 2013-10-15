@@ -17,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -73,6 +74,9 @@ public class RuntimeResource extends ResourceBase {
 
     /* REST information */
     @Context
+    private HttpHeaders headers;
+    
+    @Context
     private HttpServletRequest request;
     
     @Context
@@ -110,7 +114,7 @@ public class RuntimeResource extends ResourceBase {
                 true);
         
         JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result, request);
-        return createCorrectVariant(responseObj, restRequest);
+        return createCorrectVariant(responseObj, headers);
     }
 
     @GET
@@ -129,7 +133,7 @@ public class RuntimeResource extends ResourceBase {
         Object responseObj = null;
         if (result != null) {
             responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result);
-            return createCorrectVariant(responseObj, restRequest);
+            return createCorrectVariant(responseObj, headers);
         } else {
             throw new BadRequestException("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
@@ -149,7 +153,7 @@ public class RuntimeResource extends ResourceBase {
                 "Unable to abort process instance " + procInstId,
                 true);
                 
-        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
     @POST
@@ -171,14 +175,14 @@ public class RuntimeResource extends ResourceBase {
         }
         
         processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId, errorMsg, true); 
-        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}/variables")
     public Response getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
         Map<String, String> vars = getVariables(procInstId, true);
-        return createCorrectVariant(new JaxbVariablesResponse(vars, request), restRequest);
+        return createCorrectVariant(new JaxbVariablesResponse(vars, request), headers);
     }
     
     @POST
@@ -198,7 +202,7 @@ public class RuntimeResource extends ResourceBase {
                 (Long) getNumberParam("processInstanceId", false, formParams, "signal", true),
                 errorMsg, 
                 true); 
-        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
     @GET
@@ -210,7 +214,7 @@ public class RuntimeResource extends ResourceBase {
                 (Long) getNumberParam("processInstanceId", false, getRequestParams(request), "workitem/" + workItemId, true),
                 "Unable to get work item " +  workItemId, 
                 true);
-        return createCorrectVariant(new JaxbWorkItem(workItem), restRequest);
+        return createCorrectVariant(new JaxbWorkItem(workItem), headers);
     }
     
     @POST
@@ -233,7 +237,7 @@ public class RuntimeResource extends ResourceBase {
                 (Long) getNumberParam("processInstanceId", false, params, "workitem/" + workItemId + "/" + operation, true),
                 "Unable to " + operation + " work item " +  workItemId, 
                 true);
-        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
     /**
@@ -249,7 +253,7 @@ public class RuntimeResource extends ResourceBase {
                 (Long) getNumberParam("processInstanceId", false, getRequestParams(request), "history/clear", true),
                 "Unable to clear process instance logs",
                 true);
-        return createCorrectVariant(new JaxbGenericResponse(request), restRequest);
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
     @GET
@@ -267,7 +271,7 @@ public class RuntimeResource extends ResourceBase {
         List<ProcessInstanceLog> results = (List<ProcessInstanceLog>) result;
         
         results = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, results);
-        return createCorrectVariant(new JaxbHistoryLogList(results), restRequest);
+        return createCorrectVariant(new JaxbHistoryLogList(results), headers);
     }
 
     @GET
@@ -288,7 +292,7 @@ public class RuntimeResource extends ResourceBase {
         logList.add(procInstLog);
         
         logList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, logList);
-        return createCorrectVariant(new JaxbHistoryLogList(logList), restRequest);
+        return createCorrectVariant(new JaxbHistoryLogList(logList), headers);
     }
 
     @GET
@@ -316,7 +320,7 @@ public class RuntimeResource extends ResourceBase {
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
         varInstLogList = (new Paginator<AuditEvent>()).paginate(pageInfo, varInstLogList);
         JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
-        return createCorrectVariant(resultList, restRequest);
+        return createCorrectVariant(resultList, headers);
     }
 
     @GET
@@ -343,7 +347,7 @@ public class RuntimeResource extends ResourceBase {
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
         varInstLogList = (new Paginator<AuditEvent>()).paginate(pageInfo, varInstLogList);
         JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
-        return createCorrectVariant(resultList, restRequest);
+        return createCorrectVariant(resultList, headers);
     }
 
     @GET
@@ -361,7 +365,7 @@ public class RuntimeResource extends ResourceBase {
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
         
         procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
-        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), restRequest);
+        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
     }
 
     /**
@@ -386,7 +390,7 @@ public class RuntimeResource extends ResourceBase {
         Map<String, String> vars = getVariables(procInst.getId(), true);
         JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, request);
         
-        return createCorrectVariant(resp, restRequest);
+        return createCorrectVariant(resp, headers);
     }
 
     @GET
@@ -411,7 +415,7 @@ public class RuntimeResource extends ResourceBase {
             throw new BadRequestException("Unable to retrieve process instance " + procInstId
                     + " since it has been completed. Please see the history operations.");
         }
-        return createCorrectVariant(responseObj, restRequest);
+        return createCorrectVariant(responseObj, headers);
     }
 
     @POST
@@ -451,8 +455,7 @@ public class RuntimeResource extends ResourceBase {
         }
         Map<String, String> vars = getVariables(processInstance.getId(), true);
         
-        return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars),
-                restRequest);
+        return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars), headers);
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
