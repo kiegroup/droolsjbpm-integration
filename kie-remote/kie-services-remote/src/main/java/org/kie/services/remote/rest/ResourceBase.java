@@ -328,11 +328,20 @@ public class ResourceBase {
     }
     
     protected static List<Status> convertStringListToStatusList( List<String> statusStrList ) { 
-        List<Status> statusList = new ArrayList<Status>();
-        for( String strStatus : statusStrList ) { 
-            statusList.add(Status.valueOf(Status.class, strStatus));
+        List<Status> statuses = null;
+        if( statusStrList != null && ! statusStrList.isEmpty() ) { 
+            statuses = new ArrayList<Status>();
+            for( String statusStr : statusStrList ) { 
+                String goodStatusStr = statusStr.substring(0, 1).toUpperCase()
+                        + statusStr.substring(1).toLowerCase();
+                try { 
+                    statuses.add(Status.valueOf(goodStatusStr));
+                } catch(IllegalArgumentException iae) { 
+                    throw new BadRequestException(goodStatusStr + " is not a valid status type for a task." );
+                }
+            }
         }
-        return statusList;
+        return statuses;
     }
     
     // Pagination ----------------------------------------------------------------------------------------------------------------
