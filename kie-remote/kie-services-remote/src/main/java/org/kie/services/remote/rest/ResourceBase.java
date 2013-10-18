@@ -50,7 +50,6 @@ public class ResourceBase {
         if (commands != null) {
             int cmdListSize = commands.size(); 
             for (int i = 0; i < cmdListSize; ++i) {
-                boolean restartTx = !( i == cmdListSize - 1 ); // restart tx for all cmds except the last one
                 Command<?> cmd = commands.get(i);
                 if (!AcceptedCommands.getSet().contains(cmd.getClass())) {
                     throw new NotAcceptableException("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
@@ -68,8 +67,7 @@ public class ResourceBase {
                             cmdResult = requestBean.doTaskOperationOnDeployment(
                                     taskCmd, 
                                     errorMsg, 
-                                    request.getDeploymentId(), 
-                                    restartTx); // restart commit
+                                    request.getDeploymentId());
                         } else { 
                             cmdResult = requestBean.doTaskOperation(taskCmd, errorMsg);
                         }
@@ -78,9 +76,7 @@ public class ResourceBase {
                                 cmd, 
                                 request.getDeploymentId(), 
                                 request.getProcessInstanceId(),
-                                "Unable to execute command " + cmd.getClass().getSimpleName(), 
-                                true, // commit
-                                restartTx); // restart commit
+                                "Unable to execute command " + cmd.getClass().getSimpleName());
                     }
                 } catch(Exception e) { 
                     jaxbResponse.addException(e, i, cmd);

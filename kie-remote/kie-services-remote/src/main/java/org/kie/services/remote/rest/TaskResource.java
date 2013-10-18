@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -27,12 +26,34 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
-import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
+import org.jbpm.services.task.commands.ClaimTaskCommand;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.ExitTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
+import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
+import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
+import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
+import org.jbpm.services.task.commands.GetTaskCommand;
+import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksOwnedCommand;
+import org.jbpm.services.task.commands.NominateTaskCommand;
+import org.jbpm.services.task.commands.ReleaseTaskCommand;
+import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SkipTaskCommand;
+import org.jbpm.services.task.commands.StartTaskCommand;
+import org.jbpm.services.task.commands.StopTaskCommand;
+import org.jbpm.services.task.commands.SuspendTaskCommand;
+import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.jbpm.services.task.query.TaskSummaryImpl;
-import org.kie.api.command.Command;
 import org.kie.api.task.model.Content;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
@@ -42,7 +63,6 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.util.Paginator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -376,13 +396,13 @@ public class TaskResource extends ResourceBase {
             || cmd instanceof SkipTaskCommand ) { 
             TaskCommand<?> getTaskCmd = new GetTaskCommand(taskId);
             Task task = (Task) processRequestBean.doTaskOperation(
-                    getTaskCmd, 
+                    getTaskCmd,
                     "Task " + taskId + " does not exist or unable to check if it exists");
-            if( task == null ) {  
+            if( task == null ) {
                 throw new NotFoundException("Task " + taskId + " could not be found.");
             }
             String deploymentId = task.getTaskData().getDeploymentId();
-            return processRequestBean.doTaskOperationOnDeployment(cmd, errorMsg, deploymentId);    
+            return processRequestBean.doTaskOperationOnDeployment(cmd, errorMsg, deploymentId);
         } else { 
             return processRequestBean.doTaskOperation(cmd, errorMsg);
         }
@@ -394,9 +414,9 @@ public class TaskResource extends ResourceBase {
     public Response getTaskContent(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = processRequestBean.doTaskOperation(
-                cmd, 
+                cmd,
                 "Unable to get task " + taskId);
-        if( result == null ) { 
+        if( result == null ) {
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
         long contentId = ((Task) result).getTaskData().getDocumentContentId();
