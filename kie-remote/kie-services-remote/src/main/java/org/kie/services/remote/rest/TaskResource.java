@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -26,30 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
-import org.jbpm.services.task.commands.ActivateTaskCommand;
-import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
-import org.jbpm.services.task.commands.ClaimTaskCommand;
-import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.DelegateTaskCommand;
-import org.jbpm.services.task.commands.ExitTaskCommand;
-import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.ForwardTaskCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
-import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
-import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
-import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
-import org.jbpm.services.task.commands.GetTaskCommand;
-import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksOwnedCommand;
-import org.jbpm.services.task.commands.NominateTaskCommand;
-import org.jbpm.services.task.commands.ReleaseTaskCommand;
-import org.jbpm.services.task.commands.ResumeTaskCommand;
-import org.jbpm.services.task.commands.SkipTaskCommand;
-import org.jbpm.services.task.commands.StartTaskCommand;
-import org.jbpm.services.task.commands.StopTaskCommand;
-import org.jbpm.services.task.commands.SuspendTaskCommand;
-import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
@@ -134,14 +112,6 @@ public class TaskResource extends ResourceBase {
         JaxbTaskSummaryListResponse responseObj = null;
         Map<String, List<String>> params = getRequestParams(request);
         
-        List<Long> workItemIdList = getLongListParam(allowedQueryParams[0], false, params, "query", true);
-        List<Long> taskIdList = getLongListParam(allowedQueryParams[1], false, params, "query", true);
-        List<String> busAdminList = getStringListParam(allowedQueryParams[2], false, params, "query");
-        List<String> potOwnList = getStringListParam(allowedQueryParams[3], false, params, "query");
-        List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
-        List<String> taskOwnList = getStringListParam(allowedQueryParams[5], false, params, "query");
-        List<Long> procInstIdList = getLongListParam(allowedQueryParams[6], false, params, "query", true);
-        String language = getStringParam(allowedQueryParams[7], false, params, "query");
         for( String queryParam : params.keySet() ) { 
             boolean allowed = false;
             for( String allowedParam : allowedQueryParams ) { 
@@ -155,155 +125,29 @@ public class TaskResource extends ResourceBase {
             }
         }
         
+        List<Long> workItemIds = getLongListParam(allowedQueryParams[0], false, params, "query", true);
+        List<Long> taskIds = getLongListParam(allowedQueryParams[1], false, params, "query", true);
+        List<Long> procInstIds = getLongListParam(allowedQueryParams[6], false, params, "query", true);
+        List<String> busAdmins = getStringListParam(allowedQueryParams[2], false, params, "query");
+        List<String> potOwners = getStringListParam(allowedQueryParams[3], false, params, "query");
+        List<String> taskOwners = getStringListParam(allowedQueryParams[5], false, params, "query");
+        String unionStr = getStringParam("union", false, params, "query");
+        boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
+        
+        List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
+        List<Status> statuses = convertStringListToStatusList(statusStrList);
+        
         int [] pageInfo = getPageNumAndPageSize(params);
         Paginator<TaskSummaryImpl> paginator = new Paginator<TaskSummaryImpl>();
         
-        /**
-         * TODO: talk with Mauricio about new query command that accepts all of the above params? 
-        String andStr = getStringParam("and", false, params, "query");
-        boolean and = false;
-        if( andStr != null && Boolean.parseBoolean(andStr) ) {
-            and = true;
-        }
-        */
-
-        // clean up params
-        if (language == null) {
-            language = "en-UK";
-        }
-        List<Status> statusList = convertStringListToStatusList(statusStrList);
-
-        // process params/cmds
-        Queue<TaskCommand<?>> cmds = new LinkedList<TaskCommand<?>>();
-        if (!workItemIdList.isEmpty()) {
-            for (Long workItemId : workItemIdList) {
-                cmds.add(new GetTaskByWorkItemIdCommand(workItemId));
-            }
-        }
-        if (!taskIdList.isEmpty()) {
-            for (Long taskId : taskIdList) {
-                cmds.add(new GetTaskCommand(taskId));
-            }
-        }
-
-        Set<TaskSummaryImpl> alreadyRetrievedSet = new HashSet<TaskSummaryImpl>();
-        List<TaskSummaryImpl> results = new ArrayList<TaskSummaryImpl>();
+        TaskCommand<?> queryCmd = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, busAdmins, potOwners, taskOwners, statuses, union);
         
-        TaskCommand<?> cmd = null;
-        while (!cmds.isEmpty()) {
-            cmd = cmds.poll();
-            logger.debug( "query: " + cmd.getClass().getSimpleName());
-            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(
-                    cmd, 
-                    "Unable to execute " + cmd.getClass().getSimpleName());
-            if (task != null) {
-                TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
-                if( alreadyRetrievedSet.add(taskSum) ) { 
-                    results.add(taskSum);
-                }
-            }
-        }
+        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doTaskOperation(
+                queryCmd, 
+                "Unable to execute " + queryCmd.getClass().getSimpleName());
 
-        if( results.size() >= pageInfo[2] ) { 
-            results = paginator.paginate(pageInfo, results);
-            responseObj = new JaxbTaskSummaryListResponse(results);
-            return createCorrectVariant(responseObj, headers);
-        }
-        
-        int assignments = 0;
-        assignments += potOwnList.isEmpty() ? 0 : 1;
-        assignments += busAdminList.isEmpty() ? 0 : 1;
-        assignments += taskOwnList.isEmpty() ? 0 : 1;
-
-        if (assignments == 0) {
-            if (!procInstIdList.isEmpty()) {
-                if (!statusList.isEmpty()) {
-                    for (Long procInstId : procInstIdList) {
-                        cmds.add(new GetTasksByStatusByProcessInstanceIdCommand(procInstId.longValue(), language, statusList));
-                    }
-                } else {
-                    for (Long procInstId : procInstIdList) {
-                        cmd = new GetTasksByProcessInstanceIdCommand(procInstId);
-                        logger.debug( "query: " + cmd.getClass().getSimpleName());
-                        @SuppressWarnings("unchecked")
-                        List<Long> procInstTaskIdList = (List<Long>) processRequestBean.doTaskOperation(
-                                cmd, 
-                                "Unable to execute " + cmd.getClass().getSimpleName());
-                        for (Long taskId : procInstTaskIdList) {
-                            cmd = new GetTaskCommand(taskId);
-                            TaskImpl task = (TaskImpl) processRequestBean.doTaskOperation(
-                                    cmd, 
-                                    "Unable to execute " + cmd.getClass().getSimpleName());
-                            if (task != null) {
-                                TaskSummaryImpl taskSum = convertTaskToTaskSummary(task);
-                                if( alreadyRetrievedSet.add(taskSum) ) { 
-                                    results.add(taskSum);
-                                }
-                            }
-                        }
-                        if( results.size() >= pageInfo[2] ) { 
-                            results = paginator.paginate(pageInfo, results);
-                            responseObj = new JaxbTaskSummaryListResponse(results);
-                            return createCorrectVariant(responseObj, headers);
-                        }
-                    }
-                }
-            }
-        } else {
-            if (!busAdminList.isEmpty()) {
-                for (String userId : busAdminList) {
-                    cmds.add(new GetTaskAssignedAsBusinessAdminCommand(userId, language));
-                }
-            }
-            if (!potOwnList.isEmpty()) {
-                if (statusList.isEmpty()) {
-                    for (String userId : potOwnList) {
-                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language));
-                    }
-                } else {
-                    for (String userId : potOwnList) {
-                        cmds.add(new GetTaskAssignedAsPotentialOwnerCommand(userId, language, statusList));
-                    }
-
-                }
-            }
-            if (!taskOwnList.isEmpty()) {
-                if (statusList.isEmpty()) {
-                    for (String userId : taskOwnList) {
-                        cmds.add(new GetTasksOwnedCommand(userId, language));
-                    }
-                } else {
-                    for (String userId : taskOwnList) {
-                        cmds.add(new GetTasksOwnedCommand(userId, language, statusList));
-                    }
-                }
-            }
-        }
-
-        while (!cmds.isEmpty()) {
-            cmd = cmds.poll();
-            logger.debug( "query: " + cmd.getClass().getSimpleName());
-            @SuppressWarnings("unchecked")
-            List<TaskSummary> taskSummaryList = (List<TaskSummary>) processRequestBean.doTaskOperation(
-                    cmd, 
-                    "Unable to execute " + cmd.getClass().getSimpleName());
-            if (taskSummaryList != null && !taskSummaryList.isEmpty()) {
-                for (TaskSummary taskSummary : taskSummaryList) {
-                    TaskSummaryImpl taskSum = (TaskSummaryImpl) taskSummary;
-                    if( alreadyRetrievedSet.add(taskSum) ) { 
-                        results.add(taskSum);
-                    }
-                }
-            }
-            if( results.size() >= pageInfo[2] ) { 
-                results = paginator.paginate(pageInfo, results);
-                responseObj = new JaxbTaskSummaryListResponse(results);
-                return createCorrectVariant(responseObj, headers);
-            }
-        }
-        
         results = paginator.paginate(pageInfo, results);
-        responseObj= new JaxbTaskSummaryListResponse(results);
+        responseObj = new JaxbTaskSummaryListResponse(results);
         return createCorrectVariant(responseObj, headers);
     }
 
