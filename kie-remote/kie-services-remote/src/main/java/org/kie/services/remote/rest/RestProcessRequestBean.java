@@ -3,6 +3,7 @@ package org.kie.services.remote.rest;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -17,6 +18,8 @@ import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.seam.transaction.DefaultTransaction;
 import org.jboss.seam.transaction.SeamTransaction;
+import org.jboss.seam.transaction.TransactionInterceptor;
+import org.jboss.seam.transaction.Transactional;
 import org.jboss.solder.exception.control.ExceptionToCatch;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
@@ -43,10 +46,9 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>Retrieve the KieSession or TaskService</li>
  * <li>Execute the submitted command</li>
- * <li>Call commit on the given {@link SeamTransaction} instance</li>
  * </ul>
- * The commit on the {@link SeamTransaction} is necessary in order to avoid race-conditions
- * involving the application scoped {@link EntityManager} used in the {@link KieSession}.
+ * Transactional operations are delegated to <code>TransactionalExecutor</code> that will ensure transaction is
+ * opened and closed within boundary of the executor invocation.
  */
 @RequestScoped
 public class RestProcessRequestBean {
@@ -60,10 +62,9 @@ public class RestProcessRequestBean {
     @Inject
     private TaskService taskService;
 
-    /* Transaction control */
     @Inject
-    @DefaultTransaction
-    private SeamTransaction tx;
+    private TransactionalExecutor executor;
+
 
     @Inject
     Event<ExceptionToCatch> txExceptionEvent;
@@ -75,11 +76,9 @@ public class RestProcessRequestBean {
      * @param cmd The command to be executed.
      * @param deploymentId The id of the runtime.
      * @param processInstanceId The process instance id, if available.
-     * @param commit Whether or not to commit (the {@link SeamTransaction}) at after the {@link Command} has been completed.
      * @return The result of the {@link Command}.
      */
-    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg, 
-            boolean commit, boolean restartTx) {
+    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
         Object result = null;
         try {
             RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, processInstanceId);
@@ -87,16 +86,8 @@ public class RestProcessRequestBean {
             SingleSessionCommandService sscs 
                 = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
             synchronized (sscs) { 
-                try {
-                    result = kieSession.execute(cmd);
-                } finally {
-                    if (commit) {
-                        commit(tx, txExceptionEvent, logger);
-                    }
-                    if(restartTx) {
-                        start(tx, txExceptionEvent, logger);
-                    }
-                }
+                result = executor.execute(kieSession, cmd);
+
             }
         } catch (Exception e) {
             if( e instanceof RuntimeException ) { 
@@ -108,29 +99,6 @@ public class RestProcessRequestBean {
         return result;
     }
 
-    /**
-     * A variant of the above method which always calls commit once the {@link Command} has completed.
-     * 
-     * @param cmd The command to be executed.
-     * @param deploymentId The id of the runtime.
-     * @param processInstanceId The process id, if available.
-     * @return The result of the executed command.
-     */
-    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
-        return doKieSessionOperation(cmd, deploymentId, processInstanceId, errorMsg, true);
-    }
-
-    /**
-     * A variant of the above method which commits but does not restart the {@link SeamTransaction} once the command has completed.
-     * 
-     * @param cmd The command to be executed.
-     * @param deploymentId The id of the runtime.
-     * @param processInstanceId The process id, if available.
-     * @return The result of the executed command.
-     */
-    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg, boolean commit) {
-        return doKieSessionOperation(cmd, deploymentId, processInstanceId, errorMsg, commit, false);
-    }
     
     /**
      * Executes a command on the injected {@link TaskService} instance.
@@ -144,7 +112,7 @@ public class RestProcessRequestBean {
      * @param deploymentId The deployment id of the runtime. 
      * @return The result of the completed command.
      */
-    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg, String deploymentId, boolean restartTx) {
+    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg, String deploymentId) {
         Object result = null;
         try {
             if( deploymentId != null ) { 
@@ -153,17 +121,11 @@ public class RestProcessRequestBean {
                 SingleSessionCommandService sscs 
                     = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
                 synchronized (sscs) {
-                    try {
-                        ((InternalTaskService) taskService).execute(cmd);
-                    } finally {
-                        commit(tx, txExceptionEvent, logger);
-                        if( restartTx ) { 
-                            start(tx, txExceptionEvent, logger);
-                        }
-                    }
+                    result = executor.execute((InternalTaskService) taskService, cmd);
+
                 }
-            } else { 
-                result = ((InternalTaskService) taskService).execute(cmd);
+            } else {
+                result = executor.execute((InternalTaskService) taskService, cmd);
             }
         } catch (PermissionDeniedException pde) {
             throw new UnauthorizedException(pde.getMessage(), pde);
@@ -173,17 +135,6 @@ public class RestProcessRequestBean {
             throw new InternalServerErrorException(errorMsg, e);
         } 
         return result;
-    }
-
-    /**
-     * Variant of the above method which does not restart the transaction. 
-     * @param cmd The {@link Command} to be executed. 
-     * @param errorMsg The error message for any exception thrown. 
-     * @param deploymentId The deployment id. 
-     * @return The result of the given {@link Command}.
-     */
-    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg, String deploymentId) {
-        return doTaskOperationOnDeployment(cmd, errorMsg, deploymentId, false);
     }
     
     /**
@@ -217,61 +168,5 @@ public class RestProcessRequestBean {
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
 
-    /**
-     * Commit the given {@link SeamTransaction}.
-     * 
-     * @param tx The {@link SeamTransaction} instance.
-     * @param txExceptionEvent The CDI Event used in order to communicate with the seam-transaction framework.
-     * @param logger In order to log thrown exceptions.
-     */
-    private static void commit(SeamTransaction tx, Event<ExceptionToCatch> txExceptionEvent, Logger logger) {
-        try {
-            switch (tx.getStatus()) {
-            case javax.transaction.Status.STATUS_ACTIVE:
-                tx.commit();
-                break;
-            case javax.transaction.Status.STATUS_MARKED_ROLLBACK:
-            case javax.transaction.Status.STATUS_PREPARED:
-            case javax.transaction.Status.STATUS_PREPARING:
-                tx.rollback();
-                break;
-            case javax.transaction.Status.STATUS_COMMITTED:
-            case javax.transaction.Status.STATUS_COMMITTING:
-            case javax.transaction.Status.STATUS_ROLLING_BACK:
-            case javax.transaction.Status.STATUS_UNKNOWN:
-            case javax.transaction.Status.STATUS_ROLLEDBACK:
-            case javax.transaction.Status.STATUS_NO_TRANSACTION:
-                break;
-            }
-        } catch (SystemException se) {
-            logger.warn("Error commiting/rolling back the transaction", se);
-            txExceptionEvent.fire(new ExceptionToCatch(se));
-        } catch (HeuristicRollbackException hre) {
-            logger.warn("Error committing the transaction", hre);
-            txExceptionEvent.fire(new ExceptionToCatch(hre));
-        } catch (RollbackException re) {
-            logger.warn("Error committing the transaction", re);
-            txExceptionEvent.fire(new ExceptionToCatch(re));
-        } catch (HeuristicMixedException hme) {
-            logger.warn("Error committing the transaction", hme);
-            txExceptionEvent.fire(new ExceptionToCatch(hme));
-        }
-    }
-    
-    private static void start(SeamTransaction tx, Event<ExceptionToCatch> txExceptionEvent, Logger logger) {
-        try {
-            if (tx.getStatus() == Status.STATUS_ACTIVE) {
-                logger.warn("Transaction was already started before the listener");
-            } else {
-                logger.debug("Beginning transaction");
-                tx.begin();
-            }
-        } catch (SystemException se) {
-            logger.warn("Error starting the transaction, or checking status", se);
-            txExceptionEvent.fire(new ExceptionToCatch(se));
-        } catch (NotSupportedException e) {
-            logger.warn("Error starting the transaction", e);
-            txExceptionEvent.fire(new ExceptionToCatch(e));
-        }
-    }
+
 }
