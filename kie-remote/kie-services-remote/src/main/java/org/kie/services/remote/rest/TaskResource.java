@@ -105,6 +105,9 @@ public class TaskResource extends ResourceBase {
         JaxbTaskSummaryListResponse responseObj = null;
         Map<String, List<String>> params = getRequestParams(request);
         
+        int [] pageInfo = getPageNumAndPageSize(params);
+        Paginator<TaskSummaryImpl> paginator = new Paginator<TaskSummaryImpl>();
+        
         for( String queryParam : params.keySet() ) { 
             boolean allowed = false;
             for( String allowedParam : allowedQueryParams ) { 
@@ -129,9 +132,6 @@ public class TaskResource extends ResourceBase {
         
         List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
         List<Status> statuses = convertStringListToStatusList(statusStrList);
-        
-        int [] pageInfo = getPageNumAndPageSize(params);
-        Paginator<TaskSummaryImpl> paginator = new Paginator<TaskSummaryImpl>();
         
         TaskCommand<?> queryCmd = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, busAdmins, potOwners, taskOwners, statuses, union);
         
