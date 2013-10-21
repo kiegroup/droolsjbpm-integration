@@ -40,6 +40,8 @@ public class ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceBase.class);
     
+    protected static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
+    
     // Seam-Transaction ----------------------------------------------------------------------------------------------------------
     
     public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, RestProcessRequestBean requestBean) {
@@ -67,7 +69,8 @@ public class ResourceBase {
                             cmdResult = requestBean.doTaskOperationOnDeployment(
                                     taskCmd, 
                                     errorMsg, 
-                                    request.getDeploymentId());
+                                    request.getDeploymentId(),
+                                    request.getProcessInstanceId());
                         } else { 
                             cmdResult = requestBean.doTaskOperation(taskCmd, errorMsg);
                         }
