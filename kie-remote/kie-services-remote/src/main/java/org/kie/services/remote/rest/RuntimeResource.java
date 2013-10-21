@@ -33,6 +33,7 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
+import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindNodeInstancesCommand;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
@@ -347,15 +348,39 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/process/{procId: [a-zA-Z0-9-:\\.]+}")
     public Response getProcessInstanceLogs(@PathParam("procId") String processId) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        Number statusParam = getNumberParam("status", false, params, getRelativePath(request), false);
+        int[] pageInfo = getPageNumAndPageSize(params);
+
+        Object result;
+        if (statusParam != null) {
+            Command<?> cmd;
+            if (statusParam.intValue() == ProcessInstance.STATE_ACTIVE) {
+                cmd = new FindActiveProcessInstancesCommand(processId);
+            } else {
+                cmd = new FindProcessInstancesCommand(processId);
+            }
+            result = processRequestBean.doKieSessionOperation(cmd, deploymentId,
+                    (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, getRelativePath(request), true),
+                    "Unable to get process instance logs for process '" + processId + "'");
+        } else {
+            result = processRequestBean.doKieSessionOperation(new FindProcessInstancesCommand(processId), deploymentId,
+                    (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, getRelativePath(request), true),
+                    "Unable to get process instance logs for process '" + processId + "'");
+        }
         
-        Object result = processRequestBean.doKieSessionOperation(
-                new FindProcessInstancesCommand(processId),
-                deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, getRelativePath(request), true),
-                "Unable to get process instance logs for process '" + processId + "'");
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
         
+        if (statusParam != null && !statusParam.equals(ProcessInstance.STATE_ACTIVE)) {
+            List<ProcessInstanceLog> filteredProcLogList = new ArrayList<ProcessInstanceLog>();
+            for (int i = 0; 
+                    i < procInstLogList.size() && filteredProcLogList.size() < pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE]; 
+                    ++i) {
+                ProcessInstanceLog procLog = procInstLogList.get(i);
+                if (procLog.getStatus().equals(statusParam.intValue())) {
+                    filteredProcLogList.add(procLog);
+                }
+            }
+        }
         procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
         return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
     }
