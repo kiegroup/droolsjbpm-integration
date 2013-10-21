@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
@@ -179,9 +180,9 @@ public class ResourceBase {
 
     protected static List<String> getStringListParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
         List<String> paramValues = null;
-        for (String key : params.keySet()) {
-            if (key.equalsIgnoreCase(paramName)) {
-                paramValues = params.get(key);
+        for (Entry<String, List<String>> entry : params.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(paramName)) {
+                paramValues = entry.getValue();
                 break;
             }
         }
@@ -275,9 +276,10 @@ public class ResourceBase {
     protected static Map<String, Object> extractMapFromParams(Map<String, List<String>> params, String operation) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        for (String key : params.keySet()) {
-            if (key.startsWith("map_")) {
-                List<String> paramValues = params.get(key);
+        for (Entry<String, List<String>> entry : params.entrySet()) {
+            if (entry.getKey().startsWith("map_")) {
+                String key = entry.getKey();
+                List<String> paramValues = entry.getValue();
                 if (paramValues.size() != 1) {
                     throw new BadRequestException("Only one map_* (" + key + ") query parameter allowed for '" + operation
                             + "' operation (" + paramValues.size() + " passed).");

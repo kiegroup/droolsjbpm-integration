@@ -17,9 +17,7 @@ public class JsonSerializationProvider {
     private static ObjectMapper mapper = new JaxbJacksonObjectMapper();
     
     static { 
-      AnnotationIntrospector jaxbAnnotationIntrospector = new JaxbAnnotationIntrospector();
-      mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
     }
     
     public static String convertJaxbObjectToJsonString(Object object) throws JsonGenerationException, JsonMappingException, IOException {

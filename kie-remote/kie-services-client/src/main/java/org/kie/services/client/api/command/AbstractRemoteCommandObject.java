@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRemoteCommandObject {
 
-    protected static Logger logger = LoggerFactory.getLogger(AbstractRemoteCommandObject.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteCommandObject.class);
 
     protected final RemoteConfiguration config;
 
