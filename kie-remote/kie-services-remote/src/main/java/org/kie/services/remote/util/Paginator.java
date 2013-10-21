@@ -11,6 +11,7 @@ public class Paginator<T> {
         if( pageInfo[0] == 0 ) { 
             return results;
         }  else if( pageInfo[0] > 0 ) { 
+            // for( i  = start of page; i < start of next page && i < num results; ++i ) 
             for( int i = (pageInfo[0]-1)*pageInfo[1]; i < pageInfo[0]*pageInfo[1] && i < results.size(); ++i ) { 
                 pagedResults.add(results.get(i));
             }

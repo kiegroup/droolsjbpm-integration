@@ -3,28 +3,13 @@ package org.kie.services.remote.rest;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.interceptor.Interceptors;
-import javax.persistence.EntityManager;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
 
-import org.drools.core.command.CommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.persistence.SingleSessionCommandService;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
-import org.jboss.seam.transaction.DefaultTransaction;
-import org.jboss.seam.transaction.SeamTransaction;
-import org.jboss.seam.transaction.TransactionInterceptor;
-import org.jboss.seam.transaction.Transactional;
 import org.jboss.solder.exception.control.ExceptionToCatch;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
@@ -33,11 +18,9 @@ import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
-import org.kie.api.task.model.Task;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
-import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
 import org.kie.services.remote.cdi.RuntimeManagerManager;
 import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.slf4j.Logger;
@@ -127,7 +110,6 @@ public class RestProcessRequestBean {
                     = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
                 synchronized (sscs) {
                     result = executor.execute((InternalTaskService) taskService, cmd);
-
                 }
             } else {
                 result = executor.execute((InternalTaskService) taskService, cmd);

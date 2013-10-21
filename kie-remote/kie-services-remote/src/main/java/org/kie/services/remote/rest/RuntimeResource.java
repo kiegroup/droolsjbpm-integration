@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ import org.jbpm.process.audit.command.FindNodeInstancesCommand;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.api.command.Command;
@@ -44,6 +46,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
@@ -347,6 +350,111 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
     }
 
+    @GET
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}")
+    public Response getVariableInstanceByVar(@PathParam("varId") String variableId) {
+        Map<String, List<String>> params = getRequestParams(request);
+        int [] pageInfo = getPageNumAndPageSize(params);
+        List<VariableInstanceLog> varLogList 
+            = internalGetVariableInstancesByVarAndValue(variableId, null, params, "/history/variable/" + variableId );
+        varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
+        
+        return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
+    }
+    
+    @GET
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}")
+    public Response getVariableInstanceByVarAndValue(@PathParam("varId") String variableId, @PathParam("value") String value) {
+        Map<String, List<String>> params = getRequestParams(request);
+        int [] pageInfo = getPageNumAndPageSize(params);
+        List<VariableInstanceLog> varLogList 
+            = internalGetVariableInstancesByVarAndValue(variableId, value, params, "/history/variable/" + variableId + "/value/" + value);
+        varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
+        
+        return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
+    } 
+    
+    private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
+            Map<String, List<String>> params, String operation) { 
+        // active processes parameter
+        String activeProcsParam = getStringParam("activeProcesses", false, params, operation);
+        boolean activeProcesses = true;
+        if( activeProcsParam != null ) { 
+            activeProcesses = Boolean.parseBoolean(activeProcsParam);
+        }
+        
+        Command<?> findVarCmd; 
+        String errMsg;
+        if( value == null ) { 
+            findVarCmd = new FindVariableInstancesByNameCommand(varId, activeProcesses);
+            errMsg = "Unable to get variable instance logs for variable id '" + varId + "'";
+        } else { 
+            findVarCmd = new FindVariableInstancesByNameCommand(varId, value, activeProcesses);
+            errMsg = "Unable to get variable instance logs for variable id '" + varId + "' and value '" + value + "'";
+        }
+        Object result = processRequestBean.doKieSessionOperation(
+                findVarCmd,
+                deploymentId, 
+                null,
+                errMsg);
+        
+        return (List<VariableInstanceLog>) result;
+    }
+    
+    @GET
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
+    public Response getProcessInstanceByVar(@PathParam("varId") String variableId) {
+        Map<String, List<String>> params = getRequestParams(request);
+        int [] pageInfo = getPageNumAndPageSize(params);
+        String operation = "/history/variable/" + variableId + "/instances";
+
+        // get variables
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, operation);
+        
+        // get process instances
+        JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
+        return createCorrectVariant(response, headers);
+    }
+    
+    @GET
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
+    public Response getProcessInstanceByVarAndValue(@PathParam("procId") String variableId, @PathParam("value") String value) {
+        Map<String, List<String>> params = getRequestParams(request);
+        int [] pageInfo = getPageNumAndPageSize(params);
+        String operation = "/history/variable/" + variableId + "/instances";
+
+        // get variables
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, operation);
+        
+        // get process instances
+        JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
+        return createCorrectVariant(response, headers);
+    }
+
+    private JaxbProcessInstanceListResponse getProcessInstanceListResponse(List<VariableInstanceLog> varLogList, int [] pageInfo) { 
+        JaxbProcessInstanceListResponse response = new JaxbProcessInstanceListResponse();
+        response.setCommandName(FindProcessInstanceCommand.class.getSimpleName());
+        
+        int numVarLogs = varLogList.size();
+        int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
+        int numProcInsts = 0;
+        
+        for( int i = 0; i < numVarLogs && numProcInsts < numResults; ++i ) { 
+            long procInstId = varLogList.get(i).getProcessInstanceId();
+            Command<?> findProcInstCmd = new GetProcessInstanceCommand(procInstId);
+            Object procInstResult = processRequestBean.doKieSessionOperation(
+                    findProcInstCmd,
+                    deploymentId, 
+                    null,
+                    "Unable to get process instance with id id '" + procInstId + "'");
+            if( procInstResult != null ) { 
+                response.getResult().add(new JaxbProcessInstanceResponse((ProcessInstance) procInstResult));
+                ++numProcInsts;
+            }
+        }
+        return response;
+    }
+    
     /**
      * WithVars methods
      */
