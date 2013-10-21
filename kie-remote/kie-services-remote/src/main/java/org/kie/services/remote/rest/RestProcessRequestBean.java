@@ -101,11 +101,11 @@ public class RestProcessRequestBean {
      * @param deploymentId The deployment id of the runtime. 
      * @return The result of the completed command.
      */
-    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg, String deploymentId) {
+    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg, String deploymentId, Long processInstanceId) {
         Object result = null;
         try {
             if( deploymentId != null ) { 
-                RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, null);
+                RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, processInstanceId);
                 KieSession kieSession = runtimeEngine.getKieSession();
                 SingleSessionCommandService sscs 
                     = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
@@ -132,7 +132,7 @@ public class RestProcessRequestBean {
      * @return The result of the completed command. 
      */
     public Object doTaskOperation(TaskCommand<?> cmd, String errorMsg) {
-        return doTaskOperationOnDeployment(cmd, errorMsg, null);
+        return doTaskOperationOnDeployment(cmd, errorMsg, null, null);
     }
 
     /**

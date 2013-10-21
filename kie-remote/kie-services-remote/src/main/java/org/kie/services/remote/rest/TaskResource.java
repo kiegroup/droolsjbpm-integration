@@ -231,6 +231,8 @@ public class TaskResource extends ResourceBase {
             || cmd instanceof ExitTaskCommand
             || cmd instanceof FailTaskCommand
             || cmd instanceof SkipTaskCommand ) { 
+            Long procInstId 
+                = (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(request), getRelativePath(request), true);
             TaskCommand<?> getTaskCmd = new GetTaskCommand(taskId);
             Task task = (Task) processRequestBean.doTaskOperation(
                     getTaskCmd,
@@ -239,7 +241,7 @@ public class TaskResource extends ResourceBase {
                 throw new NotFoundException("Task " + taskId + " could not be found.");
             }
             String deploymentId = task.getTaskData().getDeploymentId();
-            return processRequestBean.doTaskOperationOnDeployment(cmd, errorMsg, deploymentId);
+            return processRequestBean.doTaskOperationOnDeployment(cmd, errorMsg, deploymentId, procInstId);
         } else { 
             return processRequestBean.doTaskOperation(cmd, errorMsg);
         }

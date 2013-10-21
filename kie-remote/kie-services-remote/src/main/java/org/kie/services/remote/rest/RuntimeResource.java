@@ -193,7 +193,7 @@ public class RuntimeResource extends ResourceBase {
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(eventType, event),
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, requestParams, oper, true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true),
                 errorMsg);
         return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
@@ -205,7 +205,7 @@ public class RuntimeResource extends ResourceBase {
         WorkItem workItem = (WorkItem) processRequestBean.doKieSessionOperation(
                 new GetWorkItemCommand(workItemId),
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, getRequestParams(request), oper, true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(request), oper, true),
                 "Unable to get work item " +  workItemId);
         return createCorrectVariant(new JaxbWorkItem(workItem), headers);
     }
@@ -228,7 +228,7 @@ public class RuntimeResource extends ResourceBase {
         processRequestBean.doKieSessionOperation(
                 cmd, 
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, params, oper, true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true),
                 "Unable to " + operation + " work item " +  workItemId);
         return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
@@ -244,7 +244,7 @@ public class RuntimeResource extends ResourceBase {
         processRequestBean.doKieSessionOperation(
                 new ClearHistoryLogsCommand(),
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, getRequestParams(request), oper, true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(request), oper, true),
                 "Unable to clear process instance logs");
         return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
@@ -259,7 +259,7 @@ public class RuntimeResource extends ResourceBase {
         Object result = processRequestBean.doKieSessionOperation(
                 new FindProcessInstancesCommand(),
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, params, oper, true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true),
                 "Unable to get process instance logs");
         List<ProcessInstanceLog> results = (List<ProcessInstanceLog>) result;
         
@@ -352,7 +352,7 @@ public class RuntimeResource extends ResourceBase {
         Object result = processRequestBean.doKieSessionOperation(
                 new FindProcessInstancesCommand(processId),
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, params, getRelativePath(request), true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, getRelativePath(request), true),
                 "Unable to get process instance logs for process '" + processId + "'");
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
         
@@ -479,7 +479,7 @@ public class RuntimeResource extends ResourceBase {
         Object result = processRequestBean.doKieSessionOperation(
                 new StartProcessCommand(processId, params),
                 deploymentId, 
-                (Long) getNumberParam("processInstanceId", false, requestParams, oper, true),
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true),
                 "Unable to get process instance logs for process '" + processId + "'");
         
         ProcessInstance procInst = (ProcessInstance) result;
