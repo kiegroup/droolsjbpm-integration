@@ -117,8 +117,10 @@ public class RequestMessageBean implements MessageListener {
                     try {
                         connection.close();
                         connection = null;
-                        session.close();
-                        session = null;
+                        if( session != null ) { 
+                            session.close();
+                            session = null;
+                        }
                     } catch (JMSException jmse) {
                         logger.warn("Unable to close connection or session after failing to create connection or session.", jmse);
                     }
@@ -154,8 +156,10 @@ public class RequestMessageBean implements MessageListener {
                     try {
                         connection.close();
                         connection = null;
-                        session.close();
-                        session = null;
+                        if( session != null ) {
+                            session.close();
+                            session = null;
+                        }
                     } catch (JMSException jmse) {
                         logger.error("Unable to close connection or session.", jmse);
                     }

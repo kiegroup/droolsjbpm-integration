@@ -2,6 +2,7 @@ package org.kie.services.client.serialization.jaxb;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -48,7 +49,7 @@ public class JaxbSerializationProvider {
     
     public static Object convertStringToJaxbObject(String xmlStr) throws JAXBException {
         Unmarshaller unmarshaller = JAXBContext.newInstance(jaxbClasses).createUnmarshaller();
-        ByteArrayInputStream xmlStrInputStream = new ByteArrayInputStream(xmlStr.getBytes());
+        ByteArrayInputStream xmlStrInputStream = new ByteArrayInputStream(xmlStr.getBytes(Charset.forName("UTF-8")));
         
         Object jaxbObj = unmarshaller.unmarshal(xmlStrInputStream);
         

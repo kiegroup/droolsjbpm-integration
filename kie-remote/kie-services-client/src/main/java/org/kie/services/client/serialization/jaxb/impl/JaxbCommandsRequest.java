@@ -180,13 +180,13 @@ public class JaxbCommandsRequest {
     }
     
     public String toString() {
-    	String result = "JaxbCommandsRequest " + deploymentId + "\n";
+    	StringBuffer result = new StringBuffer("JaxbCommandsRequest " + deploymentId + "\n");
     	if (commands != null) {
-	    	for (Command command: commands) {
-	    		result += command + "\n";
+	    	for (Command<?> command: commands) {
+	    		result.append(command + "\n");
 	    	}
     	}
-    	return result;
+    	return result.toString();
     }
 
 }

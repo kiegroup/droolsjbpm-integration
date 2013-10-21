@@ -174,7 +174,6 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}/variables")
     public Response getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
-        String oper = getRelativePath(request);
         Map<String, String> vars = getVariables(procInstId);
         return createCorrectVariant(new JaxbVariablesResponse(vars, request), headers);
     }
