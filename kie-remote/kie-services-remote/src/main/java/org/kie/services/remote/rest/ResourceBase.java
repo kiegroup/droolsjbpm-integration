@@ -337,8 +337,11 @@ public class ResourceBase {
     
     // Pagination ----------------------------------------------------------------------------------------------------------------
     
+    static int PAGE_NUM = 0;
+    static int PAGE_SIZE = 1;
+    
     protected static int [] getPageNumAndPageSize(Map<String, List<String>> params) {
-        int [] pageInfo = new int[3];
+        int [] pageInfo = new int[2];
         Number page = getNumberParam("page", false, params, "query", false);
         Number pageShort = getNumberParam("p", false, params, "query", false);
         Number pageSize = getNumberParam("pageSize", false, params, "query", false);
@@ -357,9 +360,8 @@ public class ResourceBase {
             s = pageSizeShort.intValue();
         }
         
-        pageInfo[0] = p;
-        pageInfo[1] = s;
-        pageInfo[2] = pageInfo[0] * pageInfo[1];
+        pageInfo[PAGE_NUM] = p;
+        pageInfo[PAGE_SIZE] = s;
         
         return pageInfo;
     }

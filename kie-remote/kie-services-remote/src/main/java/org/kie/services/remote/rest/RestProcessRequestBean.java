@@ -3,23 +3,11 @@ package org.kie.services.remote.rest;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.interceptor.Interceptors;
-import javax.persistence.EntityManager;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
 
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.persistence.SingleSessionCommandService;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
-import org.jboss.seam.transaction.DefaultTransaction;
-import org.jboss.seam.transaction.SeamTransaction;
-import org.jboss.seam.transaction.TransactionInterceptor;
-import org.jboss.seam.transaction.Transactional;
 import org.jboss.solder.exception.control.ExceptionToCatch;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
@@ -122,7 +110,6 @@ public class RestProcessRequestBean {
                     = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
                 synchronized (sscs) {
                     result = executor.execute((InternalTaskService) taskService, cmd);
-
                 }
             } else {
                 result = executor.execute((InternalTaskService) taskService, cmd);

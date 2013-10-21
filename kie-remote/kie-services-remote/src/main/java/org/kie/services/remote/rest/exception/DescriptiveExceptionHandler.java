@@ -1,18 +1,16 @@
 package org.kie.services.remote.rest.exception;
 
-import static org.kie.services.remote.rest.ResourceBase.*;
+import static org.kie.services.remote.rest.ResourceBase.getVariant;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
-import org.drools.core.command.GetVariableCommand;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.MethodNotAllowedException;
