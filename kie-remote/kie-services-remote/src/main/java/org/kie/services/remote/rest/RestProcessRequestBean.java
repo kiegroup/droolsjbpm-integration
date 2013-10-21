@@ -9,6 +9,7 @@ import org.drools.persistence.SingleSessionCommandService;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jboss.solder.exception.control.ExceptionToCatch;
+import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
@@ -143,14 +144,14 @@ public class RestProcessRequestBean {
      */
     private RuntimeEngine getRuntimeEngine(String deploymentId, Long processInstanceId) {
         RuntimeManager runtimeManager = runtimeMgrMgr.getRuntimeManager(deploymentId);
-        Context<?> runtimeContext;
-        if (processInstanceId != null) {
-            runtimeContext = new ProcessInstanceIdContext(processInstanceId);
-        } else {
-            runtimeContext = EmptyContext.get();
-        }
         if (runtimeManager == null) {
             throw new DomainNotFoundBadRequestException("No runtime manager could be found for deployment '" + deploymentId + "'.");
+        }
+        Context<?> runtimeContext;
+        if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 
+            runtimeContext = new ProcessInstanceIdContext(processInstanceId);
+        } else { 
+            runtimeContext = EmptyContext.get();
         }
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
