@@ -374,4 +374,10 @@ public class ResourceBase {
         
         return pageInfo;
     }
+    
+    protected String getRelativePath(HttpServletRequest request) { 
+        String path = request.getRequestURL().toString();
+        path = path.replaceAll( ".*" + request.getServletContext().getContextPath(), "");
+        return path;
+    }
 }
