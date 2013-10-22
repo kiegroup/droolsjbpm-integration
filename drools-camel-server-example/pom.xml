@@ -50,12 +50,12 @@
       <artifactId>drools-templates</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-camel</artifactId>
     </dependency>
 
     <!-- Camel -->

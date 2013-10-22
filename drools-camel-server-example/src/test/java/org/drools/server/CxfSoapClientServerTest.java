@@ -43,9 +43,9 @@ public class CxfSoapClientServerTest {
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
         cmd += "  <insert out-identifier=\"message\">\n";
-        cmd += "      <org.test.Message>\n";
+        cmd += "      <org.drools.server.Message>\n";
         cmd += "         <text>Helllo World</text>\n";
-        cmd += "      </org.test.Message>\n";
+        cmd += "      </org.drools.server.Message>\n";
         cmd += "   </insert>\n";
         cmd += "</batch-execution>\n";
 

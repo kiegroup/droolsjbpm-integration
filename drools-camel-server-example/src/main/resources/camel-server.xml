@@ -61,8 +61,8 @@
   </cxf:cxfEndpoint>
 
   <!-- Leave this, as it's needed to make Camel "drools" aware -->
-  <bean id="droolsPolicy" class="org.drools.camel.component.DroolsPolicy" />  
-    
+  <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
+
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">    
     <!-- 
      ! Routes incoming messages from end point id="rsServer".
@@ -72,18 +72,18 @@
      
     <route>
        <from uri="cxfrs://bean://rsServer"/>
-       <policy ref="droolsPolicy">
+       <policy ref="kiePolicy">
          <unmarshal ref="xstream" />
-         <to uri="drools:node1/ksession1" />
+         <to uri="kie:ksession1" />
          <marshal ref="xstream" />
        </policy>
     </route>    
 
     <route>
       <from uri="cxf://bean://soapServer"/>
-      <policy ref="droolsPolicy">
+      <policy ref="kiePolicy">
         <unmarshal ref="xstream" />       
-        <to uri="drools:node1/ksession1" />
+        <to uri="kie:ksession1" />
         <marshal ref="xstream" />
       </policy>
     </route>

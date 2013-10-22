@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package  org.test
+package  org.drools.server;
 
 declare Message
     text : String
