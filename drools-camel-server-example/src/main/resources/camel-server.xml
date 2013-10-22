@@ -42,9 +42,9 @@
     --> 
   <cxf:rsServer id="rsServer"  
                 address="/rest"
-                serviceClass="org.drools.jax.rs.CommandExecutorImpl">
+                serviceClass="org.kie.jax.rs.CommandExecutorImpl">
        <cxf:providers>
-           <bean class="org.drools.jax.rs.CommandMessageBodyReader"/>
+           <bean class="org.kie.jax.rs.CommandMessageBodyReader"/>
        </cxf:providers>
   </cxf:rsServer>  
   
