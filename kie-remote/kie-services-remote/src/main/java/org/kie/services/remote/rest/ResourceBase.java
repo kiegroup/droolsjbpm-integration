@@ -114,7 +114,7 @@ public class ResourceBase {
     private static List<Variant> variants 
         = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).build();
     private static Variant defaultVariant 
-        = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE).build().get(0);
+        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE).build().get(0);
     
     public static Variant getVariant(HttpHeaders headers) { 
         // copied (except for the acceptHeaders fix) from RestEasy's RequestImpl class

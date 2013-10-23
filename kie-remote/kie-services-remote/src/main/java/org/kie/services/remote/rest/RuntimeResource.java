@@ -390,7 +390,7 @@ public class RuntimeResource extends ResourceBase {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         List<VariableInstanceLog> varLogList 
-            = internalGetVariableInstancesByVarAndValue(variableId, null, params, getRelativePath(request));
+            = internalGetVariableInstancesByVarAndValue(variableId, null, params);
         varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
@@ -402,16 +402,16 @@ public class RuntimeResource extends ResourceBase {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         List<VariableInstanceLog> varLogList 
-            = internalGetVariableInstancesByVarAndValue(variableId, value, params, getRelativePath(request));
+            = internalGetVariableInstancesByVarAndValue(variableId, value, params);
         varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
     } 
     
     private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
-            Map<String, List<String>> params, String operation) { 
+            Map<String, List<String>> params) { 
         // active processes parameter
-        String activeProcsParam = getStringParam("activeProcesses", false, params, operation);
+        String activeProcsParam = getStringParam("activeProcesses", false, params, getRelativePath(request));
         boolean activeProcesses = true;
         if( activeProcsParam != null ) { 
             activeProcesses = Boolean.parseBoolean(activeProcsParam);
@@ -440,10 +440,9 @@ public class RuntimeResource extends ResourceBase {
     public Response getProcessInstanceByVar(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
-        String oper = getRelativePath(request);
 
         // get variables
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params);
         
         // get process instances
         JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
@@ -455,10 +454,9 @@ public class RuntimeResource extends ResourceBase {
     public Response getProcessInstanceByVarAndValue(@PathParam("procId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
-        String oper = getRelativePath(request);
 
         // get variables
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params);
         
         // get process instances
         JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
