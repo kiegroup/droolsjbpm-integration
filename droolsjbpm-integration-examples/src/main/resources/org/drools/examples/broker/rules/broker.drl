@@ -105,8 +105,8 @@ when
 then
     services.log( "Drop >5%: "+$sb+" delta: "+ BrokerUtils.percent($dt)+" price: $"+$pr );
     
-    # we also want to create an event and forward it into the engine to a predefined entry point
-    # that is being listened by other rules 
+    // we also want to create an event and forward it into the engine to a predefined entry point
+    // that is being listened by other rules
     with( sde = new SuddenDropEvent() ) {
         symbol = $sb,
         percent = $dt,
