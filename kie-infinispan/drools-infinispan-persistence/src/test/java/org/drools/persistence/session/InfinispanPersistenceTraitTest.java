@@ -33,6 +33,7 @@ import org.drools.core.factmodel.traits.TraitableBean;
 import org.drools.persistence.util.PersistenceUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
@@ -62,7 +63,7 @@ public class InfinispanPersistenceTraitTest {
 
 
 
-    @Test
+    @Test @Ignore
     public void testTripleBasedTraitsWithInfinispan() {
         String str = "package org.drools.trait.test; \n" +
                 "global java.util.List list; \n" +
@@ -164,7 +165,7 @@ public class InfinispanPersistenceTraitTest {
 
 
 
-    @Test
+    @Test @Ignore
     public void testMapBasedTraitsWithInfinispan() {
         String str = "package org.drools.trait.test; \n" +
                 "global java.util.List list; \n" +

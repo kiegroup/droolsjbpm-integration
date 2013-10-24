@@ -98,7 +98,6 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 releaseId = new ReleaseIdImpl("org.default", "artifact","1.0.0-SNAPSHOT");
             }
             KieSpringUtils.setDefaultReleaseId(releaseId);
-            System.out.println("releaseId == "+releaseId);
         }
 
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
