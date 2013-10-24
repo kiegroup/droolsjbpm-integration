@@ -17,18 +17,18 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:drools="http://drools.org/schema/drools-spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-                           http://drools.org/schema/drools-spring http://drools.org/schema/drools-spring-1.3.0.xsd">
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
-  <drools:grid-node id="node1"/>
+  <kie:kmodule id="drools-camel-server">
 
-  <drools:kbase id="kbase1" node="node1">
-    <drools:resources>
-      <drools:resource  type="DRL" source="classpath:test.drl"/>
-    </drools:resources>
-  </drools:kbase>
+    <kie:kbase name="kbase1" packages="org.drools.server">
+      <kie:ksession name="ksession1" type="stateless"/>
+    </kie:kbase>
 
-  <drools:ksession id="ksession1" type="stateless" kbase="kbase1" node="node1"/>
+  </kie:kmodule>
+
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
 
 </beans>

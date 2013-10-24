@@ -85,9 +85,20 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         log.info(":: BeanFactoryPostProcessor::postProcessBeanFactory called ::");
         if ( releaseId == null && configFilePath != null) {
             fixConfigFilePathForVfs();
-            String pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
-            releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
+            String pomProperties = null;
+            if ( configFilePath.endsWith("WEB-INF/classes/")){
+                String configFilePathForWebApps = configFilePath.substring(0, configFilePath.indexOf("WEB-INF/classes/"));
+                pomProperties = ClasspathKieProject.getPomProperties(configFilePathForWebApps);
+            } else {
+                pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
+            }
+            if (pomProperties != null) {
+                releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
+            } else {
+                releaseId = new ReleaseIdImpl("org.default", "artifact","1.0.0-SNAPSHOT");
+            }
             KieSpringUtils.setDefaultReleaseId(releaseId);
+            System.out.println("releaseId == "+releaseId);
         }
 
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
@@ -139,7 +150,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
         if ( kJar != null ) {
             KieServices ks = KieServices.Factory.get();
-            log.info("adding KieModule from "+configFileURL.toExternalForm()+" to repository.");
+            log.info("adding KieModule from " + configFileURL.toExternalForm() + " to repository.");
             ks.getRepository().addKieModule(kJar);
             KieSpringUtils.setReleaseIdForContext(releaseId, context);
         }

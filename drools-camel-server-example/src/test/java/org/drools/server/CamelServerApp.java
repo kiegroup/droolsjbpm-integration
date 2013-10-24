@@ -47,9 +47,9 @@ public class CamelServerApp {
         String batch = "";
         batch += "<batch-execution lookup=\"ksession1\">\n";
         batch += "  <insert out-identifier=\"message\">\n";
-        batch += "      <org.test.Message>\n";
+        batch += "      <org.drools.server.Message>\n";
         batch += "         <text>" + msg + "</text>\n";
-        batch += "      </org.test.Message>\n";
+        batch += "      </org.drools.server.Message>\n";
         batch += "   </insert>\n";
         batch += "</batch-execution>\n";
 
