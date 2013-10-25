@@ -69,9 +69,9 @@ public class ResourceBase {
                             || cmd instanceof SkipTaskCommand ) { 
                             cmdResult = requestBean.doTaskOperationOnDeployment(
                                     taskCmd, 
-                                    errorMsg, 
                                     request.getDeploymentId(),
-                                    request.getProcessInstanceId());
+                                    request.getProcessInstanceId(),
+                                    errorMsg);
                         } else { 
                             cmdResult = requestBean.doTaskOperation(taskCmd, errorMsg);
                         }
@@ -380,9 +380,12 @@ public class ResourceBase {
         return pageInfo;
     }
     
+    // Other helper methods ------------------------------------------------------------------------------------------------------
+    
     protected String getRelativePath(HttpServletRequest request) { 
         String path = request.getRequestURL().toString();
         path = path.replaceAll( ".*" + request.getServletContext().getContextPath(), "");
         return path;
     }
+    
 }
