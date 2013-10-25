@@ -101,7 +101,7 @@ public class RestProcessRequestBean {
      * @param deploymentId The deployment id of the runtime. 
      * @return The result of the completed command.
      */
-    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg, String deploymentId, Long processInstanceId) {
+    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
         Object result = null;
         try {
             if( deploymentId != null ) { 
@@ -132,7 +132,7 @@ public class RestProcessRequestBean {
      * @return The result of the completed command. 
      */
     public Object doTaskOperation(TaskCommand<?> cmd, String errorMsg) {
-        return doTaskOperationOnDeployment(cmd, errorMsg, null, null);
+        return doTaskOperationOnDeployment(cmd, null, null, errorMsg);
     }
 
     /**

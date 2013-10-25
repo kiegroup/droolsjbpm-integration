@@ -76,7 +76,8 @@ public class TaskResource extends ResourceBase {
         "start", 
         "stop", 
         "suspend", 
-        "nominate" };
+        "nominate", 
+        "content"};
 
     private static String [] allowedQueryParams = {
         "workItemId", 
@@ -85,8 +86,7 @@ public class TaskResource extends ResourceBase {
         "potentialOwner",
         "status",
         "taskOwner",
-        "processInstanceId",
-        "language"
+        "processInstanceId"
     };
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
@@ -158,7 +158,6 @@ public class TaskResource extends ResourceBase {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> params = getRequestParams(request);
@@ -207,6 +206,24 @@ public class TaskResource extends ResourceBase {
         } else if ("nominate".equalsIgnoreCase(operation)) {
             List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params);
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
+        } else if("content".equalsIgnoreCase(operation)) { 
+            cmd = new GetTaskCommand(taskId);
+            Object result = processRequestBean.doTaskOperation(
+                    cmd,
+                    "Unable to get task " + taskId);
+            if( result == null ) {
+                throw new NotFoundException("Task " + taskId + " could not be found.");
+            }
+            long contentId = ((Task) result).getTaskData().getDocumentContentId();
+            Content content = null;
+            if( contentId > -1 ) { 
+                cmd = new GetContentCommand(contentId);
+                result = processRequestBean.doTaskOperation(
+                        cmd, 
+                        "Unable get content " + contentId + " (from task " + taskId + ")");
+                content = (Content) result;
+            }
+            return createCorrectVariant(new JaxbContent(content), headers);
         } else {
             throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
@@ -231,43 +248,20 @@ public class TaskResource extends ResourceBase {
             || cmd instanceof ExitTaskCommand
             || cmd instanceof FailTaskCommand
             || cmd instanceof SkipTaskCommand ) { 
-            Long procInstId 
-                = (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(request), getRelativePath(request), true);
-            TaskCommand<?> getTaskCmd = new GetTaskCommand(taskId);
             Task task = (Task) processRequestBean.doTaskOperation(
-                    getTaskCmd,
+                    new GetTaskCommand(taskId),
                     "Task " + taskId + " does not exist or unable to check if it exists");
             if( task == null ) {
                 throw new NotFoundException("Task " + taskId + " could not be found.");
             }
-            String deploymentId = task.getTaskData().getDeploymentId();
-            return processRequestBean.doTaskOperationOnDeployment(cmd, errorMsg, deploymentId, procInstId);
+            return processRequestBean.doTaskOperationOnDeployment(
+                    cmd, 
+                    task.getTaskData().getDeploymentId(),
+                    task.getTaskData().getProcessInstanceId(), 
+                    errorMsg);
         } else { 
             return processRequestBean.doTaskOperation(cmd, errorMsg);
         }
-    }
-    
-    
-    @GET
-    @Path("/{taskId: [0-9-]+}/content")
-    public Response getTaskContent(@PathParam("taskId") long taskId) { 
-        TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Object result = processRequestBean.doTaskOperation(
-                cmd,
-                "Unable to get task " + taskId);
-        if( result == null ) {
-            throw new NotFoundException("Task " + taskId + " could not be found.");
-        }
-        long contentId = ((Task) result).getTaskData().getDocumentContentId();
-        Content content = null;
-        if( contentId > -1 ) { 
-            cmd = new GetContentCommand(contentId);
-            result = processRequestBean.doTaskOperation(
-                    cmd, 
-                    "Unable get content " + contentId + " (from task " + taskId + ")");
-            content = (Content) result;
-        }
-        return createCorrectVariant(new JaxbContent(content), headers);
     }
     
     @GET

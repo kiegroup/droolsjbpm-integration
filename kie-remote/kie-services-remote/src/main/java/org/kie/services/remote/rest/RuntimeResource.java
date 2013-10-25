@@ -30,6 +30,7 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.jboss.resteasy.spi.BadRequestException;
+import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
@@ -41,8 +42,13 @@ import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.process.audit.event.AuditEvent;
+import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.model.Content;
+import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.Task;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
@@ -93,7 +99,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
-    public Response startNewProcess(@PathParam("processDefId") String processId) {
+    public Response process_defId_start(@PathParam("processDefId") String processId) {
         Map<String, List<String>> requestParams = getRequestParams(request);
         String oper = getRelativePath(request);
         
@@ -112,7 +118,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}")
-    public Response getProcessInstanceDetails(@PathParam("procInstId") Long procInstId) {
+    public Response process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
@@ -134,7 +140,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
-    public Response abortProcessInstance(@PathParam("procInstId") Long procInstId) {
+    public Response process_instance_procInstId_abort(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
         
@@ -149,7 +155,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
-    public Response signalProcessInstance(@PathParam("procInstId") Long procInstId) {
+    public Response process_instance_procInstId_signal(@PathParam("procInstId") Long procInstId) {
         String oper = getRelativePath(request);
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("signal", true, params, oper);
@@ -173,14 +179,14 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}/variables")
-    public Response getProcessInstanceVariables(@PathParam("procInstId") Long procInstId) {
+    public Response process_instance_procInstId_variables(@PathParam("procInstId") Long procInstId) {
         Map<String, String> vars = getVariables(procInstId);
         return createCorrectVariant(new JaxbVariablesResponse(vars, request), headers);
     }
     
     @POST
     @Path("/signal")
-    public Response signalEvent() {
+    public Response signal() {
         String oper = getRelativePath(request);
         Map<String, List<String>> requestParams = getRequestParams(request);
         String eventType = getStringParam("signal", true, requestParams, oper);
@@ -200,7 +206,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/workitem/{workItemId: [0-9-]+}")
-    public Response getWorkItem(@PathParam("workItemId") Long workItemId) { 
+    public Response workitem_workItemId(@PathParam("workItemId") Long workItemId) { 
         String oper = getRelativePath(request);
         WorkItem workItem = (WorkItem) processRequestBean.doKieSessionOperation(
                 new GetWorkItemCommand(workItemId),
@@ -212,7 +218,7 @@ public class RuntimeResource extends ResourceBase {
     
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
-    public Response doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
+    public Response worktiem_workItemId_oper(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
         String oper = getRelativePath(request);
         Map<String, List<String>> params = getRequestParams(request);
         Command<?> cmd = null;
@@ -239,7 +245,7 @@ public class RuntimeResource extends ResourceBase {
     
     @POST
     @Path("/history/clear")
-    public Response clearProcessInstanceLogs() {
+    public Response history_clear() {
         String oper = getRelativePath(request);
         processRequestBean.doKieSessionOperation(
                 new ClearHistoryLogsCommand(),
@@ -250,8 +256,8 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @GET
-    @Path("/history/instance")
-    public Response getProcessInstanceLogs() {
+    @Path("/history/instances")
+    public Response history_instance() {
         String oper = getRelativePath(request);
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
@@ -269,7 +275,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/history/instance/{procInstId: [0-9]+}")
-    public Response getSpecificProcessInstanceLogs(@PathParam("procInstId") long procInstId) {
+    public Response history_instance_procInstId(@PathParam("procInstId") long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -289,7 +295,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
-    public Response getVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
+    public Response history_instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         
@@ -318,7 +324,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\.]+}")
-    public Response getSpecificVariableOrNodeHistoryList(@PathParam("procInstId") Long procInstId,
+    public Response history_instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
@@ -344,8 +350,8 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @GET
-    @Path("/history/process/{procId: [a-zA-Z0-9-:\\.]+}")
-    public Response getProcessInstanceLogs(@PathParam("procId") String processId) {
+    @Path("/history/process/{processDefId: [a-zA-Z0-9-:\\.]+}")
+    public Response history_process_procDefId(@PathParam("processDefId") String processId) {
         Map<String, List<String>> params = getRequestParams(request);
         Number statusParam = getNumberParam("status", false, params, getRelativePath(request), false);
         int[] pageInfo = getPageNumAndPageSize(params);
@@ -386,7 +392,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}")
-    public Response getVariableInstanceByVar(@PathParam("varId") String variableId) {
+    public Response history_variable_varId(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         List<VariableInstanceLog> varLogList 
@@ -398,7 +404,7 @@ public class RuntimeResource extends ResourceBase {
     
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}")
-    public Response getVariableInstanceByVarAndValue(@PathParam("varId") String variableId, @PathParam("value") String value) {
+    public Response history_variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
         List<VariableInstanceLog> varLogList 
@@ -437,7 +443,7 @@ public class RuntimeResource extends ResourceBase {
     
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
-    public Response getProcessInstanceByVar(@PathParam("varId") String variableId) {
+    public Response history_variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
 
@@ -451,7 +457,7 @@ public class RuntimeResource extends ResourceBase {
     
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
-    public Response getProcessInstanceByVarAndValue(@PathParam("procId") String variableId, @PathParam("value") String value) {
+    public Response history_variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         int [] pageInfo = getPageNumAndPageSize(params);
 
@@ -493,7 +499,7 @@ public class RuntimeResource extends ResourceBase {
     
     @POST
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
-    public Response startNewProcessWithVars(@PathParam("processDefId") String processId) {
+    public Response withvars_process_processDefId_start(@PathParam("processDefId") String processId) {
         Map<String, List<String>> requestParams = getRequestParams(request);
         String oper = getRelativePath(request);
         Map<String, Object> params = extractMapFromParams(requestParams, oper );
@@ -514,7 +520,7 @@ public class RuntimeResource extends ResourceBase {
 
     @GET
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
-    public Response getProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+    public Response withvars_process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         
@@ -538,7 +544,7 @@ public class RuntimeResource extends ResourceBase {
 
     @POST
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
-    public Response signalProcessInstanceWithVars(@PathParam("procInstId") Long procInstId) {
+    public Response withvars_process_instance_procInstid_signal(@PathParam("procInstId") Long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         String eventType = getStringParam("eventType", true, params, "signal");
         Object event = getObjectParam("event", false, params, "signal");
