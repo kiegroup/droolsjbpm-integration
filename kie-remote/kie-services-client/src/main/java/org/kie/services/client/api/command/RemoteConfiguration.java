@@ -37,6 +37,7 @@ import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.kie.api.runtime.manager.Context;
+import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
 
 public class RemoteConfiguration {
 
@@ -63,7 +64,7 @@ public class RemoteConfiguration {
     private Queue taskQueue;
     private Queue responseQueue;
     private int qualityOfServiceThresholdMilliSeconds = 5 * 1000; // 5 seconds
-    private int serializationType = 1;
+    private int jmsSerializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
 
     // ID
     private static final AtomicInteger idGen = new AtomicInteger(0);
@@ -290,7 +291,7 @@ public class RemoteConfiguration {
     }
 
     public void setSerializationType(int serializationType) {
-        this.serializationType = serializationType;
+        this.jmsSerializationType = serializationType;
     }
 
     public void setContext(Context<?> context) {
@@ -317,7 +318,7 @@ public class RemoteConfiguration {
     }
 
     int getSerializationType() {
-        return serializationType;
+        return jmsSerializationType;
     }
 
     boolean isJms() {

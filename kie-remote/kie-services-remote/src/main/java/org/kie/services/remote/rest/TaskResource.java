@@ -1,5 +1,6 @@
 package org.kie.services.remote.rest;
 
+import static org.kie.services.remote.util.Constants.*;
 import java.util.List;
 import java.util.Map;
 
@@ -244,10 +245,7 @@ public class TaskResource extends ResourceBase {
     private Object internalCheckAndDoTaskOperation(TaskCommand<?> cmd, Long taskId, String errorMsg) { 
         assert taskId != null : "Submitted task id should always have a value.";
 
-        if( cmd instanceof CompleteTaskCommand
-            || cmd instanceof ExitTaskCommand
-            || cmd instanceof FailTaskCommand
-            || cmd instanceof SkipTaskCommand ) { 
+        if( TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) { 
             Task task = (Task) processRequestBean.doTaskOperation(
                     new GetTaskCommand(taskId),
                     "Task " + taskId + " does not exist or unable to check if it exists");

@@ -23,6 +23,8 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 // TODO: Add object version checking
 public class JaxbSerializationProvider {
    
+    public final static int JMS_SERIALIZATION_TYPE = 0;
+    
     static Class<?> [] jaxbClasses = {
         JaxbCommandsRequest.class, 
         JaxbCommandsResponse.class,
