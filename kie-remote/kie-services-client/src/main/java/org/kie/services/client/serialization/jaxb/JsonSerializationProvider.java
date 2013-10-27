@@ -14,6 +14,8 @@ import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 // TODO: Add object version checking
 public class JsonSerializationProvider {
    
+    public final static int JMS_SERIALIZATION_TYPE = 1;
+    
     private static ObjectMapper mapper = new JaxbJacksonObjectMapper();
     
     static { 
