@@ -23,7 +23,6 @@ import javax.naming.NamingException;
 
 import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
@@ -73,9 +72,6 @@ public class RequestMessageBean implements MessageListener {
     
     @Inject
     private TaskService taskService;
-   
-    @Inject
-    private IdentityProvider identityProvider;
     
     // Constants / properties
     
@@ -198,7 +194,6 @@ public class RequestMessageBean implements MessageListener {
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId 
                     + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
-            logger.error(errMsg, ne);
             throw new KieRemoteServicesRuntimeException(errMsg, ne);
         } catch (JMSException jmse) {
             String errMsg = "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME;
