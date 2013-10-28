@@ -35,6 +35,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.event.rule.DebugAgendaEventListener;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
@@ -63,12 +64,13 @@ public class InfinispanPersistenceTraitTest {
 
 
 
-    @Test @Ignore
+    @Test
     public void testTripleBasedTraitsWithInfinispan() {
         String str = "package org.drools.trait.test; \n" +
                 "global java.util.List list; \n" +
                 "" +
                 "declare TBean \n" +
+                "  @propertyReactive \n" +
                 "  @Traitable \n" +
                 "  fld : String \n" +
                 "end \n " +
@@ -135,7 +137,7 @@ public class InfinispanPersistenceTraitTest {
 
         ksession.fireAllRules();
 
-        assertEquals( 3,
+        assertEquals( 2,
                 list.size() );
         int id = ksession.getId();
 
@@ -165,13 +167,16 @@ public class InfinispanPersistenceTraitTest {
 
 
 
-    @Test @Ignore
+    @Test
     public void testMapBasedTraitsWithInfinispan() {
         String str = "package org.drools.trait.test; \n" +
+                     "import org.drools.core.factmodel.traits.*;\n" +
+                     "" +
                 "global java.util.List list; \n" +
                 "" +
                 "declare TBean2 \n" +
                 "  @Traitable \n" +
+                "  @propertyReactive \n" +
                 "  fld : String \n" +
                 "end \n " +
                 "" +
@@ -238,7 +243,7 @@ public class InfinispanPersistenceTraitTest {
 
         ksession.fireAllRules();
 
-        assertEquals( 3,
+        assertEquals( 2,
                 list.size() );
         int id = ksession.getId();
 
@@ -271,9 +276,11 @@ public class InfinispanPersistenceTraitTest {
 
     public void traitsLegacyWrapperWithInfinispan( TraitFactory.VirtualPropertyMode mode ) {
         String str = "package org.drools.trait.test; \n" +
+                     "import org.drools.core.factmodel.traits.*; \n" +
                 "global java.util.List list; \n" +
                 "" +                "" +
                 "declare TBean \n" +
+                "@Traitable()" +
                 "  fld : String \n" +
                 "end \n " +
                 "" +
@@ -320,6 +327,7 @@ public class InfinispanPersistenceTraitTest {
 
         ksession.setGlobal("list",
                 list);
+        ksession.addEventListener( new DebugAgendaEventListener(  ) );
 
         ksession.fireAllRules();
 
