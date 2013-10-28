@@ -1,6 +1,6 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.remote.util.Constants.*;
+import static org.kie.services.client.api.command.AcceptedCommands.*;
 import java.util.List;
 import java.util.Map;
 
