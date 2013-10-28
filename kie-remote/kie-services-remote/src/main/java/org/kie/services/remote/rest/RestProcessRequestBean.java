@@ -70,7 +70,7 @@ public class RestProcessRequestBean {
     public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
         Object result = null;
         try {
-            RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, processInstanceId);
+            RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
             KieSession kieSession = runtimeEngine.getKieSession();
             SingleSessionCommandService sscs 
                 = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
@@ -105,7 +105,7 @@ public class RestProcessRequestBean {
         Object result = null;
         try {
             if( deploymentId != null ) { 
-                RuntimeEngine runtimeEngine = getRuntimeEngine(deploymentId, processInstanceId);
+                RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
                 KieSession kieSession = runtimeEngine.getKieSession();
                 SingleSessionCommandService sscs 
                     = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
@@ -134,27 +134,5 @@ public class RestProcessRequestBean {
     public Object doTaskOperation(TaskCommand<?> cmd, String errorMsg) {
         return doTaskOperationOnDeployment(cmd, null, null, errorMsg);
     }
-
-    /**
-     * Retrieve the relevant {@link RuntimeEngine} instance.
-     * 
-     * @param deploymentId The id of the deployment for the {@link RuntimeEngine}.
-     * @param processInstanceId The process instance id, if available.
-     * @return The {@link RuntimeEngine} instance.
-     */
-    private RuntimeEngine getRuntimeEngine(String deploymentId, Long processInstanceId) {
-        RuntimeManager runtimeManager = runtimeMgrMgr.getRuntimeManager(deploymentId);
-        if (runtimeManager == null) {
-            throw new DomainNotFoundBadRequestException("No runtime manager could be found for deployment '" + deploymentId + "'.");
-        }
-        Context<?> runtimeContext;
-        if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 
-            runtimeContext = new ProcessInstanceIdContext(processInstanceId);
-        } else { 
-            runtimeContext = EmptyContext.get();
-        }
-        return runtimeManager.getRuntimeEngine(runtimeContext);
-    }
-
 
 }

@@ -8,7 +8,13 @@ import javax.inject.Singleton;
 import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.kie.services.impl.event.Undeploy;
+import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
+import org.kie.api.runtime.manager.Context;
+import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.internal.runtime.manager.context.EmptyContext;
+import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
+import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,4 +46,24 @@ public class RuntimeManagerManager {
        return domainRuntimeManagers.get(domainName);
     }
 
+    /**
+     * Retrieve the relevant {@link RuntimeEngine} instance.
+     * 
+     * @param deploymentId The id of the deployment for the {@link RuntimeEngine}.
+     * @param processInstanceId The process instance id, if available.
+     * @return The {@link RuntimeEngine} instance.
+     */
+    public RuntimeEngine getRuntimeEngine(String deploymentId, Long processInstanceId) {
+        RuntimeManager runtimeManager = getRuntimeManager(deploymentId);
+        if (runtimeManager == null) {
+            throw new DomainNotFoundBadRequestException("No runtime manager could be found for deployment '" + deploymentId + "'.");
+        }
+        Context<?> runtimeContext;
+        if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 
+            runtimeContext = new ProcessInstanceIdContext(processInstanceId);
+        } else { 
+            runtimeContext = EmptyContext.get();
+        }
+        return runtimeManager.getRuntimeEngine(runtimeContext);
+    }
 }

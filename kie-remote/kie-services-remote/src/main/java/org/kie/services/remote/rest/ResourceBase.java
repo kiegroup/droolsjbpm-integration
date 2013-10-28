@@ -1,5 +1,6 @@
 package org.kie.services.remote.rest;
 
+import static org.kie.services.client.api.command.AcceptedCommands.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -60,13 +61,10 @@ public class ResourceBase {
                 logger.debug("Processing command " + cmd.getClass().getSimpleName());
                 Object cmdResult = null;
                 try { 
+                    String errorMsg = "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i;
                     if (cmd instanceof TaskCommand<?>) {
-                        String errorMsg = "Unable to execute command " + cmd.getClass().getSimpleName();
                         TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
-                        if( cmd instanceof CompleteTaskCommand
-                            || cmd instanceof ExitTaskCommand
-                            || cmd instanceof FailTaskCommand
-                            || cmd instanceof SkipTaskCommand ) { 
+                        if( TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) { 
                             cmdResult = requestBean.doTaskOperationOnDeployment(
                                     taskCmd, 
                                     request.getDeploymentId(),
@@ -80,22 +78,20 @@ public class ResourceBase {
                                 cmd, 
                                 request.getDeploymentId(), 
                                 request.getProcessInstanceId(),
-                                "Unable to execute command " + cmd.getClass().getSimpleName());
+                                errorMsg);
                     }
                 } catch(Exception e) { 
                     jaxbResponse.addException(e, i, cmd);
-                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() 
-                            + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                    logger.trace("Stack trace: \n", e);
+                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i
+                            + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
                 }
                 if (cmdResult != null) {
                     try {
                         // addResult could possibly throw an exception, which is why it's here and not above
                         jaxbResponse.addResult(cmdResult, i, cmd);
                     } catch (Exception e) {
-                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i + " because of "
-                                + e.getClass().getSimpleName(), e);
-                        logger.trace("Stack trace: \n", e);
+                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i 
+                                + " because of " + e.getClass().getSimpleName(), e);
                         jaxbResponse.addException(e, i, cmd);
                     }
                 }
