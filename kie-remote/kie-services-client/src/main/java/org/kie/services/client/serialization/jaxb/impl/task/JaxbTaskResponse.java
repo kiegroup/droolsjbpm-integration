@@ -12,7 +12,7 @@ import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
-@XmlRootElement(name = "task")
+@XmlRootElement(name = "task-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandResponse<Task> {
 
