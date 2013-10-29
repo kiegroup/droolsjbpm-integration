@@ -1,6 +1,6 @@
 package org.kie.services.client.jaxb;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.kie.services.client.SerializationTest;
 import org.kie.services.client.api.command.AcceptedCommands;
