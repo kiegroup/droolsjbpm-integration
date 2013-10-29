@@ -15,7 +15,7 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 
-@XmlRootElement(name="task-summary-list")
+@XmlRootElement(name="process-instance-list")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={JaxbProcessInstanceResponse.class})
 public class JaxbProcessInstanceListResponse extends AbstractJaxbCommandResponse<List<ProcessInstance>> {

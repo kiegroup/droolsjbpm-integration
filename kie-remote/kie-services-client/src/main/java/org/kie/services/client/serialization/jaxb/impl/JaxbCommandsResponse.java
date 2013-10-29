@@ -57,9 +57,11 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "long-list", type = JaxbLongListResponse.class),
             @XmlElement(name = "primitive", type = JaxbPrimitiveResponse.class),
             @XmlElement(name = "process-instance", type = JaxbProcessInstanceResponse.class),
-            @XmlElement(name = "task", type = JaxbTaskResponse.class),
+            @XmlElement(name = "process-instance-list", type = JaxbProcessInstanceListResponse.class),
+            @XmlElement(name = "task-response", type = JaxbTaskResponse.class),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
             @XmlElement(name = "work-item", type = JaxbWorkItem.class),
+            @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
             @XmlElement(name = "other", type = JaxbOtherResponse.class),
             })
     private List<JaxbCommandResponse<?>> responses;
