@@ -1,4 +1,4 @@
-package org.kie.example.api.defaultkiesession;
+package org.kie.example.api.kiemavenexample;
 
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -6,7 +6,7 @@ import org.kie.api.runtime.KieSession;
 
 import java.io.PrintStream;
 
-public class DefaultKieSessionExample {
+public class KieMavenPluginExample {
 
     public void go(PrintStream out) {
         KieServices ks = KieServices.Factory.get();
@@ -20,7 +20,7 @@ public class DefaultKieSessionExample {
 
 
     public static void main(String[] args) {
-        new DefaultKieSessionExample().go(System.out);
+        new KieMavenPluginExample().go(System.out);
     }
 
 }

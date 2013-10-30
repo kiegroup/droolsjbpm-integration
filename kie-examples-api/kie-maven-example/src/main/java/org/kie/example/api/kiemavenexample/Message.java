@@ -1,4 +1,4 @@
-package org.kie.example.api.defaultkiesession;
+package org.kie.example.api.kiemavenexample;
 
 public class Message {
 
