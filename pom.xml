@@ -77,7 +77,6 @@
         </property>
       </activation>
       <modules>
-        <module>droolsjbpm-integration-docs</module>
         <module>droolsjbpm-integration-distribution</module>
         <module>droolsjbpm-bpms-distribution</module>
         <module>droolsjbpm-brms-distribution</module>
