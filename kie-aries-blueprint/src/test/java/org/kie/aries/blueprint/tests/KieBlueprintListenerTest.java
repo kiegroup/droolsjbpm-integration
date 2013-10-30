@@ -17,6 +17,7 @@ package org.kie.aries.blueprint.tests;
 
 
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
+import org.junit.Ignore;
 import org.kie.api.runtime.KieSession;
 import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.kie.aries.blueprint.factorybeans.KieListenerAdaptor;
@@ -38,6 +39,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class KieBlueprintListenerTest {
 
     static BlueprintContainerImpl container = null;

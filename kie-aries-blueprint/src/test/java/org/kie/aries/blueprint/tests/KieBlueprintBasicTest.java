@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
@@ -37,6 +38,7 @@ import org.osgi.service.blueprint.container.NoSuchComponentException;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class KieBlueprintBasicTest {
 
     static BlueprintContainerImpl container = null;

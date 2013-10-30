@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
@@ -31,6 +32,7 @@ import org.kie.aries.blueprint.beans.Person;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class KieBlueprintCommandsTest {
 
     static BlueprintContainerImpl container = null;

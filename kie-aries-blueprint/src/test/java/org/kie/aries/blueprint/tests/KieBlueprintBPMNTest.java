@@ -25,6 +25,7 @@ import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeManager;
@@ -32,6 +33,7 @@ import org.kie.aries.blueprint.KieBlueprintContainer;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class KieBlueprintBPMNTest {
 
     static BlueprintContainerImpl container = null;

@@ -44,7 +44,7 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
     public void init() throws Exception {
         super.init();
     }
-
+/*
     @Override
     protected NamespaceHandlerSet createNamespaceHandlerSet(Set<URI> namespaces) {
         NamespaceHandlerSet handlerSet = new SimpleNamespaceHandlerSet();
@@ -68,4 +68,5 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
         }
         return handlerSet;
     }
+*/
 }

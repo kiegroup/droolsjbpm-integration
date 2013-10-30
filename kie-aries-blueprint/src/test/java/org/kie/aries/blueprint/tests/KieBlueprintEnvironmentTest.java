@@ -25,6 +25,7 @@ import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.runtime.Environment;
@@ -41,6 +42,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class KieBlueprintEnvironmentTest {
 
     static BlueprintContainerImpl container = null;
