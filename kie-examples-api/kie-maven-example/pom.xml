@@ -10,8 +10,8 @@
   </parent>
 
   <groupId>org.kie</groupId>
-  <artifactId>default-kiesession</artifactId>
-  <name>Drools API examples - Default KieSession</name>
+  <artifactId>kie-maven-example</artifactId>
+  <name>Kie maven plugin example</name>
 
   <packaging>kjar</packaging>
 

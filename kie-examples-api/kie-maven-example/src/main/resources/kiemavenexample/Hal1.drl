@@ -1,6 +1,6 @@
-package org.kie.example.api.defaultkiesession
+package org.kie.example.api.kiemavenexample
 
-import org.kie.example.api.defaultkiesession.Message
+import org.kie.example.api.kiemavenexample.Message
 
 global java.io.PrintStream out
 

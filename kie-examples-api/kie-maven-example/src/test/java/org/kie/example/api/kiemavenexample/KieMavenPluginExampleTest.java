@@ -1,4 +1,4 @@
-package org.kie.example.api.defaultkiesession;
+package org.kie.example.api.kiemavenexample;
 
 import org.junit.Test;
 
@@ -7,13 +7,13 @@ import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
 
-public class DefaultKieSessionExampleTest {
+public class KieMavenPluginExampleTest {
 
     @Test
     public void testGo() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
-        new DefaultKieSessionExample().go(ps);
+        new KieMavenPluginExample().go(ps);
         ps.close();
 
         String actual = new String(baos.toByteArray());

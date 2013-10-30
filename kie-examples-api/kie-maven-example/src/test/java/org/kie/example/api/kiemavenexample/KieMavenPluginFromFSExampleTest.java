@@ -1,4 +1,4 @@
-package org.kie.example.api.defaultkiesession;
+package org.kie.example.api.kiemavenexample;
 
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -12,7 +12,7 @@ import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
 
-public class DefaultKieSessionFromFSExampleTest {
+public class KieMavenPluginFromFSExampleTest {
 
     @Test
     public void testGo() {
@@ -43,9 +43,9 @@ public class DefaultKieSessionFromFSExampleTest {
 
         File rootFolder = null;
         if (currentFolder.endsWith("-integration")) {
-            rootFolder = new File("kie-examples-api/default-kiesession");
+            rootFolder = new File("kie-examples-api/kie-maven-example");
         } else if (currentFolder.endsWith("drools-examples-api")) {
-            rootFolder = new File("default-kiesession");
+            rootFolder = new File("kie-maven-example");
         } else {
             rootFolder = new File(".");
         }
