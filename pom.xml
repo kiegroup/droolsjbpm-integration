@@ -64,6 +64,7 @@
     <module>kie-aries-blueprint</module>
     <module>drools-jboss-integration</module>
     <module>drools-osgi-integration</module>
+    <module>kie-examples-api</module>
   </modules>
 
   <profiles>
