@@ -64,7 +64,8 @@
         <exclude>org.drools:droolsjbpm-integration-examples</exclude>
         <exclude>ch.qos.logback:logback-core</exclude><!-- Examples dependency -->
         <exclude>ch.qos.logback:logback-classic</exclude><!-- Examples dependency -->
-        <exclude>org.drools:droolsjbpm-integration-docs</exclude>
+        <exclude>org.drools:drools-docs</exclude>
+        <exclude>org.jbpm:jbpm-docs</exclude>
         <!--<exclude>*:*:jar:javadoc</exclude>-->
         <exclude>*:sources</exclude>
       </excludes>
@@ -94,9 +95,25 @@
     <!-- Reference manual -->
     <dependencySet>
       <includes>
-        <include>org.drools:droolsjbpm-integration-docs:jdocbook</include>
+        <include>org.drools:drools-docs:jdocbook</include>
       </includes>
-      <outputDirectory>reference_manual</outputDirectory>
+      <outputDirectory>reference_manual/drools-docs</outputDirectory>
+      <!-- Workaround for https://jira.codehaus.org/browse/MASSEMBLY-557 -->
+      <fileMode>755</fileMode>
+      <directoryMode>755</directoryMode>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>META-INF/**</exclude>
+        </excludes>
+      </unpackOptions>
+      <useStrictFiltering>true</useStrictFiltering>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.jbpm:jbpm-docs:jdocbook</include>
+      </includes>
+      <outputDirectory>reference_manual/jbpm-docs</outputDirectory>
       <!-- Workaround for https://jira.codehaus.org/browse/MASSEMBLY-557 -->
       <fileMode>755</fileMode>
       <directoryMode>755</directoryMode>
