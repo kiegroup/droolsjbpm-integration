@@ -1,32 +1,23 @@
 package org.kie.services.remote.rest;
 
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.persistence.SingleSessionCommandService;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
-import org.jboss.solder.exception.control.ExceptionToCatch;
-import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
-import org.kie.internal.runtime.manager.context.EmptyContext;
-import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.remote.cdi.RuntimeManagerManager;
 import org.kie.services.remote.cdi.TransactionalExecutor;
-import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is used by both the {@link RuntimeResource} and {@link TaskResource} to do the core operations on
@@ -43,8 +34,6 @@ import org.slf4j.LoggerFactory;
 @RequestScoped
 public class RestProcessRequestBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestProcessRequestBean.class);
-
     /* KIE processing */
     @Inject
     private RuntimeManagerManager runtimeMgrMgr;
@@ -54,10 +43,6 @@ public class RestProcessRequestBean {
 
     @Inject
     private TransactionalExecutor executor;
-
-
-    @Inject
-    Event<ExceptionToCatch> txExceptionEvent;
 
     /**
      * Executes a command on the {@link KieSession} from the proper {@link RuntimeManager}. This method
@@ -136,4 +121,27 @@ public class RestProcessRequestBean {
         return doTaskOperationOnDeployment(cmd, null, null, errorMsg);
     }
 
+
+    /**
+     * Executes a {@link TaskCommand} on the {@link TaskService}: this should be used when the {@link TaskCommand}
+     * returns an object instance that is also a (persistent) entity, and thus should also be serialized within a
+     * transaction. 
+     * 
+     * @param cmd The {@link TaskCommand} to be executed. 
+     * @param errorMsg The error message that should be associated with any eventual errors or exceptions. 
+     * @return The result of the {@link TaskCommand}, possibly null.
+     */
+    public Object doTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
+        Object result = null;
+        try {
+            result = executor.executeAndSerialize((InternalTaskService) taskService, cmd);
+        } catch (PermissionDeniedException pde) {
+            throw new UnauthorizedException(pde.getMessage(), pde);
+        } catch (RuntimeException re) {
+            throw re;
+        } catch( Exception e ) { 
+            throw new InternalServerErrorException(errorMsg, e);
+        } 
+        return result;
+    }
 }
