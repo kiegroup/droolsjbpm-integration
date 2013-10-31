@@ -1,6 +1,7 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.client.api.command.AcceptedCommands.*;
+import static org.kie.services.client.api.command.AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -20,10 +21,6 @@ import org.jboss.resteasy.core.request.ServerDrivenNegotiation;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotAcceptableException;
 import org.jboss.resteasy.util.HttpHeaderNames;
-import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.ExitTaskCommand;
-import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.impl.model.GroupImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
@@ -71,7 +68,7 @@ public class ResourceBase {
                                     request.getProcessInstanceId(),
                                     errorMsg);
                         } else { 
-                            cmdResult = requestBean.doTaskOperation(taskCmd, errorMsg);
+                            cmdResult = requestBean.doTaskOperationAndSerializeResult(taskCmd, errorMsg);
                         }
                     } else {
                         cmdResult = requestBean.doKieSessionOperation(

@@ -279,7 +279,7 @@ public class RequestMessageBean implements MessageListener {
                     // that will cause message reception to be *NOT* acknowledged!
                     if( cmd instanceof TaskCommand<?>
                         && ! AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass())  ) {
-                        cmdResult = executor.execute((InternalTaskService) taskService, (TaskCommand<?>) cmd);
+                        cmdResult = executor.executeAndSerialize((InternalTaskService) taskService, (TaskCommand<?>) cmd);
                     } else {
                         // Synchronize around SSCS to avoid race-conditions with kie session cache clearing in afterCompletion
                         KieSession kieSession 

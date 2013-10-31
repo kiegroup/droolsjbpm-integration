@@ -24,6 +24,8 @@ import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
+import org.jbpm.services.task.impl.model.xml.JaxbContent;
+import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
@@ -32,6 +34,7 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 
@@ -59,6 +62,7 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "process-instance", type = JaxbProcessInstanceResponse.class),
             @XmlElement(name = "process-instance-list", type = JaxbProcessInstanceListResponse.class),
             @XmlElement(name = "task-response", type = JaxbTaskResponse.class),
+            @XmlElement(name = "content-response", type = JaxbContentResponse.class ),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
             @XmlElement(name = "work-item", type = JaxbWorkItem.class),
             @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
@@ -153,8 +157,10 @@ public class JaxbCommandsResponse {
         String className = result.getClass().getName();
         if (result instanceof ProcessInstance) {
             this.responses.add(new JaxbProcessInstanceResponse((ProcessInstance) result, i, cmd));
-        } else if (result instanceof Task) {
-            this.responses.add(new JaxbTaskResponse((Task) result, i, cmd));
+        } else if (result instanceof JaxbTask) {
+            this.responses.add(new JaxbTaskResponse((JaxbTask) result, i, cmd));
+        } else if (result instanceof JaxbContent) {
+            this.responses.add(new JaxbContentResponse((JaxbContent) result, i, cmd));
         } else if (List.class.isInstance(result)) { 
             // Neccessary to determine return type of empty lists
             Class listType = cmdListTypes.get(cmd.getClass());

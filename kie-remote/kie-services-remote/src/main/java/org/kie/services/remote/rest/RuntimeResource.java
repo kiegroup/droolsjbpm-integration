@@ -54,15 +54,11 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
 import org.kie.services.remote.util.Paginator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
 @SuppressWarnings("unchecked")
 public class RuntimeResource extends ResourceBase {
-
-    private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
 
     /* REST information */
     @Context
