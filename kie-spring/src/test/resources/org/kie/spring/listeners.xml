@@ -6,7 +6,7 @@
                           http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
 
   <bean id="mock-agenda-listener" class="org.kie.spring.mocks.MockAgendaEventListener"/>
-  <bean id="mock-wm-listener" class="org.kie.spring.mocks.MockWorkingMemoryEventListener"/>
+  <bean id="mock-wm-listener" class="org.kie.spring.mocks.MockRuleRuntimeEventListener"/>
   <bean id="mock-process-listener" class="org.kie.spring.mocks.MockProcessEventListener"/>
 
   <kie:kmodule id="listeners_module">
@@ -22,7 +22,7 @@
       <kie:ksession name="ksession2">
         <kie:agendaEventListener ref="mock-agenda-listener"/>
         <kie:processEventListener ref="mock-process-listener"/>
-        <kie:workingMemoryEventListener ref="mock-wm-listener"/>
+        <kie:ruleRuntimeEventListener ref="mock-wm-listener"/>
       </kie:ksession>
 
       <kie:ksession name="statelessWithGroupedListeners" type="stateless" listeners-ref="debugListeners"/>
@@ -34,7 +34,7 @@
   <kie:eventListeners id="debugListeners">
     <kie:agendaEventListener ref="mock-agenda-listener"/>
     <kie:processEventListener ref="mock-process-listener"/>
-    <kie:workingMemoryEventListener ref="mock-wm-listener"/>
+    <kie:ruleRuntimeEventListener ref="mock-wm-listener"/>
   </kie:eventListeners>
 
 </beans>

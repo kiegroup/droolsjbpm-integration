@@ -37,7 +37,7 @@ public abstract class EventListenersUtil {
 
     public static final String ELEMENT_AGENDA_EVENT_LISTENER = "agendaEventListener";
     public static final String ELEMENT_PROCESS_EVENT_LISTENER = "processEventListener";
-    public static final String ELEMENT_WORKING_MEMORY_EVENT_LISTENER = "workingMemoryEventListener";
+    public static final String ELEMENT_RULE_RUNTIME_EVENT_LISTENER = "ruleRuntimeEventListener";
 
     public static void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, Element element) {
         ManagedMap completeListenersMap = new ManagedMap();
@@ -54,7 +54,7 @@ public abstract class EventListenersUtil {
             completeListenersMap.putAll(listeners);
         }
 
-        eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_WORKING_MEMORY_EVENT_LISTENER);
+        eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_RULE_RUNTIME_EVENT_LISTENER);
         if (eventListeners != null) {
             ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_WORKING_MEMORY_EVENT_LISTENER);
             completeListenersMap.putAll(listeners);

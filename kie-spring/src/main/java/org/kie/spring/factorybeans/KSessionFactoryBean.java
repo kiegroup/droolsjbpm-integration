@@ -22,6 +22,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.command.Command;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.logger.KieLoggers;
 import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.KieRuntime;
@@ -37,7 +38,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
 import org.springframework.beans.factory.support.ManagedList;
 
 import java.util.*;
@@ -61,7 +61,7 @@ public class KSessionFactoryBean
 
     protected List<AgendaEventListener> agendaEventListeners;
     protected List<ProcessEventListener> processEventListeners;
-    protected List<WorkingMemoryEventListener> workingMemoryEventListeners;
+    protected List<RuleRuntimeEventListener> ruleRuntimeEventListeners;
     protected List<Object> groupedListeners = new ArrayList<Object>();
 
     private ReleaseId releaseId;
@@ -72,7 +72,7 @@ public class KSessionFactoryBean
     public KSessionFactoryBean() {
         agendaEventListeners = new ArrayList<AgendaEventListener>();
         processEventListeners = new ArrayList<ProcessEventListener>();
-        workingMemoryEventListeners = new ArrayList<WorkingMemoryEventListener>();
+        ruleRuntimeEventListeners = new ArrayList<RuleRuntimeEventListener>();
     }
 
     public ReleaseId getReleaseId() {
@@ -194,8 +194,8 @@ public class KSessionFactoryBean
             if (eventListener instanceof AgendaEventListener) {
                 agendaEventListeners.add((AgendaEventListener) eventListener);
             }
-            if (eventListener instanceof WorkingMemoryEventListener) {
-                workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+            if (eventListener instanceof RuleRuntimeEventListener) {
+                ruleRuntimeEventListeners.add((RuleRuntimeEventListener) eventListener);
             }
             if (eventListener instanceof ProcessEventListener) {
                 processEventListeners.add((ProcessEventListener) eventListener);
@@ -251,11 +251,11 @@ public class KSessionFactoryBean
                 }
             } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
-                    if (eventListener instanceof WorkingMemoryEventListener) {
-                        workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+                    if (eventListener instanceof RuleRuntimeEventListener) {
+                        ruleRuntimeEventListeners.add((RuleRuntimeEventListener) eventListener);
                     } else {
-                        throw new IllegalArgumentException("The workingMemoryEventListener (" + eventListener.getClass()
-                                + ") is not an instance of " + WorkingMemoryEventListener.class);
+                        throw new IllegalArgumentException("The ruleRuntimeEventListeners (" + eventListener.getClass()
+                                + ") is not an instance of " + RuleRuntimeEventListener.class);
                     }
                 }
             } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {
@@ -287,12 +287,12 @@ public class KSessionFactoryBean
         this.processEventListeners = processEventListeners;
     }
 
-    public List<WorkingMemoryEventListener> getWorkingMemoryEventListeners() {
-        return workingMemoryEventListeners;
+    public List<RuleRuntimeEventListener> getRuleRuntimeEventListeners() {
+        return ruleRuntimeEventListeners;
     }
 
-    public void setWorkingMemoryEventListeners(List<WorkingMemoryEventListener> workingMemoryEventListeners) {
-        this.workingMemoryEventListeners = workingMemoryEventListeners;
+    public void setWorkingMemoryEventListeners(List<RuleRuntimeEventListener> ruleRuntimeEventListeners) {
+        this.ruleRuntimeEventListeners = ruleRuntimeEventListeners;
     }
 
     public void attachListeners(KieRuntimeEventManager kieRuntimeEventManager) {
@@ -302,8 +302,8 @@ public class KSessionFactoryBean
         for (ProcessEventListener processEventListener : getProcessEventListeners()) {
             kieRuntimeEventManager.addEventListener(processEventListener);
         }
-        for (WorkingMemoryEventListener workingMemoryEventListener : getWorkingMemoryEventListeners()) {
-            kieRuntimeEventManager.addEventListener(workingMemoryEventListener);
+        for (RuleRuntimeEventListener ruleRuntimeEventListeners : getRuleRuntimeEventListeners()) {
+            kieRuntimeEventManager.addEventListener(ruleRuntimeEventListeners);
         }
     }
 }

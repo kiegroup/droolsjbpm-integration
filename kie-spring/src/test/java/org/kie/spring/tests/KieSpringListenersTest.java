@@ -19,7 +19,6 @@ package org.kie.spring.tests;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.event.process.ProcessEventListener;
@@ -31,11 +30,9 @@ import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.Person;
 import org.kie.spring.mocks.MockAgendaEventListener;
 import org.kie.spring.mocks.MockProcessEventListener;
-import org.kie.spring.mocks.MockWorkingMemoryEventListener;
+import org.kie.spring.mocks.MockRuleRuntimeEventListener;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +117,7 @@ public class KieSpringListenersTest {
         assertTrue(kSession.getWorkingMemoryEventListeners().size() > 0);
         boolean mockWMEventListenerFound = false;
         for (WorkingMemoryEventListener listener : kSession.getWorkingMemoryEventListeners()) {
-            if (listener instanceof MockWorkingMemoryEventListener) {
+            if (listener instanceof MockRuleRuntimeEventListener) {
                 mockWMEventListenerFound = true;
                 break;
             }

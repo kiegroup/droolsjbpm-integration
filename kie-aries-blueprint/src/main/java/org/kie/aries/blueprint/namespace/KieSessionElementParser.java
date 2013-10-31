@@ -123,7 +123,7 @@ public class KieSessionElementParser extends AbstractElementParser {
             if ( localName == null) {
                 continue;
             }
-            if ("workingMemoryEventListener".equalsIgnoreCase(localName) || "processEventListener".equalsIgnoreCase(localName) || "agendaEventListener".equalsIgnoreCase(localName)){
+            if ("ruleRuntimeEventListener".equalsIgnoreCase(localName) || "processEventListener".equalsIgnoreCase(localName) || "agendaEventListener".equalsIgnoreCase(localName)){
                 // run the loop only if we have atleast one child
                 // the KieEventListenersElementParser.getBeanMetadata method will loop and pick up all the listeners
                 MutableBeanMetadata beanMetadata = KieEventListenersElementParser.getBeanMetadata(context, element);

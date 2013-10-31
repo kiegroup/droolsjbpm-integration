@@ -22,7 +22,7 @@ import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.aries.blueprint.factorybeans.KieListenerAdaptor;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
@@ -54,8 +54,8 @@ public class KieEventListenersElementParser extends AbstractElementParser {
 
             Node refValue = node.getAttributes().getNamedItem("ref");
             String type="";
-            if ("workingMemoryEventListener".equalsIgnoreCase(localName) ){
-                type = WorkingMemoryEventListener.class.getName();
+            if ("ruleRuntimeEventListener".equalsIgnoreCase(localName) ){
+                type = RuleRuntimeEventListener.class.getName();
             } else  if ("processEventListener".equalsIgnoreCase(localName)){
                 type = ProcessEventListener.class.getName();
             } else if ("agendaEventListener".equalsIgnoreCase(localName)){

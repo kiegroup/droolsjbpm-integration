@@ -37,7 +37,7 @@
       <xsd:sequence minOccurs="0" maxOccurs="unbounded">
         <xsd:element ref="agendaEventListener" minOccurs="0" maxOccurs="unbounded"/>
         <xsd:element ref="processEventListener" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="workingMemoryEventListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="ruleRuntimeEventListener" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:sequence minOccurs="0" maxOccurs="unbounded">
         <xsd:element name="consoleLogger" type="consoleLoggerT" minOccurs="0" maxOccurs="1"/>
@@ -134,14 +134,14 @@
   </xsd:complexType>
 
   <xsd:element name="agendaEventListener" type="eventListener"/>
-  <xsd:element name="workingMemoryEventListener" type="eventListener"/>
+  <xsd:element name="ruleRuntimeEventListener" type="eventListener"/>
   <xsd:element name="processEventListener" type="eventListener"/>
 
   <xsd:element name="eventListeners">
     <xsd:complexType>
       <xsd:all>
         <xsd:element ref="agendaEventListener" maxOccurs="1" minOccurs="0"/>
-        <xsd:element ref="workingMemoryEventListener" maxOccurs="1" minOccurs="0"/>
+        <xsd:element ref="ruleRuntimeEventListener" maxOccurs="1" minOccurs="0"/>
         <xsd:element ref="processEventListener" maxOccurs="1" minOccurs="0"/>
       </xsd:all>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>
