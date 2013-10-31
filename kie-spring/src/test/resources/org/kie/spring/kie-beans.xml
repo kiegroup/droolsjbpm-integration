@@ -17,9 +17,9 @@
 
   <kie:ksession-ref id="ksession1">
 
-    <kie:workingMemoryEventListener>
-      <bean class="org.kie.spring.mocks.MockWorkingMemoryEventListener"/>
-    </kie:workingMemoryEventListener>
+    <kie:ruleRuntimeEventListener>
+      <bean class="org.kie.spring.mocks.MockRuleRuntimeEventListener"/>
+    </kie:ruleRuntimeEventListener>
 
     <kie:agendaEventListener>
       <bean class="org.kie.spring.mocks.MockAgendaEventListener"/>

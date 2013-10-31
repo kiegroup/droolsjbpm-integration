@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kie.api.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.api.event.rule.DebugRuleRuntimeEventListener;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.junit.Before;
@@ -73,8 +73,8 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatefulWMEventListener() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulSession");
-        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(KieSession.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
+        assertEquals(1, KieSession.getRuleRuntimeEventListeners().size());
+        assertTrue(KieSession.getRuleRuntimeEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
 
         KieSession.setGlobal("list", list);
         KieSession.insert(new Person());
@@ -101,8 +101,8 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatelessWMEventListener() throws Exception {
         StatelessKieSession kstateless = (StatelessKieSession) context.getBean("statelessSession");
-        assertEquals(1, kstateless.getWorkingMemoryEventListeners().size());
-        assertTrue(kstateless.getWorkingMemoryEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
+        assertEquals(1, kstateless.getRuleRuntimeEventListeners().size());
+        assertTrue(kstateless.getRuleRuntimeEventListeners().toArray()[0] instanceof MockWorkingMemoryEventListener);
 
         kstateless.setGlobal("list", list);
         kstateless.execute(new Person());
@@ -114,7 +114,7 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatefulWithNestedBean() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithNestedBean");
-        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, KieSession.getRuleRuntimeEventListeners().size());
 
         KieSession.setGlobal("list", list);
         KieSession.insert(new Person());
@@ -126,7 +126,7 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatefulWithRef() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithRef");
-        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, KieSession.getRuleRuntimeEventListeners().size());
 
         KieSession.setGlobal("list", list);
         KieSession.insert(new Person());
@@ -138,21 +138,21 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatefulWithDefault() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithDefault");
-        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+        assertEquals(1, KieSession.getRuleRuntimeEventListeners().size());
+        assertTrue(KieSession.getRuleRuntimeEventListeners().iterator().next() instanceof DebugRuleRuntimeEventListener);
     }
 
     @Test
     public void testStatefulWithLegacyDebugListener() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithDebugListener");
-        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+        assertEquals(1, KieSession.getRuleRuntimeEventListeners().size());
+        assertTrue(KieSession.getRuleRuntimeEventListeners().iterator().next() instanceof DebugRuleRuntimeEventListener);
     }
 
     @Test
     public void testStatefulWithGroupedListeners() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithGroupedListeners");
-        assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, KieSession.getRuleRuntimeEventListeners().size());
 
         KieSession.setGlobal("list", list);
         KieSession.insert(new Person());
@@ -166,7 +166,7 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatelessWithNestedBean() throws Exception {
         StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithNestedBean");
-        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, StatelessKieSession.getRuleRuntimeEventListeners().size());
 
         StatelessKieSession.setGlobal("list", list);
         StatelessKieSession.execute(new Person());
@@ -177,7 +177,7 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatelessWithRef() throws Exception {
         StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithRef");
-        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, StatelessKieSession.getRuleRuntimeEventListeners().size());
 
         StatelessKieSession.setGlobal("list", list);
         StatelessKieSession.execute(new Person());
@@ -188,7 +188,7 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatelessWithMultipleSameType() throws Exception {
         StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithMultipleSameType");
-        assertEquals(2, StatelessKieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(2, StatelessKieSession.getRuleRuntimeEventListeners().size());
 
         StatelessKieSession.setGlobal("list", list);
         StatelessKieSession.execute(new Person());
@@ -200,14 +200,14 @@ public class SpringDroolsListenersTest {
     @Test
     public void testStatelessWithDefault() throws Exception {
         StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithDefault");
-        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(StatelessKieSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
+        assertEquals(1, StatelessKieSession.getRuleRuntimeEventListeners().size());
+        assertTrue(StatelessKieSession.getRuleRuntimeEventListeners().toArray()[0] instanceof DebugRuleRuntimeEventListener);
     }
 
     @Test
     public void testStatelessWithGroupedListeners() throws Exception {
         StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithGroupedListeners");
-        assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, StatelessKieSession.getRuleRuntimeEventListeners().size());
 
         StatelessKieSession.setGlobal("list", list);
         StatelessKieSession.execute(new Person());

@@ -18,7 +18,7 @@ package org.kie.spring.factorybeans;
 
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.spring.namespace.EventListenersUtil;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -61,8 +61,8 @@ public class EventListenersFactoryBean implements
                 }
             } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
-                    if (eventListener instanceof WorkingMemoryEventListener) {
-                        eventListeners.add((WorkingMemoryEventListener) eventListener);
+                    if (eventListener instanceof RuleRuntimeEventListener) {
+                        eventListeners.add((RuleRuntimeEventListener) eventListener);
                     }
                 }
             } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {

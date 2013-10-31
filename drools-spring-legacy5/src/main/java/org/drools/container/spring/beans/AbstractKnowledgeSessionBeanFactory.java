@@ -24,10 +24,11 @@ import org.drools.container.spring.namespace.EventListenersUtil;
 import org.kie.api.KieBase;
 import org.kie.api.command.Command;
 import org.kie.api.event.KieRuntimeEventManager;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.internal.event.KnowledgeRuntimeEventManager;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.drools.grid.GridNode;
 import org.kie.internal.logger.KnowledgeRuntimeLogger;
 import org.kie.internal.logger.KnowledgeRuntimeLoggerFactory;
@@ -59,7 +60,7 @@ public abstract class AbstractKnowledgeSessionBeanFactory
     // Additions for JIRA JBRULES-3076
     protected List<AgendaEventListener> agendaEventListeners;
     protected List<ProcessEventListener> processEventListeners;
-    protected List<WorkingMemoryEventListener> workingMemoryEventListeners;
+    protected List<RuleRuntimeEventListener> workingMemoryEventListeners;
     protected List<Object> groupedListeners = new ArrayList<Object>();
     // End of additions for JIRA JBRULES-3076
 
@@ -70,7 +71,7 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         // Additions for JIRA JBRULES-3076
         agendaEventListeners = new ArrayList<AgendaEventListener>();
         processEventListeners = new ArrayList<ProcessEventListener>();
-        workingMemoryEventListeners = new ArrayList<WorkingMemoryEventListener>();
+        workingMemoryEventListeners = new ArrayList<RuleRuntimeEventListener>();
         // End of additions for JIRA JBRULES-3076
     }
 
@@ -159,8 +160,8 @@ public abstract class AbstractKnowledgeSessionBeanFactory
             if (eventListener instanceof AgendaEventListener) {
                 agendaEventListeners.add((AgendaEventListener) eventListener);
             }
-            if (eventListener instanceof WorkingMemoryEventListener) {
-                workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+            if (eventListener instanceof RuleRuntimeEventListener) {
+                workingMemoryEventListeners.add((RuleRuntimeEventListener) eventListener);
             }
             if (eventListener instanceof ProcessEventListener) {
                 processEventListeners.add((ProcessEventListener) eventListener);
@@ -185,11 +186,11 @@ public abstract class AbstractKnowledgeSessionBeanFactory
                 }
             } else if (EventListenersUtil.TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(key)) {
                 for (Object eventListener : eventListenerList) {
-                    if (eventListener instanceof WorkingMemoryEventListener) {
-                        workingMemoryEventListeners.add((WorkingMemoryEventListener) eventListener);
+                    if (eventListener instanceof RuleRuntimeEventListener) {
+                        workingMemoryEventListeners.add((RuleRuntimeEventListener) eventListener);
                     } else {
                         throw new IllegalArgumentException("The workingMemoryEventListener (" + eventListener.getClass()
-                                + ") is not an instance of " + WorkingMemoryEventListener.class);
+                                + ") is not an instance of " + RuleRuntimeEventListener.class);
                     }
                 }
             } else if (EventListenersUtil.TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(key)) {
@@ -221,11 +222,11 @@ public abstract class AbstractKnowledgeSessionBeanFactory
         this.processEventListeners = processEventListeners;
     }
 
-    public List<WorkingMemoryEventListener> getWorkingMemoryEventListeners() {
+    public List<RuleRuntimeEventListener> getRuleRuntimeEventListeners() {
         return workingMemoryEventListeners;
     }
 
-    public void setWorkingMemoryEventListeners(List<WorkingMemoryEventListener> workingMemoryEventListeners) {
+    public void setWorkingMemoryEventListeners(List<RuleRuntimeEventListener> workingMemoryEventListeners) {
         this.workingMemoryEventListeners = workingMemoryEventListeners;
     }
 

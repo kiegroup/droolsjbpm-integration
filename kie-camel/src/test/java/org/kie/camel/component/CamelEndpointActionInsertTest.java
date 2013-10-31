@@ -40,7 +40,7 @@ import org.junit.Test;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.MatchCreatedEvent;
 import org.kie.api.event.rule.ObjectInsertedEvent;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.mockito.ArgumentCaptor;
 
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.verify;
 public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
     private KieSession ksession;
     private AgendaEventListener ael;
-    private WorkingMemoryEventListener wmel;
+    private RuleRuntimeEventListener wmel;
 
     @Test
     public void testSessionInsert() throws Exception {
@@ -154,7 +154,7 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
         ksession = registerKnowledgeRuntime( "ksession1",
                                              rule );
         ael = mock( AgendaEventListener.class );
-        wmel = mock( WorkingMemoryEventListener.class );
+        wmel = mock( RuleRuntimeEventListener.class );
         ksession.addEventListener( ael );
         ksession.addEventListener( wmel );
     }

@@ -17,7 +17,7 @@ package org.kie.spring.namespace;
 
 import org.drools.core.event.DebugProcessEventListener;
 import org.kie.api.event.rule.DebugAgendaEventListener;
-import org.kie.api.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.api.event.rule.DebugRuleRuntimeEventListener;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -37,7 +37,7 @@ public abstract class EventListenersUtil {
 
     public static final String ELEMENT_AGENDA_EVENT_LISTENER = "agendaEventListener";
     public static final String ELEMENT_PROCESS_EVENT_LISTENER = "processEventListener";
-    public static final String ELEMENT_WORKING_MEMORY_EVENT_LISTENER = "workingMemoryEventListener";
+    public static final String ELEMENT_RULE_RUNTIME_EVENT_LISTENER = "ruleRuntimeEventListener";
 
     public static void parseEventListeners(ParserContext parserContext, BeanDefinitionBuilder factory, Element element) {
         ManagedMap completeListenersMap = new ManagedMap();
@@ -54,7 +54,7 @@ public abstract class EventListenersUtil {
             completeListenersMap.putAll(listeners);
         }
 
-        eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_WORKING_MEMORY_EVENT_LISTENER);
+        eventListeners = DomUtils.getChildElementsByTagName(element, ELEMENT_RULE_RUNTIME_EVENT_LISTENER);
         if (eventListeners != null) {
             ManagedMap listeners = parseEventListenersByType(parserContext, eventListeners, TYPE_WORKING_MEMORY_EVENT_LISTENER);
             completeListenersMap.putAll(listeners);
@@ -90,7 +90,7 @@ public abstract class EventListenersUtil {
                     } else if (TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                         obj = new DebugProcessEventListener();
                     } else if (TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
-                        obj = new DebugWorkingMemoryEventListener();
+                        obj = new DebugRuleRuntimeEventListener();
                     } else {
                         throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
                     }

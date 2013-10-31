@@ -19,10 +19,10 @@ package org.drools.container.spring;
 import org.kie.api.event.rule.ObjectDeletedEvent;
 import org.kie.api.event.rule.ObjectInsertedEvent;
 import org.kie.api.event.rule.ObjectUpdatedEvent;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 
 
-public class MockWorkingMemoryEventListener implements WorkingMemoryEventListener {
+public class MockWorkingMemoryEventListener implements RuleRuntimeEventListener {
     public void objectInserted(ObjectInsertedEvent objectInsertedEvent) {
         System.out.println("MockWorkingMemoryEventListener :: objectInserted");
         //System.out.println(objectInsertedEvent.getObject());

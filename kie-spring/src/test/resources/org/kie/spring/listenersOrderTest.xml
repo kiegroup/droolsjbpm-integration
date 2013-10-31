@@ -17,9 +17,9 @@
           <kie:agendaEventListener>
               <bean class="org.kie.container.container.spring.MockAgendaEventListener"/>
           </kie:agendaEventListener>
-          <kie:workingMemoryEventListener>
-              <bean class="org.kie.container.container.spring.MockWorkingMemoryEventListener" />
-          </kie:workingMemoryEventListener>
+          <kie:ruleRuntimeEventListener>
+              <bean class="org.kie.container.container.spring.MockRuleRuntimeEventListener" />
+          </kie:ruleRuntimeEventListener>
           <kie:processEventListener>
               <bean class="org.kie.container.container.spring.MockProcessEventListener" />
           </kie:processEventListener>
@@ -37,9 +37,9 @@
         <kie:agendaEventListener>
           <bean class="org.kie.spring.mocks.MockAgendaEventListener"/>
         </kie:agendaEventListener>
-        <kie:workingMemoryEventListener>
-          <bean class="org.kie.spring.mocks.MockWorkingMemoryEventListener"/>
-        </kie:workingMemoryEventListener>
+        <kie:ruleRuntimeEventListener>
+          <bean class="org.kie.spring.mocks.MockRuleRuntimeEventListener"/>
+        </kie:ruleRuntimeEventListener>
         <kie:processEventListener>
           <bean class="org.kie.spring.mocks.MockProcessEventListener"/>
         </kie:processEventListener>

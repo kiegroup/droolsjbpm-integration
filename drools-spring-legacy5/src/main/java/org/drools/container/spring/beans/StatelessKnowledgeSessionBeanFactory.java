@@ -21,7 +21,7 @@ import java.util.Map;
 import org.drools.core.SessionConfiguration;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.internal.runtime.StatelessKnowledgeSession;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.StatelessKieSession;
@@ -64,7 +64,7 @@ public class StatelessKnowledgeSessionBeanFactory extends AbstractKnowledgeSessi
         for (ProcessEventListener processEventListener :getProcessEventListeners()) {
             ksession.addEventListener(processEventListener);
         }
-        for (WorkingMemoryEventListener workingMemoryEventListener :getWorkingMemoryEventListeners()) {
+        for (RuleRuntimeEventListener workingMemoryEventListener :getRuleRuntimeEventListeners()) {
             ksession.addEventListener(workingMemoryEventListener);
         }
         // End of Additions for JIRA JBRULES-3076

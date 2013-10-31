@@ -18,21 +18,21 @@ package org.kie.spring.mocks;
 import org.kie.api.event.rule.ObjectDeletedEvent;
 import org.kie.api.event.rule.ObjectInsertedEvent;
 import org.kie.api.event.rule.ObjectUpdatedEvent;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.spring.tests.KieSpringListenersTest;
 
 
-public class MockWorkingMemoryEventListener implements WorkingMemoryEventListener {
+public class MockRuleRuntimeEventListener implements RuleRuntimeEventListener {
     public void objectInserted(ObjectInsertedEvent objectInsertedEvent) {
-        System.out.println("MockWorkingMemoryEventListener :: objectInserted");
+        System.out.println("MockRuleRuntimeEventListener :: objectInserted");
         KieSpringListenersTest.incrementValueFromListener();
     }
 
     public void objectUpdated(ObjectUpdatedEvent objectUpdatedEvent) {
-        System.out.println("MockWorkingMemoryEventListener :: objectUpdated");
+        System.out.println("MockRuleRuntimeEventListener :: objectUpdated");
     }
 
     public void objectDeleted(ObjectDeletedEvent objectRetractedEvent) {
-        System.out.println("MockWorkingMemoryEventListener :: objectDeleted");
+        System.out.println("MockRuleRuntimeEventListener :: objectDeleted");
     }
 }

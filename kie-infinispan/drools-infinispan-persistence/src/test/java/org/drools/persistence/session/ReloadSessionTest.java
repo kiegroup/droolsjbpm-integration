@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
-import org.kie.api.event.rule.DefaultWorkingMemoryEventListener;
+import org.kie.api.event.rule.DefaultRuleRuntimeEventListener;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
@@ -154,14 +154,14 @@ public class ReloadSessionTest {
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
 
         ksession.addEventListener(new DefaultAgendaEventListener());
-        ksession.addEventListener(new DefaultWorkingMemoryEventListener());
+        ksession.addEventListener(new DefaultRuleRuntimeEventListener());
 
-        assertEquals(1, ksession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, ksession.getRuleRuntimeEventListeners().size());
         assertEquals(1, ksession.getAgendaEventListeners().size());
 
         ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksession.getId(), kbase, null, env);
 
-        assertEquals(1, ksession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, ksession.getRuleRuntimeEventListeners().size());
         assertEquals(1, ksession.getAgendaEventListeners().size());
     }
 }

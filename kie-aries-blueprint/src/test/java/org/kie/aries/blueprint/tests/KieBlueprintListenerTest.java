@@ -22,14 +22,14 @@ import org.kie.aries.blueprint.KieBlueprintContainer;
 import org.kie.aries.blueprint.factorybeans.KieListenerAdaptor;
 import org.kie.aries.blueprint.mocks.MockAgendaEventListener;
 import org.kie.aries.blueprint.mocks.MockProcessEventListener;
-import org.kie.aries.blueprint.mocks.MockWorkingMemoryEventListener;
+import org.kie.aries.blueprint.mocks.MockRuleRuntimeEventListener;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.StatelessKieSession;
 
 import java.net.URL;
@@ -77,10 +77,10 @@ public class KieBlueprintListenerTest {
         StatelessKieSession ksession = (StatelessKieSession) container.getComponentInstance("ksession1");
         assertNotNull(ksession);
 
-        assertEquals(1, ksession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, ksession.getRuleRuntimeEventListeners().size());
         boolean mockWMEventListenerFound = false;
-        for (WorkingMemoryEventListener listener : ksession.getWorkingMemoryEventListeners()){
-            if (listener instanceof MockWorkingMemoryEventListener){
+        for (RuleRuntimeEventListener listener : ksession.getRuleRuntimeEventListeners()){
+            if (listener instanceof MockRuleRuntimeEventListener){
                 mockWMEventListenerFound = true;
                 break;
             }
@@ -121,10 +121,10 @@ public class KieBlueprintListenerTest {
         KieSession ksession = (KieSession) container.getComponentInstance("ksession99");
         assertNotNull(ksession);
 
-        assertEquals(1, ksession.getWorkingMemoryEventListeners().size());
+        assertEquals(1, ksession.getRuleRuntimeEventListeners().size());
         boolean mockWMEventListenerFound = false;
-        for (WorkingMemoryEventListener listener : ksession.getWorkingMemoryEventListeners()){
-            if (listener instanceof MockWorkingMemoryEventListener){
+        for (RuleRuntimeEventListener listener : ksession.getRuleRuntimeEventListeners()){
+            if (listener instanceof MockRuleRuntimeEventListener){
                 mockWMEventListenerFound = true;
                 break;
             }
@@ -164,7 +164,7 @@ public class KieBlueprintListenerTest {
     public void testEventListenersStandAlone() throws Exception {
         Object obj = container.getComponentInstance("mock-wm-listener");
         assertNotNull(obj);
-        assertTrue(obj instanceof MockWorkingMemoryEventListener);
+        assertTrue(obj instanceof MockRuleRuntimeEventListener);
 
         obj = container.getComponentInstance("mock-agenda-listener");
         assertNotNull(obj);

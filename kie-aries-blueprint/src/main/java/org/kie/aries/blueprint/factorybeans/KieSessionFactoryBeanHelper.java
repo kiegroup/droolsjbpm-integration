@@ -20,7 +20,7 @@ import org.kie.api.command.Command;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.logger.KieLoggers;
 import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.KieSession;
@@ -36,8 +36,8 @@ public class KieSessionFactoryBeanHelper {
         }
         for (KieListenerAdaptor listenerConfig : listeners){
             String type = listenerConfig.getType();
-            if ( type.equalsIgnoreCase(WorkingMemoryEventListener.class.getName())){
-                kieRuntimeEventManager.addEventListener((WorkingMemoryEventListener) listenerConfig.getObjectRef());
+            if ( type.equalsIgnoreCase(RuleRuntimeEventListener.class.getName())){
+                kieRuntimeEventManager.addEventListener((RuleRuntimeEventListener) listenerConfig.getObjectRef());
             } else  if ( type.equalsIgnoreCase(ProcessEventListener.class.getName())){
                 kieRuntimeEventManager.addEventListener((ProcessEventListener) listenerConfig.getObjectRef());
             } else if ( type.equalsIgnoreCase(AgendaEventListener.class.getName())){
