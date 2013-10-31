@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest;
+package org.kie.services.remote.cdi;
 
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;

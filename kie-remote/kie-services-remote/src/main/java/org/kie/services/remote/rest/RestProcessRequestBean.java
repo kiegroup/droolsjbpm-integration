@@ -23,6 +23,7 @@ import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.remote.cdi.RuntimeManagerManager;
+import org.kie.services.remote.cdi.TransactionalExecutor;
 import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
