@@ -20,7 +20,7 @@ end
 
 rule "Insert activity names"
 no-loop
-salience 10
+salience 13
     when
         ActivitySimulationEvent( $name : activityName, $id : activityId )
         not ActivityName( name == $name )
@@ -31,7 +31,7 @@ end
 
 rule "Insert activity names for ht"
 no-loop
-salience 10
+salience 14
     when
         HumanTaskActivitySimulationEvent( $name : activityName, $id : activityId )
         not ActivityName( name == $name )
@@ -42,7 +42,7 @@ end
 
 rule "Insert event names"
 no-loop
-salience 10
+salience 15
     when
         EndSimulationEvent( $name : activityName, $id : activityId )
         not ActivityName( name == $name )
@@ -70,7 +70,7 @@ no-loop
 end
 
 rule "Calculate average duration for human activity"
-salience 20
+salience 25
 no-loop
     when
         ActivityName($name : name, type == "ht", $id : id)
