@@ -87,7 +87,8 @@ public class TaskResource extends ResourceBase {
         "potentialOwner",
         "status",
         "taskOwner",
-        "processInstanceId"
+        "processInstanceId",
+        "union"
     };
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
@@ -128,7 +129,7 @@ public class TaskResource extends ResourceBase {
         List<String> busAdmins = getStringListParam(allowedQueryParams[2], false, params, "query");
         List<String> potOwners = getStringListParam(allowedQueryParams[3], false, params, "query");
         List<String> taskOwners = getStringListParam(allowedQueryParams[5], false, params, "query");
-        String unionStr = getStringParam("union", false, params, "query");
+        String unionStr = getStringParam(allowedQueryParams[7], false, params, "query");
         boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
         
         List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
