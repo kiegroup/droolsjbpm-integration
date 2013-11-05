@@ -6,15 +6,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
@@ -35,6 +29,7 @@ import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -52,9 +47,6 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.services.client.api.command.AcceptedCommands;
-import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
@@ -69,18 +61,8 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
-import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Predicate;
 
 public abstract class SerializationTest {
 
@@ -356,87 +338,22 @@ public abstract class SerializationTest {
     }
 
     @Test
-    public void acceptedCommandsCanBeSerializedTest() throws Exception {
-        // Only neccessary to run once
-        Assume.assumeTrue(getType().equals(TestType.JAXB));
+    @Ignore("BZ-1024946")
+    public void serializingPrimitiveArraysTest() throws Exception  {
+        // Don't run with JSON: /execute is only JAXB
+        Assume.assumeTrue(!getType().equals(TestType.JSON));
 
-        Field commandsField = JaxbCommandsRequest.class.getDeclaredField("commands");
-        XmlElements xmlElemsAnno = (XmlElements) commandsField.getAnnotations()[0];
-        XmlElement[] xmlElems = xmlElemsAnno.value();
-
-        Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
-        assertEquals(cmdSet.size(), xmlElems.length);
-        Set<String> xmlElemNameSet = new HashSet<String>();
-        for (XmlElement xmlElemAnno : xmlElems) {
-            Class cmdClass = xmlElemAnno.type();
-            String name = xmlElemAnno.name();
-            assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
-            assertTrue(cmdClass.getSimpleName() + " is present in " + JaxbCommandsRequest.class.getSimpleName() + " but not in "
-                    + AcceptedCommands.class.getSimpleName(), cmdSet.remove(cmdClass));
-        }
-        for (Class cmdClass : cmdSet) {
-            System.out.println("Missing: " + cmdClass.getSimpleName());
-        }
-        assertTrue("See output for classes in " + AcceptedCommands.class.getSimpleName() + " that are not in "
-                + JaxbCommandsRequest.class.getSimpleName(), cmdSet.size() == 0);
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("url", "http://soaptest.parasoft.com/calculator.wsdl");
+        parameters.put("namespace", "http://www.parasoft.com/wsdl/calculator/");
+        parameters.put("interface", "Calculator");
+        parameters.put("operation", "add");
+        parameters.put("parameters", new Float[]{9.0f, 12.0f});
+        
+        Command<?> cmd = new StartProcessCommand("proc.with.array.params", parameters);
+        JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
+        Command<?> newCmd = ((JaxbCommandsRequest) testRoundtrip(req)).getCommands().get(0);
+        assertNotNull(newCmd);
     }
 
-    @Test
-    public void allCommandResponseTypesNeedXmlElemIdTest() throws Exception {
-        // Only neccessary to run once
-        Assume.assumeTrue(getType().equals(TestType.JAXB));
-
-        Field commandsField = JaxbCommandsResponse.class.getDeclaredField("responses");
-        XmlElements xmlElemsAnno = (XmlElements) commandsField.getAnnotations()[0];
-        XmlElement[] xmlElems = xmlElemsAnno.value();
-
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.services.client"), new SubTypesScanner());
-        Set<Class<?>> cmdSet = new HashSet<Class<?>>();
-        for (Class<?> cmdRespImpl : reflections.getSubTypesOf(JaxbCommandResponse.class)) {
-            cmdSet.add(cmdRespImpl);
-        }
-        cmdSet.remove(AbstractJaxbCommandResponse.class);
-
-        int numAnnos = xmlElems.length;
-        int numClass = cmdSet.size();
-
-        Set<String> xmlElemNameSet = new HashSet<String>();
-        for (XmlElement xmlElemAnno : xmlElems) {
-            Class cmdClass = xmlElemAnno.type();
-            String name = xmlElemAnno.name();
-            assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
-            assertTrue(cmdClass.getSimpleName() + " is present in " + JaxbCommandsResponse.class.getSimpleName() + " but does not "
-                    + "implement " + JaxbCommandResponse.class.getSimpleName(), cmdSet.remove(cmdClass));
-        }
-        for (Class cmdClass : cmdSet) {
-            System.out.println("Missing: " + cmdClass.getSimpleName());
-        }
-        assertTrue("See above output for difference between " + JaxbCommandResponse.class.getSimpleName() + " implementations "
-                + "and classes listed in " + JaxbCommandsResponse.class.getSimpleName(), cmdSet.size() == 0);
-
-        assertEquals((numClass > numAnnos ? "Not all classes" : "Non " + JaxbCommandResponse.class.getSimpleName() + " classes")
-                + " are listed in the " + JaxbCommandResponse.class.getSimpleName() + ".response @XmlElements list.", numClass,
-                numAnnos);
-    }
-
-    @Test
-    public void uniqueRootElementTest() throws Exception {
-        // Only neccessary to run once
-        Assume.assumeTrue(getType().equals(TestType.JAXB));
-
-        Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.jbpm.kie.services.client"),
-                new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
-        Set<String> idSet = new HashSet<String>();
-        HashMap<String, Class> idClassMap = new HashMap<String, Class>();
-        for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
-            XmlRootElement rootElemAnno = jaxbClass.getAnnotation(XmlRootElement.class);
-            String id = rootElemAnno.name();
-            if ("##default".equals(id)) {
-                continue;
-            }
-            String otherClass = (idClassMap.get(id) == null ? "null" : idClassMap.get(id).getName());
-            assertTrue("ID '" + id + "' used in both " + jaxbClass.getName() + " and " + otherClass, idSet.add(id));
-            idClassMap.put(id, jaxbClass);
-        }
-    }
 }
