@@ -55,6 +55,17 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
 import org.kie.services.remote.util.Paginator;
 
+/**
+ * If a method in this class is annotated by a @Path annotation, 
+ * then the name of the method should match the URL specified in the @Path, 
+ * where "_" characters should be used for all "/" characters in the path. 
+ * <p>
+ * For example: 
+ * <pre>
+ * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
+ * public void begin_varOne_middle_varTwo() { 
+ * </pre>
+ */
 @Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
 @SuppressWarnings("unchecked")
@@ -191,6 +202,7 @@ public class RuntimeResource extends ResourceBase {
                 deploymentId, 
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true),
                 errorMsg);
+        
         return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 

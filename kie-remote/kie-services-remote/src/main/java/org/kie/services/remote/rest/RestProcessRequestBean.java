@@ -62,7 +62,6 @@ public class RestProcessRequestBean {
                 = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
             synchronized (sscs) { 
                 result = executor.execute(kieSession, cmd);
-
             }
         } catch (Exception e) {
             if( e instanceof RuntimeException ) { 

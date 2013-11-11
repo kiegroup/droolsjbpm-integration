@@ -43,16 +43,7 @@ public class JaxbGenericResponse extends AbstractJaxbResponse {
      */
     public JaxbGenericResponse(HttpServletRequest request, Exception e) {
         super(request);
-        this.error = e.getMessage();
-        if( ! (e instanceof BadRequestException) ) { 
-            this.status = JaxbRequestStatus.FAILURE;
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter writer = new PrintWriter(stringWriter);
-            e.printStackTrace(writer);
-            stackTrace = stringWriter.toString();
-        } else { 
-            this.status = JaxbRequestStatus.BAD_REQUEST;
-        }
+        setException(e);
     }
     
     public static String convertStackTraceToString(Throwable t) { 
@@ -60,6 +51,16 @@ public class JaxbGenericResponse extends AbstractJaxbResponse {
         PrintWriter writer = new PrintWriter(stringWriter);
         t.printStackTrace(writer);
         return stringWriter.toString();
+    }
+    
+    public void setException(Exception e ) { 
+        this.error = e.getMessage();
+        if( ! (e instanceof BadRequestException) ) { 
+            this.status = JaxbRequestStatus.FAILURE;
+            stackTrace = convertStackTraceToString(e);
+        } else { 
+            this.status = JaxbRequestStatus.BAD_REQUEST;
+        }
     }
     
     public String prettyPrint() throws JAXBException {
