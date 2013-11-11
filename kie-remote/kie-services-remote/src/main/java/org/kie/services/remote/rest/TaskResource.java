@@ -39,6 +39,17 @@ import org.kie.services.remote.util.Paginator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * If a method in this class is annotated by a @Path annotation, 
+ * then the name of the method should match the URL specified in the @Path, 
+ * where "_" characters should be used for all "/" characters in the path. 
+ * <p>
+ * For example: 
+ * <pre>
+ * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
+ * public void begin_varOne_middle_varTwo() { 
+ * </pre>
+ */
 @Path("/task")
 @RequestScoped
 public class TaskResource extends ResourceBase {
@@ -148,7 +159,7 @@ public class TaskResource extends ResourceBase {
 
     @GET
     @Path("/{taskId: [0-9-]+}")
-    public Response getTaskInstanceInfo(@PathParam("taskId") long taskId) { 
+    public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Task task = (Task) processRequestBean.doTaskOperation(
                 cmd, 
@@ -161,7 +172,7 @@ public class TaskResource extends ResourceBase {
 
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
-    public Response doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
+    public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> params = getRequestParams(request);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
@@ -206,26 +217,8 @@ public class TaskResource extends ResourceBase {
         } else if ("suspend".equalsIgnoreCase(operation)) {
             cmd = new SuspendTaskCommand(taskId, userId);
         } else if ("nominate".equalsIgnoreCase(operation)) {
-            List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params);
+            List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params, true, "nominate");
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
-        } else if("content".equalsIgnoreCase(operation)) { 
-            cmd = new GetTaskCommand(taskId);
-            Object result = processRequestBean.doTaskOperationAndSerializeResult(
-                    cmd,
-                    "Unable to get task " + taskId);
-            if( result == null ) {
-                throw new NotFoundException("Task " + taskId + " could not be found.");
-            }
-            long contentId = ((Task) result).getTaskData().getDocumentContentId();
-            JaxbContent content = null;
-            if( contentId > -1 ) { 
-                cmd = new GetContentCommand(contentId);
-                result = processRequestBean.doTaskOperationAndSerializeResult(
-                        cmd, 
-                        "Unable get content " + contentId + " (from task " + taskId + ")");
-                content = (JaxbContent) content;
-            } 
-            return createCorrectVariant(content, headers);
         } else {
             throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
@@ -260,8 +253,30 @@ public class TaskResource extends ResourceBase {
     }
     
     @GET
+    @Path("/{taskId: [0-9-]+}/content")
+    public Response taskId_content(@PathParam("taskId") long taskId) { 
+        TaskCommand<?> cmd = new GetTaskCommand(taskId);
+        Object result = processRequestBean.doTaskOperationAndSerializeResult(
+                cmd,
+                "Unable to get task " + taskId);
+        if( result == null ) {
+            throw new NotFoundException("Task " + taskId + " could not be found.");
+        }
+        long contentId = ((Task) result).getTaskData().getDocumentContentId();
+        JaxbContent content = null;
+        if( contentId > -1 ) { 
+            cmd = new GetContentCommand(contentId);
+            result = processRequestBean.doTaskOperationAndSerializeResult(
+                    cmd, 
+                    "Unable get content " + contentId + " (from task " + taskId + ")");
+            content = (JaxbContent) content;
+        } 
+        return createCorrectVariant(content, headers);
+    }
+    
+    @GET
     @Path("/content/{contentId: [0-9-]+}")
-    public Response getContent(@PathParam("contentId") long contentId) { 
+    public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
         JaxbContent content = (JaxbContent) processRequestBean.doTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 

@@ -176,6 +176,9 @@ public class JaxbCommandsRequest {
     }
 
     public List<Command<?>> getCommands() {
+        if( this.commands == null ) { 
+            this.commands = new ArrayList<Command<?>>();
+        }
         return this.commands;
     }
     
