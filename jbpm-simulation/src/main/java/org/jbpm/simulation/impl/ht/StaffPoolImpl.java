@@ -129,6 +129,9 @@ public class StaffPoolImpl implements StaffPool {
 	}
 	
 	public double getResourceUtilization() {
+        if (poolCapacity == 0) {
+            return 0;
+        }
 		return performedWork * 100 / poolCapacity;
 	}
 

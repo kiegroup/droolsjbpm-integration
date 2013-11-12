@@ -18,6 +18,14 @@ public class AllocatedResources {
         long waitTime = 0;
         AllocatedWork allocatedWork = new AllocatedWork(duration);
         performedWork += duration;
+
+        if(poolSize == 0) {
+            // no available resources
+            allocatedWork.setAllocatedTime(startTime + duration);
+            allocatedWork.setWaitTime(duration);
+
+            return allocatedWork;
+        }
         
         if(allocatedTill.size() < poolSize) {
             long allocated = startTime + duration; 
