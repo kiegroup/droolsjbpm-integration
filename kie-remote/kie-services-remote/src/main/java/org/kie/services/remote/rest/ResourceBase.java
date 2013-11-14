@@ -350,24 +350,31 @@ public class ResourceBase {
     static int PAGE_NUM = 0;
     static int PAGE_SIZE = 1;
     
-    protected static int [] getPageNumAndPageSize(Map<String, List<String>> params) {
+    protected static int [] getPageNumAndPageSize(Map<String, List<String>> params, String oper) {
         int [] pageInfo = new int[2];
-        Number page = getNumberParam("page", false, params, "query", false);
-        Number pageShort = getNumberParam("p", false, params, "query", false);
-        Number pageSize = getNumberParam("pageSize", false, params, "query", false);
-        Number pageSizeShort = getNumberParam("s", false, params, "query", false);
+        Number page = getNumberParam("page", false, params, oper, false);
+        Number pageShort = getNumberParam("p", false, params, oper, false);
+        Number pageSize = getNumberParam("pageSize", false, params, oper, false);
+        Number pageSizeShort = getNumberParam("s", false, params, oper, false);
         
-        int p = 1;
+        int p = 0;
         int s = 10;
         if( page != null ) { 
             p = page.intValue();
         } else if( pageShort != null ) { 
             p = pageShort.intValue();
         }
+        if( p < 0 ) { 
+            p = 0;
+        }
+        
         if( pageSize != null ) { 
             s = pageSize.intValue();
         } else if( pageSizeShort != null ) { 
             s = pageSizeShort.intValue();
+        }
+        if( s < 0 ) { 
+            s = 0;
         }
         
         pageInfo[PAGE_NUM] = p;

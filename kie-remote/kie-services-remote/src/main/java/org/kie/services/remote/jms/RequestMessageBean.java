@@ -1,6 +1,10 @@
 package org.kie.services.remote.jms;
 
+import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -20,7 +24,6 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.EntityManager;
 
 import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
@@ -30,7 +33,9 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.task.TaskService;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
-import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.kie.services.client.serialization.SerializationException;
+import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.cdi.RuntimeManagerManager;
@@ -147,7 +152,6 @@ public class RequestMessageBean implements MessageListener {
         
         // 0. Get msg correlation id (for response)
         String msgCorrId = null;
-        int serializationType = -1;
         JaxbCommandsResponse jaxbResponse = null;
         try {
             msgCorrId = message.getJMSCorrelationID();
@@ -156,32 +160,46 @@ public class RequestMessageBean implements MessageListener {
             throw new KieRemoteServicesRuntimeException(errMsg, jmse);
         } 
 
-        
-        // 1. get request
+        // 0. get serialization info
+        int serializationType = -1;
         try { 
-            serializationType = message.getIntProperty("serialization");
+            if( ! message.propertyExists(SERIALIZATION_TYPE_PROPERTY_NAME) ) {
+                serializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
+            } else { 
+                serializationType = message.getIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME);
+            }
         } catch (JMSException jmse) {
-            String errMsg = "Unable to read information from message " + msgCorrId + ".";
+            String errMsg = "Unable to get properties from message " + msgCorrId + ".";
             throw new KieRemoteServicesRuntimeException(errMsg, jmse);
         }
 
-        JaxbCommandsRequest cmdsRequest = deserializeRequest(message, msgCorrId, serializationType);
+        SerializationProvider serializationProvider;
+        switch(serializationType ) { 
+        case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
+            serializationProvider = getJaxbSerializationProvider(message);
+            break;
+        default:
+            throw new KieRemoteServicesInternalError("Unknown serialization type: " + serializationType);
+        }     
+
+        // 1. deserialize request
+        JaxbCommandsRequest cmdsRequest = deserializeRequest(message, msgCorrId, serializationProvider, serializationType);
 
         // 2. process request
         jaxbResponse = processJaxbCommandsRequest(cmdsRequest);
         
-        // 3. send response
-        sendResponse(msgCorrId, serializationType, jaxbResponse);
+        // 3. serialize response 
+        Message msg = serializeResponse(session, msgCorrId, serializationType, serializationProvider, jaxbResponse);
+
+        // 4. send response
+        sendResponse(msgCorrId, serializationType, msg);
         
         if( redelivered ) { 
             retryTracker.clearRetries(msgId);
         }
     }
 
-    private void sendResponse(String msgCorrId, int serializationType, JaxbCommandsResponse jaxbResponse) { 
-        // 3a. create response message
-        Message msg = serializeResponse(session, msgCorrId, serializationType, jaxbResponse);
-
+    private void sendResponse(String msgCorrId, int serializationType, Message msg) { 
         // 3b. set correlation id in response messgae
         try {
             msg.setJMSCorrelationID(msgCorrId);
@@ -199,7 +217,7 @@ public class RequestMessageBean implements MessageListener {
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId 
                     + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
-            throw new KieRemoteServicesRuntimeException(errMsg, ne);
+            throw new KieRemoteServicesRuntimeException(errMsg, ne);       
         } catch (JMSException jmse) {
             String errMsg = "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME;
             throw new KieRemoteServicesRuntimeException(errMsg, jmse);
@@ -208,7 +226,8 @@ public class RequestMessageBean implements MessageListener {
     
     // De/Serialization helper methods -------------------------------------------------------------------------------------------
     
-    private static JaxbCommandsRequest deserializeRequest(Message message, String msgId, int serializationType) {
+    private static JaxbCommandsRequest deserializeRequest(Message message, String msgId, SerializationProvider serializationProvider, int serializationType) {
+        
         JaxbCommandsRequest cmdMsg = null;
         try {
             String msgStrContent = null;
@@ -216,7 +235,7 @@ public class RequestMessageBean implements MessageListener {
             switch(serializationType) {
             case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
                 msgStrContent = ((BytesMessage) message).readUTF();
-                cmdMsg = (JaxbCommandsRequest) JaxbSerializationProvider.convertStringToJaxbObject(msgStrContent);
+                cmdMsg = (JaxbCommandsRequest) serializationProvider.deserialize(msgStrContent);
                 break;
             default:
                 throw new KieRemoteServicesRuntimeException("Unknown serialization type when deserializing message " + msgId + ":" + serializationType);
@@ -231,16 +250,45 @@ public class RequestMessageBean implements MessageListener {
         return cmdMsg;
     }
 
-    private static Message serializeResponse(Session session, String msgId, int serializationType, JaxbCommandsResponse jaxbResponse) {
+    private static SerializationProvider getJaxbSerializationProvider(Message message) { 
+        SerializationProvider serializationProvider;
+        try { 
+            if( message.propertyExists(EXTRA_JAXB_CLASSES_PROPERTY_NAME) ) {
+                String extraClassesString = message.getStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME);
+                Set<Class<?>> extraClassesList = JaxbSerializationProvider.commaSeperatedStringToClassSet(extraClassesString);
+                serializationProvider = new JaxbSerializationProvider(extraClassesList);
+            } else { 
+                serializationProvider = new JaxbSerializationProvider();
+            }
+        } catch (JMSException jmse) {
+            throw new KieRemoteServicesInternalError("Unable to check or read JMS message for property.", jmse);
+        } catch (SerializationException se) { 
+            throw new KieRemoteServicesRuntimeException("Unable to load classes needed for JAXB deserialization.", se);
+        }
+        return serializationProvider;
+    }
+
+    private static Message serializeResponse(Session session, String msgId, int serializationType, 
+            SerializationProvider serializationProvider, JaxbCommandsResponse jaxbResponse) {
         BytesMessage byteMsg = null;
         try {
             byteMsg = session.createBytesMessage();
-            byteMsg.setIntProperty("serialization", serializationType);
+            byteMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, serializationType);
     
             String msgStr;
             switch(serializationType) { 
             case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
-                msgStr = JaxbSerializationProvider.convertJaxbObjectToString(jaxbResponse);
+                msgStr = (String) serializationProvider.serialize(jaxbResponse);
+                Set<Class<?>> extraJaxbClasses =  ((JaxbSerializationProvider) serializationProvider).getExtraJaxbClasses();
+                if( ! extraJaxbClasses.isEmpty() ) { 
+                    String propValue;
+                    try {
+                        propValue = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
+                    } catch( SerializationException se ) { 
+                        throw new KieRemoteServicesRuntimeException("Unable to get class names for extra JAXB classes.", se );
+                    }
+                    byteMsg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, propValue);
+                }
                 break;
             default:
                 throw new KieRemoteServicesRuntimeException("Unknown serialization type when deserializing message " + msgId + ":" + serializationType);

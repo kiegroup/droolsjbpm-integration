@@ -1,9 +1,17 @@
 package org.kie.services.client.api.command;
 
+import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.jms.BytesMessage;
@@ -17,15 +25,25 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.JAXBException;
 
+import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jbpm.services.task.commands.AddTaskCommand;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
-import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
@@ -64,20 +82,77 @@ public abstract class AbstractRemoteCommandObject {
 
     // Execute methods -----------------------------------------------------------------------------------------------------
 
-    public <T> T execute(Command<T> command) {
-        if( ! AcceptedCommands.getSet().contains(command.getClass()) ) {
+    public <T> T execute(Command<T> cmd) {
+        if( ! AcceptedCommands.getSet().contains(cmd.getClass()) ) {
             StackTraceElement [] st = Thread.currentThread().getStackTrace();
             String methodName = st[2].getMethodName();
             throw new UnsupportedOperationException( "The ." + methodName + "(..) method is not supported on the remote api." );
         }
         
+        if( AcceptedCommands.SEND_OBJECT_PARAMETER_COMMANDS.contains(cmd.getClass()) ) {
+            List<Object> extraClassInstanceList = new ArrayList<Object>();
+            if( cmd instanceof CompleteWorkItemCommand ) { 
+                addPossiblyNullObjectMap(((CompleteWorkItemCommand) cmd).getResults(), extraClassInstanceList);
+            } else if( cmd instanceof SignalEventCommand ) {
+               addPossiblyNullObject(((SignalEventCommand) cmd).getEvent(), extraClassInstanceList);
+            } else if( cmd instanceof StartCorrelatedProcessCommand ) { 
+                addPossiblyNullObjectList(((StartCorrelatedProcessCommand) cmd).getData(), extraClassInstanceList);
+                addPossiblyNullObjectMap(((StartCorrelatedProcessCommand) cmd).getParameters(), extraClassInstanceList );
+            } else if( cmd instanceof StartProcessCommand ) { 
+                addPossiblyNullObjectList(((StartProcessCommand) cmd).getData(), extraClassInstanceList);
+                addPossiblyNullObjectMap(((StartProcessCommand) cmd).getParameters(), extraClassInstanceList );
+            } else if( cmd instanceof SetGlobalCommand ) { 
+                addPossiblyNullObject(((SetGlobalCommand) cmd).getObject(), extraClassInstanceList );
+            } else if( cmd instanceof InsertObjectCommand ) { 
+                addPossiblyNullObject(((InsertObjectCommand) cmd).getObject(), extraClassInstanceList);
+            } else if( cmd instanceof UpdateCommand ) { 
+                addPossiblyNullObject(((UpdateCommand) cmd).getObject(),  extraClassInstanceList);
+            } else if( cmd instanceof AddTaskCommand ) { 
+                addPossiblyNullObjectMap(((AddTaskCommand) cmd).getParams(), extraClassInstanceList);
+            } else if( cmd instanceof CompleteTaskCommand ) { 
+                addPossiblyNullObjectMap(((CompleteTaskCommand) cmd).getData(), extraClassInstanceList);
+            } else if( cmd instanceof FailTaskCommand ) { 
+                addPossiblyNullObjectMap(((FailTaskCommand) cmd).getData(), extraClassInstanceList);
+            }
+            
+            if( ! extraClassInstanceList.isEmpty() ) { 
+                Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+                for( Object jaxbObject : extraClassInstanceList ) { 
+                    Class<?> jaxbClass = jaxbObject.getClass();
+                    if( jaxbClass.isLocalClass() || jaxbClass.isAnonymousClass() ) { 
+                        throw new SerializationException("Only proper classes are allowed as parameters for the remote API: neither local nor anonymous classes are accepted: " + jaxbClass.getName());
+                    }
+                    extraJaxbClasses.add(jaxbClass);
+                }
+                config.addJaxbClasses(extraJaxbClasses);
+            }
+        }
+        
         if (config.isRest()) {
-            return executeRestCommand(command);
+            return executeRestCommand(cmd);
         } else {
-            return executeJmsCommand(command);
+            return executeJmsCommand(cmd);
         }
     }
 
+    private void addPossiblyNullObject(Object inputObject, List<Object> objectList ) { 
+        if( inputObject != null ) { 
+            objectList.add(inputObject);
+        }
+    }
+    
+    private void addPossiblyNullObjectList(List<Object> inputList, List<Object> objectList ) { 
+        if( inputList != null && ! inputList.isEmpty() ) { 
+            objectList.addAll(objectList);
+        }
+    }
+    
+    private void addPossiblyNullObjectMap(Map<String, Object> inputMap, List<Object> objectList ) { 
+        if( inputMap != null && ! inputMap.isEmpty() ) { 
+            objectList.addAll(inputMap.values());
+        }
+    }
+    
     /**
      * Method to communicate with the backend via JMS.
      * 
@@ -122,19 +197,30 @@ public abstract class AbstractRemoteCommandObject {
                 throw new RemoteRuntimeException("Unable to setup a JMS connection.", jmse);
             }
 
+            
             // Create msg
             BytesMessage msg;
+            JaxbSerializationProvider serializationProvider;
             try {
                 msg = session.createBytesMessage();
-                msg.setJMSCorrelationID(corrId);
-                msg.setIntProperty("serialization", config.getSerializationType());
-                // TODO: pluggable serialization based on serialization type
-                String xmlStr = JaxbSerializationProvider.convertJaxbObjectToString(req);
+               
+                // serialize request
+                serializationProvider = config.getJaxbSerializationProvider();
+                String xmlStr = serializationProvider.serialize(req);
                 msg.writeUTF(xmlStr);
+                
+                // set properties
+                msg.setJMSCorrelationID(corrId);
+                msg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
+                Set<Class<?>> extraJaxbClasses = config.getExtraJaxbClasses(); 
+                if( ! extraJaxbClasses.isEmpty() ) { 
+                    String extraJaxbClassesPropertyValue = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
+                    msg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, extraJaxbClassesPropertyValue);
+                }
             } catch (JMSException jmse) {
                 throw new RemoteRuntimeException("Unable to create and fill a JMS message.", jmse);
-            } catch (JAXBException jaxbe) {
-                throw new RemoteRuntimeException("Unable to deserialze JMS message.", jaxbe);
+            } catch (SerializationException se) {
+                throw new RemoteRuntimeException("Unable to deserialze JMS message.", se.getCause());
             }
 
             // send
@@ -156,14 +242,13 @@ public abstract class AbstractRemoteCommandObject {
             assert response != null : "Response is empty.";
             try {
                 String xmlStr = ((BytesMessage) response).readUTF();
-                // TODO: pluggable serialization based on serialization type
-                cmdResponse = (JaxbCommandsResponse) JaxbSerializationProvider.convertStringToJaxbObject(xmlStr);
+                cmdResponse = (JaxbCommandsResponse) serializationProvider.deserialize(xmlStr);
             } catch (JMSException jmse) {
                 throw new RemoteRuntimeException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
                         + " instance from JMS response.", jmse);
-            } catch (JAXBException jaxbe) {
+            } catch (SerializationException se) {
                 throw new RemoteRuntimeException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
-                        + " instance from JMS response.", jaxbe);
+                        + " instance from JMS response.", se.getCause());
             }
             assert cmdResponse != null : "Jaxb Cmd Response was null!";
         } finally {
@@ -207,8 +292,10 @@ public abstract class AbstractRemoteCommandObject {
         } else {
             restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
         }
-        restRequest.body(MediaType.APPLICATION_XML, new JaxbCommandsRequest(deploymentId, command));
-
+        JaxbCommandsRequest jaxbRequest = new JaxbCommandsRequest(deploymentId, command);
+        String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
+        restRequest.body(MediaType.APPLICATION_XML, jaxbRequestString);
+        
         ClientResponse<Object> response = null;
         String requestUrl;
         try {
