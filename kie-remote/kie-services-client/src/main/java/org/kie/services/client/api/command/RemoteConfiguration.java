@@ -5,6 +5,8 @@ import java.net.Inet6Address;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,7 +39,7 @@ import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.kie.api.runtime.manager.Context;
-import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
 
 public class RemoteConfiguration {
 
@@ -54,6 +56,7 @@ public class RemoteConfiguration {
     private String username;
     private String password;
     private Context<?> context;
+    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     // REST
     private ClientRequestFactory requestFactory;
@@ -374,6 +377,19 @@ public class RemoteConfiguration {
 
     int getQualityOfServiceThresholdMilliSeconds() {
         return qualityOfServiceThresholdMilliSeconds;
+    }
+    
+    public void addJaxbClasses(Set<Class<?>> extraJaxbClassList) { 
+        this.extraJaxbClasses.addAll(extraJaxbClassList);
+    }
+    
+    Set<Class<?>> getExtraJaxbClasses() { 
+        return this.extraJaxbClasses;
+    }
+    
+    JaxbSerializationProvider getJaxbSerializationProvider() { 
+       JaxbSerializationProvider provider = new JaxbSerializationProvider(extraJaxbClasses); 
+       return provider;
     }
 
 }

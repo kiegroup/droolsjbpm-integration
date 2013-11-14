@@ -1,7 +1,7 @@
 package org.kie.services.client.jaxb;
 
 import org.kie.services.client.SerializationTest;
-import org.kie.services.client.serialization.jaxb.JsonSerializationProvider;
+import org.kie.services.client.serialization.JsonSerializationProvider;
 
 public class JsonSerializationTest extends SerializationTest {
 
@@ -9,10 +9,13 @@ public class JsonSerializationTest extends SerializationTest {
         return TestType.JSON;
     }
     
+    protected JsonSerializationProvider jsonProvider = new JsonSerializationProvider();
+    
     public Object testRoundtrip(Object in) throws Exception {
-        String jsonStr = JsonSerializationProvider.convertJaxbObjectToJsonString(in);
+        String jsonStr = jsonProvider.serialize(in);
         log.debug(jsonStr);
-        return JsonSerializationProvider.convertJsonStringToJaxbObject(jsonStr, in.getClass());
+        jsonProvider.setDeserializeOutputClass(in.getClass());
+        return jsonProvider.deserialize(jsonStr);
     }
  
 }

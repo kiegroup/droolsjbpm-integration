@@ -1,5 +1,10 @@
 package org.kie.services.client.api;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
@@ -54,4 +59,7 @@ public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory
     	return new RemoteRuntimeEngine(config);
     }
     
+    public void addExtraJaxbClasses(Collection<Class<?>> extraJaxbClasses ) { 
+        this.config.addJaxbClasses(new HashSet<Class<?>>(extraJaxbClasses));
+    }
 }

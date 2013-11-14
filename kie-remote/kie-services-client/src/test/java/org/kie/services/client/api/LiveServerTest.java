@@ -53,8 +53,8 @@ public class LiveServerTest {
     public void remoteRestApi() {
         String taskUserId = userId;
         
-        RemoteRestSessionFactory restSessionFactory 
-            = new RemoteRestSessionFactory(deploymentId, deploymentUrl, userId, password);
+        RemoteRestRuntimeFactory restSessionFactory 
+            = new RemoteRestRuntimeFactory(deploymentId, deploymentUrl, userId, password);
 
         // create REST request
         RuntimeEngine engine = restSessionFactory.newRuntimeEngine();
@@ -115,8 +115,8 @@ public class LiveServerTest {
         String urlString = new URL(deploymentUrl, 
                 deploymentUrl.getPath() + "rest/runtime/" + deploymentId + "/process/evaluation/start").toExternalForm();
         urlString = urlString + "?map_employee=mary";
-        RemoteRestSessionFactory restSessionFactory 
-            = new RemoteRestSessionFactory(deploymentId, deploymentUrl, userId, password);
+        RemoteRestRuntimeFactory restSessionFactory 
+            = new RemoteRestRuntimeFactory(deploymentId, deploymentUrl, userId, password);
         ClientRequest restRequest = requestFactory.createRequest(urlString);
         logger.debug(">> " + urlString);
         

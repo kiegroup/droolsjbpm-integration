@@ -117,8 +117,8 @@ public class TaskResource extends ResourceBase {
     public Response query(@Context UriInfo uriInfo) {
         JaxbTaskSummaryListResponse responseObj = null;
         Map<String, List<String>> params = getRequestParams(request);
-        
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         Paginator<TaskSummaryImpl> paginator = new Paginator<TaskSummaryImpl>();
         
         for( String queryParam : params.keySet() ) { 

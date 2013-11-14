@@ -22,10 +22,11 @@ import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
+import org.kie.api.command.Command;
 
 public class AcceptedCommands {
 
-    private static Set<Class> acceptedCommands = new HashSet<Class>();
+    private static Set<Class<? extends Command>> acceptedCommands = new HashSet<Class<? extends Command>>();
     static {
         acceptedCommands.add(AbortWorkItemCommand.class);
         acceptedCommands.add(CompleteWorkItemCommand.class);
@@ -91,7 +92,7 @@ public class AcceptedCommands {
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
-    public static Set<Class> getSet() {
+    public static Set<Class<? extends Command>> getSet() {
         return acceptedCommands;
     }
     
@@ -101,5 +102,33 @@ public class AcceptedCommands {
         TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(ExitTaskCommand.class);
         TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(FailTaskCommand.class);
         TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(SkipTaskCommand.class);
+        
+        TASK_COMMANDS_THAT_INFLUENCE_KIESESSION = Collections.unmodifiableSet(TASK_COMMANDS_THAT_INFLUENCE_KIESESSION);
+    }
+    
+    static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
+    static { 
+        SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteWorkItemCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(SignalEventCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(StartCorrelatedProcessCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(StartProcessCommand.class);
+        
+        SEND_OBJECT_PARAMETER_COMMANDS.add(SetGlobalCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(InsertObjectCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(UpdateCommand.class);
+
+        SEND_OBJECT_PARAMETER_COMMANDS.add(AddTaskCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteTaskCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(FailTaskCommand.class);
+        
+        SEND_OBJECT_PARAMETER_COMMANDS = Collections.unmodifiableSet(SEND_OBJECT_PARAMETER_COMMANDS);
+    }
+
+    static Set<Class<? extends Command>> RECV_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
+    static { 
+        RECV_OBJECT_PARAMETER_COMMANDS.add(GetVariableCommand.class);
+        RECV_OBJECT_PARAMETER_COMMANDS.add(GetGlobalCommand.class);
+        
+        RECV_OBJECT_PARAMETER_COMMANDS = Collections.unmodifiableSet(SEND_OBJECT_PARAMETER_COMMANDS);
     }
 }

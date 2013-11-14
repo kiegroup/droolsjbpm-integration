@@ -1,10 +1,13 @@
 package org.kie.services.client.jaxb;
 
+import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -15,11 +18,13 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.kie.services.client.SerializationTest;
 import org.kie.services.client.api.command.AcceptedCommands;
-import org.kie.services.client.serialization.jaxb.JaxbSerializationProvider;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.kie.services.client.serialization.JsonSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.mvel2.optimizers.impl.refl.nodes.ArrayLength;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -30,30 +35,31 @@ import org.reflections.util.ClasspathHelper;
 public class JaxbSerializationTest extends SerializationTest {
 
     private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.services.client"),
-            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), 
-            new SubTypesScanner());
-    
-    public TestType getType() { 
+            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
+
+    public TestType getType() {
         return TestType.JAXB;
     }
-    
+
+    protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
+
     public Object testRoundtrip(Object in) throws Exception {
-        String xmlObject = JaxbSerializationProvider.convertJaxbObjectToString(in);
+        String xmlObject = jaxbProvider.serialize(in);
         log.debug(xmlObject);
-        return JaxbSerializationProvider.convertStringToJaxbObject(xmlObject);
+        return jaxbProvider.deserialize(xmlObject);
     }
 
     @Test
-    public void acceptedCommandsTest() throws Exception { 
-       for( Class<?> cmdClass : AcceptedCommands.getSet() ) { 
-           try { 
-               cmdClass.getConstructor(new Class[0]);
-           } catch(Exception e) { 
-               fail( "Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor.");
-           }
-       }
+    public void acceptedCommandsTest() throws Exception {
+        for (Class<?> cmdClass : AcceptedCommands.getSet()) {
+            try {
+                cmdClass.getConstructor(new Class[0]);
+            } catch (Exception e) {
+                fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor.");
+            }
+        }
     }
-    
+
     @Test
     public void acceptedCommandsCanBeSerializedTest() throws Exception {
         // Only neccessary to run once
@@ -130,5 +136,86 @@ public class JaxbSerializationTest extends SerializationTest {
             assertTrue("ID '" + id + "' used in both " + jaxbClass.getName() + " and " + otherClass, idSet.add(id));
             idClassMap.put(id, jaxbClass);
         }
+    }
+
+    @Test
+    public void classListPropertyTest() throws Exception {
+        String in = "1";
+        String[] out;
+        String again;
+
+        out = split(in);
+        assertEquals(1, out.length);
+        assertEquals("1", out[0]);
+        again = join(out);
+        assertEquals(in, again);
+
+        out = split(" 1 ");
+        assertEquals(1, out.length);
+        assertEquals("1", out[0]);
+        again = join(out);
+        assertEquals("1", again);
+
+        out = split("1,2");
+        assertEquals(2, out.length);
+        assertEquals("1", out[0]);
+        assertEquals("2", out[1]);
+        again = join(out);
+        assertEquals(again, "1,2");
+
+        out = split(" 1,2 ");
+        assertEquals(2, out.length);
+        assertEquals("1", out[0]);
+        assertEquals("2", out[1]);
+        out[0] = "1 ";
+        out[1] = " 2";
+        again = join(out);
+        assertEquals("1,2", again);
+
+        out = split(" 1, ");
+        assertEquals(out.length, 1);
+        assertEquals(out[0], "1");
+        out[0] = "1 ";
+        again = join(out);
+        assertEquals("1", again);
+
+        out = split(" , 2   ");
+        assertEquals(out.length, 1);
+        assertEquals(out[0], "2");
+        out[0] = "2 ";
+        again = join(out);
+        assertEquals("2", again);
+
+        out = split(" ,    ");
+        assertEquals(out.length, 0);
+        again = join(out);
+        assertEquals("", again);
+        
+        Set<Class<?>> classList = new HashSet<Class<?>>();
+        classList.add(String.class);
+        classList.add(Integer.class);
+        classList.add(Byte.class);
+        classList.add(Short.class);
+        classList.add(Long.class);
+        
+        String commaString = JaxbSerializationProvider.classSetToCommaSeperatedString(classList);
+        Set<Class<?>> copyClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(commaString);
+        assertEquals( classList, copyClasses );
+        String newCommaString = JaxbSerializationProvider.classSetToCommaSeperatedString(copyClasses);
+        assertEquals( commaString, newCommaString );
+    }
+
+    private String join(String[] inArr) {
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < inArr.length; ++i) {
+            String temp = inArr[i].trim();
+            if (!temp.isEmpty()) {
+                if (out.length() > 0) {
+                    out.append(",");
+                }
+                out.append(temp);
+            }
+        }
+        return out.toString();
     }
 }

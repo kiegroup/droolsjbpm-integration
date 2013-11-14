@@ -262,7 +262,7 @@ public class RuntimeResource extends ResourceBase {
     public Response history_instance() {
         String oper = getRelativePath(request);
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         Object result = processRequestBean.doKieSessionOperation(
                 new FindProcessInstancesCommand(),
@@ -279,7 +279,8 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/instance/{procInstId: [0-9]+}")
     public Response history_instance_procInstId(@PathParam("procInstId") long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         Object result = processRequestBean.doKieSessionOperation(
                 new FindProcessInstanceCommand(procInstId),
@@ -299,7 +300,8 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
     public Response history_instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         Command<?> cmd;
         String errorMsg;
@@ -313,11 +315,11 @@ public class RuntimeResource extends ResourceBase {
             cmd = new FindVariableInstancesCommand(procInstId);
             errorMsg = "Unable to get variable instance logs for process instance " + procInstId;
         } else {
-            String oper = getRelativePath(request);
             throw new BadRequestException("Unsupported operation: " + oper );
         }
 
         Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId, errorMsg);
+        
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
         varInstLogList = (new Paginator<AuditEvent>()).paginate(pageInfo, varInstLogList);
         JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
@@ -329,7 +331,8 @@ public class RuntimeResource extends ResourceBase {
     public Response history_instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         Command<?> cmd;
         String errorMsg;
@@ -340,11 +343,11 @@ public class RuntimeResource extends ResourceBase {
             cmd = new FindVariableInstancesCommand(procInstId, logId);
             errorMsg = "Unable to get variable instance logs for variable '" + logId + "' in process instance " + procInstId;
         } else {
-            String oper = getRelativePath(request);
             throw new BadRequestException("Unsupported operation: " + oper );
         }
         
         Object result = processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId, errorMsg);
+        
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
         varInstLogList = (new Paginator<AuditEvent>()).paginate(pageInfo, varInstLogList);
         JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
@@ -356,7 +359,8 @@ public class RuntimeResource extends ResourceBase {
     public Response history_process_procDefId(@PathParam("processDefId") String processId) {
         Map<String, List<String>> params = getRequestParams(request);
         Number statusParam = getNumberParam("status", false, params, getRelativePath(request), false);
-        int[] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int[] pageInfo = getPageNumAndPageSize(params, oper);
 
         Object result;
         if (statusParam != null) {
@@ -366,12 +370,16 @@ public class RuntimeResource extends ResourceBase {
             } else {
                 cmd = new FindProcessInstancesCommand(processId);
             }
-            result = processRequestBean.doKieSessionOperation(cmd, deploymentId,
-                    (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, getRelativePath(request), true),
+            result = processRequestBean.doKieSessionOperation(
+                    cmd, 
+                    deploymentId,
+                    (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true),
                     "Unable to get process instance logs for process '" + processId + "'");
         } else {
-            result = processRequestBean.doKieSessionOperation(new FindProcessInstancesCommand(processId), deploymentId,
-                    (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, getRelativePath(request), true),
+            result = processRequestBean.doKieSessionOperation(
+                    new FindProcessInstancesCommand(processId), 
+                    deploymentId,
+                    (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true),
                     "Unable to get process instance logs for process '" + processId + "'");
         }
         
@@ -396,9 +404,10 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}")
     public Response history_variable_varId(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         List<VariableInstanceLog> varLogList 
-            = internalGetVariableInstancesByVarAndValue(variableId, null, params);
+            = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
@@ -408,49 +417,24 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}")
     public Response history_variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
         List<VariableInstanceLog> varLogList 
-            = internalGetVariableInstancesByVarAndValue(variableId, value, params);
+            = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
     } 
     
-    private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
-            Map<String, List<String>> params) { 
-        // active processes parameter
-        String activeProcsParam = getStringParam("activeProcesses", false, params, getRelativePath(request));
-        boolean activeProcesses = true;
-        if( activeProcsParam != null ) { 
-            activeProcesses = Boolean.parseBoolean(activeProcsParam);
-        }
-        
-        Command<?> findVarCmd; 
-        String errMsg;
-        if( value == null ) { 
-            findVarCmd = new FindVariableInstancesByNameCommand(varId, activeProcesses);
-            errMsg = "Unable to get variable instance logs for variable id '" + varId + "'";
-        } else { 
-            findVarCmd = new FindVariableInstancesByNameCommand(varId, value, activeProcesses);
-            errMsg = "Unable to get variable instance logs for variable id '" + varId + "' and value '" + value + "'";
-        }
-        Object result = processRequestBean.doKieSessionOperation(
-                findVarCmd,
-                deploymentId, 
-                null,
-                errMsg);
-        
-        return (List<VariableInstanceLog>) result;
-    }
-    
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
     public Response history_variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
 
         // get variables
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         
         // get process instances
         JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
@@ -461,40 +445,17 @@ public class RuntimeResource extends ResourceBase {
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
     public Response history_variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params);
+        String oper = getRelativePath(request);
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
 
         // get variables
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         
         // get process instances
         JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
         return createCorrectVariant(response, headers);
     }
 
-    private JaxbProcessInstanceListResponse getProcessInstanceListResponse(List<VariableInstanceLog> varLogList, int [] pageInfo) { 
-        JaxbProcessInstanceListResponse response = new JaxbProcessInstanceListResponse();
-        response.setCommandName(FindProcessInstanceCommand.class.getSimpleName());
-        
-        int numVarLogs = varLogList.size();
-        int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
-        int numProcInsts = 0;
-        
-        for( int i = 0; i < numVarLogs && numProcInsts < numResults; ++i ) { 
-            long procInstId = varLogList.get(i).getProcessInstanceId();
-            Command<?> findProcInstCmd = new GetProcessInstanceCommand(procInstId);
-            Object procInstResult = processRequestBean.doKieSessionOperation(
-                    findProcInstCmd,
-                    deploymentId, 
-                    null,
-                    "Unable to get process instance with id id '" + procInstId + "'");
-            if( procInstResult != null ) { 
-                response.getResult().add(new JaxbProcessInstanceResponse((ProcessInstance) procInstResult));
-                ++numProcInsts;
-            }
-        }
-        return response;
-    }
-    
     /**
      * WithVars methods
      */
@@ -583,6 +544,57 @@ public class RuntimeResource extends ResourceBase {
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
+
+    private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
+            Map<String, List<String>> params, String oper) { 
+        // active processes parameter
+        String activeProcsParam = getStringParam("activeProcesses", false, params, oper); 
+        boolean activeProcesses = true;
+        if( activeProcsParam != null ) { 
+            activeProcesses = Boolean.parseBoolean(activeProcsParam);
+        }
+        
+        Command<?> findVarCmd; 
+        String errMsg;
+        if( value == null ) { 
+            findVarCmd = new FindVariableInstancesByNameCommand(varId, activeProcesses);
+            errMsg = "Unable to get variable instance logs for variable id '" + varId + "'";
+        } else { 
+            findVarCmd = new FindVariableInstancesByNameCommand(varId, value, activeProcesses);
+            errMsg = "Unable to get variable instance logs for variable id '" + varId + "' and value '" + value + "'";
+        }
+        Object result = processRequestBean.doKieSessionOperation(
+                findVarCmd,
+                deploymentId, 
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true),
+                errMsg);
+        
+        return (List<VariableInstanceLog>) result;
+    }
+
+    private JaxbProcessInstanceListResponse getProcessInstanceListResponse(List<VariableInstanceLog> varLogList, int [] pageInfo) { 
+        JaxbProcessInstanceListResponse response = new JaxbProcessInstanceListResponse();
+        response.setCommandName(FindProcessInstanceCommand.class.getSimpleName());
+        
+        int numVarLogs = varLogList.size();
+        int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
+        int numProcInsts = 0;
+        
+        for( int i = 0; i < numVarLogs && numProcInsts < numResults; ++i ) { 
+            long procInstId = varLogList.get(i).getProcessInstanceId();
+            Command<?> findProcInstCmd = new GetProcessInstanceCommand(procInstId);
+            Object procInstResult = processRequestBean.doKieSessionOperation(
+                    findProcInstCmd,
+                    deploymentId, 
+                    procInstId,
+                    "Unable to get process instance with id id '" + procInstId + "'");
+            if( procInstResult != null ) { 
+                response.getResult().add(new JaxbProcessInstanceResponse((ProcessInstance) procInstResult));
+                ++numProcInsts;
+            }
+        }
+        return response;
+    }
 
     private Map<String, String> getVariables(long processInstanceId) {
         Object result = processRequestBean.doKieSessionOperation(
