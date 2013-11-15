@@ -10,10 +10,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.jbpm.process.audit.ProcessInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="process-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessInstanceLog> {
+public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessInstanceLog> implements JaxbCommandResponse<ProcessInstanceLog>{
 
     @XmlAttribute
     @XmlSchemaType(name="long")
@@ -179,4 +180,39 @@ public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessIns
         this.externalId = externalId;
     }
 
+    /**
+     * {@link JaxbCommandResponse} fields and methods
+     */
+    
+    @XmlAttribute
+    @XmlSchemaType(name = "int")
+    private Integer index;
+
+    @XmlElement(name = "command-name")
+    @XmlSchemaType(name = "string")
+    private String commandName;
+    
+    public Integer getIndex() { 
+        return index;
+    }
+
+    public void setIndex(Integer index) { 
+        this.index = index;
+    }
+    
+    public String getCommandName() { 
+        return commandName;
+    }
+    
+    public void setCommandName(String cmdName) {
+        this.commandName = cmdName;
+    }
+
+    public ProcessInstanceLog getResult() {
+        return createEntityInstance();
+    }
+
+    public void setResult(ProcessInstanceLog result) { 
+        initialize(result);
+    }
 }

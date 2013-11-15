@@ -46,11 +46,13 @@ public class JaxbHistoryLogTest extends Assert {
         origLog.setProcessVersion("v3.14");
         
         JaxbProcessInstanceLog xmlLog = new JaxbProcessInstanceLog(origLog);
+        xmlLog.setCommandName("test-cmd");
+        xmlLog.setIndex(2);
         String xmlStr = convertJaxbObjectToString(xmlLog);
         JaxbProcessInstanceLog newXmlLog = (JaxbProcessInstanceLog) convertStringToJaxbObject(xmlStr);
         compareOrig(xmlLog, newXmlLog, JaxbProcessInstanceLog.class);
         
-        ProcessInstanceLog newLog = newXmlLog.createEntityInstance();
+        ProcessInstanceLog newLog = newXmlLog.getResult();
         compareOrig(origLog, newLog, ProcessInstanceLog.class);
     }
     
@@ -107,11 +109,13 @@ public class JaxbHistoryLogTest extends Assert {
         origLog.setNodeType("the-sort-of-point");
         
         JaxbNodeInstanceLog xmlLog = new JaxbNodeInstanceLog(origLog);
+        xmlLog.setCommandName("test-cmd");
+        xmlLog.setIndex(2);
         String xmlStr = convertJaxbObjectToString(xmlLog);
         JaxbNodeInstanceLog newXmlLog = (JaxbNodeInstanceLog) convertStringToJaxbObject(xmlStr);
         compareOrig(xmlLog, newXmlLog, JaxbNodeInstanceLog.class);
         
-        NodeInstanceLog newLog = newXmlLog.createEntityInstance();
+        NodeInstanceLog newLog = newXmlLog.getResult();
         compareOrig(origLog, newLog, NodeInstanceLog.class);
     }
     
@@ -134,11 +138,13 @@ public class JaxbHistoryLogTest extends Assert {
         origLog.setVariableInstanceId("id-instance-variable");
        
         JaxbVariableInstanceLog xmlLog = new JaxbVariableInstanceLog(origLog);
+        xmlLog.setCommandName("test-cmd");
+        xmlLog.setIndex(2);
         String xmlStr = convertJaxbObjectToString(xmlLog);
         JaxbVariableInstanceLog newXmlLog = (JaxbVariableInstanceLog) convertStringToJaxbObject(xmlStr);
         compareOrig(xmlLog, newXmlLog, JaxbVariableInstanceLog.class);
         
-        VariableInstanceLog newLog = newXmlLog.createEntityInstance();
+        VariableInstanceLog newLog = newXmlLog.getResult();
         compareOrig(origLog, newLog, VariableInstanceLog.class);
     }
 
@@ -183,7 +189,7 @@ public class JaxbHistoryLogTest extends Assert {
                 try {
                     Object origField = getIsMethod.invoke(orig, new Object[0]);
                     Object copyField = getIsMethod.invoke(copy, new Object[0]);
-                    if (origField == null) {
+                    if (origField == null ) {
                         fail("Please fill in the " + fieldName + " field in the " + objInterface.getSimpleName() + "!");
                     }
                     if( !(origField instanceof Enum) && origField.getClass().getPackage().getName().startsWith("org.")) {

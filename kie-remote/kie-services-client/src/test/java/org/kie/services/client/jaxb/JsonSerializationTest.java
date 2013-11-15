@@ -13,9 +13,13 @@ public class JsonSerializationTest extends SerializationTest {
     
     public Object testRoundtrip(Object in) throws Exception {
         String jsonStr = jsonProvider.serialize(in);
-        log.debug(jsonStr);
+        logger.debug(jsonStr);
         jsonProvider.setDeserializeOutputClass(in.getClass());
         return jsonProvider.deserialize(jsonStr);
+    }
+
+    public void addClassesToSerializationProvider(Class<?>... extraClass) {
+        // no-op
     }
  
 }

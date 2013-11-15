@@ -1,15 +1,12 @@
 package org.kie.services.client.api;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 
-import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
@@ -55,7 +52,7 @@ public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory
         this.config.setSerializationType(serialization);
     }
     
-    public RuntimeEngine newRuntimeEngine() {
+    public RemoteRuntimeEngine newRuntimeEngine() {
     	return new RemoteRuntimeEngine(config);
     }
     

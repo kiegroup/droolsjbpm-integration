@@ -43,9 +43,14 @@ public class JaxbSerializationTest extends SerializationTest {
 
     protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
 
+    @Override
+    public void addClassesToSerializationProvider(Class<?>... extraClass) {
+        jaxbProvider.addJaxbClasses(extraClass);
+    }
+
     public Object testRoundtrip(Object in) throws Exception {
         String xmlObject = jaxbProvider.serialize(in);
-        log.debug(xmlObject);
+        logger.debug(xmlObject);
         return jaxbProvider.deserialize(xmlObject);
     }
 
@@ -60,6 +65,12 @@ public class JaxbSerializationTest extends SerializationTest {
         }
     }
 
+    /**
+     * If you think this test is a mistake: beware, this test is smarter than you. Seriously. 
+     * Heck, this test is smarter than *me*, and I wrote it!
+     * 
+     * @throws Exception
+     */
     @Test
     public void acceptedCommandsCanBeSerializedTest() throws Exception {
         // Only neccessary to run once
@@ -70,14 +81,15 @@ public class JaxbSerializationTest extends SerializationTest {
         XmlElement[] xmlElems = xmlElemsAnno.value();
 
         Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
-        assertEquals(cmdSet.size(), xmlElems.length);
+        assertEquals(AcceptedCommands.class.getSimpleName() + " contains a different set of Commands than " + JaxbCommandsRequest.class.getSimpleName(),
+                cmdSet.size(), xmlElems.length);
         Set<String> xmlElemNameSet = new HashSet<String>();
         for (XmlElement xmlElemAnno : xmlElems) {
             Class cmdClass = xmlElemAnno.type();
             String name = xmlElemAnno.name();
             assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
-            assertTrue(cmdClass.getSimpleName() + " is present in " + JaxbCommandsRequest.class.getSimpleName() + " but not in "
-                    + AcceptedCommands.class.getSimpleName(), cmdSet.remove(cmdClass));
+            assertTrue(cmdClass.getSimpleName() + " is present in " + AcceptedCommands.class.getSimpleName() + " but not in "
+                    + JaxbCommandsRequest.class.getSimpleName(), cmdSet.remove(cmdClass));
         }
         for (Class cmdClass : cmdSet) {
             System.out.println("Missing: " + cmdClass.getSimpleName());
@@ -86,6 +98,11 @@ public class JaxbSerializationTest extends SerializationTest {
                 + JaxbCommandsRequest.class.getSimpleName(), cmdSet.size() == 0);
     }
 
+    /**
+     * This test is the above one's little brother, and he takes after him. Damn.. these are some smart tests, yo! 
+     * 
+     * (HA!)
+     */
     @Test
     public void allCommandResponseTypesNeedXmlElemIdTest() throws Exception {
         Field commandsField = JaxbCommandsResponse.class.getDeclaredField("responses");
@@ -202,7 +219,7 @@ public class JaxbSerializationTest extends SerializationTest {
         Set<Class<?>> copyClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(commaString);
         assertEquals( classList, copyClasses );
         String newCommaString = JaxbSerializationProvider.classSetToCommaSeperatedString(copyClasses);
-        assertEquals( commaString, newCommaString );
+        assertEquals( commaString.length(), newCommaString.length() );
     }
 
     private String join(String[] inArr) {

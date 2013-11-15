@@ -9,12 +9,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="variable-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableInstanceLog> {
+public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableInstanceLog> implements JaxbCommandResponse<VariableInstanceLog>{
 
     @XmlAttribute
     @XmlSchemaType(name="long")
@@ -132,4 +132,39 @@ public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableI
         this.externalId = externalId;
     }
 
+    /**
+     * {@link JaxbCommandResponse} fields and methods
+     */
+    
+    @XmlAttribute
+    @XmlSchemaType(name = "int")
+    private Integer index;
+
+    @XmlElement(name = "command-name")
+    @XmlSchemaType(name = "string")
+    private String commandName;
+    
+    public Integer getIndex() { 
+        return index;
+    }
+
+    public void setIndex(Integer index) { 
+        this.index = index;
+    }
+    
+    public String getCommandName() { 
+        return commandName;
+    }
+    
+    public void setCommandName(String cmdName) {
+        this.commandName = cmdName;
+    }
+
+    public VariableInstanceLog getResult() {
+        return createEntityInstance();
+    }
+
+    public void setResult(VariableInstanceLog result) { 
+        initialize(result);
+    }
 }

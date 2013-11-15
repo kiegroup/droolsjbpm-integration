@@ -26,6 +26,7 @@ import org.jbpm.process.audit.command.FindNodeInstancesCommand;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 import org.kie.api.command.Command;
@@ -107,7 +108,8 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "find-process-instance", type = FindProcessInstanceCommand.class),
             @XmlElement(name = "find-process-instances", type = FindProcessInstancesCommand.class),
             @XmlElement(name = "find-subprocess-instances", type = FindSubProcessInstancesCommand.class),
-            @XmlElement(name = "find-variable-instances", type = FindVariableInstancesCommand.class)
+            @XmlElement(name = "find-variable-instances", type = FindVariableInstancesCommand.class),
+            @XmlElement(name = "find-variable-instances-by-name", type = FindVariableInstancesByNameCommand.class)
     })
     protected List<Command<?>> commands;
 

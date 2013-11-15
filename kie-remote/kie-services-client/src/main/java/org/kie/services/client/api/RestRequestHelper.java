@@ -1,5 +1,6 @@
 package org.kie.services.client.api;
 
+import static org.kie.services.client.api.command.RemoteConfiguration.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -13,7 +14,7 @@ import org.kie.services.client.api.command.RemoteConfiguration;
  * either {@link ClientRequest} (REST request) instances or {@link ClientRequestFactory} instances to 
  * create {@link ClientRequest} instances. 
  */
-public class RestRequestHelper extends RemoteConfiguration {
+public class RestRequestHelper {
 
     private ClientRequestFactory requestFactory;
     private static int DEFAULT_TIMEOUT = 5;

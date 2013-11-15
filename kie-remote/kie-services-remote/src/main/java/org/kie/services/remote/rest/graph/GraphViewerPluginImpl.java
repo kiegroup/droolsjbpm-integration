@@ -25,7 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jbpm.process.audit.JPAProcessInstanceDbLog;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
+
+import org.jbpm.process.audit.AuditLogService;
+import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.kie.api.KieBase;
@@ -51,14 +55,17 @@ public class GraphViewerPluginImpl {
     
 	private KieBase kbase;
 	
+	@PersistenceUnit
+	private EntityManagerFactory emf;
 
 	public List<ActiveNodeInfo> getActiveNodeInfo(String instanceId) {
-		ProcessInstanceLog processInstance = JPAProcessInstanceDbLog.findProcessInstance(new Long(instanceId));
+	    AuditLogService auditLogService = new JPAAuditLogService(emf);
+		ProcessInstanceLog processInstance = auditLogService.findProcessInstance(new Long(instanceId));
 		if (processInstance == null) {
 			throw new IllegalArgumentException("Could not find process instance " + instanceId);
 		} 
 		Map<String, NodeInstanceLog> nodeInstances = new HashMap<String, NodeInstanceLog>();
-		for (NodeInstanceLog nodeInstance: JPAProcessInstanceDbLog.findNodeInstances(new Long(instanceId))) {
+		for (NodeInstanceLog nodeInstance: auditLogService.findNodeInstances(new Long(instanceId))) {
 			if (nodeInstance.getType() == NodeInstanceLog.TYPE_ENTER) {
 				nodeInstances.put(nodeInstance.getNodeInstanceId(), nodeInstance);
 			} else {

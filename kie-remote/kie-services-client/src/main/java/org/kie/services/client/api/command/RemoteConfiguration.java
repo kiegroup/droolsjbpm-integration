@@ -41,7 +41,10 @@ import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.kie.api.runtime.manager.Context;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 
-public class RemoteConfiguration {
+/**
+ * In order to protect the Remote (Java) API, this class may not be extended nor may its constructor be made public.
+ */
+public final class RemoteConfiguration {
 
     public static final String CONNECTION_FACTORY_NAME = "jms/RemoteConnectionFactory";
     public static final String SESSION_QUEUE_NAME = "jms/queue/KIE.SESSION";
@@ -78,8 +81,9 @@ public class RemoteConfiguration {
 
     // REST ----------------------------------------------------------------------------------------------------------------------
 
-    protected RemoteConfiguration() {
-        type = Type.HELPER;
+    private RemoteConfiguration() {
+        // no public constructor!
+        this.type = Type.CONSTRUCTOR;
     }
 
     public RemoteConfiguration(String deploymentId, URL url) {
@@ -141,7 +145,7 @@ public class RemoteConfiguration {
         return serverPlusRestUrl;
     }
 
-    protected static ClientRequestFactory createAuthenticatingRequestFactory(URL url, String username, String password, int timeout) {
+    public static ClientRequestFactory createAuthenticatingRequestFactory(URL url, String username, String password, int timeout) {
         BasicHttpContext localContext = new BasicHttpContext();
         HttpClient preemptiveAuthClient = createPreemptiveAuthHttpClient(username, password, timeout, localContext);
         ClientExecutor clientExecutor = new ApacheHttpClient4Executor(preemptiveAuthClient, localContext);
@@ -335,7 +339,7 @@ public class RemoteConfiguration {
     }
 
     private enum Type {
-        REST, JMS, HELPER;
+        REST, JMS, CONSTRUCTOR;
     }
 
     // ----
