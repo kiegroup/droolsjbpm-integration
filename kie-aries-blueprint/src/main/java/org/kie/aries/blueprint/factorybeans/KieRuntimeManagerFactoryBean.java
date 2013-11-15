@@ -15,13 +15,13 @@
  */
 package org.kie.aries.blueprint.factorybeans;
 
-import org.jbpm.runtime.manager.impl.RuntimeEnvironmentBuilder;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
-import org.kie.internal.io.ResourceFactory;
 import org.kie.api.runtime.manager.RuntimeEnvironment;
+import org.kie.api.runtime.manager.RuntimeEnvironmentBuilder;
+import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
+import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 
 public class KieRuntimeManagerFactoryBean {
@@ -33,11 +33,11 @@ public class KieRuntimeManagerFactoryBean {
         RuntimeManager manager;
 
         if ("empty".equalsIgnoreCase(type)) {
-            builder = RuntimeEnvironmentBuilder.getEmpty();
+            builder = RuntimeEnvironmentBuilder.Factory.get().newEmptyBuilder();
         } else if ("default".equalsIgnoreCase(type)) {
-            builder = RuntimeEnvironmentBuilder.getDefault();
+            builder = RuntimeEnvironmentBuilder.Factory.get().newDefaultBuilder();
         } else if ("defaultInMemory".equalsIgnoreCase(type)) {
-            builder = RuntimeEnvironmentBuilder.getDefaultInMemory();
+            builder = RuntimeEnvironmentBuilder.Factory.get().newDefaultInMemoryBuilder();
         } else {
             throw new IllegalArgumentException("Could not find a RuntimeManager for the type : " + type);
         }
