@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:drools="http://drools.org/schema/drools-spring"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                        http://drools.org/schema/drools-spring org/drools/container/spring/drools-spring-1.2.0.xsd">
+
+  <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="org.h2.Driver" />
+    <property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow" />
+    <property name="username" value="sa" />
+    <property name="password" value="" />
+  </bean>
+  
+  <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource" ref="ds" />
+    <property name="persistenceUnitName" value="org.drools.persistence.jpa.local" />
+  </bean>
+
+  <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="myEmf" />
+  </bean>
+</beans>
