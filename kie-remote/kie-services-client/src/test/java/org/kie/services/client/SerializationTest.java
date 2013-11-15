@@ -66,13 +66,14 @@ import org.slf4j.LoggerFactory;
 
 public abstract class SerializationTest {
 
-    protected static final Logger log = LoggerFactory.getLogger(SerializationTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(SerializationTest.class);
 
     protected enum TestType {
         JAXB, JSON, YAML;
     }
 
     abstract public TestType getType();
+    abstract public void addClassesToSerializationProvider(Class<?>... extraClass);
 
     private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception {
         Field field = clazz.getDeclaredField(fieldName);
@@ -338,7 +339,6 @@ public abstract class SerializationTest {
     }
 
     @Test
-    @Ignore("BZ-1024946")
     public void serializingPrimitiveArraysTest() throws Exception  {
         // Don't run with JSON: /execute is only JAXB
         Assume.assumeTrue(!getType().equals(TestType.JSON));
@@ -348,7 +348,10 @@ public abstract class SerializationTest {
         parameters.put("namespace", "http://www.parasoft.com/wsdl/calculator/");
         parameters.put("interface", "Calculator");
         parameters.put("operation", "add");
-        parameters.put("parameters", new Float[]{9.0f, 12.0f});
+        Object arrayParam = new Float[]{9.0f, 12.0f};
+        parameters.put("parameters", arrayParam);
+        
+        addClassesToSerializationProvider(arrayParam.getClass());
         
         Command<?> cmd = new StartProcessCommand("proc.with.array.params", parameters);
         JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);

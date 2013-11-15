@@ -2,7 +2,6 @@ package org.kie.services.client.api;
 
 import java.net.URL;
 
-import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
@@ -14,7 +13,7 @@ public class RemoteRestRuntimeFactory implements RemoteRuntimeEngineFactory {
         this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password);
     }
     
-    public RuntimeEngine newRuntimeEngine() {
+    public RemoteRuntimeEngine newRuntimeEngine() {
     	return new RemoteRuntimeEngine(configuration);
     }
 

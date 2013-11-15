@@ -5,18 +5,22 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.audit.event.AuditEvent;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="log-instance-list")
 @XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("rawtypes")
-public class JaxbHistoryLogList {
+public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>{
 
     @XmlElements({ 
         @XmlElement(name = "process-instance-log", type = JaxbProcessInstanceLog.class),
@@ -25,35 +29,37 @@ public class JaxbHistoryLogList {
         })
     List<AbstractJaxbHistoryObject> historyLogList;
 
+    @XmlAttribute
+    @XmlSchemaType(name = "int")
+    private Integer index;
+
+    @XmlElement(name = "command-name")
+    @XmlSchemaType(name = "string")
+    private String commandName;
+    
     public JaxbHistoryLogList() { 
         // Default constructor
     }
     
-    public JaxbHistoryLogList( List<?> logList ) { 
+    public JaxbHistoryLogList( List<? extends AuditEvent> logList ) { 
+        initialize(logList);
+    }
+    
+    private void initialize( List<? extends AuditEvent> logList ) { 
         if( logList == null || logList.size() == 0 ) { 
             return;
         }
-        Object firstLogObj = logList.get(0);
-        if( firstLogObj == null ) { 
-            throw new IllegalArgumentException("null is not an acceptable value for the list parameter for this constuctor." );
-        }
-        if( firstLogObj instanceof ProcessInstanceLog ) { 
-            this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
-            for( Object logObj : logList ) { 
+        this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
+        for( Object logObj : logList ) { 
+            if( logObj instanceof ProcessInstanceLog ) { 
                 this.historyLogList.add(new JaxbProcessInstanceLog((ProcessInstanceLog) logObj));
-            }
-        } else if( firstLogObj instanceof NodeInstanceLog ) { 
-            this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
-            for( Object logObj : logList ) { 
+            } else if( logObj instanceof NodeInstanceLog ) { 
                 this.historyLogList.add(new JaxbNodeInstanceLog((NodeInstanceLog) logObj));
-            }
-        } else if( firstLogObj instanceof VariableInstanceLog ) { 
-            this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
-            for( Object logObj : logList ) { 
+            } else if( logObj instanceof VariableInstanceLog ) { 
                 this.historyLogList.add(new JaxbVariableInstanceLog((VariableInstanceLog) logObj));
+            } else { 
+                throw new IllegalArgumentException(logObj.getClass().getSimpleName() + " is not an acceptable object (list) for this constructor.");
             }
-        } else { 
-            throw new IllegalArgumentException(firstLogObj.getClass().getSimpleName() + " is not an acceptable object (list) for this constructor.");
         }
     }
     
@@ -70,6 +76,44 @@ public class JaxbHistoryLogList {
         if( this.historyLogList == null ) { 
             this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
         }
+    }
+
+    /**
+     * {@link JaxbCommandResponse} methods
+     */
+    
+    @Override
+    public Integer getIndex() {
+        return index;
+    }
+
+    @Override
+    public void setIndex(Integer index) {
+       this.index = index; 
+    }
+
+    @Override
+    public String getCommandName() {
+        return commandName;
+    }
+
+    @Override
+    public void setCommandName(String cmdName) {
+        this.commandName = cmdName;
+    }
+
+    @Override
+    public List<AuditEvent> getResult() {
+        List<AuditEvent> results = new ArrayList<AuditEvent>();
+        for( AbstractJaxbHistoryObject<?> jaxbHistLog : this.historyLogList ) { 
+            results.add(jaxbHistLog.createEntityInstance());
+        }
+        return results;
+    }
+
+    @Override
+    public void setResult(List<AuditEvent> result) {
+        initialize(result);;
     }
 
 }

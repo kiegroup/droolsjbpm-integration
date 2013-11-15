@@ -13,8 +13,13 @@ public class YamlSerializationTest extends SerializationTest {
     
     public Object testRoundtrip(Object in) throws Exception {
         String output = yaml.dump(in);
-        log.debug(output);
+        logger.debug(output);
         return yaml.load(output);
+    }
+
+    @Override
+    public void addClassesToSerializationProvider(Class<?>... extraClass) {
+        // no-op
     }
     
 }

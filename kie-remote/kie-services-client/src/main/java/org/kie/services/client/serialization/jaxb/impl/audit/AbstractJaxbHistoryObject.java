@@ -7,21 +7,32 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public abstract class AbstractJaxbHistoryObject<T> {
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+
+import org.jbpm.process.audit.event.AuditEvent;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
+
+public abstract class AbstractJaxbHistoryObject<T extends AuditEvent> {
     
-    protected Class<?> realClass;
+    protected Class<? extends AuditEvent> realClass;
    
     public AbstractJaxbHistoryObject() {
         throw new UnsupportedOperationException("No-arg constructor must be implemented by the concrete class.");
     }
     
-    public AbstractJaxbHistoryObject(Class<?> realClass) { 
+    public AbstractJaxbHistoryObject(Class<? extends AuditEvent> realClass) { 
        this.realClass = realClass; 
     }
     
-    public AbstractJaxbHistoryObject(T taskObject, Class objectInterface) {
+    public AbstractJaxbHistoryObject(T historyObject, Class<? extends AuditEvent> objectInterface) {
         this(objectInterface);
-        for (Method getIsMethod : objectInterface.getDeclaredMethods() ) { 
+        initialize(historyObject);
+    }
+    
+    protected void initialize(T historyObject) {
+        for (Method getIsMethod : this.realClass.getDeclaredMethods() ) { 
             String methodName = getIsMethod.getName();
             String fieldName;
             if (methodName.startsWith("get")) {
@@ -39,7 +50,7 @@ public abstract class AbstractJaxbHistoryObject<T> {
                 Field field = this.getClass().getDeclaredField(fieldName);
                 boolean origAccessStatus = field.isAccessible();
                 field.setAccessible(true);
-                Object setObject = getIsMethod.invoke(taskObject, new Object[0]);
+                Object setObject = getIsMethod.invoke(historyObject, new Object[0]);
                 field.set(this, setObject);
                 field.setAccessible(origAccessStatus);
             } catch( Exception e ) { 
@@ -49,14 +60,23 @@ public abstract class AbstractJaxbHistoryObject<T> {
         }
     }
     
-    public T createEntityInstance() throws Exception { 
+    protected T createEntityInstance() { 
         Class [] constructorArgTypes = new Class[0];
-        Constructor<?> constructor = this.realClass.getConstructor(constructorArgTypes);
-        Object [] initArgs = new Object[0];
-        T entity = (T) constructor.newInstance(initArgs);
+        T entity;
+        try { 
+            Constructor<?> constructor = this.realClass.getConstructor(constructorArgTypes);
+            Object [] initArgs = new Object[0];
+            entity = (T) constructor.newInstance(initArgs);
+        } catch( Exception e ) { 
+            throw new RuntimeException("Unable to construct " + this.realClass.getSimpleName() );
+        }
         
         for (Field field : this.getClass().getDeclaredFields() ) { 
             String fieldName = field.getName();
+            if( fieldName.equals("index") || fieldName.equals("commandName") || fieldName.equals("result") ) {
+                // JaxbCommandResponse
+                continue;
+            }
             try { 
                 Field entityField = this.realClass.getDeclaredField(fieldName);
                 
@@ -89,4 +109,5 @@ public abstract class AbstractJaxbHistoryObject<T> {
         throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + realClass.getSimpleName()
                 + " implementation.");
     }
+
 }

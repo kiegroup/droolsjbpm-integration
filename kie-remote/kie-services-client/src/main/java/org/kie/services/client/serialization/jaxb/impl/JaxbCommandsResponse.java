@@ -16,8 +16,16 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.drools.core.command.runtime.process.GetProcessIdsCommand;
 import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.core.common.DefaultFactHandle;
+import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
+import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindNodeInstancesCommand;
+import org.jbpm.process.audit.command.FindProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesCommand;
+import org.jbpm.process.audit.event.AuditEvent;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
@@ -29,8 +37,11 @@ import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
@@ -67,6 +78,10 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "work-item", type = JaxbWorkItem.class),
             @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
             @XmlElement(name = "other", type = JaxbOtherResponse.class),
+            @XmlElement(name = "history-log-list", type = JaxbHistoryLogList.class),
+            @XmlElement(name = "proc-inst-log", type = JaxbProcessInstanceLog.class),
+            @XmlElement(name = "node-inst-log", type = JaxbNodeInstanceLog.class),
+            @XmlElement(name = "var-inst-log", type = JaxbVariableInstanceLog.class),
             })
     private List<JaxbCommandResponse<?>> responses;
 
@@ -91,7 +106,16 @@ public class JaxbCommandsResponse {
         cmdListTypes.put(GetProcessInstancesCommand.class, ProcessInstance.class);
         
         // processInstanceLog
+        cmdListTypes.put(FindProcessInstancesCommand.class, ProcessInstanceLog.class);
         cmdListTypes.put(FindActiveProcessInstancesCommand.class, ProcessInstanceLog.class);
+        cmdListTypes.put(FindSubProcessInstancesCommand.class, ProcessInstanceLog.class);
+        
+        // variableInstanceLog
+        cmdListTypes.put(FindVariableInstancesByNameCommand.class, VariableInstanceLog.class);
+        cmdListTypes.put(FindVariableInstancesCommand.class, VariableInstanceLog.class);
+       
+        // nodeInstanceLog
+        cmdListTypes.put(FindNodeInstancesCommand.class, NodeInstanceLog.class);
     }
 
     public JaxbCommandsResponse() {
@@ -164,7 +188,9 @@ public class JaxbCommandsResponse {
         } else if (List.class.isInstance(result)) { 
             // Neccessary to determine return type of empty lists
             Class listType = cmdListTypes.get(cmd.getClass());
-            if( listType.equals(TaskSummary.class) ) { 
+            if( listType == null ) { 
+                unknownResultType = true;
+            } else if( listType.equals(TaskSummary.class) ) { 
                 this.responses.add(new JaxbTaskSummaryListResponse((List<TaskSummary>) result, i, cmd));
             } else if( listType.equals(Long.class) ) {
                 this.responses.add(new JaxbLongListResponse((List<Long>)result, i, cmd));
@@ -173,9 +199,13 @@ public class JaxbCommandsResponse {
                for( ProcessInstance procInst : (List<ProcessInstance>) result) { 
                    procInstList.add(new JaxbProcessInstanceResponse(procInst));
                }
-                this.responses.add(new JaxbProcessInstanceListResponse(procInstList, i, cmd));
-            } else {
-                unknownResultType = true;
+               this.responses.add(new JaxbProcessInstanceListResponse(procInstList, i, cmd));
+            } else if( listType.equals(ProcessInstanceLog.class) 
+                    || listType.equals(NodeInstanceLog.class)
+                    || listType.equals(VariableInstanceLog.class) ) {
+                this.responses.add(new JaxbHistoryLogList((List<AuditEvent>) result));
+            } else { 
+                throw new IllegalStateException(listType.getSimpleName() + " should be handled but is not in " + this.getClass().getSimpleName() + "!" );
             }
         } else if (result.getClass().isPrimitive() 
         		|| Boolean.class.getName().equals(className)
@@ -189,6 +219,12 @@ public class JaxbCommandsResponse {
             this.responses.add(new JaxbPrimitiveResponse(result, i, cmd));
         } else if( result instanceof WorkItem ) { 
            this.responses.add(new JaxbWorkItem((WorkItem) result, i, cmd));
+        } else if( result instanceof ProcessInstanceLog ) { 
+            this.responses.add(new JaxbProcessInstanceLog((ProcessInstanceLog) result));
+        } else if( result instanceof NodeInstanceLog ) { 
+            this.responses.add(new JaxbNodeInstanceLog((NodeInstanceLog) result));
+        } else if( result instanceof VariableInstanceLog ) { 
+            this.responses.add(new JaxbVariableInstanceLog((VariableInstanceLog) result));
         } else if( result instanceof DefaultFactHandle ) { 
            this.responses.add(new JaxbOtherResponse(result, i, cmd));
         } 
@@ -200,7 +236,8 @@ public class JaxbCommandsResponse {
         }
         
         if (unknownResultType) {
-            throw new UnsupportedOperationException("Result type " + result.getClass().getSimpleName() + " from command " + cmd.getClass().getSimpleName() + " is an unsupported response type.");
+            System.out.println( this.getClass().getSimpleName() + ": unknown result type " + result.getClass().getSimpleName() 
+                    + " from command " + cmd.getClass().getSimpleName() + " added.");
         }
     }
 }

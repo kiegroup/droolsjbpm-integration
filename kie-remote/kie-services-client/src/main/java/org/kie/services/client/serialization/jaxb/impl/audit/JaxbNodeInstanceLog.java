@@ -11,10 +11,12 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
+import org.jbpm.process.audit.event.AuditEvent;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="node-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceLog> {
+public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceLog> implements JaxbCommandResponse<NodeInstanceLog> {
 
     @XmlAttribute
     @XmlSchemaType(name="long")
@@ -168,4 +170,40 @@ public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceL
         this.externalId = externalId;
     }
 
+    
+    /**
+     * {@link JaxbCommandResponse} fields and methods
+     */
+    
+    @XmlAttribute
+    @XmlSchemaType(name = "int")
+    private Integer index;
+
+    @XmlElement(name = "command-name")
+    @XmlSchemaType(name = "string")
+    private String commandName;
+    
+    public Integer getIndex() { 
+        return index;
+    }
+
+    public void setIndex(Integer index) { 
+        this.index = index;
+    }
+    
+    public String getCommandName() { 
+        return commandName;
+    }
+    
+    public void setCommandName(String cmdName) {
+        this.commandName = cmdName;
+    }
+
+    public NodeInstanceLog getResult() {
+        return createEntityInstance();
+    }
+
+    public void setResult(NodeInstanceLog result) { 
+        initialize(result);
+    }
 }

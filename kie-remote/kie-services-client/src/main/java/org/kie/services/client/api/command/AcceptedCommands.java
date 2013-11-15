@@ -20,6 +20,7 @@ import org.jbpm.process.audit.command.FindNodeInstancesCommand;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
+import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 import org.kie.api.command.Command;
@@ -87,7 +88,9 @@ public class AcceptedCommands {
         acceptedCommands.add(FindProcessInstanceCommand.class);
         acceptedCommands.add(FindProcessInstancesCommand.class);
         acceptedCommands.add(FindSubProcessInstancesCommand.class);
+        acceptedCommands.add(FindSubProcessInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesCommand.class);
+        acceptedCommands.add(FindVariableInstancesByNameCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
