@@ -20,7 +20,7 @@ import org.drools.core.xml.jaxb.util.JaxbListAdapter;
 import org.kie.api.event.rule.ObjectDeletedEvent;
 import org.kie.api.event.rule.ObjectInsertedEvent;
 import org.kie.api.event.rule.ObjectUpdatedEvent;
-import org.kie.api.event.rule.WorkingMemoryEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -34,7 +34,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.NONE)
 public class ChangeCollector
     implements
-    WorkingMemoryEventListener {
+    RuleRuntimeEventListener {
 
     @XmlElement
     @XmlJavaTypeAdapter(JaxbListAdapter.class)
