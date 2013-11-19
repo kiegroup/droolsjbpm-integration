@@ -65,7 +65,7 @@
         <exclude>ch.qos.logback:logback-core</exclude><!-- Examples dependency -->
         <exclude>ch.qos.logback:logback-classic</exclude><!-- Examples dependency -->
         <exclude>org.drools:drools-docs</exclude>
-        <exclude>org.jbpm:jbpm-docs</exclude>
+        <!--<exclude>org.jbpm:jbpm-docs</exclude>-->
         <!--<exclude>*:*:jar:javadoc</exclude>-->
         <exclude>*:sources</exclude>
       </excludes>
@@ -109,12 +109,12 @@
       </unpackOptions>
       <useStrictFiltering>true</useStrictFiltering>
     </dependencySet>
-    <dependencySet>
+<!--    <dependencySet>
       <includes>
         <include>org.jbpm:jbpm-docs:jdocbook</include>
       </includes>
       <outputDirectory>reference_manual/jbpm-docs</outputDirectory>
-      <!-- Workaround for https://jira.codehaus.org/browse/MASSEMBLY-557 -->
+      &lt;!&ndash; Workaround for https://jira.codehaus.org/browse/MASSEMBLY-557 &ndash;&gt;
       <fileMode>755</fileMode>
       <directoryMode>755</directoryMode>
       <unpack>true</unpack>
@@ -124,7 +124,7 @@
         </excludes>
       </unpackOptions>
       <useStrictFiltering>true</useStrictFiltering>
-    </dependencySet>
+    </dependencySet>-->
     <dependencySet>
       <includes>
         <include>org.drools:*:jar:sources</include>
