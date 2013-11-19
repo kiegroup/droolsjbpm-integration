@@ -45,9 +45,9 @@
         <drools:workingMemoryEventListener/>
     </drools:ksession>
 
-    <bean id="debugWorkingMemoryEventListener" class="org.kie.api.event.rule.DebugWorkingMemoryEventListener" />
+    <bean id="debugRuleRuntimeEventListener" class="org.kie.api.event.rule.DebugRuleRuntimeEventListener" />
     <drools:ksession id="statefulWithDebugListener" type="stateful" kbase="kbase1">
-      <drools:workingMemoryEventListener ref="debugWorkingMemoryEventListener"/>
+      <drools:workingMemoryEventListener ref="debugRuleRuntimeEventListener"/>
     </drools:ksession>
 
     <drools:ksession id="statefulWithGroupedListeners" type="stateful" kbase="kbase1" node="node1"

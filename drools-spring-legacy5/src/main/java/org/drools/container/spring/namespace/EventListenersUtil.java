@@ -20,8 +20,8 @@ package org.drools.container.spring.namespace;
 import java.util.List;
 
 import org.drools.core.event.DebugProcessEventListener;
-import org.kie.api.event.rule.DebugWorkingMemoryEventListener;
 import org.kie.api.event.rule.DebugAgendaEventListener;
+import org.kie.api.event.rule.DebugRuleRuntimeEventListener;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -92,7 +92,7 @@ public abstract class EventListenersUtil {
                     } else if (TYPE_PROCESS_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
                         obj = new DebugProcessEventListener();
                     } else if (TYPE_WORKING_MEMORY_EVENT_LISTENER.equalsIgnoreCase(listenerType)) {
-                        obj = new DebugWorkingMemoryEventListener();
+                        obj = new DebugRuleRuntimeEventListener();
                     } else {
                         throw new IllegalArgumentException("eventListener must be of type 'agenda-event-listener or 'process-event-listener' or 'working-memory-event-listener'.");
                     }

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kie.api.event.rule.DebugWorkingMemoryEventListener;
+import org.kie.api.event.rule.DebugRuleRuntimeEventListener;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
 import org.junit.Before;
@@ -139,14 +139,14 @@ public class SpringDroolsListenersTest {
     public void testStatefulWithDefault() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithDefault");
         assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugRuleRuntimeEventListener);
     }
 
     @Test
     public void testStatefulWithLegacyDebugListener() throws Exception {
         KieSession KieSession = (KieSession) context.getBean("statefulWithDebugListener");
         assertEquals(1, KieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugWorkingMemoryEventListener);
+        assertTrue(KieSession.getWorkingMemoryEventListeners().iterator().next() instanceof DebugRuleRuntimeEventListener);
     }
 
     @Test
@@ -201,7 +201,7 @@ public class SpringDroolsListenersTest {
     public void testStatelessWithDefault() throws Exception {
         StatelessKieSession StatelessKieSession = (StatelessKieSession) context.getBean("statelessWithDefault");
         assertEquals(1, StatelessKieSession.getWorkingMemoryEventListeners().size());
-        assertTrue(StatelessKieSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugWorkingMemoryEventListener);
+        assertTrue(StatelessKieSession.getWorkingMemoryEventListeners().toArray()[0] instanceof DebugRuleRuntimeEventListener);
     }
 
     @Test
