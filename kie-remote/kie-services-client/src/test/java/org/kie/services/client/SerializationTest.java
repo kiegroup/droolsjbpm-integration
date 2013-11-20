@@ -141,6 +141,10 @@ public abstract class SerializationTest {
         cmds.add(spCmd);
         spCmd.getParameters().put("one", "a");
         spCmd.getParameters().put("two", "B");
+        Object weirdParam = new Integer[] { 59, 2195 };
+        spCmd.getParameters().put("thr", weirdParam);
+        
+        addClassesToSerializationProvider(weirdParam.getClass());
 
         JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundtrip(req);
         assertEquals(((StartProcessCommand) newReq.getCommands().get(0)).getParameters().get("two"), "B");

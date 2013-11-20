@@ -66,7 +66,7 @@ import org.kie.services.remote.util.Paginator;
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
  */
-@Path("/runtime/{id: [a-zA-Z0-9-:\\.]+}")
+@Path("/runtime/{deploymentId: [a-zA-Z0-9-:\\.]+}")
 @RequestScoped
 @SuppressWarnings("unchecked")
 public class RuntimeResource extends ResourceBase {
@@ -85,7 +85,7 @@ public class RuntimeResource extends ResourceBase {
     @Inject
     private RestProcessRequestBean processRequestBean;
 
-    @PathParam("id")
+    @PathParam("deploymentId")
     private String deploymentId;
     
     // Rest methods --------------------------------------------------------------------------------------------------------------

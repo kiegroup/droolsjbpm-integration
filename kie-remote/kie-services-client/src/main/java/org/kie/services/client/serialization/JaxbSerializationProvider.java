@@ -29,10 +29,14 @@ public class JaxbSerializationProvider implements SerializationProvider {
 
     public final static int JMS_SERIALIZATION_TYPE = 0;
 
-    private static Class<?>[] kieJaxbClasses = { JaxbCommandsRequest.class, JaxbCommandsResponse.class,
-            JaxbVariablesResponse.class, JaxbGenericResponse.class, JaxbProcessInstanceResponse.class,
-            JaxbProcessInstanceWithVariablesResponse.class, JaxbProcessInstanceListResponse.class, JaxbWorkItem.class,
-            JaxbOtherResponse.class, JaxbHistoryLogList.class };
+    private static Class<?>[] kieJaxbClasses = { 
+        // Command Request/Response
+            JaxbCommandsRequest.class, 
+            JaxbCommandsResponse.class,
+        // REST other
+            JaxbGenericResponse.class,
+            JaxbProcessInstanceWithVariablesResponse.class
+    };
 
     private Set<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(kieJaxbClasses));
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
@@ -54,6 +58,10 @@ public class JaxbSerializationProvider implements SerializationProvider {
         } catch (JAXBException jaxbe) {
             throw new UnsupportedOperationException("Unsupported JAXB Class during initialization: " + jaxbe.getMessage(), jaxbe);
         }
+    }
+    
+    public JAXBContext getJaxbContext() { 
+        return this.jaxbContext;
     }
 
     public String serialize(Object object) {
