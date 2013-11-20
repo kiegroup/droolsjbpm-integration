@@ -38,7 +38,7 @@ import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.remote.cdi.RuntimeManagerManager;
+import org.kie.services.remote.cdi.RuntimeManagerManagerBean;
 import org.kie.services.remote.cdi.TransactionalExecutor;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
@@ -75,7 +75,7 @@ public class RequestMessageBean implements MessageListener {
     // KIE resources
     
     @Inject
-    private RuntimeManagerManager runtimeMgrMgr;
+    private RuntimeManagerManagerBean runtimeMgrMgr;
     
     @Inject
     private TaskService taskService;

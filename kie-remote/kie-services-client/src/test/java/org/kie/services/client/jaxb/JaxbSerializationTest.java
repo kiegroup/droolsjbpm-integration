@@ -92,10 +92,10 @@ public class JaxbSerializationTest extends SerializationTest {
                     + JaxbCommandsRequest.class.getSimpleName(), cmdSet.remove(cmdClass));
         }
         for (Class cmdClass : cmdSet) {
-            System.out.println("Missing: " + cmdClass.getSimpleName());
+            logger.error("Missing: " + cmdClass.getSimpleName());
         }
-        assertTrue("See output for classes in " + AcceptedCommands.class.getSimpleName() + " that are not in "
-                + JaxbCommandsRequest.class.getSimpleName(), cmdSet.size() == 0);
+        assertEquals("See output for classes in " + AcceptedCommands.class.getSimpleName() + " that are not in "
+                + JaxbCommandsRequest.class.getSimpleName(), 0, cmdSet.size());
     }
 
     /**
@@ -127,7 +127,7 @@ public class JaxbSerializationTest extends SerializationTest {
                     + "implement " + JaxbCommandResponse.class.getSimpleName(), cmdSet.remove(cmdClass));
         }
         for (Class cmdClass : cmdSet) {
-            System.out.println("Missing: " + cmdClass.getSimpleName());
+            logger.error("Missing: " + cmdClass.getSimpleName());
         }
         assertTrue("See above output for difference between " + JaxbCommandResponse.class.getSimpleName() + " implementations "
                 + "and classes listed in " + JaxbCommandsResponse.class.getSimpleName(), cmdSet.size() == 0);

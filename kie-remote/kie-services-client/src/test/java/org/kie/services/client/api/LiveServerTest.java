@@ -147,7 +147,7 @@ public class LiveServerTest {
         responseObj.resetStream();
         int status = responseObj.getStatus();
         if (status != 200) {
-            System.out.println("Response with exception:\n" + responseObj.getEntity(String.class));
+            logger.warn("Response with exception:\n" + responseObj.getEntity(String.class));
             assertEquals("Status OK", 200, status);
         }
         return responseObj;

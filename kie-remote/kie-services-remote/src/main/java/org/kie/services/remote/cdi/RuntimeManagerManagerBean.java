@@ -1,5 +1,6 @@
 package org.kie.services.remote.cdi;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.event.Observes;
@@ -18,15 +19,15 @@ import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/*
- * {@inheritdoc}
+/**
+ * Keeps track of the {@link RuntimeManager} instances for each deployment for use by the Remote API. 
  */
 @Singleton
-public class RuntimeManagerManager {
+public class RuntimeManagerManagerBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(RuntimeManagerManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(RuntimeManagerManagerBean.class);
     
-    private static ConcurrentHashMap<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();  
+    private Map<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();  
     
     public void addOnDeploy(@Observes @Deploy DeploymentEvent event) {
         RuntimeManager runtimeManager = domainRuntimeManagers.put(event.getDeploymentId(), event.getDeployedUnit().getRuntimeManager());
