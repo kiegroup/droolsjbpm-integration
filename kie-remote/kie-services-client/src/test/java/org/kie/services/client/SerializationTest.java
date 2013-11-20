@@ -363,4 +363,11 @@ public abstract class SerializationTest {
         assertNotNull(newCmd);
     }
 
+    @Test
+    // JBPM-4170
+    public void nodeInstanceLogNpeTest() throws Exception { 
+        NodeInstanceLog nodeLog = new NodeInstanceLog();
+        JaxbNodeInstanceLog jaxbNodeLog = new JaxbNodeInstanceLog(nodeLog);
+        testRoundtrip(jaxbNodeLog);
+    }
 }

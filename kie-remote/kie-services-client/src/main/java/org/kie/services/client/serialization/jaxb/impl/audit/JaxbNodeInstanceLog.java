@@ -10,8 +10,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.jbpm.process.audit.NodeInstanceLog;
-import org.jbpm.process.audit.ProcessInstanceLog;
-import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="node-instance-log")
@@ -56,7 +54,7 @@ public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceL
     
     @XmlElement(name="work-item-id")
     @XmlSchemaType(name = "long")
-    private long workItemId;
+    private Long workItemId;
     
     @XmlElement
     @XmlSchemaType(name = "string")
@@ -146,11 +144,11 @@ public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceL
         this.nodeType = nodeType;
     }
 
-    public long getWorkItemId() {
+    public Long getWorkItemId() {
         return workItemId;
     }
 
-    public void setWorkItemId(long workItemId) {
+    public void setWorkItemId(Long workItemId) {
         this.workItemId = workItemId;
     }
 
