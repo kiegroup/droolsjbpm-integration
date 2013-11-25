@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.drools.compiler.compiler.PackageBuilder;
+import org.drools.impl.adapters.EnvironmentAdapter;
 import org.kie.api.KieBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.drools.core.util.DroolsStreamUtils;
@@ -149,7 +150,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  ctx.getBean( "myEmf" ) );
         env.set( EnvironmentName.TRANSACTION_MANAGER,
@@ -236,7 +237,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  ctx.getBean( "myEmf" ) );
         env.set( EnvironmentName.TRANSACTION_MANAGER,
@@ -418,7 +419,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull( workItem );
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  ctx.getBean( "myEmf" ) );
         env.set( EnvironmentName.TRANSACTION_MANAGER,
@@ -569,7 +570,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         service.dispose();
         log.info( "---> session disposed" );
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  ctx.getBean( "myEmf" ) );
         env.set( EnvironmentName.TRANSACTION_MANAGER,
@@ -666,7 +667,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
 
         Thread.sleep( 2000 );
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  ctx.getBean( "myEmf" ) );
         env.set( EnvironmentName.TRANSACTION_MANAGER,

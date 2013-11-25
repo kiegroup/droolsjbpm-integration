@@ -35,6 +35,7 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.drools.impl.adapters.EnvironmentAdapter;
 import org.kie.api.KieBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.drools.core.base.MapGlobalResolver;
@@ -108,7 +109,7 @@ public class VariablePersistenceStrategyTest {
         final List< ? > list = new ArrayList<Object>();
         PlatformTransactionManager txManager = (PlatformTransactionManager) ctx.getBean( "txManager" );
 
-        final Environment env = KnowledgeBaseFactory.newEnvironment();
+        final Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  ctx.getBean( "myEmf" ) );
         env.set( EnvironmentName.TRANSACTION_MANAGER,
@@ -282,7 +283,7 @@ public class VariablePersistenceStrategyTest {
         //                      result.size() );
         log.info( "### Retrieving process instance ###" );
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = new EnvironmentAdapter( KnowledgeBaseFactory.newEnvironment() );
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                  emf );
         env.set( EnvironmentName.TRANSACTION_MANAGER,

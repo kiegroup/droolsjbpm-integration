@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.core.impl.EnvironmentFactory;
+import org.drools.impl.adapters.EnvironmentAdapter;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.marshalling.ObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
@@ -190,7 +191,7 @@ public class EnvironmentDefBeanFactory implements
     }
 
     public void afterPropertiesSet() throws Exception {
-        environment = EnvironmentFactory.newEnvironment();
+        environment = new EnvironmentAdapter( EnvironmentFactory.newEnvironment() );
         if ( entityManagerFactory != null ) {
             environment.set(EnvironmentName.ENTITY_MANAGER_FACTORY, entityManagerFactory);
         }
