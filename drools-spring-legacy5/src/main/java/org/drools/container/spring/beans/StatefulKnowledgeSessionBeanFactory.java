@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.core.SessionConfiguration;
+import org.drools.impl.adapters.EnvironmentAdapter;
 import org.kie.api.command.Command;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
@@ -68,7 +69,7 @@ public class StatefulKnowledgeSessionBeanFactory extends AbstractKnowledgeSessio
 
         if ( jpaConfiguration != null ) {
 
-            Environment env = EnvironmentFactory.newEnvironment();
+            Environment env = new EnvironmentAdapter( EnvironmentFactory.newEnvironment() );
             env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,
                      jpaConfiguration.getEntityManagerFactory() );
             env.set( EnvironmentName.TRANSACTION_MANAGER,
