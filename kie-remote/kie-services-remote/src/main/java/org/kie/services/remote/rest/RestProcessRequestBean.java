@@ -16,7 +16,7 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.internal.task.api.InternalTaskService;
-import org.kie.services.remote.cdi.RuntimeManagerManagerBean;
+import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.cdi.TransactionalExecutor;
 
 /**
@@ -36,7 +36,7 @@ public class RestProcessRequestBean {
 
     /* KIE processing */
     @Inject
-    private RuntimeManagerManagerBean runtimeMgrMgr;
+    private DeploymentInfoBean runtimeMgrMgr;
 
     @Inject
     private TaskService taskService;

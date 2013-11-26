@@ -1,13 +1,12 @@
 package org.kie.services.client.jaxb;
 
-import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 import static org.junit.Assert.*;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -19,12 +18,10 @@ import org.junit.Test;
 import org.kie.services.client.SerializationTest;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
-import org.kie.services.client.serialization.JsonSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.mvel2.optimizers.impl.refl.nodes.ArrayLength;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -42,6 +39,9 @@ public class JaxbSerializationTest extends SerializationTest {
     }
 
     protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
+    { 
+        jaxbProvider.setPrettyPrint(true);
+    }
 
     @Override
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
@@ -65,6 +65,15 @@ public class JaxbSerializationTest extends SerializationTest {
         }
     }
 
+    @Test
+    public void jaxbClassesAreKnownToJaxbSerializationProvider() throws Exception { 
+        for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
+            Constructor<?> construct = jaxbClass.getConstructor(new Class [] {});
+            Object jaxbInst = construct.newInstance(new Object [] {});
+            testRoundtrip(jaxbInst);
+        } 
+    }
+    
     /**
      * If you think this test is a mistake: beware, this test is smarter than you. Seriously. 
      * Heck, this test is smarter than *me*, and I wrote it!

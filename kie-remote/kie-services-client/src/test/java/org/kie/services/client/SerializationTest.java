@@ -2,13 +2,17 @@ package org.kie.services.client;
 
 import static org.junit.Assert.*;
 
+import java.awt.PageAttributes.OriginType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
@@ -16,6 +20,7 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.bpmn2.objects.TestWorkItemHandler;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
 import org.jbpm.process.audit.NodeInstanceLog;
@@ -29,7 +34,6 @@ import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -45,6 +49,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
@@ -55,6 +60,9 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -369,5 +377,69 @@ public abstract class SerializationTest {
         NodeInstanceLog nodeLog = new NodeInstanceLog();
         JaxbNodeInstanceLog jaxbNodeLog = new JaxbNodeInstanceLog(nodeLog);
         testRoundtrip(jaxbNodeLog);
+    }
+    
+    @Test
+    public void deploymentJobResultTest() throws Exception {
+        JaxbDeploymentJobResult jaxbJob = new JaxbDeploymentJobResult();
+        testRoundtrip(jaxbJob);
+
+        KModuleDeploymentUnit kDepUnit = new KModuleDeploymentUnit("org", "jar", "1.0", "kbase", "ksession" );
+        kDepUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
+        
+        JaxbDeploymentUnit depUnit = new JaxbDeploymentUnit(kDepUnit.getGroupId(), kDepUnit.getArtifactId(), kDepUnit.getArtifactId());
+        depUnit.setKbaseName(kDepUnit.getKbaseName());
+        depUnit.setKsessionName(kDepUnit.getKsessionName());
+        depUnit.setStrategy(kDepUnit.getStrategy());
+        depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
+        jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
+        JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundtrip(jaxbJob);
+        compareObjects(jaxbJob, copyJaxbJob);
+    }
+    
+    private static void compareObjects( Object orig, Object copy ) {
+        compareObjects(orig, copy, new String [] {} );
+    }
+    
+    private static void compareObjects( Object orig, Object copy, String... nullFields ) {
+        Class<?> origClass = orig.getClass();
+        assertEquals( "copy is not an instance of " + origClass + " (" + copy.getClass().getSimpleName() + ")",  
+                origClass, copy.getClass() );
+        for (Field field : orig.getClass().getDeclaredFields() ) {
+            try { 
+                field.setAccessible(true);
+                Object origFieldVal = field.get(orig);
+                Object copyFieldVal = field.get(copy);
+
+                boolean nullFound = false;
+                if( origFieldVal == null || copyFieldVal == null ) { 
+                    nullFound = true;
+                    String fieldName = field.getName();
+                    for( String nullFieldName : nullFields ) { 
+                        if( nullFieldName.matches(fieldName) ) { 
+                            nullFound = false;
+                        }
+                    }
+                }
+                String failMsg = origClass.getSimpleName() + "." + field.getName() + " is null";
+                assertFalse( failMsg + "!", nullFound );
+
+                if( copyFieldVal != origFieldVal ) { 
+                    if( copyFieldVal == null ) { 
+                        fail( failMsg + " in copy!" );
+                    } else if( origFieldVal == null ) { 
+                        fail( failMsg + "in original!" );
+                    }
+                    if( origFieldVal.getClass().getPackage().getName().startsWith("java.") ) { 
+                        assertEquals( origClass.getSimpleName() + "." + field.getName(), origFieldVal, copyFieldVal );
+                    } else { 
+                        compareObjects(origFieldVal, copyFieldVal);
+                    }
+                }
+            } catch( Exception e ) { 
+                throw new RuntimeException("Unable to access " + field.getName() + " when testing " + origClass.getSimpleName() + ".", e ); 
+            }
+
+        }
     }
 }

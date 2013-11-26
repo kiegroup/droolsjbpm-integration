@@ -7,12 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-
 import org.jbpm.process.audit.event.AuditEvent;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 public abstract class AbstractJaxbHistoryObject<T extends AuditEvent> {
     
