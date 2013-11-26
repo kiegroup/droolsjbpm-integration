@@ -132,19 +132,23 @@ public class ResourceBase {
     }
     
     protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) { 
-        return createCorrectVariant(responseObj, headers, true);
-    }
-    
-    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, boolean useDefault) { 
         Variant v = getVariant(headers);
         if( v != null ) { 
             return Response.ok(responseObj, v).build();
-        } else if( useDefault ) { 
-            return Response.ok(responseObj, defaultVariant).build();
         } else {
-            return Response.notAcceptable(variants).build();
-        }
+            return Response.ok(responseObj, defaultVariant).build();
+        } 
     }
+    
+    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) { 
+        Variant v = getVariant(headers);
+        if( v != null ) { 
+            return Response.status(status).entity(responseObj).variant(v).build();
+        } else {
+            return Response.ok(responseObj, defaultVariant).build();
+        } 
+    }
+    
 
     // Request Params -------------------------------------------------------------------------------------------------------------
     

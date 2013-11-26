@@ -112,6 +112,18 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-shared-services</artifactId>
     </dependency>
+    
+    <!-- TEST -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
 

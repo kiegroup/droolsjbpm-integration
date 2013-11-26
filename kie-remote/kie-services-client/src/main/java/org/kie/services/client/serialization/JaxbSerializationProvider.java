@@ -16,13 +16,9 @@ import javax.xml.bind.Unmarshaller;
 
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 public class JaxbSerializationProvider implements SerializationProvider {
@@ -35,12 +31,15 @@ public class JaxbSerializationProvider implements SerializationProvider {
             JaxbCommandsResponse.class,
         // REST other
             JaxbGenericResponse.class,
-            JaxbProcessInstanceWithVariablesResponse.class
+            JaxbProcessInstanceWithVariablesResponse.class,
+            JaxbDeploymentJobResult.class,
+            JaxbDeploymentUnitList.class
     };
 
     private Set<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(kieJaxbClasses));
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
     private JAXBContext jaxbContext;
+    private boolean prettyPrint = false;
 
     public JaxbSerializationProvider() {
         initializeJaxbContext();
@@ -68,6 +67,9 @@ public class JaxbSerializationProvider implements SerializationProvider {
         Marshaller marshaller = null;
         try { 
             marshaller = jaxbContext.createMarshaller();
+            if( prettyPrint ) { 
+                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            }
         } catch( JAXBException jaxbe ) { 
             throw new SerializationException("Unable to create JAXB marshaller.", jaxbe);
         }
@@ -180,4 +182,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return outList.toArray(new String[outList.size()]);
     }
 
+    public void setPrettyPrint(boolean prettyPrint) { 
+        this.prettyPrint = prettyPrint;
+    }
+    
+    public boolean getPrettyPrint() { 
+        return this.prettyPrint;
+    }
 }

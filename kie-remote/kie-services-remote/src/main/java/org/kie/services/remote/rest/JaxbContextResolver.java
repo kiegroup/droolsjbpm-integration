@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.kie.api.runtime.KieSession;
-import org.kie.services.remote.cdi.DeploymentClassNamesBean;
+import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
     private static final Logger logger = LoggerFactory.getLogger(JaxbContextResolver.class);
     
     @Inject
-    private DeploymentClassNamesBean deploymentClassNameBean;
+    private DeploymentInfoBean deploymentClassNameBean;
     
     @Context
     private UriInfo uriInfo;
