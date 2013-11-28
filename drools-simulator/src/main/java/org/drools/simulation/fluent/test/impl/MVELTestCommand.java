@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.drools.core.command.impl.GenericCommand;
+import org.jbpm.flow.util.MVELSafeHelper;
 import org.kie.internal.command.Context;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
@@ -77,7 +78,7 @@ public class MVELTestCommand implements GenericCommand<Void>  {
             vars.put( name, context.get( name ) );
         }
         
-        if ( ! (( Boolean ) MVEL.eval( headerText + text, vars )).booleanValue() ) {
+        if ( ! (( Boolean ) MVELSafeHelper.getEvaluator().eval( headerText + text, vars )).booleanValue() ) {
             fail( text + "\n" + reason );
         }
         return null;
