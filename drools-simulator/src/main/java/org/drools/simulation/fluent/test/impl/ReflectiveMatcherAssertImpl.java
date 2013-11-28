@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.Matcher;
+import org.jbpm.flow.util.MVELSafeHelper;
 import org.kie.internal.command.Context;
 import org.kie.internal.fluent.test.ReflectiveMatcher;
 import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
@@ -115,7 +116,7 @@ public class ReflectiveMatcherAssertImpl implements ReflectiveMatcherAssert {
         
         try {
             Object o = MVEL.compileExpression( sbuilder.toString(), pctx );
-            MVEL.executeExpression( o, vars );
+            MVELSafeHelper.getEvaluator().executeExpression( o, vars );
         } catch( Exception e ) {
             // Try and unwrapp to the hamcrest assertion error if we can, else rethrwo the original mvel error
             Throwable unwrapped =  e.getCause();
