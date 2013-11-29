@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.drools.core.command.impl.GenericCommand;
-import org.jbpm.flow.util.MVELSafeHelper;
+import org.drools.core.util.MVELSafeHelper;
 import org.kie.internal.command.Context;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;

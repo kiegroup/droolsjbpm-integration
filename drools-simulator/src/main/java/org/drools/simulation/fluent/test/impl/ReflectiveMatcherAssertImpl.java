@@ -19,8 +19,8 @@ package org.drools.simulation.fluent.test.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.drools.core.util.MVELSafeHelper;
 import org.hamcrest.Matcher;
-import org.jbpm.flow.util.MVELSafeHelper;
 import org.kie.internal.command.Context;
 import org.kie.internal.fluent.test.ReflectiveMatcher;
 import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
