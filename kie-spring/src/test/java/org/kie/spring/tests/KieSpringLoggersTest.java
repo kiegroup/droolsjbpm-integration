@@ -16,7 +16,6 @@
 
 package org.kie.spring.tests;
 
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.audit.ThreadedWorkingMemoryFileLogger;
 import org.drools.core.audit.WorkingMemoryConsoleLogger;
 import org.drools.core.audit.WorkingMemoryFileLogger;
@@ -24,19 +23,14 @@ import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.impl.StatelessKnowledgeSessionImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
-import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.Person;
 import org.kie.spring.factorybeans.LoggerAdaptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 

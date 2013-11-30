@@ -17,7 +17,6 @@
 package org.kie.spring.tests.persistence;
 
 import org.drools.compiler.compiler.PackageBuilder;
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.impl.WorkImpl;
 import org.drools.core.rule.Package;
@@ -35,23 +34,19 @@ import org.jbpm.workflow.core.node.*;
 import org.jbpm.workflow.instance.node.SubProcessNodeInstance;
 import org.junit.*;
 import org.kie.api.KieBase;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.NodeInstance;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.beans.persistence.TestWorkItemHandler;
-import org.kie.spring.tests.InternalKieSpringUtilsTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
-import java.net.URL;
 import java.util.Collection;
 
 import static org.junit.Assert.*;

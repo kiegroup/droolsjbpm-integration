@@ -15,7 +15,6 @@
  */
 package org.kie.spring.tests;
 
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
@@ -25,17 +24,12 @@ import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
-import org.kie.spring.InternalKieSpringUtils;
 import org.kie.spring.mocks.MockObjectMarshallingStrategy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.io.File;
-import java.net.URL;
 
 import static org.junit.Assert.*;
 

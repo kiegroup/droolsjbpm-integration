@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
-import org.kie.spring.KieSpringUtils;
 import org.kie.spring.beans.Person;
 import org.kie.spring.beans.SampleBean;
 import org.springframework.context.ApplicationContext;
