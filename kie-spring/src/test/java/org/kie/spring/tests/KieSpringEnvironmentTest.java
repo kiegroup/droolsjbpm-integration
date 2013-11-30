@@ -63,9 +63,7 @@ public class KieSpringEnvironmentTest {
 
     @BeforeClass
     public static void runBeforeClass() {
-        ReleaseId releaseId = new ReleaseIdImpl("kie-spring-commands","test-spring","0001");
-        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/environment.xml");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+        context = new ClassPathXmlApplicationContext("org/kie/spring/environment.xml");
     }
 
     @Test

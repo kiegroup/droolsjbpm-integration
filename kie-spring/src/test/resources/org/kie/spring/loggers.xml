@@ -67,6 +67,6 @@
 
 
   <bean id="globalList" class="java.util.ArrayList"/>
-
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
 </beans>
 

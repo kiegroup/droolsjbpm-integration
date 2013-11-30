@@ -40,9 +40,7 @@ public class KieSpringCommandsTest {
 
     @BeforeClass
     public static void setup() {
-        ReleaseId releaseId = new ReleaseIdImpl("kie-spring-commands","test-spring","0001");
-        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/beans-commands.xml");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+        context = new ClassPathXmlApplicationContext("org/kie/spring/beans-commands.xml");
     }
 
     @Test

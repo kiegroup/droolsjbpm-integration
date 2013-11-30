@@ -48,9 +48,7 @@ public class KieSpringLoggersTest {
 
     @BeforeClass
     public static void runBeforeClass() {
-        ReleaseId releaseId = new ReleaseIdImpl("kie-spring-loggers","test-spring","0001");
-        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/loggers.xml");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+        context = new ClassPathXmlApplicationContext("org/kie/spring/loggers.xml");
     }
 
     @AfterClass

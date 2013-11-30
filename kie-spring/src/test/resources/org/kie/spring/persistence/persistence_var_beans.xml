@@ -47,4 +47,6 @@
     </kie:kbase>
   </kie:kmodule>
 
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
 </beans>

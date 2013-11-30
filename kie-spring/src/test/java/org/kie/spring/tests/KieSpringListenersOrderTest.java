@@ -43,9 +43,7 @@ public class KieSpringListenersOrderTest {
 
     @BeforeClass
     public static void runBeforeClass() {
-        ReleaseId releaseId = new ReleaseIdImpl("listeners-order-spring","test-spring","0001");
-        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/listenersOrderTest.xml");
-        ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+        ctx = new ClassPathXmlApplicationContext("org/kie/spring/listenersOrderTest.xml");
     }
 
     private KieSession getSession() {

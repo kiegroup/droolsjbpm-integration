@@ -87,9 +87,7 @@ public class VariablePersistenceStrategyTest {
     public void createSpringContext() {
         try {
             log.info("creating spring context");
-            ReleaseId releaseId = new ReleaseIdImpl("kie-spring-var-jpa","test-spring","0001");
-            URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_var_beans.xml");
-            ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+            ctx = new ClassPathXmlApplicationContext("org/kie/spring/persistence/persistence_var_beans.xml");
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);

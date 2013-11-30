@@ -32,6 +32,7 @@ import org.kie.spring.mocks.MockAgendaEventListener;
 import org.kie.spring.mocks.MockProcessEventListener;
 import org.kie.spring.mocks.MockRuleRuntimeEventListener;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,9 +49,7 @@ public class KieSpringListenersTest {
 
     @BeforeClass
     public static void runBeforeClass() {
-        ReleaseId releaseId = new ReleaseIdImpl("sample-group","test-spring","0001");
-        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/listeners.xml");
-        context = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+        context = new ClassPathXmlApplicationContext("org/kie/spring/listeners.xml");
     }
 
     @Before

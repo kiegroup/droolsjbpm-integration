@@ -37,4 +37,6 @@
     <kie:ruleRuntimeEventListener ref="mock-wm-listener"/>
   </kie:eventListeners>
 
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
 </beans>

@@ -48,6 +48,7 @@ import org.kie.spring.tests.InternalKieSpringUtilsTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
 import java.net.URL;
@@ -110,9 +111,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     public void createSpringContext() {
         try {
             log.info("creating spring context");
-            ReleaseId releaseId = new ReleaseIdImpl("kie-spring-jpa-env","test-spring","0001");
-            URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_beans_env.xml");
-            ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+            ctx = new ClassPathXmlApplicationContext("org/kie/spring/persistence/persistence_beans_env.xml");
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);

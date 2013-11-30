@@ -116,9 +116,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     public void createSpringContext() {
         try {
             log.info("creating spring context");
-            ReleaseId releaseId = new ReleaseIdImpl("kie-spring-jpa-singlesession","test-spring","0001");
-            URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/persistence/persistence_beans.xml");
-            ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+            ctx = new ClassPathXmlApplicationContext("org/kie/spring/persistence/persistence_beans.xml");
         } catch (Exception e) {
             log.error("can't create spring context",
                     e);
