@@ -92,14 +92,15 @@ public class TaskResource extends ResourceBase {
         "content"};
 
     private static String [] allowedQueryParams = {
-        "workItemId", 
-        "taskId", 
-        "businessAdministrator", 
-        "potentialOwner",
-        "status",
-        "taskOwner",
-        "processInstanceId",
-        "union"
+        "workItemId",             // 0
+        "taskId",                 // 1
+        "businessAdministrator",  // 2
+        "potentialOwner",         // 3
+        "status",                 // 4
+        "taskOwner",              // 5
+        "processInstanceId",      // 6
+        "language",               // 7
+        "union"                   // 8
     };
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
@@ -140,13 +141,18 @@ public class TaskResource extends ResourceBase {
         List<String> busAdmins = getStringListParam(allowedQueryParams[2], false, params, "query");
         List<String> potOwners = getStringListParam(allowedQueryParams[3], false, params, "query");
         List<String> taskOwners = getStringListParam(allowedQueryParams[5], false, params, "query");
-        String unionStr = getStringParam(allowedQueryParams[7], false, params, "query");
+        List<String> language = getStringListParam(allowedQueryParams[7], false, params, "query");
+        
+        String unionStr = getStringParam(allowedQueryParams[8], false, params, "query");
         boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
         
         List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
         List<Status> statuses = convertStringListToStatusList(statusStrList);
         
-        TaskCommand<?> queryCmd = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, busAdmins, potOwners, taskOwners, statuses, union);
+        TaskCommand<?> queryCmd 
+            = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, 
+                    busAdmins, potOwners, taskOwners, 
+                    statuses, language, union);
         
         List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doTaskOperation(
                 queryCmd, 
