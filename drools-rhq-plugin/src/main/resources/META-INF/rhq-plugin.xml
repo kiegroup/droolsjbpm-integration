@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<plugin name="DroolsRHQPlugin"
-        displayName="Drools RHQ JMX Plugin"
-        description="Provides monitoring of Drools Knowledge Bases and Sessions"
+<plugin name="KieRHQPlugin"
+        displayName="Kie RHQ JMX Plugin"
+        description="Provides monitoring of Kie Bases and Sessions"
         version="1.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:xmlns:rhq-plugin"
@@ -10,8 +10,8 @@
 
    <depends plugin="JMX" useClasses="true"/>
 
-   <service name="Drools Service"
-            description="Drools service"
+   <service name="Kie Service"
+            description="Kie Service"
             discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
             class="org.rhq.plugins.jmx.MBeanResourceComponent">
 
@@ -23,16 +23,16 @@
          <c:simple-property name="objectName" readOnly="true" default="org.drools:type=DroolsManagementAgent"/>
       </plugin-configuration>
 
-       <service name="Drools Knowledge Bases"
-                description="The Drools Knowledge Base monitoring service."
+       <service name="Kie Bases"
+                description="The Kie Base monitoring service."
                 discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
                 class="org.rhq.plugins.jmx.MBeanResourceComponent">
     
           <plugin-configuration>
              <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%"/>
-             <c:simple-property name="nameTemplate" readOnly="true" default="KBase {kbaseId}"/>
-             <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Knowledge Base {kbaseId}"/>
-             <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Knowledge Base Id"/>
+             <c:simple-property name="nameTemplate" readOnly="true" default="KieBase {kbaseId}"/>
+             <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Base {kbaseId}"/>
+             <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Kie Base Id"/>
           </plugin-configuration>
     
           <operation name="startInternalMBeans"
@@ -45,17 +45,17 @@
                      description="Stops all the internal dependent MBeans.">
           </operation>
           
-           <service name="Drools Knowledge Sessions"
-                    description="The Drools Knowledge Session monitoring service."
+           <service name="Kie Sessions"
+                    description="The Kie Session monitoring service."
                     discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
                     class="org.rhq.plugins.jmx.MBeanResourceComponent">
         
               <plugin-configuration>
                  <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%,group=Sessions,sessionId=%sessionId%"/>
-                 <c:simple-property name="nameTemplate" readOnly="true" default="KSession {sessionId}"/>
-                 <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Knowledge Base {kbaseId}, Knowledge session {sessionId}"/>
-                 <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Knowledge Base Id"/>
-                 <c:simple-property name="sessionId" type="string" readOnly="true" description="The Knowledge Session Id"/>
+                 <c:simple-property name="nameTemplate" readOnly="true" default="KieSession {sessionId}"/>
+                 <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Base {kbaseId}, Kie session {sessionId}"/>
+                 <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Kie Base Id"/>
+                 <c:simple-property name="sessionId" type="string" readOnly="true" description="The Kie Session Id"/>
               </plugin-configuration>
         
               <operation name="reset" displayName="Reset Metrics" description="Reset all metric counters."/>
@@ -97,16 +97,16 @@
                       description="The total number of facts in memory"
                       category="utilization" displayType="summary" measurementType="dynamic"/>      
         
-              <metric displayName="Total Activations Created" property="TotalActivationsCreated"
-                      description="The total number of activations created since reset"
+              <metric displayName="Total Matches Created" property="TotalMatchesCreated"
+                      description="The total number of matches created since reset"
                       category="throughput" displayType="summary" measurementType="trendsup"/>      
         
-              <metric displayName="Total Activations Fired" property="TotalActivationsFired"
-                      description="The total number of activations fired since reset"
+              <metric displayName="Total Matches Fired" property="TotalMatchesFired"
+                      description="The total number of matches fired since reset"
                       category="throughput" displayType="summary" measurementType="trendsup"/>      
         
-              <metric displayName="Total Activations Cancelled" property="TotalActivationsCancelled"
-                      description="The total number of activations cancelled since reset"
+              <metric displayName="Total Matches Cancelled" property="TotalMatchesCancelled"
+                      description="The total number of matches cancelled since reset"
                       category="throughput" displayType="summary" measurementType="trendsup"/>      
         
               <metric displayName="Total Firing Time" property="TotalFiringTime" units="milliseconds"
