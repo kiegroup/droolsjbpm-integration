@@ -29,7 +29,21 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor;
 
-@Path("/deployment/{deploymentId: [^\\s:]+(:[^\\s:]+){2,2}(:[^\\s:]*){0,2}}")
+/**
+ * If a method in this class is annotated by a @Path annotation, 
+ * then the name of the method should match the URL specified in the @Path, 
+ * where "_" characters should be used for all "/" characters in the path. 
+ * <p>
+ * For example: 
+ * <pre>
+ * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
+ * public void begin_varOne_middle_varTwo() { 
+ * </pre>
+ * 
+ * If the method is annotated by the @Path anno, but is the "root", then
+ * give it a name that explains it's funtion.
+ */
+@Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
 public class DeploymentResource extends ResourceBase {
 

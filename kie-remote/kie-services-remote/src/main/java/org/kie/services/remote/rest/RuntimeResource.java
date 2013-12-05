@@ -65,8 +65,11 @@ import org.kie.services.remote.util.Paginator;
  * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
+ * 
+ * If the method is annotated by the @Path anno, but is the "root", then
+ * give it a name that explains it's funtion.
  */
-@Path("/runtime/{deploymentId: [^\\s:]+(:[^\\s:]+){2,2}(:[^\\s:]*){0,2}}")
+@Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
 @SuppressWarnings("unchecked")
 public class RuntimeResource extends ResourceBase {
