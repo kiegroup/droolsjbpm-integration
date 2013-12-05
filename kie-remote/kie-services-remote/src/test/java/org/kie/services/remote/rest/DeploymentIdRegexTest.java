@@ -11,7 +11,20 @@ import org.junit.Test;
 public class DeploymentIdRegexTest {
 
     @Test
-    public void regextTest() {
+    public void runtimeRegexTest() {
+        Path pathAnno = RuntimeResource.class.getAnnotation(Path.class);
+        String path = pathAnno.value();
+        path = path.replace("/runtime/{deploymentId: ", "");
+        String regex = path.substring(0, path.length()-1);
+
+        String test = "group.subgroup:artifact-id:1.0";
+        assertTrue(test, Pattern.matches(regex, test));
+        test = "group.sub_group:artifact_id:v1.0.0.Final";
+        assertTrue(test, Pattern.matches(regex, test));
+    }
+
+    @Test
+    public void regexTest() {
         Path pathAnno = DeploymentResource.class.getAnnotation(Path.class);
         String path = pathAnno.value();
         path = path.replace("/deployment/{deploymentId: ", "");
@@ -44,6 +57,11 @@ public class DeploymentIdRegexTest {
         assertTrue(test, Pattern.matches(regex, all));
         String[] groups = all.split(":");
         assertEquals(5, groups.length);
+
+        test = "group.subgroup:artifact-id:1.0";
+        assertTrue(test, Pattern.matches(regex, test));
+        test = "group.sub_group:artifact_id:1.0.0.Final";
+        assertTrue(test, Pattern.matches(regex, test));
     }
 
 }
