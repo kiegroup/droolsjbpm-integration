@@ -66,7 +66,7 @@ import org.kie.services.remote.util.Paginator;
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
  */
-@Path("/runtime/{deploymentId: [a-zA-Z0-9-:\\.]+}")
+@Path("/runtime/{deploymentId: [^\\s:]+(:[^\\s:]+){2,2}(:[^\\s:]*){0,2}}")
 @RequestScoped
 @SuppressWarnings("unchecked")
 public class RuntimeResource extends ResourceBase {
