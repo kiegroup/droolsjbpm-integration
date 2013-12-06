@@ -206,7 +206,10 @@ public class KiePolicy implements Policy {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append( jaxbDataFormat.getContextPath() );
+        String contextPath = jaxbDataFormat.getContextPath();
+        if( contextPath != null ) { 
+            sb.append( contextPath );
+        }
         sb.append( ":" );
         for ( String pkgName : set ) {
             sb.append( pkgName );
