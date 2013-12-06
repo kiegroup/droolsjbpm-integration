@@ -30,6 +30,7 @@ import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
@@ -40,6 +41,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.cdi.TransactionalExecutor;
+import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
 import org.slf4j.Logger;
@@ -329,11 +331,21 @@ public class RequestMessageBean implements MessageListener {
                         && ! AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass())  ) {
                         cmdResult = executor.executeAndSerialize((InternalTaskService) taskService, (TaskCommand<?>) cmd);
                     } else {
-                        // Synchronize around SSCS to avoid race-conditions with kie session cache clearing in afterCompletion
+                        String deploymentId = request.getDeploymentId(); 
+                        if( deploymentId == null ) { 
+                            throw new DomainNotFoundBadRequestException("A deployment id is required for the " + cmd.getClass().getSimpleName());
+                        }
+                        RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
+                        if( runtimeEngine == null ) { 
+                            throw new DomainNotFoundBadRequestException("No runtime engine could be found for deployment '" + deploymentId 
+                                    + "' when executing the " + cmd.getClass().getSimpleName());
+                        }
+                        
                         KieSession kieSession 
-                            = runtimeMgrMgr.getRuntimeEngine(request.getDeploymentId(), request.getProcessInstanceId()).getKieSession();
+                            = runtimeEngine.getKieSession();
                         SingleSessionCommandService sscs 
                             = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
+                        // Synchronize around SSCS to avoid race-conditions with kie session cache clearing in afterCompletion
                         synchronized(sscs) { 
                             if( cmd instanceof TaskCommand<?> ) {
                                 cmdResult = executor.execute((InternalTaskService) taskService, (TaskCommand<?>) cmd);
