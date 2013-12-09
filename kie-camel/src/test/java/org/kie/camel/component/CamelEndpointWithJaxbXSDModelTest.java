@@ -42,7 +42,6 @@ import org.kie.api.io.KieResources;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.builder.JaxbConfiguration;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.utils.CompositeClassLoader;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.ExecutionResults;
 
