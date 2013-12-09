@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,8 +38,26 @@ public class JaxbSerializationProvider implements SerializationProvider {
             JaxbDeploymentUnitList.class
     };
 
+    public static Set<Class<?>> PRIMITIVE_ARRAY_CLASS_SET = new CopyOnWriteArraySet<Class<?>>();
+    static { 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Boolean[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Byte[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Character[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Double[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Float[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Integer[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Long[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Math[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Number[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new Short[]{}.getClass()); 
+        PRIMITIVE_ARRAY_CLASS_SET.add(new String[]{}.getClass());
+    };
+    
     private Set<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(kieJaxbClasses));
+    { jaxbClasses.addAll(PRIMITIVE_ARRAY_CLASS_SET); }
+    
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+    
     private JAXBContext jaxbContext;
     private boolean prettyPrint = false;
 
@@ -130,10 +149,14 @@ public class JaxbSerializationProvider implements SerializationProvider {
     }
     
     public static Set<Class<?>> commaSeperatedStringToClassSet(String extraClassNames) throws SerializationException { 
+        return commaSeperatedStringToClassSet(JaxbSerializationProvider.class.getClassLoader(), extraClassNames);
+    }
+    
+    public static Set<Class<?>> commaSeperatedStringToClassSet(ClassLoader classloader, String extraClassNames) throws SerializationException { 
         Set<Class<?>> classList = new HashSet<Class<?>>();
         
         extraClassNames = extraClassNames.trim();
-        if( extraClassNames.isEmpty() || ! extraClassNames.contains(",") ) { 
+        if( extraClassNames.isEmpty() ) { 
             return classList;
         }
         String [] extraClassNameList = split(extraClassNames);
@@ -142,13 +165,12 @@ public class JaxbSerializationProvider implements SerializationProvider {
         }
 
         // non-empty string/list
-        ClassLoader classLoader = JaxbSerializationProvider.class.getClassLoader();
         for( String extraClassName : extraClassNameList ) { 
             if( extraClassName.endsWith("[]") ) {
                 continue;
             }
             try { 
-                classList.add(classLoader.loadClass(extraClassName));
+                classList.add(classloader.loadClass(extraClassName));
             } catch( ClassNotFoundException cnfe ) { 
                 throw new SerializationException("Unable to load JAXB class '" + extraClassName, cnfe);
             }

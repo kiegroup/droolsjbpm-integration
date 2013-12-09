@@ -1,7 +1,6 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
-import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.*;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -216,6 +215,7 @@ public abstract class AbstractRemoteCommandObject {
                 if( ! extraJaxbClasses.isEmpty() ) { 
                     String extraJaxbClassesPropertyValue = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
                     msg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, extraJaxbClassesPropertyValue);
+                    msg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, config.getDeploymentId());
                 }
             } catch (JMSException jmse) {
                 throw new RemoteRuntimeException("Unable to create and fill a JMS message.", jmse);

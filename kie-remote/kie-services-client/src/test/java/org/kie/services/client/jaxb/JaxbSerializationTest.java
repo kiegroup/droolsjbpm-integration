@@ -2,6 +2,7 @@ package org.kie.services.client.jaxb;
 
 import static org.junit.Assert.*;
 import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
+import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -17,6 +18,8 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.kie.services.client.SerializationTest;
 import org.kie.services.client.api.command.AcceptedCommands;
+import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.services.client.api.command.RemoteRuntimeException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
@@ -243,5 +246,43 @@ public class JaxbSerializationTest extends SerializationTest {
             }
         }
         return out.toString();
+    }
+    
+    @Test
+    public void jmsSerializationPropertyTest() { 
+        
+        // 0
+        Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+        testRoundTripClassesSet(extraJaxbClasses);
+
+        // 1 
+        extraJaxbClasses.add(RemoteRuntimeException.class);
+        testRoundTripClassesSet(extraJaxbClasses);
+        
+        // 2 
+        extraJaxbClasses.add(RemoteRuntimeEngine.class);
+        testRoundTripClassesSet(extraJaxbClasses);
+    }
+    
+    private void testRoundTripClassesSet(Set<Class<?>> extraJaxbClasses ) { 
+        boolean emptySet = extraJaxbClasses.isEmpty();
+        assertNotNull( "Test class set is null!", extraJaxbClasses);
+        String classesStrProp = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
+        assertNotNull( "Classes list string is null!", classesStrProp );
+        assertTrue( "Classes list string is incorrectly formatted!", 
+                (! classesStrProp.isEmpty() || emptySet )
+                && ( ! classesStrProp.contains(" ") )
+                && ( classesStrProp.length() > 10 || emptySet) );
+        
+        Set<Class<?>> copyExtraJaxbClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(classesStrProp);
+        assertNotNull( "Round-tripped classes set is null!", copyExtraJaxbClasses );
+        assertTrue( "Round-tripped classes set is empty!", ! copyExtraJaxbClasses.isEmpty() || emptySet );
+        
+        assertEquals( "Round-tripped classes size is incorrect!", extraJaxbClasses.size(), copyExtraJaxbClasses.size() );
+        
+        for( Class<?>  origClass : extraJaxbClasses ) { 
+           assertTrue( "Round-tripped class set did not contain " + origClass.getSimpleName(), copyExtraJaxbClasses.remove(origClass) );
+        }
+        assertTrue( "There is " + copyExtraJaxbClasses.size() + " class left over in the round-tripped class set!", copyExtraJaxbClasses.isEmpty() );
     }
 }

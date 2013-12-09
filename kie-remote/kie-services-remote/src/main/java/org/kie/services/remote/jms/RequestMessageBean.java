@@ -3,6 +3,7 @@ package org.kie.services.remote.jms;
 import static org.kie.services.client.serialization.SerializationConstants.*;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -257,13 +258,38 @@ public class RequestMessageBean implements MessageListener {
         return cmdMsg;
     }
 
-    private static SerializationProvider getJaxbSerializationProvider(Message message) { 
+    private SerializationProvider getJaxbSerializationProvider(Message message) { 
         SerializationProvider serializationProvider;
+        Set<Class<?>> serializationClasses = new HashSet<Class<?>>();
+        
         try { 
+            String deploymentId = null;
+            ClassLoader classLoader = null;
+            
+            // Add classes from deployment (and get deployment classloader)
+            if( message.propertyExists(DEPLOYMENT_ID_PROPERTY_NAME) ) { 
+                deploymentId = message.getStringProperty(DEPLOYMENT_ID_PROPERTY_NAME);
+                logger.debug( "Added classes from {} to serialization context.", deploymentId);
+                Collection<Class<?>> deploymentClasses = runtimeMgrMgr.getDeploymentClasses(deploymentId);
+                if( ! deploymentClasses.isEmpty() ) { 
+                    serializationClasses.addAll(deploymentClasses);
+                    // KieContainer (deployment) classloader
+                    classLoader = deploymentClasses.iterator().next().getClassLoader(); 
+                }
+            }
+            if( classLoader == null ) { 
+                // Application classloader
+                classLoader = this.getClass().getClassLoader();
+            }
+            
+            // Add other classes that might only have been added to the war/application
             if( message.propertyExists(EXTRA_JAXB_CLASSES_PROPERTY_NAME) ) {
                 String extraClassesString = message.getStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME);
-                Set<Class<?>> extraClassesList = JaxbSerializationProvider.commaSeperatedStringToClassSet(extraClassesString);
-                serializationProvider = new JaxbSerializationProvider(extraClassesList);
+                Set<Class<?>> moreExtraClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(classLoader, extraClassesString);
+                for( Class<?> extraClass : moreExtraClasses ) { 
+                    logger.debug("Added {} to serialization context.", extraClass.getName() );
+                }
+                serializationProvider = new JaxbSerializationProvider(moreExtraClasses);
             } else { 
                 serializationProvider = new JaxbSerializationProvider();
             }
