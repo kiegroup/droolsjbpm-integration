@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,22 +35,6 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
     @Context
     private UriInfo uriInfo;
 
-    private Collection<Class<?>> otherClasses = new HashSet<Class<?>>();
-
-    public JaxbContextResolver() { 
-       otherClasses.add(new Boolean[]{}.getClass()); 
-       otherClasses.add(new Byte[]{}.getClass()); 
-       otherClasses.add(new Character[]{}.getClass()); 
-       otherClasses.add(new Double[]{}.getClass()); 
-       otherClasses.add(new Float[]{}.getClass()); 
-       otherClasses.add(new Integer[]{}.getClass()); 
-       otherClasses.add(new Long[]{}.getClass()); 
-       otherClasses.add(new Math[]{}.getClass()); 
-       otherClasses.add(new Number[]{}.getClass()); 
-       otherClasses.add(new Short[]{}.getClass()); 
-       otherClasses.add(new String[]{}.getClass()); 
-    }
-    
     @Override
     public JAXBContext getContext(Class<?> type) {
         logger.debug( "Resolving JAXBContext for " + type.getName() + " instance in input.");
@@ -65,21 +50,12 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
         }
 
         Set<Class<?>> classesForSerialization = new HashSet<Class<?>>();
-        classesForSerialization.addAll(otherClasses);
+        classesForSerialization.addAll(JaxbSerializationProvider.PRIMITIVE_ARRAY_CLASS_SET);
         
         if( deploymentId != null ) { 
             // retrieve class list from kjar
-            Collection<String> deploymentClassNames = deploymentClassNameBean.getClassNames(deploymentId);
-
-            for( String className : deploymentClassNames ) { 
-                try {
-                    Class<?> classInKjar = Class.forName(className);
-                    logger.debug("Added '" + className + "' to the classes used by the JAXBContext instance" );
-                    classesForSerialization.add(classInKjar);
-                } catch (ClassNotFoundException cnfe) {
-                    logger.error("Unable to load '" + className + "': " + cnfe.getMessage(), cnfe);
-                }
-            }
+            Collection<Class<?>> deploymentClassNames = deploymentClassNameBean.getDeploymentClasses(deploymentId);
+            classesForSerialization.addAll(deploymentClassNames);
         }
         
         // Add given type to list

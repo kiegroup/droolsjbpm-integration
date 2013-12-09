@@ -1,8 +1,11 @@
 package org.kie.services.remote.cdi;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.event.Observes;
@@ -33,7 +36,7 @@ public class DeploymentInfoBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentInfoBean.class);
     
-    private Map<String, Collection<String>> deploymentClassNamesMap = new ConcurrentHashMap<String, Collection<String>>();
+    private Map<String, Collection<Class<?>>> deploymentClassesMap = new ConcurrentHashMap<String, Collection<Class<?>>>();
     
     private Map<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();  
     
@@ -44,7 +47,7 @@ public class DeploymentInfoBean {
         if( runtimeManager != null ) { 
             logger.warn("RuntimeManager for domain {} has been replaced", event.getDeploymentId());
         }
-        deploymentClassNamesMap.put(event.getDeploymentId(), event.getDeployedUnit().getDeployedClassNames());
+        deploymentClassesMap.put(event.getDeploymentId(), event.getDeployedUnit().getDeployedClasses());
     }
     
     public void removeOnUnDeploy(@Observes @Undeploy DeploymentEvent event) {
@@ -52,7 +55,7 @@ public class DeploymentInfoBean {
         if( runtimeManager == null ) { 
             logger.warn("RuntimeManager for domain {}  does not exist and can not be undeployed.", event.getDeploymentId());
         }
-        deploymentClassNamesMap.remove(event.getDeploymentId());
+        deploymentClassesMap.remove(event.getDeploymentId());
     }
     
     // Methods for other beans/resources ------------------------------------------------------------------------------------------
@@ -82,16 +85,16 @@ public class DeploymentInfoBean {
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
     
-    public Collection<String> getClassNames(String deploymentId) { 
-        Collection<String> classNames = deploymentClassNamesMap.get(deploymentId);
-        if( classNames == null ) { 
-            classNames = new HashSet<String>();
+    public Collection<Class<?>> getDeploymentClasses(String deploymentId) { 
+        Collection<Class<?>> classes = deploymentClassesMap.get(deploymentId);
+        if( classes == null ) { 
+            return Collections.emptySet();
         }
-        return classNames;
+        return classes;
      }
 
      public Collection<String> getDeploymentIds() { 
-         return deploymentClassNamesMap.keySet();
+         return deploymentClassesMap.keySet();
      }
      
 }
