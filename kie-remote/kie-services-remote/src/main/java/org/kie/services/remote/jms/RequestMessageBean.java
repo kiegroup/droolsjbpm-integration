@@ -1,8 +1,8 @@
 package org.kie.services.remote.jms;
 
-import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
-import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -48,9 +48,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Responses to requests are <b>not</b> placed on the reply-to queue, but on the answer queue.
- * </p> Because there are multiple queues to which an instance of this class could listen to, the (JMS queue) configuration is
- * done in the ejb-jar.xml file, which allows us to configure instances of one class to listen to more than one queue.
+ * There are thus multiple queues to which an instance of this class could listen to, which is why 
+ * the (JMS queue) configuration is done in the ejb-jar.xml file.
+ * </p>
+ * Doing the configuration in the ejb-jar.xml file which allows us to configure instances of one class 
+ * to listen to more than one queue.
+ * </p>
+ * Also: responses to requests are <b>not</b> placed on a reply-to queue, but on the specified answer queue.
  */
 public class RequestMessageBean implements MessageListener {
 
@@ -166,6 +170,7 @@ public class RequestMessageBean implements MessageListener {
         int serializationType = -1;
         try { 
             if( ! message.propertyExists(SERIALIZATION_TYPE_PROPERTY_NAME) ) {
+                // default is JAXB
                 serializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
             } else { 
                 serializationType = message.getIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME);
@@ -281,7 +286,7 @@ public class RequestMessageBean implements MessageListener {
             switch(serializationType) { 
             case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
                 msgStr = (String) serializationProvider.serialize(jaxbResponse);
-                Set<Class<?>> extraJaxbClasses =  ((JaxbSerializationProvider) serializationProvider).getExtraJaxbClasses();
+                Collection<Class<?>> extraJaxbClasses =  ((JaxbSerializationProvider) serializationProvider).getExtraJaxbClasses();
                 if( ! extraJaxbClasses.isEmpty() ) { 
                     String propValue;
                     try {

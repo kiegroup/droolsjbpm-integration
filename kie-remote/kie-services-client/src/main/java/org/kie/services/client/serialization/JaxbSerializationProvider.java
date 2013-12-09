@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
         initializeJaxbContext();
     }
 
-    public JaxbSerializationProvider(Set<Class<?>> extraJaxbClassList) {
+    public JaxbSerializationProvider(Collection<Class<?>> extraJaxbClassList) {
         extraJaxbClassList.addAll(extraJaxbClassList);
         jaxbClasses.addAll(extraJaxbClassList);
         initializeJaxbContext();
@@ -116,7 +117,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
         initializeJaxbContext();
     }
 
-    public void addJaxbClasses(List<Class<?>> jaxbClassList) {
+    public void addJaxbClasses(Collection<Class<?>> jaxbClassList) {
         for (Class<?> jaxbClass : jaxbClassList) {
             jaxbClasses.add(jaxbClass);
             extraJaxbClasses.add(jaxbClass);
@@ -124,7 +125,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
         initializeJaxbContext();
     }
 
-    public Set<Class<?>> getExtraJaxbClasses() { 
+    public Collection<Class<?>> getExtraJaxbClasses() { 
         return new HashSet<Class<?>>(extraJaxbClasses);
     }
     
@@ -155,9 +156,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return classList;
     } 
 
-    public static String classSetToCommaSeperatedString(Set<Class<?>> extraClassList) throws SerializationException { 
+    public static String classSetToCommaSeperatedString(Collection<Class<?>> extraClassList) throws SerializationException { 
         StringBuilder out = new StringBuilder("");
-        for( Class<?> extraClass : extraClassList ) { 
+        Set<Class<?>> extraClassSet = new HashSet<Class<?>>();
+        extraClassSet.addAll(extraClassList);
+        for( Class<?> extraClass : extraClassSet ) { 
             if (out.length() > 0) {
                 out.append(",");
             }
