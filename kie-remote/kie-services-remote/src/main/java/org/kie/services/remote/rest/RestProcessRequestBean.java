@@ -17,7 +17,7 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
-import org.kie.services.remote.cdi.TransactionalExecutor;
+import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 
 /**
  * This class is used by both the {@link RuntimeResource} and {@link TaskResource} to do the core operations on
@@ -41,9 +41,6 @@ public class RestProcessRequestBean {
     @Inject
     private TaskService taskService;
 
-    @Inject
-    private TransactionalExecutor executor;
-
     /**
      * Executes a command on the {@link KieSession} from the proper {@link RuntimeManager}. This method
      * ends up synchronizing around the retrieved {@link KieSession} in order to avoid race-conditions.
@@ -61,7 +58,7 @@ public class RestProcessRequestBean {
             SingleSessionCommandService sscs 
                 = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
             synchronized (sscs) { 
-                result = executor.execute(kieSession, cmd);
+                result = kieSession.execute(cmd);
             }
         } catch (Exception e) {
             if( e instanceof RuntimeException ) { 
@@ -95,10 +92,10 @@ public class RestProcessRequestBean {
                 SingleSessionCommandService sscs 
                     = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
                 synchronized (sscs) {
-                    result = executor.execute((InternalTaskService) taskService, cmd);
+                    result = ((InternalTaskService) taskService).execute(cmd);
                 }
             } else {
-                result = executor.execute((InternalTaskService) taskService, cmd);
+                result = ((InternalTaskService) taskService).execute(cmd);
             }
         } catch (PermissionDeniedException pde) {
             throw new UnauthorizedException(pde.getMessage(), pde);
@@ -133,7 +130,7 @@ public class RestProcessRequestBean {
     public Object doTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
         Object result = null;
         try {
-            result = executor.executeAndSerialize((InternalTaskService) taskService, cmd);
+            result = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
         } catch (PermissionDeniedException pde) {
             throw new UnauthorizedException(pde.getMessage(), pde);
         } catch (RuntimeException re) {

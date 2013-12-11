@@ -16,6 +16,9 @@
 
 package org.kie.spring.persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.persistence.TransactionManager;
 import org.drools.persistence.TransactionSynchronization;
 import org.slf4j.Logger;
@@ -29,6 +32,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class KieSpringTransactionManager
         implements
         TransactionManager {
+
+    public static final String RESOURCE_CONTAINER = "org.kie.resources";
 
     Logger logger = LoggerFactory.getLogger(getClass());
     private AbstractPlatformTransactionManager ptm;
@@ -137,5 +142,24 @@ public class KieSpringTransactionManager
 
     public void registerTransactionSynchronization(TransactionSynchronization ts) {
         TransactionSynchronizationManager.registerSynchronization(new SpringTransactionSynchronizationAdapter(ts));
+    }
+
+    @Override
+    public void putResource(Object key, Object resource) {
+        Map<Object, Object> resources = (Map<Object, Object>) TransactionSynchronizationManager.getResource(RESOURCE_CONTAINER);
+        if (resources == null) {
+            resources = new HashMap<Object, Object>();
+            TransactionSynchronizationManager.bindResource(RESOURCE_CONTAINER, resources);
+        }
+        resources.put(key, resource);
+    }
+
+    @Override
+    public Object getResource(Object key) {
+        Map<Object, Object> resources = (Map<Object, Object>) TransactionSynchronizationManager.getResource(RESOURCE_CONTAINER);
+        if (resources == null) {
+            return null;
+        }
+        return resources.get(key);
     }
 }

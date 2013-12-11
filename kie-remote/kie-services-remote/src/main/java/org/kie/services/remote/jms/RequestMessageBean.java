@@ -41,10 +41,10 @@ import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
-import org.kie.services.remote.cdi.TransactionalExecutor;
 import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
+import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,9 +86,6 @@ public class RequestMessageBean implements MessageListener {
     
     @Inject
     private TaskService taskService;
-
-    @Inject
-    private TransactionalExecutor executor;
     
     // Constants / properties
     
@@ -360,7 +357,7 @@ public class RequestMessageBean implements MessageListener {
                     // that will cause message reception to be *NOT* acknowledged!
                     if( cmd instanceof TaskCommand<?>
                         && ! AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass())  ) {
-                        cmdResult = executor.executeAndSerialize((InternalTaskService) taskService, (TaskCommand<?>) cmd);
+                        cmdResult = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand < ? >) cmd));
                     } else {
                         String deploymentId = request.getDeploymentId(); 
                         if( deploymentId == null ) { 
@@ -379,9 +376,9 @@ public class RequestMessageBean implements MessageListener {
                         // Synchronize around SSCS to avoid race-conditions with kie session cache clearing in afterCompletion
                         synchronized(sscs) { 
                             if( cmd instanceof TaskCommand<?> ) {
-                                cmdResult = executor.execute((InternalTaskService) taskService, (TaskCommand<?>) cmd);
+                                cmdResult = ((InternalTaskService) taskService).execute((TaskCommand<?>) cmd);
                             } else { 
-                                cmdResult = executor.execute(kieSession, cmd);
+                                cmdResult = kieSession.execute(cmd);
                             }
                         }
                     }
