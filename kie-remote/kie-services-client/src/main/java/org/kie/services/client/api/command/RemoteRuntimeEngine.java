@@ -2,8 +2,10 @@ package org.kie.services.client.api.command;
 
 import org.drools.core.command.CommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.CommandBasedAuditLogService;
+import org.jbpm.services.task.events.TaskEventSupport;
 import org.jbpm.services.task.impl.command.CommandBasedTaskService;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.KieSession;
@@ -28,7 +30,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
 
     public TaskService getTaskService() {
         CommandExecutor executor = new RemoteTaskCommandExecutor(config);
-        return new CommandBasedTaskService(executor);
+        return new CommandBasedTaskService((CommandService)executor, new TaskEventSupport());
     }
     
     public AuditLogService getAuditLogService() { 

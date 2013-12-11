@@ -75,6 +75,16 @@
       <artifactId>jbpm-persistence-jpa</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-runtime-manager</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.hibernate.javax.persistence</groupId>

@@ -56,6 +56,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-jpa</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
       <scope>provided</scope>

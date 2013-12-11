@@ -130,4 +130,14 @@ public class HumanTaskSpringTransactionManager implements TransactionManager {
     public void registerTransactionSynchronization(TransactionSynchronization ts) {
         TransactionSynchronizationManager.registerSynchronization(new SpringTransactionSynchronizationAdapter(ts));
     }
+
+    @Override
+    public void putResource(Object key, Object resource) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object getResource(Object key) {
+        throw new UnsupportedOperationException();
+    }
 }

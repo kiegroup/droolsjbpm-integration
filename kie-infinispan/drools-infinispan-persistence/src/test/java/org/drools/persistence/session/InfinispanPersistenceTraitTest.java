@@ -46,6 +46,7 @@ import org.kie.api.io.ResourceType;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.api.runtime.Environment;
 
+@Ignore
 public class InfinispanPersistenceTraitTest {
 
     private HashMap<String, Object> context;

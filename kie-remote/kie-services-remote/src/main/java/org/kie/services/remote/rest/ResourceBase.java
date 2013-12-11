@@ -22,13 +22,16 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotAcceptableException;
 import org.jboss.resteasy.util.HttpHeaderNames;
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.impl.model.GroupImpl;
-import org.jbpm.services.task.impl.model.TaskImpl;
-import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
+import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
+import org.kie.api.task.model.Task;
+import org.kie.api.task.model.User;
+import org.kie.internal.task.api.TaskModelProvider;
+import org.kie.internal.task.api.model.InternalOrganizationalEntity;
+import org.kie.internal.task.api.model.InternalTask;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
@@ -299,17 +302,21 @@ public class ResourceBase {
             throw new BadRequestException("At least 1 query parameter (either 'user' or 'group') is required for the '" + operation + "' operation.");
         }
         
-        for( String user : users ) { 
-            orgEntList.add(new UserImpl(user));
+        for( String user : users ) {
+            User newuser = TaskModelProvider.getFactory().newUser();
+            ((InternalOrganizationalEntity) newuser).setId(user);
+            orgEntList.add(newuser);
         }
-        for( String group : groups ) { 
-            orgEntList.add(new GroupImpl(group));
+        for( String group : groups ) {
+            Group newuser = TaskModelProvider.getFactory().newGroup();
+            ((InternalOrganizationalEntity) newuser).setId(group);
+            orgEntList.add(newuser);
         }
         
         return orgEntList;
     }
     
-    protected static TaskSummaryImpl convertTaskToTaskSummary(TaskImpl task) { 
+    protected static TaskSummaryImpl convertTaskToTaskSummary(InternalTask task) {
        TaskSummaryImpl taskSummary = new TaskSummaryImpl(
                task.getId().longValue(),
                task.getTaskData().getProcessInstanceId(),
