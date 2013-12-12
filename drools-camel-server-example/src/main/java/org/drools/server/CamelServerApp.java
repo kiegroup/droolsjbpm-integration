@@ -43,7 +43,9 @@ public class CamelServerApp {
     }
 
     public String send(String msg) {
+        System.setProperty("drools-server", "abcd");
         ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext("classpath:/camel-client.xml");
+        System.out.println("REST URL :: "+springContext.getBean("restUrl"));
         String batch = "";
         batch += "<batch-execution lookup=\"ksession1\">\n";
         batch += "  <insert out-identifier=\"message\">\n";
