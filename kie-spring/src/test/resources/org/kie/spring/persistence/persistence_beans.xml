@@ -54,6 +54,7 @@
     <kie:transaction-manager ref="txManager"/>
   </kie:environment>
 
+    <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
 
 
 </beans>

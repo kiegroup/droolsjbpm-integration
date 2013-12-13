@@ -81,4 +81,7 @@
     </constructor-arg>
   </bean>
   <!-- end additions for environment -->
+
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
 </beans>

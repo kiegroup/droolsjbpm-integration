@@ -16,18 +16,11 @@
 
 package org.kie.spring.tests;
 
-import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
-import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.io.File;
-import java.net.URL;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -43,9 +36,7 @@ public class KieSpringListenersOrderTest {
 
     @BeforeClass
     public static void runBeforeClass() {
-        ReleaseId releaseId = new ReleaseIdImpl("listeners-order-spring","test-spring","0001");
-        URL configFileURL =  InternalKieSpringUtilsTest.class.getResource("/org/kie/spring/listenersOrderTest.xml");
-        ctx = InternalKieSpringUtils.getSpringContext(releaseId,configFileURL);
+        ctx = new ClassPathXmlApplicationContext("org/kie/spring/listenersOrderTest.xml");
     }
 
     private KieSession getSession() {
