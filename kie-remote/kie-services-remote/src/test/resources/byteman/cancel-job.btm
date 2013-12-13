@@ -1,0 +1,13 @@
+#
+# Byteman scripts for the AsyncDeploymentJobExecutorInjectionTest
+#
+########################################################################
+
+RULE cancel-job
+CLASS org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor
+METHOD submitJob(org.jbpm.kie.services.impl.KModuleDeploymentService, org.jbpm.kie.services.impl.KModuleDeploymentUnit, org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor$JobType)
+AT INVOKE java.util.Map.put
+BIND asyncExec = $0
+IF asyncExec.jobs.size() == 1
+DO System.out.println( "FIRST SUBMISSION WAITS: " + asyncExec.jobs.size() );
+ENDRULE

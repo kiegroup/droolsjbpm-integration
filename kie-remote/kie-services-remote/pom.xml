@@ -16,13 +16,8 @@
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-services-client</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-audit</artifactId>
-    </dependency>
 
-    <!-- kie -->
+    <!-- kie/drools/jbpm -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-kie-services</artifactId>
@@ -36,6 +31,14 @@
           <groupId>org.kie</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-shared-services</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
@@ -95,11 +98,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-shared-services</artifactId>
-    </dependency>
-    
+
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>
@@ -107,8 +106,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+    </dependency>
+    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.byteman</groupId>
+      <artifactId>byteman-bmunit</artifactId>
+      <version>2.1.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
