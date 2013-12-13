@@ -44,17 +44,17 @@ public class AsyncDeploymentJobExecutor {
 
     private final static Logger logger = Logger.getLogger(AsyncDeploymentJobExecutor.class);
 
-    protected final ExecutorService executor;
-    private final Map<String, Future<Boolean>> jobs;
+    final ExecutorService executor;
+    final Map<String, Future<Boolean>> jobs;
 
-    private int maxCacheSize = 100;
+    private static int maxQueueSize = 100;
 
-    private static enum JobType {
+    static enum JobType {
         DEPLOY, UNDEPLOY;
     }
 
     public AsyncDeploymentJobExecutor() {
-        Cache<Boolean> cache = new Cache<Boolean>(maxCacheSize);
+        Cache<Boolean> cache = new Cache<Boolean>(maxQueueSize);
         jobs = Collections.synchronizedMap(cache);
         executor = Executors.newSingleThreadExecutor();
     }
@@ -67,9 +67,9 @@ public class AsyncDeploymentJobExecutor {
         return submitJob(deploymentService, depUnit, JobType.UNDEPLOY);
     }
 
-    private JaxbDeploymentJobResult submitJob(KModuleDeploymentService deploymentService, KModuleDeploymentUnit depUnit,
+    JaxbDeploymentJobResult submitJob(KModuleDeploymentService deploymentService, KModuleDeploymentUnit depUnit,
             JobType type) {
-        if (jobs.size() > maxCacheSize + 1) {
+        if (jobs.size() > maxQueueSize + 1) {
             String msg = "Waiting for existing un/deploy jobs to complete first.";
             logger.info(type.toString() + " job NOT submitted: " + msg);
             return new JaxbDeploymentJobResult(msg, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
@@ -243,4 +243,7 @@ public class AsyncDeploymentJobExecutor {
         }
     }
 
+    int getMaxJobQueueSize() { 
+       return maxQueueSize; 
+    }
 }
