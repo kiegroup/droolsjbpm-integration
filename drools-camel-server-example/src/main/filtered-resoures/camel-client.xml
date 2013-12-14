@@ -31,7 +31,7 @@
     <route>
        <from uri="direct://kservice/rest"/>
        <policy ref="kiePolicy">
-         <to uri="cxfrs://http://localhost:8080/drools-camel-server-example-${project.version}/kservice/soap"/>
+         <to uri="cxfrs://http://localhost:8080/drools-camel-server-example-${project.version}/kservice/rest"/>
        </policy>
     </route>
 
