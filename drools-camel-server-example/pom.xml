@@ -186,4 +186,16 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resoures</directory>
+      </resource>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/filtered-resoures</directory>
+      </resource>
+    </resources>
+  </build>
 </project>
