@@ -25,20 +25,20 @@
   
   <!-- Leave this, as it's needed to make Camel "drools" aware -->
   <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
-    
+
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
       
     <route>
        <from uri="direct://kservice/rest"/>
        <policy ref="kiePolicy">
-         <to uri="cxfrs://http://localhost:8080/drools-server/kservice/rest"/>
+         <to uri="cxfrs://http://localhost:8080/drools-camel-server-example-${project.version}/kservice/rest"/>
        </policy>
     </route>
 
     <route>
       <from uri="direct://kservice/soap"/>
       <policy ref="kiePolicy">
-        <to uri="cxfrs://http://localhost:8080/drools-server/kservice/soap"/>
+        <to uri="cxfrs://http://localhost:8080/drools-camel-server-example-${project.version}/kservice/soap"/>
       </policy>
     </route>
 
