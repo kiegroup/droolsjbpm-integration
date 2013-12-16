@@ -100,7 +100,8 @@
     <dependency>
       <groupId>org.apache.aries.blueprint</groupId>
       <artifactId>org.apache.aries.blueprint.noosgi</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <!--  1.0.1-SNAPSHOT IS NOT AVAILABLE AND HAS NOT BEEN PUBLISHED!!! -->
+      <version>1.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>

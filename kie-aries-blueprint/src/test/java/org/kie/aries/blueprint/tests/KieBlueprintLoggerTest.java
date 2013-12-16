@@ -23,6 +23,7 @@ import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.impl.StatelessKnowledgeSessionImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+
+@Ignore("Add when org.apache.aries.blueprint.noosgi 1.0.1 is released")
 public class KieBlueprintLoggerTest {
 
     static BlueprintContainerImpl container = null;

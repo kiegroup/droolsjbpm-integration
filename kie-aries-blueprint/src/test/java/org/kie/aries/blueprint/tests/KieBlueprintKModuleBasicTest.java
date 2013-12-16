@@ -18,6 +18,7 @@ package org.kie.aries.blueprint.tests;
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore("Add when org.apache.aries.blueprint.noosgi 1.0.1 is released")
 public class KieBlueprintKModuleBasicTest {
 
     static BlueprintContainerImpl container = null;

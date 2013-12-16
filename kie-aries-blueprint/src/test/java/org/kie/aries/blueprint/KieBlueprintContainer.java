@@ -45,6 +45,9 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
         super.init();
     }
 
+    /**
+     * Readd when org.apache.aries.blueprint.noosgi 1.0.1 is released
+     * 
     @Override
     protected NamespaceHandlerSet createNamespaceHandlerSet(Set<URI> namespaces) {
         NamespaceHandlerSet handlerSet = new SimpleNamespaceHandlerSet();
@@ -68,4 +71,5 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
         }
         return handlerSet;
     }
+    */
 }

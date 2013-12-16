@@ -25,6 +25,7 @@ import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.runtime.Environment;
@@ -34,13 +35,13 @@ import org.kie.aries.blueprint.mocks.MockEntityManager;
 import org.kie.aries.blueprint.mocks.MockJpaTransactionManager;
 import org.kie.aries.blueprint.mocks.MockObjectMarshallingStrategy;
 
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore("Add when org.apache.aries.blueprint.noosgi 1.0.1 is released")
 public class KieBlueprintEnvironmentTest {
 
     static BlueprintContainerImpl container = null;
