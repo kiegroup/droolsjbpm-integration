@@ -511,9 +511,10 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
     public Response withvars_process_instance_procInstid_signal(@PathParam("procInstId") Long procInstId) {
+        String oper = getRelativePath(request);
         Map<String, List<String>> params = getRequestParams(request);
-        String eventType = getStringParam("eventType", true, params, "signal");
-        Object event = getObjectParam("event", false, params, "signal");
+        String eventType = getStringParam("signal", true, params, oper);
+        Object event = getObjectParam("event", false, params, oper);
         String errorMsg = "Unable to signal process instance " + procInstId;
         if( eventType == null ) { 
             errorMsg += " with empty signal";

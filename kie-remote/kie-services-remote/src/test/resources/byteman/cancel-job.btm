@@ -5,7 +5,7 @@
 
 RULE cancel-job
 CLASS org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor
-METHOD submitJob(org.jbpm.kie.services.impl.KModuleDeploymentService, org.jbpm.kie.services.impl.KModuleDeploymentUnit, org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor$JobType)
+METHOD putIfAbsent(java.lang.String, java.util.concurrent.Future, java.util.Map)
 AT INVOKE java.util.Map.put
 BIND asyncExec = $0
 IF asyncExec.jobs.size() == 1

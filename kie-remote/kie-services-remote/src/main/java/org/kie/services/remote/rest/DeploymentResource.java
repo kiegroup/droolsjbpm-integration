@@ -162,9 +162,7 @@ public class DeploymentResource extends ResourceBase {
 
         JaxbDeploymentJobResult jobResult;
         jobResult = jobExecutor.submitDeployJob(deploymentService, deploymentUnit);
-        JaxbDeploymentUnit depUnit = convertKModuleDepUnitToJaxbDepUnit(deploymentUnit);
-        depUnit.setStatus(JaxbDeploymentStatus.DEPLOYING);
-        jobResult = new JaxbDeploymentJobResult("test", true, depUnit, "DEPLOY");
+        jobResult.getDeploymentUnit().setStatus(JaxbDeploymentStatus.DEPLOYING);
 
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
@@ -176,6 +174,7 @@ public class DeploymentResource extends ResourceBase {
         KModuleDeploymentUnit deploymentUnit = (KModuleDeploymentUnit) deployedUnit.getDeploymentUnit();
         
         JaxbDeploymentJobResult jobResult = jobExecutor.submitUndeployJob(deploymentService, deploymentUnit);
+        jobResult.getDeploymentUnit().setStatus(JaxbDeploymentStatus.UNDEPLOYING);
 
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }

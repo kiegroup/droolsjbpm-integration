@@ -5,7 +5,7 @@ import org.kie.internal.command.Context;
 
 class RemoteSessionCommandService extends AbstractRemoteCommandObject implements CommandService {
 
-	public RemoteSessionCommandService(RemoteConfiguration config) {
+	RemoteSessionCommandService(RemoteConfiguration config) {
 		super(config);
 	}
 	
