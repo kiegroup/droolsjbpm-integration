@@ -108,7 +108,7 @@ public class LiveServerTest {
             ClientExecutor clientExecutor = new ApacheHttpClient4Executor(httpClient);
             requestFactory = new ClientRequestFactory(clientExecutor, ResteasyProviderFactory.getInstance());
         } else {
-            requestFactory = RestRequestHelper.createRestRequestFactory(deploymentUrl, userId, password);
+            requestFactory = RestRequestHelper.createRequestFactory(deploymentUrl, userId, password);
         }
 
         // Create (start process) request

@@ -6,7 +6,7 @@ import org.kie.internal.command.Context;
 
 class RemoteTaskCommandExecutor extends AbstractRemoteCommandObject implements CommandService {
 	
-	public RemoteTaskCommandExecutor(RemoteConfiguration configuration) { 
+	RemoteTaskCommandExecutor(RemoteConfiguration configuration) { 
 		super(configuration);
 		isTaskService = true;
 	}

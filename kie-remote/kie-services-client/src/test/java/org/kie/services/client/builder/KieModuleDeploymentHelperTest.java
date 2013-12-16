@@ -1,14 +1,15 @@
 package org.kie.services.client.builder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -22,7 +23,6 @@ import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.scanner.MavenRepository;
-import org.kie.services.client.api.LiveServerTest;
 import org.kie.services.client.deployment.FluentKieModuleDeploymentHelper;
 import org.kie.services.client.deployment.KieModuleDeploymentHelper;
 import org.kie.services.client.deployment.SingleKieModuleDeploymentHelper;
@@ -32,7 +32,7 @@ import org.sonatype.aether.artifact.Artifact;
 
 public class KieModuleDeploymentHelperTest {
 
-    protected static Logger logger = LoggerFactory.getLogger(LiveServerTest.class);
+    protected static Logger logger = LoggerFactory.getLogger(KieModuleDeploymentHelperTest.class);
     
     private ZipInputStream zip;
 
@@ -78,7 +78,10 @@ public class KieModuleDeploymentHelperTest {
             ze = zip.getNextEntry();
         }
         assertEquals("Num files in kjar", 10, jarFiles.size());
-        // TODO FINISH checks on files: .class files, kmodule.xml, .bpmn files.. 
+        Set<String> correctJarFiles = new HashSet<String>();
+        for( String kjarFileName : jarFiles ) { 
+            
+        }
     }
 
     @Test

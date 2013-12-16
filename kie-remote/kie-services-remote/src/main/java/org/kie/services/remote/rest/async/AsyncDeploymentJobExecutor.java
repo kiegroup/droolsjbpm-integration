@@ -1,5 +1,7 @@
 package org.kie.services.remote.rest.async;
 
+import static org.kie.services.remote.rest.DeploymentResource.convertKModuleDepUnitToJaxbDepUnit;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,12 +50,20 @@ public class AsyncDeploymentJobExecutor {
     final Map<String, Future<Boolean>> jobs;
 
     private static int maxQueueSize = 100;
+    public static final String MAX_JOB_QUEUE_SIZE_PROP = "org.kie.remote.rest.deployment.job.queue.size";
 
     static enum JobType {
         DEPLOY, UNDEPLOY;
     }
 
     public AsyncDeploymentJobExecutor() {
+        String maxCacheSizePropStr = System.getProperty(MAX_JOB_QUEUE_SIZE_PROP, String.valueOf(maxQueueSize) );
+        try { 
+            maxQueueSize = Integer.valueOf(maxCacheSizePropStr).intValue();
+        } catch( NumberFormatException nfe ) { 
+            logger.error("Unable to format " + MAX_JOB_QUEUE_SIZE_PROP + " value: '" + maxCacheSizePropStr + "', "
+                    + "using " + maxQueueSize + " for job cache size");
+        }
         Cache<Boolean> cache = new Cache<Boolean>(maxQueueSize);
         jobs = Collections.synchronizedMap(cache);
         executor = Executors.newSingleThreadExecutor();
@@ -67,11 +77,12 @@ public class AsyncDeploymentJobExecutor {
         return submitJob(deploymentService, depUnit, JobType.UNDEPLOY);
     }
 
-    JaxbDeploymentJobResult submitJob(KModuleDeploymentService deploymentService, KModuleDeploymentUnit depUnit,
-            JobType type) {
-        if (jobs.size() > maxQueueSize + 1) {
-            String msg = "Waiting for existing un/deploy jobs to complete first.";
-            logger.info(type.toString() + " job NOT submitted: " + msg);
+    JaxbDeploymentJobResult submitJob(KModuleDeploymentService deploymentService, KModuleDeploymentUnit depUnit, JobType type) {
+        String loggerJobId = type.toString() + " job for [" + depUnit.getIdentifier() + "]";
+        
+        if (jobs.size() > maxQueueSize) {
+            String msg = "Queue is full with existing incomplete un/deploy jobs";
+            logger.info(loggerJobId + " NOT submitted: " + msg);
             return new JaxbDeploymentJobResult(msg, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
         }
 
@@ -83,42 +94,40 @@ public class AsyncDeploymentJobExecutor {
          * don't do anything.
          */
         Future<Boolean> previousJob = jobs.get(jobId);
-        if (previousJob != null) {
-            if (!previousJob.isDone()) {
-                String msg = "A job already exists to " + type.toString().toLowerCase() + " this deployment.";
-                logger.info(type.toString() + " job NOT submitted: " + msg);
+        String JOB_ALREADY_EXISTS_MSG = "A job already exists to " + type.toString().toLowerCase() + " deployment [" + depUnit.getIdentifier() + "]";
+        if( jobIsPending(previousJob) ) { 
+            logger.info(type.toString() + " job NOT submitted: " + JOB_ALREADY_EXISTS_MSG);
+            return new JaxbDeploymentJobResult(JOB_ALREADY_EXISTS_MSG, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
+        }
+
+        // Submit job
+        DeploymentJobCallable jobCallable = new DeploymentJobCallable(depUnit, type, deploymentService);
+        Future<Boolean> newJob = executor.submit(jobCallable);
+        previousJob = putIfAbsent(jobId, newJob, jobs);
+
+        // If a job already exists, then cancel this new one (if it hasn't started yet). 
+        String JOB_SUBMITTED_MSG = "Deployment (" + type.toString().toLowerCase() + ") job submitted";
+        if( jobIsPending(previousJob) ) { 
+           if( newJob.cancel(false) ) { 
+               logger.info(type.toString() + " job submitted but cancelled: " + JOB_ALREADY_EXISTS_MSG);
+               return new JaxbDeploymentJobResult(JOB_ALREADY_EXISTS_MSG, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
+            } else {
+                String msg = JOB_SUBMITTED_MSG + " but was unable to cancel a previous identical job: this job may fail";
+                logger.info(loggerJobId + " submitted: " + msg);
                 return new JaxbDeploymentJobResult(msg, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
-            } else {
-                jobs.values().remove(previousJob);
-            }
+           }
         }
 
-        // submit job
-        DeploymentJobCallable job = new DeploymentJobCallable(depUnit, type, deploymentService);
-        Future<Boolean> newJob = executor.submit(job);
-        previousJob = jobs.put(jobId, newJob);
+        logger.info(loggerJobId + " submitted succesfully");
+        return new JaxbDeploymentJobResult(JOB_SUBMITTED_MSG + " successfully.", true, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
+    }
 
-        StringBuilder statusMsg = new StringBuilder("Deployment (" + type.toString().toLowerCase() + ") job submitted.");
-        /**
-         * If another request has managed to also submit a job,
-         * then we try to cancel it (before it runs, no interrupting!)
-         * (this job then runs in it's place, obviously)
-         */
-        if (previousJob != null && !previousJob.isDone()) {
-            if (previousJob.cancel(false)) {
-                String msg = "A previous identical job has been cancelled and this job will take its place.";
-                logger.info(type.toString() + " job submitted: " + msg);
-                statusMsg.append(" ").append(msg);
-            } else {
-                String msg = "Unable to cancel a previous identical job. This job may fail.";
-                logger.info(type.toString() + " job submitted: " + msg);
-                statusMsg.append(" ").append(msg);
-            }
-        } else {
-            logger.info(type.toString() + " job submitted succesfully");
+    private boolean jobIsPending(Future<Boolean> job) { 
+        if( job == null ) { 
+            return false;
         }
-
-        return new JaxbDeploymentJobResult(statusMsg.toString(), true, convertKModuleDepUnitToJaxbDepUnit(depUnit), type.toString());
+        // still queued
+        return !(job.isDone() || job.isCancelled());
     }
 
     public JaxbDeploymentStatus getStatus(String deploymentUnitId) {
@@ -137,7 +146,7 @@ public class AsyncDeploymentJobExecutor {
             try { 
                 success = deployJob.get(1, TimeUnit.MILLISECONDS);
                 if( success == null ) { 
-                    throw new KieRemoteServicesInternalError("Impossible error: deployment job did not return a boolean. Contact the developers.");
+                    throw new KieRemoteServicesInternalError("Impossible error: deployment job did not return a boolean. Contact the developers");
                 }
             } catch (Exception e) {
                 // Technically, this should never happen, but if it has, then there's probably something wrong. 
@@ -155,7 +164,7 @@ public class AsyncDeploymentJobExecutor {
             try { 
                 success = undeployJob.get(1, TimeUnit.MILLISECONDS);
                 if( success == null ) { 
-                    throw new KieRemoteServicesInternalError("Impossible error: deployment job did not return a boolean. Contact the developers.");
+                    throw new KieRemoteServicesInternalError("Impossible error: deployment job did not return a boolean. Contact the developers");
                 }
             } catch (Exception e) {
                 // Technically, this should never happen, but if it has, then there's probably something wrong. 
@@ -182,7 +191,7 @@ public class AsyncDeploymentJobExecutor {
      * 
      * @param <T>
      */
-    private static class Cache<T> extends LinkedHashMap<String, Future<T>> {
+    private static class Cache<Boolean> extends LinkedHashMap<String, Future<Boolean>> {
         private int maxSize = 100;
 
         public Cache(int maxSize) {
@@ -190,8 +199,17 @@ public class AsyncDeploymentJobExecutor {
         }
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<String, Future<T>> stringFutureEntry) {
+        protected boolean removeEldestEntry(Map.Entry<String, Future<Boolean>> stringFutureEntry) {
             return stringFutureEntry.getValue().isDone() && (size() > maxSize);
+        }
+    }
+
+    private Future<Boolean> putIfAbsent(String jobId, Future<Boolean> newJob, Map<String, Future<Boolean>> jobs) {
+        synchronized( jobs ) { 
+            if (!jobs.containsKey(jobId))
+                return jobs.put(jobId, newJob);
+            else
+                return jobs.get(jobId);
         }
     }
 
@@ -200,14 +218,20 @@ public class AsyncDeploymentJobExecutor {
      */
     private static class DeploymentJobCallable implements Callable<Boolean> {
 
-        private final KModuleDeploymentUnit deploymentUnit;
-        private final JobType type;
-        private final KModuleDeploymentService deploymentService;
+        private KModuleDeploymentUnit deploymentUnit;
+        private JobType type;
+        private KModuleDeploymentService deploymentService;
 
         public DeploymentJobCallable(KModuleDeploymentUnit depUnit, JobType type, KModuleDeploymentService deploymentService) {
             this.deploymentUnit = depUnit;
             this.type = type;
             this.deploymentService = deploymentService;
+        }
+
+        private void makeGarbageCollectionEasy() { 
+            this.type = null;
+            this.deploymentService = null;
+            this.deploymentUnit = null;
         }
 
         @Override
@@ -217,28 +241,29 @@ public class AsyncDeploymentJobExecutor {
             case DEPLOY:
                 try {
                     deploymentService.deploy(deploymentUnit);
-                    logger.debug("Deployment unit '" + deploymentUnit.getIdentifier() + "' deployed.");
+                    logger.debug("Deployment unit [" + deploymentUnit.getIdentifier() + "] deployed");
                     success = true;
                 } catch (Exception e) {
-                    logger.error("Unable to deploy '" + deploymentUnit.getIdentifier() + "'", e);
+                    logger.error("Unable to deploy [" + deploymentUnit.getIdentifier() + "]", e);
                     success = false;
                 }
                 break;
             case UNDEPLOY:
                 try {
                     deploymentService.undeploy(deploymentUnit);
-                    logger.debug("Deployment unit '" + deploymentUnit.getIdentifier() + "' undeployed.");
+                    logger.debug("Deployment unit [" + deploymentUnit.getIdentifier() + "] undeployed");
                     success = true;
                 } catch (Exception e) {
-                    logger.error("Unable to undeploy '" + deploymentUnit.getIdentifier() + "'", e);
+                    logger.error("Unable to undeploy [" + deploymentUnit.getIdentifier() + "]", e);
                     success = false;
                 }
                 break;
             default:
                 throw new KieRemoteServicesInternalError("Unknown " + JobType.class.getSimpleName() + " type (" + type.toString()
-                        + "), not taking any action.");
+                        + "), not taking any action");
             }
 
+            makeGarbageCollectionEasy();
             return success;
         }
     }

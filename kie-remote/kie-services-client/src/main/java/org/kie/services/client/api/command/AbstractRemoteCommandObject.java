@@ -59,7 +59,7 @@ public abstract class AbstractRemoteCommandObject {
 
     protected final RemoteConfiguration config;
 
-    public AbstractRemoteCommandObject(RemoteConfiguration config) {
+    AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
     }
 

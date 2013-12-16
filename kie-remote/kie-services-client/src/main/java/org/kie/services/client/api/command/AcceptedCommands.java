@@ -27,6 +27,10 @@ import org.kie.api.command.Command;
 
 public class AcceptedCommands {
 
+    private AcceptedCommands() { 
+        // static fields only
+    }
+    
     private static Set<Class<? extends Command>> acceptedCommands = new HashSet<Class<? extends Command>>();
     static {
         acceptedCommands.add(AbortWorkItemCommand.class);
