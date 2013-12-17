@@ -17,7 +17,7 @@ package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
-import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.drools.core.util.StringUtils;
 import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
@@ -66,7 +66,8 @@ public class KieBaseElementParser extends AbstractElementParser {
         kBaseOptionsAdaptor.setDef(element.getAttribute(ATTRIBUTE_DEFAULT));
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_LAZY);
-        PassThroughMetadataImpl passThroughMetadata = context.createMetadata(PassThroughMetadataImpl.class);
+
+        MutablePassThroughMetadata passThroughMetadata = context.createMetadata(MutablePassThroughMetadata.class);
         passThroughMetadata.setObject(kBaseOptionsAdaptor);
         beanMetadata.addArgument(passThroughMetadata, null, 2);
 
