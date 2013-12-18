@@ -84,6 +84,10 @@ public class AcceptedCommands {
         acceptedCommands.add(StartTaskCommand.class);
         acceptedCommands.add(StopTaskCommand.class);
         acceptedCommands.add(SuspendTaskCommand.class);
+        acceptedCommands.add(CompositeCommand.class);
+        acceptedCommands.add(ProcessSubTaskCommand.class);
+        acceptedCommands.add(ExecuteTaskRulesCommand.class);
+        acceptedCommands.add(CancelDeadlineCommand.class);
 
         // audit commands
         acceptedCommands.add(ClearHistoryLogsCommand.class);

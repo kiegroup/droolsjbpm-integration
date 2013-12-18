@@ -100,6 +100,10 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "start-task", type = StartTaskCommand.class),
             @XmlElement(name = "stop-task", type = StopTaskCommand.class),
             @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class),
+            @XmlElement(name = "task-composite-command", type = CompositeCommand.class),
+            @XmlElement(name = "process-sub-tasks-command", type = ProcessSubTaskCommand.class),
+            @XmlElement(name = "execute-task-rules-command", type = ExecuteTaskRulesCommand.class),
+            @XmlElement(name = "cancel-deadline-command", type = CancelDeadlineCommand.class),
             
             // audit
             @XmlElement(name = "clear-history-logs", type = ClearHistoryLogsCommand.class),
@@ -124,7 +128,7 @@ public class JaxbCommandsRequest {
     }
     
     public JaxbCommandsRequest(List<Command<?>> commands) {
-        this.commands = new ArrayList<Command<?>>(); 
+        this.commands = new ArrayList<Command<?>>();
         this.commands.addAll(commands);
         checkThatCommandsAreTaskCommands(commands);
     }
