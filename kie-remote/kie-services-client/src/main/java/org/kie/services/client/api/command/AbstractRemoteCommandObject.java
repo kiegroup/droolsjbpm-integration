@@ -37,6 +37,7 @@ import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.CompositeCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
@@ -90,29 +91,7 @@ public abstract class AbstractRemoteCommandObject {
         
         if( AcceptedCommands.SEND_OBJECT_PARAMETER_COMMANDS.contains(cmd.getClass()) ) {
             List<Object> extraClassInstanceList = new ArrayList<Object>();
-            if( cmd instanceof CompleteWorkItemCommand ) { 
-                addPossiblyNullObjectMap(((CompleteWorkItemCommand) cmd).getResults(), extraClassInstanceList);
-            } else if( cmd instanceof SignalEventCommand ) {
-               addPossiblyNullObject(((SignalEventCommand) cmd).getEvent(), extraClassInstanceList);
-            } else if( cmd instanceof StartCorrelatedProcessCommand ) { 
-                addPossiblyNullObjectList(((StartCorrelatedProcessCommand) cmd).getData(), extraClassInstanceList);
-                addPossiblyNullObjectMap(((StartCorrelatedProcessCommand) cmd).getParameters(), extraClassInstanceList );
-            } else if( cmd instanceof StartProcessCommand ) { 
-                addPossiblyNullObjectList(((StartProcessCommand) cmd).getData(), extraClassInstanceList);
-                addPossiblyNullObjectMap(((StartProcessCommand) cmd).getParameters(), extraClassInstanceList );
-            } else if( cmd instanceof SetGlobalCommand ) { 
-                addPossiblyNullObject(((SetGlobalCommand) cmd).getObject(), extraClassInstanceList );
-            } else if( cmd instanceof InsertObjectCommand ) { 
-                addPossiblyNullObject(((InsertObjectCommand) cmd).getObject(), extraClassInstanceList);
-            } else if( cmd instanceof UpdateCommand ) { 
-                addPossiblyNullObject(((UpdateCommand) cmd).getObject(),  extraClassInstanceList);
-            } else if( cmd instanceof AddTaskCommand ) { 
-                addPossiblyNullObjectMap(((AddTaskCommand) cmd).getParams(), extraClassInstanceList);
-            } else if( cmd instanceof CompleteTaskCommand ) { 
-                addPossiblyNullObjectMap(((CompleteTaskCommand) cmd).getData(), extraClassInstanceList);
-            } else if( cmd instanceof FailTaskCommand ) { 
-                addPossiblyNullObjectMap(((FailTaskCommand) cmd).getData(), extraClassInstanceList);
-            }
+            preprocessCommand(cmd, extraClassInstanceList);
             
             if( ! extraClassInstanceList.isEmpty() ) { 
                 Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
@@ -126,11 +105,46 @@ public abstract class AbstractRemoteCommandObject {
                 config.addJaxbClasses(extraJaxbClasses);
             }
         }
-        
+
         if (config.isRest()) {
             return executeRestCommand(cmd);
         } else {
             return executeJmsCommand(cmd);
+        }
+    }
+
+    private void preprocessCommand(Command cmd, List<Object> extraClassInstanceList) {
+        if( cmd instanceof CompleteWorkItemCommand ) {
+            addPossiblyNullObjectMap(((CompleteWorkItemCommand) cmd).getResults(), extraClassInstanceList);
+        } else if( cmd instanceof SignalEventCommand ) {
+            addPossiblyNullObject(((SignalEventCommand) cmd).getEvent(), extraClassInstanceList);
+        } else if( cmd instanceof StartCorrelatedProcessCommand ) {
+            addPossiblyNullObjectList(((StartCorrelatedProcessCommand) cmd).getData(), extraClassInstanceList);
+            addPossiblyNullObjectMap(((StartCorrelatedProcessCommand) cmd).getParameters(), extraClassInstanceList );
+        } else if( cmd instanceof StartProcessCommand ) {
+            addPossiblyNullObjectList(((StartProcessCommand) cmd).getData(), extraClassInstanceList);
+            addPossiblyNullObjectMap(((StartProcessCommand) cmd).getParameters(), extraClassInstanceList );
+        } else if( cmd instanceof SetGlobalCommand ) {
+            addPossiblyNullObject(((SetGlobalCommand) cmd).getObject(), extraClassInstanceList );
+        } else if( cmd instanceof InsertObjectCommand ) {
+            addPossiblyNullObject(((InsertObjectCommand) cmd).getObject(), extraClassInstanceList);
+        } else if( cmd instanceof UpdateCommand ) {
+            addPossiblyNullObject(((UpdateCommand) cmd).getObject(),  extraClassInstanceList);
+        } else if( cmd instanceof AddTaskCommand ) {
+            addPossiblyNullObjectMap(((AddTaskCommand) cmd).getParams(), extraClassInstanceList);
+        } else if( cmd instanceof CompleteTaskCommand ) {
+            addPossiblyNullObjectMap(((CompleteTaskCommand) cmd).getData(), extraClassInstanceList);
+        } else if( cmd instanceof FailTaskCommand ) {
+            addPossiblyNullObjectMap(((FailTaskCommand) cmd).getData(), extraClassInstanceList);
+        } else if (cmd instanceof CompositeCommand) {
+            CompositeCommand composite = (CompositeCommand) cmd;
+
+            preprocessCommand(composite.getMainCommand(), extraClassInstanceList);
+            if (composite.getCommands() != null) {
+                for (Command c : composite.getCommands()) {
+                    preprocessCommand(c, extraClassInstanceList);
+                }
+            }
         }
     }
 
