@@ -154,7 +154,7 @@ public class TaskResource extends ResourceBase {
                     busAdmins, potOwners, taskOwners, 
                     statuses, language, union);
         
-        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doTaskOperation(
+        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doTaskOperationWithAlreadySerializedResult(
                 queryCmd, 
                 "Unable to execute " + queryCmd.getClass().getSimpleName());
 
@@ -167,13 +167,13 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}")
     public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Task task = (Task) processRequestBean.doTaskOperation(
+        JaxbTask task = (JaxbTask) processRequestBean.doTaskOperationAndSerializeResult(
                 cmd, 
                 "Unable to get task " + taskId);
         if( task == null ) { 
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
-        return createCorrectVariant(new JaxbTask(task), headers);
+        return createCorrectVariant(task, headers);
     }
 
     @POST
@@ -231,7 +231,7 @@ public class TaskResource extends ResourceBase {
         
         String errorMsg = "Unable to " + operation + " task " + taskId;
         if( TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) { 
-            Task task = (Task) processRequestBean.doTaskOperation(
+            Task task = (Task) processRequestBean.doTaskOperationAndSerializeResult(
                     new GetTaskCommand(taskId),
                     "Task " + taskId + " does not exist or unable to check if it exists");
             if( task == null ) {
@@ -243,7 +243,7 @@ public class TaskResource extends ResourceBase {
                     task.getTaskData().getProcessInstanceId(), 
                     errorMsg);
         } else { 
-            processRequestBean.doTaskOperation(cmd, errorMsg);
+            processRequestBean.doTaskOperationWithAlreadySerializedResult(cmd, errorMsg);
         }
         
         return createCorrectVariant(new JaxbGenericResponse(request), headers);
