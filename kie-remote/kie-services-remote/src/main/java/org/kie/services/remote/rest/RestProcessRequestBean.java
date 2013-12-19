@@ -113,7 +113,7 @@ public class RestProcessRequestBean {
      * @param errorMsg The error message to be attached to any exceptions thrown. 
      * @return The result of the completed command. 
      */
-    public Object doTaskOperation(TaskCommand<?> cmd, String errorMsg) {
+    public Object doTaskOperationWithAlreadySerializedResult(TaskCommand<?> cmd, String errorMsg) {
         return doTaskOperationOnDeployment(cmd, null, null, errorMsg);
     }
 
