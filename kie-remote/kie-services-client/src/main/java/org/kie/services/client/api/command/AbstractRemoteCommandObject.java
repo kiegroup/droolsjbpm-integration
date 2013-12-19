@@ -252,6 +252,11 @@ public abstract class AbstractRemoteCommandObject {
                 throw new RemoteRuntimeException("Unable to receive or retrieve the JMS response.", jmse);
             }
 
+
+            if (response == null) {
+                logger.warn("Response is empty, leaving");
+                return null;
+            }
             // extract response
             assert response != null : "Response is empty.";
             try {
