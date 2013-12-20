@@ -71,6 +71,12 @@
     </dependency>
     -->
     <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-runtime-manager</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
       <scope>provided</scope>
@@ -152,6 +158,11 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.btm</groupId>
+      <artifactId>btm</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>javax.enterprise</groupId>
@@ -186,6 +197,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -200,6 +216,22 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <!--  ensure that db files are deleted before _any_ run
+              otherwise we get tests failing because of leftover db's -->
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}</directory>
+              <includes>
+                <include>btm*</include>
+                <include>DroolsFlow.*.db</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
