@@ -57,7 +57,19 @@
 
     <dependency>
       <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-jpa</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-runtime-manager</artifactId>
       <optional>true</optional>
     </dependency>
 
@@ -143,6 +155,11 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.btm</groupId>
+      <artifactId>btm</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>javax.enterprise</groupId>
@@ -177,6 +194,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

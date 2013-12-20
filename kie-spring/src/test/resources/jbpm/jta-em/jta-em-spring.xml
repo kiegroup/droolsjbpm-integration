@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+  <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="persistenceUnitName" value="org.jbpm.persistence.spring.jta"/>
+    <property name="persistenceXmlLocation" value="classpath:jbpm/jta-em/persistence-jta.xml"/>
+  </bean>
+
+  <bean id="jbpmEM" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+    <property name="entityManagerFactory" ref="jbpmEMF"/>
+  </bean>
+  
+  <bean id="jbpmTxManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+  </bean>
+  <bean id="process" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
+    <constructor-arg>
+      <value>jbpm/processes/sample.bpmn</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="runtimeEnvironment" class="org.kie.spring.factorybeans.RuntimeEnvironmentFactoryBean">
+    <property name="type" value="DEFAULT"/>
+    <property name="entityManager" ref="jbpmEM"/>
+    <property name="entityManagerFactory" ref="jbpmEMF"/>
+    <property name="transactionManager" ref="jbpmTxManager"/>
+    <property name="assets">
+      <map>
+        <entry key-ref="process"><util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/></entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
+    <property name="identifier" value="spring-rm"/>
+    <property name="runtimeEnvironment" ref="runtimeEnvironment"/>
+  </bean>
+
+  <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService">
+    <constructor-arg>
+      <ref bean="jbpmEMF"/>
+    </constructor-arg>
+  </bean>
+</beans>
