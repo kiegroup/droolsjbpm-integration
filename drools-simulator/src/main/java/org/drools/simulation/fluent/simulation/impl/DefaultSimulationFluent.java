@@ -51,9 +51,9 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     private int pathCounter = 0;
     private SimulationStep activeStep = null;
 
-    private String activeKieSessionId = null;
+    protected String activeKieSessionId = null;
     
-    private static final String DEFAULT_ID = "__DEFAULT__";
+    protected static final String DEFAULT_ID = "__DEFAULT__";
 
     public DefaultSimulationFluent() {
         super();
@@ -124,7 +124,7 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
         return newRelativeStep(timeUnit.toMillis(relativeDistance));
     }
 
-    private void assureActiveStep() {
+    protected void assureActiveStep() {
         if (activeStep == null) {
             newStep(0L);
         }
@@ -182,6 +182,7 @@ public class DefaultSimulationFluent extends AbstractTestableFluent<SimulationFl
     public void runSimulation(long startTimeMillis) {
         Simulator simulator = new Simulator( simulation, startTimeMillis );
         simulator.run();
+        simulator.dispose();
     }
 
 }
