@@ -40,9 +40,9 @@ public class ThrowEventElementHandler extends DefaultElementHandler {
                 if (catchEvent != null) {
                     PathContext context = manager.getContextFromStack();
                     boolean canBeFinished = context.isCanBeFinished();
-                    context.setCanBeFinished(false);
+                    context.setCanBeFinishedNoIncrement(false);
                     super.handle(catchEvent, manager);
-                    context.setCanBeFinished(canBeFinished);
+                    context.setCanBeFinishedNoIncrement(canBeFinished);
                 }
             }
 
