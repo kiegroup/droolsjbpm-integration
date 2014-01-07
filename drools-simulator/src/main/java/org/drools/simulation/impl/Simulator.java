@@ -29,6 +29,7 @@ import org.drools.core.command.NewKieSessionCommand;
 import org.drools.core.command.ResolvingKnowledgeCommandContext;
 import org.drools.core.command.impl.ContextImpl;
 import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.time.SessionPseudoClock;
 import org.kie.api.command.Command;
 import org.kie.internal.command.Context;
@@ -146,6 +147,9 @@ public class Simulator
                     this.ksessions.add( ksession );
                     this.lastReturnValue = ksession;
                 }
+            } else if ( cmd instanceof DisposeCommand) {
+                this.ksessions.remove(getLastReturnValue());
+                executionHandler.execute( (GenericCommand) cmd, pathContext );
             } else if ( cmd instanceof GenericCommand ) {
                 this.lastReturnValue = executionHandler.execute( (GenericCommand) cmd,
                                                                  pathContext );
@@ -212,6 +216,12 @@ public class Simulator
 	public void remove(String identifier) {
 		root.remove( identifier );
 	}
+
+    public void dispose() {
+        for (StatefulKnowledgeSession ksession : this.ksessions) {
+            ksession.dispose();
+        }
+    }
 
     //    public static interface CommandExecutorService<T> {
     //        T execute(Command command);

@@ -16,6 +16,10 @@ public class SimulationPath {
     private List<PathContext> origPaths = new ArrayList<PathContext>();
     private Map<String, String> catchEvents = new HashMap<String, String>();
     private Map<String, String> throwEvents = new HashMap<String, String>();
+
+    private String signalName;
+
+    private boolean startable = false;
     
     private double probability;
     
@@ -81,5 +85,17 @@ public class SimulationPath {
     }
     public void addThrowEvent(String activityId, String ref) {
         this.throwEvents.put(activityId, ref);
+    }
+    public String getSignalName() {
+        return signalName;
+    }
+    public void setSignalName(String signalName) {
+        this.signalName = signalName;
+    }
+    public boolean isStartable() {
+        return startable;
+    }
+    public void setStartable(boolean startable) {
+        this.startable = startable;
     }
 }

@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.CatchEvent;
 import org.eclipse.bpmn2.CompensateEventDefinition;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
@@ -14,6 +15,7 @@ import org.eclipse.bpmn2.LinkEventDefinition;
 import org.eclipse.bpmn2.MessageEventDefinition;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.SignalEventDefinition;
+import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.ThrowEvent;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathFormatConverter;
@@ -47,6 +49,12 @@ public class SimulationFilterPathFormatConverter implements
                     simPath.addSequenceFlow(fe.getId());
                 } else if (fe instanceof BoundaryEvent) {
                   simPath.addBoundaryEventId(fe.getId());  
+                } else if (fe instanceof CatchEvent) {
+                    CatchEvent act = (CatchEvent) fe;
+                    if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                        String ref = processEventDefinitions(((CatchEvent) fe).getEventDefinitions());
+                        simPath.setSignalName(ref);
+                    }
                 } else {
                     simPath.addActivity(fe.getId());
                     if (fe instanceof ThrowEvent) {
@@ -56,6 +64,10 @@ public class SimulationFilterPathFormatConverter implements
                         }
 
                     }
+                }
+                // ensure that only processes that have start nodes will be considered
+                if (fe instanceof StartEvent) {
+                    simPath.setStartable(true);
                 }
             }
             allPaths.add(simPath);
