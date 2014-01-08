@@ -115,15 +115,9 @@
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
     <bundle>wrap:mvn:org.apache.geronimo.specs/geronimo-jacc_1.1_spec/1.0</bundle>
-    <bundle>wrap:mvn:org.jboss.seam.transaction/seam-transaction-api/${karaf.version.org.jboss.seam}</bundle>
     <bundle>wrap:mvn:org.jboss.weld/weld-core/${karaf.version.org.jboss.weld}</bundle>
     <bundle>wrap:mvn:org.jboss.solder/solder-api/${karaf.version.org.jboss.solder}</bundle>
     <bundle>wrap:mvn:org.apache.helix/helix-core/${karaf.version.org.apache.helix}</bundle>
-    <bundle>mvn:org.kie.commons/kie-nio2-model/${drools.version}</bundle>
-    <bundle>mvn:org.kie.commons/kie-commons-cdi/${drools.version}</bundle>
-    <bundle>mvn:org.kie.commons/kie-commons-validation/${drools.version}</bundle>
-    <bundle>mvn:org.kie.commons/kie-commons-data/${drools.version}</bundle>
-    <bundle>mvn:org.kie.commons/kie-commons-io/${drools.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${jbpm.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-shared-services/${jbpm.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${jbpm.version}</bundle>
