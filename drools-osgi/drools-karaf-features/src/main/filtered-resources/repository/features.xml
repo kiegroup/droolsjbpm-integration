@@ -130,7 +130,8 @@
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-audit/${jbpm.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>
+    <!-- disabled human task jpa as it's currently not used -->
+    <!--<bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>-->
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${jbpm.version}</bundle>
   </feature>
 
