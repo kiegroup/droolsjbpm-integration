@@ -17,6 +17,7 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.BeanProcessor;
+import org.apache.aries.blueprint.ExtendedBeanMetadata;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableBeanArgument;
@@ -41,6 +42,7 @@ import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.kie.aries.blueprint.factorybeans.KSessionOptions;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.BeanArgument;
@@ -108,7 +110,7 @@ public class KieObjectsInjector implements BeanProcessor {
         } else {
             configFileURL = resources.get(0);
             configFilePath = configFileURL.getPath();
-            log.debug(" :: Trying to intialize the KieModule from "+configFileURL+" :: ");
+            log.debug(" :: Trying to intialize the KieModule from " + configFileURL + " :: ");
         }
         if ( configFilePath == null) {
             throw new RuntimeException("Failure creating a KieModule. Unable to determine the Configuration File Path.");
@@ -130,7 +132,7 @@ public class KieObjectsInjector implements BeanProcessor {
     }
 
     private void createOsgiKieModule() {
-        configFileURL = FrameworkUtil.getBundle(this.getClass()).getEntry("/");
+        configFileURL = getConfigFileURL();
         if (releaseId == null) {
             releaseId = KieRepositoryImpl.INSTANCE.getDefaultReleaseId();
         }
@@ -144,6 +146,18 @@ public class KieObjectsInjector implements BeanProcessor {
             ks.getRepository().addKieModule(internalKieModule);
             log.info(" :: Added KieModule From KieObjectsInjector ::");
         }
+    }
+
+    private URL getConfigFileURL() {
+        try {
+            Method m = Class.forName(blueprintContainer.getClass().getName(),
+                                     true,
+                                     blueprintContainer.getClass().getClassLoader())
+                            .getMethod("getBundle");
+            Bundle bundle = (Bundle)m.invoke(blueprintContainer);
+            return bundle.getEntry("/");
+        } catch (Exception e) { }
+        return FrameworkUtil.getBundle(this.getClass()).getEntry("/");
     }
 
     private InternalKieModule createOsgiKModule(KieModuleModel kieProject) {
