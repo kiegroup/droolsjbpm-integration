@@ -20,7 +20,6 @@ import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieBaseModelImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.compiler.kproject.models.KieSessionModelImpl;
-import org.drools.core.ClockType;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
@@ -52,7 +51,9 @@ import java.util.Map;
 
 public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
 
-    private static final Logger log               = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
+    private static final Logger log            = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
+
+    private static final String WEB_INF_FOLDER =  "WEB-INF" + File.separator + "classes" + File.separator;
 
     protected URL configFileURL;
     protected ReleaseId releaseId;
@@ -88,8 +89,8 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         if ( releaseId == null && configFilePath != null) {
             fixConfigFilePathForVfs();
             String pomProperties = null;
-            if ( configFilePath.endsWith("WEB-INF/classes/")){
-                String configFilePathForWebApps = configFilePath.substring(0, configFilePath.indexOf("WEB-INF/classes/"));
+            if ( configFilePath.endsWith(WEB_INF_FOLDER)){
+                String configFilePathForWebApps = configFilePath.substring(0, configFilePath.indexOf(WEB_INF_FOLDER));
                 pomProperties = ClasspathKieProject.getPomProperties(configFilePathForWebApps);
             }
             if (pomProperties == null) {
