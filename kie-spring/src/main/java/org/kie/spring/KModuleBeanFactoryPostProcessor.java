@@ -91,7 +91,8 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             if ( configFilePath.endsWith("WEB-INF/classes/")){
                 String configFilePathForWebApps = configFilePath.substring(0, configFilePath.indexOf("WEB-INF/classes/"));
                 pomProperties = ClasspathKieProject.getPomProperties(configFilePathForWebApps);
-            } else {
+            }
+            if (pomProperties == null) {
                 pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
             }
             if (pomProperties != null) {
