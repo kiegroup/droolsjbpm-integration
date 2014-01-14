@@ -28,13 +28,11 @@ import javax.naming.NamingException;
 
 import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
-import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
@@ -67,11 +65,14 @@ public class RequestMessageBean implements MessageListener {
     // JMS resources
     
     @Resource(mappedName = "java:/JmsXA")
-    private ConnectionFactory factory;
+    private ConnectionFactory connectionFactory;
 
     @Resource
     private MessageDrivenContext context;
     
+    @Resource(mappedName = "java:/JmsXA")
+    private ConnectionFactory factory;
+
     // Initialized in @PostConstruct
     private Session session;
     private Connection connection;
@@ -358,31 +359,15 @@ public class RequestMessageBean implements MessageListener {
 
                 Object cmdResult = null;
                 try {
-                    boolean commandHasBeenExecuted = false;
-                    String deploymentId = null;
-                    
                     // if the JTA transaction (in HT or the KieSession) doesn't commit, 
                     // that will cause message reception to be *NOT* acknowledged!
-                    if( cmd instanceof TaskCommand<?> ) { 
-                        if( AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass())  ) {
-                            Long taskId = ((TaskCommand<?>) cmd).getTaskId();
-                            if( taskId == null ) { 
-                                throw new IllegalStateException("The " + cmd.getClass().getSimpleName() + " does not contain a valid taskId value.");
-                            }
-                            Task task = (Task) ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand(new GetTaskCommand(taskId)));
-                            deploymentId = task.getTaskData().getDeploymentId();
-                        } else { 
-                            commandHasBeenExecuted = true;
-                            cmdResult = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand < ? >) cmd));
-                        }
-                    } 
-                    
-                    if( ! commandHasBeenExecuted ) { 
+                    if( cmd instanceof TaskCommand<?>
+                        && ! AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass())  ) {
+                        cmdResult = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand < ? >) cmd));
+                    } else {
+                        String deploymentId = request.getDeploymentId(); 
                         if( deploymentId == null ) { 
-                            deploymentId = request.getDeploymentId(); 
-                            if( deploymentId == null ) { 
-                                throw new DomainNotFoundBadRequestException("A deployment id is required for the " + cmd.getClass().getSimpleName());
-                            }
+                            throw new DomainNotFoundBadRequestException("A deployment id is required for the " + cmd.getClass().getSimpleName());
                         }
                         RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
                         if( runtimeEngine == null ) { 
@@ -390,13 +375,14 @@ public class RequestMessageBean implements MessageListener {
                                     + "' when executing the " + cmd.getClass().getSimpleName());
                         }
                         
-                        KieSession kieSession = runtimeEngine.getKieSession();
+                        KieSession kieSession 
+                            = runtimeEngine.getKieSession();
                         SingleSessionCommandService sscs 
                             = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
                         // Synchronize around SSCS to avoid race-conditions with kie session cache clearing in afterCompletion
                         synchronized(sscs) { 
                             if( cmd instanceof TaskCommand<?> ) {
-                                cmdResult = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
+                                cmdResult = ((InternalTaskService) taskService).execute((TaskCommand<?>) cmd);
                             } else { 
                                 cmdResult = kieSession.execute(cmd);
                             }
