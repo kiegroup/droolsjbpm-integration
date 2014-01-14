@@ -50,7 +50,7 @@ public class LiveServerTest {
      * Works with the Evaluation demo.
      */
     @Test
-    public void remoteRestApi() {
+    public void restRemoteApi() {
         String taskUserId = userId;
         
         RemoteRestRuntimeFactory restSessionFactory 
@@ -95,7 +95,7 @@ public class LiveServerTest {
 
     @Test
     // BZ 994905
-    public void anonymousTaskInitiatorTest() throws Exception {
+    public void restAnonymousTaskInitiatorTest() throws Exception {
 
         boolean like_BZ_994905 = false;
 

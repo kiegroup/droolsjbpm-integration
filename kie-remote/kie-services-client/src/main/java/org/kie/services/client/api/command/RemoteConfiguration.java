@@ -56,8 +56,8 @@ public final class RemoteConfiguration {
 
     // General
     private String deploymentId;
-    private String username;
-    private String password;
+    private String jmsQueueUsername;
+    private String jmsQueuePassword;
     private Context<?> context;
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
@@ -88,7 +88,7 @@ public final class RemoteConfiguration {
 
     public RemoteConfiguration(String deploymentId, URL url) {
         this.type = Type.REST;
-        URL realUrl = initialize(deploymentId, url);
+        URL realUrl = initializeRestServicesUrl(deploymentId, url);
         try { 
             this.requestFactory = new ClientRequestFactory(realUrl.toURI());
         } catch (URISyntaxException urise) {
@@ -102,20 +102,25 @@ public final class RemoteConfiguration {
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout) {
         this.type = Type.REST;
-        URL serverPlusRestUrl = initialize(deploymentId, url);
-        this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
-
+        URL serverPlusRestUrl = initializeRestServicesUrl(deploymentId, url);
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
         }
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        this.username = username;
-        this.password = password;
+        this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+
     }
 
-    private URL initialize(String deploymentId, URL url) {
+    /**
+     * Initializes the URL that will be used for the request factory
+     * 
+     * @param deploymentId Deployment ID
+     * @param url URL of the server instance
+     * @return An URL that can be used for the REST request factory 
+     */
+    private URL initializeRestServicesUrl(String deploymentId, URL url) {
         if (deploymentId == null || deploymentId.trim().isEmpty()) {
             throw new IllegalArgumentException("The deployment id may not be empty or null.");
         }
@@ -145,6 +150,16 @@ public final class RemoteConfiguration {
         return serverPlusRestUrl;
     }
 
+    /**
+     * Creates an request factory that autenticates using the given username and password
+     * 
+     * @param url 
+     * @param username
+     * @param password
+     * @param timeout
+     * 
+     * @return A request factory that can be used to send (authenticating) requests to REST services
+     */
     public static ClientRequestFactory createAuthenticatingRequestFactory(URL url, String username, String password, int timeout) {
         BasicHttpContext localContext = new BasicHttpContext();
         HttpClient preemptiveAuthClient = createPreemptiveAuthHttpClient(username, password, timeout, localContext);
@@ -156,6 +171,16 @@ public final class RemoteConfiguration {
         }
     }
 
+    /**
+     * This method is used in order to create the authenticating REST client factory.
+     * 
+     * @param userName
+     * @param password
+     * @param timeout
+     * @param localContext
+     * 
+     * @return A {@link DefaultHttpClient} instance that will authenticate using the given username and password.
+     */
     private static DefaultHttpClient createPreemptiveAuthHttpClient(String userName, String password, int timeout,
             BasicHttpContext localContext) {
         BasicHttpParams params = new BasicHttpParams();
@@ -192,6 +217,9 @@ public final class RemoteConfiguration {
         return client;
     }
 
+    /**
+     * This class is used in order to effect preemptive authentication in the REST request factory.
+     */
     static class PreemptiveAuth implements HttpRequestInterceptor {
 
         private final String contextId;
@@ -258,11 +286,14 @@ public final class RemoteConfiguration {
             Queue responseQueue, String username, String password) {
         this(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
 
-        this.username = username;
-        this.password = password;
+        setAndCheckUserNameAndPassword(username, password);
     }
 
     public RemoteConfiguration(String deploymentId, InitialContext context) {
+        this(deploymentId, context, null, null);
+    }
+
+    public RemoteConfiguration(String deploymentId, InitialContext context, String username, String password) {
         this.deploymentId = deploymentId;
         String prop = CONNECTION_FACTORY_NAME;
         try {
@@ -279,15 +310,21 @@ public final class RemoteConfiguration {
         checkValidValues(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
 
         this.type = Type.JMS;
+
+        setAndCheckUserNameAndPassword(username, password);
     }
 
-    public RemoteConfiguration(String deploymentId, InitialContext context, String username, String password) {
-        this(deploymentId, context);
-
-        this.username = username;
-        this.password = password;
+    private void setAndCheckUserNameAndPassword(String username, String password) { 
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("The user name may not be empty or null.");
+        }
+        this.jmsQueueUsername = username;
+        if (password == null) {
+            throw new IllegalArgumentException("The password may not be null.");
+        }
+        this.jmsQueuePassword = password;
     }
-
+    
     // Setters -------------------------------------------------------------------------------------------------------------------
 
     public void setQualityOfServiceThresholdMilliSeconds(int qualityOfServiceThresholdMilliSeconds) {
@@ -312,16 +349,6 @@ public final class RemoteConfiguration {
     String getDeploymentId() {
         assert deploymentId != null : "deploymentId value should not be null!";
         return deploymentId;
-    }
-
-    String getUsername() {
-        assert username != null : "username value should not be null!";
-        return username;
-    }
-
-    String getPassword() {
-        // helpful during tests: assert password != null : "password value should not be null!";
-        return password;
     }
 
     int getSerializationType() {
@@ -353,6 +380,16 @@ public final class RemoteConfiguration {
     // ----
     // JMS
     // ----
+
+    String getJmsQueueUsername() {
+        assert jmsQueueUsername != null : "username value should not be null!";
+        return jmsQueueUsername;
+    }
+
+    String getJmsQueuePassword() {
+        // helpful during tests: assert password != null : "password value should not be null!";
+        return jmsQueuePassword;
+    }
 
     Context<?> getContext() {
         assert context != null : "context value should not be null!";
