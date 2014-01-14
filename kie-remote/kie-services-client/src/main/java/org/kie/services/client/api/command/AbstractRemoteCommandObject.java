@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +112,7 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    private void preprocessCommand(Command cmd, List<Object> extraClassInstanceList) {
+    private void preprocessCommand(Command<?> cmd, List<Object> extraClassInstanceList) {
         if( cmd instanceof CompleteWorkItemCommand ) {
             addPossiblyNullObjectMap(((CompleteWorkItemCommand) cmd).getResults(), extraClassInstanceList);
         } else if( cmd instanceof SignalEventCommand ) {
@@ -137,11 +136,11 @@ public abstract class AbstractRemoteCommandObject {
         } else if( cmd instanceof FailTaskCommand ) {
             addPossiblyNullObjectMap(((FailTaskCommand) cmd).getData(), extraClassInstanceList);
         } else if (cmd instanceof CompositeCommand) {
-            CompositeCommand composite = (CompositeCommand) cmd;
+            CompositeCommand<?> composite = (CompositeCommand<?>) cmd;
 
             preprocessCommand(composite.getMainCommand(), extraClassInstanceList);
             if (composite.getCommands() != null) {
-                for (Command c : composite.getCommands()) {
+                for (Command<?> c : composite.getCommands()) {
                     preprocessCommand(c, extraClassInstanceList);
                 }
             }
@@ -174,6 +173,7 @@ public abstract class AbstractRemoteCommandObject {
      */
     private <T> T executeJmsCommand(Command<T> command) {
         JaxbCommandsRequest req = new JaxbCommandsRequest(config.getDeploymentId(), command);
+        req.setUser(config.getJmsQueueUsername());
 
         ConnectionFactory factory = config.getConnectionFactory();
         Queue sendQueue;
@@ -195,8 +195,8 @@ public abstract class AbstractRemoteCommandObject {
             MessageProducer producer;
             MessageConsumer consumer;
             try {
-                if (config.getPassword() != null) {
-                    connection = factory.createConnection(config.getUsername(), config.getPassword());
+                if (config.getJmsQueuePassword() != null) {
+                    connection = factory.createConnection(config.getJmsQueueUsername(), config.getJmsQueuePassword());
                 } else {
                     connection = factory.createConnection();
                 }

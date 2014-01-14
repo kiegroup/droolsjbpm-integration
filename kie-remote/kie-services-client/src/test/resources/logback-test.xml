@@ -9,8 +9,6 @@
     </encoder>
   </appender>
 
-  <logger name="org.jbpm" level="debug"/>
-  
   <!-- change to debug to see serializationTest output (JSON/JAXB/YAML strings) -->
   <logger name="org.kie.services" level="info"/>
   

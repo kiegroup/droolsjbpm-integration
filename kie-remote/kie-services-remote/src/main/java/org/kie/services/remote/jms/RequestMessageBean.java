@@ -46,6 +46,7 @@ import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
+import org.kie.services.remote.jms.request.BackupIdentityProviderProducer;
 import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,9 +86,11 @@ public class RequestMessageBean implements MessageListener {
     
     @Inject
     private TaskService taskService;
-    
+
+    @Inject
+    private BackupIdentityProviderProducer backupIdentityProviderProducer;
+
     // Constants / properties
-    
     private String RESPONSE_QUEUE_NAME = null;
     private static String RESPONSE_QUEUE_NAME_PROPERTY = "kie.services.jms.queues.response";
     
@@ -189,13 +192,16 @@ public class RequestMessageBean implements MessageListener {
         // 1. deserialize request
         JaxbCommandsRequest cmdsRequest = deserializeRequest(message, msgCorrId, serializationProvider, serializationType);
 
-        // 2. process request
+        // 2. Set initiator for request
+        backupIdentityProviderProducer.createBackupIdentityProvider(cmdsRequest.getUser());
+
+        // 3. process request
         jaxbResponse = processJaxbCommandsRequest(cmdsRequest);
-        
-        // 3. serialize response 
+
+        // 4. serialize response
         Message msg = serializeResponse(session, msgCorrId, serializationType, serializationProvider, jaxbResponse);
 
-        // 4. send response
+        // 5. send response
         sendResponse(msgCorrId, serializationType, msg);
         
         if( redelivered ) { 

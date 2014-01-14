@@ -46,6 +46,10 @@ public class JaxbCommandsRequest {
     @XmlElement(name = "ver")
     @XmlSchemaType(name = "int")
     private Integer version = 1;
+    
+    @XmlElement
+    @XmlSchemaType(name = "string")
+    private String user;
 
     // This list should match the list in AcceptedCommands
     @XmlElements({
@@ -175,6 +179,14 @@ public class JaxbCommandsRequest {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public void setCommands(List<Command<?>> commands) {

@@ -140,6 +140,7 @@ public abstract class SerializationTest {
         assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
 
         req = new JaxbCommandsRequest();
+        req.setUser("krampus");
         List<Command<?>> cmds = new ArrayList<Command<?>>();
         req.setCommands(cmds);
         req.setDeploymentId("depId");
