@@ -171,11 +171,30 @@ public class DeploymentResource extends ResourceBase {
     @Path("/undeploy")
     public Response undeploy() { 
         DeployedUnit deployedUnit = deploymentService.getDeployedUnit(deploymentId);
-        KModuleDeploymentUnit deploymentUnit = (KModuleDeploymentUnit) deployedUnit.getDeploymentUnit();
-        
-        JaxbDeploymentJobResult jobResult = jobExecutor.submitUndeployJob(deploymentService, deploymentUnit);
-        jobResult.getDeploymentUnit().setStatus(JaxbDeploymentStatus.UNDEPLOYING);
+        JaxbDeploymentJobResult jobResult; 
+        if( deployedUnit != null ) { 
+            KModuleDeploymentUnit deploymentUnit = (KModuleDeploymentUnit) deployedUnit.getDeploymentUnit();
 
+            jobResult = jobExecutor.submitUndeployJob(deploymentService, deploymentUnit);
+            jobResult.getDeploymentUnit().setStatus(JaxbDeploymentStatus.UNDEPLOYING);
+        } else { 
+            String [] gavKK = deploymentId.split(":");
+            JaxbDeploymentUnit depUnit;
+            switch( gavKK.length ) { 
+            case 3:
+                depUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
+                break;
+            case 4:
+                depUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2], gavKK[3], null);
+                break;
+            case 5:
+                depUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2], gavKK[3], gavKK[4]);
+                break;
+            default:
+                throw new IllegalStateException("Invalid deployment id: " + deploymentId);
+            }
+            jobResult = new JaxbDeploymentJobResult("Deployment unit has already been undeployed.", true, depUnit, "UNDEPLOY" );
+        }
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
 }
