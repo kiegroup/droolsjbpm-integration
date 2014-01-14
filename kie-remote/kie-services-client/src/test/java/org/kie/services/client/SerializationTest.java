@@ -89,6 +89,53 @@ public abstract class SerializationTest {
         return field.get(obj);
     }
 
+    private static void compareObjects( Object orig, Object copy ) {
+        compareObjects(orig, copy, new String [] {} );
+    }
+    private static void compareObjects( Object orig, Object copy, String... nullFields ) {
+        Class<?> origClass = orig.getClass();
+        assertEquals( "copy is not an instance of " + origClass + " (" + copy.getClass().getSimpleName() + ")",  
+                origClass, copy.getClass() );
+        for (Field field : orig.getClass().getDeclaredFields() ) {
+            try { 
+                field.setAccessible(true);
+                Object origFieldVal = field.get(orig);
+                Object copyFieldVal = field.get(copy);
+    
+                boolean nullFound = false;
+                if( origFieldVal == null || copyFieldVal == null ) { 
+                    nullFound = true;
+                    String fieldName = field.getName();
+                    for( String nullFieldName : nullFields ) { 
+                        if( nullFieldName.matches(fieldName) ) { 
+                            nullFound = false;
+                        }
+                    }
+                }
+                String failMsg = origClass.getSimpleName() + "." + field.getName() + " is null";
+                assertFalse( failMsg + "!", nullFound );
+    
+                if( copyFieldVal != origFieldVal ) { 
+                    if( copyFieldVal == null ) { 
+                        fail( failMsg + " in copy!" );
+                    } else if( origFieldVal == null ) { 
+                        fail( failMsg + "in original!" );
+                    }
+                    if( origFieldVal.getClass().getPackage().getName().startsWith("java.") ) { 
+                        assertEquals( origClass.getSimpleName() + "." + field.getName(), origFieldVal, copyFieldVal );
+                    } else { 
+                        compareObjects(origFieldVal, copyFieldVal, nullFields);
+                    }
+                }
+            } catch( Exception e ) { 
+                throw new RuntimeException("Unable to access " + field.getName() + " when testing " + origClass.getSimpleName() + ".", e ); 
+            }
+    
+        }
+    }
+    
+    // TESTS
+    
     public static KieSession createKnowledgeSession(String processFile) throws Exception {
         KieServices ks = KieServices.Factory.get();
         KieRepository kr = ks.getRepository();
@@ -381,7 +428,7 @@ public abstract class SerializationTest {
     }
     
     @Test
-    public void deploymentJobResultTest() throws Exception {
+    public void deploymentObjectsTest() throws Exception {
         JaxbDeploymentJobResult jaxbJob = new JaxbDeploymentJobResult();
         testRoundtrip(jaxbJob);
 
@@ -395,52 +442,21 @@ public abstract class SerializationTest {
         depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
         jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
         JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundtrip(jaxbJob);
-        compareObjects(jaxbJob, copyJaxbJob);
-    }
-    
-    private static void compareObjects( Object orig, Object copy ) {
-        compareObjects(orig, copy, new String [] {} );
-    }
-    
-    private static void compareObjects( Object orig, Object copy, String... nullFields ) {
-        Class<?> origClass = orig.getClass();
-        assertEquals( "copy is not an instance of " + origClass + " (" + copy.getClass().getSimpleName() + ")",  
-                origClass, copy.getClass() );
-        for (Field field : orig.getClass().getDeclaredFields() ) {
-            try { 
-                field.setAccessible(true);
-                Object origFieldVal = field.get(orig);
-                Object copyFieldVal = field.get(copy);
-
-                boolean nullFound = false;
-                if( origFieldVal == null || copyFieldVal == null ) { 
-                    nullFound = true;
-                    String fieldName = field.getName();
-                    for( String nullFieldName : nullFields ) { 
-                        if( nullFieldName.matches(fieldName) ) { 
-                            nullFound = false;
-                        }
-                    }
-                }
-                String failMsg = origClass.getSimpleName() + "." + field.getName() + " is null";
-                assertFalse( failMsg + "!", nullFound );
-
-                if( copyFieldVal != origFieldVal ) { 
-                    if( copyFieldVal == null ) { 
-                        fail( failMsg + " in copy!" );
-                    } else if( origFieldVal == null ) { 
-                        fail( failMsg + "in original!" );
-                    }
-                    if( origFieldVal.getClass().getPackage().getName().startsWith("java.") ) { 
-                        assertEquals( origClass.getSimpleName() + "." + field.getName(), origFieldVal, copyFieldVal );
-                    } else { 
-                        compareObjects(origFieldVal, copyFieldVal);
-                    }
-                }
-            } catch( Exception e ) { 
-                throw new RuntimeException("Unable to access " + field.getName() + " when testing " + origClass.getSimpleName() + ".", e ); 
-            }
-
-        }
+        compareObjects(jaxbJob, copyJaxbJob, "identifier");
+        
+        depUnit = new JaxbDeploymentUnit("g", "a", "v");
+        depUnit.setKbaseName("kbase");
+        depUnit.setKsessionName("ksession");
+        depUnit.setStatus(JaxbDeploymentStatus.DEPLOY_FAILED);
+        depUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
+        
+        JaxbDeploymentUnit copyDepUnit = (JaxbDeploymentUnit) testRoundtrip(depUnit);
+        
+        compareObjects(depUnit, copyDepUnit, "identifier");
+        
+        JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult("testing stuff", true, copyDepUnit, "test");
+        JaxbDeploymentJobResult copyDepJob = (JaxbDeploymentJobResult) testRoundtrip(depJob);
+        
+        compareObjects(copyDepJob, depJob, "identifier");
     }
 }

@@ -38,6 +38,9 @@ public class JaxbDeploymentUnit implements DeploymentUnit {
     @XmlElement(name = "deployment-strategy", type = RuntimeStrategy.class)
     private RuntimeStrategy strategy;
     
+    @XmlElement
+    @XmlSchemaType(name="string")
+    private String identifier;
     
     @XmlElement(name = "deployment-status", type = JaxbDeploymentStatus.class)
     private JaxbDeploymentStatus status;
@@ -139,5 +142,9 @@ public class JaxbDeploymentUnit implements DeploymentUnit {
             }
         }
         return id;
+    }
+    
+    public void setIdentifier(String newId) { 
+        // no op
     }
 }

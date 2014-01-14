@@ -242,8 +242,7 @@ public final class RemoteConfiguration {
                     if (creds == null) {
                         throw new HttpException("No credentials for preemptive authentication");
                     }
-                    authState.setAuthScheme(authScheme);
-                    authState.setCredentials(creds);
+                    authState.update(authScheme, creds);
                 }
             }
         }
