@@ -21,12 +21,14 @@ Start JBoss Fuse or Apache Karaf
 
 In the console, use the following commands
 
-    features:addurl mvn:org.drools/drools-karaf-features/6.0.1-SNAPSHOT/xml/features
+    features:addurl mvn:org.drools/drools-karaf-features/6.0.0-SNAPSHOT/xml/features
     features:install spring
     features:install spring-dm
-    features:install jbpm
+    features:install spring-tx
+    features:install drools-jpa
+    features:install jbpm-human-task
+    features:install kie-spring
     features:install jbpm-example
-    # install -s mvn:org.drools/jbpm-osgi-example/6.0.1-SNAPSHOT
 
 To see the results tail the Fuse ESB log
 
