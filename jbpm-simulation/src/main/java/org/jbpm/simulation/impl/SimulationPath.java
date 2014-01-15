@@ -16,6 +16,7 @@ public class SimulationPath {
     private List<PathContext> origPaths = new ArrayList<PathContext>();
     private Map<String, String> catchEvents = new HashMap<String, String>();
     private Map<String, String> throwEvents = new HashMap<String, String>();
+    private Map<String, String> seqenceFlowsSources = new HashMap<String, String>();
 
     private String signalName;
 
@@ -97,5 +98,14 @@ public class SimulationPath {
     }
     public void setStartable(boolean startable) {
         this.startable = startable;
+    }
+    public Map<String, String> getSeqenceFlowsSources() {
+        return seqenceFlowsSources;
+    }
+    public void setSeqenceFlowsSources(Map<String, String> seqenceFlowsSources) {
+        this.seqenceFlowsSources = seqenceFlowsSources;
+    }
+    public void addSequenceFlowSource(String seqId, String sourceElemId) {
+        this.seqenceFlowsSources.put(seqId, sourceElemId);
     }
 }

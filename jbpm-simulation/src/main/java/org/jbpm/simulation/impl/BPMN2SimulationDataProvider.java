@@ -4,8 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import bpsim.*;
 import org.eclipse.bpmn2.BoundaryEvent;
@@ -178,10 +180,19 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     
     public double calculatePathProbability(SimulationPath path) {
         double probability = 100;
+        Set<String> processedSourceElems = new HashSet<String>();
         for (String sequenceFlowId : path.getSequenceFlowsIds()) {
+            String sourceElemId = path.getSeqenceFlowsSources().get(sequenceFlowId);
+            // need to check if given source (gateway) was already processed as it can be twice or more when loops are
+            // modeled in the process, for probability counting only single outgoing flow is taken - currently supports
+            // only XOR and AND gateways
+            if (processedSourceElems.contains(sourceElemId)) {
+                continue;
+            }
             double transitionProbability = (Double) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
             if (transitionProbability > 0) {
                 probability = probability * (transitionProbability / 100);
+                processedSourceElems.add(sourceElemId);
             }
         }
         // calculate probability based on boundary events
