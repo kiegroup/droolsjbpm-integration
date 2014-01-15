@@ -39,7 +39,7 @@ public class SimulationFilterPathFormatConverter implements
 
     public List<SimulationPath> convert(List<PathContext> paths) {
         List<SimulationPath> allPaths = new ArrayList<SimulationPath>();
-        
+        double probabilitySummary = 0;
         for (PathContext context : paths) {
             SimulationPath simPath = new SimulationPath();
             simPath.setPathId(context.getPathId());
@@ -47,6 +47,7 @@ public class SimulationFilterPathFormatConverter implements
             for (FlowElement fe : context.getPathElements()) {
                 if (fe instanceof SequenceFlow) {
                     simPath.addSequenceFlow(fe.getId());
+                    simPath.addSequenceFlowSource(fe.getId(), ((SequenceFlow) fe).getSourceRef().getId());
                 } else if (fe instanceof BoundaryEvent) {
                   simPath.addBoundaryEventId(fe.getId());  
                 } else if (fe instanceof CatchEvent) {
@@ -74,8 +75,11 @@ public class SimulationFilterPathFormatConverter implements
             
             // calcluate path probability if required
             if (provider != null) {
-                provider.calculatePathProbability(simPath);
+                probabilitySummary += provider.calculatePathProbability(simPath);
             }
+        }
+        if (provider != null && probabilitySummary < 1) {
+            throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");
         }
         Collections.sort(allPaths, new Comparator<SimulationPath>() {
 
