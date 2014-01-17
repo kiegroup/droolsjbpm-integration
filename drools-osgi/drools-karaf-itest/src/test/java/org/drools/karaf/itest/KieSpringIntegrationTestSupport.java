@@ -19,6 +19,7 @@ package org.drools.karaf.itest;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -45,6 +46,7 @@ public class KieSpringIntegrationTestSupport {
             throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
         }
         DroolsVersion = testProps.getProperty("project.version");
+        LOG.info("Drools Project Version : " + DroolsVersion);
     }
 
     protected OsgiBundleXmlApplicationContext applicationContext;
@@ -57,18 +59,25 @@ public class KieSpringIntegrationTestSupport {
         applicationContext.refresh();
     }
 
-    public static MavenArtifactProvisionOption getFeatureUrl(String groupId, String version) {
-        return mavenBundle().groupId(groupId).artifactId(version);
+    public static MavenArtifactProvisionOption getFeaturesUrl(String groupId, String artifactId, String version) {
+        MavenArtifactProvisionOption mapo =  mavenBundle().groupId(groupId).artifactId(artifactId);
+        mapo.type("xml");
+        mapo.classifier("features");
+
+        if (version == null) {
+            mapo.versionAsInProject();
+        } else {
+            mapo.version(version);
+        }
+
+        LOG.info("Features URL : " + mapo.getURL());
+
+        return mapo;
     }
 
-    public static UrlReference getCamelKarafFeatureUrl(String version) {
-        String type = "xml/features";
-        MavenArtifactProvisionOption mavenOption = getFeatureUrl("org.apache.camel.karaf", "apache-camel");
-        if (version == null) {
-            return mavenOption.versionAsInProject().type(type);
-        } else {
-            return mavenOption.version(version).type(type);
-        }
+    public static UrlReference getCamelKarafFeaturesUrl(String version) {
+        MavenArtifactProvisionOption mapo = getFeaturesUrl("org.apache.camel.karaf", "apache-camel", version);
+        return mapo;
     }
 
     public static Option loadDroolsKieFeatures(String... features) {
@@ -77,7 +86,8 @@ public class KieSpringIntegrationTestSupport {
         for (String feature : features) {
             result.add(feature);
         }
-        return scanFeatures(getFeatureUrl("org.drools", "drools-karaf-features").type("xml/features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
+
+        return scanFeatures(getFeaturesUrl("org.drools","drools-karaf-features",DroolsVersion), result.toArray(new String[4 + features.length]));
     }
 
 }

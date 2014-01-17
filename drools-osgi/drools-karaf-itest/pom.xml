@@ -12,10 +12,11 @@
   <artifactId>drools-karaf-itest</artifactId>
 
   <name>Drools :: Karaf iTest</name>
-  <!-- <packaging>bundle</packaging> -->
 
   <properties>
     <version.org.apache.karaf>2.3.2</version.org.apache.karaf>
+    <version.org.apache.camel>2.10.3</version.org.apache.camel>
+    <version.org.apache.cxf>2.6.6</version.org.apache.cxf>
   </properties>
 
   <dependencies>
@@ -44,6 +45,17 @@
     <dependency>
       <groupId>org.apache.camel.karaf</groupId>
       <artifactId>apache-camel</artifactId>
+      <version>${version.org.apache.camel}</version>
+      <type>xml</type>
+      <classifier>features</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <!--TODO - Add dependency to BOM, ...-->
+    <dependency>
+      <groupId>org.apache.cxf.karaf</groupId>
+      <artifactId>apache-cxf</artifactId>
+      <version>${version.org.apache.cxf}</version>
       <type>xml</type>
       <classifier>features</classifier>
       <scope>test</scope>
@@ -62,6 +74,7 @@
     <dependency>
       <groupId>org.apache.karaf.assemblies.features</groupId>
       <artifactId>standard</artifactId>
+      <version>${version.org.apache.karaf}</version>
       <type>xml</type>
       <classifier>features</classifier>
       <scope>test</scope>
@@ -79,6 +92,7 @@
       <groupId>org.apache.karaf</groupId>
       <artifactId>apache-karaf</artifactId>
       <type>tar.gz</type>
+      <version>${version.org.apache.karaf}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -86,12 +100,6 @@
           <artifactId>org.apache.karaf.client</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>org.apache.karaf.features.core</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <!-- Pax exam & karaf tooling -->
@@ -150,7 +158,7 @@
     </testResources>
     <plugins>
       <plugin>
-        <!--TODO - Version number should be moved to BOM, ...-->
+        <!-- TODO - Version number should be moved to BOM, ... -->
         <groupId>org.apache.servicemix.tooling</groupId>
         <artifactId>depends-maven-plugin</artifactId>
         <version>1.2</version>
@@ -176,6 +184,18 @@
           </instructions>
         </configuration>
       </plugin>
+
+      <!--            <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-surefire-plugin</artifactId>
+                      <configuration>
+                          <includes>
+                             <include>**/DroolsOnBody*.java</include>
+                             <include>**/DroolsOnCommand*.java</include>
+                             <include>**/KieSpring*.java</include>
+                          </includes>
+                      </configuration>
+                  </plugin>-->
 
     </plugins>
   </build>
