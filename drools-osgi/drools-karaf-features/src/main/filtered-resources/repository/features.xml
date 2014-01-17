@@ -153,7 +153,7 @@
         <bundle>mvn:org.drools/drools-camel-example/${drools.version}</bundle>
     </feature>
 
-    <feature name="drools-camel-example" version="${drools.version}" description="Drools Kie Spring Camel Example">
+    <feature name="drools-decision-table-kie-spring-camel-example" version="${drools.version}" description="Drools Decision Table Kie Spring Camel Example">
         <feature version="${drools.version}">drools-module</feature>
         <feature version="${drools.version}">drools-decisiontable</feature>
         <feature version="${drools.version}">kie-spring</feature>
@@ -161,8 +161,8 @@
         <bundle start-level="100">mvn:org.drools/spring-camel-drools-decision-table-example/${drools.version}</bundle>
     </feature>
 
-    <feature name="drools-blueprint-camel-example" version="${drools.version}"
-             description="Drools Kie Blueprint Camel Example">
+    <feature name="drools-decision-kie-blueprint-camel-example" version="${drools.version}"
+             description="Drools Decision Table Kie Blueprint Camel Example">
         <feature version="${drools.version}">drools-module</feature>
         <feature version="${drools.version}">drools-decisiontable</feature>
         <feature version="${drools.version}">kie-aries-blueprint</feature>
