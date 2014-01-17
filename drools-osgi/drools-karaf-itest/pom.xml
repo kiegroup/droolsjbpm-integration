@@ -2,184 +2,189 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.drools</groupId>
-    <artifactId>drools-osgi</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-osgi</artifactId>
+        <version>6.1.0-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>drools-karaf-itest</artifactId>
+    <artifactId>drools-karaf-itest</artifactId>
 
-  <name>Drools :: Karaf iTest</name>
- <!-- <packaging>bundle</packaging> -->
+    <name>Drools :: Karaf iTest</name>
+    <!-- <packaging>bundle</packaging> -->
 
-  <dependencies>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-osgi-integration</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-spring</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-camel</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <properties>
+        <version.org.apache.karaf>2.3.2</version.org.apache.karaf>
+    </properties>
 
-    <!-- TODO : Check if we can remove it
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-core</artifactId>
-      <version>1.2.1</version>
-      <scope>test</scope>
-    </dependency>
-    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-osgi-integration</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-camel</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.camel.karaf</groupId>
-      <artifactId>apache-camel</artifactId>
-      <type>xml</type>
-      <classifier>features</classifier>
-      <scope>test</scope>
-    </dependency>
+        <!-- Features XML Dependencies used by pax-exam to resolve features to be deployed during test -->
+        <dependency>
+            <groupId>org.apache.camel.karaf</groupId>
+            <artifactId>apache-camel</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.karaf.assemblies.features</groupId>
-      <artifactId>standard</artifactId>
-      <type>xml</type>
-      <classifier>features</classifier>
-      <scope>test</scope>
-    </dependency>
+        <!--TODO - Add dependency to BOM, ...-->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-karaf-features</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.assemblies.features</groupId>
+            <artifactId>standard</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.karaf</groupId>
-      <artifactId>apache-karaf</artifactId>
-      <type>tar.gz</type>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.karaf</groupId>
-          <artifactId>org.apache.karaf.client</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!--
-    <dependency>
-      <groupId>org.apache.karaf</groupId>
-      <artifactId>apache-karaf</artifactId>
-      <version>2.3.0</version>
-    </dependency>
-    -->
+       <!-- Camel -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>org.apache.karaf.features.core</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <!-- Karaf -->
+        <dependency>
+            <groupId>org.apache.karaf</groupId>
+            <artifactId>apache-karaf</artifactId>
+            <type>tar.gz</type>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.karaf</groupId>
+                    <artifactId>org.apache.karaf.client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <!-- Pax exam & karaf tooling -->
-    <dependency>
-      <groupId>org.apache.karaf.tooling.exam</groupId>
-      <artifactId>org.apache.karaf.tooling.exam.container</artifactId>
-      <scope>test</scope>
-      <!-- inclusion added to avoid that karaf tooling transitive
-      dependencies load pax-exam 2.4 -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.ops4j.pax.exam</groupId>
-          <artifactId>pax-exam</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ops4j.pax.exam</groupId>
-          <artifactId>pax-exam-extender-service</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ops4j.pax.exam</groupId>
-          <artifactId>pax-exam-spi</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ops4j.pax.exam</groupId>
-          <artifactId>pax-exam-inject</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ops4j.pax.exam</groupId>
-          <artifactId>pax-exam-invoker-junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>org.apache.karaf.features.core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-  <build>
-    <testResources>
-      <testResource>
-        <filtering>false</filtering>
-        <directory>src/test/resources</directory>
-      </testResource>
-      <testResource>
-        <filtering>true</filtering>
-        <directory>src/test/filtered-resources</directory>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.servicemix.tooling</groupId>
-        <artifactId>depends-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-depends-file</id>
-            <goals>
-              <goal>generate-depends-file</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+        <!-- Pax exam & karaf tooling -->
+        <dependency>
+            <groupId>org.apache.karaf.tooling.exam</groupId>
+            <artifactId>org.apache.karaf.tooling.exam.container</artifactId>
+            <scope>test</scope>
+            <!-- inclusion added to avoid that karaf tooling transitive
+            dependencies load pax-exam 2.4 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>pax-exam</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>pax-exam-extender-service</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>pax-exam-spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>pax-exam-inject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>pax-exam-invoker-junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Bundle-SymbolicName>org.drools.test.osgi.kie-spring</Bundle-SymbolicName>
-            <Bundle-Name>Drools OSGI :: Test :: Kie Spring</Bundle-Name>
-            <Import-Package>*</Import-Package>
-          </instructions>
-        </configuration>
-      </plugin>
+        <!-- Unit Test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
 
-    </plugins>
-  </build>
+    <build>
+        <testResources>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/filtered-resources</directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <!--TODO - Version number should be moved to BOM, ...-->
+                <groupId>org.apache.servicemix.tooling</groupId>
+                <artifactId>depends-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-depends-file</id>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-  <repositories>
-    <repository>
-      <id>apache</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
-  </repositories>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>org.drools.test.osgi.kie-spring</Bundle-SymbolicName>
+                        <Bundle-Name>Drools OSGI :: Test :: Kie Spring</Bundle-Name>
+                        <Import-Package>*</Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>apache</id>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+    </repositories>
 
 </project>
