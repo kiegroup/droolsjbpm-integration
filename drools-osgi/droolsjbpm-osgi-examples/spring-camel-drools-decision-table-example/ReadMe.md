@@ -27,7 +27,7 @@ In the console, use the following commands
     features:install drools-decisiontable
     features:install kie-spring
     features:install kie-camel
-    features:install drools-camel-example
+    features:install drools-decision-table-kie-spring-camel-example
 
 To see the results tail the Fuse ESB log
 

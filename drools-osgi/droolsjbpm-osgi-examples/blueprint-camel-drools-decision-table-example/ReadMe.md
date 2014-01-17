@@ -27,7 +27,7 @@ In the console, use the following commands
     features:install drools-decisiontable
     features:install kie-aries-blueprint
     features:install kie-camel
-    features:install drools-blueprint-camel-example
+    features:install drools-decision-table-kie-blueprint-camel-example
 
 To see the results tail the Fuse ESB log
 
