@@ -87,12 +87,13 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
     }
 
     public static UrlReference getCamelKarafFeatureUrl(String version) {
-        String type = "xml/features";
+        String type = "xml";
+        String classifier = "features";
         MavenArtifactProvisionOption mavenOption = getFeatureUrl("org.apache.camel.karaf", "apache-camel");
         if (version == null) {
-            return mavenOption.versionAsInProject().type(type);
+            return mavenOption.versionAsInProject().type(type).classifier(classifier);
         } else {
-            return mavenOption.version(version).type(type);
+            return mavenOption.version(version).type(type).classifier(classifier);
         }
     }
 
@@ -113,7 +114,7 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
         for (String feature : features) {
             result.add(feature);
         }
-        return scanFeatures(getFeatureUrl("org.drools", "drools-karaf-features").type("xml/features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
+        return scanFeatures(getFeatureUrl("org.drools", "drools-karaf-features").type("xml").classifier("features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
     }
 
 }

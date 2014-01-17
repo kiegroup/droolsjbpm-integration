@@ -17,6 +17,7 @@
 package org.drools.karaf.itest;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.drools.compiler.kproject.ReleaseIdImpl;
@@ -39,12 +40,25 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
 public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(KieSpringOnKarafTest.class);
+
+    protected static final String DroolsVersion;
+    static {
+        Properties testProps = new Properties();
+        try {
+            testProps.load(KieSpringOnKarafTest.class.getResourceAsStream("/test.properties"));
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
+        }
+        DroolsVersion = testProps.getProperty("project.version");
+        LOG.info("Drools Project Version : " + DroolsVersion);
+    }
 
     @Before
     public void init() {
@@ -80,11 +94,16 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
                 // Install Karaf Container
                 karafDistributionConfiguration().frameworkUrl(
-                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
+                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz"))
                         .karafVersion(MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf")).name("Apache Karaf")
                         .unpackDirectory(new File("target/exam/unpack/")),
 
+                // It is really nice if the container sticks around after the test so you can check the contents
+                // of the data directory when things go wrong.
                 keepRuntimeFolder(),
+                // Don't bother with local console output as it just ends up cluttering the logs
+                configureConsole().ignoreLocalConsole(),
+                // Force the log level to INFO so we have more details during the test.  It defaults to WARN.
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
@@ -96,8 +115,11 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
                         "spring", "spring-dm"
                 ),
 
-                // Load Drools + Kie
-                loadDroolsKieFeatures("kie-spring")
+                // Load Kie-Spring, Kie-Camel and indirectly Drools, ...
+                scanFeatures(
+                        maven().groupId("org.drools").artifactId("drools-karaf-features").type("xml").classifier("features").version(DroolsVersion),
+                        "kie-spring", "kie-camel"
+                )
 
         };
 
