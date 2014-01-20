@@ -59,8 +59,21 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>org.drools.osgi.integration</Bundle-SymbolicName>
-            <Fragment-Host>org.drools.compiler</Fragment-Host>
+            <Fragment-Host>org.drools.compiler;bundle-version="[6,7)"</Fragment-Host>
             <Export-Package>*</Export-Package>
+            <Import-Package>
+                org.drools.compiler.kie.builder.impl,
+                org.drools.compiler.kproject,
+                org.drools.compiler.kproject.models,
+                org.drools.core.util,
+                org.kie.api.builder,
+                org.kie.api.builder.model,
+                org.kie.spring;resolution:=optional,
+                org.osgi.framework,
+                org.springframework.beans.factory.config;resolution:=optional,
+                org.springframework.context;resolution:=optional,
+                org.springframework.osgi.context.support;resolution:=optional
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
