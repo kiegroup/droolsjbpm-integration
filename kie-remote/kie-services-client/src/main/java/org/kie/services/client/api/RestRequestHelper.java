@@ -5,6 +5,8 @@ import static org.kie.services.client.api.command.RemoteConfiguration.createAuth
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.ws.rs.core.MediaType;
+
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 
@@ -17,6 +19,7 @@ public class RestRequestHelper {
 
     private ClientRequestFactory requestFactory;
     private static int DEFAULT_TIMEOUT = 5;
+    private MediaType type = null;
 
     /**
      * Helper methods
@@ -75,6 +78,14 @@ public class RestRequestHelper {
         inst.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, DEFAULT_TIMEOUT);
         return inst;
     }
+    
+    public void setMediaType(MediaType type) { 
+        this.type = type;
+    }
+    
+    public MediaType getMediaType() { 
+        return this.type;
+    }
 
     /**
      * Creates a REST request for the given REST operation URL. 
@@ -93,7 +104,11 @@ public class RestRequestHelper {
         if (restOperationUrl.startsWith("/")) {
             restOperationUrl = restOperationUrl.substring(1);
         }
-        return this.requestFactory.createRelativeRequest(restOperationUrl);
+        ClientRequest request =  requestFactory.createRelativeRequest(restOperationUrl);
+        if( type != null ) { 
+            request.accept(type);
+        }
+        return request;
     }
 
     /**

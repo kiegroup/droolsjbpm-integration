@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public class ResourceBase {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceBase.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ResourceBase.class);
     
     protected static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
     
