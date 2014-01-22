@@ -99,51 +99,51 @@
         <bundle>mvn:org.kie/kie-camel/${drools.version}</bundle>
     </feature>
 
-    <feature name="jbpm" version="${project.version}" description="jBPM engine">
-        <feature version="${project.version}">drools-module</feature>
+    <feature name="jbpm-commons" version="${drools.version}" description="jBPM Commons">
+        <bundle>wrap:mvn:javax.security/jacc/1.0</bundle>
         <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
         <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
         <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
         <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
+    </feature>
+
+    <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
+        <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
+        <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
+        <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>
+    </feature>
+
+    <feature name="jbpm" version="${project.version}" description="jBPM engine">
+        <feature version="${project.version}">drools-module</feature>
+        <feature version="${project.version}">drools-jpa</feature>
+        <feature version="${project.version}">jbpm-commons</feature>
+        <feature version="${project.version}">jbpm-human-task</feature>
         <bundle>mvn:org.jbpm/jbpm-flow-builder/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-flow/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-bpmn2/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-audit/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-runtime-manager/${jbpm.version}</bundle>
-    </feature>
-
-<!--    <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
-        <feature version="${project.version}">drools-module</feature>
-        <feature version="${project.version}">drools-jpa</feature>
-        <feature version="${project.version}">jbpm</feature>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
-        <bundle>wrap:mvn:org.apache.geronimo.specs/geronimo-jacc_1.1_spec/1.0</bundle>
-        <bundle>wrap:mvn:org.jboss.weld/weld-core/${karaf.version.org.jboss.weld}</bundle>
-        <bundle>wrap:mvn:org.jboss.solder/solder-api/${karaf.version.org.jboss.solder}</bundle>
-        <bundle>wrap:mvn:org.apache.helix/helix-core/${karaf.version.org.apache.helix}</bundle>
-        <bundle>wrap:mvn:javax.security/jacc/1.0</bundle>
-        <bundle>mvn:org.jbpm/jbpm-audit/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-shared-services/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-runtime-manager/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-audit/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${jbpm.version}</bundle>
-    </feature>-->
-
-    <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
-        <feature version="${project.version}">drools-module</feature>
-        <feature version="${project.version}">drools-jpa</feature>
-        <feature version="${project.version}">jbpm</feature>
-        <bundle>wrap:mvn:javax.security/jacc/1.0</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
-        <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${jbpm.version}</bundle>
     </feature>
+
+    <!--
+             <bundle>wrap:mvn:org.apache.geronimo.specs/geronimo-jacc_1.1_spec/1.0</bundle>
+            <bundle>wrap:mvn:org.jboss.weld/weld-core/${karaf.version.org.jboss.weld}</bundle>
+            <bundle>wrap:mvn:org.jboss.solder/solder-api/${karaf.version.org.jboss.solder}</bundle>
+            <bundle>wrap:mvn:org.apache.helix/helix-core/${karaf.version.org.apache.helix}</bundle>
+            <bundle>wrap:mvn:javax.security/jacc/1.0</bundle>
+            <bundle>mvn:org.jbpm/jbpm-audit/${jbpm.version}</bundle>
+            <bundle>mvn:org.jbpm/jbpm-shared-services/${jbpm.version}</bundle>
+            <bundle>mvn:org.jbpm/jbpm-runtime-manager/${jbpm.version}</bundle>
+
+        <feature name="jbpm-human-task" version="${project.version}" description="jBPM Human Task">
+            <feature version="${project.version}">jbpm</feature>
+            <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
+            <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
+            <bundle>mvn:org.jbpm/jbpm-human-task-audit/${jbpm.version}</bundle>
+            <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>
+            <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${jbpm.version}</bundle>
+        </feature>-->
 
     <feature name="drools5-camel-example" version="${drools.version}" description="Drools5 Spring Camel Example">
         <feature version="${drools.version}">drools-module</feature>
