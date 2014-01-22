@@ -26,8 +26,11 @@ import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
+import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * If a method in this class is annotated by a @Path annotation, 
@@ -47,6 +50,8 @@ import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor;
 @RequestScoped
 public class DeploymentResource extends ResourceBase {
 
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentResource.class);
+    
     /* REST information */
     @Context
     private HttpHeaders headers;
@@ -102,14 +107,15 @@ public class DeploymentResource extends ResourceBase {
         DeployedUnit deployedUnit = deploymentService.getDeployedUnit(deploymentId);
         JaxbDeploymentUnit jaxbDepUnit;
         if( deployedUnit == null ) { 
+            logger.debug("No deployment unit found, getting status");
             JaxbDeploymentStatus status = jobExecutor.getStatus(deploymentId);
-            String [] gavKK = deploymentId.split(":");
             switch(status) { 
             case DEPLOYING:
             case UNDEPLOYING:
             case DEPLOY_FAILED:
             case UNDEPLOY_FAILED: 
             case UNDEPLOYED:
+                String [] gavKK = deploymentId.split(":");
                 jaxbDepUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
                 jaxbDepUnit.setStatus(status);
                 break;
@@ -132,6 +138,7 @@ public class DeploymentResource extends ResourceBase {
             jaxbDepUnit.setStatus(JaxbDeploymentStatus.DEPLOYED);
         }
         
+        logger.debug("Returning deployment unit information for " + deploymentId);
         return createCorrectVariant(jaxbDepUnit, headers);
     }
     
