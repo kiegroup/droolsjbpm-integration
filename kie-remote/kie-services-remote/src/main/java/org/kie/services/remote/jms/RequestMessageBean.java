@@ -1,12 +1,9 @@
 package org.kie.services.remote.jms;
 
-import static org.kie.services.client.serialization.SerializationConstants.*;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
@@ -26,11 +23,8 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.drools.core.command.SingleSessionCommandService;
-import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
-import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
 import org.kie.internal.task.api.InternalTaskService;
@@ -48,6 +42,8 @@ import org.kie.services.remote.jms.request.BackupIdentityProviderProducer;
 import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.services.client.serialization.SerializationConstants.*;
 
 /**
  * There are thus multiple queues to which an instance of this class could listen to, which is why 
@@ -346,7 +342,7 @@ public class RequestMessageBean implements MessageListener {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command<?>> commands = request.getCommands();
-
+        RuntimeEngine runtimeEngine = null;
         if (commands != null) {
             for (int i = 0; i < commands.size(); ++i) {
                 Command<?> cmd = commands.get(i);
@@ -363,35 +359,39 @@ public class RequestMessageBean implements MessageListener {
                     // that will cause message reception to be *NOT* acknowledged!
                     if( cmd instanceof TaskCommand<?>
                         && ! AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass())  ) {
-                        cmdResult = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand < ? >) cmd));
+                        runtimeEngine = runtimeMgrMgr.getRuntimeEngineForTaskCommand((TaskCommand<?>) cmd, taskService);
+                        if (runtimeEngine != null) {
+
+                            cmdResult = ((InternalTaskService) runtimeEngine.getTaskService()).execute(cmd);
+                        } else {
+
+                            cmdResult = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand < ? >) cmd));
+                        }
                     } else {
                         String deploymentId = request.getDeploymentId(); 
                         if( deploymentId == null ) { 
                             throw new DomainNotFoundBadRequestException("A deployment id is required for the " + cmd.getClass().getSimpleName());
                         }
-                        RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
+                        runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
                         if( runtimeEngine == null ) { 
                             throw new DomainNotFoundBadRequestException("No runtime engine could be found for deployment '" + deploymentId 
                                     + "' when executing the " + cmd.getClass().getSimpleName());
                         }
-                        
-                        KieSession kieSession 
-                            = runtimeEngine.getKieSession();
-                        SingleSessionCommandService sscs 
-                            = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
-                        // Synchronize around SSCS to avoid race-conditions with kie session cache clearing in afterCompletion
-                        synchronized(sscs) { 
-                            if( cmd instanceof TaskCommand<?> ) {
-                                cmdResult = ((InternalTaskService) taskService).execute((TaskCommand<?>) cmd);
-                            } else { 
-                                cmdResult = kieSession.execute(cmd);
-                            }
+                        if( cmd instanceof TaskCommand<?> ) {
+
+                            cmdResult = ((InternalTaskService) runtimeEngine.getTaskService()).execute((TaskCommand<?>) cmd);
+                        } else {
+
+                            cmdResult = runtimeEngine.getKieSession().execute(cmd);
                         }
+
                     }
                 } catch( Exception e ) { 
                     String errMsg =  "Unable to execute " + cmd.getClass().getSimpleName() + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage();
                     logger.warn(errMsg, e);
                     jaxbResponse.addException(new KieRemoteServicesRuntimeException(errMsg, e), i, cmd);
+                } finally {
+                    runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
                 }
                 if (cmdResult != null) {
                     try {

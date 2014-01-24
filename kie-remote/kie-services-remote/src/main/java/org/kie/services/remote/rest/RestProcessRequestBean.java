@@ -3,8 +3,6 @@ package org.kie.services.remote.rest;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.persistence.SingleSessionCommandService;
 import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
@@ -28,8 +26,6 @@ import org.kie.services.remote.util.ExecuteAndSerializeCommand;
  * <li>Retrieve the KieSession or TaskService</li>
  * <li>Execute the submitted command</li>
  * </ul>
- * Transactional operations are delegated to <code>TransactionalExecutor</code> that will ensure transaction is
- * opened and closed within boundary of the executor invocation.
  */
 @RequestScoped
 public class RestProcessRequestBean {
@@ -52,20 +48,20 @@ public class RestProcessRequestBean {
      */
     public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
         Object result = null;
+        RuntimeEngine runtimeEngine = null;
         try {
-            RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
+            runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
             KieSession kieSession = runtimeEngine.getKieSession();
-            SingleSessionCommandService sscs 
-                = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
-            synchronized (sscs) { 
-                result = kieSession.execute(cmd);
-            }
+            result = kieSession.execute(cmd);
+
         } catch (Exception e) {
             if( e instanceof RuntimeException ) { 
                 throw (RuntimeException) e;
             } else {
                 throw new InternalServerErrorException(errorMsg, e);
             }
+        } finally {
+            runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
         }
         return result;
     }
@@ -85,17 +81,20 @@ public class RestProcessRequestBean {
      */
     public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
         Object result = null;
+        RuntimeEngine engine = null;
         try {
             if( deploymentId != null ) { 
                 RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
-                KieSession kieSession = runtimeEngine.getKieSession();
-                SingleSessionCommandService sscs 
-                    = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) kieSession).getCommandService();
-                synchronized (sscs) {
+                result = ((InternalTaskService) runtimeEngine.getTaskService()).execute(cmd);
+            } else {
+                engine = runtimeMgrMgr.getRuntimeEngineForTaskCommand(cmd, taskService);
+                if (engine != null) {
+
+                    result = ((InternalTaskService) engine.getTaskService()).execute(cmd);
+                } else {
+
                     result = ((InternalTaskService) taskService).execute(cmd);
                 }
-            } else {
-                result = ((InternalTaskService) taskService).execute(cmd);
             }
         } catch (PermissionDeniedException pde) {
             throw new UnauthorizedException(pde.getMessage(), pde);
@@ -103,7 +102,9 @@ public class RestProcessRequestBean {
             throw re;
         } catch( Exception e ) { 
             throw new InternalServerErrorException(errorMsg, e);
-        } 
+        } finally {
+            runtimeMgrMgr.disposeRuntimeEngine(engine);
+        }
         return result;
     }
     
@@ -129,15 +130,25 @@ public class RestProcessRequestBean {
      */
     public Object doTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
         Object result = null;
+        RuntimeEngine engine = null;
         try {
-            result = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
+            engine = runtimeMgrMgr.getRuntimeEngineForTaskCommand(cmd, taskService);
+            if (engine != null) {
+
+                result = ((InternalTaskService) engine.getTaskService()).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
+            } else {
+
+                result = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
+            }
         } catch (PermissionDeniedException pde) {
             throw new UnauthorizedException(pde.getMessage(), pde);
         } catch (RuntimeException re) {
             throw re;
         } catch( Exception e ) { 
             throw new InternalServerErrorException(errorMsg, e);
-        } 
+        } finally {
+            runtimeMgrMgr.disposeRuntimeEngine(engine);
+        }
         return result;
     }
 }

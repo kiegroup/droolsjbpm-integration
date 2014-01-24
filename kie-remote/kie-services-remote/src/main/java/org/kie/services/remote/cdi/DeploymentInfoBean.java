@@ -2,12 +2,8 @@ package org.kie.services.remote.cdi;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 
@@ -15,9 +11,13 @@ import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.kie.services.impl.event.Undeploy;
 import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
+import org.jbpm.runtime.manager.impl.RuntimeEngineImpl;
+import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.task.TaskService;
+import org.kie.api.task.model.Task;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
@@ -62,6 +62,26 @@ public class DeploymentInfoBean {
     
     public RuntimeManager getRuntimeManager(String domainName) { 
        return domainRuntimeManagers.get(domainName);
+    }
+
+    public RuntimeEngine getRuntimeEngineForTaskCommand(TaskCommand<?> cmd, TaskService taskService) {
+        Long taskId = cmd.getTaskId();
+        if (taskId != null) {
+            Task task = taskService.getTaskById(taskId);
+            if (task != null) {
+                return getRuntimeEngine(task.getTaskData().getDeploymentId(),
+                        task.getTaskData().getProcessInstanceId());
+            }
+        }
+
+        return null;
+    }
+
+    public void disposeRuntimeEngine(RuntimeEngine runtimeEngine) {
+        if (runtimeEngine != null) {
+            RuntimeManager manager = ((RuntimeEngineImpl) runtimeEngine).getManager();
+            manager.disposeRuntimeEngine(runtimeEngine);
+        }
     }
 
     /**
