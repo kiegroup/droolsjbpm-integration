@@ -34,7 +34,7 @@ public class BankLoanProcessTest {
 
         List<AggregatedSimulationEvent> summary = (List<AggregatedSimulationEvent>) wmRepo.getGlobal("summary");
         assertNotNull(summary);
-        assertEquals(10, summary.size());
+        assertEquals(11, summary.size());
         assertEquals(110, wmRepo.getEvents().size());
 
         wmRepo.close();

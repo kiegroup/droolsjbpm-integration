@@ -1,5 +1,6 @@
 package org.jbpm.simulation.impl.events;
 
+import org.apache.commons.lang.StringUtils;
 import org.jbpm.simulation.AggregatedSimulationEvent;
 
 
@@ -48,7 +49,11 @@ public class AggregatedActivitySimulationEvent implements AggregatedSimulationEv
         this.maxExecutionTime = maxExecutionTime;
     }
     public String getActivityName() {
-        return activityName;
+        if (StringUtils.isNotEmpty(this.activityName)) {
+            return this.activityName;
+        }
+
+        return this.activityId;
     }
     public void setActivityName(String activityName) {
         this.activityName = activityName;
