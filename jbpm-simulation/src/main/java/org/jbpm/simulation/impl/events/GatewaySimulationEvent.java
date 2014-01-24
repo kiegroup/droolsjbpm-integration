@@ -2,6 +2,8 @@ package org.jbpm.simulation.impl.events;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 public class GatewaySimulationEvent extends GenericSimulationEvent {
 
     private String activityName;
@@ -16,7 +18,11 @@ public class GatewaySimulationEvent extends GenericSimulationEvent {
     }
     
     public String getActivityName() {
-        return activityName;
+        if (StringUtils.isNotEmpty(this.activityName)) {
+            return this.activityName;
+        }
+
+        return this.activityId;
     }
 
     public void setActivityName(String activityName) {

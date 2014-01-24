@@ -1,5 +1,6 @@
 package org.jbpm.simulation.impl.events;
 
+import org.apache.commons.lang.StringUtils;
 import org.jbpm.simulation.AggregatedSimulationEvent;
 
 public class AggregatedEndEventSimulationEvent implements
@@ -56,7 +57,11 @@ public class AggregatedEndEventSimulationEvent implements
 
 
     public String getActivityName() {
-        return activityName;
+        if (StringUtils.isNotEmpty(this.activityName)) {
+            return this.activityName;
+        }
+
+        return this.activityId;
     }
 
 

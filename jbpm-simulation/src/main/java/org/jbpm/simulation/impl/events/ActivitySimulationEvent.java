@@ -1,5 +1,6 @@
 package org.jbpm.simulation.impl.events;
 
+import org.apache.commons.lang.StringUtils;
 
 public class ActivitySimulationEvent extends GenericSimulationEvent {
     
@@ -19,7 +20,11 @@ public class ActivitySimulationEvent extends GenericSimulationEvent {
     
 
     public String getActivityName() {
-        return this.activityName;
+        if (StringUtils.isNotEmpty(this.activityName)) {
+            return this.activityName;
+        }
+
+        return this.activityId;
     }
 
     public String getActivityId() {

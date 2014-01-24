@@ -1,5 +1,7 @@
 package org.jbpm.simulation.impl.events;
 
+import org.apache.commons.lang.StringUtils;
+
 public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
 
     private double resourceCost;
@@ -40,7 +42,11 @@ public class HumanTaskActivitySimulationEvent extends GenericSimulationEvent {
     }
 
     public String getActivityName() {
-        return activityName;
+        if (StringUtils.isNotEmpty(this.activityName)) {
+            return this.activityName;
+        }
+
+        return this.activityId;
     }
 
     public void setActivityName(String activityName) {
