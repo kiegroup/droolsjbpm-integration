@@ -107,7 +107,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
-            if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KModuleFactoryBean.class.getName())){
+            if ( beanDefinition.getBeanClassName() != null && beanDefinition.getBeanClassName().equalsIgnoreCase(KModuleFactoryBean.class.getName())){
                 KieModuleModel kieModuleModel = fetchKieModuleModel(beanFactory);
                 addKieModuleToRepo(kieModuleModel);
             }
@@ -201,7 +201,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     private void addKieBaseModels(ConfigurableListableBeanFactory beanFactory, KieModuleModelImpl kieModuleModel) {
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
-            if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KBaseFactoryBean.class.getName())){
+            if ( beanDefinition.getBeanClassName() != null && beanDefinition.getBeanClassName().equalsIgnoreCase(KBaseFactoryBean.class.getName())){
                 KieBaseModelImpl kBase = new KieBaseModelImpl();
                 kBase.setKModule(kieModuleModel);
 
@@ -257,7 +257,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     private void addKieSessionModels(ConfigurableListableBeanFactory beanFactory, KieBaseModelImpl kBase) {
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
-            if ( beanDefinition.getBeanClassName().equalsIgnoreCase(KSessionFactoryBean.class.getName())){
+            if ( beanDefinition.getBeanClassName() != null && beanDefinition.getBeanClassName().equalsIgnoreCase(KSessionFactoryBean.class.getName())){
                 String kBaseName = getPropertyValue(beanDefinition, "kBaseName");
                 if ( kBase.getName().equalsIgnoreCase(kBaseName)) {
                     String name = getPropertyValue(beanDefinition, "name");
