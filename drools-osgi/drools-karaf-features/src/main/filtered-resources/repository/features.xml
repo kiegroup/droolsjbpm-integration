@@ -71,6 +71,33 @@
         <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
     </feature>
 
+    <feature name="kie-ci" version="${drools.version}">
+<!-- TODO : Not required as we have embedded depdendencies in kie-ci dur to class resolution issues
+        <bundle>wrap:mvn:org.sonatype.aether/aether-impl/1.9</bundle>
+        <bundle>wrap:mvn:org.sonatype.aether/aether-api/1.9</bundle>
+        <bundle>wrap:mvn:org.sonatype.aether/aether-util/1.9</bundle>
+        <bundle>wrap:mvn:org.sonatype.aether/aether-spi/1.9</bundle>
+        <bundle>wrap:mvn:org.sonatype.aether/aether-connector-file/1.9</bundle>
+        <bundle>wrap:mvn:org.sonatype.aether/aether-connector-wagon/1.9</bundle>
+        <bundle>wrap:mvn:org.sonatype.plexus/plexus-cipher/1.7</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-settings/3.1.1</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-settings-builder/3.1.1</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-core/3.1.1</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-model/3.1.1</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-model-builder/3.1.1</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-compat/3.1.1</bundle>
+        <bundle>wrap:mvn:org.apache.maven.wagon/wagon-provider-api/2.6</bundle>
+        <bundle>wrap:mvn:org.apache.maven.wagon/wagon-http/2.6</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-aether-provider/3.0.5</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/1.9.2_1</bundle>
+        <bundle>wrap:mvn:org.codehaus.plexus/plexus-classworlds/2.5.1</bundle>
+        <bundle>wrap:mvn:org.codehaus.plexus/plexus-interpolation/1.19</bundle>
+        <bundle>wrap:mvn:org.codehaus.plexus/plexus-container-default/1.5.5</bundle>
+        <bundle>wrap:mvn:org.codehaus.plexus/plexus-utils/3.0.15</bundle>
+        <bundle>wrap:mvn:org.sonatype.sisu/sisu-inject-plexus/2.5.2</bundle>-->
+        <bundle>mvn:org.kie/kie-ci/${drools.version}</bundle>
+    </feature>
+
     <feature name="kie-spring" version="${drools.version}">
         <feature version="${drools.version}">kie</feature>
         <feature version="${drools.version}">drools-jpa</feature>
