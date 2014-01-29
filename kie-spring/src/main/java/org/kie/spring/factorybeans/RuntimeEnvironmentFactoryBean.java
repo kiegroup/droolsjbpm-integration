@@ -150,7 +150,7 @@ public class RuntimeEnvironmentFactoryBean implements FactoryBean, InitializingB
         // common environment entries
         builder.addEnvironmentEntry("org.kie.api.task.TaskService", taskService);
         builder.addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, transactionManager);
-        builder.addEnvironmentEntry(EnvironmentName.TASK_USER_GROUP_CALLBASK, userGroupCallback);
+        builder.addEnvironmentEntry(EnvironmentName.TASK_USER_GROUP_CALLBACK, userGroupCallback);
         builder.addEnvironmentEntry(EnvironmentName.TASK_USER_INFO, userInfo);
         if (entityManager != null) {
             builder.addEnvironmentEntry(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, entityManager)
