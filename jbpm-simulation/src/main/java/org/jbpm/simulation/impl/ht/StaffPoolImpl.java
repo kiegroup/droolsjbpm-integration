@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.math.random.RandomData;
-import org.apache.commons.math.random.RandomDataImpl;
+import org.apache.commons.math3.random.RandomData;
+import org.apache.commons.math3.random.RandomDataImpl;
 import org.jbpm.simulation.SimulationContext;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.TimeGenerator;

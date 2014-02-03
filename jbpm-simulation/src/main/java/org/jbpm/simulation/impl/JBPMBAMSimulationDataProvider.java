@@ -12,7 +12,7 @@ import java.util.Map;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math3.stat.StatUtils;
 import org.jbpm.simulation.NodeStatistic;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.kie.api.definition.process.Node;

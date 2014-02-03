@@ -3,8 +3,8 @@ package org.jbpm.simulation.impl.time;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.math.random.RandomData;
-import org.apache.commons.math.random.RandomDataImpl;
+import org.apache.commons.math3.random.RandomData;
+import org.apache.commons.math3.random.RandomDataImpl;
 import org.jbpm.simulation.TimeGenerator;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.simulation.util.SimulationUtils;
