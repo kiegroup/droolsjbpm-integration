@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.math.stat.descriptive.rank.Percentile;
+import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 import org.jbpm.simulation.impl.time.RandomTimeGenerator;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.junit.Test;
