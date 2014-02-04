@@ -12,7 +12,11 @@ public class RemoteRestRuntimeFactory implements RemoteRuntimeEngineFactory {
     public RemoteRestRuntimeFactory(String deploymentId, URL baseUrl, String username, String password) {
         this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password);
     }
-    
+   
+    public RemoteRestRuntimeFactory(String deploymentId, URL baseUrl, String username, String password, int timeoutInSeconds) {
+        this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password, timeoutInSeconds);
+    }
+   
     public RemoteRuntimeEngine newRuntimeEngine() {
     	return new RemoteRuntimeEngine(configuration);
     }
