@@ -275,7 +275,7 @@ public class TaskResource extends ResourceBase {
             result = processRequestBean.doTaskOperationAndSerializeResult(
                     cmd, 
                     "Unable get content " + contentId + " (from task " + taskId + ")");
-            content = (JaxbContent) content;
+            content = (JaxbContent) result;
         } 
         return createCorrectVariant(content, headers);
     }
