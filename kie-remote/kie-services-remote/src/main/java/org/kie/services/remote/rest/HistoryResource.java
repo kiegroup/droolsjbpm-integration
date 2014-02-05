@@ -147,7 +147,6 @@ public class HistoryResource extends ResourceBase {
         String oper = getRelativePath(request);
         int [] pageInfo = getPageNumAndPageSize(params, oper);
         
-        JPAAuditLogService auditLogService = new JPAAuditLogService(emf);
         Object result = null;
         if ("node".equalsIgnoreCase(operation)) {
             result = auditLogService.findNodeInstances(procInstId, logId);
@@ -175,12 +174,12 @@ public class HistoryResource extends ResourceBase {
         Object result;
         if (statusParam != null) {
             if (statusParam.intValue() == ProcessInstance.STATE_ACTIVE) {
-                result = new JPAAuditLogService(emf).findActiveProcessInstances(processId);
+                result = auditLogService.findActiveProcessInstances(processId);
             } else {
-                result = new JPAAuditLogService(emf).findProcessInstances(processId);
+                result = auditLogService.findProcessInstances(processId);
             }
         } else {
-            result = new JPAAuditLogService(emf).findProcessInstances(processId);
+            result = auditLogService.findProcessInstances(processId);
         }
         
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
@@ -206,8 +205,7 @@ public class HistoryResource extends ResourceBase {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
         int [] pageInfo = getPageNumAndPageSize(params, oper);
-        List<VariableInstanceLog> varLogList 
-            = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
@@ -228,20 +226,20 @@ public class HistoryResource extends ResourceBase {
     
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
-    private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
+    List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
             Map<String, List<String>> params, String oper) { 
         // active processes parameter
         String activeProcsParam = getStringParam("activeProcesses", false, params, oper); 
-        boolean activeProcesses = true;
+        boolean onlyActiveProcesses = false;
         if( activeProcsParam != null ) { 
-            activeProcesses = Boolean.parseBoolean(activeProcsParam);
+            onlyActiveProcesses = Boolean.parseBoolean(activeProcsParam);
         }
-        
+       
         Object result;
         if( value == null ) { 
-            result = new JPAAuditLogService(emf).findVariableInstancesByName(varId, activeProcesses);
+            result = auditLogService.findVariableInstancesByName(varId, onlyActiveProcesses);
         } else { 
-            result = new JPAAuditLogService(emf).findVariableInstancesByNameAndValue(varId, value, activeProcesses);
+            result = auditLogService.findVariableInstancesByNameAndValue(varId, value, onlyActiveProcesses);
         }
         
         return (List<VariableInstanceLog>) result;
