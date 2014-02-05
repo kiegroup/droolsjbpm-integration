@@ -302,32 +302,16 @@ public class RuntimeResource extends ResourceBase {
     
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
+    @Deprecated // Delete with 6.1.0
     public Response history_variable_varId_instances(@PathParam("varId") String variableId) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
-
-        // get variables
-        List<VariableInstanceLog> varLogList = historyResource.internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
-        
-        // get process instances
-        JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
-        return createCorrectVariant(response, headers);
+        return historyResource.variable_varId_instances(variableId);
     }
     
     @GET
     @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
+    @Deprecated // Delete with 6.1.0
     public Response history_variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
-
-        // get variables
-        List<VariableInstanceLog> varLogList = historyResource.internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
-        
-        // get process instances
-        JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
-        return createCorrectVariant(response, headers);
+        return historyResource.variable_varId_value_valueVal_instances(variableId, value);
     }
 
     /**

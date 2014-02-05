@@ -23,11 +23,13 @@ import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.util.Paginator;
 
 /**
  * If a method in this class is annotated by a @Path annotation, 
@@ -90,11 +92,10 @@ public class HistoryResource extends ResourceBase {
     public Response instances() {
         String oper = getRelativePath(request);
         Map<String, List<String>> params = getRequestParams(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         List<ProcessInstanceLog> results = auditLogService.findProcessInstances();
         
-        results = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, results);
+        results = paginate(getPageNumAndPageSize(params, oper), results);
         return createCorrectVariant(new JaxbHistoryLogList(results), headers);
     }
 
@@ -103,14 +104,13 @@ public class HistoryResource extends ResourceBase {
     public Response instance_procInstId(@PathParam("procInstId") long procInstId) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         ProcessInstanceLog procInstLog = auditLogService.findProcessInstance(procInstId);
         
         List<ProcessInstanceLog> logList = new ArrayList<ProcessInstanceLog>();
         logList.add(procInstLog);
         
-        logList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, logList);
+        logList = paginate(getPageNumAndPageSize(params, oper), logList);
         return createCorrectVariant(new JaxbHistoryLogList(logList), headers);
     }
 
@@ -119,7 +119,6 @@ public class HistoryResource extends ResourceBase {
     public Response instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         Object result = null;
         if ("child".equalsIgnoreCase(operation)) {
@@ -133,7 +132,7 @@ public class HistoryResource extends ResourceBase {
         }
 
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
-        varInstLogList = (new Paginator<AuditEvent>()).paginate(pageInfo, varInstLogList);
+        varInstLogList = paginate(getPageNumAndPageSize(params, oper), varInstLogList);
         JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
         
         return createCorrectVariant(resultList, headers);
@@ -145,7 +144,6 @@ public class HistoryResource extends ResourceBase {
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         Object result = null;
         if ("node".equalsIgnoreCase(operation)) {
@@ -157,7 +155,7 @@ public class HistoryResource extends ResourceBase {
         }
         
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
-        varInstLogList = (new Paginator<AuditEvent>()).paginate(pageInfo, varInstLogList);
+        varInstLogList = paginate(getPageNumAndPageSize(params, oper), varInstLogList);
         JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
         
         return createCorrectVariant(resultList, headers);
@@ -187,7 +185,7 @@ public class HistoryResource extends ResourceBase {
         if (statusParam != null && !statusParam.equals(ProcessInstance.STATE_ACTIVE)) {
             List<ProcessInstanceLog> filteredProcLogList = new ArrayList<ProcessInstanceLog>();
             for (int i = 0; 
-                    i < procInstLogList.size() && filteredProcLogList.size() < pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE]; 
+                    i < procInstLogList.size() && filteredProcLogList.size() < getMaxNumResultsNeeded(pageInfo);
                     ++i) {
                 ProcessInstanceLog procLog = procInstLogList.get(i);
                 if (procLog.getStatus().equals(statusParam.intValue())) {
@@ -195,7 +193,7 @@ public class HistoryResource extends ResourceBase {
                 }
             }
         }
-        procInstLogList = (new Paginator<ProcessInstanceLog>()).paginate(pageInfo, procInstLogList);
+        procInstLogList = paginate(pageInfo, procInstLogList);
         return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
     }
 
@@ -204,9 +202,8 @@ public class HistoryResource extends ResourceBase {
     public Response variable_varId(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
-        varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
+        varLogList = paginate(getPageNumAndPageSize(params, oper), varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
     }
@@ -216,17 +213,48 @@ public class HistoryResource extends ResourceBase {
     public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
         List<VariableInstanceLog> varLogList 
             = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
-        varLogList = (new Paginator<VariableInstanceLog>()).paginate(pageInfo, varLogList);
+        varLogList = paginate(getPageNumAndPageSize(params, oper), varLogList);
         
         return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
     } 
+   
+    @GET
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
+    public Response variable_varId_instances(@PathParam("varId") String variableId) {
+        Map<String, List<String>> params = getRequestParams(request);
+        String oper = getRelativePath(request);
+
+        // get variables
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
+        
+        // get process instance logs
+        int maxNumResults = getMaxNumResultsNeeded(getPageNumAndPageSize(params, oper));
+        List<ProcessInstanceLog> procInstLogList = getProcessInstanceLogsByVariable(varLogList, maxNumResults);
+        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
+    }
     
+    @GET
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
+    public Response variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
+        Map<String, List<String>> params = getRequestParams(request);
+        String oper = getRelativePath(request);
+
+        // get variables
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
+        
+        // get process instance logs
+        int maxNumResults = getMaxNumResultsNeeded(getPageNumAndPageSize(params, oper));
+        List<ProcessInstanceLog> procInstLogList = getProcessInstanceLogsByVariable(varLogList, maxNumResults);
+        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
+    }
+    
+    
+
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
-    List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
+    private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
             Map<String, List<String>> params, String oper) { 
         // active processes parameter
         String activeProcsParam = getStringParam("activeProcesses", false, params, oper); 
@@ -243,5 +271,21 @@ public class HistoryResource extends ResourceBase {
         }
         
         return (List<VariableInstanceLog>) result;
+    }
+
+    private List<ProcessInstanceLog> getProcessInstanceLogsByVariable(List<VariableInstanceLog> varLogList, int maxNumResults) {
+        int numVarLogs = varLogList.size();
+        int numProcInsts = 0;
+       
+        List<ProcessInstanceLog> resultList = new ArrayList<ProcessInstanceLog>();
+        for( int i = 0; i < numVarLogs && numProcInsts < maxNumResults; ++i ) { 
+            long procInstId = varLogList.get(i).getProcessInstanceId();
+            ProcessInstanceLog procInstlog = auditLogService.findProcessInstance(procInstId);
+            if( procInstlog != null ) { 
+                resultList.add(procInstlog);
+                ++numProcInsts;
+            }
+        }
+        return resultList;
     }
 }

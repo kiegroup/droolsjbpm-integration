@@ -363,26 +363,30 @@ public class ResourceBase {
     
     protected static int [] getPageNumAndPageSize(Map<String, List<String>> params, String oper) {
         int [] pageInfo = new int[2];
-        Number page = getNumberParam("page", false, params, oper, false);
-        Number pageShort = getNumberParam("p", false, params, oper, false);
-        Number pageSize = getNumberParam("pageSize", false, params, oper, false);
-        Number pageSizeShort = getNumberParam("s", false, params, oper, false);
         
         int p = 0;
-        int s = 10;
+        Number page = getNumberParam("page", false, params, oper, false);
         if( page != null ) { 
             p = page.intValue();
-        } else if( pageShort != null ) { 
-            p = pageShort.intValue();
+        } else { 
+            Number pageShort = getNumberParam("p", false, params, oper, false);
+            if( pageShort != null ) { 
+                p = pageShort.intValue();
+            }
         }
         if( p < 0 ) { 
             p = 0;
         }
         
+        int s = 10;
+        Number pageSize = getNumberParam("pageSize", false, params, oper, false);
         if( pageSize != null ) { 
             s = pageSize.intValue();
-        } else if( pageSizeShort != null ) { 
-            s = pageSizeShort.intValue();
+        } else { 
+            Number pageSizeShort = getNumberParam("s", false, params, oper, false);
+            if( pageSizeShort != null ) { 
+                s = pageSizeShort.intValue();
+            }
         }
         if( s < 0 ) { 
             s = 0;
@@ -392,6 +396,28 @@ public class ResourceBase {
         pageInfo[PAGE_SIZE] = s;
         
         return pageInfo;
+    }
+   
+    protected static <T> List<T> paginate(int[] pageInfo, List<T> results) { 
+        List<T> pagedResults = new ArrayList<T>();
+        assert pageInfo[0] >= 0;
+        if( pageInfo[0] == 0 ) { 
+            return results;
+        }  else if( pageInfo[0] > 0 ) { 
+            // for( i  = start of page; i < start of next page && i < num results; ++i ) 
+            for( int i = (pageInfo[0]-1)*pageInfo[1]; i < pageInfo[0]*pageInfo[1] && i < results.size(); ++i ) { 
+                pagedResults.add(results.get(i));
+            }
+        }
+        return pagedResults;
+    }
+    
+    protected static int getMaxNumResultsNeeded(int [] pageInfo) { 
+        int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
+        if( pageInfo[PAGE_NUM] == 0 ) { 
+            numResults = Integer.MAX_VALUE;
+        } 
+        return numResults;
     }
     
     // Other helper methods ------------------------------------------------------------------------------------------------------
