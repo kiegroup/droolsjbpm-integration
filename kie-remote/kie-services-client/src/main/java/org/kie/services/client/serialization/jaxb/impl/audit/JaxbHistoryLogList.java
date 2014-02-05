@@ -46,10 +46,10 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
     }
     
     private void initialize( List<? extends AuditEvent> logList ) { 
+        this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
         if( logList == null || logList.size() == 0 ) { 
             return;
         }
-        this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
         for( Object logObj : logList ) { 
             if( logObj instanceof ProcessInstanceLog ) { 
                 this.historyLogList.add(new JaxbProcessInstanceLog((ProcessInstanceLog) logObj));

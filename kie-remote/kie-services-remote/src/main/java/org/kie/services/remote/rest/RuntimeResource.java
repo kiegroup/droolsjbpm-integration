@@ -308,7 +308,7 @@ public class RuntimeResource extends ResourceBase {
         int [] pageInfo = getPageNumAndPageSize(params, oper);
 
         // get variables
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
+        List<VariableInstanceLog> varLogList = historyResource.internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         
         // get process instances
         JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
@@ -323,7 +323,7 @@ public class RuntimeResource extends ResourceBase {
         int [] pageInfo = getPageNumAndPageSize(params, oper);
 
         // get variables
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
+        List<VariableInstanceLog> varLogList = historyResource.internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         
         // get process instances
         JaxbProcessInstanceListResponse response = getProcessInstanceListResponse(varLogList, pageInfo);
@@ -396,22 +396,6 @@ public class RuntimeResource extends ResourceBase {
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
-
-    private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
-            Map<String, List<String>> params, String oper) { 
-        // active processes parameter
-        String activeProcsParam = getStringParam("activeProcesses", false, params, oper); 
-        boolean activeProcesses = true;
-        if( activeProcsParam != null ) { 
-            activeProcesses = Boolean.parseBoolean(activeProcsParam);
-        }
-        
-        if( value == null ) { 
-            return historyResource.getAuditLogService().findVariableInstancesByName(varId, activeProcesses);
-        } else { 
-            return historyResource.getAuditLogService().findVariableInstancesByNameAndValue(varId, value, activeProcesses);
-        }
-    }
 
     private JaxbProcessInstanceListResponse getProcessInstanceListResponse(List<VariableInstanceLog> varLogList, int [] pageInfo) { 
         JaxbProcessInstanceListResponse response = new JaxbProcessInstanceListResponse();
