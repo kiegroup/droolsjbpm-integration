@@ -35,7 +35,6 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.util.Paginator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,8 +118,6 @@ public class TaskResource extends ResourceBase {
         JaxbTaskSummaryListResponse responseObj = null;
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
-        Paginator<TaskSummaryImpl> paginator = new Paginator<TaskSummaryImpl>();
         
         for( String queryParam : params.keySet() ) { 
             boolean allowed = false;
@@ -158,7 +155,7 @@ public class TaskResource extends ResourceBase {
                 queryCmd, 
                 "Unable to execute " + queryCmd.getClass().getSimpleName());
 
-        results = paginator.paginate(pageInfo, results);
+        results = paginate(getPageNumAndPageSize(params, oper), results);
         responseObj = new JaxbTaskSummaryListResponse(results);
         return createCorrectVariant(responseObj, headers);
     }
