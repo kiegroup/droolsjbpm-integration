@@ -38,14 +38,14 @@ public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory
         this.config = new RemoteConfiguration(deploymentId, context, username, password);
     }
     
-    public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue, String username, String password, int qualityOfServiceThresholdMillisecs) {
+    public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue, String username, String password, int qualityOfServiceThresholdSeconds) {
         this.config = new RemoteConfiguration(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue, username, password);
-        this.config.setQualityOfServiceThresholdMilliSeconds(qualityOfServiceThresholdMillisecs);
+        this.config.setQualityOfServiceThresholdMilliSeconds(qualityOfServiceThresholdSeconds*1000);
     }
     
-    public RemoteJmsRuntimeEngineFactory(String deploymentId, InitialContext context, String username, String password, int qualityofServiceThresholdMillisecs) { 
+    public RemoteJmsRuntimeEngineFactory(String deploymentId, InitialContext context, String username, String password, int qualityofServiceThresholdSeconds) { 
         this.config = new RemoteConfiguration(deploymentId, context, username, password);
-        this.config.setQualityOfServiceThresholdMilliSeconds(qualityofServiceThresholdMillisecs);
+        this.config.setQualityOfServiceThresholdMilliSeconds(qualityofServiceThresholdSeconds*1000);
     }
     
     public static InitialContext getRemoteJbossInitialContext(URL url, String user, String password) { 
