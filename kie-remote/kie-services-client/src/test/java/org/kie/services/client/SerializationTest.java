@@ -63,6 +63,7 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -429,9 +430,14 @@ public abstract class SerializationTest {
     
     @Test
     public void deploymentObjectsTest() throws Exception {
+        // for test at end, fill during test
+        JaxbDeploymentUnitList depUnitList = new JaxbDeploymentUnitList();
+       
+        // dep jobs
         JaxbDeploymentJobResult jaxbJob = new JaxbDeploymentJobResult();
         testRoundtrip(jaxbJob);
 
+        // complex dep jobs
         KModuleDeploymentUnit kDepUnit = new KModuleDeploymentUnit("org", "jar", "1.0", "kbase", "ksession" );
         kDepUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
         
@@ -440,6 +446,7 @@ public abstract class SerializationTest {
         depUnit.setKsessionName(kDepUnit.getKsessionName());
         depUnit.setStrategy(kDepUnit.getStrategy());
         depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
+        depUnitList.getDeploymentUnitList().add(depUnit);
         jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
         JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundtrip(jaxbJob);
         compareObjects(jaxbJob, copyJaxbJob, "identifier");
@@ -449,6 +456,7 @@ public abstract class SerializationTest {
         depUnit.setKsessionName("ksession");
         depUnit.setStatus(JaxbDeploymentStatus.DEPLOY_FAILED);
         depUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
+        depUnitList.getDeploymentUnitList().add(depUnit);
         
         JaxbDeploymentUnit copyDepUnit = (JaxbDeploymentUnit) testRoundtrip(depUnit);
         
@@ -458,5 +466,8 @@ public abstract class SerializationTest {
         JaxbDeploymentJobResult copyDepJob = (JaxbDeploymentJobResult) testRoundtrip(depJob);
         
         compareObjects(copyDepJob, depJob, "identifier");
+        
+        JaxbDeploymentUnitList roundTripUnitList = (JaxbDeploymentUnitList) testRoundtrip(depUnitList);
+        compareObjects(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "identifier");
     }
 }

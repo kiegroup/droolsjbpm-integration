@@ -63,7 +63,7 @@ public class DeploymentsResource extends ResourceBase {
             depUnitList.add(jaxbDepUnit);
         }
         
-        return createCorrectVariant(depUnitList, headers);
+        return createCorrectVariant(new JaxbDeploymentUnitList(depUnitList), headers);
     }
     
 }
