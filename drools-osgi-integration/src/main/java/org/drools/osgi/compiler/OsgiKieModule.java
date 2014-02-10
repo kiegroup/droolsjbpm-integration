@@ -25,6 +25,8 @@ public class OsgiKieModule extends AbstractKieModule {
 
     private Collection<String> fileNames;
 
+    private final long creationTimestamp = System.currentTimeMillis();
+
     private OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle, int bundleUrlPrefixLength) {
         super(releaseId, kModuleModel);
         this.bundle = bundle;
@@ -68,6 +70,11 @@ public class OsgiKieModule extends AbstractKieModule {
     @Override
     public File getFile() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getCreationTimestamp() {
+        return creationTimestamp;
     }
 
     public static OsgiKieModule create(URL url) {
