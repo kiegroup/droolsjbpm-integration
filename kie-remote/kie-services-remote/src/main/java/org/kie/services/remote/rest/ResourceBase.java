@@ -27,7 +27,6 @@ import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
-import org.kie.api.task.model.Task;
 import org.kie.api.task.model.User;
 import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.internal.task.api.model.InternalOrganizationalEntity;

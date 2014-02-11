@@ -1,6 +1,6 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.remote.rest.DeploymentResource.*;
+import static org.kie.services.remote.rest.DeploymentResource.convertKModuleDepUnitToJaxbDepUnit;
 
 import java.util.Collection;
 import java.util.List;

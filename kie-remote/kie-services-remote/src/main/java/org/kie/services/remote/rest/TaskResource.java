@@ -1,7 +1,5 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.client.api.command.AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION;
-
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +22,9 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
+import org.jbpm.services.task.audit.DeleteAuditEventsCommand;
 import org.jbpm.services.task.commands.*;
-import org.jbpm.services.task.impl.model.BAMTaskSummary;
 import org.jbpm.services.task.impl.model.command.DeleteBAMTaskSummariesCommand;
-import org.jbpm.services.task.impl.model.command.GetBAMTaskSummariesCommand;
-import org.jbpm.services.task.impl.model.xml.JaxbBAMTaskSummary;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.jbpm.services.task.query.TaskSummaryImpl;
@@ -275,4 +271,18 @@ public class TaskResource extends ResourceBase {
         }
         return createCorrectVariant(new JaxbContent(content), headers);
     }
+    
+    @POST
+    @Path("/history/bam/clear")
+    public Response bam_clear() { 
+        processRequestBean.doNonDeploymentTaskOperation(new DeleteBAMTaskSummariesCommand(), "Unable to delete BAM task summaries.");
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
+    }
+    
+    @POST
+    @Path("/history/events/clear")
+    public Response events_clear() { 
+        processRequestBean.doNonDeploymentTaskOperation(new DeleteAuditEventsCommand(), "Unable to delete task audit events.");
+        return createCorrectVariant(new JaxbGenericResponse(request), headers);
+    } 
 }

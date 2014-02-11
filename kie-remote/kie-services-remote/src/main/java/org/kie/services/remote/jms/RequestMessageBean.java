@@ -26,15 +26,10 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.drools.core.command.SingleSessionCommandService;
-import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
-import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
-import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
