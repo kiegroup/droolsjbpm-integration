@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 
+import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.kie.services.impl.event.Undeploy;
@@ -64,17 +66,22 @@ public class DeploymentInfoBean {
        return domainRuntimeManagers.get(domainName);
     }
 
-    public RuntimeEngine getRuntimeEngineForTaskCommand(TaskCommand<?> cmd, TaskService taskService) {
+    public RuntimeEngine getRuntimeEngineForTaskCommand(TaskCommand<?> cmd, TaskService taskService, boolean required) {
         Long taskId = cmd.getTaskId();
+        RuntimeEngine engine = null;
         if (taskId != null) {
             Task task = taskService.getTaskById(taskId);
             if (task != null) {
-                return getRuntimeEngine(task.getTaskData().getDeploymentId(),
-                        task.getTaskData().getProcessInstanceId());
+                engine 
+                    = getRuntimeEngine(task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId());
             }
         }
 
-        return null;
+        if( required && engine == null ) { 
+            throw new NotFoundException("Unable to find deployment for command " + cmd.getClass().getSimpleName() 
+                    + " called on task " + taskId + ".");
+        }
+        return engine;
     }
 
     public void disposeRuntimeEngine(RuntimeEngine runtimeEngine) {

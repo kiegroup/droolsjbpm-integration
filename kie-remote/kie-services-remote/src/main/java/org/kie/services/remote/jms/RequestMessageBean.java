@@ -364,7 +364,7 @@ public class RequestMessageBean implements MessageListener {
                     // if the JTA transaction (in HT or the KieSession) doesn't commit, that will cause message reception to be *NOT* acknowledged!
                     if( cmd instanceof TaskCommand<?> ) { 
                         if( AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) {
-                            runtimeEngine = runtimeMgrMgr.getRuntimeEngineForTaskCommand((TaskCommand<?>) cmd, injectedTaskService);
+                            runtimeEngine = runtimeMgrMgr.getRuntimeEngineForTaskCommand((TaskCommand<?>) cmd, injectedTaskService, true);
                             internalTaskService = (InternalTaskService) runtimeEngine.getTaskService();
                         }  else { 
                             internalTaskService = (InternalTaskService) injectedTaskService;
