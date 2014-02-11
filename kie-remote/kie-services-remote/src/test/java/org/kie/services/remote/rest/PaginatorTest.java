@@ -1,14 +1,12 @@
 package org.kie.services.remote.rest;
 
-import static org.junit.Assert.*;
-import static org.kie.services.remote.rest.ResourceBase.getPageNumAndPageSize;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class PaginatorTest extends ResourceBase {

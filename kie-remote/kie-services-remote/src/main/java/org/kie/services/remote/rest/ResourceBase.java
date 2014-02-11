@@ -71,7 +71,7 @@ public class ResourceBase {
                                     request.getProcessInstanceId(),
                                     errorMsg);
                         } else { 
-                            cmdResult = requestBean.doTaskOperationAndSerializeResult(taskCmd, errorMsg);
+                            cmdResult = requestBean.doNonDeploymentTaskOperationAndSerializeResult(taskCmd, errorMsg);
                         }
                     } else {
                         cmdResult = requestBean.doKieSessionOperation(

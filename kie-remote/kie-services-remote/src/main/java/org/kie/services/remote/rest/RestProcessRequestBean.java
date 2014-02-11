@@ -13,7 +13,9 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 
@@ -87,12 +89,13 @@ public class RestProcessRequestBean {
                 RuntimeEngine runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
                 result = ((InternalTaskService) runtimeEngine.getTaskService()).execute(cmd);
             } else {
-                engine = runtimeMgrMgr.getRuntimeEngineForTaskCommand(cmd, taskService);
+                engine = runtimeMgrMgr.getRuntimeEngineForTaskCommand(
+                        cmd, 
+                        taskService,
+                        AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()));
                 if (engine != null) {
-
                     result = ((InternalTaskService) engine.getTaskService()).execute(cmd);
                 } else {
-
                     result = ((InternalTaskService) taskService).execute(cmd);
                 }
             }
@@ -114,40 +117,45 @@ public class RestProcessRequestBean {
      * @param errorMsg The error message to be attached to any exceptions thrown. 
      * @return The result of the completed command. 
      */
-    public Object doTaskOperationWithAlreadySerializedResult(TaskCommand<?> cmd, String errorMsg) {
+    public Object doTaskOperationOnDeployment(TaskCommand<?> cmd, String errorMsg) {
         return doTaskOperationOnDeployment(cmd, null, null, errorMsg);
     }
 
 
     /**
-     * Executes a {@link TaskCommand} on the {@link TaskService}: this should be used when the {@link TaskCommand}
+     * Intended for <i>read-only</i> {@link TaskCommand}s on the {@link TaskService}.<ul>
+     * <li>This should be used when the {@link TaskCommand}
      * returns an object instance that is also a (persistent) entity, and thus should also be serialized within a
-     * transaction. 
-     * 
+     * transaction.</li>
+     * </ul>
      * @param cmd The {@link TaskCommand} to be executed. 
      * @param errorMsg The error message that should be associated with any eventual errors or exceptions. 
      * @return The result of the {@link TaskCommand}, possibly null.
      */
-    public Object doTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
+    public Object doNonDeploymentTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
+        return doNonDeploymentTaskOperation(new ExecuteAndSerializeCommand(cmd), errorMsg);
+    }
+   
+    /**
+     * Intended for {@link TaskCommand}'s which do <i>not</i> modify {@link Task}s. This should be used: 
+     * <ul>
+     * <li>when retrieving an object instance</li>
+     * <li>when deleting task history entities</li>
+     * </ul> 
+     * @param cmd The {@link TaskCommand} to be executed. 
+     * @param errorMsg The error message that should be associated with any eventual errors or exceptions. 
+     * @return The result of the {@link TaskCommand}, possibly null.
+     */
+    public Object doNonDeploymentTaskOperation(TaskCommand<?> cmd, String errorMsg) {
         Object result = null;
-        RuntimeEngine engine = null;
         try {
-            engine = runtimeMgrMgr.getRuntimeEngineForTaskCommand(cmd, taskService);
-            if (engine != null) {
-
-                result = ((InternalTaskService) engine.getTaskService()).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
-            } else {
-
-                result = ((InternalTaskService) taskService).execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
-            }
+            result = ((InternalTaskService) taskService).execute(cmd);
         } catch (PermissionDeniedException pde) {
             throw new UnauthorizedException(pde.getMessage(), pde);
         } catch (RuntimeException re) {
             throw re;
         } catch( Exception e ) { 
             throw new InternalServerErrorException(errorMsg, e);
-        } finally {
-            runtimeMgrMgr.disposeRuntimeEngine(engine);
         }
         return result;
     }

@@ -25,6 +25,10 @@ import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.impl.model.BAMTaskSummary;
+import org.jbpm.services.task.impl.model.command.DeleteBAMTaskSummariesCommand;
+import org.jbpm.services.task.impl.model.command.GetBAMTaskSummariesCommand;
+import org.jbpm.services.task.impl.model.xml.JaxbBAMTaskSummary;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.jbpm.services.task.query.TaskSummaryImpl;
@@ -151,7 +155,7 @@ public class TaskResource extends ResourceBase {
                     busAdmins, potOwners, taskOwners, 
                     statuses, language, union);
         
-        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doTaskOperationWithAlreadySerializedResult(
+        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doNonDeploymentTaskOperation(
                 queryCmd, 
                 "Unable to execute " + queryCmd.getClass().getSimpleName());
 
@@ -164,7 +168,7 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}")
     public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        JaxbTask task = (JaxbTask) processRequestBean.doTaskOperationAndSerializeResult(
+        JaxbTask task = (JaxbTask) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(
                 cmd, 
                 "Unable to get task " + taskId);
         if( task == null ) { 
@@ -226,23 +230,7 @@ public class TaskResource extends ResourceBase {
             throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
         }
         
-        String errorMsg = "Unable to " + operation + " task " + taskId;
-        if( TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) { 
-            Task task = (Task) processRequestBean.doTaskOperationAndSerializeResult(
-                    new GetTaskCommand(taskId),
-                    "Task " + taskId + " does not exist or unable to check if it exists");
-            if( task == null ) {
-                throw new NotFoundException("Task " + taskId + " could not be found.");
-            }
-            processRequestBean.doTaskOperationOnDeployment(
-                    cmd, 
-                    task.getTaskData().getDeploymentId(),
-                    task.getTaskData().getProcessInstanceId(), 
-                    errorMsg);
-        } else { 
-            processRequestBean.doTaskOperationWithAlreadySerializedResult(cmd, errorMsg);
-        }
-        
+        processRequestBean.doTaskOperationOnDeployment(cmd, "Unable to " + operation + " task " + taskId);
         return createCorrectVariant(new JaxbGenericResponse(request), headers);
     }
 
@@ -259,9 +247,7 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}/content")
     public Response taskId_content(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Object result = processRequestBean.doTaskOperationAndSerializeResult(
-                cmd,
-                "Unable to get task " + taskId);
+        Object result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task " + taskId);
         if( result == null ) {
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
@@ -269,11 +255,13 @@ public class TaskResource extends ResourceBase {
         JaxbContent content = null;
         if( contentId > -1 ) { 
             cmd = new GetContentCommand(contentId);
-            result = processRequestBean.doTaskOperationAndSerializeResult(
+            result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(
                     cmd, 
                     "Unable get content " + contentId + " (from task " + taskId + ")");
             content = (JaxbContent) result;
-        } 
+        } else { 
+            throw new NotFoundException("Content for task " + taskId + " could not be found.");
+        }
         return createCorrectVariant(content, headers);
     }
     
@@ -281,11 +269,10 @@ public class TaskResource extends ResourceBase {
     @Path("/content/{contentId: [0-9-]+}")
     public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
-        JaxbContent content = (JaxbContent) processRequestBean.doTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
+        JaxbContent content = (JaxbContent) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 
             throw new NotFoundException("Content " + contentId + " could not be found.");
         }
         return createCorrectVariant(new JaxbContent(content), headers);
     }
-    
 }
