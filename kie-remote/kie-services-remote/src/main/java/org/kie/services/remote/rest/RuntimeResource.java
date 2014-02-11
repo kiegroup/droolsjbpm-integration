@@ -31,7 +31,6 @@ import org.drools.core.process.instance.WorkItem;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
-import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;

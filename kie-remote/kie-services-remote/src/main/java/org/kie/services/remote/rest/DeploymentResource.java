@@ -26,7 +26,6 @@ import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
-import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor;
 import org.slf4j.Logger;

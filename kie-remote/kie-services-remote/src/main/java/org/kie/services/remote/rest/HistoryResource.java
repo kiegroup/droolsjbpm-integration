@@ -23,12 +23,9 @@ import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 /**
