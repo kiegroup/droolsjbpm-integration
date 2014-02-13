@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
@@ -359,16 +361,29 @@ public class ResourceBase {
     
     static int PAGE_NUM = 0;
     static int PAGE_SIZE = 1;
+   
+    static String PAGE_LONG_PARAM = "page";
+    static String PAGE_SHORT_PARAM = "p";
+    static String SIZE_LONG_PARAM = "pageSize";
+    static String SIZE_SHORT_PARAM = "s";
+   
+    static Set<String> paginationParams = new HashSet<String>();
+    static { 
+        paginationParams.add(PAGE_LONG_PARAM);
+        paginationParams.add(PAGE_SHORT_PARAM);
+        paginationParams.add(SIZE_LONG_PARAM);
+        paginationParams.add(SIZE_SHORT_PARAM);
+    };
     
     protected static int [] getPageNumAndPageSize(Map<String, List<String>> params, String oper) {
         int [] pageInfo = new int[2];
         
         int p = 0;
-        Number page = getNumberParam("page", false, params, oper, false);
+        Number page = getNumberParam(PAGE_LONG_PARAM, false, params, oper, false);
         if( page != null ) { 
             p = page.intValue();
         } else { 
-            Number pageShort = getNumberParam("p", false, params, oper, false);
+            Number pageShort = getNumberParam(PAGE_SHORT_PARAM, false, params, oper, false);
             if( pageShort != null ) { 
                 p = pageShort.intValue();
             }
@@ -378,11 +393,11 @@ public class ResourceBase {
         }
         
         int s = 10;
-        Number pageSize = getNumberParam("pageSize", false, params, oper, false);
+        Number pageSize = getNumberParam(SIZE_LONG_PARAM, false, params, oper, false);
         if( pageSize != null ) { 
             s = pageSize.intValue();
         } else { 
-            Number pageSizeShort = getNumberParam("s", false, params, oper, false);
+            Number pageSizeShort = getNumberParam(SIZE_SHORT_PARAM, false, params, oper, false);
             if( pageSizeShort != null ) { 
                 s = pageSizeShort.intValue();
             }
