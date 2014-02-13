@@ -135,7 +135,7 @@ public class RestProcessRequestBean {
      * @param errorMsg The error message that should be associated with any eventual errors or exceptions. 
      * @return The result of the {@link TaskCommand}, possibly null.
      */
-    public Object doTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
+    public Object doNonDeploymentTaskOperationAndSerializeResult(TaskCommand<?> cmd, String errorMsg) {
         return doNonDeploymentTaskOperation(new ExecuteAndSerializeCommand(cmd), errorMsg);
     }
    

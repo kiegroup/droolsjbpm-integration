@@ -164,7 +164,7 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}")
     public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        JaxbTask task = (JaxbTask) processRequestBean.doTaskOperationAndSerializeResult(
+        JaxbTask task = (JaxbTask) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(
                 cmd, 
                 "Unable to get task " + taskId);
         if( task == null ) { 
@@ -243,7 +243,7 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}/content")
     public Response taskId_content(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Object result = processRequestBean.doTaskOperationAndSerializeResult(cmd, "Unable to get task " + taskId);
+        Object result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task " + taskId);
         if( result == null ) {
             throw new NotFoundException("Task " + taskId + " could not be found.");
         }
@@ -251,7 +251,7 @@ public class TaskResource extends ResourceBase {
         JaxbContent content = null;
         if( contentId > -1 ) { 
             cmd = new GetContentCommand(contentId);
-            result = processRequestBean.doTaskOperationAndSerializeResult(
+            result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(
                     cmd, 
                     "Unable get content " + contentId + " (from task " + taskId + ")");
             content = (JaxbContent) result;
@@ -265,7 +265,7 @@ public class TaskResource extends ResourceBase {
     @Path("/content/{contentId: [0-9-]+}")
     public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
-        JaxbContent content = (JaxbContent) processRequestBean.doTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
+        JaxbContent content = (JaxbContent) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 
             throw new NotFoundException("Content " + contentId + " could not be found.");
         }
