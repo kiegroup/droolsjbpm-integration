@@ -4,14 +4,17 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
 import org.jboss.resteasy.spi.InternalServerErrorException;
+import org.jboss.resteasy.spi.NotFoundException;
 import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
+import org.jbpm.workflow.instance.impl.WorkflowProcessInstanceImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
@@ -158,5 +161,32 @@ public class RestProcessRequestBean {
             throw new InternalServerErrorException(errorMsg, e);
         }
         return result;
+    }
+    
+    public Object getVariableObjectInstanceFromRuntime(String deploymentId, long processInstanceId, String varName) { 
+        String errorMsg = "Unable to retrieve variable '" + varName + "' from process instance " + processInstanceId;
+        Object procVar = null;
+        RuntimeEngine runtimeEngine = null;
+        try {
+            runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
+            KieSession kieSession = runtimeEngine.getKieSession();
+            ProcessInstance procInst = kieSession.getProcessInstance(processInstanceId);
+            if( procInst == null ) { 
+                throw new NotFoundException("Process instance " + processInstanceId + " could not be found!");
+            }
+            procVar = ((WorkflowProcessInstanceImpl) procInst).getVariable(varName);
+            if( procVar == null ) { 
+                throw new NotFoundException("Variable " + varName + " does not exist in process instance " + processInstanceId + "!");
+            }
+        } catch (Exception e) {
+            if( e instanceof RuntimeException ) { 
+                throw (RuntimeException) e;
+            } else {
+                throw new InternalServerErrorException(errorMsg, e);
+            }
+        } finally {
+            runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
+        }
+        return procVar;
     }
 }
