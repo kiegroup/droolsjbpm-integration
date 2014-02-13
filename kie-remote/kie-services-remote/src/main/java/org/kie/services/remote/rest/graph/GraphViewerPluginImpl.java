@@ -54,8 +54,8 @@ import org.kie.services.remote.rest.graph.jaxb.DiagramNodeInfo;
 public class GraphViewerPluginImpl {
     
 	private KieBase kbase;
-	
-	@PersistenceUnit
+
+    //@PersistenceUnit(unitName = "org.jbpm.domain")
 	private EntityManagerFactory emf;
 
 	public List<ActiveNodeInfo> getActiveNodeInfo(String instanceId) {
