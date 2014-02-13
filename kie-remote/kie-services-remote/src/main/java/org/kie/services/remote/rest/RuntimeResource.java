@@ -182,6 +182,14 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbVariablesResponse(vars, request), headers);
     }
     
+    @GET
+    @Path("/process/instance/{procInstId: [0-9]+}/variable/{varName: [\\w\\.-]+")
+    public Response process_instance_procInstId_variable_varName(@PathParam("procInstId") Long procInstId,
+            @PathParam("varName") String varName) {
+        Object procVar =  processRequestBean.getVariableObjectInstanceFromRuntime(deploymentId, procInstId, varName);
+        return createCorrectVariant(procVar, headers);
+    }
+    
     @POST
     @Path("/signal")
     public Response signal() {
