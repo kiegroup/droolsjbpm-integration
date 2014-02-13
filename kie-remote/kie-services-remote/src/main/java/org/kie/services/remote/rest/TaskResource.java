@@ -121,10 +121,10 @@ public class TaskResource extends ResourceBase {
         for( String queryParam : params.keySet() ) { 
             boolean allowed = false;
             for( String allowedParam : allowedQueryParams ) { 
-                if( allowedParam.equalsIgnoreCase(queryParam) ) { 
+                if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam)) { 
                    allowed = true;
                    break;
-                }
+                } 
             }
             if( ! allowed ) { 
                 throw RestOperationException.badRequest(queryParam + " is an unknown and unsupported query param for the task query operation." );
