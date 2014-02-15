@@ -41,6 +41,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+@Component("kiePostProcessor")
 public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
 
     private static final Logger log            = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
