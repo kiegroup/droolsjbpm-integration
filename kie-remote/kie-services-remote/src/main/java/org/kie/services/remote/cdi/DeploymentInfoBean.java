@@ -22,16 +22,18 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
-import org.kie.services.remote.exception.DomainNotFoundBadRequestException;
-import org.kie.services.remote.rest.JaxbContextResolver;
+import org.kie.services.remote.exception.DeploymentNotFoundBadRequestException;
+import org.kie.services.remote.rest.jaxb.JaxbContextResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * - Keeps track of the {@link RuntimeManager} instances for each deployment for use by the Remote API. 
- * - Keeps track of the list of classes in deployments. 
- *   - This is necessary in order for serialization of inputs containing instances of (user) classes defined in the KJar deployments. 
- *   - See the {@link JaxbContextResolver} for more info.
+ * <ul>
+ * <li>Keeps track of the {@link RuntimeManager} instances for each deployment for use by the Remote API.</li>
+ * <li>Keeps track of the list of classes in deployments.<ul>
+ *   <li>This is necessary in order for serialization of inputs containing instances of (user) classes defined in the KJar deployments.</li>
+ *   <li>See the {@link JaxbContextResolver} for more info.</li></ul>
+ * <ul>
  */
 @Singleton
 public class DeploymentInfoBean {
@@ -43,7 +45,11 @@ public class DeploymentInfoBean {
     private Map<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();  
     
     // Observer methods -----------------------------------------------------------------------------------------------------------
-    
+   
+    /**
+     * Called when the workbench/console/business-central deploys a new deployment.
+     * @param event
+     */
     public void addOnDeploy(@Observes @Deploy DeploymentEvent event) {
         RuntimeManager runtimeManager = domainRuntimeManagers.put(event.getDeploymentId(), event.getDeployedUnit().getRuntimeManager());
         if( runtimeManager != null ) { 
@@ -51,7 +57,11 @@ public class DeploymentInfoBean {
         }
         deploymentClassesMap.put(event.getDeploymentId(), event.getDeployedUnit().getDeployedClasses());
     }
-    
+   
+    /**
+     * Called when the workbench/console/business-central *un*deploys (removes) a deployment.
+     * @param event
+     */
     public void removeOnUnDeploy(@Observes @Undeploy DeploymentEvent event) {
         RuntimeManager runtimeManager = domainRuntimeManagers.remove(event.getDeploymentId());
         if( runtimeManager == null ) { 
@@ -61,7 +71,7 @@ public class DeploymentInfoBean {
     }
     
     // Methods for other beans/resources ------------------------------------------------------------------------------------------
-    
+   
     public RuntimeManager getRuntimeManager(String domainName) { 
        return domainRuntimeManagers.get(domainName);
     }
@@ -101,7 +111,7 @@ public class DeploymentInfoBean {
     public RuntimeEngine getRuntimeEngine(String deploymentId, Long processInstanceId) {
         RuntimeManager runtimeManager = getRuntimeManager(deploymentId);
         if (runtimeManager == null) {
-            throw new DomainNotFoundBadRequestException("No runtime manager could be found for deployment '" + deploymentId + "'.");
+            throw new DeploymentNotFoundBadRequestException("No runtime manager could be found for deployment '" + deploymentId + "'.");
         }
         Context<?> runtimeContext;
         if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 
@@ -111,7 +121,13 @@ public class DeploymentInfoBean {
         }
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
-    
+   
+    /**
+     * Used by classes involved with de/serialzation in order to retrieve (user-defined) clases 
+     * to be used in de/serialization.
+     * @param deploymentId The deployment unit id
+     * @return A Collection of Classes that are in the deployment unit
+     */
     public Collection<Class<?>> getDeploymentClasses(String deploymentId) { 
         Collection<Class<?>> classes = deploymentClassesMap.get(deploymentId);
         if( classes == null ) { 

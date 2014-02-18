@@ -22,6 +22,11 @@ import org.jboss.resteasy.spi.WriterException;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
 
+/**
+ * This class makes sure that exceptions thrown as a result of REST requests
+ * are translated into a user-friendly output (with the correct REST error code)
+ * for the client.
+ */
 @Provider
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
 

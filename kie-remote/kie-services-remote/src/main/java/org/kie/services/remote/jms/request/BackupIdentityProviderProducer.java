@@ -3,11 +3,21 @@ package org.kie.services.remote.jms.request;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 
+import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.kie.services.api.RequestScopedBackupIdentityProvider;
+import org.jbpm.kie.services.impl.audit.ServicesAwareAuditEventBuilder;
 import org.kie.services.remote.jms.RequestMessageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * See the {@link ServicesAwareAuditEventBuilder} bean for more context.
+ * </p>
+ * This bean provides a {@link RequestScopedBackupIdentityProvider} instance 
+ * for JMS requests, which have a Request scope but for which the "normally" 
+ * provided ("normally" as in with REST requests) {@link IdentityProvider} 
+ * is not available. This due to vagaries of the code, as always. 
+ */
 @RequestScoped
 public class BackupIdentityProviderProducer {
 

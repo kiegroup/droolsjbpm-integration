@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.decorator.Decorator;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
  * </pre>
  * 
  * If the method is annotated by the @Path anno, but is the "root", then
- * give it a name that explains it's funtion.
+ * give it a name that explains it's function.
  */
 @Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
