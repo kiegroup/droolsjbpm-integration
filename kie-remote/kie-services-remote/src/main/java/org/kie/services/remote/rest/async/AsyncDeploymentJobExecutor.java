@@ -38,8 +38,8 @@ import static org.kie.services.remote.rest.DeploymentResource.*;
  * no guarantee with regards to concurrency (e.g. is not thread-safe), it's important to make sure that the same deployment unit is 
  * not <i>concurrently</i> deployed (or undeployed).
  * </p>
- * In order to satisfy that last requirement (no concurrent un/deployment of the same deployment unit), we use a single threaded 
- * exector, which queues up other jobs.
+ * In order to satisfy that last requirement (no concurrent un/deployment of the same deployment unit), we use a </b>single threaded 
+ * exector</b>, which queues up other jobs.
  */
 @ApplicationScoped
 public class AsyncDeploymentJobExecutor {
@@ -66,6 +66,8 @@ public class AsyncDeploymentJobExecutor {
         }
         Cache<Boolean> cache = new Cache<Boolean>(maxQueueSize);
         jobs = Collections.synchronizedMap(cache);
+        
+        // See the javadoc for this class (above)
         executor = Executors.newSingleThreadExecutor();
     }
 

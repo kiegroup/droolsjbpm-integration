@@ -2,7 +2,7 @@ package org.kie.services.remote.exception;
 
 /**
  * This class is meant to be thrown in situations that should never happen. 
- * 
+ * </p> 
  * If this exception *is* thrown, then it's almost certain that it's caused by a the code, 
  * and not be the circumstances or data presented to this component. 
  */

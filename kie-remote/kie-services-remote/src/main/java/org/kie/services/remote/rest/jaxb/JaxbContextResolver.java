@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest;
+package org.kie.services.remote.rest.jaxb;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,6 +55,9 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
         if( deploymentId != null ) { 
             // retrieve class list from kjar
             Collection<Class<?>> deploymentClassNames = deploymentClassNameBean.getDeploymentClasses(deploymentId);
+            for( Class<?> clazz : deploymentClassNames ) { 
+                logger.debug( "Adding {} to JAXBContext instance.", clazz.getName() );
+            }
             classesForSerialization.addAll(deploymentClassNames);
         }
         
