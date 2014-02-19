@@ -38,7 +38,7 @@ import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
-import org.kie.services.remote.exception.DeploymentNotFoundBadRequestException;
+import org.kie.services.remote.exception.DeploymentNotFoundException;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
 import org.kie.services.remote.jms.request.BackupIdentityProviderProducer;
@@ -368,7 +368,7 @@ public class RequestMessageBean implements MessageListener {
                     } else { 
                         String deploymentId = request.getDeploymentId();
                         if( deploymentId == null ) {
-                            throw new DeploymentNotFoundBadRequestException("A deployment id is required for the " + cmd.getClass().getSimpleName());
+                            throw new DeploymentNotFoundException("A deployment id is required for the " + cmd.getClass().getSimpleName());
                         }
                         runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
                         cmdResult = runtimeEngine.getKieSession().execute(cmd);

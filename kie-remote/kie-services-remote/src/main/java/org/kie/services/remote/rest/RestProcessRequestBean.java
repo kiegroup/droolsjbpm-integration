@@ -3,9 +3,6 @@ package org.kie.services.remote.rest;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import org.jboss.resteasy.spi.InternalServerErrorException;
-import org.jboss.resteasy.spi.NotFoundException;
-import org.jboss.resteasy.spi.UnauthorizedException;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
@@ -20,6 +17,7 @@ import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
+import org.kie.services.remote.rest.exception.RestOperationException;
 import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 
 /**
@@ -63,7 +61,7 @@ public class RestProcessRequestBean {
             if( e instanceof RuntimeException ) { 
                 throw (RuntimeException) e;
             } else {
-                throw new InternalServerErrorException(errorMsg, e);
+                throw RestOperationException.internalServerError(errorMsg, e);
             }
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
@@ -103,11 +101,11 @@ public class RestProcessRequestBean {
                 }
             }
         } catch (PermissionDeniedException pde) {
-            throw new UnauthorizedException(pde.getMessage(), pde);
+            throw RestOperationException.unauthorized(pde.getMessage(), pde);
         } catch (RuntimeException re) {
             throw re;
         } catch( Exception e ) { 
-            throw new InternalServerErrorException(errorMsg, e);
+            throw RestOperationException.internalServerError(errorMsg, e);
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(engine);
         }
@@ -154,11 +152,11 @@ public class RestProcessRequestBean {
         try {
             result = ((InternalTaskService) taskService).execute(cmd);
         } catch (PermissionDeniedException pde) {
-            throw new UnauthorizedException(pde.getMessage(), pde);
+            throw RestOperationException.unauthorized(pde.getMessage(), pde);
         } catch (RuntimeException re) {
             throw re;
         } catch( Exception e ) { 
-            throw new InternalServerErrorException(errorMsg, e);
+            throw RestOperationException.internalServerError(errorMsg, e);
         }
         return result;
     }
@@ -172,17 +170,17 @@ public class RestProcessRequestBean {
             KieSession kieSession = runtimeEngine.getKieSession();
             ProcessInstance procInst = kieSession.getProcessInstance(processInstanceId);
             if( procInst == null ) { 
-                throw new NotFoundException("Process instance " + processInstanceId + " could not be found!");
+                throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
             }
             procVar = ((WorkflowProcessInstanceImpl) procInst).getVariable(varName);
             if( procVar == null ) { 
-                throw new NotFoundException("Variable " + varName + " does not exist in process instance " + processInstanceId + "!");
+                throw RestOperationException.notFound("Variable " + varName + " does not exist in process instance " + processInstanceId + "!");
             }
         } catch (Exception e) {
             if( e instanceof RuntimeException ) { 
                 throw (RuntimeException) e;
             } else {
-                throw new InternalServerErrorException(errorMsg, e);
+                throw RestOperationException.internalServerError(errorMsg, e);
             }
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);

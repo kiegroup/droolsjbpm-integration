@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 
-import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.kie.services.impl.event.Undeploy;
@@ -22,7 +21,7 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
-import org.kie.services.remote.exception.DeploymentNotFoundBadRequestException;
+import org.kie.services.remote.exception.DeploymentNotFoundException;
 import org.kie.services.remote.rest.jaxb.JaxbContextResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +87,7 @@ public class DeploymentInfoBean {
         }
 
         if( required && engine == null ) { 
-            throw new NotFoundException("Unable to find deployment for command " + cmd.getClass().getSimpleName() 
+            throw new DeploymentNotFoundException("Unable to find deployment for command " + cmd.getClass().getSimpleName() 
                     + " called on task " + taskId + ".");
         }
         return engine;
@@ -111,7 +110,7 @@ public class DeploymentInfoBean {
     public RuntimeEngine getRuntimeEngine(String deploymentId, Long processInstanceId) {
         RuntimeManager runtimeManager = getRuntimeManager(deploymentId);
         if (runtimeManager == null) {
-            throw new DeploymentNotFoundBadRequestException("No runtime manager could be found for deployment '" + deploymentId + "'.");
+            throw new DeploymentNotFoundException("No runtime manager could be found for deployment '" + deploymentId + "'.");
         }
         Context<?> runtimeContext;
         if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 

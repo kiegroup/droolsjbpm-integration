@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,17 +13,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
 
-import org.jboss.resteasy.logging.Logger;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
-
-import static org.kie.services.remote.rest.DeploymentResource.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A lot of the ideas in this class have been taken from the <code>org.jboss.resteasy.coreAsynchronousDispatcher</code> class.
@@ -44,7 +40,7 @@ import static org.kie.services.remote.rest.DeploymentResource.*;
 @ApplicationScoped
 public class AsyncDeploymentJobExecutor {
 
-    private final static Logger logger = Logger.getLogger(AsyncDeploymentJobExecutor.class);
+    private final static Logger logger = LoggerFactory.getLogger(AsyncDeploymentJobExecutor.class);
 
     final ExecutorService executor;
     final Map<String, Future<Boolean>> jobs;

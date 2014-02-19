@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.decorator.Decorator;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +28,6 @@ import org.drools.core.command.runtime.process.GetWorkItemCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
-import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
@@ -43,7 +41,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.remote.exception.KieRemoteServicesPreConditionException;
+import org.kie.services.remote.rest.exception.RestOperationException;
 
 /**
  * If a method in this class is annotated by a @Path annotation, 
@@ -132,7 +130,7 @@ public class RuntimeResource extends ResourceBase {
             responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result);
             return createCorrectVariant(responseObj, headers);
         } else {
-            throw new BadRequestException("Unable to retrieve process instance " + procInstId
+            throw RestOperationException.badRequest("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
         }
     }
@@ -236,7 +234,7 @@ public class RuntimeResource extends ResourceBase {
         } else if ("abort".equalsIgnoreCase(operation.toLowerCase())) {
             cmd = new AbortWorkItemCommand(workItemId);
         } else {
-            throw new BadRequestException("Unsupported operation: " + oper);
+            throw RestOperationException.badRequest("Unsupported operation: " + oper);
         }
         
         processRequestBean.doKieSessionOperation(
@@ -418,7 +416,7 @@ public class RuntimeResource extends ResourceBase {
                 "Unable to get process instance with id id '" + procInstId + "'");
         
         if( procInstResult == null ) { 
-            throw new KieRemoteServicesPreConditionException("This method can only be used on processes that are still active.");
+            throw RestOperationException.preConditionFailed("This method can only be used on processes that are still active.");
         }
         return (ProcessInstance) procInstResult;
     }
