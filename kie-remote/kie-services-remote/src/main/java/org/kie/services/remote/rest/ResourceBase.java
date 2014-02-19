@@ -17,6 +17,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.task.commands.TaskCommand;
@@ -139,22 +140,23 @@ public class ResourceBase {
         // return restRequest.selectVariant(variants); 
     }
     
+    
     protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) { 
-        Variant v = getVariant(headers);
-        if( v != null ) { 
-            return Response.ok(responseObj, v).build();
-        } else {
-            return Response.ok(responseObj, defaultVariant).build();
-        } 
+        return createCorrectVariant(responseObj, headers, null);
     }
     
-    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) { 
+    private static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) { 
+        ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers);
         if( v != null ) { 
-            return Response.status(status).entity(responseObj).variant(v).build();
-        } else {
-            return Response.ok(responseObj, defaultVariant).build();
-        } 
+            v = defaultVariant;
+        }
+        if( status != null ) { 
+            responseBuilder = Response.status(status).entity(responseObj).variant(v);
+        } else { 
+            responseBuilder = Response.ok(responseObj, v);
+        }
+        return responseBuilder.build();
     }
     
 

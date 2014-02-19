@@ -1,7 +1,9 @@
 package org.kie.services.remote.rest.exception;
 
-import static org.kie.services.remote.rest.ResourceBase.*;
+import static org.kie.services.remote.rest.ResourceBase.getRelativePath;
+import static org.kie.services.remote.rest.ResourceBase.getVariant;
 
+import javax.enterprise.context.RequestScoped;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * for the client.
  */
 @Provider
+@RequestScoped
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
 
     private static final Logger logger = LoggerFactory.getLogger(DescriptiveExceptionHandler.class);

@@ -1,5 +1,7 @@
 package org.kie.services.remote.rest;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.namespace.QName;
 
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
@@ -35,7 +40,6 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -75,7 +79,7 @@ public class RuntimeResource extends ResourceBase {
     /* KIE information and processing */
     @Inject
     private RestProcessRequestBean processRequestBean;
-
+    
     @PathParam("deploymentId")
     private String deploymentId;
 
@@ -175,20 +179,62 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @GET
-    @Path("/process/instance/{procInstId: [0-9]+}/variables")
-    public Response process_instance_procInstId_variables(@PathParam("procInstId") Long procInstId) {
-        Map<String, String> vars = getVariables(procInstId);
-        return createCorrectVariant(new JaxbVariablesResponse(vars, request), headers);
-    }
-    
-    @GET
-    @Path("/process/instance/{procInstId: [0-9]+}/variable/{varName: [\\w\\.-]+")
+    @Path("/process/instance/{procInstId: [0-9]+}/variable/{varName: [\\w\\.-]+}")
     public Response process_instance_procInstId_variable_varName(@PathParam("procInstId") Long procInstId,
             @PathParam("varName") String varName) {
         Object procVar =  processRequestBean.getVariableObjectInstanceFromRuntime(deploymentId, procInstId, varName);
-        return createCorrectVariant(procVar, headers);
+     
+        // serialize
+        QName rootElementName = getRootElementName(procVar); 
+        @SuppressWarnings("rawtypes") // unknown at compile time, dynamic from deployment
+        JAXBElement<?> jaxbElem = new JAXBElement(rootElementName, procVar.getClass(), procVar) ;
+        
+        // return
+        return createCorrectVariant(jaxbElem, headers);
     }
-    
+  
+    protected QName getRootElementName(Object object) { 
+        boolean xmlRootElemAnnoFound = false;
+        Class<?> objClass = object.getClass();
+        
+        // This usually doesn't work in the kie-wb/bpms environment, see comment below
+        XmlRootElement xmlRootElemAnno = objClass.getAnnotation(XmlRootElement.class);
+        logger.debug("Getting XML root element annotation for " + object.getClass().getName());
+        if( xmlRootElemAnno != null ) { 
+            xmlRootElemAnnoFound = true;
+            return new QName(xmlRootElemAnno.name());
+        } else { 
+            /**
+             * There seem to be weird classpath issues going on here, probably related
+             * to the fact that kjar's have their own classloader..
+             * (The XmlRootElement class can't be found in the same classpath as the
+             * class from the Kjar)
+             */
+            for( Annotation anno : objClass.getAnnotations() ) { 
+                Class<?> annoClass = anno.annotationType();
+                // we deliberately compare *names* and not classes because it's on a different classpath!
+                if( XmlRootElement.class.getName().equals(annoClass.getName()) ) { 
+                    xmlRootElemAnnoFound = true;
+                    try {
+                        Method nameMethod = annoClass.getMethod("name");
+                        Object nameVal = nameMethod.invoke(anno);
+                        if( nameVal instanceof String ) { 
+                            return new QName((String) nameVal); 
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Unable to retrieve XmlRootElement info via reflection", e);
+                    } 
+                }
+            }
+            if( ! xmlRootElemAnnoFound ) { 
+                String errorMsg = "Unable to serialize " + object.getClass().getName() + " instance "
+                        + "because it is missing a " + XmlRootElement.class.getName() + " annotation with a name value.";
+                throw RestOperationException.preConditionFailed(errorMsg);
+            }
+            return null;
+        }
+    }
+   
     @POST
     @Path("/signal")
     public Response signal() {
