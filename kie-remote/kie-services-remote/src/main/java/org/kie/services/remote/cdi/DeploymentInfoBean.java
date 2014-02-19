@@ -22,7 +22,6 @@ import org.kie.api.task.model.Task;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.services.remote.exception.DeploymentNotFoundException;
-import org.kie.services.remote.rest.jaxb.JaxbContextResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +127,9 @@ public class DeploymentInfoBean {
      * @return A Collection of Classes that are in the deployment unit
      */
     public Collection<Class<?>> getDeploymentClasses(String deploymentId) { 
+        if( deploymentId == null ) { 
+            return Collections.emptySet();
+        }
         Collection<Class<?>> classes = deploymentClassesMap.get(deploymentId);
         if( classes == null ) { 
             return Collections.emptySet();
