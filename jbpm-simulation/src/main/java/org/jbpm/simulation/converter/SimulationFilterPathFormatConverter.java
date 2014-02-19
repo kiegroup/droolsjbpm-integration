@@ -1,5 +1,6 @@
 package org.jbpm.simulation.converter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -78,6 +79,9 @@ public class SimulationFilterPathFormatConverter implements
                 probabilitySummary += provider.calculatePathProbability(simPath);
             }
         }
+        BigDecimal bd = new BigDecimal(probabilitySummary);
+        bd = bd.setScale(5, BigDecimal.ROUND_HALF_UP);
+        probabilitySummary = bd.doubleValue();
         if (provider != null && probabilitySummary != 1) {
             throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");
         }
