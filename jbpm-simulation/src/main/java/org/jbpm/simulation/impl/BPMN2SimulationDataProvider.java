@@ -3,6 +3,7 @@ package org.jbpm.simulation.impl;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -203,7 +204,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
             }
         }
         double result = probability / 100;
-        
+
         path.setProbability(result);
         
         return result;
