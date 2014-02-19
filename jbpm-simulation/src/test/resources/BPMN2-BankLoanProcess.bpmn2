@@ -478,7 +478,7 @@
                     <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_3D5CC4B2-5F39-49B4-8FE3-4B3DF088B235" id="_U_Slh62kEeKKItgypwOtWQ">
                         <bpsim:ControlParameters xsi:type="bpsim:ControlParameters">
                             <bpsim:Probability xsi:type="bpsim:Parameter">
-                                <bpsim:FloatingParameter value="100.0"/>
+                                <bpsim:FloatingParameter value="70.0"/>
                             </bpsim:Probability>
                         </bpsim:ControlParameters>
                     </bpsim:ElementParameters>
