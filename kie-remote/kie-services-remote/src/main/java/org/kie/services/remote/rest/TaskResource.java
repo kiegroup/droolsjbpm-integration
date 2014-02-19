@@ -19,8 +19,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.jboss.resteasy.spi.BadRequestException;
-import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.audit.DeleteAuditEventsCommand;
 import org.jbpm.services.task.commands.*;
@@ -35,6 +33,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.remote.rest.exception.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +127,7 @@ public class TaskResource extends ResourceBase {
                 }
             }
             if( ! allowed ) { 
-                throw new BadRequestException(queryParam + " is an unknown and unsupported query param for the task query operation." );
+                throw RestOperationException.badRequest(queryParam + " is an unknown and unsupported query param for the task query operation." );
             }
         }
         
@@ -168,7 +167,7 @@ public class TaskResource extends ResourceBase {
                 cmd, 
                 "Unable to get task " + taskId);
         if( task == null ) { 
-            throw new NotFoundException("Task " + taskId + " could not be found.");
+            throw RestOperationException.notFound("Task " + taskId + " could not be found.");
         }
         return createCorrectVariant(task, headers);
     }
@@ -223,7 +222,7 @@ public class TaskResource extends ResourceBase {
             List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params, true, "nominate");
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
         } else {
-            throw new BadRequestException("Unsupported operation: /task/" + taskId + "/" + operation);
+            throw RestOperationException.badRequest("Unsupported operation: /task/" + taskId + "/" + operation);
         }
         
         processRequestBean.doTaskOperationOnDeployment(cmd, "Unable to " + operation + " task " + taskId);
@@ -236,7 +235,7 @@ public class TaskResource extends ResourceBase {
                 return oper;
             }
         }
-        throw new BadRequestException("Operation '" + operation + "' is not supported on tasks.");
+        throw RestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
     
     @GET
@@ -245,7 +244,7 @@ public class TaskResource extends ResourceBase {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task " + taskId);
         if( result == null ) {
-            throw new NotFoundException("Task " + taskId + " could not be found.");
+            throw RestOperationException.notFound("Task " + taskId + " could not be found.");
         }
         long contentId = ((Task) result).getTaskData().getDocumentContentId();
         JaxbContent content = null;
@@ -256,7 +255,7 @@ public class TaskResource extends ResourceBase {
                     "Unable get content " + contentId + " (from task " + taskId + ")");
             content = (JaxbContent) result;
         } else { 
-            throw new NotFoundException("Content for task " + taskId + " could not be found.");
+            throw RestOperationException.notFound("Content for task " + taskId + " could not be found.");
         }
         return createCorrectVariant(content, headers);
     }
@@ -267,7 +266,7 @@ public class TaskResource extends ResourceBase {
         TaskCommand<?> cmd = new GetContentCommand(contentId);
         JaxbContent content = (JaxbContent) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
         if( content == null ) { 
-            throw new NotFoundException("Content " + contentId + " could not be found.");
+            throw RestOperationException.notFound("Content " + contentId + " could not be found.");
         }
         return createCorrectVariant(new JaxbContent(content), headers);
     }

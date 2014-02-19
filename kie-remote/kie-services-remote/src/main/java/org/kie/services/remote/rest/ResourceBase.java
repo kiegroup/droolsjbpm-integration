@@ -17,10 +17,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.jboss.resteasy.core.request.ServerDrivenNegotiation;
-import org.jboss.resteasy.spi.BadRequestException;
-import org.jboss.resteasy.spi.NotAcceptableException;
-import org.jboss.resteasy.util.HttpHeaderNames;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
@@ -34,6 +30,8 @@ import org.kie.internal.task.api.model.InternalTask;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.remote.rest.exception.RestOperationException;
+import org.kie.services.remote.rest.variant.ServerDrivenNegotiation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +53,7 @@ public class ResourceBase {
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
                 if (!AcceptedCommands.getSet().contains(cmd.getClass())) {
-                    throw new NotAcceptableException("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
+                    throw RestOperationException.notAcceptable("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
                 }
                 logger.debug("Processing command " + cmd.getClass().getSimpleName());
                 Object cmdResult = null;
@@ -110,12 +108,18 @@ public class ResourceBase {
         = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).build();
     private static Variant defaultVariant 
         = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE).build().get(0);
+   
+    private static final String ACCEPT = "Accept";
+    private static final String ACCEPT_CHARSET = "Accept-Charset";
+    private static final String ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String ACCEPT_LANGUAGE = "Accept-Language";
     
     public static Variant getVariant(HttpHeaders headers) { 
         // copied (except for the acceptHeaders fix) from RestEasy's RequestImpl class
         ServerDrivenNegotiation negotiation = new ServerDrivenNegotiation();
         MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
-        List<String> acceptHeaders = requestHeaders.get(HttpHeaderNames.ACCEPT);
+        List<String> acceptHeaders = requestHeaders.get(ACCEPT);
+        // Fix
         if( acceptHeaders != null && ! acceptHeaders.isEmpty() ) { 
             List<String> fixedAcceptHeaders = new ArrayList<String>();
             for(String header : acceptHeaders ) { 
@@ -124,9 +128,9 @@ public class ResourceBase {
             acceptHeaders = fixedAcceptHeaders;
         }
         negotiation.setAcceptHeaders(acceptHeaders);
-        negotiation.setAcceptCharsetHeaders(requestHeaders.get(HttpHeaderNames.ACCEPT_CHARSET));
-        negotiation.setAcceptEncodingHeaders(requestHeaders.get(HttpHeaderNames.ACCEPT_ENCODING));
-        negotiation.setAcceptLanguageHeaders(requestHeaders.get(HttpHeaderNames.ACCEPT_LANGUAGE));
+        negotiation.setAcceptCharsetHeaders(requestHeaders.get(ACCEPT_CHARSET));
+        negotiation.setAcceptEncodingHeaders(requestHeaders.get(ACCEPT_ENCODING));
+        negotiation.setAcceptLanguageHeaders(requestHeaders.get(ACCEPT_LANGUAGE));
 
         return negotiation.getBestMatch(variants);
         // ** use below instead of above when RESTEASY-960 is fixed **
@@ -171,7 +175,7 @@ public class ResourceBase {
             return null;
         }
         if (paramValues.size() != 1) {
-            throw new BadRequestException("One and only one '" + paramName + "' query parameter required for '" + operation
+            throw RestOperationException.badRequest("One and only one '" + paramName + "' query parameter required for '" + operation
                     + "' operation (" + paramValues.size() + " passed).");
         }
         return paramValues.get(0);
@@ -187,7 +191,7 @@ public class ResourceBase {
         }
         if (paramValues == null) {
             if (required) {
-                throw new BadRequestException("Query parameter '" + paramName + "' required for '" + operation
+                throw RestOperationException.badRequest("Query parameter '" + paramName + "' required for '" + operation
                         + "' operation.");
             }
             return new ArrayList<String>();
@@ -248,19 +252,19 @@ public class ResourceBase {
         if (paramVal.matches("^\\d+[li]?$")) {
             if (paramVal.matches(".*i$")) {
                 if (mustBeLong) {
-                    throw new BadRequestException( paramName 
+                    throw RestOperationException.badRequest( paramName 
                             + " parameter is numerical but contains the \"Integer\" suffix 'i' and must have no suffix or \"Long\" suffix 'l' ("
                             + paramVal + ")");
                 }
                 paramVal = paramVal.substring(0, paramVal.length() - 1);
                 if (paramVal.length() > 9) {
-                    throw new BadRequestException(paramName + " parameter is numerical but too large to be an integer ("
+                    throw RestOperationException.badRequest(paramName + " parameter is numerical but too large to be an integer ("
                             + paramVal + "i)");
                 }
                 return Integer.parseInt(paramVal);
             } else {
                 if (paramVal.length() > 18) {
-                    throw new BadRequestException(paramName + " parameter is numerical but too large to be a long ("
+                    throw RestOperationException.badRequest(paramName + " parameter is numerical but too large to be a long ("
                             + paramVal + ")");
                 }
                 if (paramVal.matches(".*l$")) {
@@ -269,7 +273,7 @@ public class ResourceBase {
                 return Long.parseLong(paramVal);
             }
         }
-        throw new BadRequestException(paramName + " parameter does not have a numerical format (" + paramVal + ")");
+        throw RestOperationException.badRequest(paramName + " parameter does not have a numerical format (" + paramVal + ")");
     }
 
     protected static Map<String, Object> extractMapFromParams(Map<String, List<String>> params, String operation) {
@@ -280,7 +284,7 @@ public class ResourceBase {
                 String key = entry.getKey();
                 List<String> paramValues = entry.getValue();
                 if (paramValues.size() != 1) {
-                    throw new BadRequestException("Only one map_* (" + key + ") query parameter allowed for '" + operation
+                    throw RestOperationException.badRequest("Only one map_* (" + key + ") query parameter allowed for '" + operation
                             + "' operation (" + paramValues.size() + " passed).");
                 }
                 String mapKey = key.substring("map_".length());
@@ -298,7 +302,7 @@ public class ResourceBase {
         List<String> users = getStringListParam("user", false, params, "nominate");
         List<String> groups = getStringListParam("group", false, params, "nominate");
         if (required && (users.isEmpty() && groups.isEmpty()) ) {
-            throw new BadRequestException("At least 1 query parameter (either 'user' or 'group') is required for the '" + operation + "' operation.");
+            throw RestOperationException.badRequest("At least 1 query parameter (either 'user' or 'group') is required for the '" + operation + "' operation.");
         }
         
         for( String user : users ) {
@@ -348,7 +352,7 @@ public class ResourceBase {
                 try { 
                     statuses.add(Status.valueOf(goodStatusStr));
                 } catch(IllegalArgumentException iae) { 
-                    throw new BadRequestException(goodStatusStr + " is not a valid status type for a task." );
+                    throw RestOperationException.badRequest(goodStatusStr + " is not a valid status type for a task." );
                 }
             }
         }
@@ -421,7 +425,7 @@ public class ResourceBase {
     
     // Other helper methods ------------------------------------------------------------------------------------------------------
     
-    protected String getRelativePath(HttpServletRequest request) { 
+    public static String getRelativePath(HttpServletRequest request) { 
         String path = request.getRequestURL().toString();
         path = path.replaceAll( ".*" + request.getServletContext().getContextPath(), "");
         return path;

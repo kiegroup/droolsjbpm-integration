@@ -18,7 +18,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.spi.BadRequestException;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
@@ -27,6 +26,7 @@ import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.remote.rest.exception.RestOperationException;
 
 /**
  * If a method in this class is annotated by a @Path annotation, 
@@ -125,7 +125,7 @@ public class HistoryResource extends ResourceBase {
         } else if ("variable".equalsIgnoreCase(operation)) {
             auditLogService.findVariableInstances(procInstId);
         } else {
-            throw new BadRequestException("Unsupported operation: " + oper );
+            throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
 
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
@@ -148,7 +148,7 @@ public class HistoryResource extends ResourceBase {
         } else if ("variable".equalsIgnoreCase(operation)) {
             result = auditLogService.findVariableInstances(procInstId, logId);
         } else {
-            throw new BadRequestException("Unsupported operation: " + oper );
+            throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
         
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;

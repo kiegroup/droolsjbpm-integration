@@ -16,8 +16,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.jboss.resteasy.spi.BadRequestException;
-import org.jboss.resteasy.spi.NotFoundException;
 import org.jbpm.kie.services.api.Kjar;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
@@ -26,8 +24,10 @@ import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
+import org.kie.services.remote.exception.DeploymentNotFoundException;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor;
+import org.kie.services.remote.rest.exception.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +128,7 @@ public class DeploymentResource extends ResourceBase {
                 }
                 break;
             case NONEXISTENT:
-                throw new NotFoundException("Deployment " + deploymentId + " does not exist");
+                throw new DeploymentNotFoundException("Deployment " + deploymentId + " does not exist");
             default: 
                 throw new KieRemoteServicesInternalError("Unknown deployment status (" + status.toString() + "), contact the developers.");
             }
@@ -160,10 +160,10 @@ public class DeploymentResource extends ResourceBase {
             RuntimeStrategy runtimeStrategy;
             try { 
                 runtimeStrategy = RuntimeStrategy.valueOf(strategy);
-                deploymentUnit.setStrategy(runtimeStrategy);
             } catch( IllegalArgumentException iae ) { 
-                throw new BadRequestException("Runtime strategy '" + strategy + "' does not exist.");
+                throw RestOperationException.badRequest("Runtime strategy '" + strategy + "' does not exist.");
             }
+            deploymentUnit.setStrategy(runtimeStrategy);
         }
 
         JaxbDeploymentJobResult jobResult;
