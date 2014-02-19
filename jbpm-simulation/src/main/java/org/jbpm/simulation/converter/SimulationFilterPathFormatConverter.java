@@ -78,7 +78,7 @@ public class SimulationFilterPathFormatConverter implements
                 probabilitySummary += provider.calculatePathProbability(simPath);
             }
         }
-        if (provider != null && probabilitySummary < 1) {
+        if (provider != null && probabilitySummary != 1) {
             throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");
         }
         Collections.sort(allPaths, new Comparator<SimulationPath>() {
