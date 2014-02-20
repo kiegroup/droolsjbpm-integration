@@ -82,7 +82,7 @@ public class DeploymentResource extends ResourceBase {
             deployUnit.setKbaseName(gavKK[3]);
         }
         if( gavKK.length > 4 ) { 
-            deployUnit.setKbaseName(gavKK[4]);
+            deployUnit.setKsessionName(gavKK[4]);
         }
         return deployUnit;
     }
