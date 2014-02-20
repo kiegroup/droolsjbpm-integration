@@ -134,7 +134,7 @@ public class RuntimeResource extends ResourceBase {
             responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result);
             return createCorrectVariant(responseObj, headers);
         } else {
-            throw RestOperationException.badRequest("Unable to retrieve process instance " + procInstId
+            throw RestOperationException.notFound("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
         }
     }
@@ -222,14 +222,14 @@ public class RuntimeResource extends ResourceBase {
                             return new QName((String) nameVal); 
                         }
                     } catch (Exception e) {
-                        logger.warn("Unable to retrieve XmlRootElement info via reflection", e);
+                        throw RestOperationException.internalServerError("Unable to retrieve XmlRootElement info via reflection", e);
                     } 
                 }
             }
             if( ! xmlRootElemAnnoFound ) { 
                 String errorMsg = "Unable to serialize " + object.getClass().getName() + " instance "
                         + "because it is missing a " + XmlRootElement.class.getName() + " annotation with a name value.";
-                throw RestOperationException.preConditionFailed(errorMsg);
+                throw RestOperationException.internalServerError(errorMsg);
             }
             return null;
         }
@@ -462,7 +462,7 @@ public class RuntimeResource extends ResourceBase {
                 "Unable to get process instance with id id '" + procInstId + "'");
         
         if( procInstResult == null ) { 
-            throw RestOperationException.preConditionFailed("This method can only be used on processes that are still active.");
+            throw RestOperationException.notFound("This method can only be used on processes that are still active.");
         }
         return (ProcessInstance) procInstResult;
     }

@@ -48,7 +48,7 @@ public class RestRequestHelper {
     private RestRequestHelper() { 
         
     }
-    
+   
     /**
      * Creates a {@link RestRequestHelper} instance.
      * 
@@ -86,10 +86,7 @@ public class RestRequestHelper {
      * 
      */
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password) {
-        RestRequestHelper inst = new RestRequestHelper();
-        URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
-        inst.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, DEFAULT_TIMEOUT);
-        return inst;
+        return newInstance(serverPortUrl, username, password, DEFAULT_TIMEOUT, null);
     }
     
     public void setMediaType(MediaType type) { 

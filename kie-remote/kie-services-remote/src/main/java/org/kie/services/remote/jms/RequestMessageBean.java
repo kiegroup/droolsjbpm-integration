@@ -1,5 +1,6 @@
 package org.kie.services.remote.jms;
 
+import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.*;
 import static org.kie.services.client.serialization.SerializationConstants.*;
 
 import java.util.Collection;
@@ -27,6 +28,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.exception.IllegalTaskStateException;
+import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.task.TaskService;
@@ -350,10 +353,11 @@ public class RequestMessageBean implements MessageListener {
                 if( ! AcceptedCommands.getSet().contains(cmd.getClass())) {
                     UnsupportedOperationException uoe = new UnsupportedOperationException(cmd.getClass().getName()
                             + " is not a supported command.");
-                    jaxbResponse.addException(uoe, i, cmd);
+                    jaxbResponse.addException(uoe, i, cmd, FORBIDDEN );
                     continue;
                 }
 
+                String errMsg =  "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i;
                 Object cmdResult = null;
                 try {
                     // if the JTA transaction (in HT or the KieSession) doesn't commit, that will cause message reception to be *NOT* acknowledged!
@@ -373,10 +377,15 @@ public class RequestMessageBean implements MessageListener {
                         runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
                         cmdResult = runtimeEngine.getKieSession().execute(cmd);
                     }
+                } catch( PermissionDeniedException pde ) { 
+                    logger.warn(errMsg, pde);
+                    jaxbResponse.addException(pde, i, cmd, PERMISSIONS_CONFLICT );
+                } catch( IllegalTaskStateException itse ) { 
+                    logger.warn(errMsg, itse);
+                    jaxbResponse.addException(itse, i, cmd, PERMISSIONS_CONFLICT);
                 } catch( Exception e ) { 
-                    String errMsg =  "Unable to execute " + cmd.getClass().getSimpleName() + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage();
                     logger.warn(errMsg, e);
-                    jaxbResponse.addException(new KieRemoteServicesRuntimeException(errMsg, e), i, cmd);
+                    jaxbResponse.addException(e, i, cmd, FAILURE);
                 } finally {
                     runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
                 }
@@ -385,10 +394,9 @@ public class RequestMessageBean implements MessageListener {
                         // addResult could possibly throw an exception, which is why it's here and not above
                         jaxbResponse.addResult(cmdResult, i, cmd);
                     } catch (Exception e) {
-                        String errMsg = "Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i 
-                                + " because of "+ e.getClass().getSimpleName();
+                        errMsg = "Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i;
                         logger.error(errMsg, e);
-                        jaxbResponse.addException(new KieRemoteServicesRuntimeException(errMsg, e), i, cmd);
+                        jaxbResponse.addException(e, i, cmd, FAILURE);
                     }
                 }
             }

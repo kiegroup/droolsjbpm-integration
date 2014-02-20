@@ -13,11 +13,11 @@ public class DeploymentNotFoundException extends RestOperationException {
     private static final long serialVersionUID = 6533087530265037387L;
 
     public DeploymentNotFoundException(String s) {
-        super(s, Status.PRE_CONDITION_FAILED);
+        super(s, Status.NOT_FOUND);
     }
 
     public DeploymentNotFoundException(String s, Throwable throwable) {
-        super(s, throwable, Status.PRE_CONDITION_FAILED);
+        super(s, throwable, Status.NOT_FOUND);
     }
 
 }

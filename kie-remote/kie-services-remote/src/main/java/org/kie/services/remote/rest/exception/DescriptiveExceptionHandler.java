@@ -13,7 +13,9 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
+import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(Exception e) {
 
+        // Translate exception to status
         ResponseBuilder responseBuilder = null;
         int status = -1;
         if (e instanceof RestOperationException) {
@@ -61,20 +64,41 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
                 status = 500;
             }
         }
+        logger.warn("Exception thrown when processing request [" + getRelativePath(request) + "]; responding with status " + status, e);
 
+        // Convert status to correct information in response
         if (status > 0) {
             responseBuilder = Response.status(status);
         } else {
             responseBuilder = Response.serverError();
         }
-
-        logger.warn("Exception thrown when processing request [" + getRelativePath(request) + "]; responding with status " + status, e);
-        JaxbGenericResponse response = new JaxbGenericResponse(request, e, status);
-
+        
+        JaxbRequestStatus requestStatus;
+        switch(status) { 
+        case 400:
+            requestStatus = JaxbRequestStatus.BAD_REQUEST;
+            break;
+        case 403: 
+            requestStatus = JaxbRequestStatus.FORBIDDEN;
+            break;
+        case 404: 
+            requestStatus = JaxbRequestStatus.NOT_FOUND;
+            break;
+        case 409:
+            requestStatus = JaxbRequestStatus.PERMISSIONS_CONFLICT;
+            break;
+        case 500:
+        case -1: 
+        default:
+            requestStatus = JaxbRequestStatus.FAILURE;
+        }
+       
+        // Build and send response
+        JaxbExceptionResponse response = new JaxbExceptionResponse(request, e, requestStatus);
         try {
             responseBuilder.entity(response.prettyPrint());
-        } catch (JAXBException jaxb) {
-            responseBuilder.entity(JaxbGenericResponse.convertStackTraceToString(jaxb));
+        } catch (JAXBException jaxbe) {
+            responseBuilder.entity(JaxbExceptionResponse.convertStackTraceToString(jaxbe));
         }
         return responseBuilder.variant(getVariant(headers)).build();
     }

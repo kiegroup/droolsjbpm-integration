@@ -49,6 +49,8 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name = "command-response")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -169,9 +171,9 @@ public class JaxbCommandsResponse {
         this.responses = responses;
     }
 
-    public void addException(Exception exception, int i, Command<?> cmd) {
+    public void addException(Exception exception, int i, Command<?> cmd, JaxbRequestStatus status) {
         lazyInitResponseList();
-        this.responses.add(new JaxbExceptionResponse(exception, i, cmd));
+        this.responses.add(new JaxbExceptionResponse(exception, i, cmd, status));
     }
 
     @SuppressWarnings("unchecked")

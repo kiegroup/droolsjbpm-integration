@@ -22,7 +22,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -41,12 +40,15 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
+import org.kie.services.client.api.command.exception.RemoteApiException;
+import org.kie.services.client.api.command.exception.RemoteCommunicationException;
+import org.kie.services.client.api.command.exception.RemoteTaskException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbExceptionResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +209,7 @@ public abstract class AbstractRemoteCommandObject {
 
                 connection.start();
             } catch (JMSException jmse) {
-                throw new RemoteRuntimeException("Unable to setup a JMS connection.", jmse);
+                throw new RemoteCommunicationException("Unable to setup a JMS connection.", jmse);
             }
 
             
@@ -232,16 +234,16 @@ public abstract class AbstractRemoteCommandObject {
                     msg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, config.getDeploymentId());
                 }
             } catch (JMSException jmse) {
-                throw new RemoteRuntimeException("Unable to create and fill a JMS message.", jmse);
+                throw new RemoteCommunicationException("Unable to create and fill a JMS message.", jmse);
             } catch (SerializationException se) {
-                throw new RemoteRuntimeException("Unable to deserialze JMS message.", se.getCause());
+                throw new RemoteCommunicationException("Unable to deserialze JMS message.", se.getCause());
             }
 
             // send
             try {
                 producer.send(msg);
             } catch (JMSException jmse) {
-                throw new RemoteRuntimeException("Unable to send a JMS message.", jmse);
+                throw new RemoteCommunicationException("Unable to send a JMS message.", jmse);
             }
 
             // receive
@@ -249,7 +251,7 @@ public abstract class AbstractRemoteCommandObject {
             try {
                 response = consumer.receive(config.getQualityOfServiceThresholdMilliSeconds());
             } catch (JMSException jmse) {
-                throw new RemoteRuntimeException("Unable to receive or retrieve the JMS response.", jmse);
+                throw new RemoteCommunicationException("Unable to receive or retrieve the JMS response.", jmse);
             }
 
 
@@ -263,10 +265,10 @@ public abstract class AbstractRemoteCommandObject {
                 String xmlStr = ((BytesMessage) response).readUTF();
                 cmdResponse = (JaxbCommandsResponse) serializationProvider.deserialize(xmlStr);
             } catch (JMSException jmse) {
-                throw new RemoteRuntimeException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
+                throw new RemoteCommunicationException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
                         + " instance from JMS response.", jmse);
             } catch (SerializationException se) {
-                throw new RemoteRuntimeException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
+                throw new RemoteCommunicationException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
                         + " instance from JMS response.", se.getCause());
             }
             assert cmdResponse != null : "Jaxb Cmd Response was null!";
@@ -285,7 +287,7 @@ public abstract class AbstractRemoteCommandObject {
             JaxbCommandResponse<?> response = responses.get(0);
             if (response instanceof JaxbExceptionResponse) {
                 JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) response;
-                throw new RemoteRuntimeException(exceptionResponse.getMessage());
+                throw new RemoteApiException(exceptionResponse.getMessage());
             } else {
                 return (T) response.getResult();
             }
@@ -316,36 +318,39 @@ public abstract class AbstractRemoteCommandObject {
         restRequest.body(MediaType.APPLICATION_XML, jaxbRequestString);
         
         ClientResponse<Object> response = null;
-        String requestUrl;
         try {
-            requestUrl = restRequest.getUri();
+            logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + restRequest.getUri());
             response = restRequest.post(Object.class);
         } catch (Exception e) {
-            throw new RuntimeException("Unable to post request: " + e.getMessage(), e);
+            throw new RemoteCommunicationException("Unable to post request: " + e.getMessage(), e);
         }
 
-        if (response.getResponseStatus() == Status.OK) {
-            JaxbCommandsResponse commandResponse = response.getEntity(JaxbCommandsResponse.class);
-            List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
-            if (responses.size() == 0) {
-                return null;
-            } else if (responses.size() == 1) {
-                JaxbCommandResponse<?> responseObject = responses.get(0);
-                if (responseObject instanceof JaxbExceptionResponse) {
-                    JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) responseObject;
-                    String causeMessage = exceptionResponse.getCauseMessage();
-                    throw new RuntimeException(exceptionResponse.getMessage()
-                            + (causeMessage == null ? "" : " Caused by: " + causeMessage));
-                } else {
-                    return (T) responseObject.getResult();
-                }
+        // Get response
+        JaxbCommandsResponse commandResponse = response.getEntity(JaxbCommandsResponse.class);
+        List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
+        JaxbExceptionResponse exceptionResponse;
+        if (responses.size() == 0) {
+            return null;
+        } else if (responses.size() == 1) {
+            JaxbCommandResponse<?> responseObject = responses.get(0);
+            if (responseObject instanceof JaxbExceptionResponse) {
+                exceptionResponse = (JaxbExceptionResponse) responseObject;
             } else {
-                throw new RuntimeException("Unexpected number of results from " + command.getClass().getSimpleName() + ":"
-                        + responses.size() + " results instead of only 1");
+                return (T) responseObject.getResult();
             }
-        } else {
-            throw new RuntimeException("Error invoking " + command.getClass().getSimpleName() + " via REST (" + requestUrl + "):\n"
-                    + response.getEntity(String.class));
+        } else { 
+            throw new RemoteCommunicationException("Unexpected number of results from " + command.getClass().getSimpleName() + ":"
+                    + responses.size() + " results instead of only 1");
+        }
+        
+        // Process exception response
+        switch( response.getResponseStatus() ) { 
+        case OK: 
+            throw new IllegalStateException("A response with an OK/200 status should never return an exception response! Contact the developers.");
+        case CONFLICT: 
+            throw new RemoteTaskException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
+        default: 
+            throw new RemoteApiException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
         }
     }
 }

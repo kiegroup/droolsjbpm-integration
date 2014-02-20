@@ -12,7 +12,7 @@ import javax.naming.NamingException;
 
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
-import org.kie.services.client.api.command.RemoteRuntimeException;
+import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 
 public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory {
 
@@ -64,7 +64,7 @@ public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory
         try {
             return new InitialContext(initialProps);
         } catch (NamingException e) {
-            throw new RemoteRuntimeException("Unable to create " + InitialContext.class.getSimpleName(), e);
+            throw new RemoteCommunicationException("Unable to create " + InitialContext.class.getSimpleName(), e);
         }
     }
     

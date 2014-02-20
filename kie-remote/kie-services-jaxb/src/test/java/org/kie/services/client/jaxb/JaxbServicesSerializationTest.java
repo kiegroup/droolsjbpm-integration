@@ -2,7 +2,6 @@ package org.kie.services.client.jaxb;
 
 import static org.junit.Assert.*;
 import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
-import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -16,10 +15,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.junit.Assume;
 import org.junit.Test;
-import org.kie.services.client.SerializationTest;
+import org.kie.services.client.AbstractServicesSerializationTest;
 import org.kie.services.client.api.command.AcceptedCommands;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
-import org.kie.services.client.api.command.RemoteRuntimeException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
@@ -32,7 +29,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
-public class JaxbSerializationTest extends SerializationTest {
+public class JaxbServicesSerializationTest extends AbstractServicesSerializationTest {
 
     private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.services.client"),
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
@@ -51,7 +48,7 @@ public class JaxbSerializationTest extends SerializationTest {
         jaxbProvider.addJaxbClasses(extraClass);
     }
 
-    public Object testRoundtrip(Object in) throws Exception {
+    public Object testRoundTrip(Object in) throws Exception {
         String xmlObject = jaxbProvider.serialize(in);
         logger.debug(xmlObject);
         return jaxbProvider.deserialize(xmlObject);
@@ -73,7 +70,7 @@ public class JaxbSerializationTest extends SerializationTest {
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
             Constructor<?> construct = jaxbClass.getConstructor(new Class [] {});
             Object jaxbInst = construct.newInstance(new Object [] {});
-            testRoundtrip(jaxbInst);
+            testRoundTrip(jaxbInst);
         } 
     }
     
@@ -250,17 +247,16 @@ public class JaxbSerializationTest extends SerializationTest {
     
     @Test
     public void jmsSerializationPropertyTest() { 
-        
         // 0
         Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
         testRoundTripClassesSet(extraJaxbClasses);
 
         // 1 
-        extraJaxbClasses.add(RemoteRuntimeException.class);
+        extraJaxbClasses.add(JaxbServicesSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
         
         // 2 
-        extraJaxbClasses.add(RemoteRuntimeEngine.class);
+        extraJaxbClasses.add(JsonServicesSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
     }
     

@@ -10,7 +10,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 
-import org.jboss.resteasy.logging.Logger;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.junit.Before;
@@ -20,10 +19,12 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobR
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor.JobType;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AbstractAsyncDeploymentJobExecutorTest {
 
-    protected final static Logger logger = Logger.getLogger(AbstractAsyncDeploymentJobExecutorTest.class);
+    protected final static Logger logger = LoggerFactory.getLogger(AbstractAsyncDeploymentJobExecutorTest.class);
 
     protected AsyncDeploymentJobExecutor asyncDeploymentJobExecutor = null;
     protected KModuleDeploymentService deploymentService = null;
