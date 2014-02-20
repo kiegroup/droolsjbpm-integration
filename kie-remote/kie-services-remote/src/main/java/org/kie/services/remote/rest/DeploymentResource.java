@@ -75,7 +75,7 @@ public class DeploymentResource extends ResourceBase {
    
     // Helper methods ------------------------------------------------------------------------------------------------------------
     
-    private KModuleDeploymentUnit createDeploymentUnit(String deploymentId) { 
+    protected KModuleDeploymentUnit createDeploymentUnit(String deploymentId) { 
         String [] gavKK = deploymentId.split(":");
         KModuleDeploymentUnit deployUnit = new KModuleDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
         if( gavKK.length > 3 ) { 

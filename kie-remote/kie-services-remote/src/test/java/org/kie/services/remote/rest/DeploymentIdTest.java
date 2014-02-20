@@ -2,13 +2,18 @@ package org.kie.services.remote.rest;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import org.apache.lucene.sandbox.queries.DuplicateFilter.KeepMode;
+import org.apache.tools.ant.util.StringUtils;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.junit.Test;
+import org.kie.internal.deployment.DeploymentUnit;
 
-public class DeploymentIdRegexTest {
+public class DeploymentIdTest extends DeploymentResource {
 
     @Test
     public void sameRegexUsedEverywhereTest() {
@@ -81,4 +86,50 @@ public class DeploymentIdRegexTest {
         assertFalse(test, Pattern.matches(regex, test));
     }
 
+    @Test
+    public void parseDeploymentIdTest() { 
+        // Test : groups
+        {
+        String [] test = { "a", "b", "c" };
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        checkDepUnit(depUnit, test); 
+        }
+       
+        {
+        String [] test = { "g", "a", "v", "kbase", "ksess" };
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        checkDepUnit(depUnit, test); 
+        }
+        
+        { 
+        String [] test = { "g", "a", "v", "kbase" };
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        checkDepUnit(depUnit, test); 
+        }
+
+        {
+        String [] test = { "group.sub_group", "artifact_id", "1.0.0.Final" };
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        checkDepUnit(depUnit, test); 
+        }
+    }
+    
+    private String join(String [] strArr, String sep) { 
+      StringBuilder builder = new StringBuilder();
+      if( strArr.length > 0 ) { 
+         builder.append(strArr[0]);
+         for( int i = 1; i < strArr.length; ++i ) { 
+            builder.append( sep + strArr[i]);
+         }
+      }
+      return builder.toString();
+    }
+    
+    private void checkDepUnit(DeploymentUnit depUnit, String [] test) { 
+       String [] depUnitArr = depUnit.getIdentifier().split(":");
+       assertEquals( "size/# components", test.length, depUnitArr.length);
+       for( int i = 0; i < depUnitArr.length; ++i ) { 
+           assertEquals(test[i], depUnitArr[i]);
+       }
+    }
 }
