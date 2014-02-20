@@ -1,9 +1,13 @@
 package org.kie.services.client.api;
 
-import org.kie.api.runtime.manager.RuntimeEngine;
+import java.util.Collection;
+
+import org.kie.services.client.api.command.RemoteRuntimeEngine;
+
 
 public interface RemoteRuntimeEngineFactory {
 
-    RuntimeEngine newRuntimeEngine();
+    RemoteRuntimeEngine newRuntimeEngine();
 
+    void addExtraJaxbClasses(Collection<Class<?>> extraJaxbClasses );
 }

@@ -39,6 +39,7 @@ import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.kie.api.runtime.manager.Context;
+import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 
 /**
@@ -304,7 +305,7 @@ public final class RemoteConfiguration {
             prop = RESPONSE_QUEUE_NAME;
             this.responseQueue = (Queue) context.lookup(prop);
         } catch (NamingException ne) {
-            throw new RemoteRuntimeException("Unable to retrieve object for " + prop, ne);
+            throw new RemoteCommunicationException("Unable to retrieve object for " + prop, ne);
         }
         checkValidValues(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
 

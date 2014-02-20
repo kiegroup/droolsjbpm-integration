@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.exception.IllegalTaskStateException;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.jbpm.workflow.instance.impl.WorkflowProcessInstanceImpl;
 import org.kie.api.command.Command;
@@ -56,13 +57,8 @@ public class RestProcessRequestBean {
             runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
             KieSession kieSession = runtimeEngine.getKieSession();
             result = kieSession.execute(cmd);
-
-        } catch (Exception e) {
-            if( e instanceof RuntimeException ) { 
-                throw (RuntimeException) e;
-            } else {
-                throw RestOperationException.internalServerError(errorMsg, e);
-            }
+        } catch (RuntimeException re) {
+            throw re;
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
         }
@@ -101,11 +97,11 @@ public class RestProcessRequestBean {
                 }
             }
         } catch (PermissionDeniedException pde) {
-            throw RestOperationException.unauthorized(pde.getMessage(), pde);
+            throw RestOperationException.conflict(pde.getMessage(), pde);
+        } catch (IllegalTaskStateException itse) {
+            throw RestOperationException.conflict(itse.getMessage(), itse);
         } catch (RuntimeException re) {
             throw re;
-        } catch( Exception e ) { 
-            throw RestOperationException.internalServerError(errorMsg, e);
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(engine);
         }
@@ -152,11 +148,11 @@ public class RestProcessRequestBean {
         try {
             result = ((InternalTaskService) taskService).execute(cmd);
         } catch (PermissionDeniedException pde) {
-            throw RestOperationException.unauthorized(pde.getMessage(), pde);
+            throw RestOperationException.conflict(pde.getMessage(), pde);
+        } catch (IllegalTaskStateException itse) {
+            throw RestOperationException.conflict(itse.getMessage(), itse);
         } catch (RuntimeException re) {
             throw re;
-        } catch( Exception e ) { 
-            throw RestOperationException.internalServerError(errorMsg, e);
         }
         return result;
     }
@@ -176,12 +172,8 @@ public class RestProcessRequestBean {
             if( procVar == null ) { 
                 throw RestOperationException.notFound("Variable " + varName + " does not exist in process instance " + processInstanceId + "!");
             }
-        } catch (Exception e) {
-            if( e instanceof RuntimeException ) { 
-                throw (RuntimeException) e;
-            } else {
-                throw RestOperationException.internalServerError(errorMsg, e);
-            }
+        } catch (RuntimeException re) {
+            throw RestOperationException.internalServerError(errorMsg, re);
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
         }

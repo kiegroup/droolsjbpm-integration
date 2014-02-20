@@ -11,15 +11,26 @@
   <groupId>org.kie.remote</groupId>
   <artifactId>kie-remote</artifactId>
   <packaging>pom</packaging>
-  
+
   <name>KIE Remote Services multiproject</name>
   <description>
     Remote services (REST, JMS, etc.) for various kie projects
   </description>
 
   <modules>
+    <module>kie-services-jaxb</module>
     <module>kie-services-client</module>
     <module>kie-services-remote</module>
   </modules>
-  
+
+  <!-- move to droolsjbpm-buildbootstrap! -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kie.remote</groupId>
+        <artifactId>kie-services-jaxb</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

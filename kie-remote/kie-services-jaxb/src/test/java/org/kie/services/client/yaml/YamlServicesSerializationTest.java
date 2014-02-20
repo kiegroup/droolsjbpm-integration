@@ -1,9 +1,9 @@
 package org.kie.services.client.yaml;
 
-import org.kie.services.client.SerializationTest;
+import org.kie.services.client.AbstractServicesSerializationTest;
 import org.yaml.snakeyaml.Yaml;
 
-public class YamlSerializationTest extends SerializationTest {
+public class YamlServicesSerializationTest extends AbstractServicesSerializationTest {
 
     public TestType getType() { 
         return TestType.YAML;
@@ -11,7 +11,7 @@ public class YamlSerializationTest extends SerializationTest {
     
     private Yaml yaml = new Yaml();
     
-    public Object testRoundtrip(Object in) throws Exception {
+    public Object testRoundTrip(Object in) throws Exception {
         String output = yaml.dump(in);
         logger.debug(output);
         return yaml.load(output);

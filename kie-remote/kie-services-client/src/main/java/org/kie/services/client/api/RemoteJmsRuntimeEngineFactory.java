@@ -12,15 +12,12 @@ import javax.naming.NamingException;
 
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 
 public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory {
 
     private RemoteConfiguration config;
   
-    public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) {
-        this.config = new RemoteConfiguration(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
-    }
-    
     public RemoteJmsRuntimeEngineFactory(String deploymentId, URL hostUrl, String userName, String password) { 
         InitialContext context = getRemoteJbossInitialContext(hostUrl, userName, password);
         this.config = new RemoteConfiguration(deploymentId, context);
@@ -30,22 +27,26 @@ public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory
         this.config = new RemoteConfiguration(deploymentId, context);
     }
     
-    public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue, String username, String password) {
-        this.config = new RemoteConfiguration(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue, username, password);
-    }
-    
     public RemoteJmsRuntimeEngineFactory(String deploymentId, InitialContext context, String username, String password) { 
         this.config = new RemoteConfiguration(deploymentId, context, username, password);
+    }
+
+    public RemoteJmsRuntimeEngineFactory(String deploymentId, InitialContext context, String username, String password, int qualityofServiceThresholdSeconds) { 
+        this.config = new RemoteConfiguration(deploymentId, context, username, password);
+        this.config.setQualityOfServiceThresholdMilliSeconds(qualityofServiceThresholdSeconds*1000);
+    }
+
+    public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) {
+        this.config = new RemoteConfiguration(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
+    }
+
+    public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue, String username, String password) {
+        this.config = new RemoteConfiguration(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue, username, password);
     }
     
     public RemoteJmsRuntimeEngineFactory(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue, String username, String password, int qualityOfServiceThresholdSeconds) {
         this.config = new RemoteConfiguration(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue, username, password);
         this.config.setQualityOfServiceThresholdMilliSeconds(qualityOfServiceThresholdSeconds*1000);
-    }
-    
-    public RemoteJmsRuntimeEngineFactory(String deploymentId, InitialContext context, String username, String password, int qualityofServiceThresholdSeconds) { 
-        this.config = new RemoteConfiguration(deploymentId, context, username, password);
-        this.config.setQualityOfServiceThresholdMilliSeconds(qualityofServiceThresholdSeconds*1000);
     }
     
     public static InitialContext getRemoteJbossInitialContext(URL url, String user, String password) { 
@@ -63,7 +64,7 @@ public class RemoteJmsRuntimeEngineFactory implements RemoteRuntimeEngineFactory
         try {
             return new InitialContext(initialProps);
         } catch (NamingException e) {
-            throw new RuntimeException("Unable to create " + InitialContext.class.getSimpleName(), e);
+            throw new RemoteCommunicationException("Unable to create " + InitialContext.class.getSimpleName(), e);
         }
     }
     

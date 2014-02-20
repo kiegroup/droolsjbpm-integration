@@ -18,7 +18,7 @@
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-client</artifactId>
+      <artifactId>kie-services-jaxb</artifactId>
     </dependency>
 
     <!-- kie/drools/jbpm -->
@@ -65,15 +65,11 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <scope>provided</scope> <!-- for AS 7 -->
+      <scope>provided</scope> 
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jettison-provider</artifactId>
     </dependency>
 
     <!-- general -->
@@ -101,6 +97,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>

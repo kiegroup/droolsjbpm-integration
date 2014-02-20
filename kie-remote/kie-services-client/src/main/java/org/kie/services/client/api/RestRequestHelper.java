@@ -48,6 +48,22 @@ public class RestRequestHelper {
     private RestRequestHelper() { 
         
     }
+   
+    /**
+     * Creates a {@link RestRequestHelper} instance.
+     * 
+     * @param serverPortUrl in the format of "http://server:port/"
+     * @param username The username (registered on the kie-wb or business-central server)
+     * @param password The password associated with the username.
+     * @param timeout The timeout used for REST requests.
+     */
+    public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout, MediaType mediaType) {
+        RestRequestHelper inst = new RestRequestHelper();
+        URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
+        inst.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+        inst.type = mediaType;
+        return inst;
+    }
     
     /**
      * Creates a {@link RestRequestHelper} instance.
@@ -58,10 +74,7 @@ public class RestRequestHelper {
      * @param timeout The timeout used for REST requests.
      */
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout) {
-        RestRequestHelper inst = new RestRequestHelper();
-        URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
-        inst.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
-        return inst;
+        return newInstance(serverPortUrl, username, password, DEFAULT_TIMEOUT);
     }
 
     /**
@@ -73,10 +86,7 @@ public class RestRequestHelper {
      * 
      */
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password) {
-        RestRequestHelper inst = new RestRequestHelper();
-        URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
-        inst.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, DEFAULT_TIMEOUT);
-        return inst;
+        return newInstance(serverPortUrl, username, password, DEFAULT_TIMEOUT, null);
     }
     
     public void setMediaType(MediaType type) { 

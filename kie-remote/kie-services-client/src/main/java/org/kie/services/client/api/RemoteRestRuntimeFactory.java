@@ -1,6 +1,8 @@
 package org.kie.services.client.api;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
@@ -21,4 +23,7 @@ public class RemoteRestRuntimeFactory implements RemoteRuntimeEngineFactory {
     	return new RemoteRuntimeEngine(configuration);
     }
 
+    public void addExtraJaxbClasses(Collection<Class<?>> extraJaxbClasses ) { 
+        this.configuration.addJaxbClasses(new HashSet<Class<?>>(extraJaxbClasses));
+    }
 }

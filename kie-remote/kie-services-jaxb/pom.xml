@@ -8,15 +8,11 @@
     <version>6.0.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-services-client</artifactId>
-  <name>KIE Remote Services :: Client</name>
+  <artifactId>kie-services-jaxb</artifactId>
+  <name>KIE Remote Services :: JAXB classes</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-jaxb</artifactId>
-    </dependency>
-    
+
     <!-- kie/drools/jbpm -->
     <dependency>
       <groupId>org.kie</groupId>
@@ -53,26 +49,10 @@
       <artifactId>jbpm-audit</artifactId>
     </dependency>
 
-    <!-- jms -->
-    <dependency>
-      <groupId>javax.jms</groupId>
-      <artifactId>jms</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
     <!-- rest -->
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-    </dependency>
-    <dependency>
-      <!-- resteasy logging -->
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
 
     <!-- jaxb -->
@@ -146,9 +126,9 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
+      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
-      <version>${project.version}</version>
     </dependency>
     
     <!-- reflection -->
@@ -158,6 +138,7 @@
       <version>0.9.9-RC1</version>
       <scope>test</scope>
     </dependency>
+    
   </dependencies>
 
 </project>

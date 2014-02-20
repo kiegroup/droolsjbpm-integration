@@ -2,17 +2,13 @@ package org.kie.services.client;
 
 import static org.junit.Assert.*;
 
-import java.awt.PageAttributes.OriginType;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
@@ -33,6 +29,7 @@ import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.jaxb.ComparePair;
 import org.junit.Assume;
 import org.junit.Test;
 import org.kie.api.KieBase;
@@ -68,14 +65,15 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class SerializationTest {
+public abstract class AbstractServicesSerializationTest {
 
-    protected static final Logger logger = LoggerFactory.getLogger(SerializationTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractServicesSerializationTest.class);
 
     protected enum TestType {
         JAXB, JSON, YAML;
@@ -167,7 +165,7 @@ public abstract class SerializationTest {
         return ksession;
     }
 
-    public abstract Object testRoundtrip(Object in) throws Exception;
+    public abstract Object testRoundTrip(Object in) throws Exception;
 
     /*
      * Tests
@@ -182,7 +180,7 @@ public abstract class SerializationTest {
         long taskId = 1;
         Command<?> cmd = new StartTaskCommand(taskId, "krisv");
         JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        Command<?> newCmd = ((JaxbCommandsRequest) testRoundtrip(req)).getCommands().get(0);
+        Command<?> newCmd = ((JaxbCommandsRequest) testRoundTrip(req)).getCommands().get(0);
         assertNotNull(newCmd);
         assertEquals("taskId is not equal", taskId, getField("taskId", TaskCommand.class, newCmd));
         assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
@@ -203,11 +201,11 @@ public abstract class SerializationTest {
         
         addClassesToSerializationProvider(weirdParam.getClass());
 
-        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundtrip(req);
+        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundTrip(req);
         assertEquals(((StartProcessCommand) newReq.getCommands().get(0)).getParameters().get("two"), "B");
 
         req = new JaxbCommandsRequest("deployment", new StartProcessCommand("org.jbpm.humantask"));
-        newReq = (JaxbCommandsRequest) testRoundtrip(req);
+        newReq = (JaxbCommandsRequest) testRoundTrip(req);
     }
 
     @Test
@@ -222,38 +220,54 @@ public abstract class SerializationTest {
         List<Long> resultTwo = new ArrayList<Long>();
         resp.addResult(resultTwo, 1, cmd);
 
-        Object newResp = testRoundtrip(resp);
+        Object newResp = testRoundTrip(resp);
+        assertNotNull(newResp);
+        assertEquals( 2, ((JaxbCommandsResponse) newResp).getResponses().size());
     }
 
     @Test
     public void genericTest() throws Exception {
         JaxbGenericResponse resp = new JaxbGenericResponse();
-        resp.setError("error");
-        resp.setStackTrace("stack");
+        resp.setMessage("error");
         resp.setStatus(JaxbRequestStatus.SUCCESS);
         resp.setUrl("http://here");
 
-        testRoundtrip(resp);
+        testRoundTrip(resp);
     }
 
+    @Test
+    public void exceptionTest() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+        
+        JaxbExceptionResponse resp = new JaxbExceptionResponse();
+        resp.setMessage("error");
+        resp.setStatus(JaxbRequestStatus.SUCCESS);
+        resp.setUrl("http://here");
+       
+        RuntimeException re = new RuntimeException();
+        resp.setCause(re);
+
+        testRoundTrip(resp);
+    }
+    
     @Test
     public void variablesResponseTest() throws Exception {
         JaxbVariablesResponse resp = new JaxbVariablesResponse();
 
-        testRoundtrip(resp);
+        testRoundTrip(resp);
 
         Map<String, String> vars = new HashMap<String, String>();
         vars.put("one", "two");
         resp.setVariables(vars);
 
-        testRoundtrip(resp);
+        testRoundTrip(resp);
     }
 
     @Test
     public void historyLogListTest() throws Exception {
         JaxbHistoryLogList resp = new JaxbHistoryLogList();
 
-        testRoundtrip(resp);
+        testRoundTrip(resp);
 
         // vLog
         VariableInstanceLog vLog = new VariableInstanceLog(23, "process", "varInst", "var", "two", "one");
@@ -296,14 +310,14 @@ public abstract class SerializationTest {
         nLog.setExternalId("domain");
         resp.getHistoryLogList().add(new JaxbNodeInstanceLog(nLog));
 
-        testRoundtrip(resp);
+        testRoundTrip(resp);
     }
 
     @Test
     public void auditCommandsTest() throws Exception {
         FindProcessInstanceCommand cmd = new FindProcessInstanceCommand(23);
 
-        testRoundtrip(cmd);
+        testRoundTrip(cmd);
     }
 
     @Test
@@ -325,7 +339,7 @@ public abstract class SerializationTest {
         resp.setProcessInstanceId(processInstance.getId());
         resp.addResult(processInstance, 0, cmd);
 
-        testRoundtrip(resp);
+        testRoundTrip(resp);
     }
 
     @Test
@@ -338,7 +352,7 @@ public abstract class SerializationTest {
 
         GetProcessInstanceByCorrelationKeyCommand cmd = new GetProcessInstanceByCorrelationKeyCommand(corrKey);
         JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        testRoundtrip(req);
+        testRoundTrip(req);
     }
 
     @Test
@@ -351,7 +365,7 @@ public abstract class SerializationTest {
         InsertObjectCommand cmd = new InsertObjectCommand("The Sky is Green");
         FactHandle factHandle = ksession.execute(cmd);
         JaxbOtherResponse jor = new JaxbOtherResponse(factHandle, 0, cmd);
-        testRoundtrip(jor);
+        testRoundTrip(jor);
     }
 
     @Test
@@ -374,19 +388,19 @@ public abstract class SerializationTest {
         map.put("test", "initial-val");
 
         JaxbProcessInstanceWithVariablesResponse jpiwvr = new JaxbProcessInstanceWithVariablesResponse(processInstance, map);
-        testRoundtrip(jpiwvr);
+        testRoundTrip(jpiwvr);
 
         JaxbProcessInstanceListResponse jpilp = new JaxbProcessInstanceListResponse();
         List<ProcessInstance> procInstList = new ArrayList<ProcessInstance>();
         procInstList.add(new JaxbProcessInstanceResponse(processInstance));
         jpilp.setResult(procInstList);
-        testRoundtrip(jpilp);
+        testRoundTrip(jpilp);
     }
 
     @Test
     public void workItemObjectTest() throws Exception {
         // Don't run with YAML?
-        Assume.assumeTrue(!getType().equals(TestType.YAML));
+        Assume.assumeFalse(getType().equals(TestType.YAML));
 
         JaxbWorkItem workitemObject = new JaxbWorkItem();
         workitemObject.setId(35l);
@@ -396,13 +410,13 @@ public abstract class SerializationTest {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("test", "driving");
         workitemObject.setParameters(params);
-        testRoundtrip(workitemObject);
+        testRoundTrip(workitemObject);
     }
 
     @Test
     public void serializingPrimitiveArraysTest() throws Exception  {
         // Don't run with JSON: /execute is only JAXB
-        Assume.assumeTrue(!getType().equals(TestType.JSON));
+        Assume.assumeFalse(getType().equals(TestType.JSON));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("url", "http://soaptest.parasoft.com/calculator.wsdl");
@@ -416,7 +430,7 @@ public abstract class SerializationTest {
         
         Command<?> cmd = new StartProcessCommand("proc.with.array.params", parameters);
         JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        Command<?> newCmd = ((JaxbCommandsRequest) testRoundtrip(req)).getCommands().get(0);
+        Command<?> newCmd = ((JaxbCommandsRequest) testRoundTrip(req)).getCommands().get(0);
         assertNotNull(newCmd);
     }
 
@@ -425,7 +439,7 @@ public abstract class SerializationTest {
     public void nodeInstanceLogNpeTest() throws Exception { 
         NodeInstanceLog nodeLog = new NodeInstanceLog();
         JaxbNodeInstanceLog jaxbNodeLog = new JaxbNodeInstanceLog(nodeLog);
-        testRoundtrip(jaxbNodeLog);
+        testRoundTrip(jaxbNodeLog);
     }
     
     @Test
@@ -435,7 +449,7 @@ public abstract class SerializationTest {
        
         // dep jobs
         JaxbDeploymentJobResult jaxbJob = new JaxbDeploymentJobResult();
-        testRoundtrip(jaxbJob);
+        testRoundTrip(jaxbJob);
 
         // complex dep jobs
         KModuleDeploymentUnit kDepUnit = new KModuleDeploymentUnit("org", "jar", "1.0", "kbase", "ksession" );
@@ -448,7 +462,7 @@ public abstract class SerializationTest {
         depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
         depUnitList.getDeploymentUnitList().add(depUnit);
         jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
-        JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundtrip(jaxbJob);
+        JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundTrip(jaxbJob);
         compareObjects(jaxbJob, copyJaxbJob, "identifier");
         
         depUnit = new JaxbDeploymentUnit("g", "a", "v");
@@ -458,16 +472,140 @@ public abstract class SerializationTest {
         depUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
         depUnitList.getDeploymentUnitList().add(depUnit);
         
-        JaxbDeploymentUnit copyDepUnit = (JaxbDeploymentUnit) testRoundtrip(depUnit);
+        JaxbDeploymentUnit copyDepUnit = (JaxbDeploymentUnit) testRoundTrip(depUnit);
         
         compareObjects(depUnit, copyDepUnit, "identifier");
         
         JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult("testing stuff", true, copyDepUnit, "test");
-        JaxbDeploymentJobResult copyDepJob = (JaxbDeploymentJobResult) testRoundtrip(depJob);
+        JaxbDeploymentJobResult copyDepJob = (JaxbDeploymentJobResult) testRoundTrip(depJob);
         
         compareObjects(copyDepJob, depJob, "identifier");
         
-        JaxbDeploymentUnitList roundTripUnitList = (JaxbDeploymentUnitList) testRoundtrip(depUnitList);
+        JaxbDeploymentUnitList roundTripUnitList = (JaxbDeploymentUnitList) testRoundTrip(depUnitList);
         compareObjects(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "identifier");
+    }
+    
+    @Test
+    public void roundTripXmlAndTestEqualsProcessInstanceLog() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+        
+        ProcessInstanceLog origLog = new ProcessInstanceLog(54, "org.hospital.patient.triage");
+        origLog.setDuration(65l);
+        origLog.setDuration(234l);
+        origLog.setEnd(new Date((new Date()).getTime() + 1000));
+        origLog.setExternalId("testDomainId");
+        origLog.setIdentity("identityNotMemory");
+        
+        // nullable
+        origLog.setStatus(2);
+        origLog.setOutcome("descriptiveErrorCodeOfAnError");
+        origLog.setParentProcessInstanceId(65l);
+        
+        origLog.setProcessName("org.process.not.technical");
+        origLog.setProcessVersion("v3.14");
+        
+        JaxbProcessInstanceLog xmlLog = new JaxbProcessInstanceLog(origLog);
+        xmlLog.setCommandName("test-cmd");
+        xmlLog.setIndex(2);
+        JaxbProcessInstanceLog newXmlLog = (JaxbProcessInstanceLog) testRoundTrip(xmlLog);
+        ComparePair.compareOrig(xmlLog, newXmlLog, JaxbProcessInstanceLog.class);
+        
+        ProcessInstanceLog newLog = newXmlLog.getResult();
+        ComparePair.compareOrig(origLog, newLog, ProcessInstanceLog.class);
+    }
+    
+    @Test
+    public void roundTripXmlAndTestEqualsProcessInstanceLogNillable() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+        
+        ProcessInstanceLog origLog = new ProcessInstanceLog(54, "org.hospital.patient.triage");
+        origLog.setDuration(65l);
+        origLog.setEnd(new Date((new Date()).getTime() + 1000));
+        origLog.setExternalId("testDomainId");
+        origLog.setIdentity("identityNotMemory");
+        
+        // nullable/nillable
+        // origLog.setStatus(2);
+        // origLog.setOutcome("descriptiveErrorCodeOfAnError");
+        // origLog.setParentProcessInstanceId(65l);
+        
+        origLog.setProcessName("org.process.not.technical");
+        origLog.setProcessVersion("v3.14");
+        
+        JaxbProcessInstanceLog xmlLog = new JaxbProcessInstanceLog(origLog);
+        JaxbProcessInstanceLog newXmlLog = (JaxbProcessInstanceLog) testRoundTrip(xmlLog);
+        
+        assertEquals( xmlLog.getProcessInstanceId(), newXmlLog.getProcessInstanceId() );
+        assertEquals( xmlLog.getProcessId(), newXmlLog.getProcessId() );
+        
+        assertEquals( xmlLog.getDuration(), newXmlLog.getDuration() );
+        assertEquals( xmlLog.getEnd(), newXmlLog.getEnd() );
+        assertEquals( xmlLog.getExternalId(), newXmlLog.getExternalId() );
+        assertEquals( xmlLog.getIdentity(), newXmlLog.getIdentity() );
+        
+        assertEquals( xmlLog.getStatus(), newXmlLog.getStatus() );
+        assertEquals( xmlLog.getOutcome(), newXmlLog.getOutcome() );
+        assertEquals( xmlLog.getParentProcessInstanceId(), newXmlLog.getParentProcessInstanceId() );
+        
+        assertEquals( xmlLog.getProcessName(), newXmlLog.getProcessName() );
+        assertEquals( xmlLog.getProcessVersion(), newXmlLog.getProcessVersion() );
+    }
+    
+    @Test
+    public void roundTripXmlAndTestEqualsNodeInstanceLog() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+        
+        int type = 0;
+        long processInstanceId = 23;
+        String processId = "org.hospital.doctor.review";
+        String nodeInstanceId = "1-1";
+        String nodeId = "1";
+        String nodeName = "notification";
+        
+        NodeInstanceLog origLog = new NodeInstanceLog(type, processInstanceId, processId, nodeInstanceId, nodeId, nodeName);
+        
+        origLog.setWorkItemId(78l);
+        origLog.setConnection("link");
+        origLog.setExternalId("not-internal-num");
+        origLog.setNodeType("the-sort-of-point");
+        
+        JaxbNodeInstanceLog xmlLog = new JaxbNodeInstanceLog(origLog);
+        xmlLog.setCommandName("test-cmd");
+        xmlLog.setIndex(2);
+        JaxbNodeInstanceLog newXmlLog = (JaxbNodeInstanceLog) testRoundTrip(xmlLog);
+        ComparePair.compareOrig(xmlLog, newXmlLog, JaxbNodeInstanceLog.class);
+        
+        NodeInstanceLog newLog = newXmlLog.getResult();
+        ComparePair.compareOrig(origLog, newLog, NodeInstanceLog.class);
+    }
+    
+    @Test
+    public void roundTripXmlAndTestEqualsVariableInstanceLog() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+        
+        long processInstanceId = 23;
+        String processId = "org.hospital.intern.rounds";
+        String variableInstanceId = "patientNum-1";
+        String variableId = "patientNum";
+        String value = "33";
+        String oldValue = "32";
+        
+        VariableInstanceLog origLog 
+            = new VariableInstanceLog(processInstanceId, processId, variableInstanceId, variableId, value, oldValue);
+        
+        origLog.setExternalId("outside-identity-representation");
+        origLog.setOldValue("previous-data-that-this-variable-contains");
+        origLog.setValue("the-new-data-that-has-been-put-in-this-variable");
+        origLog.setVariableId("shortend-representation-of-this-representation");
+        origLog.setVariableInstanceId("id-instance-variable");
+       
+        JaxbVariableInstanceLog xmlLog = new JaxbVariableInstanceLog(origLog);
+        xmlLog.setCommandName("test-cmd");
+        xmlLog.setIndex(2);
+        JaxbVariableInstanceLog newXmlLog = (JaxbVariableInstanceLog) testRoundTrip(xmlLog);
+        ComparePair.compareOrig(xmlLog, newXmlLog, JaxbVariableInstanceLog.class);
+        
+        VariableInstanceLog newLog = newXmlLog.getResult();
+        ComparePair.compareOrig(origLog, newLog, VariableInstanceLog.class);
     }
 }

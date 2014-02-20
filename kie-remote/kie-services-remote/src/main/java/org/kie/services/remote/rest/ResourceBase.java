@@ -21,6 +21,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.exception.IllegalTaskStateException;
+import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
@@ -33,6 +35,7 @@ import org.kie.internal.task.api.model.InternalTask;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.kie.services.remote.rest.exception.RestOperationException;
 import org.kie.services.remote.rest.variant.ServerDrivenNegotiation;
 import org.slf4j.Logger;
@@ -53,11 +56,18 @@ public class ResourceBase {
 
         if (commands != null) {
             int cmdListSize = commands.size(); 
+           
+            // First check to make sure that all commands will be processed
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
                 if (!AcceptedCommands.getSet().contains(cmd.getClass())) {
-                    throw RestOperationException.notAcceptable("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
+                    throw RestOperationException.forbidden("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
                 }
+            }
+           
+            // Execute commands
+            for (int i = 0; i < cmdListSize; ++i) {
+                Command<?> cmd = commands.get(i);
                 logger.debug("Processing command " + cmd.getClass().getSimpleName());
                 Object cmdResult = null;
                 try { 
@@ -80,19 +90,23 @@ public class ResourceBase {
                                 request.getProcessInstanceId(),
                                 errorMsg);
                     }
+                } catch(PermissionDeniedException pde) { 
+                    jaxbResponse.addException(pde, i, cmd, JaxbRequestStatus.PERMISSIONS_CONFLICT);
+                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, pde);
+                } catch(IllegalTaskStateException itse) { 
+                    jaxbResponse.addException(itse, i, cmd, JaxbRequestStatus.PERMISSIONS_CONFLICT);
+                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, itse);
                 } catch(Exception e) { 
-                    jaxbResponse.addException(e, i, cmd);
-                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i
-                            + " because of " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
+                    jaxbResponse.addException(e, i, cmd, JaxbRequestStatus.FAILURE);
+                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, e);
                 }
                 if (cmdResult != null) {
                     try {
                         // addResult could possibly throw an exception, which is why it's here and not above
                         jaxbResponse.addResult(cmdResult, i, cmd);
                     } catch (Exception e) {
-                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i 
-                                + " because of " + e.getClass().getSimpleName(), e);
-                        jaxbResponse.addException(e, i, cmd);
+                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i, e); 
+                        jaxbResponse.addException(e, i, cmd, JaxbRequestStatus.FAILURE);
                     }
                 }
             }
