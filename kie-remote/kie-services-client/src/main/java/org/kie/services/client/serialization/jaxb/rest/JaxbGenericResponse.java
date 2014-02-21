@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.jboss.resteasy.spi.BadRequestException;
 
 @XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -41,9 +40,9 @@ public class JaxbGenericResponse extends AbstractJaxbResponse {
      * @param request
      * @param e
      */
-    public JaxbGenericResponse(HttpServletRequest request, Exception e) {
+    public JaxbGenericResponse(HttpServletRequest request, Exception e, int status) {
         super(request);
-        setException(e);
+        setException(e, status);
     }
     
     public static String convertStackTraceToString(Throwable t) { 
@@ -53,9 +52,9 @@ public class JaxbGenericResponse extends AbstractJaxbResponse {
         return stringWriter.toString();
     }
     
-    public void setException(Exception e ) { 
+    public void setException(Exception e, int status ) { 
         this.error = e.getMessage();
-        if( ! (e instanceof BadRequestException) ) { 
+        if( status == 500 ) {
             this.status = JaxbRequestStatus.FAILURE;
             stackTrace = convertStackTraceToString(e);
         } else { 
