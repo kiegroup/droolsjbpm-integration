@@ -71,6 +71,10 @@
     <bundle>mvn:org.kie/kie-internal/${drools.version}</bundle>
   </feature>
 
+  <feature name="kie-ci" version="${drools.version}">
+    <bundle>mvn:org.kie/kie-ci-osgi/${drools.version}</bundle>
+  </feature>
+
   <feature name="kie-spring" version="${drools.version}">
     <feature version="${drools.version}">kie</feature>
     <feature version="${drools.version}">drools-jpa</feature>
