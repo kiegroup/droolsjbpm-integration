@@ -69,7 +69,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         }
 
         logger.warn("Exception thrown when processing request [" + getRelativePath(request) + "]; responding with status " + status, e);
-        JaxbGenericResponse response = new JaxbGenericResponse(request, e);
+        JaxbGenericResponse response = new JaxbGenericResponse(request, e, status);
 
         try {
             responseBuilder.entity(response.prettyPrint());

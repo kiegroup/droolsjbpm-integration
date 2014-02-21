@@ -148,7 +148,7 @@ public class ResourceBase {
     protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) { 
         ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers);
-        if( v != null ) { 
+        if( v == null ) { 
             v = defaultVariant;
         }
         if( status != null ) { 
