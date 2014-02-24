@@ -154,8 +154,8 @@ public class SimulateProcessTest {
             if (event instanceof AggregatedProcessSimulationEvent) {
                 Map<String, Integer> numberOfInstancePerPath = ((AggregatedProcessSimulationEvent) event).getPathNumberOfInstances();
                 assertNotNull(numberOfInstancePerPath);
-                assertTrue(3 == numberOfInstancePerPath.get("Path800898475"));
-                assertTrue(7 == numberOfInstancePerPath.get("Path-960633761"));
+                assertTrue(3 == numberOfInstancePerPath.get("Path800898475-0"));
+                assertTrue(7 == numberOfInstancePerPath.get("Path-960633761-1"));
             }
         }
         wmRepo.close();
@@ -265,8 +265,8 @@ public class SimulateProcessTest {
             if (event instanceof AggregatedProcessSimulationEvent) {
                 Map<String, Integer> numberOfInstancePerPath = ((AggregatedProcessSimulationEvent) event).getPathNumberOfInstances();
                 assertNotNull(numberOfInstancePerPath);
-                assertEquals(1, (int)numberOfInstancePerPath.get("Path800898475"));
-                assertEquals(4, (int)numberOfInstancePerPath.get("Path-960633761"));
+                assertEquals(1, (int)numberOfInstancePerPath.get("Path800898475-0"));
+                assertEquals(4, (int)numberOfInstancePerPath.get("Path-960633761-1"));
             }
         }
         

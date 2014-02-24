@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +70,19 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     }
     public Map<String, Object> getSimulationDataForNode(
             String nodeId) {
+        boolean reverse = false;
+        if (nodeId.startsWith("$reverseprops$")) {
+            reverse = true;
+            nodeId = nodeId.replaceFirst("\\$reverseprops\\$", "");
+        }
+
         Map<String, Object> properties = new HashMap<String, Object>();
+        // default value for probability is 50
+        double defaultValue = 50.0;
+        if (reverse) {
+            defaultValue = 100 - defaultValue;
+        }
+        properties.put("probability", defaultValue);
         Scenario scenario = getDefaultScenario(def);
         if(scenario != null) {
         	String baseTimeUnitValue = "";
@@ -100,7 +112,11 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                                 properties.put("probability", 100.0);
                             } else {
                                 FloatingParameterType valType = (FloatingParameterType) eleType.getControlParameters().getProbability().getParameterValue().get(0);
-                                properties.put("probability", valType.getValue());
+                                double value = valType.getValue();
+                                if (reverse) {
+                                    value = 100 - value;
+                                }
+                                properties.put("probability", value);
                             }
         				}
         				if(eleType.getTimeParameters() != null) {
@@ -181,7 +197,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
     
     public double calculatePathProbability(SimulationPath path) {
         double probability = 100;
-        Set<String> processedSourceElems = new HashSet<String>();
+        Set<String> processedSourceElems = new LinkedHashSet<String>();
         for (String sequenceFlowId : path.getSequenceFlowsIds()) {
             String sourceElemId = path.getSeqenceFlowsSources().get(sequenceFlowId);
             // need to check if given source (gateway) was already processed as it can be twice or more when loops are

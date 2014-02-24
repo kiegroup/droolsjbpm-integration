@@ -103,7 +103,7 @@ public class SimulationRunner {
             if (!path.isStartable()) {
                 continue;
             }
-            double probability = provider.calculatePathProbability(path);
+            double probability = path.getProbability();
             f.newPath("path" + counter);
 
             int instancesOfPath = 1;

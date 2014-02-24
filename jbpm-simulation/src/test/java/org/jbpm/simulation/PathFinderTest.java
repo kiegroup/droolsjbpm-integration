@@ -345,6 +345,7 @@ public class PathFinderTest {
         expectedIds1.add("_1");
         expectedIds1.add("SequenceFlow_1");
         expectedIds1.add("UserTask_1");
+        expectedIds1.add("$reverseprops$BoundaryEvent_2");
         expectedIds1.add("SequenceFlow_2");
         expectedIds1.add("UserTask_2");
         expectedIds1.add("SequenceFlow_3");    
@@ -542,6 +543,7 @@ public class PathFinderTest {
         expectedIds1.add("_1");
         expectedIds1.add("SequenceFlow_1");
         expectedIds1.add("UserTask_1");
+        expectedIds1.add("$reverseprops$BoundaryEvent_2");
         expectedIds1.add("SequenceFlow_2");
         expectedIds1.add("UserTask_2");
         expectedIds1.add("SequenceFlow_3");    
@@ -1565,5 +1567,29 @@ public class PathFinderTest {
         
         TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
        
+    }
+
+
+    @Test
+    public void testMortgageProcessPaths() throws IOException {
+
+
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-MortgageProcess.bpmn2"));
+
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(6, paths.size());
+
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(6, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+
+        TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
+
     }
 }

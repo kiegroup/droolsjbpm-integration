@@ -93,7 +93,7 @@ public class RequestMessageBean implements MessageListener {
     private static String RESPONSE_QUEUE_NAME_PROPERTY = "kie.services.jms.queues.response";
     
     private static final String ID_NECESSARY = "This id is needed to be able to match a request to a response message.";
-    
+
     
     @PostConstruct
     public void init() {

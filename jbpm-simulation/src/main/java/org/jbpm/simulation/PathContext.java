@@ -1,6 +1,6 @@
 package org.jbpm.simulation;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -17,14 +17,16 @@ public class PathContext {
         TEMP;
     }
 
-    private Set<FlowElement> pathElements = new HashSet<FlowElement>();
+    private Set<FlowElement> pathElements = new LinkedHashSet<FlowElement>();
     private Type type;
     private boolean canBeFinished = true;
     private boolean locked = false;
     private String id; 
     private int canBeFinishedCounter = 0;
     private String pathId;
-    
+
+    private Set<FlowElement> visitedSplitPoint = new LinkedHashSet<FlowElement>();
+
     protected int getCanBeFinishedCounter() {
         return canBeFinishedCounter;
     }
@@ -121,4 +123,17 @@ public class PathContext {
     public void setPathId(String pathId) {
         this.pathId = pathId;
     }
+
+    public void addVisitedSplitPoint(FlowElement element) {
+        this.visitedSplitPoint.add(element);
+    }
+
+    public Set<FlowElement> getVisitedSplitPoint() {
+        return visitedSplitPoint;
+    }
+
+    public void setVisitedSplitPoint(Set<FlowElement> visitedSplitPoint) {
+        this.visitedSplitPoint = visitedSplitPoint;
+    }
+
 }
