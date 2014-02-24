@@ -12,6 +12,8 @@ import org.eclipse.bpmn2.CompensateEventDefinition;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.Gateway;
+import org.eclipse.bpmn2.GatewayDirection;
 import org.eclipse.bpmn2.LinkEventDefinition;
 import org.eclipse.bpmn2.MessageEventDefinition;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -21,7 +23,9 @@ import org.eclipse.bpmn2.ThrowEvent;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathFormatConverter;
 import org.jbpm.simulation.SimulationDataProvider;
+import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
+import org.jbpm.simulation.util.SimulationConstants;
 
 public class SimulationFilterPathFormatConverter implements
         PathFormatConverter<List<SimulationPath>> {
@@ -40,7 +44,7 @@ public class SimulationFilterPathFormatConverter implements
 
     public List<SimulationPath> convert(List<PathContext> paths) {
         List<SimulationPath> allPaths = new ArrayList<SimulationPath>();
-        double probabilitySummary = 0;
+
         for (PathContext context : paths) {
             SimulationPath simPath = new SimulationPath();
             simPath.setPathId(context.getPathId());
@@ -49,6 +53,22 @@ public class SimulationFilterPathFormatConverter implements
                 if (fe instanceof SequenceFlow) {
                     simPath.addSequenceFlow(fe.getId());
                     simPath.addSequenceFlowSource(fe.getId(), ((SequenceFlow) fe).getSourceRef().getId());
+                } else if (fe instanceof Gateway && ((Gateway) fe).getGatewayDirection().equals(GatewayDirection.DIVERGING)) {
+                    if (provider != null) {
+                        double probability = 0;
+                        for (SequenceFlow sq : ((Gateway) fe).getOutgoing()) {
+                            if (provider instanceof BPMN2SimulationDataProvider) {
+                                probability += (Double)((BPMN2SimulationDataProvider)provider).getSimulationDataForNode(sq.getId()).get(SimulationConstants.PROBABILITY);
+                            }
+                        }
+                        BigDecimal bd = new BigDecimal(probability);
+                        bd = bd.setScale(5, BigDecimal.ROUND_HALF_UP);
+                        probability = bd.doubleValue();
+                        if (probability != 100) {
+                            throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");
+                        }
+
+                    }
                 } else if (fe instanceof BoundaryEvent) {
                   simPath.addBoundaryEventId(fe.getId());  
                 } else if (fe instanceof CatchEvent) {
@@ -76,15 +96,10 @@ public class SimulationFilterPathFormatConverter implements
             
             // calcluate path probability if required
             if (provider != null) {
-                probabilitySummary += provider.calculatePathProbability(simPath);
+                provider.calculatePathProbability(simPath);
             }
         }
-        BigDecimal bd = new BigDecimal(probabilitySummary);
-        bd = bd.setScale(5, BigDecimal.ROUND_HALF_UP);
-        probabilitySummary = bd.doubleValue();
-        if (provider != null && probabilitySummary != 1) {
-            throw new IllegalArgumentException("Process is not valid for simulation - use validation to find errors");
-        }
+
         Collections.sort(allPaths, new Comparator<SimulationPath>() {
 
             public int compare(SimulationPath o1, SimulationPath o2) {

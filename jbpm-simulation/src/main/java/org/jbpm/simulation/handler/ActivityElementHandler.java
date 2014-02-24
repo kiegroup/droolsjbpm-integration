@@ -9,6 +9,7 @@ import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathContextManager;
+import org.jbpm.simulation.util.WrappedBoundaryEvent;
 
 public class ActivityElementHandler extends MainElementHandler {
 
@@ -24,15 +25,20 @@ public class ActivityElementHandler extends MainElementHandler {
         if (bEvents != null && bEvents.size() > 0) {
             boolean cancelActivity = false;
             for (BoundaryEvent bEvent : bEvents) {
-                manager.addToPath(bEvent, context);
-                List<SequenceFlow> bOut = bEvent.getOutgoing();
-                outgoing.addAll(bOut);
-                cancelActivity = bEvent.isCancelActivity();
-            
-                handleSeparatePaths(outgoing, manager, bEvent);
-                handleCombinedPaths(outgoing, manager);
-                if (!cancelActivity) {
-                    handleAllPaths(outgoing, manager);
+
+                if (!context.getPathElements().contains(bEvent)) {
+                    manager.addToPath(bEvent, context);
+                    List<SequenceFlow> bOut = bEvent.getOutgoing();
+                    outgoing.addAll(bOut);
+                    cancelActivity = bEvent.isCancelActivity();
+
+                    handleSeparatePaths(outgoing, manager, bEvent);
+                    handleCombinedPaths(outgoing, manager);
+                    if (!cancelActivity) {
+                        handleAllPaths(outgoing, manager);
+                    }
+                } else {
+                    HandlerRegistry.getHandler().handle(element, manager);
                 }
             }
             return true;
@@ -51,9 +57,10 @@ public class ActivityElementHandler extends MainElementHandler {
             FlowElement target = seqFlow.getTargetRef();
 
             PathContext separatePath = manager.cloneGiven(context);
-            // remove boundary event if sequence flow does not go out if it
+            // replace boundary event with a wrapper if sequence flow does not go out if it
             if (!seqFlow.getSourceRef().equals(bEvent)) {
                 separatePath.removePathElement(bEvent);
+                separatePath.addPathElement(new WrappedBoundaryEvent(bEvent));
             }
             manager.addToPath(seqFlow, separatePath);
             super.handle(target, manager);

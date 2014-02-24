@@ -66,7 +66,7 @@ public class BPMN2SimulationDataProviderTest {
         });
         
         assertNotNull(data);
-        assertEquals(8, data.size());
+        assertEquals(9, data.size());
         assertTrue(data.containsKey(SimulationConstants.COST_PER_TIME_UNIT));
         assertTrue(data.containsKey(SimulationConstants.DISTRIBUTION_TYPE));
         assertTrue(data.containsKey(SimulationConstants.STANDARD_DEVIATION));
@@ -75,6 +75,7 @@ public class BPMN2SimulationDataProviderTest {
         assertTrue(data.containsKey(SimulationConstants.STANDARD_DEVIATION));
         assertTrue(data.containsKey(SimulationConstants.TIMEUNIT));
         assertTrue(data.containsKey(SimulationConstants.WORKING_HOURS));
+        assertTrue(data.containsKey(SimulationConstants.PROBABILITY));
     }
     
     @Test

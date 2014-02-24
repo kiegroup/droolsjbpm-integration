@@ -3,7 +3,7 @@ package org.jbpm.simulation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -80,7 +80,8 @@ public class PathContextManager {
         clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
         clone.setCanBeFinishedCounter(toclone.getCanBeFinishedCounter());
         
-        clone.setPathElements(new HashSet<FlowElement>(toclone.getPathElements()));
+        clone.setPathElements(new LinkedHashSet<FlowElement>(toclone.getPathElements()));
+        clone.setVisitedSplitPoint(new LinkedHashSet<FlowElement>(toclone.getVisitedSplitPoint()));
         
         this.paths.push(clone);
         return clone;
@@ -92,7 +93,8 @@ public class PathContextManager {
         clone.setCanBeFinishedNoIncrement(toclone.isCanBeFinished());
         clone.setCanBeFinishedCounter(toclone.getCanBeFinishedCounter());
         
-        clone.setPathElements(new HashSet<FlowElement>(toclone.getPathElements()));
+        clone.setPathElements(new LinkedHashSet<FlowElement>(toclone.getPathElements()));
+        clone.setVisitedSplitPoint(new LinkedHashSet<FlowElement>(toclone.getVisitedSplitPoint()));
         toclone.setType(Type.TEMP);
         return clone;
     }
@@ -156,7 +158,7 @@ public class PathContextManager {
         for (FlowElement fe : list) {
             pathIdElements.append(fe.getId());
         }
-        context.setPathId("Path"+pathIdElements.toString().hashCode());
+        context.setPathId("Path"+pathIdElements.toString().hashCode()+ "-" + this.completePaths.size());
         this.completePaths.add(context);
     }
 }
