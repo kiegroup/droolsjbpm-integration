@@ -16,6 +16,7 @@ import java.util.zip.ZipInputStream;
 
 import org.drools.core.impl.EnvironmentImpl;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.builder.KieModule;
 import org.kie.api.builder.model.KieBaseModel;
@@ -49,6 +50,7 @@ public class KieModuleDeploymentHelperTest {
     }
 
     @Test
+    @Ignore
     public void testSingleDeploymentHelper() throws Exception {
         SingleKieModuleDeploymentHelper deploymentHelper = KieModuleDeploymentHelper.newSingleInstance();
 
@@ -85,6 +87,7 @@ public class KieModuleDeploymentHelperTest {
     }
 
     @Test
+    @Ignore
     public void testFluentDeploymentHelper() throws Exception {
         String content = "test file created by " + this.getClass().getSimpleName();
         File tempFile = File.createTempFile(UUID.randomUUID().toString(), ".tst");
