@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Map;
 
 public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
@@ -101,6 +102,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             } else {
                 releaseId = new ReleaseIdImpl("org.default", "artifact","1.0.0-SNAPSHOT");
             }
+            log.info("Found project with releaseId: " + releaseId);
             KieSpringUtils.setDefaultReleaseId(releaseId);
             System.out.println("releaseId == "+releaseId);
         }
@@ -293,29 +295,19 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             throw new RuntimeException(e);
         }
         if (configFileURL.toString().endsWith("service-loader-resources/")) {
-            String moduleName = getModuleName();
-            if (moduleName != null) {
-                if (moduleName.endsWith(".war")) {
-                    try {
-                        configFileURL = new URL("vfs:/content/" + moduleName + "/WEB-INF/classes/");
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
+            try {
+                Enumeration<URL> urls = getClass().getClassLoader().getResources("/");
+                while (urls.hasMoreElements()) {
+                    URL url = urls.nextElement();
+                    if (url.toString().endsWith("WEB-INF/classes/")) {
+                        configFileURL = url;
+                        break;
                     }
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
-    }
-
-    private String getModuleName() {
-        String clName = getClass().getClassLoader().toString();
-        int start = clName.indexOf("deployment.");
-        if (start >= 0) {
-            start += "deployment.".length();
-            int end = Math.min(clName.indexOf(':', start), clName.indexOf('"', start));
-            if (end > start) {
-                return clName.substring(start, end);
-            }
-        }
-        return null;
+        log.info("classpath root URL: " + configFileURL);
     }
 }
