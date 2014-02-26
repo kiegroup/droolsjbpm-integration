@@ -35,14 +35,14 @@ public class JaxbDeploymentUnit implements DeploymentUnit {
     @XmlSchemaType(name="string")
     private String ksessionName;
 
-    @XmlElement(name = "deployment-strategy", type = RuntimeStrategy.class)
+    @XmlElement(type = RuntimeStrategy.class)
     private RuntimeStrategy strategy;
     
     @XmlElement
     @XmlSchemaType(name="string")
     private String identifier;
     
-    @XmlElement(name = "deployment-status", type = JaxbDeploymentStatus.class)
+    @XmlElement(type = JaxbDeploymentStatus.class)
     private JaxbDeploymentStatus status;
     
     @XmlEnum
