@@ -57,11 +57,24 @@ public class RestRequestHelper {
      * @param password The password associated with the username.
      * @param timeout The timeout used for REST requests.
      */
-    public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout) {
+    public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout, MediaType mediaType) {
         RestRequestHelper inst = new RestRequestHelper();
         URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
         inst.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+        inst.type = mediaType;
         return inst;
+    }
+    
+    /**
+     * Creates a {@link RestRequestHelper} instance.
+     * 
+     * @param serverPortUrl in the format of "http://server:port/"
+     * @param username The username (registered on the kie-wb or business-central server)
+     * @param password The password associated with the username.
+     * @param timeout The timeout used for REST requests.
+     */
+    public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout) {
+        return newInstance(serverPortUrl, username, password, timeout, null);
     }
 
     /**
