@@ -53,6 +53,7 @@
       <artifactId>kie-internal</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!--  remove after the IllegalTaskStateException has been moved back to -core -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-jpa</artifactId>
