@@ -74,7 +74,7 @@ public class RestRequestHelper {
      * @param timeout The timeout used for REST requests.
      */
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout) {
-        return newInstance(serverPortUrl, username, password, DEFAULT_TIMEOUT);
+        return newInstance(serverPortUrl, username, password, timeout, null);
     }
 
     /**

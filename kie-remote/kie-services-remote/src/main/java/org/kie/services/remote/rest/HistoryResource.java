@@ -218,7 +218,7 @@ public class HistoryResource extends ResourceBase {
     } 
    
     @GET
-    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
     public Response variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
@@ -233,7 +233,7 @@ public class HistoryResource extends ResourceBase {
     }
     
     @GET
-    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
     public Response variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
