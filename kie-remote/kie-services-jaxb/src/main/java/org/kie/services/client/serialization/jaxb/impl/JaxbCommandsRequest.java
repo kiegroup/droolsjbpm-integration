@@ -20,6 +20,7 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
+import org.jbpm.process.audit.command.AbstractHistoryLogCommand;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
 import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindNodeInstancesCommand;
@@ -128,23 +129,26 @@ public class JaxbCommandsRequest {
     public JaxbCommandsRequest(Command<?> command) {
         this.commands = new ArrayList<Command<?>>();
         this.commands.add(command);
-        checkThatCommandsAreTaskCommands(commands);
+        checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
     
     public JaxbCommandsRequest(List<Command<?>> commands) {
         this.commands = new ArrayList<Command<?>>();
         this.commands.addAll(commands);
-        checkThatCommandsAreTaskCommands(commands);
+        checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
 
-    private void checkThatCommandsAreTaskCommands(List<Command<?>> commands) {
-        for( Command<?> command : commands ) { 
-           if( ! (command instanceof TaskCommand<?>) ) { 
-               throw new UnsupportedOperationException( "Only commands for the task service are supported when leaving out the deployment id (" + command.getClass().getSimpleName()  + ")" );
-           }
+    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command<?>> checkCommands) {
+        if( deploymentId != null && ! deploymentId.trim().isEmpty() ) { 
+            return;
+        }
+        for( Command<?> command : checkCommands ) { 
+            if( ! (command instanceof TaskCommand<?>) && ! (command instanceof AbstractHistoryLogCommand) ) { 
+                throw new UnsupportedOperationException( "A " + command.getClass().getSimpleName() + " requires that the deployment id has been set!" );
+            }
         }
     }
-    
+
     public JaxbCommandsRequest(String deploymentId, Command<?> command) {
         this.deploymentId = deploymentId;
         this.commands = new ArrayList<Command<?>>();
