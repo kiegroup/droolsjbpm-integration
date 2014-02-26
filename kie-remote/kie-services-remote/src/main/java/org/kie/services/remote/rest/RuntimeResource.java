@@ -324,7 +324,7 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @GET
-    @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\.]+}")
+    @Path("/history/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
     @Deprecated // Delete with 6.1.0
     public Response history_instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
@@ -332,35 +332,35 @@ public class RuntimeResource extends ResourceBase {
     }
 
     @GET
-    @Path("/history/process/{processDefId: [a-zA-Z0-9-:\\.]+}")
+    @Path("/history/process/{processDefId: [a-zA-Z0-9-:\\._]+}")
     @Deprecated // Delete with 6.1.0
     public Response history_process_procDefId(@PathParam("processDefId") String processId) {
        return historyResource.process_procDefId(processId); 
     }
 
     @GET
-    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}")
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\._]+}")
     @Deprecated // Delete with 6.1.0
     public Response history_variable_varId(@PathParam("varId") String variableId) {
         return historyResource.variable_varId(variableId);
     }
     
     @GET
-    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}")
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
     @Deprecated // Delete with 6.1.0
     public Response history_variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
        return historyResource.variable_varId_value_valueVal(variableId, value);
     }
     
     @GET
-    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
     @Deprecated // Delete with 6.1.0
     public Response history_variable_varId_instances(@PathParam("varId") String variableId) {
         return historyResource.variable_varId_instances(variableId);
     }
     
     @GET
-    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
+    @Path("/history/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\._]+}/instances")
     @Deprecated // Delete with 6.1.0
     public Response history_variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
         return historyResource.variable_varId_value_valueVal_instances(variableId, value);

@@ -136,7 +136,7 @@ public class HistoryResource extends ResourceBase {
     }
 
     @GET
-    @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\.]+}")
+    @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
     public Response instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, List<String>> params = getRequestParams(request);
@@ -159,7 +159,7 @@ public class HistoryResource extends ResourceBase {
     }
 
     @GET
-    @Path("/process/{processDefId: [a-zA-Z0-9-:\\.]+}")
+    @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}")
     public Response process_procDefId(@PathParam("processDefId") String processId) {
         Map<String, List<String>> params = getRequestParams(request);
         Number statusParam = getNumberParam("status", false, params, getRelativePath(request), false);
@@ -195,7 +195,7 @@ public class HistoryResource extends ResourceBase {
     }
 
     @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}")
     public Response variable_varId(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
@@ -206,7 +206,7 @@ public class HistoryResource extends ResourceBase {
     }
     
     @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
     public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
@@ -218,7 +218,7 @@ public class HistoryResource extends ResourceBase {
     } 
    
     @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/instances")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
     public Response variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
@@ -233,7 +233,7 @@ public class HistoryResource extends ResourceBase {
     }
     
     @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\.]+}/instances")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\._]+}/instances")
     public Response variable_varId_value_valueVal_instances(@PathParam("procId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(request);
         String oper = getRelativePath(request);
