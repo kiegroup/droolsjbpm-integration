@@ -119,11 +119,11 @@ public class HistoryResource extends ResourceBase {
         
         Object result = null;
         if ("child".equalsIgnoreCase(operation)) {
-            auditLogService.findSubProcessInstances(procInstId);
+            result = auditLogService.findSubProcessInstances(procInstId);
         } else if ("node".equalsIgnoreCase(operation)) {
-            auditLogService.findNodeInstances(procInstId);
+            result = auditLogService.findNodeInstances(procInstId);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            auditLogService.findVariableInstances(procInstId);
+            result = auditLogService.findVariableInstances(procInstId);
         } else {
             throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
