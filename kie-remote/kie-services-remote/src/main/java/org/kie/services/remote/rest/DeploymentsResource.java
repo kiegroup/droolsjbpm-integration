@@ -7,12 +7,10 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.jbpm.kie.services.api.Kjar;
@@ -28,16 +26,9 @@ import org.kie.services.remote.cdi.DeploymentInfoBean;
 @RequestScoped
 public class DeploymentsResource extends ResourceBase {
 
-    /* REST information */
     @Context
     private HttpHeaders headers;
     
-    @Context
-    private HttpServletRequest request;
-    
-    @Context
-    private Request restRequest;
-
     /* KIE resources */
    
     @Inject

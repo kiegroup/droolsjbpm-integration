@@ -8,10 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
-import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Content;
-import org.kie.api.task.model.Task;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name = "content-response")

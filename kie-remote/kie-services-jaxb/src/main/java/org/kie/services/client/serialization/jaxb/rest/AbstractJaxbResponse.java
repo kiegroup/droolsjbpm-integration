@@ -2,7 +2,6 @@ package org.kie.services.client.serialization.jaxb.rest;
 
 import java.io.StringWriter;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -25,17 +24,9 @@ public class AbstractJaxbResponse {
        // Default constructor 
     }
     
-    public AbstractJaxbResponse(HttpServletRequest request ) { 
-        this.url = getUrl(request);
+    public AbstractJaxbResponse(String requestUrl ) { 
+        this.url = requestUrl;
         this.status = JaxbRequestStatus.SUCCESS;
-    }
-    
-    protected String getUrl(HttpServletRequest request) { 
-        String url = request.getRequestURI();
-        if( request.getQueryString() != null ) { 
-            url += "?" + request.getQueryString();
-        }
-        return url;
     }
     
     public String prettyPrint() throws JAXBException {

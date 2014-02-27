@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,6 +14,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.jbpm.kie.services.api.Kjar;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -56,7 +56,7 @@ public class DeploymentResource extends ResourceBase {
     private HttpHeaders headers;
     
     @Context
-    private HttpServletRequest request;
+    private UriInfo uriInfo;
     
     @Context
     private Request restRequest;
@@ -149,8 +149,8 @@ public class DeploymentResource extends ResourceBase {
     @POST
     @Path("/deploy")
     public Response deploy() { 
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         String strategy = getStringParam("strategy", false, params, oper);
 
         KModuleDeploymentUnit deploymentUnit = createDeploymentUnit(deploymentId);

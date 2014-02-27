@@ -2,14 +2,12 @@ package org.kie.services.client.serialization.jaxb.impl.process;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
@@ -32,8 +30,8 @@ public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbRespon
         initialize(processInstance, vars);
     }
 
-    public JaxbProcessInstanceWithVariablesResponse(ProcessInstance processInstance, Map<String, String> vars, HttpServletRequest request) { 
-        super(request);
+    public JaxbProcessInstanceWithVariablesResponse(ProcessInstance processInstance, Map<String, String> vars, String requestUrl) { 
+        super(requestUrl);
         initialize(processInstance, vars);
     }
     

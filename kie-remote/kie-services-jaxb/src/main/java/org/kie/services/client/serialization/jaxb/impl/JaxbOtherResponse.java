@@ -2,7 +2,6 @@ package org.kie.services.client.serialization.jaxb.impl;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -30,8 +29,8 @@ public class JaxbOtherResponse extends AbstractJaxbCommandResponse<Object> {
         this.result = result;
     }
 
-    public JaxbOtherResponse(Map<String, String> variables, HttpServletRequest request) {
-        this.url = getUrl(request);
+    public JaxbOtherResponse(Map<String, String> variables, String requestUrl) {
+        this.url = requestUrl;
         this.status = JaxbRequestStatus.SUCCESS;
     }
 

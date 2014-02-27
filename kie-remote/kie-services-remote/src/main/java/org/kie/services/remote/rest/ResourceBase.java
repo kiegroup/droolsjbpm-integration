@@ -3,8 +3,6 @@ package org.kie.services.remote.rest;
 import static org.kie.services.client.api.command.AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,12 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.task.commands.TaskCommand;
@@ -176,15 +174,8 @@ public class ResourceBase {
 
     // Request Params -------------------------------------------------------------------------------------------------------------
     
-    protected static Map<String, List<String>> getRequestParams(HttpServletRequest request) {
-        Map<String, List<String>> parameters = new HashMap<String, List<String>>();
-        Enumeration<String> names = request.getParameterNames();
-        while (names.hasMoreElements()) {
-            String name = names.nextElement();
-            parameters.put(name, Arrays.asList(request.getParameterValues(name)));
-        }
-
-        return parameters;
+    protected static Map<String, List<String>> getRequestParams(UriInfo uriInfo) {
+        return uriInfo.getQueryParameters();
     }
 
     protected static String getStringParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
@@ -456,10 +447,8 @@ public class ResourceBase {
     
     // Other helper methods ------------------------------------------------------------------------------------------------------
     
-    public static String getRelativePath(HttpServletRequest request) { 
-        String path = request.getRequestURL().toString();
-        path = path.replaceAll( ".*" + request.getServletContext().getContextPath(), "");
-        return path;
+    public static String getRelativePath(UriInfo uriInfo) { 
+        return uriInfo.getRequestUri().toString().replaceAll( ".*/rest", "");
     }
     
 }

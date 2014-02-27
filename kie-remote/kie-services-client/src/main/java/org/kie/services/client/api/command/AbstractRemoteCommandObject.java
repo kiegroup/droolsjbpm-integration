@@ -21,6 +21,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.drools.core.command.runtime.SetGlobalCommand;
@@ -33,6 +34,7 @@ import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.CompositeCommand;
@@ -326,7 +328,18 @@ public abstract class AbstractRemoteCommandObject {
         }
 
         // Get response
-        JaxbCommandsResponse commandResponse = response.getEntity(JaxbCommandsResponse.class);
+        JaxbCommandsResponse commandResponse;
+        try { 
+            commandResponse = response.getEntity(JaxbCommandsResponse.class);
+        } catch(ClientResponseFailure crf) { 
+           String setCookie = (String) response.getHeaders().getFirst(HttpHeaders.SET_COOKIE); 
+           String contentType = (String) response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+           if( setCookie != null && contentType.startsWith(MediaType.TEXT_HTML) ) { 
+               throw new RemoteCommunicationException("The remote server requires form-based authentication.", crf);
+           } else { 
+               throw crf;
+           }
+        }
         List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
         JaxbExceptionResponse exceptionResponse;
         if (responses.size() == 0) {
@@ -345,10 +358,9 @@ public abstract class AbstractRemoteCommandObject {
         
         // Process exception response
         switch( response.getResponseStatus() ) { 
-        case OK: 
-            throw new IllegalStateException("A response with an OK/200 status should never return an exception response! Contact the developers.");
         case CONFLICT: 
             throw new RemoteTaskException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
+        case OK: 
         default: 
             throw new RemoteApiException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
         }

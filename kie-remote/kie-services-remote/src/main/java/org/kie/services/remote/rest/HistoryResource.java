@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,6 +16,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
@@ -52,12 +52,15 @@ public class HistoryResource extends ResourceBase {
     private HttpHeaders headers;
     
     @Context
-    private HttpServletRequest request;
+    private UriInfo uriInfo;
     
     @Context
     private Request restRequest;
 
-    @PersistenceUnit(unitName = "org.jbpm.domain")
+    /* KIE and Persistence information */
+    private static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
+    
+    @PersistenceUnit(unitName = PERSISTENCE_UNIT_NAME)
     private EntityManagerFactory emf;
    
     private AuditLogService auditLogService;
@@ -67,6 +70,9 @@ public class HistoryResource extends ResourceBase {
     @PostConstruct
     public void setAuditLogService() { 
         auditLogService = new JPAAuditLogService(emf);
+        if( emf == null ) { 
+            ((JPAAuditLogService) auditLogService).setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
+        }
     }
     
     public AuditLogService getAuditLogService() { 
@@ -81,14 +87,14 @@ public class HistoryResource extends ResourceBase {
     @Path("/clear")
     public Response clear() {
         auditLogService.clear();
-        return createCorrectVariant(new JaxbGenericResponse(request), headers);
+        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
 
     @GET
     @Path("/instances")
     public Response instances() {
-        String oper = getRelativePath(request);
-        Map<String, List<String>> params = getRequestParams(request);
+        String oper = getRelativePath(uriInfo);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
         
         List<ProcessInstanceLog> results = auditLogService.findProcessInstances();
         
@@ -99,8 +105,8 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/instance/{procInstId: [0-9]+}")
     public Response instance_procInstId(@PathParam("procInstId") long procInstId) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         
         ProcessInstanceLog procInstLog = auditLogService.findProcessInstance(procInstId);
         
@@ -114,8 +120,8 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
     public Response instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         
         Object result = null;
         if ("child".equalsIgnoreCase(operation)) {
@@ -139,8 +145,8 @@ public class HistoryResource extends ResourceBase {
     @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
     public Response instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         
         Object result = null;
         if ("node".equalsIgnoreCase(operation)) {
@@ -161,9 +167,9 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}")
     public Response process_procDefId(@PathParam("processDefId") String processId) {
-        Map<String, List<String>> params = getRequestParams(request);
-        Number statusParam = getNumberParam("status", false, params, getRelativePath(request), false);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        Number statusParam = getNumberParam("status", false, params, getRelativePath(uriInfo), false);
+        String oper = getRelativePath(uriInfo);
         int[] pageInfo = getPageNumAndPageSize(params, oper);
 
         Object result;
@@ -197,8 +203,8 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}")
     public Response variable_varId(@PathParam("varId") String variableId) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         varLogList = paginate(getPageNumAndPageSize(params, oper), varLogList);
         
@@ -208,8 +214,8 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
     public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         List<VariableInstanceLog> varLogList 
             = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         varLogList = paginate(getPageNumAndPageSize(params, oper), varLogList);
@@ -220,8 +226,8 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
     public Response variable_varId_instances(@PathParam("varId") String variableId) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
 
         // get variables
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
@@ -235,8 +241,8 @@ public class HistoryResource extends ResourceBase {
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\._]+}/instances")
     public Response variable_varId_value_valueVal_instances(@PathParam("varId") String variableId, @PathParam("value") String value) {
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
 
         // get variables
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
