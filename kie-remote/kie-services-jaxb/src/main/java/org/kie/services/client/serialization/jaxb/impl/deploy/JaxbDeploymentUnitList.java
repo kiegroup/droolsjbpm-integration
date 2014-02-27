@@ -10,8 +10,6 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
-
 @XmlRootElement(name="deployment-unit-list")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={JaxbDeploymentUnit.class})

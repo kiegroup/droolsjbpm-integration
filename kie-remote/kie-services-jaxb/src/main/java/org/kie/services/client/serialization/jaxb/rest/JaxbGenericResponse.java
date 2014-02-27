@@ -2,7 +2,6 @@ package org.kie.services.client.serialization.jaxb.rest;
 
 import java.io.StringWriter;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -24,8 +23,8 @@ public class JaxbGenericResponse extends AbstractJaxbResponse {
        // Default constructor 
     }
     
-    public JaxbGenericResponse(HttpServletRequest request ) { 
-        super(request);
+    public JaxbGenericResponse(String requestUrl) { 
+        super(requestUrl);
     }
     
     public String prettyPrint() throws JAXBException {

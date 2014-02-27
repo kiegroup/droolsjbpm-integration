@@ -3,7 +3,6 @@ package org.kie.services.client.serialization.jaxb.rest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -39,8 +38,8 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
        this.status = status;
     }
     
-    public JaxbExceptionResponse(HttpServletRequest request, Exception e, JaxbRequestStatus status) { 
-        this.url = getUrl(request);
+    public JaxbExceptionResponse(String requestUrl, Exception e, JaxbRequestStatus status) { 
+        this.url = requestUrl;
         this.status = status;
         initializeExceptionAndMessage(e);
     }

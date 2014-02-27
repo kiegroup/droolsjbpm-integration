@@ -3,7 +3,6 @@ package org.kie.services.client.serialization.jaxb.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -27,8 +26,8 @@ public class JaxbVariablesResponse extends AbstractJaxbCommandResponse<Map<Strin
        this.variables = variables;
     }
 
-    public JaxbVariablesResponse(Map<String, String> variables, HttpServletRequest request) { 
-        this.url = getUrl(request);
+    public JaxbVariablesResponse(Map<String, String> variables, String requestUrl) { 
+        this.url = requestUrl;
         this.status = JaxbRequestStatus.SUCCESS;
     }
     

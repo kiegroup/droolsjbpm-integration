@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -51,9 +50,9 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
         initialize(processInstance);
     }
 
-    public JaxbProcessInstanceResponse(ProcessInstance processInstance, HttpServletRequest request) { 
+    public JaxbProcessInstanceResponse(ProcessInstance processInstance, String requestUrl) { 
         initialize(processInstance);
-        this.url = getUrl(request);
+        this.url = requestUrl;
         this.status = JaxbRequestStatus.SUCCESS;
     }
 

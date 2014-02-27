@@ -6,8 +6,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
-
 
 @XmlRootElement(name="deployment-job-result")
 @XmlAccessorType(XmlAccessType.FIELD)

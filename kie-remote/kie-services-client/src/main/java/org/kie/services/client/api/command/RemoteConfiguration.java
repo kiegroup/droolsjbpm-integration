@@ -3,6 +3,7 @@ package org.kie.services.client.api.command;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
@@ -14,6 +15,8 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -36,11 +39,17 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.ClientExecutor;
+import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
+import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.jboss.resteasy.spi.interception.ClientExecutionContext;
+import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
 import org.kie.api.runtime.manager.Context;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * In order to protect the Remote (Java) API, this class may not be extended nor may its constructor be made public.
@@ -52,6 +61,8 @@ public final class RemoteConfiguration {
     public static final String TASK_QUEUE_NAME = "jms/queue/KIE.TASK";
     public static final String RESPONSE_QUEUE_NAME = "jms/queue/KIE.RESPONSE";
 
+    public static final int DEFAULT_TIMEOUT = 5;
+    
     // REST or JMS
     private final Type type;
 
@@ -64,6 +75,7 @@ public final class RemoteConfiguration {
 
     // REST
     private ClientRequestFactory requestFactory;
+    private boolean useFormBasedAuth = false;
 
     // JMS
     private ConnectionFactory connectionFactory;
@@ -82,26 +94,21 @@ public final class RemoteConfiguration {
 
     // REST ----------------------------------------------------------------------------------------------------------------------
 
+    @SuppressWarnings("unused")
     private RemoteConfiguration() {
         // no public constructor!
         this.type = Type.CONSTRUCTOR;
     }
 
-    public RemoteConfiguration(String deploymentId, URL url) {
-        this.type = Type.REST;
-        URL realUrl = initializeRestServicesUrl(deploymentId, url);
-        try { 
-            this.requestFactory = new ClientRequestFactory(realUrl.toURI());
-        } catch (URISyntaxException urise) {
-            throw new IllegalArgumentException("URL (" + realUrl.toExternalForm() + ") is incorrectly formatted: " + urise.getMessage(), urise);
-        }
-    }
-
     public RemoteConfiguration(String deploymentId, URL url, String username, String password) {
-        this(deploymentId, url, username, password, 5);
+        this(deploymentId, url, username, password, DEFAULT_TIMEOUT);
     }
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout) {
+        this(deploymentId, url, username, password, timeout, false);
+    }
+
+    public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout, boolean formBasedAuth) {
         this.type = Type.REST;
         URL serverPlusRestUrl = initializeRestServicesUrl(deploymentId, url);
         if (username == null || username.trim().isEmpty()) {
@@ -110,8 +117,12 @@ public final class RemoteConfiguration {
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
-
+        this.useFormBasedAuth = formBasedAuth;
+        if( useFormBasedAuth ) { 
+            this.requestFactory = createFormBasedAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+        } else { 
+            this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+        }
     }
 
     /**
@@ -119,42 +130,44 @@ public final class RemoteConfiguration {
      * 
      * @param deploymentId Deployment ID
      * @param url URL of the server instance
-     * @return An URL that can be used for the REST request factory 
+     * @return An URL that can be used for the REST request factory
      */
     private URL initializeRestServicesUrl(String deploymentId, URL url) {
         if (deploymentId == null || deploymentId.trim().isEmpty()) {
             throw new IllegalArgumentException("The deployment id may not be empty or null.");
         }
-        if (url == null ) {
+        if (url == null) {
             throw new IllegalArgumentException("The url may not be empty or null.");
         }
-        try { 
+        try {
             url.toURI();
-        } catch( URISyntaxException urise) { 
-            throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is incorrectly formatted: " + urise.getMessage(), urise);
+        } catch (URISyntaxException urise) {
+            throw new IllegalArgumentException(
+                    "URL (" + url.toExternalForm() + ") is incorrectly formatted: " + urise.getMessage(), urise);
         }
         this.deploymentId = deploymentId;
-       
+
         String urlString = url.toExternalForm();
         if (!urlString.endsWith("/")) {
             urlString += "/";
         }
         urlString += "rest";
-        
+
         URL serverPlusRestUrl;
         try {
             serverPlusRestUrl = new URL(urlString);
         } catch (MalformedURLException murle) {
-            throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is incorrectly formatted: " + murle.getMessage(), murle);
+            throw new IllegalArgumentException(
+                    "URL (" + url.toExternalForm() + ") is incorrectly formatted: " + murle.getMessage(), murle);
         }
 
         return serverPlusRestUrl;
     }
 
     /**
-     * Creates an request factory that autenticates using the given username and password
+     * Creates an request factory that authenticates using the given username and password
      * 
-     * @param url 
+     * @param url
      * @param username
      * @param password
      * @param timeout
@@ -170,6 +183,186 @@ public final class RemoteConfiguration {
         } catch (URISyntaxException urise) {
             throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is not formatted correctly.", urise);
         }
+    }
+
+    /**
+     * Creates an request factory that authenticates using the given username and password
+     * 
+     * @param url
+     * @param username
+     * @param password
+     * @param timeout
+     * 
+     * @return A request factory that can be used to send (authenticating) requests to REST services
+     */
+    public static ClientRequestFactory createFormBasedAuthenticatingRequestFactory(URL url, final String username,
+            final String password, int timeout) {
+        try {
+            return new FormBasedAuthenticatingClientRequestFactory(url.toURI(), username, password);
+        } catch (URISyntaxException urise) {
+            throw new RemoteCommunicationException("Invalid URL: " + url.toExternalForm(), urise);
+        }
+    }
+
+    static class FormBasedAuthenticatingClientRequestFactory extends ClientRequestFactory { 
+     
+        private final String username;
+        private final String password;
+        
+        public FormBasedAuthenticatingClientRequestFactory(URI uri, String username, String password) { 
+            super(uri);
+            this.username = username;
+            this.password = password;
+        }
+        
+        public ClientRequest createRelativeRequest(String uriTemplate) {
+           ClientRequest request =  super.createRelativeRequest(uriTemplate);
+           request.registerInterceptor(new FormBasedAuthenticatingInterceptor(username, password));
+           return request;
+        }
+
+        public ClientRequest createRequest(String uriTemplate) {
+           ClientRequest request =  super.createRequest(uriTemplate);
+           request.registerInterceptor(new FormBasedAuthenticatingInterceptor(username, password));
+           return request;
+        }
+    }
+    
+    static class FormBasedAuthenticatingInterceptor implements ClientExecutionInterceptor {
+
+        private static final Logger logger = LoggerFactory.getLogger(FormBasedAuthenticatingInterceptor.class);
+       
+        private static final String LOGIN_FORM = "/j_security_check";
+        private static final String FORM_BASED_AUTH_PROPERTY = "org.kie.remote.form.based.auth";
+
+        private final String username;
+        private final String password;
+        private String sessionCookie = null;
+
+        public FormBasedAuthenticatingInterceptor(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        /**
+         * This method is called </b>every time</b> a {@link ClientRequest} is executed.
+         * </p>
+         * This interceptor method is thus triggered from {@link ClientRequest} calls within the method itself,
+         * making it a recursively called method [*]. 
+         */
+        @Override
+        public ClientResponse<?> execute(ClientExecutionContext ctx) throws Exception {
+            
+            // Setup
+            ClientRequest origRequest = ctx.getRequest();
+            if( sessionCookie != null ) { 
+                // Try with session cookie if it already exists
+                origRequest.header(HttpHeaders.COOKIE, sessionCookie);
+            }
+            URL restUrl = new URL(origRequest.getUri());
+            String restUrlString = restUrl.toExternalForm();
+            String origRequestMethod = origRequest.getHttpMethod();
+            debug("Processing request: [" + origRequestMethod + "] " + restUrlString 
+                    + (sessionCookie == null ? "" : " (session: " + sessionCookie + ")"));
+
+            // Do request (whichever request it may be!)
+            ClientResponse<?> response = ctx.proceed();
+            int status = response.getStatus();
+            debug("Response received [" + status + "]" );
+           
+            // If 
+            // 1. this is the form-based auth request, or
+            // 2. if the form-based auth has completed, 
+            // then we're done.. 
+            if( restUrlString.endsWith(LOGIN_FORM) ||
+                Boolean.parseBoolean((String) origRequest.getAttributes().get(FORM_BASED_AUTH_PROPERTY)) ) { 
+                return response;
+            }
+           
+            // Check response to see if form-based auth is necessary
+            String requestCookie = (String) response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+            Object contentTypeObj = response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+            boolean doFormBasedAuth = false;
+            if (contentTypeObj != null && (contentTypeObj instanceof String)) {
+                if (((String) contentTypeObj).startsWith(MediaType.TEXT_HTML)
+                        && requestCookie != null
+                        && !requestCookie.equals(sessionCookie) ) {
+                    debug( "New session cookie: " + requestCookie );
+                    doFormBasedAuth = true;
+                    sessionCookie = requestCookie;
+                }
+            }
+
+            // If form-based auth is required, do it
+            if (doFormBasedAuth) {
+                response.releaseConnection();
+
+                // Create form-based auth URL
+                String appBase = "/" + restUrl.getPath().substring(1).replaceAll("/.*", "");
+                URL appBaseUrl = new URL(restUrl.getProtocol(), restUrl.getHost(), restUrl.getPort(), appBase);
+                ClientRequestFactory requestFactory = new ClientRequestFactory(appBaseUrl.toURI());
+                ClientRequest formRequest = requestFactory.createRelativeRequest(LOGIN_FORM);
+                formRequest = formRequest.formParameter("j_username", username).formParameter("j_password", password);
+                if( sessionCookie != null ) { 
+                    formRequest.header(HttpHeaders.COOKIE, sessionCookie);
+                }
+
+                // Do form-based auth
+                try {
+                    debug("Trying form-based authentication for session '" + sessionCookie + "'");
+                    // [*] triggers recursive call of this method
+                    response = formRequest.post();
+                    int formRequestStatus = response.getStatus();
+                    if (formRequestStatus != 302) {
+                        String errMsg = "Unable to complete form-based authentication in via " + formRequest.getUri();
+                        System.err.println(errMsg + "\n [" + formRequestStatus + "] " + response.getEntity(String.class));
+                        throw new RemoteCommunicationException(errMsg + " (see output)");
+                    } 
+                    debug("Form-based authentication succeeded.");
+                } catch (RemoteCommunicationException rce) {
+                    throw rce;
+                } catch (Exception e) {
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    } else {
+                        String errMsg = "Unable to complete form-based authentication in via " + formRequest.getUri();
+                        throw new RemoteCommunicationException(errMsg, e);
+                    }
+                } finally {
+                    try {
+                        response.releaseConnection();
+                    } catch (Exception e) {
+                        // do nothing..
+                    }
+                }
+
+                // Somehow, query parameters are being added a second time here.. 
+                // As long we use UriInfo in the service-side resources to get the query parameters
+                //  instead of the HttpServletRequest, then things work..
+                try {
+                    if( sessionCookie == null ) { 
+                        throw new IllegalStateException("A cookie for a authenticated session should be available at this point!" );
+                    }
+                    debug("Retrying original request (proceed): [" + origRequestMethod + "] " + restUrlString );
+                   
+                    // [*] triggers recursive call of this method
+                    response = ctx.proceed();
+                } catch (Exception e) {
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    } else {
+                        throw new RemoteCommunicationException("Unable to " + origRequestMethod + " to " + restUrlString, e);
+                    }
+                }
+            }
+
+            return response;
+        }
+        
+        private void debug(String msg) { 
+            logger.debug(msg);
+        }
+        
     }
 
     /**
@@ -314,7 +507,7 @@ public final class RemoteConfiguration {
         setAndCheckUserNameAndPassword(username, password);
     }
 
-    private void setAndCheckUserNameAndPassword(String username, String password) { 
+    private void setAndCheckUserNameAndPassword(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
         }
@@ -324,7 +517,7 @@ public final class RemoteConfiguration {
         }
         this.jmsQueuePassword = password;
     }
-    
+
     // Setters -------------------------------------------------------------------------------------------------------------------
 
     public void setQualityOfServiceThresholdMilliSeconds(int qualityOfServiceThresholdMilliSeconds) {
@@ -419,18 +612,22 @@ public final class RemoteConfiguration {
     int getQualityOfServiceThresholdMilliSeconds() {
         return qualityOfServiceThresholdMilliSeconds;
     }
-    
-    public void addJaxbClasses(Set<Class<?>> extraJaxbClassList) { 
+
+    public void addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
         this.extraJaxbClasses.addAll(extraJaxbClassList);
     }
-    
-    Set<Class<?>> getExtraJaxbClasses() { 
+
+    Set<Class<?>> getExtraJaxbClasses() {
         return this.extraJaxbClasses;
     }
-    
-    JaxbSerializationProvider getJaxbSerializationProvider() { 
-       JaxbSerializationProvider provider = new JaxbSerializationProvider(extraJaxbClasses); 
-       return provider;
+
+    JaxbSerializationProvider getJaxbSerializationProvider() {
+        JaxbSerializationProvider provider = new JaxbSerializationProvider(extraJaxbClasses);
+        return provider;
+    }
+
+    public boolean getFormBasedAuth() {
+        return useFormBasedAuth;
     }
 
 }

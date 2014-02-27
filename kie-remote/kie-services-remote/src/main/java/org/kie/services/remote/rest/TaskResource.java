@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -59,7 +58,7 @@ public class TaskResource extends ResourceBase {
     private HttpHeaders headers;
     
     @Context
-    private HttpServletRequest request;
+    private UriInfo uriInfo;
     
     @Context
     private Request restRequest;
@@ -115,8 +114,8 @@ public class TaskResource extends ResourceBase {
     @Path("/query")
     public Response query(@Context UriInfo uriInfo) {
         JaxbTaskSummaryListResponse responseObj = null;
-        Map<String, List<String>> params = getRequestParams(request);
-        String oper = getRelativePath(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath(uriInfo);
         
         for( String queryParam : params.keySet() ) { 
             boolean allowed = false;
@@ -175,7 +174,7 @@ public class TaskResource extends ResourceBase {
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
-        Map<String, List<String>> params = getRequestParams(request);
+        Map<String, List<String>> params = getRequestParams(uriInfo);
         operation = checkThatOperationExists(operation, allowedOperations);        
         String userId = identityProvider.getName();
         logger.debug("Executing " + operation + " on task " + taskId + " by user " + userId );
@@ -226,7 +225,7 @@ public class TaskResource extends ResourceBase {
         }
         
         processRequestBean.doTaskOperationOnDeployment(cmd, "Unable to " + operation + " task " + taskId);
-        return createCorrectVariant(new JaxbGenericResponse(request), headers);
+        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
 
     private static String checkThatOperationExists(String operation, String[] possibleOperations) {
@@ -275,13 +274,13 @@ public class TaskResource extends ResourceBase {
     @Path("/history/bam/clear")
     public Response bam_clear() { 
         processRequestBean.doNonDeploymentTaskOperation(new DeleteBAMTaskSummariesCommand(), "Unable to delete BAM task summaries.");
-        return createCorrectVariant(new JaxbGenericResponse(request), headers);
+        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
     
     @POST
     @Path("/history/events/clear")
     public Response events_clear() { 
         processRequestBean.doNonDeploymentTaskOperation(new DeleteAuditEventsCommand(), "Unable to delete task audit events.");
-        return createCorrectVariant(new JaxbGenericResponse(request), headers);
+        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     } 
 }

@@ -4,17 +4,16 @@ import static org.kie.services.remote.rest.ResourceBase.getRelativePath;
 import static org.kie.services.remote.rest.ResourceBase.getVariant;
 
 import javax.enterprise.context.RequestScoped;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,10 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     private static final Logger logger = LoggerFactory.getLogger(DescriptiveExceptionHandler.class);
 
     @Context
-    HttpServletRequest request;
+    private UriInfo uriInfo;
 
     @Context
-    HttpHeaders headers;
+    private HttpHeaders headers;
 
     @Override
     public Response toResponse(Exception e) {
@@ -64,7 +63,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
                 status = 500;
             }
         }
-        logger.warn("Exception thrown when processing request [" + getRelativePath(request) + "]; responding with status " + status, e);
+        logger.warn("Exception thrown when processing request [" + getRelativePath(uriInfo) + "]; responding with status " + status, e);
 
         // Convert status to correct information in response
         if (status > 0) {
@@ -94,7 +93,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         }
        
         // Build and send response
-        JaxbExceptionResponse response = new JaxbExceptionResponse(request, e, requestStatus);
+        JaxbExceptionResponse response = new JaxbExceptionResponse(uriInfo.getRequestUri().toString(), e, requestStatus);
         try {
             responseBuilder.entity(response.prettyPrint());
         } catch (JAXBException jaxbe) {
