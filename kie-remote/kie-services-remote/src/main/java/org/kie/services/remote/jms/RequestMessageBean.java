@@ -1,7 +1,7 @@
 package org.kie.services.remote.jms;
 
-import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.*;
 import static org.kie.services.client.serialization.SerializationConstants.*;
+import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,7 +28,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.exception.IllegalTaskStateException;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.manager.RuntimeEngine;
@@ -380,9 +379,6 @@ public class RequestMessageBean implements MessageListener {
                 } catch( PermissionDeniedException pde ) { 
                     logger.warn(errMsg, pde);
                     jaxbResponse.addException(pde, i, cmd, PERMISSIONS_CONFLICT );
-                } catch( IllegalTaskStateException itse ) { 
-                    logger.warn(errMsg, itse);
-                    jaxbResponse.addException(itse, i, cmd, PERMISSIONS_CONFLICT);
                 } catch( Exception e ) { 
                     logger.warn(errMsg, e);
                     jaxbResponse.addException(e, i, cmd, FAILURE);

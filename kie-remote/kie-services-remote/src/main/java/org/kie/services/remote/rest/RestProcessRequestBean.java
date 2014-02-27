@@ -5,7 +5,6 @@ import javax.inject.Inject;
 
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.exception.IllegalTaskStateException;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.jbpm.workflow.instance.impl.WorkflowProcessInstanceImpl;
 import org.kie.api.command.Command;
@@ -98,8 +97,6 @@ public class RestProcessRequestBean {
             }
         } catch (PermissionDeniedException pde) {
             throw RestOperationException.conflict(pde.getMessage(), pde);
-        } catch (IllegalTaskStateException itse) {
-            throw RestOperationException.conflict(itse.getMessage(), itse);
         } catch (RuntimeException re) {
             throw re;
         } finally {
@@ -149,8 +146,6 @@ public class RestProcessRequestBean {
             result = ((InternalTaskService) taskService).execute(cmd);
         } catch (PermissionDeniedException pde) {
             throw RestOperationException.conflict(pde.getMessage(), pde);
-        } catch (IllegalTaskStateException itse) {
-            throw RestOperationException.conflict(itse.getMessage(), itse);
         } catch (RuntimeException re) {
             throw re;
         }

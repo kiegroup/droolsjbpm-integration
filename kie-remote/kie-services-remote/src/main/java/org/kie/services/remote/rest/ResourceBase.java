@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.exception.IllegalTaskStateException;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
@@ -93,9 +92,6 @@ public class ResourceBase {
                 } catch(PermissionDeniedException pde) { 
                     jaxbResponse.addException(pde, i, cmd, JaxbRequestStatus.PERMISSIONS_CONFLICT);
                     logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, pde);
-                } catch(IllegalTaskStateException itse) { 
-                    jaxbResponse.addException(itse, i, cmd, JaxbRequestStatus.PERMISSIONS_CONFLICT);
-                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, itse);
                 } catch(Exception e) { 
                     jaxbResponse.addException(e, i, cmd, JaxbRequestStatus.FAILURE);
                     logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, e);
