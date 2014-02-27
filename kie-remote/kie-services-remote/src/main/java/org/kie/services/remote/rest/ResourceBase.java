@@ -352,12 +352,10 @@ public class ResourceBase {
         if( statusStrList != null && ! statusStrList.isEmpty() ) { 
             statuses = new ArrayList<Status>();
             for( String statusStr : statusStrList ) { 
-                String goodStatusStr = statusStr.substring(0, 1).toUpperCase()
-                        + statusStr.substring(1).toLowerCase();
                 try { 
-                    statuses.add(Status.valueOf(goodStatusStr));
+                    statuses.add(getEnum(statusStr));
                 } catch(IllegalArgumentException iae) { 
-                    throw RestOperationException.badRequest(goodStatusStr + " is not a valid status type for a task." );
+                    throw RestOperationException.badRequest(statusStr + " is not a valid status type for a task." );
                 }
             }
         }
@@ -445,6 +443,19 @@ public class ResourceBase {
     
     public static String getRelativePath(UriInfo uriInfo) { 
         return uriInfo.getRequestUri().toString().replaceAll( ".*/rest", "");
+    }
+    
+    protected static Status getEnum(String value) {
+        value = value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
+
+        try { 
+            return Status.valueOf(value);
+        } catch( IllegalArgumentException iae ) { 
+           if( value.equalsIgnoreCase("inprogress") )  { 
+               return Status.InProgress;
+           }
+           throw iae;
+        }
     }
     
 }
