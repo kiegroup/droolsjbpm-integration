@@ -30,50 +30,17 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
     private static final Logger logger = LoggerFactory.getLogger(JaxbContextResolver.class);
     
     @Inject
-    private DeploymentInfoBean deploymentClassNameBean;
-    
+    private DynamicJAXBContext dynamicContext;
+
     @Context
     private UriInfo uriInfo;
 
     @Override
     public JAXBContext getContext(Class<?> type) {
-        logger.debug( "Resolving JAXBContext for " + type.getName() + " instance in input.");
-        String deploymentId = null;
-        List<String> deploymentIdParams =  uriInfo.getPathParameters().get("deploymentId");
-        if( deploymentIdParams != null && ! deploymentIdParams.isEmpty() ) {
-            deploymentId = deploymentIdParams.get(0);
-        } else { 
-            deploymentIdParams = uriInfo.getQueryParameters().get("deploymentId");
-        }
-        if( deploymentIdParams != null && ! deploymentIdParams.isEmpty() ) {
-            deploymentId = deploymentIdParams.get(0);
-        }
-
-        Set<Class<?>> classesForSerialization = new HashSet<Class<?>>();
-        classesForSerialization.addAll(JaxbSerializationProvider.PRIMITIVE_ARRAY_CLASS_SET);
-        
-        if( deploymentId != null ) { 
-            // retrieve class list from kjar
-            Collection<Class<?>> deploymentClassNames = deploymentClassNameBean.getDeploymentClasses(deploymentId);
-            for( Class<?> clazz : deploymentClassNames ) { 
-                logger.debug( "Adding {} to JAXBContext instance.", clazz.getName() );
-            }
-            classesForSerialization.addAll(deploymentClassNames);
-        }
-        
-        // Add given type to list
-        classesForSerialization.add(type);
-
-        // Create JAXBContext instance and return it. 
-        Class<?> [] types = classesForSerialization.toArray(new Class[classesForSerialization.size()]);
-        
-        try {
-            return JAXBContext.newInstance(types);
-        } catch (JAXBException jaxbe) {
-            logger.error( "Unable to create new " + JAXBContext.class.getSimpleName() + " instance.", jaxbe);
-        }
-        
-        return null;
+        dynamicContext.addType(type);
+        // this assumes that UriInfo is proxied so it will have right values for every request
+        dynamicContext.setUriInfo(uriInfo);
+        return dynamicContext;
     }
 
 }
