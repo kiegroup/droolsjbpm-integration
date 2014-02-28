@@ -57,10 +57,6 @@
 
     <!-- jaxb -->
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxb-provider</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
     </dependency>
