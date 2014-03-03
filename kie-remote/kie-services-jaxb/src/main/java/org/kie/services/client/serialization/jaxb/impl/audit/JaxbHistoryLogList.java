@@ -104,6 +104,7 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
 
     @Override
     public List<AuditEvent> getResult() {
+        lazyInitResponseList();
         List<AuditEvent> results = new ArrayList<AuditEvent>();
         for( AbstractJaxbHistoryObject<?> jaxbHistLog : this.historyLogList ) { 
             results.add(jaxbHistLog.createEntityInstance());
