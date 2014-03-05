@@ -102,7 +102,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-jaxb</artifactId>
+      <artifactId>kie-services-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
@@ -132,10 +132,6 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-karaf-features</artifactId>
     </dependency>
-<!--    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-itest</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-osgi-integration</artifactId>

@@ -28,6 +28,7 @@
         <include>org.kie:kie-maven-plugin</include>
         <include>org.kie:kie-ci</include>
         <include>org.kie.remote:kie-services-client</include>
+        <include>org.kie.remote:kie-services-jaxb</include>
         <include>org.kie.remote:kie-services-remote</include>
         <include>org.kie:kie-camel</include>
         <include>org.kie:kie-spring</include>
@@ -36,7 +37,6 @@
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
         <include>org.drools:drools-karaf-features</include>
-        <include>org.drools:drools-karaf-itest</include>
         <include>org.drools:drools-osgi-integration</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-reteoo</include>
@@ -58,7 +58,6 @@
         <exclude>org.jbpm:jbpm-workitems</exclude>
         <exclude>org.jbpm:jbpm-kie-services</exclude>
         <exclude>org.jbpm:jbpm-executor</exclude>
-        <exclude>org.jbpm:jbpm-form-services</exclude>
         <exclude>org.jbpm:jbpm-human-task-core</exclude>
         <exclude>org.jbpm:jbpm-human-task-audit</exclude>
         <exclude>org.jbpm:jbpm-human-task-workitems</exclude>
@@ -71,6 +70,7 @@
         <exclude>org.kie:kie-maven-plugin</exclude>
         <exclude>org.kie:kie-ci</exclude>
         <exclude>org.kie.remote:kie-services-client</exclude>
+        <exclude>org.kie.remote:kie-services-jaxb</exclude>
         <exclude>org.kie.remote:kie-services-remote</exclude>
         <exclude>org.kie:kie-camel</exclude>
         <exclude>org.kie:kie-spring</exclude>
@@ -79,7 +79,6 @@
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
         <exclude>org.drools:drools-karaf-features</exclude>
-        <exclude>org.drools:drools-karaf-itest</exclude>
         <exclude>org.drools:drools-osgi-integration</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
         <exclude>org.drools:drools-reteoo</exclude>
