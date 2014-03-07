@@ -114,7 +114,7 @@
   <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-audit/${jbpm.version}</bundle>
   </feature>
 
   <feature name="jbpm" version="${project.version}" description="jBPM engine">
