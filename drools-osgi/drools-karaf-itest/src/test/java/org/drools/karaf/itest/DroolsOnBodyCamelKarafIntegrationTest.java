@@ -38,9 +38,9 @@ import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpring
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(JUnit4TestRunner.class)
-public class DroolsOnBodyCamelKarafTest extends OSGiIntegrationSpringTestSupport {
+public class DroolsOnBodyCamelKarafIntegrationTest extends OSGiIntegrationSpringTestSupport {
 
-    protected static final transient Logger LOG = LoggerFactory.getLogger(DroolsOnBodyCamelKarafTest.class);
+    protected static final transient Logger LOG = LoggerFactory.getLogger(DroolsOnBodyCamelKarafIntegrationTest.class);
 
     // templates to send to input endpoints
     @Produce(ref = "ruleOnBodyEndpoint")
@@ -49,7 +49,7 @@ public class DroolsOnBodyCamelKarafTest extends OSGiIntegrationSpringTestSupport
     @Override
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
         return getOsgiSpringContext(new ReleaseIdImpl("dummyGroup", "dummyArtifact", "dummyVersion"),
-                                    DroolsOnBodyCamelKarafTest.class.getResource("/org/drools/karaf/itest/camel-context.xml"));
+                                    DroolsOnBodyCamelKarafIntegrationTest.class.getResource("/org/drools/karaf/itest/camel-context.xml"));
     }
 
     @Test

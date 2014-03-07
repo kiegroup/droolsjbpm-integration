@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -51,7 +51,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!--TODO - Add dependency to BOM, ...-->
+    <!--TODO - Add dependency to BOM, ... -->
     <dependency>
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
@@ -61,7 +61,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!--TODO - Add dependency to BOM, ...-->
+    <!--TODO - Add dependency to BOM, ... -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-karaf-features</artifactId>
@@ -107,8 +107,7 @@
       <groupId>org.apache.karaf.tooling.exam</groupId>
       <artifactId>org.apache.karaf.tooling.exam.container</artifactId>
       <scope>test</scope>
-      <!-- inclusion added to avoid that karaf tooling transitive
-      dependencies load pax-exam 2.4 -->
+      <!-- inclusion added to avoid that karaf tooling transitive dependencies load pax-exam 2.4 -->
       <exclusions>
         <exclusion>
           <groupId>org.ops4j.pax.exam</groupId>
@@ -197,28 +196,28 @@
                       </configuration>
                   </plugin>-->
 
-          <!-- this keeps the droolsjbpm-integration build from breaking.. @#$@#$@#.. -->
-          <plugin>
-            <groupId>com.google.code.maven-replacer-plugin</groupId>
-            <artifactId>replacer</artifactId>
-            <executions>
-              <execution>
-                <id>fix-broken-junit-reports</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>replace</goal>
-                </goals>
-                <configuration>
-                  <basedir>${project.build.directory}/surefire-reports</basedir>
-                  <includes>
-                    <include>TEST*xml</include>
-                  </includes>
-                  <unescape>true</unescape>
-                  <tokenValueMap>${basedir}/replace-tokenFile.txt</tokenValueMap>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+      <!-- this keeps the droolsjbpm-integration build from breaking.. @#$@#$@#.. -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <id>fix-broken-junit-reports</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <basedir>${project.build.directory}/surefire-reports</basedir>
+              <includes>
+                <include>TEST*xml</include>
+              </includes>
+              <unescape>true</unescape>
+              <tokenValueMap>${basedir}/replace-tokenFile.txt</tokenValueMap>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 

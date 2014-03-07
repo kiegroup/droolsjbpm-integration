@@ -44,15 +44,15 @@ import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
-public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
+public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSupport {
 
-    protected static final transient Logger LOG = LoggerFactory.getLogger(KieSpringOnKarafTest.class);
+    protected static final transient Logger LOG = LoggerFactory.getLogger(KieSpringOnKarafIntegrationTest.class);
 
     protected static final String DroolsVersion;
     static {
         Properties testProps = new Properties();
         try {
-            testProps.load(KieSpringOnKarafTest.class.getResourceAsStream("/test.properties"));
+            testProps.load(KieSpringOnKarafIntegrationTest.class.getResourceAsStream("/test.properties"));
         } catch (Exception e) {
             throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
         }
