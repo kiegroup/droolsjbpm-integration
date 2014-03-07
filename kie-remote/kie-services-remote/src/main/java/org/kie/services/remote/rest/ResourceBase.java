@@ -116,9 +116,9 @@ public class ResourceBase {
     // JSON / JAXB ---------------------------------------------------------------------------------------------------------------
     
     private static List<Variant> variants 
-        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).build();
+        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).add().build();
     private static Variant defaultVariant 
-        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE).build().get(0);
+        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE).add().build().get(0);
    
     private static final String ACCEPT = "Accept";
     private static final String ACCEPT_CHARSET = "Accept-Charset";

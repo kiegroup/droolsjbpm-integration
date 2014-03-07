@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *   <li>See the {@link JaxbContextResolver} for more info.</li></ul>
  * <ul>
  */
-@Singleton
+@ApplicationScoped
 public class DeploymentInfoBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentInfoBean.class);
