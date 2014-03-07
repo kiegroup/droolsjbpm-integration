@@ -208,7 +208,7 @@
               <goal>replace</goal>
             </goals>
             <configuration>
-              <basedir>${project.build.directory}/surefire-reports</basedir>
+              <basedir>${project.build.directory}/failsafe-reports</basedir>
               <includes>
                 <include>TEST*xml</include>
               </includes>
