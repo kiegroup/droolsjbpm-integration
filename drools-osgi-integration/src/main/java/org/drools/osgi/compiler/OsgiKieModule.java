@@ -15,13 +15,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 
 public class OsgiKieModule extends AbstractKieModule {
 
     private final Bundle bundle;
-    private final int bundleUrlPrefixLength;
+    private int bundleUrlPrefixLength = -1;
 
     private Collection<String> fileNames;
 
@@ -31,6 +33,11 @@ public class OsgiKieModule extends AbstractKieModule {
         super(releaseId, kModuleModel);
         this.bundle = bundle;
         this.bundleUrlPrefixLength = bundleUrlPrefixLength;
+    }
+
+    private OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle) {
+        super(releaseId, kModuleModel);
+        this.bundle = bundle;
     }
 
     @Override
@@ -45,7 +52,10 @@ public class OsgiKieModule extends AbstractKieModule {
 
     @Override
     public byte[] getBytes(String pResourceName) {
-        URL url = bundle.getEntry(pResourceName);
+        // Add a leading '/' char as it has been removed from
+        // file Resource name
+        pResourceName = "/" + pResourceName;
+        URL url = bundle.getResource(pResourceName);
         return url == null ? null : readUrlAsBytes(url);
     }
 
@@ -58,11 +68,11 @@ public class OsgiKieModule extends AbstractKieModule {
         Enumeration<URL> e = bundle.findEntries("", "*", true);
         while (e.hasMoreElements()) {
             URL url = e.nextElement();
-            String urlString = url.toString();
-            if (urlString.endsWith("/")) {
+            String path = url.getPath();
+            if (path.endsWith("/")) {
                 continue;
             }
-            fileNames.add(urlString.substring(bundleUrlPrefixLength));
+            fileNames.add(path.substring(1, path.length()));
         }
         return fileNames;
     }
@@ -86,7 +96,8 @@ public class OsgiKieModule extends AbstractKieModule {
         Bundle bundle = FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
         String pomProperties = getPomProperties( bundle );
         ReleaseId releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
-        return new OsgiKieModule(releaseId, kieProject, bundle, urlString.indexOf("META-INF"));
+        //return new OsgiKieModule(releaseId, kieProject, bundle, urlString.indexOf("META-INF"));
+        return new OsgiKieModule(releaseId, kieProject, bundle);
     }
 
     public static OsgiKieModule create(URL url, ReleaseId releaseId, KieModuleModel kieProject) {
