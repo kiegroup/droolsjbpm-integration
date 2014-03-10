@@ -94,7 +94,7 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
                 // Install Karaf Container
                 karafDistributionConfiguration().frameworkUrl(
-                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz"))
+                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
                         .karafVersion(MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf")).name("Apache Karaf")
                         .unpackDirectory(new File("target/exam/unpack/")),
 
@@ -115,11 +115,8 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
                         "spring", "spring-dm"
                 ),
 
-                // Load Kie-Spring, Kie-Camel and indirectly Drools, ...
-                scanFeatures(
-                        maven().groupId("org.drools").artifactId("drools-karaf-features").type("xml").classifier("features").version(DroolsVersion),
-                        "kie-spring", "kie-camel"
-                )
+                // Load Kie-Spring
+                loadDroolsKieFeatures("kie-spring")
 
         };
 
@@ -127,9 +124,5 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
         return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/kie-beans.xml"});
-/*
-        return getOsgiSpringContext(new ReleaseIdImpl("dummyGroup", "dummyArtifact", "dummyVersion"),
-                                    KieSpringOnKarafTest.class.getResource("/org/drools/karaf/itest/kie-beans.xml"));
-*/
     }
 }
