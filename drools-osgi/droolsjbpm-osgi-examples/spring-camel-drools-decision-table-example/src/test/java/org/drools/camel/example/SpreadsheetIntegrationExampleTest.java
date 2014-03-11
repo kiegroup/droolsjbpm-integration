@@ -94,7 +94,7 @@ public class SpreadsheetIntegrationExampleTest {
     public void testNamedWorksheet() throws Exception {
         DecisionTableConfiguration dtconf = KnowledgeBuilderFactory.newDecisionTableConfiguration();
         dtconf.setInputType( DecisionTableInputType.XLS );
-        dtconf.setWorksheetName( "Tables_2" );
+        dtconf.setWorksheetName( "Tables" );
 
         Resource dt = ResourceFactory.newClassPathResource("/data/IntegrationExampleTest.xls", getClass() )
                                      .setConfiguration( dtconf );
@@ -105,7 +105,7 @@ public class SpreadsheetIntegrationExampleTest {
                                     42 ) );
         ksession.insert( new Person( "michael",
                                     "stilton",
-                                    25 ) );
+                                    21 ) );
         final List<String> list = new ArrayList<String>();
         ksession.setGlobal( "list",
                            list );
