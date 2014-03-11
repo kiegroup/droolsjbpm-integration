@@ -208,6 +208,7 @@
               <goal>replace</goal>
             </goals>
             <configuration>
+              <ignoreErrors>true</ignoreErrors>
               <basedir>${project.build.directory}/failsafe-reports</basedir>
               <includes>
                 <include>TEST*xml</include>
