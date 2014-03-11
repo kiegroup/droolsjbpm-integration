@@ -22,41 +22,38 @@ public class Person {
     private int    age;
 
     private char         sex;
-
     private boolean      alive;
-
     private String       status;
 
-    public Person() {
+    public Person() { }
 
-    }
     public Person(final String name) {
-        this( name,
-              "",
-              0 );
+        this( name, "", 0, 'M');
     }
 
     public Person(final String name,
                   final String likes) {
-        this( name,
-              likes,
-              0 );
+        this( name, likes, 0, 'M');
     }
 
     public Person(final String name,
                   final String likes,
                   final int age) {
+        this(name, likes, age, 'M');
+    }
+
+    public Person(final String name,
+                  final String likes,
+                  final int age,
+                  final char sex) {
         this.name = name;
         this.likes = likes;
         this.age = age;
+        this.sex = sex;
     }
 
     public String getStatus() {
         return this.status;
-    }
-
-    public void setStatus(final String status) {
-        this.status = status;
     }
 
     public String getLikes() {
@@ -79,15 +76,19 @@ public class Person {
         return this.alive;
     }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public void setAge(int age) {
         this.age = age;
     }
 
-    public void setAlive(final boolean alive) {
+    public void setAlive(boolean alive) {
         this.alive = alive;
     }
 
-    public void setSex(final char sex) {
+    public void setSex(char sex) {
         this.sex = sex;
     }
 

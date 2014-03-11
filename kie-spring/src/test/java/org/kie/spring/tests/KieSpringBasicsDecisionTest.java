@@ -65,29 +65,24 @@ public class KieSpringBasicsDecisionTest {
         StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) context.getBean("ksession2");
 
         assertNotNull(ksession.getGlobals().get("list"));
-        List<?> list = (List<?>) ksession.getGlobals().get("list");
+        List list = (List) ksession.getGlobals().get("list");
 
-        ksession.insert(new Cheese("cheddar",
-                42));
-        ksession.insert(new Person("michael",
-                "stilton",
-                25));
-        ksession.insert(new Person("Jane",
-                "stilton",
-                55));
+        ksession.insert(new Cheese("stilton",40));
+        //ksession.insert(new Cheese("cheddar",30));
+
+        ksession.insert(new Person("helen", "stilton", 42, 'F'));
+        //ksession.insert(new Person("charles", "cheddar", 25 ,'M'));
 
         ksession.fireAllRules();
-        ksession.dispose();
 
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
 
-        assertTrue(list.contains("Young man cheddar"));
         assertTrue(list.contains("Old man stilton"));
+        //assertTrue(list.contains("Young man cheddar"));
+
     }
 
     @AfterClass
-    public static void tearDown() {
-
-    }
+    public static void tearDown() { }
 
 }

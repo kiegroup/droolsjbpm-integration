@@ -16,7 +16,7 @@
         </kie:kbase>
     </kie:kmodule>
 
-    <bean id="person" class="org.drools.decisiontable.Person">
+<!--    <bean id="person" class="org.drools.decisiontable.Person">
         <constructor-arg type="java.lang.String" index="0" value="Charles"/>
         <property name="sex" value="M"/>
     </bean>
@@ -24,7 +24,7 @@
     <bean id="person2" class="org.drools.decisiontable.Person">
         <constructor-arg type="java.lang.String" index="0" value="Pauline"/>
         <property name="sex" value="F"/>
-    </bean>
+    </bean>-->
 
     <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
     <bean id="globalList" class="java.util.ArrayList"/>
