@@ -64,8 +64,8 @@ public class KieSpringBasicsDecisionTest {
     public void testDecisionTableRules() throws Exception {
         StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) context.getBean("ksession2");
 
-        assertNotNull(ksession.getGlobals().get("persons"));
-        List<?> list = (List<?>) ksession.getGlobals().get("persons");
+        assertNotNull(ksession.getGlobals().get("list"));
+        List<?> list = (List<?>) ksession.getGlobals().get("list");
 
         ksession.insert(new Cheese("cheddar",
                 42));

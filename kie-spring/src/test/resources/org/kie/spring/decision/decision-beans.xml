@@ -10,7 +10,7 @@
             <kie:ksession name="ksession1" type="stateless"/>
             <kie:ksession name="ksession2" type="stateful">
                 <kie:batch>
-                    <kie:set-global identifier="persons" ref="globalList"/>
+                    <kie:set-global identifier="list" ref="globalList"/>
                 </kie:batch>
             </kie:ksession>
         </kie:kbase>
