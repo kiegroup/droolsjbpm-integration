@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,6 +31,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
 public class JaxbServicesSerializationTest extends AbstractServicesSerializationTest {
+
+    private static final String PROCESS_INSTANCE_ID_NAME = "process-instance-id";
 
     private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.services.client"),
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
@@ -66,18 +69,18 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
     }
 
     @Test
-    public void jaxbClassesAreKnownToJaxbSerializationProvider() throws Exception { 
+    public void jaxbClassesAreKnownToJaxbSerializationProvider() throws Exception {
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
             Constructor<?> construct = jaxbClass.getConstructor(new Class [] {});
             Object jaxbInst = construct.newInstance(new Object [] {});
             testRoundTrip(jaxbInst);
-        } 
+        }
     }
-    
+
     /**
-     * If you think this test is a mistake: beware, this test is smarter than you. Seriously. 
+     * If you think this test is a mistake: beware, this test is smarter than you. Seriously.
      * Heck, this test is smarter than *me*, and I wrote it!
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -108,8 +111,8 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
     }
 
     /**
-     * This test is the above one's little brother, and he takes after him. Damn.. these are some smart tests, yo! 
-     * 
+     * This test is the above one's little brother, and he takes after him. Damn.. these are some smart tests, yo!
+     *
      * (HA!)
      */
     @Test
@@ -216,14 +219,14 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
         assertEquals(out.length, 0);
         again = join(out);
         assertEquals("", again);
-        
+
         Set<Class<?>> classList = new HashSet<Class<?>>();
         classList.add(String.class);
         classList.add(Integer.class);
         classList.add(Byte.class);
         classList.add(Short.class);
         classList.add(Long.class);
-        
+
         String commaString = JaxbSerializationProvider.classSetToCommaSeperatedString(classList);
         Set<Class<?>> copyClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(commaString);
         assertEquals( classList, copyClasses );
@@ -244,20 +247,87 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
         }
         return out.toString();
     }
-    
+
     @Test
-    public void jmsSerializationPropertyTest() { 
+    public void jmsSerializationPropertyTest() {
         // 0
         Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
         testRoundTripClassesSet(extraJaxbClasses);
 
-        // 1 
+        // 1
         extraJaxbClasses.add(JaxbServicesSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
-        
-        // 2 
+
+        // 2
         extraJaxbClasses.add(JsonServicesSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
+    }
+
+
+
+    @Test
+    public void processInstanceIdFieldInCommands() throws Exception {
+        Reflections cmdReflections = new Reflections(
+                ClasspathHelper.forPackage("org.drools.command.*"),
+                new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
+
+        Set<Class<?>> classes = cmdReflections.getTypesAnnotatedWith(XmlRootElement.class);
+        Set<Class> cmdClasses = new HashSet<Class>();
+        for (Class<?> jaxbClass : classes ) {
+            if( jaxbClass.getSimpleName().endsWith("Command") ) {
+                cmdClasses.add(jaxbClass);
+            }
+        }
+        for( Class<?> jaxbCmdClass : cmdClasses ) {
+            Field procInstIdField = null;
+            for( Field field : jaxbCmdClass.getDeclaredFields() ) {
+                String fullFieldName = jaxbCmdClass.getSimpleName() + "." + field.getName();
+                field.setAccessible(true);
+                // check that type matches
+                XmlElement xmlElem = ((XmlElement) field.getAnnotation(XmlElement.class));
+                XmlAttribute xmlAttribute = ((XmlAttribute) field.getAnnotation(XmlAttribute.class));
+                if( xmlElem != null ) {
+                    String xmlElemName = xmlElem.name();
+                    if( xmlElemName != null && xmlElemName.equals(PROCESS_INSTANCE_ID_NAME) ) {
+                        assertTrue( fullFieldName + " is an incorrect type! (" + field.getType() + ")",
+                                field.getType().equals(Long.class) || field.getType().equals(long.class) );
+                    }
+                } else  if( xmlAttribute != null ) {
+                    String xmlAttributeName = xmlAttribute.name();
+                    if( xmlAttributeName != null && xmlAttributeName.equals(PROCESS_INSTANCE_ID_NAME) ) {
+                        assertTrue( fullFieldName + " is an incorrect type! (" + field.getType() + ")",
+                                field.getType().equals(Long.class) || field.getType().equals(long.class) );
+                    }
+                }
+                // check that field has correct XmlElement name
+                String name = field.getName().toLowerCase();
+                if( name.startsWith("proc") && name.contains("inst")
+                        && ! name.endsWith("s") && ! name.endsWith("list")) {
+                    xmlElem = ((XmlElement) field.getAnnotation(XmlElement.class));
+                    xmlAttribute = ((XmlAttribute) field.getAnnotation(XmlAttribute.class));
+                    String xmlElemName = null;
+                    String xmlAttrName = null;
+
+                    if( xmlElem != null ) {
+                        xmlElemName = xmlElem.name();
+                    }
+                    if( xmlAttribute != null ) {
+                        xmlAttrName = xmlAttribute.name();
+                    }
+                    if( xmlElemName != null ) {
+                        assertEquals( fullFieldName + " is incorrectly annotated with name '" + xmlElemName + "'",
+                                PROCESS_INSTANCE_ID_NAME, xmlElemName );
+                    } else if( xmlAttrName != null ) {
+                        assertEquals( fullFieldName + " is incorrectly annotated with name '" + xmlAttrName + "'",
+                                PROCESS_INSTANCE_ID_NAME, xmlAttrName );
+                    } else {
+                        logger.error( "Should " + fullFieldName + " have an @XmlElement or @XmlAttribute annotation?");
+                    }
+
+                }
+            }
+
+        }
     }
     
     private void testRoundTripClassesSet(Set<Class<?>> extraJaxbClasses ) { 
