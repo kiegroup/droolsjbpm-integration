@@ -57,24 +57,25 @@ public class KieSpringBasicsDecisionTest {
 
     @Test
     public void testDecisionTableRules() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
+        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession-table-1");
 
         assertNotNull(ksession);
 
         // Cheeses selection
         Cheese cheese = new Cheese();
-        cheese.setPrice(10);
+        cheese.setPrice(250);
         cheese.setType("cheddar");
 
         // Young person
         Person person = new Person();
         person.setName("Young Scott");
-        person.setAge(25);
+        person.setAge(21);
 
         List cmds = new ArrayList();
         cmds.add( CommandFactory.newSetGlobal("list", new ArrayList(), true) );
         cmds.add( CommandFactory.newInsert(person,"yscott"));
         cmds.add( CommandFactory.newInsert(cheese,"cheddar"));
+        cmds.add( CommandFactory.newFireAllRules());
 
         // Execute the list
         ExecutionResults results = ksession.execute(CommandFactory.newBatchExecution(cmds));
@@ -82,20 +83,20 @@ public class KieSpringBasicsDecisionTest {
         assertEquals(1, list.size());
         assertTrue(list.contains("Young man cheddar"));
 
-
         // Old person
         person = new Person();
         person.setName("Old Scott");
         person.setAge(42);
 
         cheese = new Cheese();
-        cheese.setPrice(21);
+        cheese.setPrice(150);
         cheese.setType("stilton");
 
         cmds = new ArrayList();
         cmds.add( CommandFactory.newSetGlobal("list", new ArrayList(), true) );
         cmds.add( CommandFactory.newInsert(person,"oscott"));
         cmds.add( CommandFactory.newInsert(cheese,"stilton"));
+        cmds.add( CommandFactory.newFireAllRules());
 
         // Execute the list
         results = ksession.execute(CommandFactory.newBatchExecution(cmds));

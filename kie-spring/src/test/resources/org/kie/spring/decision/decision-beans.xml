@@ -7,7 +7,7 @@
 
     <kie:kmodule id="kmodule1">
         <kie:kbase name="decisionCSV" packages="org.kie.spring.decision.xls">
-            <kie:ksession name="ksession1" type="stateless">
+            <kie:ksession name="ksession-table-1" type="stateless">
                 <kie:batch>
                     <kie:set-global identifier="list" ref="globalList"/>
                 </kie:batch>
