@@ -42,4 +42,8 @@ public class Cheese {
         this.price = price;
     }
 
+    public void setType(final String type) {
+        this.type = type;
+    }
+
 }

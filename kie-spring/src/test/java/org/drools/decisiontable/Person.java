@@ -17,10 +17,10 @@
 package org.drools.decisiontable;
 
 public class Person {
+
     private String name;
     private String likes;
     private int    age;
-
     private char         sex;
     private boolean      alive;
     private String       status;
@@ -90,6 +90,10 @@ public class Person {
 
     public void setSex(char sex) {
         this.sex = sex;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String toString() {

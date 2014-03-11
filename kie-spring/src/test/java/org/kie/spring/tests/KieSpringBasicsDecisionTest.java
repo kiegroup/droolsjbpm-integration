@@ -22,8 +22,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.StatelessKieSession;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.internal.command.CommandFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -55,30 +56,52 @@ public class KieSpringBasicsDecisionTest {
     }
 
     @Test
-    public void testStatelessKieSession() throws Exception {
-        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
-        assertNotNull(ksession);
-    }
-
-    @Test
     public void testDecisionTableRules() throws Exception {
-        StatefulKnowledgeSession ksession = (StatefulKnowledgeSession) context.getBean("ksession2");
+        StatelessKieSession ksession = (StatelessKieSession) context.getBean("ksession1");
 
-        assertNotNull(ksession.getGlobals().get("list"));
-        List list = (List) ksession.getGlobals().get("list");
+        assertNotNull(ksession);
 
-        ksession.insert(new Cheese("stilton",40));
-        //ksession.insert(new Cheese("cheddar",30));
+        // Cheeses selection
+        Cheese cheese = new Cheese();
+        cheese.setPrice(10);
+        cheese.setType("cheddar");
 
-        ksession.insert(new Person("helen", "stilton", 42, 'F'));
-        //ksession.insert(new Person("charles", "cheddar", 25 ,'M'));
+        // Young person
+        Person person = new Person();
+        person.setName("Young Scott");
+        person.setAge(25);
 
-        ksession.fireAllRules();
+        List cmds = new ArrayList();
+        cmds.add( CommandFactory.newSetGlobal("list", new ArrayList(), true) );
+        cmds.add( CommandFactory.newInsert(person,"yscott"));
+        cmds.add( CommandFactory.newInsert(cheese,"cheddar"));
 
+        // Execute the list
+        ExecutionResults results = ksession.execute(CommandFactory.newBatchExecution(cmds));
+        List list = (List) results.getValue("list");
         assertEquals(1, list.size());
+        assertTrue(list.contains("Young man cheddar"));
 
+
+        // Old person
+        person = new Person();
+        person.setName("Old Scott");
+        person.setAge(42);
+
+        cheese = new Cheese();
+        cheese.setPrice(21);
+        cheese.setType("stilton");
+
+        cmds = new ArrayList();
+        cmds.add( CommandFactory.newSetGlobal("list", new ArrayList(), true) );
+        cmds.add( CommandFactory.newInsert(person,"oscott"));
+        cmds.add( CommandFactory.newInsert(cheese,"stilton"));
+
+        // Execute the list
+        results = ksession.execute(CommandFactory.newBatchExecution(cmds));
+        list = (List) results.getValue("list");
+        assertEquals(1, list.size());
         assertTrue(list.contains("Old man stilton"));
-        //assertTrue(list.contains("Young man cheddar"));
 
     }
 
