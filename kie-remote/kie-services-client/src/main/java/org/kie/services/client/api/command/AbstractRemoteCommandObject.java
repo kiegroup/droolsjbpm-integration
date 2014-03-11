@@ -25,6 +25,7 @@ import javax.jms.Session;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -380,6 +381,12 @@ public abstract class AbstractRemoteCommandObject {
                     String attributeName = field.getAnnotation(XmlAttribute.class).name();
 
                     if ("process-instance-id".equalsIgnoreCase(attributeName)) {
+                        return (Long) field.get(command);
+                    }
+                } else if (field.isAnnotationPresent(XmlElement.class)) {
+                    String elementName = field.getAnnotation(XmlElement.class).name();
+
+                    if ("process-instance-id".equalsIgnoreCase(elementName)) {
                         return (Long) field.get(command);
                     }
                 }
