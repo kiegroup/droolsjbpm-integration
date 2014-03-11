@@ -5,6 +5,7 @@ import static org.kie.services.client.serialization.SerializationConstants.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -177,6 +179,7 @@ public abstract class AbstractRemoteCommandObject {
      */
     private <T> T executeJmsCommand(Command<T> command) {
         JaxbCommandsRequest req = new JaxbCommandsRequest(config.getDeploymentId(), command);
+        req.setProcessInstanceId(findProcessInstanceId(command));
         req.setUser(config.getJmsQueueUsername());
 
         ConnectionFactory factory = config.getConnectionFactory();
@@ -316,6 +319,7 @@ public abstract class AbstractRemoteCommandObject {
             restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
         }
         JaxbCommandsRequest jaxbRequest = new JaxbCommandsRequest(deploymentId, command);
+        jaxbRequest.setProcessInstanceId(findProcessInstanceId(command));
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         restRequest.body(MediaType.APPLICATION_XML, jaxbRequestString);
         
@@ -364,5 +368,26 @@ public abstract class AbstractRemoteCommandObject {
         default: 
             throw new RemoteApiException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
         }
+    }
+
+    private Long findProcessInstanceId(Command<?> command) {
+        try {
+            Field[] fields = command.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(XmlAttribute.class)) {
+                    String attributeName = field.getAnnotation(XmlAttribute.class).name();
+
+                    if ("process-instance-id".equalsIgnoreCase(attributeName)) {
+                        return (Long) field.get(command);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("Unable to find process instance id on command {} due to {}", command, e.getMessage());
+        }
+
+        return null;
     }
 }
