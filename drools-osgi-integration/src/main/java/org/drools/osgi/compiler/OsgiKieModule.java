@@ -23,17 +23,10 @@ import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 public class OsgiKieModule extends AbstractKieModule {
 
     private final Bundle bundle;
-    private int bundleUrlPrefixLength = -1;
 
     private Collection<String> fileNames;
 
     private final long creationTimestamp = System.currentTimeMillis();
-
-    private OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle, int bundleUrlPrefixLength) {
-        super(releaseId, kModuleModel);
-        this.bundle = bundle;
-        this.bundleUrlPrefixLength = bundleUrlPrefixLength;
-    }
 
     private OsgiKieModule(ReleaseId releaseId, KieModuleModel kModuleModel, Bundle bundle) {
         super(releaseId, kModuleModel);
@@ -89,23 +82,24 @@ public class OsgiKieModule extends AbstractKieModule {
 
     public static OsgiKieModule create(URL url) {
         KieModuleModel kieProject = KieModuleModelImpl.fromXML(url);
-        String urlString = url.toString();
-        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
-        long bundleId = Long.parseLong(id);
+        Bundle bundle = getBundle(url.toString());
+        if (bundle != null) {
+            String pomProperties = getPomProperties(bundle);
+            ReleaseId releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
+            return new OsgiKieModule(releaseId, kieProject, bundle);
+        } else {
+            throw new RuntimeException("Bundle does not exist or no retrieved for this URL :  " + url);
+        }
 
-        Bundle bundle = FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
-        String pomProperties = getPomProperties( bundle );
-        ReleaseId releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
-        //return new OsgiKieModule(releaseId, kieProject, bundle, urlString.indexOf("META-INF"));
-        return new OsgiKieModule(releaseId, kieProject, bundle);
     }
 
     public static OsgiKieModule create(URL url, ReleaseId releaseId, KieModuleModel kieProject) {
-        String urlString = url.toString();
-        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
-        long bundleId = Long.parseLong(id);
-        Bundle bundle = FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
-        return new OsgiKieModule(releaseId, kieProject, bundle, urlString.indexOf('/', "bundle://".length()+1) + 1);
+        Bundle bundle = getBundle(url.toString());
+        if (bundle != null) {
+            return new OsgiKieModule(releaseId, kieProject, bundle);
+        } else {
+            throw new RuntimeException("Bundle does not exist or no retrieved for this URL :  " + url);
+        }
     }
 
     private static String getPomProperties(Bundle bundle) {
@@ -114,6 +108,13 @@ public class OsgiKieModule extends AbstractKieModule {
             throw new RuntimeException("Cannot find pom.properties file in bundle " + bundle);
         }
         return readUrlAsString(e.nextElement());
+    }
+
+    private static Bundle getBundle(String url) {
+        String urlString = url.toString();
+        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
+        long bundleId = Long.parseLong(id);
+        return FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
     }
 
     private static String readUrlAsString(URL url) {
@@ -131,7 +132,8 @@ public class OsgiKieModule extends AbstractKieModule {
             if (is != null) {
                 try {
                     is.close();
-                } catch (IOException e) { }
+                } catch (IOException e) {
+                }
             }
         }
     }
