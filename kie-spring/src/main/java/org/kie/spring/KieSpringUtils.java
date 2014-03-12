@@ -48,7 +48,7 @@ public final class KieSpringUtils {
     static {
         //this forces the KieModules to be loaded up.
         ks = KieServices.Factory.get();
-        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieContainer kContainer = ks.newKieClasspathContainer();
     }
 
     static void setDefaultReleaseId(ReleaseId releaseId) {
