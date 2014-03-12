@@ -10,10 +10,13 @@ import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.CatchEvent;
 import org.eclipse.bpmn2.CompensateEventDefinition;
 import org.eclipse.bpmn2.ErrorEventDefinition;
+import org.eclipse.bpmn2.EventBasedGateway;
 import org.eclipse.bpmn2.EventDefinition;
+import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.GatewayDirection;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.LinkEventDefinition;
 import org.eclipse.bpmn2.MessageEventDefinition;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -53,7 +56,7 @@ public class SimulationFilterPathFormatConverter implements
                 if (fe instanceof SequenceFlow) {
                     simPath.addSequenceFlow(fe.getId());
                     simPath.addSequenceFlowSource(fe.getId(), ((SequenceFlow) fe).getSourceRef().getId());
-                } else if (fe instanceof Gateway && ((Gateway) fe).getGatewayDirection().equals(GatewayDirection.DIVERGING)) {
+                } else if (isGatewaySplit(fe)) {
                     if (provider != null) {
                         double probability = 0;
                         for (SequenceFlow sq : ((Gateway) fe).getOutgoing()) {
@@ -141,5 +144,14 @@ public class SimulationFilterPathFormatConverter implements
             }
         }
         return key;
+    }
+
+    private boolean isGatewaySplit(FlowElement fe) {
+        if ((fe instanceof ExclusiveGateway || fe instanceof InclusiveGateway || fe instanceof EventBasedGateway)
+                && ((Gateway) fe).getGatewayDirection().equals(GatewayDirection.DIVERGING)) {
+            return true;
+        }
+
+        return false;
     }
 }
