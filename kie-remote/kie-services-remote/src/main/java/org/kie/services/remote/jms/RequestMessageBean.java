@@ -31,8 +31,6 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.task.TaskService;
-import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
@@ -40,11 +38,10 @@ import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
-import org.kie.services.remote.exception.DeploymentNotFoundException;
+import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.exception.KieRemoteServicesInternalError;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
 import org.kie.services.remote.jms.request.BackupIdentityProviderProducer;
-import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +76,10 @@ public class RequestMessageBean implements MessageListener {
     // KIE resources
     
     @Inject
-    private DeploymentInfoBean runtimeMgrMgr;
+    protected DeploymentInfoBean runtimeMgrMgr;
     
     @Inject
-    private TaskService injectedTaskService;
+    protected ProcessRequestBean processRequestBean;
 
     @Inject
     private BackupIdentityProviderProducer backupIdentityProviderProducer;
@@ -338,13 +335,12 @@ public class RequestMessageBean implements MessageListener {
     
     // Runtime / KieSession / TaskService helper methods --------------------------------------------------------------------------
     
-    private JaxbCommandsResponse processJaxbCommandsRequest(JaxbCommandsRequest request) {
+    protected JaxbCommandsResponse processJaxbCommandsRequest(JaxbCommandsRequest request) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command<?>> commands = request.getCommands();
         
         RuntimeEngine runtimeEngine = null;
-        InternalTaskService internalTaskService = null;
         if (commands != null) {
             for (int i = 0; i < commands.size(); ++i) {
                 
@@ -361,20 +357,19 @@ public class RequestMessageBean implements MessageListener {
                 try {
                     // if the JTA transaction (in HT or the KieSession) doesn't commit, that will cause message reception to be *NOT* acknowledged!
                     if( cmd instanceof TaskCommand<?> ) { 
-                        if( AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) {
-                            runtimeEngine = runtimeMgrMgr.getRuntimeEngineForTaskCommand((TaskCommand<?>) cmd, injectedTaskService, true);
-                            internalTaskService = (InternalTaskService) runtimeEngine.getTaskService();
-                        }  else { 
-                            internalTaskService = (InternalTaskService) injectedTaskService;
-                        }
-                        cmdResult = internalTaskService.execute(new ExecuteAndSerializeCommand((TaskCommand<?>) cmd));
+                        TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
+                        cmdResult = processRequestBean.doTaskOperation(
+                                taskCmd.getTaskId(), 
+                                request.getDeploymentId(), 
+                                request.getProcessInstanceId(), 
+                                null, 
+                                taskCmd);
                     } else { 
-                        String deploymentId = request.getDeploymentId();
-                        if( deploymentId == null ) {
-                            throw new DeploymentNotFoundException("A deployment id is required for the " + cmd.getClass().getSimpleName());
-                        }
-                        runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, request.getProcessInstanceId());
-                        cmdResult = runtimeEngine.getKieSession().execute(cmd);
+                        cmdResult = processRequestBean.doKieSessionOperation(
+                                cmd, 
+                                request.getDeploymentId(), 
+                                request.getProcessInstanceId(), 
+                                errMsg);
                     }
                 } catch( PermissionDeniedException pde ) { 
                     logger.warn(errMsg, pde);
@@ -404,5 +399,5 @@ public class RequestMessageBean implements MessageListener {
 
         return jaxbResponse;
     }
-    
+
 }
