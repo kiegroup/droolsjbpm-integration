@@ -151,7 +151,10 @@ public class TaskResource extends ResourceBase {
         
         List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) doRestTaskOperation(null, queryCmd);
 
+        logger.debug("{} results found.", results.size());
         results = paginate(getPageNumAndPageSize(params, oper), results);
+        logger.debug("Returning {} results after pagination.", results.size());
+        
         responseObj = new JaxbTaskSummaryListResponse(results);
         return createCorrectVariant(responseObj, headers);
     }

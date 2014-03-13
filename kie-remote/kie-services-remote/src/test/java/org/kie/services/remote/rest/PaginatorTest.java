@@ -55,4 +55,22 @@ public class PaginatorTest extends ResourceBase {
         pagedList = paginate(pageInfo, results);
         assertEquals( pagedList.size(), results.size());
     }
+    
+    @Test
+    public void pageSize10ReturnsAllTasks() { 
+        String oper = "/test/paginate";
+        List<Integer> results = new ArrayList<Integer>();
+        for( int i = 0; i < 100; ++i ) { 
+            results.add(i);
+        }
+
+        int pageSize = 10;
+        List<String> sizeValues = new ArrayList<String>();
+        sizeValues.add(String.valueOf(pageSize));
+        Map<String, List<String>> params = new HashMap<String, List<String>>();
+        params.put("pageSize", sizeValues );
+        
+        List<Integer> pagedResults = paginate(getPageNumAndPageSize(params, oper), results);
+        assertEquals( "Paginated results", pageSize, pagedResults.size());
+    }
 }

@@ -416,7 +416,10 @@ public class ResourceBase {
     protected static <T> List<T> paginate(int[] pageInfo, List<T> results) { 
         List<T> pagedResults = new ArrayList<T>();
         assert pageInfo[0] >= 0;
-        if( pageInfo[0] == 0 ) { 
+        if( pageInfo[1] > 0 && pageInfo[0] == 0 ) { 
+            pageInfo[0] = 1;
+        }
+        if( pageInfo[0] == 0 && pageInfo[1] == 0) { 
             return results;
         }  else if( pageInfo[0] > 0 ) { 
             // for( i  = start of page; i < start of next page && i < num results; ++i ) 
