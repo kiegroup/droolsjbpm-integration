@@ -1,7 +1,5 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.client.api.command.AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +32,7 @@ import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
+import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.RestOperationException;
 import org.kie.services.remote.rest.variant.ServerDrivenNegotiation;
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ public class ResourceBase {
     
     // Seam-Transaction ----------------------------------------------------------------------------------------------------------
     
-    public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, RestProcessRequestBean requestBean) {
+    public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command<?>> commands = request.getCommands();
@@ -72,15 +71,12 @@ public class ResourceBase {
                     String errorMsg = "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i;
                     if (cmd instanceof TaskCommand<?>) {
                         TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
-                        if( TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) ) { 
-                            cmdResult = requestBean.doTaskOperationOnDeployment(
-                                    taskCmd, 
-                                    request.getDeploymentId(),
-                                    request.getProcessInstanceId(),
-                                    errorMsg);
-                        } else { 
-                            cmdResult = requestBean.doNonDeploymentTaskOperationAndSerializeResult(taskCmd, errorMsg);
-                        }
+                        cmdResult = requestBean.doTaskOperation(
+                                taskCmd.getTaskId(),
+                                request.getDeploymentId(),
+                                request.getProcessInstanceId(),
+                                null,
+                                taskCmd);
                     } else {
                         cmdResult = requestBean.doKieSessionOperation(
                                 cmd, 

@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jbpm.kie.services.api.IdentityProvider;
-import org.jbpm.services.task.audit.DeleteAuditEventsCommand;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.command.DeleteBAMTaskSummariesCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
@@ -32,6 +31,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,20 +55,20 @@ public class TaskResource extends ResourceBase {
     
     /* REST information */
     @Context
-    private HttpHeaders headers;
+    protected HttpHeaders headers;
     
     @Context
-    private UriInfo uriInfo;
+    protected UriInfo uriInfo;
     
     @Context
-    private Request restRequest;
+    protected Request restRequest;
 
     /* KIE information and processing */
     @Inject
-    private RestProcessRequestBean processRequestBean;
+    protected ProcessRequestBean processRequestBean;
 
     @Inject
-    private IdentityProvider identityProvider;
+    protected IdentityProvider identityProvider;
    
     private static String[] allowedOperations = { 
         "activate", 
@@ -149,9 +149,7 @@ public class TaskResource extends ResourceBase {
                     busAdmins, potOwners, taskOwners, 
                     statuses, language, union);
         
-        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) processRequestBean.doNonDeploymentTaskOperation(
-                queryCmd, 
-                "Unable to execute " + queryCmd.getClass().getSimpleName());
+        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) doRestTaskOperation(null, queryCmd);
 
         results = paginate(getPageNumAndPageSize(params, oper), results);
         responseObj = new JaxbTaskSummaryListResponse(results);
@@ -162,9 +160,7 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}")
     public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        JaxbTask task = (JaxbTask) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(
-                cmd, 
-                "Unable to get task " + taskId);
+        JaxbTask task = (JaxbTask) doRestTaskOperation(taskId, cmd);
         if( task == null ) { 
             throw RestOperationException.notFound("Task " + taskId + " could not be found.");
         }
@@ -224,7 +220,7 @@ public class TaskResource extends ResourceBase {
             throw RestOperationException.badRequest("Unsupported operation: /task/" + taskId + "/" + operation);
         }
         
-        processRequestBean.doTaskOperationOnDeployment(cmd, "Unable to " + operation + " task " + taskId);
+        doRestTaskOperation(taskId, cmd);
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
 
@@ -241,17 +237,16 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}/content")
     public Response taskId_content(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Object result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task " + taskId);
+        Object result = doRestTaskOperation(taskId, cmd);
         if( result == null ) {
             throw RestOperationException.notFound("Task " + taskId + " could not be found.");
         }
-        long contentId = ((Task) result).getTaskData().getDocumentContentId();
+        Task task = ((Task) result);
+        long contentId = task.getTaskData().getDocumentContentId();
         JaxbContent content = null;
         if( contentId > -1 ) { 
             cmd = new GetContentCommand(contentId);
-            result = processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(
-                    cmd, 
-                    "Unable get content " + contentId + " (from task " + taskId + ")");
+            result = processRequestBean.doRestTaskOperation(taskId, task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId(), task, cmd);
             content = (JaxbContent) result;
         } else { 
             throw RestOperationException.notFound("Content for task " + taskId + " could not be found.");
@@ -263,7 +258,7 @@ public class TaskResource extends ResourceBase {
     @Path("/content/{contentId: [0-9-]+}")
     public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
-        JaxbContent content = (JaxbContent) processRequestBean.doNonDeploymentTaskOperationAndSerializeResult(cmd, "Unable to get task content " + contentId);
+        JaxbContent content = (JaxbContent) doRestTaskOperation(null, cmd);
         if( content == null ) { 
             throw RestOperationException.notFound("Content " + contentId + " could not be found.");
         }
@@ -273,14 +268,11 @@ public class TaskResource extends ResourceBase {
     @POST
     @Path("/history/bam/clear")
     public Response bam_clear() { 
-        processRequestBean.doNonDeploymentTaskOperation(new DeleteBAMTaskSummariesCommand(), "Unable to delete BAM task summaries.");
+        doRestTaskOperation(null, new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
-    
-    @POST
-    @Path("/history/events/clear")
-    public Response events_clear() { 
-        processRequestBean.doNonDeploymentTaskOperation(new DeleteAuditEventsCommand(), "Unable to delete task audit events.");
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
-    } 
+ 
+    public Object doRestTaskOperation(Long taskId, TaskCommand<?> cmd) { 
+        return processRequestBean.doRestTaskOperation(taskId, null, null, null, cmd);
+    }
 }

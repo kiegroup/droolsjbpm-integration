@@ -75,24 +75,6 @@ public class DeploymentInfoBean {
        return domainRuntimeManagers.get(domainName);
     }
 
-    public RuntimeEngine getRuntimeEngineForTaskCommand(TaskCommand<?> cmd, TaskService taskService, boolean required) {
-        Long taskId = cmd.getTaskId();
-        RuntimeEngine engine = null;
-        if (taskId != null) {
-            Task task = taskService.getTaskById(taskId);
-            if (task != null) {
-                engine 
-                    = getRuntimeEngine(task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId());
-            }
-        }
-
-        if( required && engine == null ) { 
-            throw new DeploymentNotFoundException("Unable to find deployment for command " + cmd.getClass().getSimpleName() 
-                    + " called on task " + taskId + ".");
-        }
-        return engine;
-    }
-
     public void disposeRuntimeEngine(RuntimeEngine runtimeEngine) {
         if (runtimeEngine != null) {
             RuntimeManager manager = ((RuntimeEngineImpl) runtimeEngine).getManager();
@@ -114,6 +96,9 @@ public class DeploymentInfoBean {
         }
         Context<?> runtimeContext;
         if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 
+            if( processInstanceId == null || processInstanceId == -1) { 
+                throw new IllegalStateException("No process instance id supplied for operation!");
+            }
             runtimeContext = new ProcessInstanceIdContext(processInstanceId);
         } else { 
             runtimeContext = EmptyContext.get();
