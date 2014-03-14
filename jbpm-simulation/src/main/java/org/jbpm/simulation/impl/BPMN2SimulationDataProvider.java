@@ -207,7 +207,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
                 continue;
             }
             double transitionProbability = (Double) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
-            if (transitionProbability > 0) {
+            if (transitionProbability >= 0) {
                 probability = probability * (transitionProbability / 100);
                 processedSourceElems.add(sourceElemId);
             }
@@ -215,7 +215,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         // calculate probability based on boundary events
         for (String sequenceFlowId : path.getBoundaryEventIds()) {
             double transitionProbability = (Double) getSimulationDataForNode(sequenceFlowId).get(SimulationConstants.PROBABILITY);
-            if (transitionProbability > 0) {
+            if (transitionProbability >= 0) {
                 probability = probability * (transitionProbability / 100);
             }
         }
