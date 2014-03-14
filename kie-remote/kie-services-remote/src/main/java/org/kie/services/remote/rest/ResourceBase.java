@@ -393,7 +393,7 @@ public class ResourceBase {
             p = 0;
         }
         
-        int s = 10;
+        int s = 0;
         Number pageSize = getNumberParam(SIZE_LONG_PARAM, false, params, oper, false);
         if( pageSize != null ) { 
             s = pageSize.intValue();

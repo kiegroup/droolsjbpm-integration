@@ -13,7 +13,6 @@ public class PaginatorTest extends ResourceBase {
 
     @Test
     public void testPaginate() { 
-       
         List<Integer> results = new ArrayList<Integer>();
         for( int i = 0; i < 100; ++i ) { 
             results.add(i);
@@ -52,6 +51,7 @@ public class PaginatorTest extends ResourceBase {
         assertEquals( 5, pagedList.size() );
         
         pageInfo[PAGE_NUM] = 0;
+        pageInfo[PAGE_SIZE] = 0;
         pagedList = paginate(pageInfo, results);
         assertEquals( pagedList.size(), results.size());
     }
