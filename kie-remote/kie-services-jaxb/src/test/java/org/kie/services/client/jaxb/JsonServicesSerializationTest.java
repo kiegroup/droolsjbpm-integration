@@ -11,11 +11,11 @@ public class JsonServicesSerializationTest extends AbstractServicesSerialization
     
     protected JsonSerializationProvider jsonProvider = new JsonSerializationProvider();
     
-    public Object testRoundTrip(Object in) throws Exception {
+    public <T> T testRoundTrip(T in) throws Exception {
         String jsonStr = jsonProvider.serialize(in);
         logger.debug(jsonStr);
         jsonProvider.setDeserializeOutputClass(in.getClass());
-        return jsonProvider.deserialize(jsonStr);
+        return (T) jsonProvider.deserialize(jsonStr);
     }
 
     public void addClassesToSerializationProvider(Class<?>... extraClass) {

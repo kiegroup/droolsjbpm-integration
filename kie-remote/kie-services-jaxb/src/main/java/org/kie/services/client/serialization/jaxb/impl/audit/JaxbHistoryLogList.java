@@ -11,9 +11,16 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonSubTypes.Type;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.annotate.JsonTypeInfo.As;
+import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.audit.command.AbstractHistoryLogCommand;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
@@ -26,8 +33,14 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
         @XmlElement(name = "process-instance-log", type = JaxbProcessInstanceLog.class),
         @XmlElement(name = "node-instance-log", type = JaxbNodeInstanceLog.class),
         @XmlElement(name = "variable-instance-log", type = JaxbVariableInstanceLog.class),
-        })
-    List<AbstractJaxbHistoryObject> historyLogList;
+    })
+    @JsonTypeInfo(use=Id.CLASS, include=As.WRAPPER_OBJECT)
+    @JsonSubTypes({
+            @Type(value=JaxbProcessInstanceLog.class),
+            @Type(value=JaxbNodeInstanceLog.class),
+            @Type(value=JaxbVariableInstanceLog.class)
+    })
+    private List<AbstractJaxbHistoryObject> historyLogList;
 
     @XmlAttribute
     @XmlSchemaType(name = "int")
@@ -103,6 +116,7 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
     }
 
     @Override
+    @JsonIgnore
     public List<AuditEvent> getResult() {
         lazyInitResponseList();
         List<AuditEvent> results = new ArrayList<AuditEvent>();
@@ -117,4 +131,18 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
         initialize(result);;
     }
 
+    @JsonTypeInfo(use=Id.CLASS, include=As.WRAPPER_OBJECT)
+    @JsonSubTypes({
+            @Type(value=JaxbProcessInstanceLog.class),
+            @Type(value=JaxbNodeInstanceLog.class),
+            @Type(value=JaxbVariableInstanceLog.class)
+    })
+    public List<AbstractJaxbHistoryObject> getList() { 
+        return historyLogList;
+    }
+    
+    public void setList(List<AbstractJaxbHistoryObject> historyLogList) { 
+        this.historyLogList = historyLogList;
+    }
+    
 }

@@ -126,6 +126,11 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     
     <!-- reflection -->
     <dependency>
