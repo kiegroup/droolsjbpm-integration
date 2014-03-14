@@ -137,11 +137,12 @@ public class SimulationRunner {
             }
             
             counter++;
-            if (probability == 1) {
-                // in case given path has probability of 100% there is a need to reset the remaining instances
-                // as this is standalone process path
-                remainingInstances = numberOfAllInstances;
-            }
+// currently standalone paths within single definition are not supported
+//            if (probability == 1) {
+//                // in case given path has probability of 100% there is a need to reset the remaining instances
+//                // as this is standalone process path
+//                remainingInstances = numberOfAllInstances;
+//            }
         }
         f.runSimulation();
         // @formatter:on
