@@ -1,3 +1,8 @@
+# IDE
+/target
+
 # test
 /test-output
-/target
+/*log
+/*db
+

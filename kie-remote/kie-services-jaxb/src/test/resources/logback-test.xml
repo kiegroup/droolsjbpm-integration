@@ -12,6 +12,12 @@
   <!-- change to debug to see serializationTest output (JSON/JAXB/YAML strings) -->
   <logger name="org.kie.services" level="info"/>
   
+  <!--  hibernate, bitronix and org.jbpm.test are annoying..  --> 
+  <logger name="java.sql.DatabaseMetaData" level="warn"/>
+  <logger name="org.hibernate" level="warn"/>
+  <logger name="bitronix" level="error"/>
+  <logger name="org.jbpm.test" level="warn"/>
+  
   <root level="info">
     <appender-ref ref="consoleAppender" />
   </root>

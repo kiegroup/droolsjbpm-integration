@@ -1,7 +1,5 @@
 package org.kie.services.client;
 
-import static org.junit.Assert.*;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,7 +13,6 @@ import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKe
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.EnvironmentFactory;
-import org.jbpm.bpmn2.objects.TestWorkItemHandler;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
@@ -29,7 +26,11 @@ import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.jaxb.ComparePair;
+import org.jbpm.services.task.query.TaskSummaryImpl;
+import org.jbpm.test.JbpmJUnitBaseTestCase;
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Test;
 import org.kie.api.KieBase;
@@ -43,12 +44,16 @@ import org.kie.api.io.Resource;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.internal.task.api.TaskQueryService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
@@ -65,13 +70,14 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractServicesSerializationTest {
+public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTestCase {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractServicesSerializationTest.class);
 
@@ -81,56 +87,19 @@ public abstract class AbstractServicesSerializationTest {
 
     abstract public TestType getType();
     abstract public void addClassesToSerializationProvider(Class<?>... extraClass);
-
+    public abstract <T> T testRoundTrip(T in) throws Exception;
+    
     private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception {
         Field field = clazz.getDeclaredField(fieldName);
         field.setAccessible(true);
         return field.get(obj);
     }
-
-    private static void compareObjects( Object orig, Object copy ) {
-        compareObjects(orig, copy, new String [] {} );
-    }
-    private static void compareObjects( Object orig, Object copy, String... nullFields ) {
-        Class<?> origClass = orig.getClass();
-        assertEquals( "copy is not an instance of " + origClass + " (" + copy.getClass().getSimpleName() + ")",  
-                origClass, copy.getClass() );
-        for (Field field : orig.getClass().getDeclaredFields() ) {
-            try { 
-                field.setAccessible(true);
-                Object origFieldVal = field.get(orig);
-                Object copyFieldVal = field.get(copy);
-    
-                boolean nullFound = false;
-                if( origFieldVal == null || copyFieldVal == null ) { 
-                    nullFound = true;
-                    String fieldName = field.getName();
-                    for( String nullFieldName : nullFields ) { 
-                        if( nullFieldName.matches(fieldName) ) { 
-                            nullFound = false;
-                        }
-                    }
-                }
-                String failMsg = origClass.getSimpleName() + "." + field.getName() + " is null";
-                assertFalse( failMsg + "!", nullFound );
-    
-                if( copyFieldVal != origFieldVal ) { 
-                    if( copyFieldVal == null ) { 
-                        fail( failMsg + " in copy!" );
-                    } else if( origFieldVal == null ) { 
-                        fail( failMsg + "in original!" );
-                    }
-                    if( origFieldVal.getClass().getPackage().getName().startsWith("java.") ) { 
-                        assertEquals( origClass.getSimpleName() + "." + field.getName(), origFieldVal, copyFieldVal );
-                    } else { 
-                        compareObjects(origFieldVal, copyFieldVal, nullFields);
-                    }
-                }
-            } catch( Exception e ) { 
-                throw new RuntimeException("Unable to access " + field.getName() + " when testing " + origClass.getSimpleName() + ".", e ); 
-            }
-    
-        }
+  
+    @After
+    public void after() throws Exception { 
+        super.tearDown();
+        this.setupDataSource = false;
+        this.sessionPersistence = false;
     }
     
     // TESTS
@@ -165,7 +134,7 @@ public abstract class AbstractServicesSerializationTest {
         return ksession;
     }
 
-    public abstract Object testRoundTrip(Object in) throws Exception;
+    
 
     /*
      * Tests
@@ -209,7 +178,7 @@ public abstract class AbstractServicesSerializationTest {
     }
 
     @Test
-    public void taskSummaryListTest() throws Exception {
+    public void jaxbCommandsResponseTest() throws Exception {
         Command<?> cmd = new GetTaskAssignedAsBusinessAdminCommand();
         List<TaskSummary> result = new ArrayList<TaskSummary>();
 
@@ -225,8 +194,46 @@ public abstract class AbstractServicesSerializationTest {
         assertEquals( 2, ((JaxbCommandsResponse) newResp).getResponses().size());
     }
 
+
     @Test
-    public void genericTest() throws Exception {
+    public void taskSummaryListTest() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+        this.setupDataSource = true;
+        this.sessionPersistence = true;
+        super.setUp();
+        
+        RuntimeManager runtimeManager = createRuntimeManager(Strategy.SINGLETON, "test", "BPMN2-HumanTaskWithTaskContent.bpmn2");
+        RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(null);
+        KieSession ksession = runtimeEngine.getKieSession();
+        TaskService taskService = runtimeEngine.getTaskService();
+        
+        ProcessInstance procInst = ksession.startProcess("org.kie.remote.test.usertask.UserTask");
+        long procInstId = procInst.getId();
+
+        List<Long> statuses = new ArrayList<Long>();
+        statuses.add(procInstId);
+        
+        Map<String, List<?>> fieldVals = new HashMap<String, List<?>>();
+        fieldVals.put(TaskQueryService.PROCESS_INST_ID_LIST, statuses);
+        List<TaskSummary> taskSumList = taskService.getTasksByVariousFields(fieldVals, true);
+        assertEquals( "Task summary list size", 1, taskSumList.size());
+        TaskSummaryImpl taskSumImpl = (TaskSummaryImpl) taskSumList.get(0);
+        taskSumImpl.setActualOwner(new UserImpl("Minnie"));
+        taskSumImpl.setCreatedBy(new UserImpl("Mickey"));
+        
+        JaxbTaskSummaryListResponse jaxbTaskSumListResp = new JaxbTaskSummaryListResponse(taskSumList);
+        JaxbTaskSummaryListResponse jaxbTaskSumListRespCopy = testRoundTrip(jaxbTaskSumListResp);
+        assertEquals( jaxbTaskSumListResp.getList().size(), jaxbTaskSumListRespCopy.getList().size() );
+        TaskSummary taskSum = jaxbTaskSumListResp.getList().get(0);
+        TaskSummary taskSumCopy = jaxbTaskSumListRespCopy.getList().get(0);
+        ComparePair.compareObjectsViaFields(taskSum, taskSumCopy, 
+                "potentialOwners", // null
+                "createdOn", "activationTime", "expirationTime",
+                "subTaskStrategy"); // dates
+    }
+    
+    @Test
+    public void genericResponseTest() throws Exception {
         JaxbGenericResponse resp = new JaxbGenericResponse();
         resp.setMessage("error");
         resp.setStatus(JaxbRequestStatus.SUCCESS);
@@ -322,9 +329,12 @@ public abstract class AbstractServicesSerializationTest {
 
     @Test
     public void commandsResponseTest() throws Exception {
-        KieSession ksession = createKnowledgeSession("BPMN2-StringStructureRef.bpmn2");
-        TestWorkItemHandler workItemHandler = new TestWorkItemHandler();
-        ksession.getWorkItemManager().registerWorkItemHandler("Human Task", workItemHandler);
+        this.setupDataSource = true;
+        this.sessionPersistence = true;
+        super.setUp();
+        
+        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
+        KieSession ksession = runtimeEngine.getKieSession();
 
         Map<String, Object> params = new HashMap<String, Object>();
         String val = "initial-val";
@@ -370,9 +380,12 @@ public abstract class AbstractServicesSerializationTest {
 
     @Test
     public void processInstanceWithVariablesTest() throws Exception {
-        KieSession ksession = createKnowledgeSession("BPMN2-StringStructureRef.bpmn2");
-        TestWorkItemHandler workItemHandler = new TestWorkItemHandler();
-        ksession.getWorkItemManager().registerWorkItemHandler("Human Task", workItemHandler);
+        this.setupDataSource = true;
+        this.sessionPersistence = true;
+        super.setUp();
+        
+        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
+        KieSession ksession = runtimeEngine.getKieSession();
 
         Map<String, Object> params = new HashMap<String, Object>();
         String val = "initial-val";
@@ -382,7 +395,7 @@ public abstract class AbstractServicesSerializationTest {
 
         Map<String, Object> res = new HashMap<String, Object>();
         res.put("testHT", "test value");
-        ksession.getWorkItemManager().completeWorkItem(workItemHandler.getWorkItem().getId(), res);
+//        ksession.getWorkItemManager().completeWorkItem(workItemHandler.getWorkItem().getId(), res);
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("test", "initial-val");
@@ -463,7 +476,7 @@ public abstract class AbstractServicesSerializationTest {
         depUnitList.getDeploymentUnitList().add(depUnit);
         jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
         JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundTrip(jaxbJob);
-        compareObjects(jaxbJob, copyJaxbJob, "identifier");
+        ComparePair.compareObjectsViaFields(jaxbJob, copyJaxbJob, "identifier");
         
         depUnit = new JaxbDeploymentUnit("g", "a", "v");
         depUnit.setKbaseName("kbase");
@@ -474,15 +487,15 @@ public abstract class AbstractServicesSerializationTest {
         
         JaxbDeploymentUnit copyDepUnit = (JaxbDeploymentUnit) testRoundTrip(depUnit);
         
-        compareObjects(depUnit, copyDepUnit, "identifier");
+        ComparePair.compareObjectsViaFields(depUnit, copyDepUnit, "identifier");
         
         JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult("testing stuff", true, copyDepUnit, "test");
         JaxbDeploymentJobResult copyDepJob = (JaxbDeploymentJobResult) testRoundTrip(depJob);
         
-        compareObjects(copyDepJob, depJob, "identifier");
+        ComparePair.compareObjectsViaFields(copyDepJob, depJob, "identifier");
         
         JaxbDeploymentUnitList roundTripUnitList = (JaxbDeploymentUnitList) testRoundTrip(depUnitList);
-        compareObjects(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "identifier");
+        ComparePair.compareObjectsViaFields(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "identifier");
     }
     
     @Test

@@ -27,6 +27,8 @@ import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
+import org.kie.api.task.model.TaskSummary;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
@@ -113,7 +115,6 @@ public class TaskResource extends ResourceBase {
     @GET
     @Path("/query")
     public Response query(@Context UriInfo uriInfo) {
-        JaxbTaskSummaryListResponse responseObj = null;
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
         
@@ -149,10 +150,13 @@ public class TaskResource extends ResourceBase {
                     busAdmins, potOwners, taskOwners, 
                     statuses, language, union);
         
-        List<TaskSummaryImpl> results = (List<TaskSummaryImpl>) doRestTaskOperation(null, queryCmd);
+        List<TaskSummary> results = (List<TaskSummary>) doRestTaskOperation(null, queryCmd);
 
+        logger.debug("{} results found.", results.size());
         results = paginate(getPageNumAndPageSize(params, oper), results);
-        responseObj = new JaxbTaskSummaryListResponse(results);
+        logger.debug("Returning {} results after pagination.", results.size());
+        
+        JaxbTaskSummaryListResponse responseObj = new JaxbTaskSummaryListResponse(results);
         return createCorrectVariant(responseObj, headers);
     }
 
