@@ -433,7 +433,7 @@ public class ResourceBase {
     protected static int getMaxNumResultsNeeded(int [] pageInfo) { 
         int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
         if( pageInfo[PAGE_NUM] == 0 ) { 
-            numResults = Integer.MAX_VALUE;
+            numResults = 1000;
         } 
         return numResults;
     }

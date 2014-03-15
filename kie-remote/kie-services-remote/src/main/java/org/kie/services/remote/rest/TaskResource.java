@@ -23,12 +23,10 @@ import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.command.DeleteBAMTaskSummariesCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
-import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
@@ -145,15 +143,17 @@ public class TaskResource extends ResourceBase {
         List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
         List<Status> statuses = convertStringListToStatusList(statusStrList);
         
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
+        int maxResults = getMaxNumResultsNeeded(pageInfo);
         TaskCommand<?> queryCmd 
             = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, 
                     busAdmins, potOwners, taskOwners, 
-                    statuses, language, union);
+                    statuses, language, union, maxResults);
         
         List<TaskSummary> results = (List<TaskSummary>) doRestTaskOperation(null, queryCmd);
-
+        
         logger.debug("{} results found.", results.size());
-        results = paginate(getPageNumAndPageSize(params, oper), results);
+        results = paginate(pageInfo, results);
         logger.debug("Returning {} results after pagination.", results.size());
         
         JaxbTaskSummaryListResponse responseObj = new JaxbTaskSummaryListResponse(results);
