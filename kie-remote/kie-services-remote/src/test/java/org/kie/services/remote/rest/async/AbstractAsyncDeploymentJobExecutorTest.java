@@ -22,7 +22,7 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AbstractAsyncDeploymentJobExecutorTest {
+public abstract class AbstractAsyncDeploymentJobExecutorTest {
 
     protected final static Logger logger = LoggerFactory.getLogger(AbstractAsyncDeploymentJobExecutorTest.class);
 
