@@ -20,7 +20,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.command.AbstractHistoryLogCommand;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
