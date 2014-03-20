@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.ws.rs.GET;
@@ -26,6 +27,7 @@ import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.RestOperationException;
 
 /**
@@ -57,26 +59,13 @@ public class HistoryResource extends ResourceBase {
     @Context
     private Request restRequest;
 
-    /* KIE and Persistence information */
-    private static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
-    
-    @PersistenceUnit(unitName = PERSISTENCE_UNIT_NAME)
-    private EntityManagerFactory emf;
-   
-    private AuditLogService auditLogService;
+    @Inject
+    private ProcessRequestBean processRequestBean;
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
-    @PostConstruct
-    public void setAuditLogService() { 
-        auditLogService = new JPAAuditLogService(emf);
-        if( emf == null ) { 
-            ((JPAAuditLogService) auditLogService).setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
-        }
-    }
-    
     public AuditLogService getAuditLogService() { 
-        return auditLogService;
+        return processRequestBean.getAuditLogService();
     }
     
     /**
@@ -86,7 +75,7 @@ public class HistoryResource extends ResourceBase {
     @POST
     @Path("/clear")
     public Response clear() {
-        auditLogService.clear();
+        getAuditLogService().clear();
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
 
@@ -96,7 +85,7 @@ public class HistoryResource extends ResourceBase {
         String oper = getRelativePath(uriInfo);
         Map<String, List<String>> params = getRequestParams(uriInfo);
         
-        List<ProcessInstanceLog> results = auditLogService.findProcessInstances();
+        List<ProcessInstanceLog> results = getAuditLogService().findProcessInstances();
         
         results = paginate(getPageNumAndPageSize(params, oper), results);
         return createCorrectVariant(new JaxbHistoryLogList(results), headers);
@@ -108,7 +97,7 @@ public class HistoryResource extends ResourceBase {
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
         
-        ProcessInstanceLog procInstLog = auditLogService.findProcessInstance(procInstId);
+        ProcessInstanceLog procInstLog = getAuditLogService().findProcessInstance(procInstId);
         
         List<ProcessInstanceLog> logList = new ArrayList<ProcessInstanceLog>();
         logList.add(procInstLog);
@@ -125,11 +114,11 @@ public class HistoryResource extends ResourceBase {
         
         Object result = null;
         if ("child".equalsIgnoreCase(operation)) {
-            result = auditLogService.findSubProcessInstances(procInstId);
+            result = getAuditLogService().findSubProcessInstances(procInstId);
         } else if ("node".equalsIgnoreCase(operation)) {
-            result = auditLogService.findNodeInstances(procInstId);
+            result = getAuditLogService().findNodeInstances(procInstId);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            result = auditLogService.findVariableInstances(procInstId);
+            result = getAuditLogService().findVariableInstances(procInstId);
         } else {
             throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
@@ -150,9 +139,9 @@ public class HistoryResource extends ResourceBase {
         
         Object result = null;
         if ("node".equalsIgnoreCase(operation)) {
-            result = auditLogService.findNodeInstances(procInstId, logId);
+            result = getAuditLogService().findNodeInstances(procInstId, logId);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            result = auditLogService.findVariableInstances(procInstId, logId);
+            result = getAuditLogService().findVariableInstances(procInstId, logId);
         } else {
             throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
@@ -175,12 +164,12 @@ public class HistoryResource extends ResourceBase {
         Object result;
         if (statusParam != null) {
             if (statusParam.intValue() == ProcessInstance.STATE_ACTIVE) {
-                result = auditLogService.findActiveProcessInstances(processId);
+                result = getAuditLogService().findActiveProcessInstances(processId);
             } else {
-                result = auditLogService.findProcessInstances(processId);
+                result = getAuditLogService().findProcessInstances(processId);
             }
         } else {
-            result = auditLogService.findProcessInstances(processId);
+            result = getAuditLogService().findProcessInstances(processId);
         }
         
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
@@ -268,9 +257,9 @@ public class HistoryResource extends ResourceBase {
        
         Object result;
         if( value == null ) { 
-            result = auditLogService.findVariableInstancesByName(varId, onlyActiveProcesses);
+            result = getAuditLogService().findVariableInstancesByName(varId, onlyActiveProcesses);
         } else { 
-            result = auditLogService.findVariableInstancesByNameAndValue(varId, value, onlyActiveProcesses);
+            result = getAuditLogService().findVariableInstancesByNameAndValue(varId, value, onlyActiveProcesses);
         }
         
         return (List<VariableInstanceLog>) result;
@@ -283,7 +272,7 @@ public class HistoryResource extends ResourceBase {
         List<ProcessInstanceLog> resultList = new ArrayList<ProcessInstanceLog>();
         for( int i = 0; i < numVarLogs && numProcInsts < maxNumResults; ++i ) { 
             long procInstId = varLogList.get(i).getProcessInstanceId();
-            ProcessInstanceLog procInstlog = auditLogService.findProcessInstance(procInstId);
+            ProcessInstanceLog procInstlog = getAuditLogService().findProcessInstance(procInstId);
             if( procInstlog != null ) { 
                 resultList.add(procInstlog);
                 ++numProcInsts;

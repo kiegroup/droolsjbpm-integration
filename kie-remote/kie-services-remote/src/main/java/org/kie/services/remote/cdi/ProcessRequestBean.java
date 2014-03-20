@@ -1,8 +1,13 @@
 package org.kie.services.remote.cdi;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 
+import org.jbpm.process.audit.AuditLogService;
+import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
@@ -45,6 +50,14 @@ public class ProcessRequestBean {
     @Inject
     private TaskService injectedTaskService;
 
+    /** AuditLogService **/
+    private static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
+    
+    @PersistenceUnit(unitName = PERSISTENCE_UNIT_NAME)
+    private EntityManagerFactory emf;
+   
+    private AuditLogService auditLogService;
+    
     // Injection methods for tests
     
     public void setRuntimeMgrMgr(DeploymentInfoBean runtimeMgrMgr) {
@@ -55,6 +68,11 @@ public class ProcessRequestBean {
         this.injectedTaskService = taskService;
     }
 
+    public void setAuditLogService(AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
+    }
+
+    
     /**
      * Executes a command on the {@link KieSession} from the proper {@link RuntimeManager}. This method
      * ends up synchronizing around the retrieved {@link KieSession} in order to avoid race-conditions.
@@ -196,4 +214,18 @@ public class ProcessRequestBean {
         }
     }
 
+    // Audit Log Service logic ---------------------------------------------------------------------------------------------------
+    
+    @PostConstruct
+    public void initAuditLogService() { 
+        auditLogService = new JPAAuditLogService(emf);
+        if( emf == null ) { 
+            ((JPAAuditLogService) auditLogService).setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
+        }
+    }
+    
+    public AuditLogService getAuditLogService() { 
+        return auditLogService;
+    }
+    
 }

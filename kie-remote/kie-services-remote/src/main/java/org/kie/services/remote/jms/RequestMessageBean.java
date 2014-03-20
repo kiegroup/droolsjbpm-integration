@@ -27,6 +27,7 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.jbpm.process.audit.command.AuditCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
@@ -364,7 +365,11 @@ public class RequestMessageBean implements MessageListener {
                                 request.getProcessInstanceId(), 
                                 null, 
                                 taskCmd);
-                    } else { 
+                    } else if( cmd instanceof AuditCommand<?>) { 
+                        AuditCommand<?> auditCmd = ((AuditCommand<?>) cmd);
+                        auditCmd.setAuditLogService(processRequestBean.getAuditLogService());
+                        cmdResult = auditCmd.execute(null);
+                    } else {
                         cmdResult = processRequestBean.doKieSessionOperation(
                                 cmd, 
                                 request.getDeploymentId(), 

@@ -38,6 +38,7 @@ import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
+import org.jbpm.process.audit.command.AuditCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.CompositeCommand;
@@ -179,7 +180,13 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeJmsCommand(Command<T> command) {
-        JaxbCommandsRequest req = new JaxbCommandsRequest(config.getDeploymentId(), command);
+        JaxbCommandsRequest req;
+        if( ! (command instanceof AuditCommand) ) { 
+           req = new JaxbCommandsRequest(config.getDeploymentId(), command);
+        } else { 
+            req = new JaxbCommandsRequest(command);
+        }
+        
         req.setProcessInstanceId(findProcessInstanceId(command));
         req.setUser(config.getJmsQueueUsername());
 
