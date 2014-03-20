@@ -20,7 +20,7 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
-import org.jbpm.process.audit.command.AbstractHistoryLogCommand;
+import org.jbpm.process.audit.command.AuditCommand;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
 import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindNodeInstancesCommand;
@@ -143,7 +143,7 @@ public class JaxbCommandsRequest {
             return;
         }
         for( Command<?> command : checkCommands ) { 
-            if( ! (command instanceof TaskCommand<?>) && ! (command instanceof AbstractHistoryLogCommand) ) { 
+            if( ! (command instanceof TaskCommand<?>) && ! (command instanceof AuditCommand<?>) ) { 
                 throw new UnsupportedOperationException( "A " + command.getClass().getSimpleName() + " requires that the deployment id has been set!" );
             }
         }
