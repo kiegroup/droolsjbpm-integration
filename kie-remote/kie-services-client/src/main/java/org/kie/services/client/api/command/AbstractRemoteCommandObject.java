@@ -172,6 +172,24 @@ public abstract class AbstractRemoteCommandObject {
             objectList.addAll(inputMap.values());
         }
     }
+   
+    private <T> JaxbCommandsRequest prepareCommandRequest(Command<T> command) { 
+        JaxbCommandsRequest req;
+        if( command instanceof AuditCommand ) { 
+            req = new JaxbCommandsRequest(command);
+        } else { 
+            req = new JaxbCommandsRequest(config.getDeploymentId(), command);
+        }
+
+        Long processInstanceId = findProcessInstanceId(command);
+        if( processInstanceId == null ) { 
+           processInstanceId = config.getProcessInstanceId(); 
+        }
+        req.setProcessInstanceId(processInstanceId);
+        req.setUser(config.getUserName());
+        
+        return req;
+    }
     
     /**
      * Method to communicate with the backend via JMS.
@@ -180,22 +198,19 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeJmsCommand(Command<T> command) {
-        JaxbCommandsRequest req;
-        if( ! (command instanceof AuditCommand) ) { 
-           req = new JaxbCommandsRequest(config.getDeploymentId(), command);
-        } else { 
-            req = new JaxbCommandsRequest(command);
-        }
-        
-        req.setProcessInstanceId(findProcessInstanceId(command));
-        req.setUser(config.getJmsQueueUsername());
+        JaxbCommandsRequest req = prepareCommandRequest(command);
 
         ConnectionFactory factory = config.getConnectionFactory();
         Queue sendQueue;
-        if (command instanceof TaskCommand) {
-            sendQueue = config.getKsessionQueue();
-        } else {
+        
+        boolean isTaskCommand = (command instanceof TaskCommand);
+        if (isTaskCommand) { 
             sendQueue = config.getTaskQueue();
+            if( ! config.getUseUssl() ) { 
+               throw new SecurityException("Task operation requests can only be sent via JMS if SSL is used.");
+            }
+        } else {
+            sendQueue = config.getKsessionQueue();
         }
         Queue responseQueue = config.getResponseQueue();
 
@@ -210,8 +225,8 @@ public abstract class AbstractRemoteCommandObject {
             MessageProducer producer;
             MessageConsumer consumer;
             try {
-                if (config.getJmsQueuePassword() != null) {
-                    connection = factory.createConnection(config.getJmsQueueUsername(), config.getJmsQueuePassword());
+                if (config.getPassword() != null) {
+                    connection = factory.createConnection(config.getUserName(), config.getPassword());
                 } else {
                     connection = factory.createConnection();
                 }
@@ -225,7 +240,6 @@ public abstract class AbstractRemoteCommandObject {
                 throw new RemoteCommunicationException("Unable to setup a JMS connection.", jmse);
             }
 
-            
             // Create msg
             BytesMessage msg;
             JaxbSerializationProvider serializationProvider;
@@ -238,7 +252,9 @@ public abstract class AbstractRemoteCommandObject {
                 msg.writeUTF(xmlStr);
                 
                 // set properties
+                // 1. corr id
                 msg.setJMSCorrelationID(corrId);
+                // 2. serialization info
                 msg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
                 Set<Class<?>> extraJaxbClasses = config.getExtraJaxbClasses(); 
                 if( ! extraJaxbClasses.isEmpty() ) { 
@@ -246,6 +262,20 @@ public abstract class AbstractRemoteCommandObject {
                     msg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, extraJaxbClassesPropertyValue);
                     msg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, config.getDeploymentId());
                 }
+                // 3. user/pass for task operations
+                String userName = config.getUserName();
+                String password = config.getPassword();
+                if( isTaskCommand ) { 
+                    if( userName == null ) { 
+                        throw new RemoteCommunicationException("A user name is required when sending task operation requests via JMS");
+                    }
+                    if( password == null ) { 
+                        throw new RemoteCommunicationException("A password is required when sending task operation requests via JMS");
+                    }
+                    msg.setStringProperty("username", userName);
+                    msg.setStringProperty("password", password);
+                }
+                // 4. process instance id
             } catch (JMSException jmse) {
                 throw new RemoteCommunicationException("Unable to create and fill a JMS message.", jmse);
             } catch (SerializationException se) {
@@ -262,14 +292,14 @@ public abstract class AbstractRemoteCommandObject {
             // receive
             Message response;
             try {
-                response = consumer.receive(config.getQualityOfServiceThresholdMilliSeconds());
+                response = consumer.receive(config.getTimeout()*1000);
             } catch (JMSException jmse) {
                 throw new RemoteCommunicationException("Unable to receive or retrieve the JMS response.", jmse);
             }
 
 
             if (response == null) {
-                logger.warn("Response is empty, leaving");
+                logger.warn("Response is empty");
                 return null;
             }
             // extract response
@@ -289,7 +319,9 @@ public abstract class AbstractRemoteCommandObject {
             if (connection != null) {
                 try {
                     connection.close();
-                    session.close();
+                    if( session != null ) { 
+                        session.close();
+                    }
                 } catch (JMSException jmse) {
                     logger.warn("Unable to close connection or session!", jmse);
                 }
@@ -326,9 +358,18 @@ public abstract class AbstractRemoteCommandObject {
         } else {
             restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
         }
-        JaxbCommandsRequest jaxbRequest = new JaxbCommandsRequest(deploymentId, command);
-        jaxbRequest.setProcessInstanceId(findProcessInstanceId(command));
+        
+        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
+        
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
+        if( logger.isTraceEnabled() ) { 
+            try {
+                logger.trace("Sending {} via POST to {}", command.getClass().getSimpleName(), restRequest.getUri());
+            } catch (Exception e) {
+                // do nothing because this should never happen..  
+            }
+            logger.trace("Serialized JaxbCommandsRequest:\n {}", jaxbRequestString);
+        }
         restRequest.body(MediaType.APPLICATION_XML, jaxbRequestString);
         
         ClientResponse<Object> response = null;
@@ -378,7 +419,11 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
+    // TODO: https://issues.jboss.org/browse/JBPM-4296
     private Long findProcessInstanceId(Command<?> command) {
+        if( command instanceof AuditCommand<?> ) { 
+            return null;
+        }
         try {
             Field[] fields = command.getClass().getDeclaredFields();
 

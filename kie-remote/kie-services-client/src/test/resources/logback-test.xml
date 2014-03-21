@@ -11,6 +11,7 @@
 
   <!-- change to debug to see serializationTest output (JSON/JAXB/YAML strings) -->
   <logger name="org.kie.services" level="info"/>
+  <logger name="org.kie.services.client.builder" level="debug"/>
   
   <root level="info">
     <appender-ref ref="consoleAppender" />

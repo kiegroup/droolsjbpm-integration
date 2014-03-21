@@ -1,6 +1,6 @@
 package org.kie.services.client.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotEquals;
 
 import java.net.URL;
@@ -62,6 +62,7 @@ public class LiveServerTest {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("employee", taskUserId);
         ProcessInstance processInstance = ksession.startProcess("evaluation", params);
+        assertNotNull( processInstance );
 
         logger.debug("Started process instance: " + processInstance + " "
                 + (processInstance == null ? "" : processInstance.getId()));

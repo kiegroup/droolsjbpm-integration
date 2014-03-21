@@ -11,6 +11,11 @@
   <artifactId>kie-services-client</artifactId>
   <name>KIE Remote Services :: Client</name>
 
+  <properties>
+    <version.org.mockito>1.9.5</version.org.mockito>
+    <version.org.powermock>1.5.4</version.org.powermock>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
@@ -59,6 +64,10 @@
       <artifactId>jms</artifactId>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.hornetq</groupId>
+      <artifactId>hornetq-jms-client</artifactId>
+   </dependency>
 
     <!-- rest -->
     <dependency>
@@ -156,6 +165,36 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.9.9-RC1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- powermock -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>${version.org.mockito}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${version.org.mockito}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>${version.org.powermock}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>${version.org.powermock}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-remote-naming</artifactId>
+      <version>1.0.5.Final</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

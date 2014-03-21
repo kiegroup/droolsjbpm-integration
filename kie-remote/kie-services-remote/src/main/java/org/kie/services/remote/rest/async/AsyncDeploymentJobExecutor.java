@@ -120,7 +120,7 @@ public class AsyncDeploymentJobExecutor {
                 try {
                     thisJobSuccess = job.get(1, TimeUnit.NANOSECONDS);
                 } catch (Exception e) {
-                    logger.warn("Unable to retrieve status of job {}", entry.getKey(), e);
+                    logger.warn("Unable to retrieve status of job {}", entry.getKey());
                     // do nothing
                 }
                 
