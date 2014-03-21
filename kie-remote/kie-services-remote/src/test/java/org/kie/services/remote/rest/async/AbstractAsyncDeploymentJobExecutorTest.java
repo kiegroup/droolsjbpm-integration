@@ -115,20 +115,5 @@ public abstract class AbstractAsyncDeploymentJobExecutorTest {
             return true;
         }
     }
-    
-    protected class TestSubmitCallable implements Callable<JaxbDeploymentJobResult> {
 
-        private final KModuleDeploymentUnit depUnit;
-        
-        public TestSubmitCallable(KModuleDeploymentUnit depUnit) { 
-            this.depUnit = depUnit;
-        }
-        
-        @Override
-        public JaxbDeploymentJobResult call() throws Exception {
-            submittedPendingJobsTrackerList.add(depUnit.getVersion().intern());
-            return asyncDeploymentJobExecutor.submitJob(deploymentService, depUnit, JobType.DEPLOY);
-        }
-        
-    }
 }
