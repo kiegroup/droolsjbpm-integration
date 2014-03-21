@@ -1,6 +1,10 @@
 package org.kie.services.remote.rest.async;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,11 +12,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.junit.After;
 import org.junit.Test;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
+import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor.JobId;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor.JobType;
 
 public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobExecutorTest {
@@ -24,10 +31,10 @@ public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobEx
 
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
-    private void addJob(int id, Map<String, Future<Boolean>> jobs) { 
+    private void addJob(int id, Map<JobId, Future<Boolean>> jobs) { 
         TestSemaphoreCallable testCallable = new TestSemaphoreCallable(id);
         Future<Boolean> job = asyncDeploymentJobExecutor.executor.submit(testCallable);
-        jobs.put(String.valueOf(id), job);
+        jobs.put(new JobId(String.valueOf(id), ( id % 2 == 0 ? JobType.UNDEPLOY : JobType.DEPLOY)), job);
         submittedPendingJobsTrackerList.add(String.valueOf(id).intern());
     }
 
@@ -126,7 +133,7 @@ public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobEx
 
     @Test
     public void jobQueueEvictionTest() throws Exception {
-        Map<String, Future<Boolean>> jobs = asyncDeploymentJobExecutor.jobs;
+        Map<JobId, Future<Boolean>> jobs = asyncDeploymentJobExecutor.jobs;
         assertEquals(0, jobs.size());
 
         // Fill jobs queue with unfinished jobs
@@ -160,9 +167,9 @@ public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobEx
         ++unfinishedJobs;
 
         int jobsWaiting = 0;
-        Iterator<Entry<String, Future<Boolean>>> jobsIter = jobs.entrySet().iterator();
+        Iterator<Entry<JobId, Future<Boolean>>> jobsIter = jobs.entrySet().iterator();
         while (jobsIter.hasNext()) {
-            Entry<String, Future<Boolean>> jobsEntry = jobsIter.next();
+            Entry<JobId, Future<Boolean>> jobsEntry = jobsIter.next();
             if (! jobsEntry.getValue().isDone() ) {
                 ++jobsWaiting;
                 logger.debug( "NOT DONE: " + jobsEntry.getKey() );
@@ -172,7 +179,7 @@ public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobEx
     }
 
     @Test
-    public void duplicateRequestsOfFinishedOrCancelledRequestsAreAcceptedTest() throws Exception { 
+    public void jobQueueTest() throws Exception { 
         // setup
         Queue<KModuleDeploymentUnit> testDepUnits = new LinkedList<KModuleDeploymentUnit>();
         float verIndex = 1.0f;
@@ -189,15 +196,6 @@ public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobEx
             submitJob(depUnit);
         }
         assertEquals( "Submitted jobs: ", asyncDeploymentJobExecutor.jobs.size(), testJobQueueSize );
-        
-        // Duplicates of *pending* jobs will not be accepted
-        iter = testDepUnits.iterator();
-        for (int i = 0; i < testJobQueueSize; ++i) {
-            KModuleDeploymentUnit depUnit = iter.next();
-            logger.debug("[" + depUnit.getIdentifier() + "] job submitted.");
-            JaxbDeploymentJobResult result = asyncDeploymentJobExecutor.submitJob(deploymentService, depUnit, JobType.DEPLOY);
-            assertFalse( "Duplicate job should not have been accepted.", result.isSuccess());
-        }
         
         // Let all jobs finish 
         for (int i = 0; i < testJobQueueSize; ++i) {
@@ -234,4 +232,133 @@ public class AsyncDeploymentJobExecutorTest extends AbstractAsyncDeploymentJobEx
         assertTrue( "Still " + submittedPendingJobsTrackerList.size() + " jobs incomplete.", submittedPendingJobsTrackerList.isEmpty());
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getDeploymentStatusTest() throws Exception {
+        Future<Boolean> doneSuccessJob = mock(Future.class);
+        Future<Boolean> doneFailJob = mock(Future.class);
+        Future<Boolean> doneNullJob = mock(Future.class);
+        Future<Boolean> runningJob = mock(Future.class);
+             
+        // finished successfully
+        doReturn(true).when(doneSuccessJob).isDone();
+        doReturn(true).when(doneSuccessJob).get(anyLong(), any(TimeUnit.class));
+        // finished failure
+        doReturn(true).when(doneFailJob).isDone();
+        doReturn(false).when(doneFailJob).get(anyLong(), any(TimeUnit.class));
+        assertFalse( "Mock is not working!", doneFailJob.get(1, TimeUnit.MINUTES) );
+        // isDone() but .get() returns null
+        doReturn(true).when(doneNullJob).isDone();
+        doReturn(null).when(doneNullJob).get(anyLong(), any(TimeUnit.class));
+        // ! isDone()
+        doReturn(false).when(runningJob).isDone();
+        doReturn(null).when(doneNullJob).get(anyLong(), any(TimeUnit.class));
+                
+        String depId = "A";
+        String otherDepId = "B";
+       
+        // no status
+        JaxbDeploymentStatus 
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.NONEXISTENT, status);
+       
+        // no status, other jobs
+        JobId jobId = new JobId(otherDepId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneSuccessJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.NONEXISTENT, status);
+        
+        // only 1 done job
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneSuccessJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYED, status);
+        
+        // multiple done jobs
+        jobId = new JobId(depId, JobType.UNDEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneSuccessJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.UNDEPLOYED, status);
+      
+        // more done jobs
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneFailJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOY_FAILED, status);
+        
+        // more done jobs
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneSuccessJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYED, status);
+        
+        // Running job added
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, runningJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYING, status);
+       
+        // Added another running job, but it should be ignored
+        jobId = new JobId(depId, JobType.UNDEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, runningJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYING, status);
+        
+        // Add a completed job, which should be ignored, because there's a running job before it 
+        // (This is impossible, but just double-checking.. )
+        jobId = new JobId(depId, JobType.UNDEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneFailJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYING, status);
+       
+        
+        // New round of tests
+        asyncDeploymentJobExecutor.jobs.clear();
+       
+        // one running job, no completed jobs
+        jobId = new JobId(depId, JobType.UNDEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, runningJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.UNDEPLOYING, status);
+        
+        // two running/queued jobs, no completed jobs, should take 1rst running job
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, runningJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.UNDEPLOYING, status);
+        
+        // two running/queued jobs, and a complete job after that
+        // (not possible, double checking )
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneSuccessJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.UNDEPLOYING, status);
+        
+        
+        // New round of tests
+        asyncDeploymentJobExecutor.jobs.clear();
+      
+        // only 1 done job, with null status
+        jobId = new JobId(depId, JobType.DEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneNullJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYING, status);
+        
+        // one running job after the 1 done job, with null status
+        jobId = new JobId(depId, JobType.UNDEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, runningJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.DEPLOYING, status);
+
+        
+        // New round of tests
+        asyncDeploymentJobExecutor.jobs.clear();
+     
+        // failed done undeploy job
+        jobId = new JobId(depId, JobType.UNDEPLOY);
+        asyncDeploymentJobExecutor.jobs.put(jobId, doneFailJob);
+        status = asyncDeploymentJobExecutor.getStatus(depId);
+        assertEquals( JaxbDeploymentStatus.UNDEPLOY_FAILED, status);
+    }
+    
 }
