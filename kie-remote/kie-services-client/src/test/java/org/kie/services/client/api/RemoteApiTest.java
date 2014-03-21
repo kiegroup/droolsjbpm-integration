@@ -16,8 +16,13 @@ public class RemoteApiTest extends Assert {
     @Test
     public void notAceptedMethodTest() throws Exception { 
         URL deploymentUrl = new URL( "http://localhost:8080/kie-wb/" );
-        RemoteRestRuntimeFactory restSessionFactory 
-            = new RemoteRestRuntimeFactory("deployment", deploymentUrl, "mary", "pass");
+        RemoteRestRuntimeEngineFactory restSessionFactory 
+            = RemoteRestRuntimeEngineFactory.newBuilder()
+                .addDeploymentId("deployment")
+                .addUrl(deploymentUrl)
+                .addUserName("mary")
+                .addPassword("pass")
+                .build();
         
         WorkItemHandler wih = new DoNothingWorkItemHandler();
         try { 

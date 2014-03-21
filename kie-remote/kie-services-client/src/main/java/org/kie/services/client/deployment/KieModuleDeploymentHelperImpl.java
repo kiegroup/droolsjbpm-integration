@@ -568,6 +568,7 @@ final class KieModuleDeploymentHelperImpl extends FluentKieModuleDeploymentHelpe
             while ((read = ios.read(buffer)) != -1) {
                 baos.write(buffer, 0, read);
             }
+            return baos.toByteArray();
         } finally {
             try {
                 if (baos != null) {
@@ -580,7 +581,6 @@ final class KieModuleDeploymentHelperImpl extends FluentKieModuleDeploymentHelpe
                 // do nothing
             }
         }
-        return baos.toByteArray();
     }
 
     static class KJarResource {

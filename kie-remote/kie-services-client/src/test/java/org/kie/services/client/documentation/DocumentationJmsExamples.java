@@ -204,7 +204,9 @@ public class DocumentationJmsExamples {
             if (connection != null) {
                 try {
                     connection.close();
-                    session.close();
+                    if( session != null ) { 
+                        session.close();
+                    }
                 } catch (JMSException jmse) {
                     logger.warn("Unable to close connection or session!", jmse);
                 }
@@ -231,4 +233,9 @@ public class DocumentationJmsExamples {
             throw new RemoteCommunicationException("Unable to create " + InitialContext.class.getSimpleName(), e);
         }
     }
+    
+   
+   public void jmsBuilderExamples() { 
+       
+   }
 }

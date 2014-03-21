@@ -1,39 +1,33 @@
 package org.kie.services.client.api;
 
-import static org.kie.services.client.api.command.RemoteConfiguration.*;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.kie.services.client.api.command.RemoteConfiguration;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
+/**
+ * Please use the fluent API provided by the {@link RemoteRestRuntimeEngineFactory#newBuilder()}
+ * </p>
+ * This class will be NOT be present in branches after 6.0.x.
+ */
+@Deprecated
+public class RemoteRestRuntimeFactory extends RemoteRestRuntimeEngineFactory {
 
-public class RemoteRestRuntimeFactory implements RemoteRuntimeEngineFactory {
-
-    private RemoteConfiguration configuration;
-
+    @Deprecated
     public RemoteRestRuntimeFactory(String deploymentId, URL baseUrl, String username, String password) {
-        this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password);
+        super(deploymentId, baseUrl, username, password);
     }
    
+    @Deprecated
     public RemoteRestRuntimeFactory(String deploymentId, URL baseUrl, String username, String password, boolean useFormBasedAuth) {
-        this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password, DEFAULT_TIMEOUT, useFormBasedAuth);
+        super(deploymentId, baseUrl, username, password, useFormBasedAuth);
     }
    
+    @Deprecated
     public RemoteRestRuntimeFactory(String deploymentId, URL baseUrl, String username, String password, int timeoutInSeconds) {
-        this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password, timeoutInSeconds);
+        super(deploymentId, baseUrl, username, password, timeoutInSeconds);
     }
    
+    @Deprecated
     public RemoteRestRuntimeFactory(String deploymentId, URL baseUrl, String username, String password, int timeoutInSeconds, boolean useFormBasedAuth) {
-        this.configuration = new RemoteConfiguration(deploymentId, baseUrl, username, password, timeoutInSeconds, useFormBasedAuth);
+        super(deploymentId, baseUrl, username, password, timeoutInSeconds, useFormBasedAuth);
     }
    
-    public RemoteRuntimeEngine newRuntimeEngine() {
-    	return new RemoteRuntimeEngine(configuration);
-    }
-
-    public void addExtraJaxbClasses(Collection<Class<?>> extraJaxbClasses ) { 
-        this.configuration.addJaxbClasses(new HashSet<Class<?>>(extraJaxbClasses));
-    }
-    
 }

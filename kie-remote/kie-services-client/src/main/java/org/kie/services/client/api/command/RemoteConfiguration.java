@@ -34,6 +34,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
@@ -47,6 +48,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.spi.interception.ClientExecutionContext;
 import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
 import org.kie.api.runtime.manager.Context;
+import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.json.JaxbJacksonObjectMapperResolver;
@@ -58,21 +60,23 @@ import org.slf4j.LoggerFactory;
  */
 public final class RemoteConfiguration {
 
+    public static final String SSL_CONNECTION_FACTORY_NAME = "jms/SslRemoteConnectionFactory";
     public static final String CONNECTION_FACTORY_NAME = "jms/RemoteConnectionFactory";
     public static final String SESSION_QUEUE_NAME = "jms/queue/KIE.SESSION";
     public static final String TASK_QUEUE_NAME = "jms/queue/KIE.TASK";
     public static final String RESPONSE_QUEUE_NAME = "jms/queue/KIE.RESPONSE";
 
     public static final int DEFAULT_TIMEOUT = 5;
+    private long timeout = DEFAULT_TIMEOUT;
     
     // REST or JMS
     private final Type type;
 
     // General
     private String deploymentId;
-    private String jmsQueueUsername;
-    private String jmsQueuePassword;
-    private Context<?> context;
+    private Long processInstanceId;
+    private String userName;
+    private String password;
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     // REST
@@ -80,27 +84,30 @@ public final class RemoteConfiguration {
     private boolean useFormBasedAuth = false;
 
     // JMS
+    private boolean useSsl = false;
     private ConnectionFactory connectionFactory;
     private Queue ksessionQueue;
     private Queue taskQueue;
     private Queue responseQueue;
-    private int qualityOfServiceThresholdMilliSeconds = 5 * 1000; // 5 seconds
     private int jmsSerializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
 
-    // ID
     private static final AtomicInteger idGen = new AtomicInteger(0);
-
+    
     /**
      * Public constructors and setters
      */
-
-    // REST ----------------------------------------------------------------------------------------------------------------------
 
     @SuppressWarnings("unused")
     private RemoteConfiguration() {
         // no public constructor!
         this.type = Type.CONSTRUCTOR;
     }
+
+    public RemoteConfiguration(Type type) { 
+        this.type = type;
+    }
+    
+    // REST ----------------------------------------------------------------------------------------------------------------------
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password) {
         this(deploymentId, url, username, password, DEFAULT_TIMEOUT);
@@ -112,21 +119,27 @@ public final class RemoteConfiguration {
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout, boolean formBasedAuth) {
         this.type = Type.REST;
-        URL serverPlusRestUrl = initializeRestServicesUrl(deploymentId, url);
+        this.deploymentId = deploymentId;
+        createRequestFactory(url, username, password);
+        this.timeout = timeout;
+        this.useFormBasedAuth = formBasedAuth;
+    }
+
+    public void createRequestFactory(URL url, String username, String password) { 
+        URL serverPlusRestUrl = initializeRestServicesUrl(url);
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
         }
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        this.useFormBasedAuth = formBasedAuth;
         if( useFormBasedAuth ) { 
-            this.requestFactory = createFormBasedAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+            this.requestFactory = createFormBasedAuthenticatingRequestFactory(serverPlusRestUrl, username, password, (int) timeout);
         } else { 
-            this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, timeout);
+            this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, (int) timeout);
         }
     }
-
+    
     /**
      * Initializes the URL that will be used for the request factory
      * 
@@ -134,10 +147,7 @@ public final class RemoteConfiguration {
      * @param url URL of the server instance
      * @return An URL that can be used for the REST request factory
      */
-    private URL initializeRestServicesUrl(String deploymentId, URL url) {
-        if (deploymentId == null || deploymentId.trim().isEmpty()) {
-            throw new IllegalArgumentException("The deployment id may not be empty or null.");
-        }
+    private URL initializeRestServicesUrl(URL url) {
         if (url == null) {
             throw new IllegalArgumentException("The url may not be empty or null.");
         }
@@ -147,7 +157,6 @@ public final class RemoteConfiguration {
             throw new IllegalArgumentException(
                     "URL (" + url.toExternalForm() + ") is incorrectly formatted: " + urise.getMessage(), urise);
         }
-        this.deploymentId = deploymentId;
 
         String urlString = url.toExternalForm();
         if (!urlString.endsWith("/")) {
@@ -199,10 +208,11 @@ public final class RemoteConfiguration {
      * 
      * @return A request factory that can be used to send (authenticating) requests to REST services
      */
-    public static ClientRequestFactory createFormBasedAuthenticatingRequestFactory(URL url, final String username,
-            final String password, int timeout) {
+    public static ClientRequestFactory createFormBasedAuthenticatingRequestFactory(URL url, 
+            final String username, final String password, 
+            int timeout) {
         try {
-            return new FormBasedAuthenticatingClientRequestFactory(url.toURI(), username, password);
+            return new FormBasedAuthenticatingClientRequestFactory(url.toURI(), username, password, timeout);
         } catch (URISyntaxException urise) {
             throw new RemoteCommunicationException("Invalid URL: " + url.toExternalForm(), urise);
         }
@@ -212,21 +222,29 @@ public final class RemoteConfiguration {
      
         private final String username;
         private final String password;
+        private final ClientExecutor executor;
         
-        public FormBasedAuthenticatingClientRequestFactory(URI uri, String username, String password) { 
+        public FormBasedAuthenticatingClientRequestFactory(URI uri, String username, String password, int timeout) { 
             super(uri);
             this.username = username;
             this.password = password;
+           
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpParams params = httpClient.getParams();
+            HttpConnectionParams.setConnectionTimeout(params, timeout*1000);
+            HttpConnectionParams.setSoTimeout(params, timeout*1000);
+            
+            executor = new ApacheHttpClient4Executor(httpClient);
         }
         
         public ClientRequest createRelativeRequest(String uriTemplate) {
-           ClientRequest request =  super.createRelativeRequest(uriTemplate);
+           ClientRequest request =  executor.createRequest(getBase().toString() + uriTemplate);
            request.registerInterceptor(new FormBasedAuthenticatingInterceptor(username, password));
            return request;
         }
 
         public ClientRequest createRequest(String uriTemplate) {
-           ClientRequest request =  super.createRequest(uriTemplate);
+           ClientRequest request =  executor.createRequest(uriTemplate);
            request.registerInterceptor(new FormBasedAuthenticatingInterceptor(username, password));
            return request;
         }
@@ -448,53 +466,56 @@ public final class RemoteConfiguration {
 
     // JMS ----------------------------------------------------------------------------------------------------------------------
 
-    public RemoteConfiguration(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue,
-            Queue responseQueue) {
-        checkValidValues(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
+    public RemoteConfiguration(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) {
         this.deploymentId = deploymentId;
+        this.type = Type.JMS;
+        setQueuesAndConnectionFactory(connectionFactory, ksessionQueue, taskQueue, responseQueue);
+    }
+
+    public void setQueuesAndConnectionFactory(ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) { 
         this.connectionFactory = connectionFactory;
         this.ksessionQueue = ksessionQueue;
         this.taskQueue = taskQueue;
         this.responseQueue = responseQueue;
-
-        this.type = Type.JMS;
+        checkValidValues(this.connectionFactory, this.ksessionQueue, this.taskQueue, this.responseQueue);
     }
-
-    private static void checkValidValues(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue,
-            Queue taskQueue, Queue responseQueue) {
-        if (deploymentId == null || deploymentId.trim().isEmpty()) {
-            throw new IllegalArgumentException("The deployment id may not be empty or null.");
-        }
+    
+    public void checkValidJmsValues() {
+        checkValidValues(connectionFactory, ksessionQueue, taskQueue, responseQueue);
+    }
+    
+    private static void checkValidValues(ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) 
+            throws InsufficientInfoToBuildException {
         if (connectionFactory == null) {
-            throw new IllegalArgumentException("The connection factory argument may not be null.");
+            throw new InsufficientInfoToBuildException("The connection factory argument may not be null.");
         }
-        if (ksessionQueue == null) {
-            throw new IllegalArgumentException("The ksession queue argument may not be null.");
-        }
-        if (taskQueue == null) {
-            throw new IllegalArgumentException("The task queue argument may not be null.");
+        if (ksessionQueue == null && taskQueue == null) {
+            throw new InsufficientInfoToBuildException("At least a ksession queue or task queue is required.");
         }
         if (responseQueue == null) {
-            throw new IllegalArgumentException("The response queue argument may not be null.");
+            throw new InsufficientInfoToBuildException("The response queue argument may not be null.");
         }
     }
 
     public RemoteConfiguration(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue,
             Queue responseQueue, String username, String password) {
         this(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
-
         setAndCheckUserNameAndPassword(username, password);
-    }
-
-    public RemoteConfiguration(String deploymentId, InitialContext context) {
-        this(deploymentId, context, null, null);
     }
 
     public RemoteConfiguration(String deploymentId, InitialContext context, String username, String password) {
         this.deploymentId = deploymentId;
+        this.type = Type.JMS;
+        setAndCheckUserNameAndPassword(username, password);
+        setRemoteInitialContext(context);
+    }
+    
+    public void setRemoteInitialContext(InitialContext context) { 
         String prop = CONNECTION_FACTORY_NAME;
         try {
-            this.connectionFactory = (ConnectionFactory) context.lookup(prop);
+            if( this.connectionFactory == null ) { 
+                this.connectionFactory = (ConnectionFactory) context.lookup(prop);
+            }
             prop = SESSION_QUEUE_NAME;
             this.ksessionQueue = (Queue) context.lookup(prop);
             prop = TASK_QUEUE_NAME;
@@ -504,39 +525,18 @@ public final class RemoteConfiguration {
         } catch (NamingException ne) {
             throw new RemoteCommunicationException("Unable to retrieve object for " + prop, ne);
         }
-        checkValidValues(deploymentId, connectionFactory, ksessionQueue, taskQueue, responseQueue);
-
-        this.type = Type.JMS;
-
-        setAndCheckUserNameAndPassword(username, password);
+        checkValidValues(connectionFactory, ksessionQueue, taskQueue, responseQueue);
     }
 
     private void setAndCheckUserNameAndPassword(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
         }
-        this.jmsQueueUsername = username;
+        this.userName = username;
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        this.jmsQueuePassword = password;
-    }
-
-    // Setters -------------------------------------------------------------------------------------------------------------------
-
-    public void setQualityOfServiceThresholdMilliSeconds(int qualityOfServiceThresholdMilliSeconds) {
-        if (qualityOfServiceThresholdMilliSeconds < 0) {
-            throw new IllegalArgumentException("The QOS threshold limit must be positve.");
-        }
-        this.qualityOfServiceThresholdMilliSeconds = qualityOfServiceThresholdMilliSeconds;
-    }
-
-    public void setSerializationType(int serializationType) {
-        this.jmsSerializationType = serializationType;
-    }
-
-    public void setContext(Context<?> context) {
-        this.context = context;
+        this.password = password;
     }
 
     /**
@@ -544,7 +544,6 @@ public final class RemoteConfiguration {
      */
 
     String getDeploymentId() {
-        assert deploymentId != null : "deploymentId value should not be null!";
         return deploymentId;
     }
 
@@ -562,7 +561,7 @@ public final class RemoteConfiguration {
         return (this.type == Type.REST);
     }
 
-    private enum Type {
+    public enum Type {
         REST, JMS, CONSTRUCTOR;
     }
 
@@ -578,19 +577,14 @@ public final class RemoteConfiguration {
     // JMS
     // ----
 
-    String getJmsQueueUsername() {
-        assert jmsQueueUsername != null : "username value should not be null!";
-        return jmsQueueUsername;
+    public String getUserName() {
+        // assert userName != null : "username value should not be null!"; // disabled for tests
+        return userName;
     }
 
-    String getJmsQueuePassword() {
-        // helpful during tests: assert password != null : "password value should not be null!";
-        return jmsQueuePassword;
-    }
-
-    Context<?> getContext() {
-        assert context != null : "context value should not be null!";
-        return context;
+    public String getPassword() {
+        // assert password != null : "password value should not be null!"; // disabled for tests
+        return password;
     }
 
     ConnectionFactory getConnectionFactory() {
@@ -599,12 +593,12 @@ public final class RemoteConfiguration {
     }
 
     Queue getKsessionQueue() {
-        assert ksessionQueue != null : "ksessionQueue value should not be null!";
+        // assert ksessionQueue != null : "ksessionQueue value should not be null!"; // disabled for testing
         return ksessionQueue;
     }
 
     Queue getTaskQueue() {
-        assert taskQueue != null : "taskQueue value should not be null!";
+        // assert taskQueue != null : "taskQueue value should not be null!"; // disabled for testing
         return taskQueue;
     }
 
@@ -613,12 +607,12 @@ public final class RemoteConfiguration {
         return responseQueue;
     }
 
-    int getQualityOfServiceThresholdMilliSeconds() {
-        return qualityOfServiceThresholdMilliSeconds;
-    }
-
     public void addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
         this.extraJaxbClasses.addAll(extraJaxbClassList);
+    }
+
+    public void clearJaxbClasses() {
+        this.extraJaxbClasses.clear();
     }
 
     Set<Class<?>> getExtraJaxbClasses() {
@@ -630,8 +624,94 @@ public final class RemoteConfiguration {
         return provider;
     }
 
-    public boolean getFormBasedAuth() {
-        return useFormBasedAuth;
+    public Type getType() { 
+        return this.type;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+    
+    public boolean getUseUssl() {
+        return useSsl;
+    } 
+    
+    Long getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    // Setters -------------------------------------------------------------------------------------------------------------------
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
+
+    public void setProcessInstanceId(long processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses) {
+        this.extraJaxbClasses = extraJaxbClasses;
+    }
+
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    public void setKsessionQueue(Queue ksessionQueue) {
+        this.ksessionQueue = ksessionQueue;
+    }
+
+    public void setTaskQueue(Queue taskQueue) {
+        this.taskQueue = taskQueue;
+    }
+
+    public void setResponseQueue(Queue responseQueue) {
+        this.responseQueue = responseQueue;
+    }
+
+    public void setUseFormBasedAuth(boolean useFormBasedAuth) {
+        this.useFormBasedAuth = useFormBasedAuth;
+    }
+    
+    public void setUseSsl(boolean useSsl) {
+        this.useSsl = useSsl;
+    }
+   
+    // Clone --- 
+   
+    private RemoteConfiguration(RemoteConfiguration config) { 
+       this.connectionFactory = config.connectionFactory;
+       this.deploymentId = config.deploymentId;
+       this.extraJaxbClasses = config.extraJaxbClasses;
+       this.jmsSerializationType = config.jmsSerializationType;
+       this.ksessionQueue = config.ksessionQueue;
+       this.password = config.password;
+       this.processInstanceId = config.processInstanceId;
+       this.responseQueue = config.responseQueue;
+       this.requestFactory = config.requestFactory;
+       this.taskQueue = config.taskQueue;
+       this.timeout = config.timeout;
+       this.type = config.type;
+       this.useFormBasedAuth = config.useFormBasedAuth;
+       this.userName = config.userName;
+       this.useSsl = config.useSsl;
+    }
+    
+    public RemoteConfiguration clone() {
+       return new RemoteConfiguration(this);
     }
 
 }
