@@ -96,8 +96,11 @@ public class DeploymentInfoBean {
         }
         Context<?> runtimeContext;
         if( runtimeManager instanceof PerProcessInstanceRuntimeManager ) { 
-            if( processInstanceId == null || processInstanceId == -1) { 
-                throw new IllegalStateException("No process instance id supplied for operation!");
+            if( processInstanceId < 0 ) { 
+                processInstanceId = null;
+            }
+            if( processInstanceId == null ) { 
+                logger.warn("No process instance id supplied for operation!");
             }
             runtimeContext = new ProcessInstanceIdContext(processInstanceId);
         } else { 
