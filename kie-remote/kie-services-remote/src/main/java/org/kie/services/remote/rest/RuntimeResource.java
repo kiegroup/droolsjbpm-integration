@@ -69,20 +69,20 @@ public class RuntimeResource extends ResourceBase {
 
     /* REST information */
     @Context
-    private HttpHeaders headers;
+    protected HttpHeaders headers;
     
     @Context
-    private UriInfo uriInfo;
+    protected UriInfo uriInfo;
     
     @Context
     private Request restRequest;
 
     /* KIE information and processing */
     @Inject
-    private ProcessRequestBean processRequestBean;
+    protected ProcessRequestBean processRequestBean;
     
     @PathParam("deploymentId")
-    private String deploymentId;
+    protected String deploymentId;
 
     // Backwards compatability
     

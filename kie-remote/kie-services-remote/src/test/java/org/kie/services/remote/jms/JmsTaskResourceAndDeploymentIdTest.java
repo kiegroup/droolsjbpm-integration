@@ -1,7 +1,7 @@
 package org.kie.services.remote.jms;
 
 import static org.junit.Assert.*;
-import static org.kie.services.remote.TaskResourceAndDeploymentIdTestHelper.*;
+import static org.kie.services.remote.MockSetupTestHelper.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -22,13 +22,13 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.services.remote.TaskResourceAndDeploymentIdTest;
+import org.kie.services.remote.TaskDeploymentIdTest;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.mockito.Mock;
 
 @SuppressWarnings("unchecked")
-public class JmsTaskResourceAndDeploymentIdTest extends RequestMessageBean implements TaskResourceAndDeploymentIdTest {
+public class JmsTaskResourceAndDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
     private InternalTaskService injectedTaskService;
@@ -67,7 +67,7 @@ public class JmsTaskResourceAndDeploymentIdTest extends RequestMessageBean imple
 
     @Test
     public void testJmsIndependentTaskProcessing() {
-        setupMocks(this, FOR_INDEPENDENT_TASKS);
+        setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
 
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
@@ -82,7 +82,7 @@ public class JmsTaskResourceAndDeploymentIdTest extends RequestMessageBean imple
 
     @Test
     public void testJmsProcessTaskProcessing() {
-        setupMocks(this, FOR_PROCESS_TASKS);
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
 
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
@@ -99,7 +99,7 @@ public class JmsTaskResourceAndDeploymentIdTest extends RequestMessageBean imple
 
     @Test
     public void testJmsAuditCommandWithoutDeploymentId() {
-        setupMocks(this, FOR_PROCESS_TASKS);
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
 
         // run cmd (no deploymentId set on JaxbConmandsRequest object
         JaxbCommandsRequest 

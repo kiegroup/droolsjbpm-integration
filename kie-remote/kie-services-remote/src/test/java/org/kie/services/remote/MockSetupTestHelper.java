@@ -1,8 +1,22 @@
 package org.kie.services.remote;
 
+import static org.kie.services.remote.StartProcessEveryStrategyTest.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import java.util.ArrayList;
+
+import javax.management.RuntimeErrorException;
+
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.jbpm.kie.services.impl.event.DeploymentEvent;
+import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
+import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
+import org.jbpm.runtime.manager.impl.PerRequestRuntimeManager;
+import org.jbpm.runtime.manager.impl.RuntimeEngineImpl;
+import org.jbpm.runtime.manager.impl.SingletonRuntimeManager;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
@@ -12,13 +26,24 @@ import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.impl.model.TaskDataImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.internal.deployment.DeployedUnit;
+import org.kie.internal.deployment.DeploymentUnit;
+import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
+import org.kie.internal.runtime.manager.context.EmptyContext;
+import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.model.InternalTask;
 import org.kie.internal.task.api.model.InternalTaskData;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
-public class TaskResourceAndDeploymentIdTestHelper {
+public class MockSetupTestHelper {
 
     public final static String USER = "user";
     public final static long TASK_ID = 1;
@@ -27,7 +52,7 @@ public class TaskResourceAndDeploymentIdTestHelper {
     public final static boolean FOR_INDEPENDENT_TASKS = true;
     public final static boolean FOR_PROCESS_TASKS = false;
 
-    public static void setupMocks(TaskResourceAndDeploymentIdTest test, boolean independentTask) {
+    public static void setupTaskMocks(TaskDeploymentIdTest test, boolean independentTask) {
         // DeploymentInfoBean
         DeploymentInfoBean runtimeMgrMgrMock = spy(new DeploymentInfoBean());
         test.setRuntimeMgrMgrMock(runtimeMgrMgrMock);
@@ -89,4 +114,60 @@ public class TaskResourceAndDeploymentIdTestHelper {
         test.setupTestMocks();
     }
 
+    public static void setupProcessMocks(StartProcessEveryStrategyTest test, RuntimeStrategy strategy) {
+        // DeploymentInfoBean, runtime engine
+        DeploymentInfoBean runtimeMgrMgr = new DeploymentInfoBean();
+        test.setRuntimeMgrMgrMock(runtimeMgrMgr);
+      
+        // dep unit (with runtime mgr): 
+        // - deployed classes
+        DeployedUnit depUnitMock = mock(DeployedUnit.class);
+        doReturn(new ArrayList<Class<?>>()).when(depUnitMock).getDeployedClasses();
+        // - deployment unit
+        DeploymentUnit realDepUnitMock = mock(DeploymentUnit.class);
+        doReturn(realDepUnitMock).when(depUnitMock).getDeploymentUnit();
+        // - runtime engine
+        RuntimeEngineImpl runtimeEngineMock = mock(RuntimeEngineImpl.class);
+        RuntimeManager runtimeMgrMock;
+        switch(strategy) { 
+        case PER_PROCESS_INSTANCE: 
+            runtimeMgrMock = mock(PerProcessInstanceRuntimeManager.class);
+            // this doesn't really do anything since there is no class/cast checking by mockito
+            doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(ProcessInstanceIdContext.class));
+            // throw exception is EmptyContext.get()
+            mockStatic( EmptyContext.class );
+            Mockito.when(EmptyContext.get()).thenThrow(new IllegalStateException("A ProcessInstanceIdContext is expected to be used here!"));
+            break;
+        case PER_REQUEST:
+            runtimeMgrMock = mock(PerRequestRuntimeManager.class);
+            doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(EmptyContext.class));
+            break;
+        case SINGLETON:
+            runtimeMgrMock = mock(SingletonRuntimeManager.class);
+            doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(EmptyContext.class));
+            break;
+        default: 
+            throw new IllegalStateException("Unknown runtime strategy: " + strategy );
+        }
+        doReturn(runtimeMgrMock).when(depUnitMock).getRuntimeManager();
+        doReturn(runtimeMgrMock).when(runtimeEngineMock).getManager();
+        
+        // add deployment unit
+        runtimeMgrMgr.addOnDeploy(new DeploymentEvent(DEPLOYMENT_ID, depUnitMock));
+        
+        // ksession setup
+        KieSession kieSessionMock = mock(KieSession.class);
+        test.setKieSessionMock(kieSessionMock);
+        doReturn(kieSessionMock).when(runtimeEngineMock).getKieSession();
+
+        // start process
+        RuleFlowProcessInstance procInst = new RuleFlowProcessInstance();
+        procInst.setId(TEST_PROCESS_INST_ID);
+        
+        ProcessInstance procInstMock = spy(procInst);
+        doReturn(procInstMock).when(kieSessionMock).execute(any(StartProcessCommand.class));
+        
+        // have test setup mocks
+        test.setupTestMocks();
+    }
 }

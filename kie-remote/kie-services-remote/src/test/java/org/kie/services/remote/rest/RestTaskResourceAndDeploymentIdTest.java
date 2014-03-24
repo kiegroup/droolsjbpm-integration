@@ -1,6 +1,6 @@
 package org.kie.services.remote.rest;
 
-import static org.kie.services.remote.TaskResourceAndDeploymentIdTestHelper.*;
+import static org.kie.services.remote.MockSetupTestHelper.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -19,12 +19,12 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.remote.TaskResourceAndDeploymentIdTest;
+import org.kie.services.remote.TaskDeploymentIdTest;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 
 @SuppressWarnings("unchecked")
-public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements TaskResourceAndDeploymentIdTest {
+public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements TaskDeploymentIdTest {
 
     private final static String USER = "user";
 
@@ -66,7 +66,7 @@ public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements
 
     @Test
     public void testRestUrlIndependentTaskProcessing() throws URISyntaxException {
-        setupMocks(this, FOR_INDEPENDENT_TASKS);
+        setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
         
         String oper = "claim";
         doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
@@ -86,7 +86,7 @@ public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements
      */
     @Test
     public void testRestExecuteCommandIndependentTaskProcessing() {
-        setupMocks(this, FOR_INDEPENDENT_TASKS);
+        setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
         
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
@@ -101,7 +101,7 @@ public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements
 
     @Test
     public void testRestUrlProcessTaskProcessing() throws Exception {
-        setupMocks(this, FOR_PROCESS_TASKS);
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
         
         String oper = "claim";
         doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
@@ -120,7 +120,7 @@ public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements
 
     @Test
     public void testRestExecuteCommandProcessTaskProcessing() {
-        setupMocks(this, FOR_PROCESS_TASKS);
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
 
         JaxbCommandsRequest cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
         this.execute(cmdsRequest);
