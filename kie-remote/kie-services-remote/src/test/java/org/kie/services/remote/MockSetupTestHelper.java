@@ -1,15 +1,12 @@
 package org.kie.services.remote;
 
-import static org.kie.services.remote.StartProcessEveryStrategyTest.*;
+import static org.kie.services.remote.StartProcessEveryStrategyTest.TEST_PROCESS_INST_ID;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.ArrayList;
 
-import javax.management.RuntimeErrorException;
-
-import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
@@ -27,7 +24,6 @@ import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.impl.model.TaskDataImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
@@ -41,7 +37,8 @@ import org.kie.internal.task.api.model.InternalTask;
 import org.kie.internal.task.api.model.InternalTaskData;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class MockSetupTestHelper {
 
@@ -129,22 +126,41 @@ public class MockSetupTestHelper {
         // - runtime engine
         RuntimeEngineImpl runtimeEngineMock = mock(RuntimeEngineImpl.class);
         RuntimeManager runtimeMgrMock;
+        EmptyContext emptyMock = mock(EmptyContext.class);
         switch(strategy) { 
         case PER_PROCESS_INSTANCE: 
             runtimeMgrMock = mock(PerProcessInstanceRuntimeManager.class);
             // this doesn't really do anything since there is no class/cast checking by mockito
             doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(ProcessInstanceIdContext.class));
             // throw exception is EmptyContext.get()
-            mockStatic( EmptyContext.class );
+            mockStatic( EmptyContext.class, ProcessInstanceIdContext.class );
             Mockito.when(EmptyContext.get()).thenThrow(new IllegalStateException("A ProcessInstanceIdContext is expected to be used here!"));
+            Mockito.when(ProcessInstanceIdContext.get()).then(new Answer<ProcessInstanceIdContext>() {
+                int times = 0;
+                public ProcessInstanceIdContext answer(InvocationOnMock invocation) throws Throwable {
+                    ++times;
+                    if( times > 1 ) { 
+                        throw new IllegalStateException("A process instance id is expected to be passed, received and used in the second call.");
+                    }
+                    return new ProcessInstanceIdContext(null);
+                }
+            });
             break;
         case PER_REQUEST:
             runtimeMgrMock = mock(PerRequestRuntimeManager.class);
             doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(EmptyContext.class));
+            
+            mockStatic( EmptyContext.class, ProcessInstanceIdContext.class );
+            Mockito.when(ProcessInstanceIdContext.get()).thenThrow(new IllegalStateException("A ProcessInstanceIdContext should NOT have been used here!"));
+            Mockito.when(EmptyContext.get()).thenReturn(emptyMock);
             break;
         case SINGLETON:
             runtimeMgrMock = mock(SingletonRuntimeManager.class);
             doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(EmptyContext.class));
+            
+            mockStatic( EmptyContext.class, ProcessInstanceIdContext.class );
+            Mockito.when(ProcessInstanceIdContext.get()).thenThrow(new IllegalStateException("A ProcessInstanceIdContext should NOT have been used here!"));
+            Mockito.when(EmptyContext.get()).thenReturn(emptyMock);
             break;
         default: 
             throw new IllegalStateException("Unknown runtime strategy: " + strategy );
