@@ -64,8 +64,7 @@ public class TaskResource extends ResourceBase {
     protected Request restRequest;
 
     /* KIE information and processing */
-    @Inject
-    protected ProcessRequestBean processRequestBean;
+
 
     @Inject
     protected IdentityProvider identityProvider;

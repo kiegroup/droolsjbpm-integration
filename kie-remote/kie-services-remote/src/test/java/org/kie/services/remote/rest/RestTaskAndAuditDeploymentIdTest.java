@@ -1,5 +1,7 @@
 package org.kie.services.remote.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.kie.services.remote.MockSetupTestHelper.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -13,18 +15,24 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.kie.services.api.IdentityProvider;
+import org.jbpm.process.audit.AuditLogService;
+import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
+import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.remote.TaskDeploymentIdTest;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 
 @SuppressWarnings("unchecked")
-public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements TaskDeploymentIdTest {
+public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements TaskDeploymentIdTest {
 
     private final static String USER = "user";
 
@@ -32,6 +40,7 @@ public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements
     private InternalTaskService injectedTaskService;
     private InternalTaskService runtimeTaskService;
 
+    private AuditLogService auditLogService = mock(AuditLogService.class);
     
     @Override
     public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
@@ -132,5 +141,35 @@ public class RestTaskResourceAndDeploymentIdTest extends TaskResource implements
         verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
         // complete operation should be done by runtime task service
         verify(runtimeTaskService, times(1)).execute(any(TaskCommand.class));
+    }
+    
+    @Test
+    public void testRestAuditCommandWithoutDeploymentId() {
+        // setup
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
+        this.processRequestBean.setAuditLogService(auditLogService);
+
+        // run cmd (no deploymentId set on JaxbConmandsRequest object
+        JaxbCommandsRequest 
+        cmdsRequest = new JaxbCommandsRequest(new FindProcessInstancesCommand());
+        JaxbCommandsResponse 
+        response = this.execute(cmdsRequest);
+       
+        // check result
+        assertEquals( "Number of response objects", 1, response.getResponses().size() );
+        JaxbCommandResponse<?> 
+        responseObj = response.getResponses().get(0);
+        assertFalse( "Command did not complete successfully", responseObj instanceof JaxbExceptionResponse );
+        
+        // run cmd (no deploymentId set on JaxbConmandsRequest object
+        cmdsRequest = new JaxbCommandsRequest(new ClearHistoryLogsCommand());
+        response = this.execute(cmdsRequest);
+        
+        // check result
+        assertEquals( "Number of response objects", 0, response.getResponses().size() );
+        
+        // verify
+        verify(auditLogService, times(1)).findProcessInstances();
+        verify(auditLogService, times(1)).clear();
     }
 }

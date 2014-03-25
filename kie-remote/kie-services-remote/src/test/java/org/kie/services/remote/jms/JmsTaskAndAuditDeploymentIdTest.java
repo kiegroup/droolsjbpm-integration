@@ -28,7 +28,7 @@ import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.mockito.Mock;
 
 @SuppressWarnings("unchecked")
-public class JmsTaskResourceAndDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {
+public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
     private InternalTaskService injectedTaskService;
