@@ -101,14 +101,17 @@ public class DeploymentInfoBean {
                     processInstanceId = null;
                 }
                 logger.warn("No process instance id supplied for operation!");
+                // Use the static method here instead of the constructor in order to use mock static magic in the tests
+                runtimeContext = ProcessInstanceIdContext.get();
+            } else { 
+                runtimeContext = ProcessInstanceIdContext.get(processInstanceId);
             }
-            runtimeContext = new ProcessInstanceIdContext(processInstanceId);
         } else { 
             runtimeContext = EmptyContext.get();
         }
         return runtimeManager.getRuntimeEngine(runtimeContext);
     }
-   
+  
     /**
      * Used by classes involved with de/serialzation in order to retrieve (user-defined) clases 
      * to be used in de/serialization.
