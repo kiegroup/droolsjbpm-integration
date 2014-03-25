@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.process.audit.command.AuditCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.IllegalTaskStateException;
 import org.jbpm.services.task.exception.PermissionDeniedException;
@@ -43,10 +45,13 @@ public class ResourceBase {
     protected static final Logger logger = LoggerFactory.getLogger(ResourceBase.class);
     
     protected static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
+   
+    @Inject
+    protected ProcessRequestBean processRequestBean;
     
     // Seam-Transaction ----------------------------------------------------------------------------------------------------------
     
-    public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
+    public JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command<?>> commands = request.getCommands();
@@ -77,6 +82,10 @@ public class ResourceBase {
                                 request.getProcessInstanceId(),
                                 null,
                                 taskCmd);
+                    } else if( cmd instanceof AuditCommand<?>) {
+                        AuditCommand<?> auditCmd = (AuditCommand<?>) cmd;
+                        ((AuditCommand) cmd).setAuditLogService(processRequestBean.getAuditLogService());
+                        cmdResult = ((AuditCommand) cmd).execute(null);
                     } else {
                         cmdResult = requestBean.doKieSessionOperation(
                                 cmd, 

@@ -78,8 +78,7 @@ public class RuntimeResource extends ResourceBase {
     private Request restRequest;
 
     /* KIE information and processing */
-    @Inject
-    protected ProcessRequestBean processRequestBean;
+
     
     @PathParam("deploymentId")
     protected String deploymentId;
