@@ -1,12 +1,12 @@
 package org.kie.services.remote.jms;
 
-import static org.powermock.api.mockito.PowerMockito.*;
 import static org.junit.Assert.*;
 import static org.kie.services.remote.MockSetupTestHelper.DEPLOYMENT_ID;
 import static org.kie.services.remote.MockSetupTestHelper.setupProcessMocks;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 

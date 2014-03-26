@@ -1,6 +1,7 @@
 package org.kie.services.remote.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.kie.services.remote.MockSetupTestHelper.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
-import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
@@ -25,7 +25,6 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.remote.TaskDeploymentIdTest;
 import org.kie.services.remote.cdi.DeploymentInfoBean;
 import org.kie.services.remote.cdi.ProcessRequestBean;
-import org.mockito.Mock;
 
 @SuppressWarnings("unchecked")
 public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {

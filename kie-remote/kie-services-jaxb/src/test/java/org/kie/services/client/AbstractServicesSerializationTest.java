@@ -156,7 +156,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
 
         req = new JaxbCommandsRequest();
         req.setUser("krampus");
-        List<Command<?>> cmds = new ArrayList<Command<?>>();
+        List<Command> cmds = new ArrayList<Command>();
         req.setCommands(cmds);
         req.setDeploymentId("depId");
         req.setProcessInstanceId(43l);

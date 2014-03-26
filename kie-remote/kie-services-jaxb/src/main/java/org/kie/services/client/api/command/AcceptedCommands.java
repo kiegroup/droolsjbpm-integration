@@ -25,6 +25,7 @@ import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 import org.kie.api.command.Command;
 
+@SuppressWarnings("rawtypes")
 public class AcceptedCommands {
 
     private AcceptedCommands() { 
@@ -76,6 +77,7 @@ public class AcceptedCommands {
         acceptedCommands.add(GetTaskCommand.class);
         acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
+        acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);
         acceptedCommands.add(ReleaseTaskCommand.class);

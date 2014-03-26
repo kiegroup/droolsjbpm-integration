@@ -340,7 +340,7 @@ public class RequestMessageBean implements MessageListener {
     protected JaxbCommandsResponse processJaxbCommandsRequest(JaxbCommandsRequest request) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
-        List<Command<?>> commands = request.getCommands();
+        List<Command> commands = request.getCommands();
         
         RuntimeEngine runtimeEngine = null;
         if (commands != null) {
