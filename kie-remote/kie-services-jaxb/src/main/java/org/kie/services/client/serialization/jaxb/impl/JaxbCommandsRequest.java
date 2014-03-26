@@ -1,6 +1,7 @@
 package org.kie.services.client.serialization.jaxb.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,9 +32,11 @@ import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 import org.kie.api.command.Command;
+import org.kie.services.client.api.command.AcceptedCommands;
 
 @XmlRootElement(name = "command-request")
 @XmlAccessorType(XmlAccessType.FIELD)
+@SuppressWarnings("rawtypes")
 public class JaxbCommandsRequest {
 
     @XmlElement(name = "deployment-id")
@@ -97,6 +100,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
             @XmlElement(name = "get-tasks-by-processinstanceid", type = GetTasksByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
+            @XmlElement(name = "get-tasks-by-various-command", type = GetTasksByVariousFieldsCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
             @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),
@@ -120,25 +124,27 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "find-variable-instances", type = FindVariableInstancesCommand.class),
             @XmlElement(name = "find-variable-instances-by-name", type = FindVariableInstancesByNameCommand.class)
     })
-    protected List<Command<?>> commands;
+    protected List<Command> commands;
 
     public JaxbCommandsRequest() {
         // Default constructor
     }
 
-    public JaxbCommandsRequest(Command<?> command) {
-        this.commands = new ArrayList<Command<?>>();
+    public JaxbCommandsRequest(Command command) {
+        checkThatCommandIsAccepted(command);
+        this.commands = new ArrayList<Command>();
         this.commands.add(command);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
     
-    public JaxbCommandsRequest(List<Command<?>> commands) {
-        this.commands = new ArrayList<Command<?>>();
+    public JaxbCommandsRequest(List<Command> commands) {
+        checkThatCommandsAreAccepted(commands);
+        this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
 
-    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command<?>> checkCommands) {
+    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
         if( deploymentId != null && ! deploymentId.trim().isEmpty() ) { 
             return;
         }
@@ -150,17 +156,30 @@ public class JaxbCommandsRequest {
     }
 
     public JaxbCommandsRequest(String deploymentId, Command<?> command) {
+        checkThatCommandIsAccepted(command);
         this.deploymentId = deploymentId;
-        this.commands = new ArrayList<Command<?>>();
+        this.commands = new ArrayList<Command>();
         this.commands.add(command);
     }
 
-    public JaxbCommandsRequest(String deploymentId, List<Command<?>> commands) {
+    public JaxbCommandsRequest(String deploymentId, List<Command> commands) {
+        checkThatCommandsAreAccepted(commands);
         this.deploymentId = deploymentId;
-        this.commands = new ArrayList<Command<?>>();
+        this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
     }
 
+    private void checkThatCommandsAreAccepted(Collection<Command> cmds) { 
+       for( Command cmd : cmds ) { 
+          checkThatCommandIsAccepted(cmd); 
+       }
+    }
+    private void checkThatCommandIsAccepted(Command<?> cmd) { 
+        if( ! AcceptedCommands.getSet().contains(cmd.getClass()) ) {
+           throw new UnsupportedOperationException(cmd.getClass().getName() + " is not an accepted command." ); 
+        }
+    }
+    
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -193,13 +212,14 @@ public class JaxbCommandsRequest {
         this.user = user;
     }
 
-    public void setCommands(List<Command<?>> commands) {
+    public void setCommands(List<Command> commands) {
+        checkThatCommandsAreAccepted(commands);
         this.commands = commands;
     }
 
-    public List<Command<?>> getCommands() {
+    public List<Command> getCommands() {
         if( this.commands == null ) { 
-            this.commands = new ArrayList<Command<?>>();
+            this.commands = new ArrayList<Command>();
         }
         return this.commands;
     }

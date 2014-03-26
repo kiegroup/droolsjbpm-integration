@@ -2,13 +2,10 @@ package org.kie.services.remote.rest;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.apache.lucene.sandbox.queries.DuplicateFilter.KeepMode;
-import org.apache.tools.ant.util.StringUtils;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.junit.Test;
 import org.kie.internal.deployment.DeploymentUnit;

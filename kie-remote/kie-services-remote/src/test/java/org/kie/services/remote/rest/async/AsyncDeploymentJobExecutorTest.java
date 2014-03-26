@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.junit.After;
 import org.junit.Test;
-import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor.JobId;
 import org.kie.services.remote.rest.async.AsyncDeploymentJobExecutor.JobType;

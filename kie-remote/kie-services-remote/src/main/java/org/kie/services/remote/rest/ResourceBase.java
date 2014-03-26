@@ -50,10 +50,11 @@ public class ResourceBase {
     
     // Seam-Transaction ----------------------------------------------------------------------------------------------------------
     
+    @SuppressWarnings("rawtypes")
     public JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
-        List<Command<?>> commands = request.getCommands();
+        List<Command> commands = request.getCommands();
 
         if (commands != null) {
             int cmdListSize = commands.size(); 
@@ -83,8 +84,8 @@ public class ResourceBase {
                                 taskCmd);
                     } else if( cmd instanceof AuditCommand<?>) {
                         AuditCommand<?> auditCmd = (AuditCommand<?>) cmd;
-                        ((AuditCommand) cmd).setAuditLogService(processRequestBean.getAuditLogService());
-                        cmdResult = ((AuditCommand) cmd).execute(null);
+                        auditCmd.setAuditLogService(processRequestBean.getAuditLogService());
+                        cmdResult = auditCmd.execute(null);
                     } else {
                         cmdResult = requestBean.doKieSessionOperation(
                                 cmd, 
