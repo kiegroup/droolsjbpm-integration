@@ -6,9 +6,11 @@ import static org.kie.services.remote.rest.ResourceBase.getVariant;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
@@ -27,17 +29,26 @@ import org.slf4j.LoggerFactory;
 @RequestScoped
 public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
 
-    private static final Logger logger = LoggerFactory.getLogger(DescriptiveExceptionHandler.class);
+    protected static Logger logger = LoggerFactory.getLogger(DescriptiveExceptionHandler.class);
 
     @Context
-    private UriInfo uriInfo;
+    protected UriInfo uriInfo;
 
     @Context
-    private HttpHeaders headers;
+    protected HttpHeaders headers;
 
+    private static final Variant jsonVariant = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE).add().build().get(0);
+   
+    private static final String [] kieServicesRemotePaths = { 
+       "deployment",
+       "history",
+       "runtime",
+       "task" 
+    };
+    
     @Override
     public Response toResponse(Exception e) {
-
+        
         // Translate exception to status
         ResponseBuilder responseBuilder = null;
         int status = -1;
@@ -99,7 +110,25 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         } catch (JAXBException jaxbe) {
             responseBuilder.entity(JaxbExceptionResponse.convertStackTraceToString(jaxbe));
         }
-        return responseBuilder.variant(getVariant(headers)).build();
+       
+        // Determine if the exception came from kie-services-remote or drools-wb-rest
+        // - if drools-wb-rest, use JSON
+        boolean knowledgeStoreUrl = true;
+        String path = uriInfo.getRequestUri().toString().replaceAll( ".*/rest/", "");
+        for( String resourcePath : kieServicesRemotePaths ) { 
+            if( path.startsWith(resourcePath) ) { 
+                knowledgeStoreUrl = false;
+                break;
+            }
+        }
+        Variant variant;
+        if( knowledgeStoreUrl ) { 
+           variant = jsonVariant;
+        } else { 
+           variant = getVariant(headers); 
+        }
+        
+        return responseBuilder.variant(variant).build();
     }
 
 }
