@@ -3,10 +3,9 @@ package org.kie.services.client.serialization;
 import java.io.IOException;
 
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.kie.services.client.serialization.jaxb.json.JaxbJacksonObjectMapper;
 
 public class JsonSerializationProvider implements SerializationProvider {
 
@@ -49,23 +48,6 @@ public class JsonSerializationProvider implements SerializationProvider {
             throw new SerializationException("Unable to deserialize String " + outputType.getClass().getSimpleName() + " instance", jme);
         } catch (IOException ie) {
             throw new SerializationException("Unable to deserialize String to " + outputType.getClass().getSimpleName() + " instance", ie);
-        }
-    }
-
-    private static class JaxbJacksonObjectMapper extends ObjectMapper {
-
-        public JaxbJacksonObjectMapper() {
-            super();
-
-            final AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-
-            this.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
-            this.configure(org.codehaus.jackson.map.SerializationConfig.Feature.WRAP_ROOT_VALUE, true);
-
-            this.setDeserializationConfig(this.getDeserializationConfig().withAnnotationIntrospector(introspector));
-            this.setSerializationConfig(this.getSerializationConfig().withAnnotationIntrospector(introspector));
-
-            this.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         }
     }
 

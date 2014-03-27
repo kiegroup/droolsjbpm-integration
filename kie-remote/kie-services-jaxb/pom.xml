@@ -51,10 +51,10 @@
 
     <!-- rest -->
     <dependency>
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>jaxrs-api</artifactId>
     </dependency>
-
+    
     <!-- jaxb -->
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -63,8 +63,12 @@
 
     <!-- json -->
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jackson-provider</artifactId>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-jaxrs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-xc</artifactId>
     </dependency>
 
     <!-- logging -->
