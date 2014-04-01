@@ -159,8 +159,10 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             KieServices ks = KieServices.Factory.get();
             log.info("adding KieModule from " + configFileURL.toExternalForm() + " to repository.");
             ks.getRepository().addKieModule(kJar);
-            KieSpringUtils.setReleaseIdForContext(releaseId, context);
-            KieSpringUtils.setDefaultReleaseId(releaseId);
+            if (context != null) {
+                KieSpringUtils.setReleaseIdForContext(releaseId, context);
+                KieSpringUtils.setDefaultReleaseId(releaseId);
+            }
         }
     }
 
