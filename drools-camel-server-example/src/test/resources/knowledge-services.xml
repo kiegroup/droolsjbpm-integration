@@ -1,0 +1,16 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
+
+    <kie:kmodule id="drools-camel-server">
+        <kie:kbase name="kbase1" packages="org.drools.server">
+            <kie:ksession name="ksession1" type="stateless"/>
+        </kie:kbase>
+    </kie:kmodule>
+
+    <bean id="kiePostProcessor"
+          class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
+</beans>
