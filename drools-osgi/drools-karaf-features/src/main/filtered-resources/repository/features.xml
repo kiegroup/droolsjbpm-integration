@@ -112,7 +112,7 @@
     </feature>
 
     <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
-        <bundle>mvn:mvn:org.codehaus.jackson/jackson-core-asl/1.9.9</bundle>
+        <bundle>mvn:org.codehaus.jackson/jackson-core-asl/1.9.9</bundle>
         <bundle>mvn:org.jbpm/jbpm-human-task-core/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${jbpm.version}</bundle>
         <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${jbpm.version}</bundle>

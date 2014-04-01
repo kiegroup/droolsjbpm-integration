@@ -231,7 +231,7 @@
             <Bundle-Name>Kie Spring</Bundle-Name>
             <Import-Package>
               !org.kie.spring*,
-              !org.drools.container.Spring.beans.persistence,
+              !org.drools.container.spring.beans.persistence,
               *
             </Import-Package>
             <Export-Package>
