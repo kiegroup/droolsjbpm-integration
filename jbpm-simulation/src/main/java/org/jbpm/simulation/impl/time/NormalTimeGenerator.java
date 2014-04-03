@@ -1,10 +1,10 @@
 package org.jbpm.simulation.impl.time;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.math3.random.RandomData;
-import org.apache.commons.math3.random.RandomDataImpl;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.jbpm.simulation.TimeGenerator;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.simulation.util.SimulationUtils;
@@ -12,7 +12,7 @@ import org.jbpm.simulation.util.SimulationUtils;
 public class NormalTimeGenerator implements TimeGenerator {
 
     private Map<String, Object> data;
-    private static RandomData generator = new RandomDataImpl();
+    private static RandomDataGenerator generator = new RandomDataGenerator();
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
     
     public NormalTimeGenerator(Map<String, Object> data) {
@@ -31,10 +31,15 @@ public class NormalTimeGenerator implements TimeGenerator {
         
         if (sdv > 0) {
         
-            return  (long) generator.nextGaussian(mean, sdv);
+            long value =  (long) generator.nextGaussian(mean, sdv);
+            if (value <= 0) {
+                value = mean;
+            }
+            return value;
         } else {
             return 0;
         }
     }
+
 
 }
