@@ -61,13 +61,13 @@ public class SimulationNodeInstanceFactoryRegistry extends NodeInstanceFactoryRe
       register( FaultNode.class,
                 new CreateNewNodeFactory( SimulationNodeInstance.class ) );
       register( CompositeNode.class,
-                new CreateNewNodeFactory( SimulationNodeInstance.class ) );
+                new CreateNewNodeFactory( SimulationCompositeNodeInstance.class ) );
       register( CompositeContextNode.class,
-                new CreateNewNodeFactory( SimulationNodeInstance.class ) );
+                new CreateNewNodeFactory( SimulationCompositeNodeInstance.class ) );
       register( HumanTaskNode.class,
                 new CreateNewNodeFactory( SimulationNodeInstance.class ) );
       register( ForEachNode.class,
-                new CreateNewNodeFactory( SimulationNodeInstance.class ) );
+                new CreateNewNodeFactory( SimulationCompositeNodeInstance.class ) );
       register( EventNode.class,
                 new CreateNewNodeFactory( SimulationEventNodeInstance.class ) );
       register( StateNode.class,
