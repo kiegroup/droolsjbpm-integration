@@ -3,8 +3,7 @@ package org.jbpm.simulation.impl.time;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.math3.random.RandomData;
-import org.apache.commons.math3.random.RandomDataImpl;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.jbpm.simulation.TimeGenerator;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.simulation.util.SimulationUtils;
@@ -12,7 +11,7 @@ import org.jbpm.simulation.util.SimulationUtils;
 public class UniformTimeGenerator implements TimeGenerator {
 
     private Map<String, Object> data;
-    private static RandomData generator = new RandomDataImpl();
+    private static RandomDataGenerator generator = new RandomDataGenerator();
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
     
     public UniformTimeGenerator(Map<String, Object> data) {
