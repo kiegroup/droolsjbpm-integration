@@ -43,7 +43,7 @@ public class SimulationNodeInstanceFactoryRegistry extends NodeInstanceFactoryRe
       register( Split.class,
                 new CreateNewNodeFactory( SimulationNodeInstance.class ) );
       register( Join.class,
-                new ReuseNodeFactory( SimulationNodeInstance.class ) );
+                new ReuseNodeFactory( SimulationJoinNodeInstance.class ) );
       register( StartNode.class,
                 new CreateNewNodeFactory( SimulationStartNodeInstance.class ) );
       register( EndNode.class,
