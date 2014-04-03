@@ -420,4 +420,26 @@ public class SimulateProcessTest {
         assertEquals(37, wmRepo.getEvents().size());
         wmRepo.close();
     }
+
+    @Test
+    public void testSimulationRunnerEmbeddedSubprocessWithActivites() throws IOException {
+
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/BPMN2-EmbeddedSubprocessWithActivites.bpmn2"));
+
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine())
+            out += line;
+
+
+
+        SimulationRepository repo = SimulationRunner.runSimulation("project.simulation", out, 10, 120000, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+
+        assertEquals(50, wmRepo.getAggregatedEvents().size());
+        assertEquals(80, wmRepo.getEvents().size());
+        wmRepo.close();
+    }
 }
