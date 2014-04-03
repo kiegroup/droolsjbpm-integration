@@ -3,6 +3,7 @@ package org.jbpm.simulation.handler;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
@@ -38,21 +39,23 @@ public class GatewayElementHandler extends MainElementHandler {
 
     protected void handleExclusiveGateway(List<SequenceFlow> outgoing) {
         List<PathContext> locked = new ArrayList<PathContext>();
-        PathContext context = manager.getContextFromStack();
-        PathContext contextAtThisNode = manager.cloneGivenWithoutPush(context);
+        Stack<PathContext> contextsAtThisNode = manager.getContextsFromStack();
 
-        for (SequenceFlow seqFlow : outgoing) {
-            FlowElement target = seqFlow.getTargetRef();
-            if (!context.getVisitedSplitPoint().contains(seqFlow)) {
-                PathContext separatePath = manager.cloneGiven(contextAtThisNode);
-                separatePath.addVisitedSplitPoint(seqFlow);
-                manager.addToPath(seqFlow, separatePath);
-                super.handle(target, manager);
-                separatePath.setLocked(true);
-                locked.add(separatePath);
+        for (PathContext contextAtThisNode : contextsAtThisNode) {
+
+            for (SequenceFlow seqFlow : outgoing) {
+
+                FlowElement target = seqFlow.getTargetRef();
+                if (!contextAtThisNode.getVisitedSplitPoint().contains(seqFlow)) {
+                    PathContext separatePath = manager.cloneGiven(contextAtThisNode);
+                    separatePath.addVisitedSplitPoint(seqFlow);
+                    manager.addToPath(seqFlow, separatePath);
+                    super.handle(target, manager);
+                    separatePath.setLocked(true);
+                    locked.add(separatePath);
+                }
             }
         }
-
         // unlock
         for (PathContext ctx : locked) {
             ctx.setLocked(false);
@@ -107,8 +110,19 @@ public class GatewayElementHandler extends MainElementHandler {
             FlowElement target = seqFlow.getTargetRef();
 
             if (counter == outgoing.size()) {
-                context = manager.getContextFromStack();
-                context.setCanBeFinished(canBeFinished);
+                if (manager.getPaths().size() == 1) {
+                    context.setCanBeFinished(canBeFinished);
+
+                } else {
+                    Iterator<PathContext> it = manager.getPaths().iterator();
+
+                    while (it.hasNext()) {
+                        PathContext pathContext = (PathContext) it.next();
+                        if (pathContext.getType() == Type.ACTIVE) {
+                            pathContext.setCanBeFinished(canBeFinished);
+                        }
+                    }
+                }
             }
             
             super.handle(target, manager);
@@ -120,17 +134,7 @@ public class GatewayElementHandler extends MainElementHandler {
                 manager.addToPath(seqFlow, context);
                 manager.addToPath(seqFlow.getTargetRef(), context);
             }
-            
-            Iterator<PathContext> it = manager.getPaths().iterator();
-            
-            while (it.hasNext()) {
-                PathContext pathContext = (PathContext) it.next();
-                if (pathContext.getType() == Type.ACTIVE) {
-                    pathContext.setCanBeFinishedNoIncrement(canBeFinished);
-                    manager.finalizePath(pathContext);
-                    it.remove();
-                }
-            }
+            manager.finalizePathOnLeave();
             
         }
     }

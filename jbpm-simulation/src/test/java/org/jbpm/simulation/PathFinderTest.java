@@ -1592,4 +1592,32 @@ public class PathFinderTest {
         TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
 
     }
+
+    @Test
+    public void testParallelTwoExclusivesGateways() throws IOException {
+
+
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-ParallelTwoExclusivesGateways.bpmn2"));
+
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(4, paths.size());
+
+
+        for (PathContext context : paths) {
+            assertEquals(15, context.getPathElements().size());
+        }
+
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(4, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+
+        TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
+
+    }
 }

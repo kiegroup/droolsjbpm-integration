@@ -3,9 +3,12 @@ package org.jbpm.simulation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.bpmn2.FlowElement;
@@ -16,6 +19,7 @@ public class PathContextManager {
 
     private Stack<PathContext> paths = new Stack<PathContext>();
     private List<PathContext> completePaths = new ArrayList<PathContext>();
+    private Set<String> completedPathsIds = new HashSet<String>();
     
     protected Map<String, FlowElement> catchingEvents = null;
 
@@ -33,6 +37,22 @@ public class PathContextManager {
         }
 
         return this.paths.peek();
+    }
+
+    public Stack<PathContext> getContextsFromStack() {
+        if (this.paths.isEmpty()) {
+            this.paths.push(new PathContext());
+        }
+        Stack<PathContext> contexts = new Stack<PathContext>();
+        for (PathContext ctx : this.paths) {
+            if (ctx.getType() == PathContext.Type.ACTIVE) {
+                contexts.add(cloneGivenWithoutPush(ctx));
+            }
+        }
+        if (contexts.isEmpty()) {
+            contexts.add(this.paths.peek());
+        }
+        return contexts;
     }
     
     public void addToPath(FlowElement element, PathContext context) {
@@ -104,15 +124,35 @@ public class PathContextManager {
     }
     
     public void finalizePath() {
+
         PathContext context = getContextFromStack();
-        
+
         if (context.isCanBeFinished()) {
-            
+
             // no outgoing sequence flow means end of path
             PathContext completePath = this.paths.pop();
             completePath.setType(Type.COMPLETED);
             addToCompleted(completePath);
+
         }
+    }
+
+    public void finalizePathOnLeave() {
+
+        Iterator<PathContext> it = paths.iterator();
+        while (it.hasNext()) {
+            PathContext context = it.next();
+
+            if (context.isCanBeFinished() && context.getType() == Type.ACTIVE) {
+
+                // no outgoing sequence flow means end of path
+                PathContext completePath = context;
+                completePath.setType(Type.COMPLETED);
+                addToCompleted(completePath);
+                it.remove();
+            }
+        }
+
     }
     
     public void finalizePath(PathContext context) {
@@ -158,7 +198,13 @@ public class PathContextManager {
         for (FlowElement fe : list) {
             pathIdElements.append(fe.getId());
         }
-        context.setPathId("Path"+pathIdElements.toString().hashCode()+ "-" + this.completePaths.size());
-        this.completePaths.add(context);
+
+        int elementsId = pathIdElements.toString().hashCode();
+        context.setPathId("Path" + elementsId + "-" + this.completePaths.size());
+        if (!completedPathsIds.contains(elementsId+"")) {
+            this.completePaths.add(context);
+            completedPathsIds.add(elementsId+"");
+        }
     }
+
 }
