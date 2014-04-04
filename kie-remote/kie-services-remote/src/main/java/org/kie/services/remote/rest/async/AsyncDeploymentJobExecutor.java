@@ -138,14 +138,14 @@ public class AsyncDeploymentJobExecutor {
 
         if (currentJobEntry == null && nextWaitingJobEntry == null) {
             return JaxbDeploymentStatus.NONEXISTENT;
-        } else if (currentJobEntry == null) {
+        } else if (currentJobEntry == null && nextWaitingJobEntry != null) {
             JobId jobId = nextWaitingJobEntry.getKey();
             if (jobId.matches(JobType.DEPLOY)) {
                return JaxbDeploymentStatus.DEPLOYING; 
             } else { 
                return JaxbDeploymentStatus.UNDEPLOYING;
             }
-        } else {
+        } else if( currentJobEntry != null ){
             JobId jobId = currentJobEntry.getKey();
             Future<Boolean> job = currentJobEntry.getValue();
             if (nextWaitingJobEntry != null) {
@@ -185,6 +185,8 @@ public class AsyncDeploymentJobExecutor {
                     return JaxbDeploymentStatus.UNDEPLOYING;
                 }
             }
+        } else { 
+            throw new IllegalStateException("This block in the code should never be reached. Please contact the developers!");
         }
     }
 

@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.runtime.GetFactCountCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
@@ -54,6 +55,8 @@ public class JaxbCommandsRequest {
     @XmlElement
     @XmlSchemaType(name = "string")
     private String user;
+   
+    private transient String [] userPass;
 
     // This list should match the list in AcceptedCommands
     @XmlElements({
@@ -145,9 +148,6 @@ public class JaxbCommandsRequest {
     }
 
     private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
-        if( deploymentId != null && ! deploymentId.trim().isEmpty() ) { 
-            return;
-        }
         for( Command<?> command : checkCommands ) { 
             if( ! (command instanceof TaskCommand<?>) && ! (command instanceof AuditCommand<?>) ) { 
                 throw new UnsupportedOperationException( "A " + command.getClass().getSimpleName() + " requires that the deployment id has been set!" );
@@ -174,6 +174,7 @@ public class JaxbCommandsRequest {
           checkThatCommandIsAccepted(cmd); 
        }
     }
+    
     private void checkThatCommandIsAccepted(Command<?> cmd) { 
         if( ! AcceptedCommands.getSet().contains(cmd.getClass()) ) {
            throw new UnsupportedOperationException(cmd.getClass().getName() + " is not an accepted command." ); 
@@ -223,7 +224,17 @@ public class JaxbCommandsRequest {
         }
         return this.commands;
     }
-    
+   
+    @JsonIgnore
+    public String [] getUserPass() {
+        return userPass;
+    }
+
+    @JsonIgnore
+    public void setUserPass(String [] userPass) {
+        this.userPass = userPass;
+    }
+
     public String toString() {
     	StringBuffer result = new StringBuffer("JaxbCommandsRequest " + deploymentId + "\n");
     	if (commands != null) {
