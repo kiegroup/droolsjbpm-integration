@@ -23,36 +23,35 @@
       <artifactId>kie-services-jaxb</artifactId>
     </dependency>
 
-    <!-- kie/drools/jbpm -->
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-kie-services</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>weld-core</artifactId>
-          <groupId>org.jboss.weld</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>kie-ci</artifactId>
-          <groupId>org.kie</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-audit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-shared-services</artifactId>
-    </dependency>
+    <!-- kie/drools/jbpm: provided in jbpm-console, kie-wb, etc -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-kie-services</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-shared-services</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
       <scope>provided</scope>
     </dependency>
     <!--  remove after the IllegalTaskStateException has been moved back to -core -->
@@ -103,6 +102,14 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- security -->
+    <dependency>
+      <groupId>javax.security</groupId>
+      <artifactId>jacc</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- TEST -->
