@@ -1,5 +1,8 @@
 package org.kie.services.remote.cdi;
 
+import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.FAILURE;
+import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.PERMISSIONS_CONFLICT;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -8,6 +11,7 @@ import javax.persistence.PersistenceUnit;
 
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
+import org.jbpm.process.audit.command.AuditCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
@@ -23,12 +27,16 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.api.command.AcceptedCommands;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
+import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.exception.DeploymentNotFoundException;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
 import org.kie.services.remote.rest.RuntimeResource;
 import org.kie.services.remote.rest.TaskResource;
 import org.kie.services.remote.rest.exception.RestOperationException;
 import org.kie.services.remote.util.ExecuteAndSerializeCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used by both the {@link RuntimeResource} and {@link TaskResource} to do the core operations on
@@ -43,6 +51,8 @@ import org.kie.services.remote.util.ExecuteAndSerializeCommand;
 @RequestScoped
 public class ProcessRequestBean {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);
+    
     /* KIE processing */
     @Inject
     private DeploymentInfoBean runtimeMgrMgr;
@@ -72,6 +82,50 @@ public class ProcessRequestBean {
         this.auditLogService = auditLogService;
     }
 
+    public void processCommand(Command cmd, JaxbCommandsRequest request, int i, JaxbCommandsResponse jaxbResponse) { 
+        String cmdName = cmd.getClass().getSimpleName();
+        logger.debug("Processing command " + cmdName);
+        String errMsg = "Unable to execute " + cmdName + "/" + i;
+        
+        Object cmdResult = null;
+        try {
+            if( cmd instanceof TaskCommand<?> ) { 
+                TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
+                cmdResult = doTaskOperation(
+                        taskCmd.getTaskId(), 
+                        request.getDeploymentId(), 
+                        request.getProcessInstanceId(), 
+                        null, 
+                        taskCmd);
+            } else if( cmd instanceof AuditCommand<?>) { 
+                AuditCommand<?> auditCmd = ((AuditCommand<?>) cmd);
+                auditCmd.setAuditLogService(getAuditLogService());
+                cmdResult = auditCmd.execute(null);
+            } else {
+                cmdResult = doKieSessionOperation(
+                        cmd, 
+                        request.getDeploymentId(), 
+                        request.getProcessInstanceId(), 
+                        errMsg);
+            }
+        } catch (PermissionDeniedException pde) {
+            logger.warn(errMsg, pde);
+            jaxbResponse.addException(pde, i, cmd, PERMISSIONS_CONFLICT);
+        } catch (Exception e) {
+            logger.warn(errMsg, e);
+            jaxbResponse.addException(e, i, cmd, FAILURE);
+        } 
+        if (cmdResult != null) {
+            try {
+                // addResult could possibly throw an exception, which is why it's here and not above
+                jaxbResponse.addResult(cmdResult, i, cmd);
+            } catch (Exception e) {
+                errMsg = "Unable to add result from " + cmdName + "/" + i;
+                logger.error(errMsg, e);
+                jaxbResponse.addException(e, i, cmd, FAILURE);
+            }
+        }
+    }
     
     /**
      * Executes a command on the {@link KieSession} from the proper {@link RuntimeManager}. This method
@@ -196,9 +250,7 @@ public class ProcessRequestBean {
                     TaskService runtimeTaskService = runtimeEngine.getTaskService();
                     return ((InternalTaskService) runtimeTaskService).execute(cmd);
                 } finally { 
-                    if( runtimeEngine != null ) { 
-                        runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
-                    }
+                    runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
                 }
             }
         }

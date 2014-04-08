@@ -17,9 +17,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
-import org.jbpm.process.audit.command.AuditCommand;
-import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
@@ -32,7 +29,6 @@ import org.kie.internal.task.api.model.InternalTask;
 import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.kie.services.remote.cdi.ProcessRequestBean;
 import org.kie.services.remote.rest.exception.RestOperationException;
 import org.kie.services.remote.rest.variant.ServerDrivenNegotiation;
@@ -70,45 +66,7 @@ public class ResourceBase {
             // Execute commands
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
-                logger.debug("Processing command " + cmd.getClass().getSimpleName());
-                Object cmdResult = null;
-                try { 
-                    String errorMsg = "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i;
-                    if (cmd instanceof TaskCommand<?>) {
-                        TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
-                        cmdResult = requestBean.doTaskOperation(
-                                taskCmd.getTaskId(),
-                                request.getDeploymentId(),
-                                request.getProcessInstanceId(),
-                                null,
-                                taskCmd);
-                    } else if( cmd instanceof AuditCommand<?>) {
-                        AuditCommand<?> auditCmd = (AuditCommand<?>) cmd;
-                        auditCmd.setAuditLogService(processRequestBean.getAuditLogService());
-                        cmdResult = auditCmd.execute(null);
-                    } else {
-                        cmdResult = requestBean.doKieSessionOperation(
-                                cmd, 
-                                request.getDeploymentId(), 
-                                request.getProcessInstanceId(),
-                                errorMsg);
-                    }
-                } catch(PermissionDeniedException pde) { 
-                    jaxbResponse.addException(pde, i, cmd, JaxbRequestStatus.PERMISSIONS_CONFLICT);
-                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, pde);
-                } catch(Exception e) { 
-                    jaxbResponse.addException(e, i, cmd, JaxbRequestStatus.FAILURE);
-                    logger.warn("Unable to execute " + cmd.getClass().getSimpleName() + "/" + i, e);
-                }
-                if (cmdResult != null) {
-                    try {
-                        // addResult could possibly throw an exception, which is why it's here and not above
-                        jaxbResponse.addResult(cmdResult, i, cmd);
-                    } catch (Exception e) {
-                        logger.error("Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i, e); 
-                        jaxbResponse.addException(e, i, cmd, JaxbRequestStatus.FAILURE);
-                    }
-                }
+                requestBean.processCommand(cmd, request, i, jaxbResponse);
             }
         }
 
