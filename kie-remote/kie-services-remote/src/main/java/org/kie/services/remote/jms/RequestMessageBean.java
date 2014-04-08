@@ -220,7 +220,8 @@ public class RequestMessageBean implements MessageListener {
         } catch (JMSException jmse) {
             // Without correlation id, receiver won't know what the response relates to
             String errMsg = "Unable to set correlation id of response to msg id " + msgCorrId;
-            throw new KieRemoteServicesRuntimeException(errMsg, jmse);
+            logger.error(errMsg, jmse);
+            return;
         }
 
         // 3c. send response message
@@ -231,10 +232,10 @@ public class RequestMessageBean implements MessageListener {
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId 
                     + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
-            throw new KieRemoteServicesRuntimeException(errMsg, ne);
+            logger.error(errMsg, ne);
         } catch (JMSException jmse) {
             String errMsg = "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME;
-            throw new KieRemoteServicesRuntimeException(errMsg, jmse);
+            logger.error(errMsg, jmse);
         }
     }
 
@@ -351,7 +352,6 @@ public class RequestMessageBean implements MessageListener {
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command> commands = request.getCommands();
       
-        RuntimeEngine runtimeEngine = null;
         if (commands != null) {
             UserGroupAdapter userGroupAdapter = null;
             try { 
@@ -366,56 +366,13 @@ public class RequestMessageBean implements MessageListener {
                         jaxbResponse.addException(uoe, i, cmd, FORBIDDEN);
                         continue;
                     }
-
+                    
                     if( cmd instanceof TaskCommand && userGroupAdapter == null ) { 
                         userGroupAdapter = getUserFromMessageAndLookupAndInjectGroups(request.getUserPass());
                     }
 
-                    String errMsg = "Unable to execute " + cmd.getClass().getSimpleName() + "/" + i;
-                    Object cmdResult = null;
-                    try {
-                        // if the JTA transaction (in HT or the KieSession) doesn't commit, that will cause message reception to be *NOT* acknowledged!
-                        if( cmd instanceof TaskCommand<?> ) { 
-                            TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
-                            cmdResult = processRequestBean.doTaskOperation(
-                                    taskCmd.getTaskId(), 
-                                    request.getDeploymentId(), 
-                                    request.getProcessInstanceId(), 
-                                    null, 
-                                    taskCmd);
-                        } else if( cmd instanceof AuditCommand<?>) { 
-                            AuditCommand<?> auditCmd = ((AuditCommand<?>) cmd);
-                            auditCmd.setAuditLogService(processRequestBean.getAuditLogService());
-                            cmdResult = auditCmd.execute(null);
-                        } else {
-                            cmdResult = processRequestBean.doKieSessionOperation(
-                                    cmd, 
-                                    request.getDeploymentId(), 
-                                    request.getProcessInstanceId(), 
-                                    errMsg);
-                        }
-                    } catch (PermissionDeniedException pde) {
-                        logger.warn(errMsg, pde);
-                        jaxbResponse.addException(pde, i, cmd, PERMISSIONS_CONFLICT);
-                    } catch (IllegalTaskStateException itse) {
-                        logger.warn(errMsg, itse);
-                        jaxbResponse.addException(itse, i, cmd, PERMISSIONS_CONFLICT);
-                    } catch (Exception e) {
-                        logger.warn(errMsg, e);
-                        jaxbResponse.addException(e, i, cmd, FAILURE);
-                    } finally {
-                        runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
-                    }
-                    if (cmdResult != null) {
-                        try {
-                            // addResult could possibly throw an exception, which is why it's here and not above
-                            jaxbResponse.addResult(cmdResult, i, cmd);
-                        } catch (Exception e) {
-                            errMsg = "Unable to add result from " + cmd.getClass().getSimpleName() + "/" + i;
-                            logger.error(errMsg, e);
-                            jaxbResponse.addException(e, i, cmd, FAILURE);
-                        }
-                    }
+                    // if the JTA transaction (in HT or the KieSession) doesn't commit, that will cause message reception to be *NOT* acknowledged!
+                    processRequestBean.processCommand(cmd, request, i, jaxbResponse);
                 }
             } finally { 
                 clearUserGroupAdapter(userGroupAdapter);
