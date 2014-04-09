@@ -203,7 +203,9 @@ public class ResourceBase {
     }
 
     private static Object getObjectFromString(String key, String mapVal) {
-        if (!mapVal.matches("^\\d+[li]?$")) {
+        if (mapVal.matches("^\".*\"$")) {
+            return mapVal.substring(1, mapVal.length()-1);
+        } else if (!mapVal.matches("^\\d+[li]?$")) {
             return mapVal;
         } else {
             return getNumberFromString(key, mapVal, false);
