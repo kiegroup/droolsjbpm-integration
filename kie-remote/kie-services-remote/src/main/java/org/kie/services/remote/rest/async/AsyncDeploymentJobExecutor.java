@@ -43,6 +43,8 @@ public class AsyncDeploymentJobExecutor {
 
     private final static Logger logger = LoggerFactory.getLogger(AsyncDeploymentJobExecutor.class);
 
+    private final static boolean ASYNC_DEPLOY_ENABLED = Boolean.parseBoolean(System.getProperty("kie.services.rest.deploy.async", "true"));
+
     final ExecutorService executor;
     final Map<JobId, Future<Boolean>> jobs;
 
@@ -80,23 +82,56 @@ public class AsyncDeploymentJobExecutor {
         String typeName = type.toString();
         String typeNameLower = typeName.toLowerCase();
 
-        String loggerJobId = typeName + " job for [" + depUnit.getIdentifier() + "]";
+        if (ASYNC_DEPLOY_ENABLED) {
+            logger.info("Deployment executing as async jobs");
+            String loggerJobId = typeName + " job for [" + depUnit.getIdentifier() + "]";
 
-        if (jobs.size() > maxQueueSize) {
-            String msg = "Queue is full with existing incomplete un/deploy jobs";
-            logger.info(loggerJobId + " NOT submitted: " + msg);
-            return new JaxbDeploymentJobResult(msg, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), typeName);
+            if (jobs.size() > maxQueueSize) {
+                String msg = "Queue is full with existing incomplete un/deploy jobs";
+                logger.info(loggerJobId + " NOT submitted: " + msg);
+                return new JaxbDeploymentJobResult(msg, false, convertKModuleDepUnitToJaxbDepUnit(depUnit), typeName);
+            }
+
+            // Submit job
+            JobId jobId = new JobId(depUnit.getIdentifier(), type);
+            DeploymentJobCallable jobCallable = new DeploymentJobCallable(depUnit, type, deploymentService);
+            Future<Boolean> newJob = executor.submit(jobCallable);
+            jobs.put(jobId, newJob);
+
+            logger.info(loggerJobId + " submitted succesfully");
+            return new JaxbDeploymentJobResult("Deployment (" + typeNameLower + ") job submitted successfully.", true,
+                    convertKModuleDepUnitToJaxbDepUnit(depUnit), typeName);
+        }  else {
+            logger.info("Deployment executing as part of the incoming request, async mode not available");
+            String message = " completed successfully";
+            boolean success = true;
+            switch (type) {
+                case DEPLOY:
+                    try {
+                        deploymentService.deploy(depUnit);
+                        logger.debug("Deployment unit [" + depUnit.getIdentifier() + "] deployed");
+                    } catch (Exception e) {
+                        message = " failed due to " + e.getMessage();
+                        success = false;
+                        logger.error("Unable to deploy [" + depUnit.getIdentifier() + "]", e);
+                    }
+                    break;
+                case UNDEPLOY:
+                    try {
+                        deploymentService.undeploy(depUnit);
+                        logger.debug("Deployment unit [" + depUnit.getIdentifier() + "] undeployed");
+                    } catch (Exception e) {
+                        message = " failed due to " + e.getMessage();
+                        success = false;
+                        logger.error("Unable to undeploy [" + depUnit.getIdentifier() + "]", e);
+                    }
+                    break;
+                default:
+                    logger.error("Unknown " + JobType.class.getSimpleName() + " type (" + type.toString() + "), not taking any action");
+            }
+            return new JaxbDeploymentJobResult("Deployment (" + typeNameLower + ") job " + message, success,
+                    convertKModuleDepUnitToJaxbDepUnit(depUnit), typeName);
         }
-
-        // Submit job
-        JobId jobId = new JobId(depUnit.getIdentifier(), type);
-        DeploymentJobCallable jobCallable = new DeploymentJobCallable(depUnit, type, deploymentService);
-        Future<Boolean> newJob = executor.submit(jobCallable);
-        jobs.put(jobId, newJob);
-
-        logger.info(loggerJobId + " submitted succesfully");
-        return new JaxbDeploymentJobResult("Deployment (" + typeNameLower + ") job submitted successfully.", true,
-                convertKModuleDepUnitToJaxbDepUnit(depUnit), typeName);
     }
 
     /**
