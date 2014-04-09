@@ -107,8 +107,7 @@ public class ProcessRequestBean {
                 cmdResult = doKieSessionOperation(
                         cmd, 
                         request.getDeploymentId(), 
-                        request.getProcessInstanceId(), 
-                        errMsg);
+                        request.getProcessInstanceId());
             }
         } catch (PermissionDeniedException pde) {
             logger.warn(errMsg, pde);
@@ -141,7 +140,7 @@ public class ProcessRequestBean {
      * @param processInstanceId The process instance id, if available.
      * @return The result of the {@link Command}.
      */
-    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId, String errorMsg) {
+    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId) {
         if( deploymentId == null ) {
             throw new DeploymentNotFoundException("No deployment id supplied! Could not retrieve runtime to execute " + cmd.getClass().getSimpleName());
         }
@@ -152,8 +151,6 @@ public class ProcessRequestBean {
             runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
             KieSession kieSession = runtimeEngine.getKieSession();
             result = kieSession.execute(cmd);
-        } catch (RuntimeException re) {
-            throw re;
         } finally {
             runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
         }

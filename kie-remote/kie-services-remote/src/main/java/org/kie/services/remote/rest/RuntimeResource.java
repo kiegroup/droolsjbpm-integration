@@ -34,13 +34,11 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
@@ -102,40 +100,19 @@ public class RuntimeResource extends ResourceBase {
     public Response process_defId_start(@PathParam("processDefId") String processId) {
         Map<String, List<String>> requestParams = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
-        
         Map<String, Object> params = extractMapFromParams(requestParams, oper);
-        Command<?> cmd = new StartProcessCommand(processId, params);
 
-        Object result = processRequestBean.doKieSessionOperation(
-                cmd, 
-                deploymentId, 
-                null,
-                "Unable to start process with process definition id '" + processId + "'");
+        ProcessInstance result = startProcessInstance(processId, params);
 
-        JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result, uriInfo.getRequestUri().toString());
+        JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse(result, uriInfo.getRequestUri().toString());
         return createCorrectVariant(responseObj, headers);
     }
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}")
     public Response process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
-        Command<?> cmd = new GetProcessInstanceCommand(procInstId);
-        ((GetProcessInstanceCommand) cmd).setReadOnly(true);
-        
-        Object result = processRequestBean.doKieSessionOperation(
-                cmd, 
-                deploymentId, 
-                procInstId, 
-                "Unable to get process instance " + procInstId);
-        
-        Object responseObj = null;
-        if (result != null) {
-            responseObj = new JaxbProcessInstanceResponse((ProcessInstance) result);
-            return createCorrectVariant(responseObj, headers);
-        } else {
-            throw RestOperationException.notFound("Unable to retrieve process instance " + procInstId
-                    + " which may have been completed. Please see the history operations.");
-        }
+        ProcessInstance result = getProcessInstance(procInstId);
+        return createCorrectVariant(new JaxbProcessInstanceResponse(result), headers);
     }
 
     @POST
@@ -143,12 +120,18 @@ public class RuntimeResource extends ResourceBase {
     public Response process_instance_procInstId_abort(@PathParam("procInstId") Long procInstId) {
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
-        
-        processRequestBean.doKieSessionOperation(
+       
+        try { 
+            processRequestBean.doKieSessionOperation(
                 cmd, 
                 deploymentId, 
-                procInstId,
-                "Unable to abort process instance " + procInstId);
+                procInstId);
+        } catch( IllegalArgumentException iae ) { 
+            if( iae.getMessage().startsWith("Could not find process instance") ) {
+                throw RestOperationException.notFound("Process instance " + procInstId + " is not available.");
+            }
+            throw iae;
+        }
                 
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
@@ -162,17 +145,8 @@ public class RuntimeResource extends ResourceBase {
         Object event = getObjectParam("event", false, params, oper);
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
         
-        String errorMsg = "Unable to signal process instance";
-        if( eventType == null ) { 
-            errorMsg += " with empty signal";
-        } else { 
-            errorMsg += " with signal type '" + eventType + "'";
-        }
-        if( event != null ) { 
-            errorMsg += " and event '" + event + "'";
-        }
-
-        processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId, errorMsg);
+        processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId);
+        
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
 
     }
@@ -192,48 +166,6 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(jaxbElem, headers);
     }
   
-    protected QName getRootElementName(Object object) { 
-        boolean xmlRootElemAnnoFound = false;
-        Class<?> objClass = object.getClass();
-        
-        // This usually doesn't work in the kie-wb/bpms environment, see comment below
-        XmlRootElement xmlRootElemAnno = objClass.getAnnotation(XmlRootElement.class);
-        logger.debug("Getting XML root element annotation for " + object.getClass().getName());
-        if( xmlRootElemAnno != null ) { 
-            xmlRootElemAnnoFound = true;
-            return new QName(xmlRootElemAnno.name());
-        } else { 
-            /**
-             * There seem to be weird classpath issues going on here, probably related
-             * to the fact that kjar's have their own classloader..
-             * (The XmlRootElement class can't be found in the same classpath as the
-             * class from the Kjar)
-             */
-            for( Annotation anno : objClass.getAnnotations() ) { 
-                Class<?> annoClass = anno.annotationType();
-                // we deliberately compare *names* and not classes because it's on a different classpath!
-                if( XmlRootElement.class.getName().equals(annoClass.getName()) ) { 
-                    xmlRootElemAnnoFound = true;
-                    try {
-                        Method nameMethod = annoClass.getMethod("name");
-                        Object nameVal = nameMethod.invoke(anno);
-                        if( nameVal instanceof String ) { 
-                            return new QName((String) nameVal); 
-                        }
-                    } catch (Exception e) {
-                        throw RestOperationException.internalServerError("Unable to retrieve XmlRootElement info via reflection", e);
-                    } 
-                }
-            }
-            if( ! xmlRootElemAnnoFound ) { 
-                String errorMsg = "Unable to serialize " + object.getClass().getName() + " instance "
-                        + "because it is missing a " + XmlRootElement.class.getName() + " annotation with a name value.";
-                throw RestOperationException.internalServerError(errorMsg);
-            }
-            return null;
-        }
-    }
-   
     @POST
     @Path("/signal")
     public Response signal() {
@@ -241,16 +173,11 @@ public class RuntimeResource extends ResourceBase {
         Map<String, List<String>> requestParams = getRequestParams(uriInfo);
         String eventType = getStringParam("signal", true, requestParams, oper);
         Object event = getObjectParam("event", false, requestParams, oper);
-        String errorMsg = "Unable to send signal '" + eventType + "'";
-        if( event != null ) { 
-            errorMsg += " with event '" + event + "'";
-        }
 
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(eventType, event),
                 deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true),
-                errorMsg);
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
         
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
@@ -262,8 +189,12 @@ public class RuntimeResource extends ResourceBase {
         WorkItem workItem = (WorkItem) processRequestBean.doKieSessionOperation(
                 new GetWorkItemCommand(workItemId),
                 deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(uriInfo), oper, true),
-                "Unable to get work item " +  workItemId);
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(uriInfo), oper, true));
+               
+        if( workItem == null ) { 
+            throw RestOperationException.notFound("WorkItem " + workItemId + " does not exist.");
+        }
+        
         return createCorrectVariant(new JaxbWorkItem(workItem), headers);
     }
     
@@ -281,12 +212,13 @@ public class RuntimeResource extends ResourceBase {
         } else {
             throw RestOperationException.badRequest("Unsupported operation: " + oper);
         }
-        
+      
+        // Will NOT throw an exception if the work item does not exist!!
         processRequestBean.doKieSessionOperation(
                 cmd, 
                 deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true),
-                "Unable to " + operation + " work item " +  workItemId);
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true));
+                
         return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
     }
 
@@ -376,13 +308,7 @@ public class RuntimeResource extends ResourceBase {
         String oper = getRelativePath(uriInfo);
         Map<String, Object> params = extractMapFromParams(requestParams, oper );
 
-        Object result = processRequestBean.doKieSessionOperation(
-                new StartProcessCommand(processId, params),
-                deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true),
-                "Unable to get process instance logs for process '" + processId + "'");
-        
-        ProcessInstance procInst = (ProcessInstance) result;
+        ProcessInstance procInst = startProcessInstance(processId, params);
         
         Map<String, String> vars = getVariables(procInst.getId());
         JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, uriInfo.getRequestUri().toString());
@@ -408,21 +334,11 @@ public class RuntimeResource extends ResourceBase {
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String eventType = getStringParam("signal", true, params, oper);
         Object event = getObjectParam("event", false, params, oper);
-        String errorMsg = "Unable to signal process instance " + procInstId;
-        if( eventType == null ) { 
-            errorMsg += " with empty signal";
-        } else { 
-            errorMsg += " with signal type '" + eventType + "'";
-        }
-        if( event != null ) { 
-            errorMsg += " and event '" + event + "'";
-        }
-        
+
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(procInstId, eventType, event),
                 deploymentId, 
-                procInstId,
-                errorMsg);
+                procInstId);
         
         ProcessInstance processInstance = getProcessInstance(procInstId);
         Map<String, String> vars = getVariables(processInstance.getId());
@@ -432,46 +348,28 @@ public class RuntimeResource extends ResourceBase {
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
-    private JaxbProcessInstanceListResponse getProcessInstanceListResponse(List<VariableInstanceLog> varLogList, int [] pageInfo) { 
-        JaxbProcessInstanceListResponse response = new JaxbProcessInstanceListResponse();
-        response.setCommandName(FindProcessInstanceCommand.class.getSimpleName());
-        
-        int numVarLogs = varLogList.size();
-        int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
-        int numProcInsts = 0;
-        
-        for( int i = 0; i < numVarLogs && numProcInsts < numResults; ++i ) { 
-            long procInstId = varLogList.get(i).getProcessInstanceId();
-            Object procInstResult = getProcessInstance(procInstId);
-            if( procInstResult != null ) { 
-                response.getResult().add(new JaxbProcessInstanceResponse((ProcessInstance) procInstResult));
-                ++numProcInsts;
-            }
-        }
-        return response;
-    }
-
     private ProcessInstance getProcessInstance(long procInstId) { 
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         Object procInstResult = processRequestBean.doKieSessionOperation(
                 cmd,
                 deploymentId, 
-                procInstId,
-                "Unable to get process instance with id id '" + procInstId + "'");
+                procInstId);
         
-        if( procInstResult == null ) { 
-            throw RestOperationException.notFound("This method can only be used on processes that are still active.");
+        if (procInstResult != null) {
+            return (ProcessInstance) procInstResult;
+        } else {
+            throw RestOperationException.notFound("Unable to retrieve process instance " + procInstId
+                    + " which may have been completed. Please see the history operations.");
         }
-        return (ProcessInstance) procInstResult;
+        
     }
     
     private Map<String, String> getVariables(long processInstanceId) {
         Object result = processRequestBean.doKieSessionOperation(
                 new FindVariableInstancesCommand(processInstanceId),
                 deploymentId, 
-                processInstanceId,
-                "Unable to retrieve process variables from process instance " + processInstanceId);
+                processInstanceId);
         List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;
         
         Map<String, String> vars = new HashMap<String, String>();
@@ -495,6 +393,64 @@ public class RuntimeResource extends ResourceBase {
         }
             
         return vars;
+    }
+    
+    private ProcessInstance startProcessInstance(String processId, Map<String, Object> params) { 
+        Object result = null;
+        try { 
+            result = processRequestBean.doKieSessionOperation(
+                new StartProcessCommand(processId, params),
+                deploymentId, 
+                null);
+        } catch( IllegalArgumentException iae ) { 
+            if( iae.getMessage().startsWith("Unknown process ID")) { 
+                throw RestOperationException.notFound("Process '" + processId + "' is not known to this deployment.");
+            }
+            throw iae;
+        }
+        return (ProcessInstance) result;
+    }
+
+    protected QName getRootElementName(Object object) { 
+        boolean xmlRootElemAnnoFound = false;
+        Class<?> objClass = object.getClass();
+        
+        // This usually doesn't work in the kie-wb/bpms environment, see comment below
+        XmlRootElement xmlRootElemAnno = objClass.getAnnotation(XmlRootElement.class);
+        logger.debug("Getting XML root element annotation for " + object.getClass().getName());
+        if( xmlRootElemAnno != null ) { 
+            xmlRootElemAnnoFound = true;
+            return new QName(xmlRootElemAnno.name());
+        } else { 
+            /**
+             * There seem to be weird classpath issues going on here, probably related
+             * to the fact that kjar's have their own classloader..
+             * (The XmlRootElement class can't be found in the same classpath as the
+             * class from the Kjar)
+             */
+            for( Annotation anno : objClass.getAnnotations() ) { 
+                Class<?> annoClass = anno.annotationType();
+                // we deliberately compare *names* and not classes because it's on a different classpath!
+                if( XmlRootElement.class.getName().equals(annoClass.getName()) ) { 
+                    xmlRootElemAnnoFound = true;
+                    try {
+                        Method nameMethod = annoClass.getMethod("name");
+                        Object nameVal = nameMethod.invoke(anno);
+                        if( nameVal instanceof String ) { 
+                            return new QName((String) nameVal); 
+                        }
+                    } catch (Exception e) {
+                        throw RestOperationException.internalServerError("Unable to retrieve XmlRootElement info via reflection", e);
+                    } 
+                }
+            }
+            if( ! xmlRootElemAnnoFound ) { 
+                String errorMsg = "Unable to serialize " + object.getClass().getName() + " instance "
+                        + "because it is missing a " + XmlRootElement.class.getName() + " annotation with a name value.";
+                throw RestOperationException.internalServerError(errorMsg);
+            }
+            return null;
+        }
     }
 
 }
