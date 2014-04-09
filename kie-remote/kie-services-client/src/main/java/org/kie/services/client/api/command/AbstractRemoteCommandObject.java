@@ -46,6 +46,7 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
+import org.kie.services.client.api.builder.exception.MissingRequiredInfoException;
 import org.kie.services.client.api.command.exception.RemoteApiException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.api.command.exception.RemoteTaskException;
@@ -174,6 +175,10 @@ public abstract class AbstractRemoteCommandObject {
     }
    
     private <T> JaxbCommandsRequest prepareCommandRequest(Command<T> command) { 
+        if( config.getDeploymentId() == null 
+                && ! (command instanceof TaskCommand || command instanceof AuditCommand) ) {
+           throw new MissingRequiredInfoException("A deployment id is required when sending commands involving the KieSession.");
+        }
         JaxbCommandsRequest req;
         if( command instanceof AuditCommand ) { 
             req = new JaxbCommandsRequest(command);
@@ -199,6 +204,7 @@ public abstract class AbstractRemoteCommandObject {
      */
     private <T> T executeJmsCommand(Command<T> command) {
         JaxbCommandsRequest req = prepareCommandRequest(command);
+        String deploymentId = config.getDeploymentId();
 
         ConnectionFactory factory = config.getConnectionFactory();
         Queue sendQueue;
@@ -260,7 +266,10 @@ public abstract class AbstractRemoteCommandObject {
                 if( ! extraJaxbClasses.isEmpty() ) { 
                     String extraJaxbClassesPropertyValue = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
                     msg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, extraJaxbClassesPropertyValue);
-                    msg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, config.getDeploymentId());
+                    if( deploymentId == null ) { 
+                        throw new MissingRequiredInfoException("Deserialization of parameter classes requires a deployment id, which has not been configured."); 
+                    }
+                    msg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, deploymentId);
                 }
                 // 3. user/pass for task operations
                 String userName = config.getUserName();
@@ -350,16 +359,17 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeRestCommand(Command<T> command) {
+        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
         String deploymentId = config.getDeploymentId();
+        
         ClientRequestFactory requestFactory = config.getRequestFactory();
         ClientRequest restRequest;
-        if (isTaskService) {
+        if (isTaskService || command instanceof AuditCommand ) {
             restRequest = requestFactory.createRelativeRequest("/task/execute");
         } else {
             restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
         }
         
-        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
         
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) { 

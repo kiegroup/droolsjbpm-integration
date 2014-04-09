@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactoryBuilderImpl;
 import org.kie.services.client.api.RemoteRestRuntimeEngineFactory;
@@ -30,6 +31,8 @@ import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineFactoryBuilder;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.builder.exception.MissingRequiredInfoException;
 import org.kie.services.client.api.command.RemoteConfiguration;
+import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.builder.objects.MyType;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -554,5 +557,68 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
        Field field = obj.getClass().getDeclaredField(fieldName);
        field.setAccessible(true);
        field.set(obj, val);
+    }
+    
+    @Test
+    public void missingDeploymentIdTest() throws Exception { 
+        RemoteRuntimeEngineFactory factory = 
+                RemoteRestRuntimeEngineFactory.newBuilder()
+                .addUserName("user")
+                .addPassword("pass")
+                .addUrl(new URL("http://localhost:8080/business-central"))
+                .build();
+        
+        RemoteRuntimeEngine runtimeEngine = factory.newRuntimeEngine();
+        try { 
+            runtimeEngine.getTaskService().claim(23l, "user");
+        } catch( RemoteCommunicationException rce ) { 
+            // expected
+        }
+        
+        try { 
+            runtimeEngine.getAuditLogService().clear();
+        } catch( RemoteCommunicationException rce ) { 
+            // expected
+        }
+        
+        // This will throw a MissingRequiredInfoException because the deployment id is required here
+        try { 
+            runtimeEngine.getKieSession().startProcess("org.test.process"); 
+        } catch( MissingRequiredInfoException mrie ) { 
+            // expected
+        }
+       
+        factory = 
+                RemoteJmsRuntimeEngineFactory.newBuilder()
+                .addUserName("user")
+                .addPassword("pass")
+                .addRemoteInitialContext(remoteInitialContext)
+                .addHostName("localhost")
+                .addJmsConnectorPort(5446)
+                .addKeystorePassword("R")
+                .addKeystoreLocation("ssl/client_keystore.jks")
+                .useKeystoreAsTruststore()
+                .useSsl(true)
+                .build();
+        
+        runtimeEngine = factory.newRuntimeEngine();
+        try { 
+            runtimeEngine.getTaskService().claim(23l, "user");
+        } catch( RemoteCommunicationException rce ) { 
+            // expected
+        }
+        
+        try { 
+            runtimeEngine.getAuditLogService().clear();
+        } catch( RemoteCommunicationException rce ) { 
+            // expected
+        }
+        
+        // This will throw a MissingRequiredInfoException because the deployment id is required here
+        try { 
+            runtimeEngine.getKieSession().startProcess("org.test.process"); 
+        } catch( MissingRequiredInfoException mrie ) { 
+            // expected
+        }
     }
 }
