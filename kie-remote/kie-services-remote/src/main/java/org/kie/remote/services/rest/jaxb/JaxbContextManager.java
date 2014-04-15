@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBException;
 import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.kie.services.impl.event.Undeploy;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +140,7 @@ public class JaxbContextManager {
         Set<Class<?>> allClasses = new HashSet<Class<?>>(KIE_JAXB_CLASS_SET);
         allClasses.addAll(PRIMITIVE_ARRAY_CLASS_SET);
         allClasses.addAll(depClasses);
+        allClasses.add(DeploymentDescriptorImpl.class);
         Class [] allClassesArr = allClasses.toArray(new Class[allClasses.size()]);
 
         // create and cache jaxb context 

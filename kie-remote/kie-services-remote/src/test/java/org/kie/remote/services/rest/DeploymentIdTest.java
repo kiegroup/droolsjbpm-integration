@@ -88,25 +88,25 @@ public class DeploymentIdTest extends DeploymentResource {
         // Test : groups
         {
         String [] test = { "a", "b", "c" };
-        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"), null);
         checkDepUnit(depUnit, test); 
         }
        
         {
         String [] test = { "g", "a", "v", "kbase", "ksess" };
-        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"), null);
         checkDepUnit(depUnit, test); 
         }
         
         { 
         String [] test = { "g", "a", "v", "kbase" };
-        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"), null);
         checkDepUnit(depUnit, test); 
         }
 
         {
         String [] test = { "group.sub_group", "artifact_id", "1.0.0.Final" };
-        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"));
+        KModuleDeploymentUnit depUnit = createDeploymentUnit(join(test, ":"), null);
         checkDepUnit(depUnit, test); 
         }
     }

@@ -17,13 +17,19 @@
 package org.kie.spring.factorybeans;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.kie.api.runtime.manager.RuntimeEnvironment;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
+import org.kie.internal.runtime.conf.ObjectModelResolver;
+import org.kie.internal.runtime.conf.ObjectModelResolverProvider;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * FactoryBean responsible to create instances of <code>RuntimeManager</code> of given type based on provided
@@ -39,7 +45,9 @@ import org.springframework.beans.factory.InitializingBean;
  * <br/>
  * All instances created by this factory are cached to be able to properly dispose them using destroy method (close()).
  */
-public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean {
+public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean, ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
 
     private Set<RuntimeManager> runtimeManagerSet = new HashSet<RuntimeManager>();
 
@@ -79,6 +87,7 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean 
         if (runtimeEnvironment == null && identifier == null) {
             throw new IllegalArgumentException("RuntimeEnvironment and identifier needs to be set");
         }
+
     }
 
     public RuntimeEnvironment getRuntimeEnvironment() {
@@ -108,6 +117,21 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean 
     public void close() {
         for (RuntimeManager manager : runtimeManagerSet) {
             manager.close();
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+
+        // init any spring based ObjectModelResolvers
+        List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
+        if (resolvers != null) {
+            for (ObjectModelResolver resolver : resolvers) {
+                if (resolver instanceof ApplicationContextAware) {
+                    ((ApplicationContextAware) resolver).setApplicationContext(applicationContext);
+                }
+            }
         }
     }
 }

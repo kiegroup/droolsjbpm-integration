@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -18,10 +21,13 @@ import javax.ws.rs.core.UriInfo;
 import org.jbpm.kie.services.api.Kjar;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManager;
 import org.kie.internal.deployment.DeployedUnit;
 import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
+import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.remote.services.rest.exception.RestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
@@ -75,7 +81,7 @@ public class DeploymentResource extends ResourceBase {
    
     // Helper methods ------------------------------------------------------------------------------------------------------------
     
-    protected KModuleDeploymentUnit createDeploymentUnit(String deploymentId) { 
+    protected KModuleDeploymentUnit createDeploymentUnit(String deploymentId, DeploymentDescriptorImpl descriptor) {
         String [] gavKK = deploymentId.split(":");
         KModuleDeploymentUnit deployUnit = new KModuleDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
         if( gavKK.length > 3 ) { 
@@ -83,6 +89,9 @@ public class DeploymentResource extends ResourceBase {
         }
         if( gavKK.length > 4 ) { 
             deployUnit.setKsessionName(gavKK[4]);
+        }
+        if (descriptor != null) {
+            deployUnit.setDeploymentDescriptor(descriptor);
         }
         return deployUnit;
     }
@@ -126,12 +135,14 @@ public class DeploymentResource extends ResourceBase {
     
     @POST
     @Path("/deploy")
-    public Response deploy() { 
+    @Consumes(value = {MediaType.APPLICATION_XML, MediaType.MEDIA_TYPE_WILDCARD})
+    public Response deploy(DeploymentDescriptorImpl descriptor) {
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
         String strategy = getStringParam("strategy", false, params, oper);
+        String mergeMode = getStringParam("mergemode", false, params, oper);
 
-        KModuleDeploymentUnit deploymentUnit = createDeploymentUnit(deploymentId);
+        KModuleDeploymentUnit deploymentUnit = createDeploymentUnit(deploymentId, descriptor);
        
         if( strategy != null ) { 
             strategy = strategy.toUpperCase();
@@ -142,6 +153,16 @@ public class DeploymentResource extends ResourceBase {
                 throw RestOperationException.badRequest("Runtime strategy '" + strategy + "' does not exist.");
             }
             deploymentUnit.setStrategy(runtimeStrategy);
+        }
+        if (mergeMode != null) {
+            mergeMode = mergeMode.toUpperCase();
+            MergeMode mode;
+            try {
+                mode = MergeMode.valueOf(mergeMode);
+            }  catch( IllegalArgumentException iae ) {
+                throw RestOperationException.badRequest("Merge mode '" + mergeMode + "' does not exist.");
+            }
+            deploymentUnit.setMergeMode(mode);
         }
 
         String typeName = JobType.DEPLOY.toString();
