@@ -49,9 +49,11 @@ public class DeploymentsResource extends ResourceBase {
         List<JaxbDeploymentUnit> depUnitList = jaxbDepUnitList.getDeploymentUnitList();
         for( String deploymentId : deploymentIds ) { 
             DeployedUnit deployedUnit = deploymentService.getDeployedUnit(deploymentId);
-            JaxbDeploymentUnit jaxbDepUnit = convertKModuleDepUnitToJaxbDepUnit((KModuleDeploymentUnit) deployedUnit.getDeploymentUnit());
-            jaxbDepUnit.setStatus(JaxbDeploymentStatus.DEPLOYED);
-            depUnitList.add(jaxbDepUnit);
+            if( deployedUnit != null ) { 
+                JaxbDeploymentUnit jaxbDepUnit = convertKModuleDepUnitToJaxbDepUnit((KModuleDeploymentUnit) deployedUnit.getDeploymentUnit());
+                jaxbDepUnit.setStatus(JaxbDeploymentStatus.DEPLOYED);
+                depUnitList.add(jaxbDepUnit);
+            }
         }
         
         return createCorrectVariant(new JaxbDeploymentUnitList(depUnitList), headers);
