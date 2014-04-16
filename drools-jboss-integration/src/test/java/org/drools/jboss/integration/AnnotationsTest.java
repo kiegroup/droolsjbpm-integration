@@ -150,7 +150,7 @@ public class AnnotationsTest extends FullDistributionTest {
             ObjectPropertyTO baseTypeProp = new ObjectPropertyTO(fieldName, fieldClass, false, true);
             baseTypeProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, fieldLabelValue);
             baseTypeProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, fieldDescriptionValue);
-            baseTypeProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, fieldPositionValue);
+            baseTypeProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, fieldPositionValue);
             dataObject.setProperties(Arrays.asList(baseTypeProp));
 
             GenerationResult result = modelerService.saveModel(dataModel, project);
@@ -185,7 +185,7 @@ public class AnnotationsTest extends FullDistributionTest {
                         assertEquals("Field " + fieldName + "should have 3 annotations: ", 3, fieldAnnotations.size());
                         checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.LABEL_ANNOTATION, fieldLabelValue);
                         checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.DESCRIPTION_ANNOTATION, fieldDescriptionValue);
-                        checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.POSITION_ANNOTATON, Integer.toString(fieldPositionValue));
+                        checkAnnotation(fieldAnnotations, AnnotationDefinitionTO.POSITION_ANNOTATION, Integer.toString(fieldPositionValue));
                     }
                 }
             } else {
@@ -299,7 +299,7 @@ public class AnnotationsTest extends FullDistributionTest {
             ObjectPropertyTO parentProp = new ObjectPropertyTO(parentFieldName, parentFieldClass, false, true);
             parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentFieldLabelValue);
             parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentFieldDescriptionValue);
-            parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, parentFieldPositionValue);
+            parentProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, parentFieldPositionValue);
             parent.setProperties(Arrays.asList(parentProp));
 
             String extendingName = "B2";
@@ -323,7 +323,7 @@ public class AnnotationsTest extends FullDistributionTest {
             ObjectPropertyTO extendingProp = new ObjectPropertyTO(extendingFieldName, extendingFieldClass, false, true);
             extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldLabelValue);
             extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldDescriptionValue);
-            extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldPositionValue);
+            extendingProp.addAnnotation(annotationDefs.get(AnnotationDefinitionTO.POSITION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, extendingFieldPositionValue);
             extending.setProperties(Arrays.asList(extendingProp));
 
             GenerationResult result = modelerService.saveModel(dataModel, project);
