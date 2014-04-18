@@ -45,7 +45,6 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.reteoo.ReteooRuleBase;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -154,7 +153,7 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
             KieBase kbase = ksession1.getKieBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
+                Thread.currentThread().setContextClassLoader( ((KnowledgeBaseImpl) kbase).getRootClassLoader() );
                 def = KiePolicy.augmentJaxbDataFormatDefinition( def );
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );

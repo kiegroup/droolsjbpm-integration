@@ -1,14 +1,8 @@
 package org.drools.persistence.infinispan.processinstance;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.drools.core.WorkItemHandlerNotFoundException;
 import org.drools.core.common.InternalKnowledgeRuntime;
-import org.drools.core.common.InternalRuleBase;
-import org.drools.core.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.process.instance.WorkItem;
 import org.drools.core.process.instance.WorkItemManager;
 import org.drools.core.process.instance.impl.WorkItemImpl;
@@ -20,6 +14,11 @@ import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItemHandler;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class InfinispanWorkItemManager extends JPAWorkItemManager implements WorkItemManager {
 
@@ -168,7 +167,7 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
 
     private WorkItem internalGetWorkItem(WorkItemInfo workItemInfo) { 
         Environment env = kruntime.getEnvironment();
-        InternalRuleBase ruleBase = (InternalRuleBase) ((KnowledgeBaseImpl) kruntime.getKieBase()).getRuleBase();
+        InternalKnowledgeBase ruleBase = (InternalKnowledgeBase) kruntime.getKieBase();
         WorkItem workItem = workItemInfo.getWorkItem(env, ruleBase); 
         ((WorkItemImpl) workItem).setId(workItemInfo.getId());
         return workItem;

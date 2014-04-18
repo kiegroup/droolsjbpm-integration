@@ -29,7 +29,6 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.pipeline.camel.Person;
 import org.drools.pipeline.camel.WrappedList;
-import org.drools.core.reteoo.ReteooRuleBase;
 import org.junit.Test;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactoryService;
@@ -185,7 +184,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends DroolsCamelTestSu
             KnowledgeBase kbase = ksession1.getKieBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
+                Thread.currentThread().setContextClassLoader( ((KnowledgeBaseImpl) kbase).getRootClassLoader() );
                 def = DroolsPolicy.augmentJaxbDataFormatDefinition( def );
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );

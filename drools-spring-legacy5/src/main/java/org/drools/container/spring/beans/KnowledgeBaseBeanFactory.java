@@ -27,6 +27,7 @@ import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactoryService;
 import org.drools.core.base.evaluators.EvaluatorDefinition;
 import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderConfiguration;
 import org.kie.internal.builder.KnowledgeBuilderErrors;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.builder.KnowledgeBuilderFactoryService;
@@ -35,7 +36,6 @@ import org.kie.api.runtime.rule.AccumulateFunction;
 import org.kie.internal.builder.conf.AccumulateFunctionOption;
 import org.kie.internal.builder.conf.EvaluatorOption;
 import org.drools.core.builder.conf.impl.JaxbConfigurationImpl;
-import org.drools.compiler.compiler.PackageBuilderConfiguration;
 import org.drools.grid.GridNode;
 import org.drools.grid.impl.GridNodeImpl;
 import org.drools.core.impl.KnowledgeBaseImpl;
@@ -77,7 +77,7 @@ public class KnowledgeBaseBeanFactory
 
         }
 
-        PackageBuilderConfiguration kconf = (PackageBuilderConfiguration) KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+        KnowledgeBuilderConfiguration kconf = KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
         if ( this.accumulateFunctions != null && !this.accumulateFunctions.isEmpty() ) {
             for ( Entry<String, AccumulateFunction> entry : this.accumulateFunctions.entrySet() ) {
                 kconf.setOption( AccumulateFunctionOption.get( entry.getKey(),

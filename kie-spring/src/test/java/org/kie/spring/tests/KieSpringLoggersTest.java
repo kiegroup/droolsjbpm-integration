@@ -53,7 +53,7 @@ public class KieSpringLoggersTest {
     public void testStatelessSessionRefConsoleLogger() throws Exception {
         StatelessKieSession session = (StatelessKieSession) context.getBean("loggerSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) session;
-        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
         }
     }
@@ -62,7 +62,7 @@ public class KieSpringLoggersTest {
     public void testStatefulKnowledgeConsoleLogger() throws Exception {
         KieSession statefulSession = (KieSession) context.getBean("ConsoleLogger-statefulSession");
         StatefulKnowledgeSessionImpl impl = (StatefulKnowledgeSessionImpl) statefulSession;
-        for (Object listener : impl.session.getWorkingMemoryEventListeners()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
         }
     }
@@ -72,7 +72,7 @@ public class KieSpringLoggersTest {
         KieSession statefulSession = (KieSession) context.getBean("FileLogger-statefulSession");
         assertNotNull(statefulSession.getGlobals().get("persons"));
         StatefulKnowledgeSessionImpl impl = (StatefulKnowledgeSessionImpl) statefulSession;
-        for (Object listener : impl.session.getWorkingMemoryEventListeners()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryFileLogger);
         }
         LoggerAdaptor adaptor = (LoggerAdaptor) context.getBean("sf_fl_logger");
@@ -86,7 +86,7 @@ public class KieSpringLoggersTest {
         KieSession statefulSession = (KieSession) context.getBean("ThreadedFileLogger-statefulSession");
         assertNotNull(statefulSession.getGlobals().get("persons"));
         StatefulKnowledgeSessionImpl impl = (StatefulKnowledgeSessionImpl) statefulSession;
-        for (Object listener : impl.session.getWorkingMemoryEventListeners()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof ThreadedWorkingMemoryFileLogger);
         }
         LoggerAdaptor adaptor = (LoggerAdaptor) context.getBean("sf_tfl_logger");
@@ -98,7 +98,7 @@ public class KieSpringLoggersTest {
     public void testStatelessKnowledgeConsoleLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean("ConsoleLogger-statelessSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryConsoleLogger);
         }
     }
@@ -107,7 +107,7 @@ public class KieSpringLoggersTest {
     public void testStatelessKnowledgeFileLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean("FileLogger-statelessSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryFileLogger);
         }
         LoggerAdaptor adaptor = (LoggerAdaptor) context.getBean("ss_fl_logger");
@@ -119,7 +119,7 @@ public class KieSpringLoggersTest {
     public void testStatelessKnowledgeThreadedFileLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean("ThreadedFileLogger-statelessSession");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof ThreadedWorkingMemoryFileLogger);
         }
         LoggerAdaptor loggerAdaptor = (LoggerAdaptor) context.getBean("ss_tfl_logger");
@@ -132,7 +132,7 @@ public class KieSpringLoggersTest {
     public void testSessionLoggersFromGroupAndNested() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean("k1");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        assertEquals(2, impl.mappedWorkingMemoryListeners.values().size());
+        assertEquals(2, impl.getRuleRuntimeEventListeners().size());
 
         List list = new ArrayList();
         statelessKnowledgeSession.setGlobal("persons", list);
@@ -153,7 +153,7 @@ public class KieSpringLoggersTest {
     public void testStatelessNoNameFileLogger() throws Exception {
         StatelessKieSession statelessKnowledgeSession = (StatelessKieSession) context.getBean("FileLogger-statelessSession-noNameLogger");
         StatelessKnowledgeSessionImpl impl = (StatelessKnowledgeSessionImpl) statelessKnowledgeSession;
-        for (Object listener : impl.mappedWorkingMemoryListeners.values()) {
+        for (Object listener : impl.getRuleRuntimeEventListeners()) {
             assertTrue(listener instanceof WorkingMemoryFileLogger);
         }
     }

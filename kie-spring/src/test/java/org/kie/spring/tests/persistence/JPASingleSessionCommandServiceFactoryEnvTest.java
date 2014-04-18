@@ -16,10 +16,9 @@
 
 package org.kie.spring.tests.persistence;
 
-import org.drools.compiler.compiler.PackageBuilder;
+import org.drools.compiler.builder.impl.KnowledgeBuilderImpl;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.impl.WorkImpl;
-import org.drools.core.rule.Package;
 import org.drools.core.util.DroolsStreamUtils;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
@@ -40,6 +39,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.NodeInstance;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.internal.definition.KnowledgePackage;
 import org.kie.spring.beans.persistence.TestWorkItemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -302,7 +302,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static Package getProcessWorkItems() {
+    private static KnowledgePackage getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.TestProcess");
         process.setName("TestProcess");
@@ -365,7 +365,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        PackageBuilder packageBuilder = new PackageBuilder();
+        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
         processBuilder.buildProcess(process,
                 null);
@@ -373,7 +373,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         return packageBuilder.getPackage();
     }
 
-    public static void writePackage(Package pkg,
+    public static void writePackage(KnowledgePackage pkg,
                                     File dest) {
         dest.deleteOnExit();
         OutputStream out = null;
@@ -456,7 +456,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static Package getProcessSubProcess() {
+    private static KnowledgePackage getProcessSubProcess() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessSubProcess");
         process.setName("ProcessSubProcess");
@@ -495,7 +495,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        PackageBuilder packageBuilder = new PackageBuilder();
+        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
         processBuilder.buildProcess(process,
                 null);
@@ -600,7 +600,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static Package getProcessTimer() {
+    private static KnowledgePackage getProcessTimer() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer");
         process.setName("ProcessTimer");
@@ -641,7 +641,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        PackageBuilder packageBuilder = new PackageBuilder();
+        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
         processBuilder.buildProcess(process,
                 null);
@@ -680,7 +680,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static Package getProcessTimer2() {
+    private static KnowledgePackage getProcessTimer2() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer2");
         process.setName("ProcessTimer2");
@@ -721,7 +721,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        PackageBuilder packageBuilder = new PackageBuilder();
+        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
         processBuilder.buildProcess(process,
                 null);

@@ -30,7 +30,6 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.QueryCommand;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.reteoo.ReteooRuleBase;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;

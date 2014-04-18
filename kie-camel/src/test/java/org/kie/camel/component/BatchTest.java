@@ -15,7 +15,6 @@ import org.kie.camel.testdomain.Cheese;
 import org.kie.camel.testdomain.Person;
 import org.drools.core.command.runtime.rule.ModifyCommand;
 import org.drools.core.common.InternalFactHandle;
-import org.drools.core.common.InternalRuleBase;
 import org.drools.core.util.StringUtils;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.jbpm.process.core.context.variable.VariableScope;
@@ -1408,7 +1407,7 @@ public abstract class BatchTest extends CamelTestSupport {
         ExecutionResults results = null;
         String outXml = null;
         ClassLoader orig = null;
-        ClassLoader cl = ((InternalRuleBase) ((StatefulKnowledgeSessionImpl) ksession).getRuleBase()).getRootClassLoader();
+        ClassLoader cl = ((StatefulKnowledgeSessionImpl) ksession).getKnowledgeBase().getRootClassLoader();
         try {
             orig = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader( cl );
@@ -1446,7 +1445,7 @@ public abstract class BatchTest extends CamelTestSupport {
 
         KieSession ksession = getKieSession(ResourceFactory.newByteArrayResource(str.getBytes()));
         setExec( ksession );
-        ClassLoader cl = ((InternalRuleBase) ((StatefulKnowledgeSessionImpl) ksession).getRuleBase()).getRootClassLoader();
+        ClassLoader cl = ((StatefulKnowledgeSessionImpl) ksession).getKnowledgeBase().getRootClassLoader();
         ClassLoader orig = null;
         try {
             orig = Thread.currentThread().getContextClassLoader();

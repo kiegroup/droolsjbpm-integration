@@ -31,9 +31,7 @@ import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.core.common.InternalRuleBase;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.reteoo.ReteooRuleBase;
 import org.junit.Test;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactoryService;
@@ -162,7 +160,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
             KnowledgeBase kbase = ksession1.getKieBase();
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader( ((ReteooRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader() );
+                Thread.currentThread().setContextClassLoader( ((KnowledgeBaseImpl) kbase).getRootClassLoader() );
                 def = DroolsPolicy.augmentJaxbDataFormatDefinition( def );
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );
@@ -256,7 +254,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends DroolsCamelTestSupport {
 
         KnowledgeBase kbase = node.get( KnowledgeBaseFactoryService.class ).newKnowledgeBase();
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-        classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) kbase).getRuleBase()).getRootClassLoader();
+        classLoader = ((KnowledgeBaseImpl) kbase).getRootClassLoader();
 
         StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
         node.set( identifier,

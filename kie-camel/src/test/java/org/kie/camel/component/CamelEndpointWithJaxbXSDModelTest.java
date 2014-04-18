@@ -31,7 +31,6 @@ import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.core.common.InternalRuleBase;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -213,7 +212,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
         }
 
         KieSession ksession = ks.newKieContainer(ks.getRepository().getDefaultReleaseId()).newKieSession();
-        classLoader = ((InternalRuleBase) ((KnowledgeBaseImpl) ksession.getKieBase()).getRuleBase()).getRootClassLoader();
+        classLoader = ((KnowledgeBaseImpl) ksession.getKieBase()).getRootClassLoader();
 
         try {
             jndiContext.bind( identifier, ksession );

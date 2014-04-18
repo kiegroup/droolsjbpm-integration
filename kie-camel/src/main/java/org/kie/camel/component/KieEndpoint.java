@@ -41,10 +41,9 @@ import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.impl.DefaultMessage;
 import org.apache.camel.spi.DataFormat;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.core.impl.KnowledgeBaseImpl;
+import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.impl.StatelessKnowledgeSessionImpl;
-import org.drools.core.reteoo.ReteooRuleBase;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
 
@@ -210,11 +209,11 @@ public class KieEndpoint extends DefaultEndpoint {
         ClassLoader cl = null;
 
         if ( exec instanceof StatefulKnowledgeSessionImpl ) {
-            cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
+            cl = ((StatefulKnowledgeSessionImpl) exec).getKnowledgeBase().getRootClassLoader();
         } else if ( exec instanceof StatelessKnowledgeSessionImpl ) {
-            cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
+            cl = ((StatelessKnowledgeSessionImpl) exec).getKnowledgeBase().getRootClassLoader();
         } else if ( exec instanceof CommandBasedStatefulKnowledgeSession ) {
-            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKieBase()).getRuleBase()).getRootClassLoader();
+            cl = ((InternalKnowledgeBase) ((CommandBasedStatefulKnowledgeSession) exec).getKieBase()).getRootClassLoader();
         }
 
         return cl;

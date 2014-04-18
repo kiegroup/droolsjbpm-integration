@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.drools.core.process.instance.impl.WorkItemImpl;
-import org.drools.core.util.codec.Base64;
+import org.drools.persistence.util.Base64;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

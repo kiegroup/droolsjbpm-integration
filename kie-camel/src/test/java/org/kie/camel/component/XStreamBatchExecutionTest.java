@@ -16,9 +16,50 @@
 
 package org.kie.camel.component;
 
+import com.thoughtworks.xstream.XStream;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
+import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.core.command.runtime.rule.ModifyCommand;
+import org.drools.core.common.InternalFactHandle;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.StatefulKnowledgeSessionImpl;
+import org.drools.core.impl.StatelessKnowledgeSessionImpl;
+import org.jbpm.process.core.context.variable.VariableScope;
+import org.jbpm.process.instance.context.variable.VariableScopeInstance;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.Message;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.CommandExecutor;
+import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.process.WorkItem;
+import org.kie.api.runtime.process.WorkItemHandler;
+import org.kie.api.runtime.process.WorkItemManager;
+import org.kie.api.runtime.process.WorkflowProcessInstance;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResultsRow;
+import org.kie.camel.testdomain.Cheese;
+import org.kie.camel.testdomain.Person;
+import org.kie.camel.testdomain.TestVariable;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.helper.BatchExecutionHelper;
+import org.xml.sax.SAXException;
+
+import javax.naming.Context;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,56 +68,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.naming.Context;
-
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.Message;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.StatelessKieSession;
-import org.kie.camel.testdomain.Cheese;
-import org.kie.camel.testdomain.Person;
-import org.kie.camel.testdomain.TestVariable;
-import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.core.command.runtime.rule.ModifyCommand;
-import org.drools.core.common.InternalFactHandle;
-import org.drools.core.common.InternalRuleBase;
-import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.impl.StatefulKnowledgeSessionImpl;
-import org.drools.core.impl.StatelessKnowledgeSessionImpl;
-import org.drools.core.reteoo.ReteooRuleBase;
-import org.jbpm.process.core.context.variable.VariableScope;
-import org.jbpm.process.instance.context.variable.VariableScopeInstance;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.kie.camel.testdomain.Cheese;
-import org.kie.camel.testdomain.Person;
-import org.kie.camel.testdomain.TestVariable;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.api.io.Resource;
-import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.CommandExecutor;
-import org.kie.api.runtime.ExecutionResults;
-import org.kie.internal.runtime.helper.BatchExecutionHelper;
-import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.runtime.process.WorkItem;
-import org.kie.api.runtime.process.WorkItemHandler;
-import org.kie.api.runtime.process.WorkItemManager;
-import org.kie.api.runtime.process.WorkflowProcessInstance;
-import org.kie.api.runtime.rule.FactHandle;
-import org.kie.api.runtime.rule.QueryResultsRow;
-import org.xml.sax.SAXException;
-
-import com.thoughtworks.xstream.XStream;
 
 public class XStreamBatchExecutionTest extends CamelTestSupport {
     protected CommandExecutor exec;
@@ -1818,7 +1809,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
                                               inXml,
                                               String.class );
 
-        ClassLoader cl = ((InternalRuleBase) ((StatefulKnowledgeSessionImpl) ksession).getRuleBase()).getRootClassLoader();
+        ClassLoader cl = ((StatefulKnowledgeSessionImpl) ksession).getKnowledgeBase().getRootClassLoader();
         XStream xstream = BatchExecutionHelper.newXStreamMarshaller();
         xstream.setClassLoader( cl );
         FactHandle factHandle = (FactHandle) ((ExecutionResults) xstream.fromXML( outXml )).getFactHandle( "outStilton" );
@@ -2089,11 +2080,11 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         ClassLoader cl = null;
 
         if ( exec instanceof StatefulKnowledgeSessionImpl ) {
-            cl = ((ReteooRuleBase) ((StatefulKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
+            cl = ((StatefulKnowledgeSessionImpl) exec).getKnowledgeBase().getRootClassLoader();
         } else if ( exec instanceof StatelessKnowledgeSessionImpl ) {
-            cl = ((ReteooRuleBase) ((StatelessKnowledgeSessionImpl) exec).getRuleBase()).getRootClassLoader();
+            cl = ((StatelessKnowledgeSessionImpl) exec).getKnowledgeBase().getRootClassLoader();
         } else if ( exec instanceof CommandBasedStatefulKnowledgeSession ) {
-            cl = ((ReteooRuleBase) ((KnowledgeBaseImpl) ((CommandBasedStatefulKnowledgeSession) exec).getKieBase()).getRuleBase()).getRootClassLoader();
+            cl = ((InternalKnowledgeBase) ((CommandBasedStatefulKnowledgeSession) exec).getKieBase()).getRootClassLoader();
         }
 
         return cl;

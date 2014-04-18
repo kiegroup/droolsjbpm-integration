@@ -31,7 +31,6 @@ import org.drools.core.ClockType;
 import org.drools.core.RuleBaseConfiguration;
 import org.drools.core.RuleBaseConfiguration.AssertBehaviour;
 import org.drools.core.SessionConfiguration;
-import org.drools.core.common.InternalRuleBase;
 import org.kie.api.KieBase;
 import org.kie.api.conf.EventProcessingOption;
 import org.drools.container.spring.beans.DroolsResourceAdapter;
@@ -210,7 +209,7 @@ public class SpringDroolsTest {
     public void testConfiguration() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("org/drools/container/spring/session-conf-beans.xml");
         KnowledgeBaseImpl kbase1 = (KnowledgeBaseImpl) context.getBean( "kbase1" );
-        RuleBaseConfiguration rconf = ((InternalRuleBase) kbase1.getRuleBase()).getConfiguration();
+        RuleBaseConfiguration rconf = kbase1.getConfiguration();
         assertTrue( rconf.isAdvancedProcessRuleIntegration() );
         assertFalse( rconf.isMultithreadEvaluation() );
         assertEquals( EventProcessingOption.STREAM,
@@ -221,7 +220,7 @@ public class SpringDroolsTest {
                       rconf.getConsequenceExceptionHandler() );
 
         KnowledgeBaseImpl kbase2 = (KnowledgeBaseImpl) context.getBean( "kbase2" );
-        rconf = ((InternalRuleBase) kbase2.getRuleBase()).getConfiguration();
+        rconf = kbase2.getConfiguration();
         assertFalse( rconf.isAdvancedProcessRuleIntegration() );
         assertFalse( rconf.isMultithreadEvaluation() );
         assertEquals( 3,
@@ -232,7 +231,7 @@ public class SpringDroolsTest {
                       rconf.getAssertBehaviour() );
 
         StatefulKnowledgeSessionImpl ksession1 = (StatefulKnowledgeSessionImpl) context.getBean( "ksession1" );
-        SessionConfiguration sconf = ksession1.session.getSessionConfiguration();
+        SessionConfiguration sconf = ksession1.getSessionConfiguration();
         assertTrue( sconf.isKeepReference() );
         assertEquals( ClockType.REALTIME_CLOCK,
                       sconf.getClockType() );
@@ -251,7 +250,7 @@ public class SpringDroolsTest {
                       wih.get( "wih2" ).getClass() );
 
         StatefulKnowledgeSessionImpl ksession2 = (StatefulKnowledgeSessionImpl) context.getBean( "ksession2" );
-        sconf = ksession2.session.getSessionConfiguration();
+        sconf = ksession2.getSessionConfiguration();
         assertFalse( sconf.isKeepReference() );
         assertEquals( ClockType.PSEUDO_CLOCK,
                       sconf.getClockType() );

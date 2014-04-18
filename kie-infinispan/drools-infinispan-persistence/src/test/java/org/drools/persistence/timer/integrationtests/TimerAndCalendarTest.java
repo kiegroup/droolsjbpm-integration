@@ -185,7 +185,9 @@ public class TimerAndCalendarTest {
 
         clock = (SessionPseudoClock) ksession.<SessionClock>getSessionClock();
         clock.advanceTime( 10,
-                           TimeUnit.MILLISECONDS );
+                           TimeUnit.SECONDS );
+
+        ksession.fireAllRules();
 
         Assert.assertEquals( 1,
                              list.size() );

@@ -25,13 +25,13 @@ import javax.transaction.UserTransaction;
 import junit.framework.Assert;
 
 import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.io.impl.ClassPathResource;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.datatype.impl.type.ObjectDataType;
 import org.drools.core.process.core.impl.WorkImpl;
-import org.drools.core.reteoo.ReteooRuleBase;
 import org.drools.persistence.infinispan.marshaller.InfinispanPlaceholderResolverStrategy;
 import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
@@ -168,7 +168,7 @@ public class VariablePersistenceStrategyTest {
         process.addNode( endNode );
         
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        ((ReteooRuleBase) ((InternalKnowledgeBase) kbase).getRuleBase()).addProcess(process);
+        ((KnowledgeBaseImpl) kbase).addProcess(process);
         return kbase;
     }
     
