@@ -65,8 +65,8 @@ public class JaxbCommandsResponse {
     private Long processInstanceId;
 
     @XmlElement(name = "ver")
-    @XmlSchemaType(name = "int")
-    private Integer version;
+    @XmlSchemaType(name = "String")
+    private String version;
 
     @XmlElements({ 
             @XmlElement(name = "exception", type = JaxbExceptionResponse.class),
@@ -121,7 +121,6 @@ public class JaxbCommandsResponse {
     }
 
     public JaxbCommandsResponse() {
-        this.version = 1;
         // Default constructor
     }
 
@@ -147,11 +146,11 @@ public class JaxbCommandsResponse {
         this.processInstanceId = processInstanceId;
     }
 
-    public Integer getVersion() {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 

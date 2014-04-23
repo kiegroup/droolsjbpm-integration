@@ -160,7 +160,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         req.setCommands(cmds);
         req.setDeploymentId("depId");
         req.setProcessInstanceId(43l);
-        req.setVersion(2);
+        req.setVersion("6.0.1.0");
         StartProcessCommand spCmd = new StartProcessCommand("test.proc.yaml");
         cmds.add(spCmd);
         spCmd.getParameters().put("one", "a");
@@ -178,11 +178,33 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
 
     @Test
-    public void jaxbCommandsResponseTest() throws Exception {
-        Command<?> cmd = new GetTaskAssignedAsBusinessAdminCommand();
+    public void commandsResponseTest() throws Exception {
+        this.setupDataSource = true;
+        this.sessionPersistence = true;
+        super.setUp();
+        
+        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
+        KieSession ksession = runtimeEngine.getKieSession();
+    
+        Map<String, Object> params = new HashMap<String, Object>();
+        String val = "initial-val";
+        params.put("test", val);
+        Command cmd = new StartProcessCommand("StructureRef");
+        ((StartProcessCommand) cmd).setParameters(params);
+        ProcessInstance processInstance = ksession.execute((StartProcessCommand) cmd);
+        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
+    
+        JaxbCommandsResponse resp = new JaxbCommandsResponse();
+        resp.setDeploymentId("deploy");
+        resp.setProcessInstanceId(processInstance.getId());
+        resp.addResult(processInstance, 0, cmd);
+    
+        testRoundTrip(resp);
+    
+        cmd = new GetTaskAssignedAsBusinessAdminCommand();
         List<TaskSummary> result = new ArrayList<TaskSummary>();
 
-        JaxbCommandsResponse resp = new JaxbCommandsResponse();
+        resp = new JaxbCommandsResponse();
         resp.addResult(result, 0, cmd);
 
         cmd = new GetTasksByProcessInstanceIdCommand();
@@ -193,7 +215,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         assertNotNull(newResp);
         assertEquals( 2, ((JaxbCommandsResponse) newResp).getResponses().size());
     }
-
 
     @Test
     public void taskSummaryListTest() throws Exception {
@@ -325,31 +346,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         FindProcessInstanceCommand cmd = new FindProcessInstanceCommand(23);
 
         testRoundTrip(cmd);
-    }
-
-    @Test
-    public void commandsResponseTest() throws Exception {
-        this.setupDataSource = true;
-        this.sessionPersistence = true;
-        super.setUp();
-        
-        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
-        KieSession ksession = runtimeEngine.getKieSession();
-
-        Map<String, Object> params = new HashMap<String, Object>();
-        String val = "initial-val";
-        params.put("test", val);
-        StartProcessCommand cmd = new StartProcessCommand("StructureRef");
-        cmd.setParameters(params);
-        ProcessInstance processInstance = ksession.execute(cmd);
-        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
-
-        JaxbCommandsResponse resp = new JaxbCommandsResponse();
-        resp.setDeploymentId("deploy");
-        resp.setProcessInstanceId(processInstance.getId());
-        resp.addResult(processInstance, 0, cmd);
-
-        testRoundTrip(resp);
     }
 
     @Test

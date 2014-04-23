@@ -17,6 +17,10 @@
     Remote services (REST, JMS, etc.) for various kie projects
   </description>
 
+  <properties>
+    <bugfix.version>1</bugfix.version>
+  </properties>
+
   <modules>
     <module>kie-services-jaxb</module>
     <module>kie-services-client</module>
