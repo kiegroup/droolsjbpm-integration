@@ -32,7 +32,6 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.remote.exception.DeploymentNotFoundException;
 import org.kie.services.remote.exception.KieRemoteServicesRuntimeException;
-import org.kie.services.remote.jms.RequestMessageBean;
 import org.kie.services.remote.rest.RuntimeResource;
 import org.kie.services.remote.rest.TaskResource;
 import org.kie.services.remote.rest.exception.RestOperationException;
@@ -69,6 +68,9 @@ public class ProcessRequestBean {
     private EntityManagerFactory emf;
    
     private AuditLogService auditLogService;
+  
+    // Do not modify this: this is automatically incremented by the maven replacer plugin
+    private final String ARTIFACT_VERSION = "6.0.3.1";
     
     // Injection methods for tests
     
@@ -85,6 +87,14 @@ public class ProcessRequestBean {
     }
 
     public void processCommand(Command cmd, JaxbCommandsRequest request, int i, JaxbCommandsResponse jaxbResponse) { 
+        String version = request.getVersion();
+        if( version == null ) { 
+            version = "pre-6.0.3";
+        }
+        if( ! version.equals(ARTIFACT_VERSION) ) { 
+            logger.warn( "Request received from client version [{}] while server is version [{}]! THIS MAY CAUSE PROBLEMS!", version, ARTIFACT_VERSION);
+        }
+        
         String cmdName = cmd.getClass().getSimpleName();
         logger.debug("Processing command " + cmdName);
         String errMsg = "Unable to execute " + cmdName + "/" + i;
@@ -207,7 +217,7 @@ public class ProcessRequestBean {
      * @param errorMsg
      * @return
      */
-    public Object doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<?> cmd) { 
+    private Object doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<?> cmd) { 
         boolean onDeployment = false;
         if( AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) )  {
            onDeployment = true;

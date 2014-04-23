@@ -49,9 +49,9 @@ public class JaxbCommandsRequest {
     private Long processInstanceId;
 
     @XmlElement(name = "ver")
-    @XmlSchemaType(name = "int")
-    private Integer version = 1;
-    
+    @XmlSchemaType(name = "string")
+    private String version;
+
     @XmlElement
     @XmlSchemaType(name = "string")
     private String user;
@@ -197,11 +197,11 @@ public class JaxbCommandsRequest {
         this.processInstanceId = processInstanceId;
     }
 
-    public int getVersion() {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 

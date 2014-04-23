@@ -68,6 +68,9 @@ public abstract class AbstractRemoteCommandObject {
 
     protected final RemoteConfiguration config;
 
+    // Do not modify this: this is automatically incremented by the maven replacer plugin
+    private final String ARTIFACT_VERSION = "6.0.3.1";
+            
     AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
     }
@@ -192,6 +195,7 @@ public abstract class AbstractRemoteCommandObject {
         }
         req.setProcessInstanceId(processInstanceId);
         req.setUser(config.getUserName());
+        req.setVersion(ARTIFACT_VERSION);
         
         return req;
     }
@@ -335,6 +339,13 @@ public abstract class AbstractRemoteCommandObject {
                     logger.warn("Unable to close connection or session!", jmse);
                 }
             }
+        }
+        String version = cmdResponse.getVersion();
+        if( version == null ) { 
+            version = "pre-6.0.3";
+        }
+        if( ! version.equals(ARTIFACT_VERSION) ) { 
+            logger.info("Response received from server version [{}] while client is version [{}]! This may cause problems.", version, ARTIFACT_VERSION);
         }
         List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
         if (responses.size() > 0) {
