@@ -104,11 +104,13 @@
     </feature>
 
     <feature name="jbpm-commons" version="${drools.version}" description="jBPM Commons">
-        <bundle>wrap:mvn:javax.security/jacc/1.0</bundle>
+        <bundle>mvn:org.jboss.spec.javax.servlet/jboss-servlet-api_3.0_spec/1.0.2.Final</bundle>
+        <bundle>mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/1.0.0.Final</bundle>
         <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
+        <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/1.0.0.Final</bundle>
+        <bundle>mvn:org.jboss.spec.javax.jms/jboss-jms-api_1.1_spec/</bundle>
+        <bundle>mvn:org.hibernate.javax.persistence/hibernate-jpa-2.1-api/1.0.0.Final</bundle>
+        <bundle>mvn:org.jboss.spec.javax.transaction/jboss-transaction-api_1.2_spec/1.0.0.Final</bundle>
     </feature>
 
     <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
