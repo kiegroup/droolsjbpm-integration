@@ -11,51 +11,17 @@
   <artifactId>kie-services-client</artifactId>
   <name>KIE Remote Services :: Client</name>
 
+  <!-- IF YOU AUTOFORMAT THIS, MAKE SURE THAT THE LINES MARKED WITH "FORMAT CHECK" ARE BACK TO NORMAL -->
+
   <properties>
     <version.org.mockito>1.9.5</version.org.mockito>
     <version.org.powermock>1.5.4</version.org.powermock>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-services-jaxb</artifactId>
-    </dependency>
-    
-    <!-- kie/drools/jbpm -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-internal</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-human-task-core</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>weld-core</artifactId>
-          <groupId>org.jboss.weld</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>seam-transaction</artifactId>
-          <groupId>org.jboss.seam.transaction</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>solder-api</artifactId>
-          <groupId>org.jboss.solder</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-audit</artifactId>
     </dependency>
 
     <!-- jms -->
@@ -67,7 +33,7 @@
     <dependency>
       <groupId>org.hornetq</groupId>
       <artifactId>hornetq-jms-client</artifactId>
-   </dependency>
+    </dependency>
 
     <!-- rest -->
     <dependency>
@@ -106,12 +72,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- Only for the KieModuleDeploymentHelper -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-ci</artifactId>
-    </dependency>
-
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>
@@ -146,7 +106,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!--  serialization -->
+    <!-- serialization -->
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
@@ -159,14 +119,14 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- reflection -->
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- powermock -->
     <dependency>
       <groupId>org.mockito</groupId>
@@ -191,7 +151,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -214,7 +174,7 @@
             <phase>generate-sources</phase>
             <goals>
               <goal>replace</goal>
-            </goals>                    
+            </goals>
           </execution>
         </executions>
         <configuration>
@@ -226,12 +186,14 @@
           <replacements>
             <replacement>
               <token>ARTIFACT_VERSION = ".*</token>
+              <!-- FORMAT CHECK: the following element should be on one line -->
               <value>ARTIFACT_VERSION = "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${bugfix.version}";</value>
             </replacement>
           </replacements>
         </configuration>
       </plugin>
+
     </plugins>
-  </build>  
+  </build>
 </project>
 
