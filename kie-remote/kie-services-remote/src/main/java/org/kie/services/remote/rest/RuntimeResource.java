@@ -36,6 +36,7 @@ import org.drools.core.process.instance.WorkItem;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;

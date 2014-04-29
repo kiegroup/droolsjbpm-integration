@@ -60,7 +60,7 @@ public class HistoryResource extends ResourceBase {
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
-    public AuditLogService getAuditLogService() { 
+    private AuditLogService getAuditLogService() { 
         return processRequestBean.getAuditLogService();
     }
     

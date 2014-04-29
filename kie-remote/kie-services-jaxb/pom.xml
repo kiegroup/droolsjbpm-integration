@@ -13,7 +13,7 @@
 
   <dependencies>
 
-    <!-- kie/drools/jbpm -->
+    <!-- kie -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
@@ -22,31 +22,73 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
+   
+    <!--  command jars --> 
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-human-task-core</artifactId>
       <exclusions>
         <exclusion>
-          <artifactId>weld-core</artifactId>
-          <groupId>org.jboss.weld</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>seam-transaction</artifactId>
-          <groupId>org.jboss.seam.transaction</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>solder-api</artifactId>
-          <groupId>org.jboss.solder</groupId>
+          <groupId>org.mvel</groupId>
+          <artifactId>mvel2</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-audit</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jbpm</groupId>
+          <artifactId>jbpm-flow</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.drools</groupId>
+          <artifactId>drools-persistence-jpa</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.0-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jbpm</groupId>
+          <artifactId>jbpm-flow</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.drools</groupId>
+          <artifactId>drools-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.mvel</groupId>
+          <artifactId>mvel2</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-core-asl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- rest -->
@@ -54,7 +96,7 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
     </dependency>
-    
+
     <!-- jaxb -->
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -75,12 +117,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <!-- Only for the KieModuleDeploymentHelper -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-ci</artifactId>
     </dependency>
 
     <!-- TEST -->
@@ -116,8 +152,13 @@
       <artifactId>jbpm-kie-services</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-    <!--  serialization -->
+    <!-- serialization -->
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
@@ -135,7 +176,7 @@
       <artifactId>jbpm-test</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- reflection -->
     <dependency>
       <groupId>org.reflections</groupId>
@@ -143,8 +184,7 @@
       <version>0.9.9-RC1</version>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
 
 </project>
-

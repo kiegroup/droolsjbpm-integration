@@ -69,7 +69,8 @@ public abstract class AbstractRemoteCommandObject {
     protected final RemoteConfiguration config;
 
     // Do not modify this: this is automatically incremented by the maven replacer plugin
-    private final String ARTIFACT_VERSION = "6.1.0.1";
+    private final String ARTIFACT_VERSION =
+                "6.1.0.1";
             
     AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
