@@ -115,9 +115,9 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
+      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- reflection -->
