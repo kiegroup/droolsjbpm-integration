@@ -133,6 +133,7 @@ public class AcceptedCommands {
         SEND_OBJECT_PARAMETER_COMMANDS.add(AddTaskCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteTaskCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(FailTaskCommand.class);
+        SEND_OBJECT_PARAMETER_COMMANDS.add(CompositeCommand.class);
         
         SEND_OBJECT_PARAMETER_COMMANDS = Collections.unmodifiableSet(SEND_OBJECT_PARAMETER_COMMANDS);
     }

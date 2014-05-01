@@ -375,12 +375,12 @@ public abstract class AbstractRemoteCommandObject {
         
         ClientRequestFactory requestFactory = config.getRequestFactory();
         ClientRequest restRequest;
-        if (isTaskService || command instanceof AuditCommand ) {
+        if (config.getExtraJaxbClasses().isEmpty() && (isTaskService || command instanceof AuditCommand) ) {
             restRequest = requestFactory.createRelativeRequest("/task/execute");
         } else {
             restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
         }
-        
+       
         
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) { 

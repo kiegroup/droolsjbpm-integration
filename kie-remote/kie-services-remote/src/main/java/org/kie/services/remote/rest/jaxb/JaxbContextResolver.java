@@ -20,19 +20,17 @@ import org.slf4j.LoggerFactory;
 public class JaxbContextResolver implements ContextResolver<JAXBContext> {
 
     private static final Logger logger = LoggerFactory.getLogger(JaxbContextResolver.class);
-    
+   
     @Inject
-    private DynamicJAXBContext dynamicContext;
+    JaxbContextManager dynamicContext;
 
     @Context
-    private UriInfo uriInfo;
+    UriInfo uriInfo;
 
     @Override
     public JAXBContext getContext(Class<?> type) {
-        dynamicContext.addType(type);
-        // this assumes that UriInfo is proxied so it will have right values for every request
-        dynamicContext.setUriInfo(uriInfo);
-        return dynamicContext;
+        logger.debug("Retrieving JAXBContext for '{}'", type.getCanonicalName());
+        return dynamicContext.getJaxbContext(type, uriInfo);
     }
 
 }
