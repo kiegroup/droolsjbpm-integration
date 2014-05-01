@@ -221,8 +221,8 @@ public class RemoteJmsRuntimeEngineFactoryBuilderImpl implements RemoteJmsRuntim
            Map<String, Object> connParams;
            if( config.getUseUssl() ) { 
                connParams = new HashMap<String, Object>(7);  
-               connParams.put(TransportConstants.PORT_PROP_NAME, 5446);  
-               connParams.put(TransportConstants.HOST_PROP_NAME, "localhost");
+               connParams.put(TransportConstants.PORT_PROP_NAME, jmsConnectorPort);  
+               connParams.put(TransportConstants.HOST_PROP_NAME, hostName);
               
                checkKeyAndTruststoreInfo();
 

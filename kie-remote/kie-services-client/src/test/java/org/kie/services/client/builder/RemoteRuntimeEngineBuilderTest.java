@@ -273,6 +273,29 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
     @Test
     public void jmsSslRuntimeFactoryAndBuilderTest() throws Exception { 
 
+        String hostName = "host-local";
+        int port = 12345;
+        RemoteJmsRuntimeEngineFactoryBuilder builder = RemoteJmsRuntimeEngineFactoryBuilderImpl.newBuilder()
+        .addUserName("H")
+        .addPassword("gummy bears")
+        .addHostName(hostName)
+        .addJmsConnectorPort(port)
+        .addKieSessionQueue(ksessionQueue)
+        .addResponseQueue(responseQueue)
+        .useSsl(true);
+    
+        // this doesn't really test what I want.. but it's better than nothing? Maybe? 
+        {
+        Field hostNameField = RemoteJmsRuntimeEngineFactoryBuilderImpl.class.getDeclaredField("hostName");
+        hostNameField.setAccessible(true);
+        assertEquals( hostName, hostNameField.get(builder) );
+        }
+        {
+        Field portField = RemoteJmsRuntimeEngineFactoryBuilderImpl.class.getDeclaredField("jmsConnectorPort");
+        portField.setAccessible(true);
+        assertEquals( port, portField.get(builder) );
+        }
+       
         try { 
             RemoteJmsRuntimeEngineFactoryBuilderImpl.newBuilder()
             .addUserName("H")
@@ -445,8 +468,7 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
             .build();
        
         // useKeystoreAsTruststore
-        RemoteJmsRuntimeEngineFactoryBuilder builder = 
-        RemoteJmsRuntimeEngineFactory.newBuilder()
+        builder = RemoteJmsRuntimeEngineFactory.newBuilder()
             .addUserName("H")
             .addPassword("gummy bears")
             .addHostName("localhost")
