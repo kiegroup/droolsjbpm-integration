@@ -1,7 +1,7 @@
 package org.kie.services.client.jaxb;
 
 import static org.junit.Assert.*;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -70,11 +70,14 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
 
     @Test
     public void jaxbClassesAreKnownToJaxbSerializationProvider() throws Exception {
+        int i = 0;
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
+            ++i;
             Constructor<?> construct = jaxbClass.getConstructor(new Class [] {});
             Object jaxbInst = construct.newInstance(new Object [] {});
             testRoundTrip(jaxbInst);
         }
+        assertTrue( i > 20 );
     }
 
     /**

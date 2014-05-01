@@ -18,43 +18,97 @@ import javax.xml.bind.Unmarshaller;
 
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 public class JaxbSerializationProvider implements SerializationProvider {
 
     public final static int JMS_SERIALIZATION_TYPE = 0;
 
-    private static Class<?>[] kieJaxbClasses = { 
-        // Command Request/Response
-            JaxbCommandsRequest.class, 
-            JaxbCommandsResponse.class,
-        // REST other
-            JaxbGenericResponse.class,
-            JaxbProcessInstanceWithVariablesResponse.class,
-            JaxbDeploymentJobResult.class,
-            JaxbDeploymentUnitList.class
+    public static Set<Class<?>> KIE_JAXB_CLASS_SET;
+    static { 
+        Class<?> [] kieJaxbClasses = { 
+                // Command Request/Response
+                JaxbCommandsRequest.class, 
+                JaxbCommandsResponse.class,
+
+                // command response
+                JaxbContentResponse.class,
+                JaxbTaskResponse.class,
+                JaxbTaskSummaryListResponse.class,
+                JaxbProcessInstanceListResponse.class,
+                JaxbProcessInstanceResponse.class,
+                JaxbProcessInstanceWithVariablesResponse.class,
+
+                // REST other
+                JaxbGenericResponse.class,
+                JaxbLongListResponse.class,
+                JaxbOtherResponse.class,
+                JaxbPrimitiveResponse.class,
+                JaxbVariablesResponse.class,
+                JaxbExceptionResponse.class,
+                JaxbGenericResponse.class,
+                JaxbRequestStatus.class,
+
+                // deployment
+                JaxbDeploymentJobResult.class,
+                JaxbDeploymentUnit.class,
+                JaxbDeploymentUnitList.class,
+
+                // workitem
+                JaxbWorkItem.class,
+
+                // history
+                JaxbHistoryLogList.class,
+                JaxbNodeInstanceLog.class,
+                JaxbProcessInstanceLog.class,
+                JaxbVariableInstanceLog.class
+        };
+        KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
     };
 
-    public static Set<Class<?>> PRIMITIVE_ARRAY_CLASS_SET = new CopyOnWriteArraySet<Class<?>>();
+    public static Set<Class<?>> PRIMITIVE_ARRAY_CLASS_SET;
     static { 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Boolean[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Byte[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Character[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Double[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Float[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Integer[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Long[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Math[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Number[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new Short[]{}.getClass()); 
-        PRIMITIVE_ARRAY_CLASS_SET.add(new String[]{}.getClass());
+        Class<?> [] primitiveClasses = { 
+                new Boolean[]{}.getClass(),
+                new Byte[]{}.getClass(),
+                new Character[]{}.getClass(),
+                new Double[]{}.getClass(),
+                new Float[]{}.getClass(),
+                new Integer[]{}.getClass(),
+                new Long[]{}.getClass(),
+                new Math[]{}.getClass(),
+                new Number[]{}.getClass(),
+                new Short[]{}.getClass(),
+                new String[]{}.getClass()
+        };
+        PRIMITIVE_ARRAY_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(primitiveClasses));
     };
     
-    private Set<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(kieJaxbClasses));
-    { jaxbClasses.addAll(PRIMITIVE_ARRAY_CLASS_SET); }
+    private Set<Class<?>> jaxbClasses;
+    {
+        jaxbClasses = new HashSet<Class<?>>(KIE_JAXB_CLASS_SET);
+        jaxbClasses.addAll(PRIMITIVE_ARRAY_CLASS_SET);
+    }
     
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
     
