@@ -1,19 +1,30 @@
 package org.kie.services.client;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.codec.binary.Base64;
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
+import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
 import org.jbpm.process.audit.NodeInstanceLog;
@@ -40,6 +51,7 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.command.Command;
+import org.kie.api.definition.KieDefinition.KnowledgeType;
 import org.kie.api.io.Resource;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
@@ -66,6 +78,9 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobR
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionSource;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -95,6 +110,37 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         return field.get(obj);
     }
   
+    // TESTS
+    
+    private static KieSession createKnowledgeSession(String processFile) throws Exception {
+        KieServices ks = KieServices.Factory.get();
+        KieRepository kr = ks.getRepository();
+        KieFileSystem kfs = ks.newKieFileSystem();
+        if (processFile != null) {
+            Resource process = ResourceFactory.newClassPathResource(processFile);
+            kfs.write(process);
+        }
+    
+        KieBuilder kb = ks.newKieBuilder(kfs);
+        kb.buildAll();
+    
+        if (kb.getResults().hasMessages(Level.ERROR)) {
+            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
+        }
+    
+        KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
+        KieBase kbase = kContainer.getKieBase();
+    
+        Environment env = EnvironmentFactory.newEnvironment();
+    
+        Properties defaultProps = new Properties();
+        defaultProps.setProperty("drools.processSignalManagerFactory", DefaultSignalManagerFactory.class.getName());
+        defaultProps.setProperty("drools.processInstanceManagerFactory", DefaultProcessInstanceManagerFactory.class.getName());
+        SessionConfiguration conf = new SessionConfiguration(defaultProps);
+    
+        KieSession ksession = (StatefulKnowledgeSession) kbase.newKieSession(conf, env);
+        return ksession;
+    }
     @After
     public void after() throws Exception { 
         super.tearDown();
@@ -104,35 +150,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     
     // TESTS
     
-    public static KieSession createKnowledgeSession(String processFile) throws Exception {
-        KieServices ks = KieServices.Factory.get();
-        KieRepository kr = ks.getRepository();
-        KieFileSystem kfs = ks.newKieFileSystem();
-        if (processFile != null) {
-            Resource process = ResourceFactory.newClassPathResource(processFile);
-            kfs.write(process);
-        }
-
-        KieBuilder kb = ks.newKieBuilder(kfs);
-        kb.buildAll();
-
-        if (kb.getResults().hasMessages(Level.ERROR)) {
-            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
-        }
-
-        KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
-        KieBase kbase = kContainer.getKieBase();
-
-        Environment env = EnvironmentFactory.newEnvironment();
-
-        Properties defaultProps = new Properties();
-        defaultProps.setProperty("drools.processSignalManagerFactory", DefaultSignalManagerFactory.class.getName());
-        defaultProps.setProperty("drools.processInstanceManagerFactory", DefaultProcessInstanceManagerFactory.class.getName());
-        SessionConfiguration conf = new SessionConfiguration(defaultProps);
-
-        KieSession ksession = (StatefulKnowledgeSession) kbase.newKieSession(conf, env);
-        return ksession;
-    }
+    
 
     
 
@@ -175,8 +193,15 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
 
         req = new JaxbCommandsRequest("deployment", new StartProcessCommand("org.jbpm.humantask"));
         newReq = (JaxbCommandsRequest) testRoundTrip(req);
-    }
 
+        CorrelationKeyInfo corrKey = new CorrelationKeyInfo();
+        corrKey.addProperty(new CorrelationPropertyInfo("null", "val"));
+    
+        GetProcessInstanceByCorrelationKeyCommand gpibckCmd = new GetProcessInstanceByCorrelationKeyCommand(corrKey);
+        req = new JaxbCommandsRequest("test", gpibckCmd);
+        testRoundTrip(req);
+    }
+    
     @Test
     public void commandsResponseTest() throws Exception {
         this.setupDataSource = true;
@@ -349,19 +374,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
 
     @Test
-    public void xmlAdapterTest() throws Exception {
-        // Don't run with JSON: /execute is only JAXB
-        Assume.assumeTrue(!getType().equals(TestType.JSON));
-
-        CorrelationKeyInfo corrKey = new CorrelationKeyInfo();
-        corrKey.addProperty(new CorrelationPropertyInfo("null", "val"));
-
-        GetProcessInstanceByCorrelationKeyCommand cmd = new GetProcessInstanceByCorrelationKeyCommand(corrKey);
-        JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        testRoundTrip(req);
-    }
-
-    @Test
     public void factHandleTest() throws Exception {
         // Don't run with YAML?
         Assume.assumeTrue(!getType().equals(TestType.YAML));
@@ -495,7 +507,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
     
     @Test
-    public void roundTripXmlAndTestEqualsProcessInstanceLog() throws Exception {
+    public void processInstanceLogTest() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
         
         ProcessInstanceLog origLog = new ProcessInstanceLog(54, "org.hospital.patient.triage");
@@ -524,7 +536,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
     
     @Test
-    public void roundTripXmlAndTestEqualsProcessInstanceLogNillable() throws Exception {
+    public void processInstanceLogNillable() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
         
         ProcessInstanceLog origLog = new ProcessInstanceLog(54, "org.hospital.patient.triage");
@@ -561,7 +573,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
     
     @Test
-    public void roundTripXmlAndTestEqualsNodeInstanceLog() throws Exception {
+    public void nodeInstanceLogTest() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
         
         int type = 0;
@@ -589,7 +601,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
     
     @Test
-    public void roundTripXmlAndTestEqualsVariableInstanceLog() throws Exception {
+    public void variableInstanceLogTest() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
         
         long processInstanceId = 23;
@@ -616,5 +628,73 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         
         VariableInstanceLog newLog = newXmlLog.getResult();
         ComparePair.compareOrig(origLog, newLog, VariableInstanceLog.class);
+    }
+    
+    @Test
+    public void processIdAndProcessDefinitionTest() throws Exception {
+        // JaxbProcessIdList 
+        String [] procIdArr = { "org.test.process.multiplex", "org.test.process.demultiplex" };
+        List<String> processIdList = Arrays.asList(procIdArr);
+        JaxbProcessIdList jaxbProcIdList = new JaxbProcessIdList(processIdList);
+        JaxbProcessIdList roundTripList = testRoundTrip(jaxbProcIdList);
+        ComparePair.compareObjectsViaFields(jaxbProcIdList, roundTripList);
+        
+        // JaxbProcessDefinition
+        ProcessAssetDesc assetDesc = new ProcessAssetDesc(
+                "org.test.proc.id", "The Name Of The Process", 
+                "1.999.23.Final", "org.test.proc", 
+                "RuleFlow", KnowledgeType.PROCESS.toString(),
+                "org.test.proc",
+                "org.test.proc:procs:1.999.Final");
+        
+        JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition();
+        jaxbProcDef.setDeploymentId(assetDesc.getDeploymentId());
+        jaxbProcDef.setId(assetDesc.getId());
+        jaxbProcDef.setName(assetDesc.getName());
+        jaxbProcDef.setPackageName(assetDesc.getPackageName());
+        jaxbProcDef.setVersion(assetDesc.getVersion());
+        Map<String, String> forms = new HashMap<String, String>();
+        forms.put( "locationForm", "GPS: street: post code: city: state: land: planet: universe: ");
+        jaxbProcDef.setForms(forms);
+       
+        URL bpmn2FileUrl = this.getClass().getResource("/BPMN2-StringStructureRef.bpmn2");
+        String bpmn2Source = convertFileToString(new FileInputStream(new File(bpmn2FileUrl.toURI())));
+        jaxbProcDef.setEncodedProcessSource(Base64.encodeBase64String(bpmn2Source.getBytes()));
+        
+        JaxbProcessDefinition copyJaxbProcDef = testRoundTrip(jaxbProcDef);
+        ComparePair.compareObjectsViaFields(jaxbProcDef, copyJaxbProcDef, "encodedProcessSource");
+        String origBpmn2 = jaxbProcDef.getProcessSource();
+        String copyBpmn2 = copyJaxbProcDef.getProcessSource();
+        assertEquals( "Decoded bpmn2 is not the same!", origBpmn2, copyBpmn2);
+    }
+    
+    private static String convertFileToString(InputStream in) {
+        InputStreamReader input = new InputStreamReader(in);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStreamWriter output = new OutputStreamWriter(baos);
+        char[] buffer = new char[4096];
+        int n = 0;
+        try {
+            while (-1 != (n = input.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+            output.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return baos.toString();
+    }
+    
+    @Test
+    public void processDefinitionSourceTest() throws Exception { 
+        URL bpmn2FileUrl = this.getClass().getResource("/BPMN2-StringStructureRef.bpmn2");
+        String bpmn2Source = convertFileToString(new FileInputStream(new File(bpmn2FileUrl.toURI())));
+        logger.debug( "-----" );
+        logger.debug( bpmn2Source); 
+        logger.debug( "-----" );
+        JaxbProcessDefinitionSource jaxbProcDefSource = new JaxbProcessDefinitionSource(bpmn2Source);
+        JaxbProcessDefinitionSource copyJaxbProcDefSource = testRoundTrip(jaxbProcDefSource);
+        
+        ComparePair.compareObjectsViaFields(jaxbProcDefSource, copyJaxbProcDefSource);
     }
 }

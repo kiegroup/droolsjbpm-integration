@@ -270,8 +270,8 @@ public class ResourceBase {
     protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, List<String>> params, boolean required, String operation) {
         List<OrganizationalEntity> orgEntList = new ArrayList<OrganizationalEntity>();
 
-        List<String> users = getStringListParam("user", false, params, "nominate");
-        List<String> groups = getStringListParam("group", false, params, "nominate");
+        List<String> users = getStringListParam("user", false, params, operation);
+        List<String> groups = getStringListParam("group", false, params, operation);
         if (required && (users.isEmpty() && groups.isEmpty()) ) {
             throw RestOperationException.badRequest("At least 1 query parameter (either 'user' or 'group') is required for the '" + operation + "' operation.");
         }

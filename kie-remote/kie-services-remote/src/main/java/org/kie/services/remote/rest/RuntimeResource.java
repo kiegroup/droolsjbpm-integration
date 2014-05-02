@@ -2,6 +2,7 @@ package org.kie.services.remote.rest;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.codec.binary.Base64;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -33,6 +36,8 @@ import org.drools.core.command.runtime.process.GetWorkItemCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
+import org.jbpm.kie.services.api.RuntimeDataService;
+import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.kie.api.command.Command;
@@ -40,6 +45,9 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionSource;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
@@ -74,9 +82,11 @@ public class RuntimeResource extends ResourceBase {
     
     @Context
     private Request restRequest;
+    
+    @Inject
+    private RuntimeDataService runtimeDataService;
 
     /* KIE information and processing */
-
     
     @PathParam("deploymentId")
     protected String deploymentId;
@@ -88,6 +98,14 @@ public class RuntimeResource extends ResourceBase {
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
+    /**
+     * The "/execute" method, primarily for the classes in the kie-services-client jar. 
+     * </p>
+     * A pain to support.. 
+     * 
+     * @param cmdsRequest The {@link JaxbCommandsRequest} containing the {@link Command} and other necessary info.
+     * @return A {@link JaxbCommandsResponse} with the result from the {@link Command}
+     */
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
@@ -96,6 +114,33 @@ public class RuntimeResource extends ResourceBase {
         return restProcessJaxbCommandsRequest(cmdsRequest);
     } 
 
+    /**
+     * Return a list of process definition ids available in this deployment.
+     * @return A {@link JaxbProcessIdList} instance.
+     */
+    @GET
+    @Path("/process")
+    public Response process() { 
+        Collection<String> processIdList = runtimeDataService.getProcessIds(deploymentId);
+        return createCorrectVariant(new JaxbProcessIdList(processIdList), headers);
+    }
+    
+    @GET
+    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
+    public Response process_defId(@PathParam("processDefId") String processId) {
+        ProcessAssetDesc processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
+        JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDescList);
+        return createCorrectVariant(jaxbProcDef, headers);
+    }
+    
+    @GET
+    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/source")
+    public Response process_defId_source(@PathParam("processDefId") String processId) {
+        ProcessAssetDesc processAssetDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
+        String bpmn2Source =  new String(Base64.decodeBase64(processAssetDesc.getEncodedProcessSource()));
+        return createCorrectVariant(new JaxbProcessDefinitionSource(bpmn2Source), headers);
+    }
+    
     @POST
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public Response process_defId_start(@PathParam("processDefId") String processId) {
@@ -349,6 +394,19 @@ public class RuntimeResource extends ResourceBase {
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
+    private JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessAssetDesc procAssetDesc) { 
+        JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
+        jaxbProcDef.setDeploymentId(procAssetDesc.getDeploymentId());
+        jaxbProcDef.setEncodedProcessSource(procAssetDesc.getEncodedProcessSource());
+        jaxbProcDef.setForms(procAssetDesc.getForms());
+        jaxbProcDef.setId(procAssetDesc.getId());
+        jaxbProcDef.setName(procAssetDesc.getName());
+        jaxbProcDef.setPackageName(procAssetDesc.getPackageName());
+        jaxbProcDef.setVersion(procAssetDesc.getVersion());
+        
+        return jaxbProcDef;
+    }
+    
     private ProcessInstance getProcessInstance(long procInstId) { 
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);

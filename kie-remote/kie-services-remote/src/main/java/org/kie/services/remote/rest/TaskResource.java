@@ -173,7 +173,8 @@ public class TaskResource extends ResourceBase {
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, List<String>> params = getRequestParams(uriInfo);
-        operation = checkThatOperationExists(operation, allowedOperations);        
+        operation = checkThatOperationExists(operation, allowedOperations);
+        String oper = getRelativePath(uriInfo);
         String userId = identityProvider.getName();
         logger.debug("Executing " + operation + " on task " + taskId + " by user " + userId );
        
@@ -193,15 +194,15 @@ public class TaskResource extends ResourceBase {
             Map<String, Object> data = extractMapFromParams(params, operation);
             cmd = new CompleteTaskCommand(taskId, userId, data);
         } else if ("delegate".equalsIgnoreCase(operation)) {
-            String targetEntityId = getStringParam("targetEntityId", true, params, operation);
+            String targetEntityId = getStringParam("targetEntityId", true, params, oper);
             cmd = new DelegateTaskCommand(taskId, userId, targetEntityId);
         } else if ("exit".equalsIgnoreCase(operation)) {
             cmd = new ExitTaskCommand(taskId, userId);
         } else if ("fail".equalsIgnoreCase(operation)) {
-            Map<String, Object> data = extractMapFromParams(params, operation);
+            Map<String, Object> data = extractMapFromParams(params, oper);
             cmd = new FailTaskCommand(taskId, userId, data);
         } else if ("forward".equalsIgnoreCase(operation)) {
-            String targetEntityId = getStringParam("targetEntityId", true, params, operation);
+            String targetEntityId = getStringParam("targetEntityId", true, params, oper);
             cmd = new ForwardTaskCommand(taskId, userId, targetEntityId);
         } else if ("release".equalsIgnoreCase(operation)) {
             cmd = new ReleaseTaskCommand(taskId, userId);
@@ -216,10 +217,10 @@ public class TaskResource extends ResourceBase {
         } else if ("suspend".equalsIgnoreCase(operation)) {
             cmd = new SuspendTaskCommand(taskId, userId);
         } else if ("nominate".equalsIgnoreCase(operation)) {
-            List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params, true, "nominate");
+            List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params, true, oper);
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
         } else {
-            throw RestOperationException.badRequest("Unsupported operation: /task/" + taskId + "/" + operation);
+            throw RestOperationException.badRequest("Unsupported operation: " + oper);
         }
         
         doRestTaskOperation(taskId, cmd);

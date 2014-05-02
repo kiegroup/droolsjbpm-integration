@@ -1,7 +1,9 @@
 package org.kie.services.client.serialization;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
@@ -29,6 +32,9 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionSource;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -39,6 +45,8 @@ import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListR
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
+
+import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 
 public class JaxbSerializationProvider implements SerializationProvider {
 
@@ -73,6 +81,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbDeploymentJobResult.class,
                 JaxbDeploymentUnit.class,
                 JaxbDeploymentUnitList.class,
+                
+                // process
+                JaxbProcessIdList.class,
+                JaxbProcessDefinition.class,
+                JaxbProcessDefinitionSource.class,
 
                 // workitem
                 JaxbWorkItem.class,
@@ -145,8 +158,19 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             }
         } catch( JAXBException jaxbe ) { 
-            throw new SerializationException("Unable to create JAXB marshaller.", jaxbe);
+            throw new SerializationException("Unable to create JAXB marshaller", jaxbe);
         }
+        
+        try {
+            marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
+                public void escape(char[] ac, int i, int j, boolean flag, Writer writer) throws IOException {
+                    writer.write( ac, i, j ); 
+                }
+            });
+        } catch (PropertyException e) {
+            throw new SerializationException("Unable to set CharacterEscapeHandler", e);
+        }
+        
         StringWriter stringWriter = new StringWriter();
 
         try {
