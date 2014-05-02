@@ -91,12 +91,6 @@
       </exclusions>
     </dependency>
 
-    <!-- rest -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-    </dependency>
-
     <!-- jaxb -->
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -113,6 +107,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- TEST -->
@@ -177,7 +172,6 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.9-RC1</version>
       <scope>test</scope>
     </dependency>
 
