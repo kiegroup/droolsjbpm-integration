@@ -1,5 +1,6 @@
 package org.kie.services.remote.cdi;
 
+import static org.kie.remote.ServicesVersion.*;
 import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.FAILURE;
 import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 
@@ -68,9 +69,6 @@ public class ProcessRequestBean {
    
     private AuditLogService auditLogService;
   
-    // Do not modify this: this is automatically incremented by the maven replacer plugin
-    private final String ARTIFACT_VERSION = "6.1.0.1";
-    
     // Injection methods for tests
     
     public void setRuntimeMgrMgr(DeploymentInfoBean runtimeMgrMgr) {
@@ -90,8 +88,8 @@ public class ProcessRequestBean {
         if( version == null ) { 
             version = "pre-6.0.3";
         }
-        if( ! version.equals(ARTIFACT_VERSION) ) { 
-            logger.warn( "Request received from client version [{}] while server is version [{}]! THIS MAY CAUSE PROBLEMS!", version, ARTIFACT_VERSION);
+        if( ! version.equals(VERSION) ) { 
+            logger.warn( "Request received from client version [{}] while server is version [{}]! THIS MAY CAUSE PROBLEMS!", version, VERSION);
         }
         
         String cmdName = cmd.getClass().getSimpleName();

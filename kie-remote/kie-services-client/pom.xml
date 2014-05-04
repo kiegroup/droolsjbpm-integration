@@ -154,48 +154,5 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>parse-version</id>
-            <goals>
-              <goal>parse-version</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>replacer</artifactId>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <basedir>${basedir}/src/main/java/org/kie/services/client/api/command/</basedir>
-          <includes>
-            <include>AbstractRemoteCommandObject.java</include>
-          </includes>
-          <regex>true</regex>
-          <replacements>
-            <replacement>
-              <token>ARTIFACT_VERSION = ".*</token>
-              <!-- FORMAT CHECK: the following element should be on one line -->
-              <value>ARTIFACT_VERSION = "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${bugfix.version}";</value>
-            </replacement>
-          </replacements>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </build>
 </project>
 

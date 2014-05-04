@@ -1,5 +1,6 @@
 package org.kie.services.client.api.command;
 
+import static org.kie.remote.ServicesVersion.*;
 import static org.kie.services.client.serialization.SerializationConstants.*;
 
 import java.io.IOException;
@@ -68,10 +69,6 @@ public abstract class AbstractRemoteCommandObject {
 
     protected final RemoteConfiguration config;
 
-    // Do not modify this: this is automatically incremented by the maven replacer plugin
-    private final String ARTIFACT_VERSION =
-                "6.1.0.1";
-            
     AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
     }
@@ -196,7 +193,7 @@ public abstract class AbstractRemoteCommandObject {
         }
         req.setProcessInstanceId(processInstanceId);
         req.setUser(config.getUserName());
-        req.setVersion(ARTIFACT_VERSION);
+        req.setVersion(VERSION);
         
         return req;
     }
@@ -345,8 +342,8 @@ public abstract class AbstractRemoteCommandObject {
         if( version == null ) { 
             version = "pre-6.0.3";
         }
-        if( ! version.equals(ARTIFACT_VERSION) ) { 
-            logger.info("Response received from server version [{}] while client is version [{}]! This may cause problems.", version, ARTIFACT_VERSION);
+        if( ! version.equals(VERSION) ) { 
+            logger.info("Response received from server version [{}] while client is version [{}]! This may cause problems.", version, VERSION);
         }
         List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
         if (responses.size() > 0) {
