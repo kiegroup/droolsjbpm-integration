@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.jaxb;
+package org.kie.remote.services.rest.jaxb;
 
 import java.io.Externalizable;
 import java.io.IOException;

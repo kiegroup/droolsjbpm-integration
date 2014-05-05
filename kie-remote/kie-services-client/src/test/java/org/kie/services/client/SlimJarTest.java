@@ -3,7 +3,7 @@ package org.kie.services.client;
 import java.lang.reflect.Constructor;
 
 import org.junit.Test;
-import org.kie.services.client.api.command.AcceptedCommands;
+import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,8 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.services.client.serialization.SerializationConstants.*;
+import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -56,6 +58,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
+import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -7,6 +7,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -20,7 +21,9 @@ import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jbpm.bpmn2.objects.Person;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
@@ -60,7 +63,10 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
     @BeforeClass
     public static void beforeClass() { 
     }
-   
+  
+    @Rule
+    public TestName testName = new TestName();
+
     @Before
     public void before() throws Exception {  // Create initial context
         mockStatic( NamingManager.class );
@@ -85,6 +91,8 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
         prop = RESPONSE_QUEUE_NAME;
         this.responseQueue = mock(Queue.class);
         doReturn(responseQueue).when(remoteInitialContext).lookup(prop);
+        
+        System.out.println( ">>> " + testName.getMethodName());
     }
     
     @Test
@@ -599,6 +607,7 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
         
         try { 
             runtimeEngine.getAuditLogService().clear();
+            fail( "This should have failed because there's no server running... ");
         } catch( RemoteCommunicationException rce ) { 
             // expected
         }
@@ -606,6 +615,7 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
         // This will throw a MissingRequiredInfoException because the deployment id is required here
         try { 
             runtimeEngine.getKieSession().startProcess("org.test.process"); 
+            fail( "This should have failed because no deployment id has been provided. ");
         } catch( MissingRequiredInfoException mrie ) { 
             // expected
         }
@@ -626,13 +636,17 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
         runtimeEngine = factory.newRuntimeEngine();
         try { 
             runtimeEngine.getTaskService().claim(23l, "user");
+            fail( "This should have failed because there's no server running... ");
         } catch( RemoteCommunicationException rce ) { 
+            logger.info("The " + NoSuchAlgorithmException.class.getSimpleName() + " above is expected, nothing is wrong.");
             // expected
         }
         
         try { 
             runtimeEngine.getAuditLogService().clear();
+            fail( "This should have failed because there's no server running... ");
         } catch( RemoteCommunicationException rce ) { 
+            logger.info("The " + NoSuchAlgorithmException.class.getSimpleName() + " above is expected, nothing is wrong.");
             // expected
         }
         
