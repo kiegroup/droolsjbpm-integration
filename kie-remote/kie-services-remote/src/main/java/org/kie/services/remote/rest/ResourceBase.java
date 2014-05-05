@@ -47,7 +47,7 @@ public class ResourceBase {
     // Seam-Transaction ----------------------------------------------------------------------------------------------------------
     
     @SuppressWarnings("rawtypes")
-    public JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, ProcessRequestBean requestBean) {
+    public JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command> commands = request.getCommands();
@@ -66,7 +66,7 @@ public class ResourceBase {
             // Execute commands
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
-                requestBean.processCommand(cmd, request, i, jaxbResponse);
+                processRequestBean.processCommand(cmd, request, i, jaxbResponse);
             }
         }
 

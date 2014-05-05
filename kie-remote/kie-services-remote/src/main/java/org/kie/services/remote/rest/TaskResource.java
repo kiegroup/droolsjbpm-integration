@@ -105,7 +105,7 @@ public class TaskResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        return restProcessJaxbCommandsRequest(cmdsRequest, processRequestBean);
+        return restProcessJaxbCommandsRequest(cmdsRequest);
     }
 
     @GET

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions 
+	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:tns="http://services.remote.kie.org/6.1.0.1/command" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
+	name="CommandService" 
+	targetNamespace="http://services.remote.kie.org/6.1.0.1/command" 
+	>
+  <!-- JAX-WS Customizations: Wrapper styles, async. -->
+  <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+    <jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
+    <jaxws:enableAsyncMapping>false</jaxws:enableAsyncMapping>
+  </jaxws:bindings>
+  <types xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:schema 
+        xmlns:jxb="http://java.sun.com/xml/ns/jaxb" 
+        xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+        jxb:extensionBindingPrefixes="xjc" 
+        jxb:version="1.0" 
+        targetNamespace="http://services.remote.kie.org/6.1.0.1/command" 
+        version="1.0">
+      <xs:annotation>
+        <xs:appinfo>
+          <jxb:globalBindings collectionType="java.util.LinkedList" fixedAttributeAsConstantProperty="true" generateIsSetMethod="false">
+            <xjc:serializable uid="1"/>
+          </jxb:globalBindings>
+        </xs:appinfo>
+      </xs:annotation> 
+
+      <xs:element name="CommandWebServiceException" type="tns:WebServiceFaultInfo"/>
+      <xs:element name="command-request" type="tns:jaxbCommandsRequest"/>
+      <xs:element name="command-response" type="tns:jaxbCommandsResponse"/>
+
+      <xs:element name="execute" type="tns:execute"/>
+      <xs:element name="executeResponse" type="tns:executeResponse"/>
+
+      <xs:complexType name="execute">
+        <xs:sequence>
+          <xs:element name="request" type="tns:jaxbCommandsRequest" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="jaxbCommandsRequest">
+         <xs:annotation>
+          <xs:appinfo>
+            <jxb:class ref="org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest"/>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:complexType>
+
+      <xs:complexType name="executeResponse">
+        <xs:sequence>
+          <xs:element name="return" type="tns:jaxbCommandsResponse" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:complexType name="jaxbCommandsResponse">
+        <xs:annotation>
+          <xs:appinfo>
+            <jxb:class ref="org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse"/>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:complexType>
+
+      <xs:complexType name="serializableServiceObject" abstract="true">
+        <xs:annotation>
+          <xs:appinfo>
+            <jxb:class ref="org.kie.services.remote.ws.common.SerializableServiceObject"/>
+          </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence/>
+      </xs:complexType>
+
+      <xs:complexType name="WebServiceFaultInfo">
+        <xs:annotation>
+          <xs:appinfo>
+            <jxb:class ref="org.kie.services.remote.ws.common.WebServiceFaultInfo"/>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:complexType>
+
+    </xs:schema>
+  </types>
+  <message name="execute">
+    <part name="parameters" element="tns:execute"/>
+  </message>
+  <message name="executeResponse">
+    <part name="parameters" element="tns:executeResponse"/>
+  </message>
+  <message name="CommandWebServiceException">
+    <part name="fault" element="tns:CommandWebServiceException"/>
+  </message>
+  <portType name="CommandService">
+    <operation name="execute">
+      <input wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/executeRequest" message="tns:execute"/>
+      <output wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/executeResponse" message="tns:executeResponse"/>
+      <fault message="tns:CommandWebServiceException" name="CommandWebServiceException" wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/execute/Fault/CommandWebServiceException"/>
+    </operation>
+  </portType>
+  <binding name="CommandServicePortBinding" type="tns:CommandService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="execute">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="CommandWebServiceException">
+        <soap:fault name="CommandWebServiceException" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="CommandServicePort">
+    <port name="CommandServicePort" binding="tns:CommandServicePortBinding">
+      <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
+    </port>
+  </service>
+</definitions>
+

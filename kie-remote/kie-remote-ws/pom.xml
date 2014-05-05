@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.remote</groupId>
+    <artifactId>kie-remote</artifactId>
+    <version>6.1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie.remote.ws</groupId>
+  <artifactId>kie-remote-ws</artifactId>
+  <packaging>pom</packaging>
+
+  <name>KIE Remote WebServices multiproject</name>
+  <description>Web services for various kie projects</description>
+
+  <modules>
+    <module>kie-remote-ws-common</module>
+    <module>kie-remote-ws-wsdl-cmd</module>
+    <!-- Need to import and setup WSDL's from Poc project
+    <module>kie-remote-ws-wsdl</module>
+    -->
+    <!-- 
+    Eventually, we'll refactor the impl code out of kie-services-remote, 
+    but that's premature optimization at this point
+    <module>kie-remote-ws-impl</module>
+    -->
+  </modules>
+
+  <!-- add to bom.xml -->
+  <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.kie.remote.ws</groupId>
+            <artifactId>kie-remote-ws-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.remote.ws</groupId>
+            <artifactId>kie-remote-ws-wsdl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.remote.ws</groupId>
+            <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.remote.ws</groupId>
+            <artifactId>kie-remote-ws-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

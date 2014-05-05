@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.remote.ws</groupId>
+    <artifactId>kie-remote-ws</artifactId>
+    <version>6.1.0-SNAPSHOT</version>
+  </parent>
+
+  <packaging>jar</packaging>
+  <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
+  <name>KIE Remote Webservices :: WSDL for the Command service</name>
+
+  <dependencies>
+    <!-- generated code -->
+    <dependency>
+      <groupId>org.kie.remote.ws</groupId>
+      <artifactId>kie-remote-ws-common</artifactId>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/generated</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jvnet.jax-ws-commons</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <id>wsimport-from-jdk</id>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsimport}</executable>
+              <sourceDestDir>${basedir}//src/main/generated</sourceDestDir>
+              <packageName>org.kie.services.remote.ws.wsdl.generated</packageName>
+              <target>2.1</target>
+              <!-- Following configuration will invoke wsimport once for each wsdl. -->
+              <wsdlLocation>file:///wsdl/*</wsdlLocation>
+              <wsdlDirectory>${basedir}//src/main/resources/META-INF/wsdl</wsdlDirectory>
+              <wsdlFiles>
+                <wsdlFile>ProcessService.wsdl</wsdlFile>
+                <wsdlFile>DeploymentService.wsdl</wsdlFile>
+                <wsdlFile>HistoryService.wsdl</wsdlFile>
+                <wsdlFile>KnowledgeService.wsdl</wsdlFile>
+                <wsdlFile>ProcessService.wsdl</wsdlFile>
+                <wsdlFile>TaskService.wsdl</wsdlFile>
+              </wsdlFiles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>src/main/generated</directory>
+              <includes>
+                <include>**/*.java</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- setup corresponding executables on win/*nix -->
+  <profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <tool.wsgen>${java.home}/../bin/wsgen.exe</tool.wsgen>
+        <tool.wsimport>${java.home}/../bin/wsimport.exe</tool.wsimport>
+      </properties>
+    </profile>
+    <profile>
+      <id>nix</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <properties>
+        <tool.wsgen>${java.home}/../bin/wsgen</tool.wsgen>
+        <tool.wsimport>${java.home}/../bin/wsimport</tool.wsimport>
+      </properties>
+    </profile>
+  </profiles>
+</project>

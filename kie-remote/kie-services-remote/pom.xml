@@ -22,6 +22,13 @@
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-services-jaxb</artifactId>
     </dependency>
+    
+    <!-- webservices -->
+    <dependency>
+      <groupId>org.kie.remote.ws</groupId>
+      <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- kie/drools/jbpm: provided in jbpm-console, kie-wb, etc -->
     <dependency>

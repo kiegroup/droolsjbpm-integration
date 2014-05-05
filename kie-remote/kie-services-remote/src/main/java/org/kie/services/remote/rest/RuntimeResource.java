@@ -93,7 +93,7 @@ public class RuntimeResource extends ResourceBase {
     @Produces(MediaType.APPLICATION_XML)
     @Path("/execute")
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        return restProcessJaxbCommandsRequest(cmdsRequest, processRequestBean);
+        return restProcessJaxbCommandsRequest(cmdsRequest);
     } 
 
     @POST
