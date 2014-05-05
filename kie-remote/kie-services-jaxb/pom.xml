@@ -206,7 +206,7 @@
         <configuration>
           <basedir>${basedir}//src/main/java/org/kie/remote</basedir>
           <includes>
-            <include>ArtifactVersion.java</include>
+            <include>ServiceVersion.java</include>
           </includes>
           <regex>true</regex>
           <replacements>
