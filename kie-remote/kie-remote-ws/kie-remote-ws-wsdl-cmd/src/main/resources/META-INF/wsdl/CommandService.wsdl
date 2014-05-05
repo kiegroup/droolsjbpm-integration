@@ -67,7 +67,7 @@
       <xs:complexType name="serializableServiceObject" abstract="true">
         <xs:annotation>
           <xs:appinfo>
-            <jxb:class ref="org.kie.services.remote.ws.common.SerializableServiceObject"/>
+            <jxb:class ref="org.kie.remote.services.ws.common.SerializableServiceObject"/>
           </xs:appinfo>
         </xs:annotation>
         <xs:sequence/>
@@ -76,7 +76,7 @@
       <xs:complexType name="WebServiceFaultInfo">
         <xs:annotation>
           <xs:appinfo>
-            <jxb:class ref="org.kie.services.remote.ws.common.WebServiceFaultInfo"/>
+            <jxb:class ref="org.kie.remote.services.ws.common.WebServiceFaultInfo"/>
           </xs:appinfo>
         </xs:annotation>
       </xs:complexType>

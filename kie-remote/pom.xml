@@ -24,6 +24,7 @@
   <modules>
     <module>kie-services-jaxb</module>
     <module>kie-services-client</module>
+    <module>kie-remote-ws</module>
     <module>kie-services-remote</module>
   </modules>
 

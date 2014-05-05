@@ -1,4 +1,4 @@
-package org.kie.services.remote.ws.common;
+package org.kie.remote.services.ws.common;
 
 
 
@@ -39,7 +39,7 @@ public class KieRemoteWebServiceException extends Exception {
     /**
      * 
      * @return
-     *     returns fault bean: org.kie.services.remote.ws.wsdl.ServiceFaultInfoSO
+     *     returns fault bean: org.kie.remote.services.ws.wsdl.ServiceFaultInfoSO
      */
     public WebServiceFaultInfo getFaultInfo() {
         return faultInfo;

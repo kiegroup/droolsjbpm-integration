@@ -1,4 +1,4 @@
-package org.kie.services.remote.ws.common;
+package org.kie.remote.services.ws.common;
 
 
 import javax.xml.bind.annotation.XmlType;
