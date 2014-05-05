@@ -1,7 +1,6 @@
 package org.kie.services.client.serialization.jaxb.impl.process;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.kie.services.client.api.command;
+package org.kie.services.shared;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -119,7 +119,7 @@ public class AcceptedCommands {
         TASK_COMMANDS_THAT_INFLUENCE_KIESESSION = Collections.unmodifiableSet(TASK_COMMANDS_THAT_INFLUENCE_KIESESSION);
     }
     
-    static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
+    public static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
     static { 
         SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteWorkItemCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(SignalEventCommand.class);

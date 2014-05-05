@@ -17,12 +17,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.junit.Assume;
 import org.junit.Test;
 import org.kie.services.client.AbstractServicesSerializationTest;
-import org.kie.services.client.api.command.AcceptedCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.shared.AcceptedCommands;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -51,10 +51,11 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
         jaxbProvider.addJaxbClasses(extraClass);
     }
 
-    public Object testRoundTrip(Object in) throws Exception {
+    @Override
+    public <T> T testRoundTrip(T in) throws Exception {
         String xmlObject = jaxbProvider.serialize(in);
         logger.debug(xmlObject);
-        return jaxbProvider.deserialize(xmlObject);
+        return (T) jaxbProvider.deserialize(xmlObject);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.kie.remote;
+package org.kie.services.shared;
 
 public class ServicesVersion {
 

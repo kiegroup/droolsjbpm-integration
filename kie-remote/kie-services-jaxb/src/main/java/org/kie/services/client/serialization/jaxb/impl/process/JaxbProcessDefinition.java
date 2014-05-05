@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.kie.internal.deployment.DeployedAsset;
 
 @XmlRootElement(name="process-definition")
 @XmlAccessorType(XmlAccessType.FIELD)

@@ -33,7 +33,7 @@ import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.*;
 import org.kie.api.command.Command;
-import org.kie.services.client.api.command.AcceptedCommands;
+import org.kie.services.shared.AcceptedCommands;
 
 @XmlRootElement(name = "command-request")
 @XmlAccessorType(XmlAccessType.FIELD)

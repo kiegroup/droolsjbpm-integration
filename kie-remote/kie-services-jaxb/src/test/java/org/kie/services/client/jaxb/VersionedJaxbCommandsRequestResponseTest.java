@@ -28,10 +28,10 @@ public class VersionedJaxbCommandsRequestResponseTest {
         jaxbProvider.setPrettyPrint(true);
     }
 
-    public Object testRoundTrip(Object in) throws Exception {
+    public <T> T testRoundTrip(T in) throws Exception {
         String xmlStr = jaxbProvider.serialize(in);
         logger.debug(xmlStr);
-        return deserialize(xmlStr);
+        return (T) deserialize(xmlStr);
     }
     
     public Object deserialize(String xmlStr) { 
@@ -79,7 +79,7 @@ public class VersionedJaxbCommandsRequestResponseTest {
         Object weirdParam = new Integer[] { 59, 2195 };
         spCmd.getParameters().put("thr", weirdParam);
         
-        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundTrip(req);
+        JaxbCommandsRequest newReq = testRoundTrip(req);
         assertEquals(((StartProcessCommand) newReq.getCommands().get(0)).getParameters().get("two"), "B");
         
         Object newStringReq = deserialize(cmdReqXmlStr);

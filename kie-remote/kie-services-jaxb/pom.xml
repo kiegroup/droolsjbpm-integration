@@ -207,7 +207,7 @@
           </execution>
         </executions>
         <configuration>
-          <basedir>${basedir}//src/main/java/org/kie/remote</basedir>
+          <basedir>${basedir}//src/main/java/org/kie/services/shared</basedir>
           <includes>
             <include>ServicesVersion.java</include>
           </includes>
