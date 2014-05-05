@@ -11,10 +11,10 @@ public class YamlServicesSerializationTest extends AbstractServicesSerialization
     
     private Yaml yaml = new Yaml();
     
-    public Object testRoundTrip(Object in) throws Exception {
+    public <T> T testRoundTrip(T in) throws Exception {
         String output = yaml.dump(in);
         logger.debug(output);
-        return yaml.load(output);
+        return (T) yaml.load(output);
     }
 
     @Override

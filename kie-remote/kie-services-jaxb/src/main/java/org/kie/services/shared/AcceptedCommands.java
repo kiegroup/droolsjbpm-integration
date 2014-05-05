@@ -1,4 +1,4 @@
-package org.kie.services.client.api.command;
+package org.kie.services.shared;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -9,7 +9,18 @@ import org.drools.core.command.runtime.GetFactCountCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.GetIdCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
-import org.drools.core.command.runtime.process.*;
+import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
+import org.drools.core.command.runtime.process.AbortWorkItemCommand;
+import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.core.command.runtime.process.GetProcessIdsCommand;
+import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
+import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
+import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
+import org.drools.core.command.runtime.process.GetWorkItemCommand;
+import org.drools.core.command.runtime.process.SetProcessInstanceVariablesCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
@@ -22,7 +33,37 @@ import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
-import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.AddTaskCommand;
+import org.jbpm.services.task.commands.CancelDeadlineCommand;
+import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
+import org.jbpm.services.task.commands.ClaimTaskCommand;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.CompositeCommand;
+import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
+import org.jbpm.services.task.commands.ExitTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
+import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.GetAttachmentCommand;
+import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
+import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
+import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
+import org.jbpm.services.task.commands.GetTaskCommand;
+import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
+import org.jbpm.services.task.commands.GetTasksOwnedCommand;
+import org.jbpm.services.task.commands.NominateTaskCommand;
+import org.jbpm.services.task.commands.ProcessSubTaskCommand;
+import org.jbpm.services.task.commands.ReleaseTaskCommand;
+import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SkipTaskCommand;
+import org.jbpm.services.task.commands.StartTaskCommand;
+import org.jbpm.services.task.commands.StopTaskCommand;
+import org.jbpm.services.task.commands.SuspendTaskCommand;
+import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 
 @SuppressWarnings("rawtypes")
@@ -119,7 +160,7 @@ public class AcceptedCommands {
         TASK_COMMANDS_THAT_INFLUENCE_KIESESSION = Collections.unmodifiableSet(TASK_COMMANDS_THAT_INFLUENCE_KIESESSION);
     }
     
-    static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
+    public static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
     static { 
         SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteWorkItemCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(SignalEventCommand.class);

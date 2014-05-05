@@ -40,7 +40,6 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.command.Command;
-import org.kie.api.io.Resource;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -109,7 +108,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         KieRepository kr = ks.getRepository();
         KieFileSystem kfs = ks.newKieFileSystem();
         if (processFile != null) {
-            Resource process = ResourceFactory.newClassPathResource(processFile);
+            org.kie.api.io.Resource process = ResourceFactory.newClassPathResource(processFile);
             kfs.write(process);
         }
 
@@ -149,7 +148,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         long taskId = 1;
         Command<?> cmd = new StartTaskCommand(taskId, "krisv");
         JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        Command<?> newCmd = ((JaxbCommandsRequest) testRoundTrip(req)).getCommands().get(0);
+        Command<?> newCmd = testRoundTrip(req).getCommands().get(0);
         assertNotNull(newCmd);
         assertEquals("taskId is not equal", taskId, getField("taskId", TaskCommand.class, newCmd));
         assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
@@ -170,11 +169,18 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         
         addClassesToSerializationProvider(weirdParam.getClass());
 
-        JaxbCommandsRequest newReq = (JaxbCommandsRequest) testRoundTrip(req);
+        JaxbCommandsRequest newReq = testRoundTrip(req);
         assertEquals(((StartProcessCommand) newReq.getCommands().get(0)).getParameters().get("two"), "B");
 
         req = new JaxbCommandsRequest("deployment", new StartProcessCommand("org.jbpm.humantask"));
-        newReq = (JaxbCommandsRequest) testRoundTrip(req);
+        newReq = testRoundTrip(req);
+
+        CorrelationKeyInfo corrKey = new CorrelationKeyInfo();
+        corrKey.addProperty(new CorrelationPropertyInfo("null", "val"));
+    
+        GetProcessInstanceByCorrelationKeyCommand gpibckCmd = new GetProcessInstanceByCorrelationKeyCommand(corrKey);
+        req = new JaxbCommandsRequest("test", gpibckCmd);
+        testRoundTrip(req);
     }
 
     @Test
@@ -439,7 +445,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         
         Command<?> cmd = new StartProcessCommand("proc.with.array.params", parameters);
         JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        Command<?> newCmd = ((JaxbCommandsRequest) testRoundTrip(req)).getCommands().get(0);
+        Command<?> newCmd = testRoundTrip(req).getCommands().get(0);
         assertNotNull(newCmd);
     }
 
@@ -471,7 +477,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
         depUnitList.getDeploymentUnitList().add(depUnit);
         jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
-        JaxbDeploymentJobResult copyJaxbJob = (JaxbDeploymentJobResult) testRoundTrip(jaxbJob);
+        JaxbDeploymentJobResult copyJaxbJob = testRoundTrip(jaxbJob);
         ComparePair.compareObjectsViaFields(jaxbJob, copyJaxbJob, "identifier");
         
         depUnit = new JaxbDeploymentUnit("g", "a", "v");
@@ -481,16 +487,16 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         depUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
         depUnitList.getDeploymentUnitList().add(depUnit);
         
-        JaxbDeploymentUnit copyDepUnit = (JaxbDeploymentUnit) testRoundTrip(depUnit);
+        JaxbDeploymentUnit copyDepUnit = testRoundTrip(depUnit);
         
         ComparePair.compareObjectsViaFields(depUnit, copyDepUnit, "identifier");
         
         JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult("testing stuff", true, copyDepUnit, "test");
-        JaxbDeploymentJobResult copyDepJob = (JaxbDeploymentJobResult) testRoundTrip(depJob);
+        JaxbDeploymentJobResult copyDepJob = testRoundTrip(depJob);
         
         ComparePair.compareObjectsViaFields(copyDepJob, depJob, "identifier");
         
-        JaxbDeploymentUnitList roundTripUnitList = (JaxbDeploymentUnitList) testRoundTrip(depUnitList);
+        JaxbDeploymentUnitList roundTripUnitList = testRoundTrip(depUnitList);
         ComparePair.compareObjectsViaFields(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "identifier");
     }
     
@@ -516,7 +522,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         JaxbProcessInstanceLog xmlLog = new JaxbProcessInstanceLog(origLog);
         xmlLog.setCommandName("test-cmd");
         xmlLog.setIndex(2);
-        JaxbProcessInstanceLog newXmlLog = (JaxbProcessInstanceLog) testRoundTrip(xmlLog);
+        JaxbProcessInstanceLog newXmlLog = testRoundTrip(xmlLog);
         ComparePair.compareOrig(xmlLog, newXmlLog, JaxbProcessInstanceLog.class);
         
         ProcessInstanceLog newLog = newXmlLog.getResult();
@@ -542,7 +548,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         origLog.setProcessVersion("v3.14");
         
         JaxbProcessInstanceLog xmlLog = new JaxbProcessInstanceLog(origLog);
-        JaxbProcessInstanceLog newXmlLog = (JaxbProcessInstanceLog) testRoundTrip(xmlLog);
+        JaxbProcessInstanceLog newXmlLog = testRoundTrip(xmlLog);
         
         assertEquals( xmlLog.getProcessInstanceId(), newXmlLog.getProcessInstanceId() );
         assertEquals( xmlLog.getProcessId(), newXmlLog.getProcessId() );
@@ -581,7 +587,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         JaxbNodeInstanceLog xmlLog = new JaxbNodeInstanceLog(origLog);
         xmlLog.setCommandName("test-cmd");
         xmlLog.setIndex(2);
-        JaxbNodeInstanceLog newXmlLog = (JaxbNodeInstanceLog) testRoundTrip(xmlLog);
+        JaxbNodeInstanceLog newXmlLog = testRoundTrip(xmlLog);
         ComparePair.compareOrig(xmlLog, newXmlLog, JaxbNodeInstanceLog.class);
         
         NodeInstanceLog newLog = newXmlLog.getResult();
@@ -611,7 +617,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         JaxbVariableInstanceLog xmlLog = new JaxbVariableInstanceLog(origLog);
         xmlLog.setCommandName("test-cmd");
         xmlLog.setIndex(2);
-        JaxbVariableInstanceLog newXmlLog = (JaxbVariableInstanceLog) testRoundTrip(xmlLog);
+        JaxbVariableInstanceLog newXmlLog = testRoundTrip(xmlLog);
         ComparePair.compareOrig(xmlLog, newXmlLog, JaxbVariableInstanceLog.class);
         
         VariableInstanceLog newLog = newXmlLog.getResult();

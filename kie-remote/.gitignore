@@ -12,3 +12,6 @@ nbproject/
 
 # Repository wide ignore mac DS_Store files
 .DS_Store
+
+# Kie webservices doesn't exist in 6.0.x
+/kie-remote-ws
