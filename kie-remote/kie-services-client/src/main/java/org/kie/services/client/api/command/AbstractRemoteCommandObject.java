@@ -1,6 +1,6 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.remote.ServicesVersion.*;
+import static org.kie.services.shared.ServicesVersion.*;
 import static org.kie.services.client.serialization.SerializationConstants.*;
 
 import java.io.IOException;
@@ -57,6 +57,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
+import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
