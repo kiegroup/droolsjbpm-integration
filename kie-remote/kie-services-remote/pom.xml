@@ -119,6 +119,13 @@
       <scope>provided</scope>
     </dependency>
 
+
+    <!-- async processing using jbpm executor -->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-executor</artifactId>
+    </dependency>
+
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>

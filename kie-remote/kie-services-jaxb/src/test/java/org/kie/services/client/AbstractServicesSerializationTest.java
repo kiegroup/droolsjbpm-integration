@@ -482,7 +482,8 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         depUnit.setStrategy(kDepUnit.getStrategy());
         depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
         depUnitList.getDeploymentUnitList().add(depUnit);
-        jaxbJob = new JaxbDeploymentJobResult("test", false, depUnit, "deploy");
+
+        jaxbJob = new JaxbDeploymentJobResult(null, "test", false, depUnit, "deploy");
         JaxbDeploymentJobResult copyJaxbJob = testRoundTrip(jaxbJob);
         ComparePair.compareObjectsViaFields(jaxbJob, copyJaxbJob, "identifier");
         
@@ -496,8 +497,8 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         JaxbDeploymentUnit copyDepUnit = testRoundTrip(depUnit);
         
         ComparePair.compareObjectsViaFields(depUnit, copyDepUnit, "identifier");
-        
-        JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult("testing stuff", true, copyDepUnit, "test");
+
+        JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult(null, "testing stuff", true, copyDepUnit, "test");
         JaxbDeploymentJobResult copyDepJob = testRoundTrip(depJob);
         
         ComparePair.compareObjectsViaFields(copyDepJob, depJob, "identifier");

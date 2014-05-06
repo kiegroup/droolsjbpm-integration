@@ -2,7 +2,6 @@ package org.kie.remote.services.rest;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -21,13 +20,14 @@ import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.kie.internal.deployment.DeployedUnit;
 import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
+import org.kie.internal.executor.api.CommandContext;
+import org.kie.internal.executor.api.ExecutorService;
+import org.kie.remote.services.rest.exception.RestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
-import org.kie.remote.services.exception.DeploymentNotFoundException;
-import org.kie.remote.services.exception.KieRemoteServicesInternalError;
-import org.kie.remote.services.rest.async.AsyncDeploymentJobExecutor;
-import org.kie.remote.services.rest.exception.RestOperationException;
+import org.kie.services.remote.rest.async.DeploymentCmd;
+import org.kie.services.remote.rest.async.JobType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +71,7 @@ public class DeploymentResource extends ResourceBase {
     private KModuleDeploymentService deploymentService;
     
     @Inject
-    private AsyncDeploymentJobExecutor jobExecutor;
+    private ExecutorService jobExecutor;
    
     // Helper methods ------------------------------------------------------------------------------------------------------------
     
@@ -105,33 +105,11 @@ public class DeploymentResource extends ResourceBase {
     public Response getConfig() { 
         DeployedUnit deployedUnit = deploymentService.getDeployedUnit(deploymentId);
         JaxbDeploymentUnit jaxbDepUnit;
-        if( deployedUnit == null ) { 
-            logger.debug("No deployment unit found, getting status");
-            JaxbDeploymentStatus status = jobExecutor.getStatus(deploymentId);
-            switch(status) { 
-            case DEPLOYING:
-            case UNDEPLOYING:
-            case DEPLOY_FAILED:
-            case UNDEPLOY_FAILED: 
-            case UNDEPLOYED:
-                String [] gavKK = deploymentId.split(":");
-                jaxbDepUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
-                jaxbDepUnit.setStatus(status);
-                break;
-            case DEPLOYED:
-                deployedUnit = deploymentService.getDeployedUnit(deploymentId);
-                if( deployedUnit == null ) { 
-                    throw new KieRemoteServicesInternalError("Impossible error: the job executor says that this has been deployed but it can't be located via the deployment service.");
-                } else { 
-                    jaxbDepUnit = extractDeploymentUnit(deployedUnit);
-                    jaxbDepUnit.setStatus(status);
-                }
-                break;
-            case NONEXISTENT:
-                throw new DeploymentNotFoundException("Deployment " + deploymentId + " does not exist");
-            default: 
-                throw new KieRemoteServicesInternalError("Unknown deployment status (" + status.toString() + "), contact the developers.");
-            }
+        if( deployedUnit == null ) {
+            JaxbDeploymentStatus status = JaxbDeploymentStatus.NONEXISTENT;
+            String [] gavKK = deploymentId.split(":");
+            jaxbDepUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
+            jaxbDepUnit.setStatus(status);
         } else { 
             jaxbDepUnit = extractDeploymentUnit(deployedUnit);
             jaxbDepUnit.setStatus(JaxbDeploymentStatus.DEPLOYED);
@@ -166,8 +144,20 @@ public class DeploymentResource extends ResourceBase {
             deploymentUnit.setStrategy(runtimeStrategy);
         }
 
+        String typeName = JobType.DEPLOY.toString();
+        String typeNameLower = typeName.toLowerCase();
+
         JaxbDeploymentJobResult jobResult;
-        jobResult = jobExecutor.submitDeployJob(deploymentService, deploymentUnit);
+        CommandContext ctx = new CommandContext();
+        ctx.setData("DeploymentUnit", deploymentUnit);
+        ctx.setData("JobType", JobType.DEPLOY);
+        ctx.setData("businessKey", deploymentId);
+        ctx.setData("retries", 0);
+        long id = jobExecutor.scheduleRequest(DeploymentCmd.class.getName(), ctx);
+
+        jobResult = new JaxbDeploymentJobResult(id, "Deployment (" + typeNameLower + ") job submitted successfully.", true,
+                    convertKModuleDepUnitToJaxbDepUnit(deploymentUnit), typeName);
+
         jobResult.getDeploymentUnit().setStatus(JaxbDeploymentStatus.DEPLOYING);
 
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
@@ -181,7 +171,18 @@ public class DeploymentResource extends ResourceBase {
         if( deployedUnit != null ) { 
             KModuleDeploymentUnit deploymentUnit = (KModuleDeploymentUnit) deployedUnit.getDeploymentUnit();
 
-            jobResult = jobExecutor.submitUndeployJob(deploymentService, deploymentUnit);
+            String typeName = JobType.UNDEPLOY.toString();
+            String typeNameLower = typeName.toLowerCase();
+
+            CommandContext ctx = new CommandContext();
+            ctx.setData("DeploymentUnit", deploymentUnit);
+            ctx.setData("JobType", JobType.UNDEPLOY);
+            ctx.setData("businessKey", deploymentId);
+            ctx.setData("retries", 0);
+            long id = jobExecutor.scheduleRequest(DeploymentCmd.class.getName(), ctx);
+
+            jobResult = new JaxbDeploymentJobResult(id, "Deployment (" + typeNameLower + ") job submitted successfully.", true,
+                    convertKModuleDepUnitToJaxbDepUnit(deploymentUnit), typeName);
             jobResult.getDeploymentUnit().setStatus(JaxbDeploymentStatus.UNDEPLOYING);
         } else { 
             String [] gavKK = deploymentId.split(":");
@@ -199,7 +200,7 @@ public class DeploymentResource extends ResourceBase {
             default:
                 throw new IllegalStateException("Invalid deployment id: " + deploymentId);
             }
-            jobResult = new JaxbDeploymentJobResult("Deployment unit has already been undeployed.", true, depUnit, "UNDEPLOY" );
+            jobResult = new JaxbDeploymentJobResult(null, "Deployment unit has already been undeployed.", true, depUnit, "UNDEPLOY" );
         }
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }

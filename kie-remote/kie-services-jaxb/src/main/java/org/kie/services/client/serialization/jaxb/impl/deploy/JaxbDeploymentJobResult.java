@@ -12,6 +12,10 @@ import javax.xml.bind.annotation.XmlSchemaType;
 public class JaxbDeploymentJobResult {
 
     @XmlElement
+    @XmlSchemaType(name="long")
+    private Long identifier;
+
+    @XmlElement
     @XmlSchemaType(name="string")
     private String operation;
     
@@ -30,11 +34,12 @@ public class JaxbDeploymentJobResult {
         // default
     }
     
-    public JaxbDeploymentJobResult(String explanation, boolean success, JaxbDeploymentUnit depUnit, String operation ) { 
+    public JaxbDeploymentJobResult(Long id, String explanation, boolean success, JaxbDeploymentUnit depUnit, String operation ) {
         this.explanation = explanation;
         this.success = success;
         this.deploymentUnit = depUnit;
         this.operation = operation;
+        this.identifier = id;
     }
 
     public String getOperation() {
@@ -68,5 +73,12 @@ public class JaxbDeploymentJobResult {
     public void setSuccess(boolean success) {
         this.success = success;
     }
-    
+
+    public Long getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(Long identifier) {
+        this.identifier = identifier;
+    }
 }
