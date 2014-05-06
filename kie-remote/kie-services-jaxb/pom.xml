@@ -22,6 +22,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+   </dependency>
    
     <!--  command jars --> 
     <dependency>
@@ -182,7 +186,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
         <executions>
           <execution>
             <id>parse-version</id>
@@ -206,7 +209,7 @@
         <configuration>
           <basedir>${basedir}//src/main/java/org/kie/remote</basedir>
           <includes>
-            <include>ServiceVersion.java</include>
+            <include>ServicesVersion.java</include>
           </includes>
           <regex>true</regex>
           <replacements>
