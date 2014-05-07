@@ -126,11 +126,6 @@
       <artifactId>xstream</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.jboss.seam.spring</groupId>
-      <artifactId>seam-spring-core</artifactId>
-    </dependency>
-
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -167,6 +162,7 @@
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- test -->
