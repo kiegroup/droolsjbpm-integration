@@ -29,6 +29,7 @@ public class JaxbContextManager {
 
     private static final Logger logger = LoggerFactory.getLogger(JaxbContextManager.class);
 
+    // The contextsCache needs to be a ConcurrentHashMap because parallel operations (involing *different* deployments) can happen on it.
     private ConcurrentHashMap<String, JAXBContext> contextsCache = new ConcurrentHashMap<String, JAXBContext>();
     private ConcurrentHashMap<String, Object> locks = new ConcurrentHashMap<String, Object>();
 
@@ -58,8 +59,17 @@ public class JaxbContextManager {
      */
     public void cleanUpOnUndeploy(@Observes @Undeploy DeploymentEvent event) {
         String deploymentId = event.getDeploymentId();
-        contextsCache.remove(deploymentId);
-        locks.remove(event.getDeploymentId());
+        Object deploymentLockObject = locks.get(deploymentId);
+        if( deploymentLockObject != null ) { 
+            synchronized(deploymentLockObject) { 
+                contextsCache.remove(deploymentId);
+                locks.remove(event.getDeploymentId());
+            }
+        } else { 
+            // this should be impossible
+            contextsCache.remove(deploymentId);
+            logger.error("Lock object no available for JAXBContexts cache for deployment '" + deploymentId + "'!", new Throwable("Stack trace:"));
+        }
     }
 
     /**
@@ -97,12 +107,12 @@ public class JaxbContextManager {
 
         Object deploymentLockObject = locks.get(deploymentId);
         if( deploymentLockObject == null ) { 
-            // I love you {@link ConcurrentHashMap}!! (for not making me do double-checked locking)
-            locks.putIfAbsent(deploymentId, deploymentLockObject);
+            // deploymentLockObject could be null if this method is called (interleaving) "simultaneously" with createDeploymentLockObjectOnDeploy
+            locks.putIfAbsent(deploymentId, new Object());
             deploymentLockObject = locks.get(deploymentId);
         }
         
-        // synchronized to make action atomic
+        // synchronized to make action atomic (see synchronized clause below for conflict)
         synchronized(deploymentLockObject) {
             if (contextsCache.containsKey(deploymentId)) {
                 return contextsCache.get(deploymentId);
@@ -136,13 +146,21 @@ public class JaxbContextManager {
         try { 
             // synchronized to make action atomic (see synchronized clause above for conflict) 
             synchronized(deploymentLockObject) {
-                jaxbContext = JAXBContext.newInstance(allClassesArr);
-                contextsCache.put(deploymentId, jaxbContext);
+                if( contextsCache.containsKey(deploymentId) ) { 
+                    jaxbContext = contextsCache.get(deploymentId);
+                } else { 
+                    // creating a new instance of a JAXBContext is costly, which is why we don't use putIfAbsent(..)
+                    jaxbContext = JAXBContext.newInstance(allClassesArr);
+                    contextsCache.put(deploymentId, jaxbContext);
+                }
             }
             return jaxbContext;
         } catch( JAXBException jaxbe ) { 
-            logger.error( "Unable to instantiate JAXBContext for deployment '{}'", deploymentId);
-            throw new IllegalStateException( "Unable to create new " + JAXBContext.class.getSimpleName() + " instance.", jaxbe);
+            String errMsg = "Unable to instantiate JAXBContext for deployment '" + deploymentId + "'.";
+            logger.error(errMsg, jaxbe);
+            throw new IllegalStateException( errMsg, jaxbe );
+            // it's overkill to log and throw this, but this is a serious problem if it goes wrong here. 
+            // (if it gets annoying, just remove the logger.error(..) line)
         }
     }
 
