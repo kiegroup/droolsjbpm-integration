@@ -189,12 +189,11 @@
   <build>
     <resources>
       <resource>
-        <filtering>false</filtering>
-        <directory>src/main/resoures</directory>
+        <directory>src/main/resources</directory>
       </resource>
       <resource>
         <filtering>true</filtering>
-        <directory>src/main/filtered-resoures</directory>
+        <directory>src/main/filtered-resources</directory>
       </resource>
     </resources>
   </build>
