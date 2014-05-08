@@ -15,26 +15,29 @@
  */
 package org.kie.jax.soap;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import java.io.InputStream;
+import java.util.Map;
 
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPMessage;
-import java.io.InputStream;
-import java.util.Map;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 
 public class PreCxfTransportSoapProcessor
     implements
     Processor {
-
+    
     public void process(Exchange exchange) throws Exception {
         InputStream is = (InputStream) exchange.getIn().getBody();
         Map<String, Object> headers = exchange.getIn().getHeaders();
         MimeHeaders mimeHeaders = new MimeHeaders();
-        for ( String header : headers.keySet() ) {
-            mimeHeaders.addHeader( header,
-                                   (String) headers.get( header ) );
+        for ( Map.Entry<String,Object> header : headers.entrySet() ) {
+            if( header.getValue() instanceof String ) {
+                mimeHeaders.addHeader( header.getKey(),
+                                      (String) headers.get( header ) );
+            }
         }
         SOAPMessage soapMessage = MessageFactory.newInstance().createMessage( mimeHeaders,
                                                                               is );
