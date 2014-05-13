@@ -101,6 +101,7 @@
             <scope>test</scope>
             <!-- inclusion added to avoid that karaf tooling transitive
             dependencies load pax-exam 2.4 -->
+            <!-- TODO ip-bom 6.0.0.CR9 will upgrade us from pax 2.6 to 3.4. Are these excludes still relevant? -->
             <exclusions>
                 <exclusion>
                     <groupId>org.ops4j.pax.exam</groupId>
