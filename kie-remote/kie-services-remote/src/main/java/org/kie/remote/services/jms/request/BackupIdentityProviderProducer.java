@@ -44,8 +44,18 @@ public class BackupIdentityProviderProducer {
     @Produces
     @RequestScoped
     public RequestScopedBackupIdentityProvider getJmsRequestScopeIdentityProvider() {
-        logger.debug( "Producing backup identity bean for user: {}" , this.backupIdentityProvider.getName() );
-        return this.backupIdentityProvider;
+        if (this.backupIdentityProvider != null) {
+            logger.debug( "Producing backup identity bean for user: {}" , this.backupIdentityProvider.getName() );
+            return this.backupIdentityProvider;
+        } else {
+            // in case there is none set return dummy one as @RequestScoped producers cannot return null
+            return new RequestScopedBackupIdentityProvider() {
+                @Override
+                public String getName() {
+                    return "unknown";
+                }
+            };
+        }
     }
 
 }
