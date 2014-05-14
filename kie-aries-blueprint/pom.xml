@@ -100,14 +100,11 @@
     <dependency>
       <groupId>org.apache.aries.blueprint</groupId>
       <artifactId>org.apache.aries.blueprint.noosgi</artifactId>
-      <!--  1.0.1-SNAPSHOT IS NOT AVAILABLE AND HAS NOT BEEN PUBLISHED!!! -->
-      <version>1.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>named-kiesession</artifactId>
-      <version>${drools.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- test persistence -->

@@ -56,7 +56,6 @@
             <type>xml</type>
             <classifier>features</classifier>
             <scope>test</scope>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -207,7 +206,8 @@
     <repositories>
         <repository>
             <id>apache</id>
-            <url>http://repo1.maven.org/maven2/</url>
+            <!-- <url>http://repo1.maven.org/maven2/</url> -->
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 

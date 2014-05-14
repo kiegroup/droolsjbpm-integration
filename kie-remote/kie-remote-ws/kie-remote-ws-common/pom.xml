@@ -15,11 +15,11 @@
   <name>KIE Remote Webservices :: Common classes</name>
 
   <dependencies>
+
     <!-- generated code -->
     <dependency>
-      <groupId>javax.xml.ws</groupId>
-      <artifactId>jaxws-api</artifactId>
-      <version>2.1</version>
+      <groupId>org.jboss.spec.javax.xml.ws</groupId>
+      <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
     </dependency>
     
     <!-- reflection -->

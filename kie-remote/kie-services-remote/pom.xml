@@ -31,7 +31,6 @@
     <dependency>
       <groupId>org.kie.remote.ws</groupId>
       <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- kie/drools/jbpm: provided in jbpm-console, kie-wb, etc -->
@@ -121,10 +120,9 @@
     </dependency>
 
     <!-- security -->
-    <dependency>
+   <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
       <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-      <version>${version.org.jboss.spec.javax.security.jacc}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -155,25 +153,21 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>${version.org.mockito}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>${version.org.mockito}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>${version.org.powermock}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito</artifactId>
-      <version>${version.org.powermock}</version>
       <scope>test</scope>
     </dependency>
     
