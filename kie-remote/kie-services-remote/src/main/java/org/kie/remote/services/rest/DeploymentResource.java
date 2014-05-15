@@ -2,6 +2,7 @@ package org.kie.remote.services.rest;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -9,7 +10,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -22,18 +22,17 @@ import org.jbpm.kie.services.api.Kjar;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
-import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManager;
 import org.kie.internal.deployment.DeployedUnit;
 import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.MergeMode;
-import org.kie.remote.services.rest.exception.RestOperationException;
+import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
+import org.kie.remote.services.rest.async.cmd.JobType;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
-import org.kie.services.remote.rest.async.DeploymentCmd;
-import org.kie.services.remote.rest.async.JobType;
+import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -31,11 +31,11 @@ import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
 import org.kie.remote.services.rest.RuntimeResource;
 import org.kie.remote.services.rest.TaskResource;
-import org.kie.remote.services.rest.exception.RestOperationException;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.shared.AcceptedCommands;
+import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

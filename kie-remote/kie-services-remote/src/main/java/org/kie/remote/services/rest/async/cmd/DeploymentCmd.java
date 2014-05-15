@@ -1,4 +1,4 @@
-package org.kie.services.remote.rest.async;
+package org.kie.remote.services.rest.async.cmd;
 
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.AnnotationLiteral;

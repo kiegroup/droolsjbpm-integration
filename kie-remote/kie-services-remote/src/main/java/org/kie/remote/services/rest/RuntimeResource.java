@@ -50,7 +50,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.remote.services.rest.exception.RestOperationException;
+import org.kie.workbench.common.services.rest.RestOperationException;
 
 /**
  * If a method in this class is annotated by a @Path annotation, 

@@ -19,7 +19,7 @@ import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.remote.services.rest.exception.DescriptiveExceptionHandler;
-import org.kie.remote.services.rest.exception.RestOperationException;
+import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 
 

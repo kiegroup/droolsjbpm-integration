@@ -27,11 +27,11 @@ import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.internal.task.api.model.InternalOrganizationalEntity;
 import org.kie.internal.task.api.model.InternalTask;
 import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.kie.remote.services.rest.exception.RestOperationException;
 import org.kie.remote.services.rest.variant.ServerDrivenNegotiation;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.shared.AcceptedCommands;
+import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
