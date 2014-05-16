@@ -5,6 +5,7 @@ import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * <li>Execute the submitted command</li>
  * </ul>
  */
-@RequestScoped
+@ApplicationScoped
 public class ProcessRequestBean {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);
@@ -83,6 +84,22 @@ public class ProcessRequestBean {
         this.auditLogService = auditLogService;
     }
 
+    // Audit Log Service logic 
+    
+    @PostConstruct
+    public void initAuditLogService() { 
+        auditLogService = new JPAAuditLogService(emf);
+        if( emf == null ) { 
+            ((JPAAuditLogService) auditLogService).setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
+        }
+    }
+    
+    public AuditLogService getAuditLogService() { 
+        return auditLogService;
+    }
+    
+    // Methods used
+    
     public void processCommand(Command cmd, JaxbCommandsRequest request, int i, JaxbCommandsResponse jaxbResponse) { 
         String version = request.getVersion();
         if( version == null ) { 
@@ -273,18 +290,4 @@ public class ProcessRequestBean {
         }
     }
 
-    // Audit Log Service logic ---------------------------------------------------------------------------------------------------
-    
-    @PostConstruct
-    public void initAuditLogService() { 
-        auditLogService = new JPAAuditLogService(emf);
-        if( emf == null ) { 
-            ((JPAAuditLogService) auditLogService).setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
-        }
-    }
-    
-    public AuditLogService getAuditLogService() { 
-        return auditLogService;
-    }
-    
 }
