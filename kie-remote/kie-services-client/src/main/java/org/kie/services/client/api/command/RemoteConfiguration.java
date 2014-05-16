@@ -65,7 +65,7 @@ public final class RemoteConfiguration {
     public static final String RESPONSE_QUEUE_NAME = "jms/queue/KIE.RESPONSE";
 
     public static final int DEFAULT_TIMEOUT = 5;
-    private long timeout = DEFAULT_TIMEOUT;
+    private long timeout = DEFAULT_TIMEOUT; // in seconds
     
     // REST or JMS
     private final Type type;
