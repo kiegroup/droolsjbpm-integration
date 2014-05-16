@@ -53,6 +53,7 @@ public class RemoteRestRuntimeEngineFactoryBuilderImpl implements RemoteRestRunt
 
     @Override
     public RemoteRestRuntimeEngineFactoryBuilder addTimeout(int timeoutInSeconds) {
+        config.setTimeout(timeoutInSeconds);
         return this;
     }
 
@@ -84,10 +85,10 @@ public class RemoteRestRuntimeEngineFactoryBuilderImpl implements RemoteRestRunt
             throw new InsufficientInfoToBuildException("A URL is required to build the factory.");
         }
         if( username == null ) { 
-            throw new InsufficientInfoToBuildException("A URL is required to build the factory.");
+            throw new InsufficientInfoToBuildException("A user name is required to build the factory.");
         }
         if( password == null ) { 
-            throw new InsufficientInfoToBuildException("A URL is required to build the factory.");
+            throw new InsufficientInfoToBuildException("A password is required to build the factory.");
         }
         this.config.createRequestFactory(url, username, password);
         return new RemoteRestRuntimeEngineFactory(config.clone());
