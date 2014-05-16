@@ -122,9 +122,9 @@
 
     <!-- security -->
     <dependency>
-      <groupId>javax.security</groupId>
-      <artifactId>jacc</artifactId>
-      <version>1.0</version>
+      <groupId>org.jboss.spec.javax.security.jacc</groupId>
+      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+      <version>${version.org.jboss.spec.javax.security.jacc}</version>
       <scope>provided</scope>
     </dependency>
 
