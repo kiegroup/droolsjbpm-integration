@@ -22,6 +22,26 @@
         </kie:configuration>
 
       </kie:ksession>
+
+      <kie:ksession name="jpaSingleSessionCommandServiceWithListeners">
+        <kie:processEventListener>
+          <bean class="org.drools.core.event.DebugProcessEventListener"/>
+        </kie:processEventListener>
+        <kie:agendaEventListener>
+          <bean class="org.drools.core.event.DebugAgendaEventListener"/>
+        </kie:agendaEventListener>
+        <kie:ruleRuntimeEventListener>
+          <bean class="org.drools.core.event.DebugRuleRuntimeEventListener"/>
+        </kie:ruleRuntimeEventListener>
+        <kie:configuration>
+          <kie:jpa-persistence>
+            <kie:transaction-manager ref="txManager"/>
+            <kie:entity-manager-factory ref="myEmf"/>
+          </kie:jpa-persistence>
+
+        </kie:configuration>
+
+      </kie:ksession>
     </kie:kbase>
 
     <kie:kbase name="drl_persistence_rb" packages="drl_persistence_rb">
