@@ -36,6 +36,9 @@ import org.jbpm.workflow.instance.node.SubProcessNodeInstance;
 import org.junit.*;
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
@@ -408,6 +411,80 @@ public class JPASingleSessionCommandServiceFactoryTest {
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService");
 
         int sessionId = service.getId();
+
+        RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess("org.drools.test.ProcessSubProcess");
+        log.info("Started process instance {}",
+                processInstance.getId());
+        long processInstanceId = processInstance.getId();
+
+        TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
+        WorkItem workItem = handler.getWorkItem();
+        assertNotNull(workItem);
+        service.dispose();
+
+        Environment env = KnowledgeBaseFactory.newEnvironment();
+        env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
+                ctx.getBean("myEmf"));
+        env.set(EnvironmentName.TRANSACTION_MANAGER,
+                ctx.getBean("txManager"));
+
+        KieStoreServices kstore = (KieStoreServices) ctx.getBean("kstore1");
+        KieBase kbase1 = (KieBase) ctx.getBean("kb_persistence");
+        service = kstore.loadKieSession(sessionId,
+                kbase1,
+                null,
+                env);
+
+        processInstance = (RuleFlowProcessInstance) service.getProcessInstance(processInstanceId);
+        assertNotNull(processInstance);
+
+        Collection<NodeInstance> nodeInstances = processInstance.getNodeInstances();
+        assertEquals(1,
+                nodeInstances.size());
+        SubProcessNodeInstance subProcessNodeInstance = (SubProcessNodeInstance) nodeInstances.iterator().next();
+        long subProcessInstanceId = subProcessNodeInstance.getProcessInstanceId();
+        RuleFlowProcessInstance subProcessInstance = (RuleFlowProcessInstance) service.getProcessInstance(subProcessInstanceId);
+        assertNotNull(subProcessInstance);
+        service.dispose();
+
+        service = kstore.loadKieSession(sessionId,
+                kbase1,
+                null,
+                env);
+        service.getWorkItemManager().completeWorkItem(workItem.getId(),
+                null);
+        service.dispose();
+
+        service = kstore.loadKieSession(sessionId,
+                kbase1,
+                null,
+                env);
+        subProcessInstance = (RuleFlowProcessInstance) service.getProcessInstance(subProcessInstanceId);
+        assertNull(subProcessInstance);
+
+        processInstance = (RuleFlowProcessInstance) service.getProcessInstance(processInstanceId);
+        assertNull(processInstance);
+        service.dispose();
+    }
+
+    @Test
+    public void testPersistenceSubProcessWithListeners() {
+
+        KieBase kbase = (KieBase) ctx.getBean("kb_persistence");
+
+        KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandServiceWithListeners");
+
+        int sessionId = service.getId();
+
+        Collection<ProcessEventListener> listenersP = service.getProcessEventListeners();
+        assertEquals(1, listenersP.size());
+
+        Collection<AgendaEventListener> listenersA = service.getAgendaEventListeners();
+        // two of these are jbpm listeners registered by default + one defined in spring xml
+        assertEquals(3, listenersA.size());
+
+        Collection<RuleRuntimeEventListener> listenersR = service.getRuleRuntimeEventListeners();
+        assertEquals(1, listenersR.size());
 
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess("org.drools.test.ProcessSubProcess");
         log.info("Started process instance {}",

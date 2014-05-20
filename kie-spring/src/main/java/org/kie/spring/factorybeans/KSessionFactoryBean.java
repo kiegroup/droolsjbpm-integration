@@ -177,6 +177,8 @@ public class KSessionFactoryBean
             helper = new StatefulKSessionFactoryBeanHelper(this, (KieSession) kSession);
         }
         helper.internalAfterPropertiesSet();
+        // get ksession from helper as it might change the ksession when persistence is configured
+        kSession = helper.internalGetObject();
         attachLoggers((KieRuntimeEventManager) kSession);
         attachListeners((KieRuntimeEventManager) kSession);
     }
