@@ -118,9 +118,9 @@ public final class RemoteConfiguration {
     public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout, boolean formBasedAuth) {
         this.type = Type.REST;
         this.deploymentId = deploymentId;
-        createRequestFactory(url, username, password);
         this.timeout = timeout;
         this.useFormBasedAuth = formBasedAuth;
+        createRequestFactory(url, username, password);
     }
 
     public void createRequestFactory(URL url, String username, String password) { 
