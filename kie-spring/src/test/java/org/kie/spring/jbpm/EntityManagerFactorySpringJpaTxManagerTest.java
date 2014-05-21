@@ -1,5 +1,7 @@
 package org.kie.spring.jbpm;
 
+import java.util.List;
+
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
@@ -10,10 +12,6 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
-import java.util.List;
 
 import static junit.framework.Assert.*;
 
@@ -34,18 +32,9 @@ public class EntityManagerFactorySpringJpaTxManagerTest extends AbstractJbpmSpri
 
         System.out.println("Process started");
 
-/*      TODO : ERROR TO BE FIXED AS UNTIL NOW No Tx is created for Audit with a Spring JPATxManager
-
-        java.lang.IllegalStateException: Unable to join EntityManager to transaction: No local transaction to join
-	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.doJoinTransaction(ExtendedEntityManagerCreator.java:407)
-	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.invoke(ExtendedEntityManagerCreator.java:350)
-	at com.sun.proxy.$Proxy40.joinTransaction(Unknown Source)
-	at org.jbpm.process.audit.strategy.StandaloneJtaStrategy.joinTransaction(StandaloneJtaStrategy.java:54)
-	at org.jbpm.process.audit.JPAAuditLogService.joinTransaction(JPAAuditLogService.java:331)
-
         AuditLogService logService = (AuditLogService) context.getBean("logService");
         ProcessInstanceLog log = logService.findProcessInstance(processInstance.getId());
-        assertNotNull(log);*/
+        assertNotNull(log);
 
         List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
         System.out.println("Found " + tasks.size() + " task(s) for user 'john'");
