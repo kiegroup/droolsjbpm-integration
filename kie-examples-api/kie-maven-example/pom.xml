@@ -22,7 +22,7 @@
     </dependency>
   </dependencies>
 
-  <!-- maven-enforcer-plugin was overwritten here due to the use of kie-maven-pugin
+  <!-- maven-enforcer-plugin was overwritten here due to the use of kie-maven-plugin
   now it is possible to have SNAPSHOT versions-->
   <build>
     <pluginManagement>
