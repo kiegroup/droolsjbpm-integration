@@ -18,7 +18,6 @@
         <bundle>mvn:org.mvel/mvel2/${karaf.version.org.mvel}</bundle>
         <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${karaf.version.org.eclipse.jdt.core.compiler}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt.core.compiler}</bundle>
         <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
         <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
         <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
     </feature>
@@ -105,6 +104,7 @@
 
     <feature name="jbpm-commons" version="${drools.version}" description="jBPM Commons">
         <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
         <bundle>mvn:org.jboss.spec.javax.servlet/jboss-servlet-api_3.0_spec/1.0.2.Final</bundle>
         <bundle>mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/1.0.0.Final</bundle>
         <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
