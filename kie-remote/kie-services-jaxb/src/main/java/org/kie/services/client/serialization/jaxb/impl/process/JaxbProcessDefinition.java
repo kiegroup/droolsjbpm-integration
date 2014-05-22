@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 @XmlRootElement(name="process-definition")
@@ -55,10 +54,6 @@ public class JaxbProcessDefinition implements Serializable {
     @XmlElement(name="deployment-id")
     @XmlSchemaType(name="string") 
     private String deploymentId;
-   
-    @XmlElement(name="encoded-process-source")
-    @XmlSchemaType(name="string") 
-    private String encodedProcessSource;
    
     @XmlElement
     private Map<String, String> forms = new HashMap<String, String>();
@@ -107,21 +102,6 @@ public class JaxbProcessDefinition implements Serializable {
         this.deploymentId = deploymentId;
     }
 
-    public String getEncodedProcessSource() {
-        return encodedProcessSource;
-    }
-
-    public void setEncodedProcessSource(String encodedProcessSource) {
-        this.encodedProcessSource = encodedProcessSource;
-    }
-
-    public String getProcessSource() { 
-        if( this.encodedProcessSource == null) { 
-            return null;
-        }
-        return new String(Base64.decodeBase64(this.encodedProcessSource));
-    }
-    
     public Map<String, String> getForms() {
         return forms;
     }

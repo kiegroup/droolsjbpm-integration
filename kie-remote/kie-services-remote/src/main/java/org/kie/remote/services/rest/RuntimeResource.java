@@ -26,7 +26,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.codec.binary.Base64;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -44,7 +43,6 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionSource;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -80,7 +78,7 @@ public class RuntimeResource extends ResourceBase {
     
     @Context
     private Request restRequest;
-    
+   
     @Inject
     private RuntimeDataService runtimeDataService;
 
@@ -129,14 +127,6 @@ public class RuntimeResource extends ResourceBase {
         ProcessAssetDesc processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
         JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDescList);
         return createCorrectVariant(jaxbProcDef, headers);
-    }
-    
-    @GET
-    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/source")
-    public Response process_defId_source(@PathParam("processDefId") String processId) {
-        ProcessAssetDesc processAssetDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
-        String bpmn2Source =  new String(Base64.decodeBase64(processAssetDesc.getEncodedProcessSource()));
-        return createCorrectVariant(new JaxbProcessDefinitionSource(bpmn2Source), headers);
     }
     
     @POST
@@ -320,7 +310,6 @@ public class RuntimeResource extends ResourceBase {
     private JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessAssetDesc procAssetDesc) { 
         JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
         jaxbProcDef.setDeploymentId(procAssetDesc.getDeploymentId());
-        jaxbProcDef.setEncodedProcessSource(procAssetDesc.getEncodedProcessSource());
         jaxbProcDef.setForms(procAssetDesc.getForms());
         jaxbProcDef.setId(procAssetDesc.getId());
         jaxbProcDef.setName(procAssetDesc.getName());

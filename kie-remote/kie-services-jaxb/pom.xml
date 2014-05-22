@@ -22,10 +22,6 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-   </dependency>
    
     <!--  command jars --> 
     <dependency>
