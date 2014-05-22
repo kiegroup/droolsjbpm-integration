@@ -87,11 +87,6 @@ public class RuntimeResource extends ResourceBase {
     @PathParam("deploymentId")
     protected String deploymentId;
 
-    // Backwards compatability
-    
-    @Inject
-    private HistoryResource historyResource; 
-    
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
     /**
