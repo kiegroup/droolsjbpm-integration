@@ -15,6 +15,7 @@
     <version.org.jboss.byteman>2.1.4</version.org.jboss.byteman>
     <version.org.mockito>1.9.5</version.org.mockito>
     <version.org.powermock>1.5.4</version.org.powermock>
+    <version.org.codehaus.enunciate>1.28</version.org.codehaus.enunciate>
   </properties>
 
   <dependencies>
@@ -171,7 +172,34 @@
       <version>${version.org.powermock}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>enunciate-rt</artifactId>
+      <version>${version.org.codehaus.enunciate}</version>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>maven-enunciate-plugin</artifactId>
+        <version>${version.org.codehaus.enunciate}</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>docs</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <!-- the directory where to put the docs -->
+            <docsDir>${project.build.directory}/docs</docsDir>
+            <configFile>src/main/resources/enunciate.xml</configFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
 

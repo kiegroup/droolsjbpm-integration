@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<enunciate label="wannabecool" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.28.xsd">
+   <services>
+    <rest defaultRestSubcontext="/rest">
+    </rest>
+   </services>
+   <webapp disabled="true">
+   </webapp>
+   <modules>
+      <disable-rule id="csharp.warnings"/>
+      <disable-rule id="c.warnings"/>
+      <disable-rule id="obj-c.warnings"/>
+      <!-- Disable all the client generation tools -->
+      <basic-app disabled="true" />
+      <c disabled="true" />
+      <csharp disabled="true" />
+      <java-client disabled="true" />
+      <jaxws-client disabled="true" />
+      <jaxws-ri disabled="true" />
+      <jaxws-support disabled="true" />
+      <jersey disabled="true" />
+      <obj-c disabled="true" />
+      <jaxws disabled="true"/>
+      <amf disabled="true"/>
+      <php disabled="true"/>
+      <ruby disabled="true"/>
+      <xml disabled="false" forceExampleJson="true" />
+      <!-- Docs -->
+      <docs splashPackage="org.kie.remote.services.rest" title="REST API" copyright="jboss.org" forceExampleJson="true"  includeExampleXml="true"/>
+   </modules>
+</enunciate>

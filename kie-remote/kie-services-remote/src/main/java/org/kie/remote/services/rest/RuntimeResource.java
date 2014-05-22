@@ -58,13 +58,12 @@ import org.kie.workbench.common.services.rest.RestOperationException;
  * where "_" characters should be used for all "/" characters in the path. 
  * <p>
  * For example: 
- * <pre>
- * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
+ * <pre>@Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
  * 
  * If the method is annotated by the @Path anno, but is the "root", then
- * give it a name that explains it's function.
+ * give it a name that explains its function.
  */
 @Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
