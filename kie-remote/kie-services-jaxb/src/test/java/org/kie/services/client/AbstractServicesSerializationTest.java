@@ -1,14 +1,11 @@
 package org.kie.services.client;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.codec.binary.Base64;
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
@@ -79,7 +75,6 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionSource;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
@@ -658,15 +653,8 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         forms.put( "locationForm", "GPS: street: post code: city: state: land: planet: universe: ");
         jaxbProcDef.setForms(forms);
        
-        URL bpmn2FileUrl = this.getClass().getResource("/BPMN2-StringStructureRef.bpmn2");
-        String bpmn2Source = convertFileToString(new FileInputStream(new File(bpmn2FileUrl.toURI())));
-        jaxbProcDef.setEncodedProcessSource(Base64.encodeBase64String(bpmn2Source.getBytes()));
-        
         JaxbProcessDefinition copyJaxbProcDef = testRoundTrip(jaxbProcDef);
-        ComparePair.compareObjectsViaFields(jaxbProcDef, copyJaxbProcDef, "encodedProcessSource");
-        String origBpmn2 = jaxbProcDef.getProcessSource();
-        String copyBpmn2 = copyJaxbProcDef.getProcessSource();
-        assertEquals( "Decoded bpmn2 is not the same!", origBpmn2, copyBpmn2);
+        ComparePair.compareObjectsViaFields(jaxbProcDef, copyJaxbProcDef);
     }
     
     private static String convertFileToString(InputStream in) {
@@ -686,16 +674,4 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         return baos.toString();
     }
     
-    @Test
-    public void processDefinitionSourceTest() throws Exception { 
-        URL bpmn2FileUrl = this.getClass().getResource("/BPMN2-StringStructureRef.bpmn2");
-        String bpmn2Source = convertFileToString(new FileInputStream(new File(bpmn2FileUrl.toURI())));
-        logger.debug( "-----" );
-        logger.debug( bpmn2Source); 
-        logger.debug( "-----" );
-        JaxbProcessDefinitionSource jaxbProcDefSource = new JaxbProcessDefinitionSource(bpmn2Source);
-        JaxbProcessDefinitionSource copyJaxbProcDefSource = testRoundTrip(jaxbProcDefSource);
-        
-        ComparePair.compareObjectsViaFields(jaxbProcDefSource, copyJaxbProcDefSource);
-    }
 }

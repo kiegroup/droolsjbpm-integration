@@ -33,7 +33,6 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobR
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionSource;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
@@ -85,7 +84,6 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 // process
                 JaxbProcessIdList.class,
                 JaxbProcessDefinition.class,
-                JaxbProcessDefinitionSource.class,
 
                 // workitem
                 JaxbWorkItem.class,
