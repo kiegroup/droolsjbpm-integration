@@ -109,7 +109,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new StartProcessCommand(TEST_PROCESS_DEF_NAME));
         JaxbCommandsResponse
-        resp = this.processJaxbCommandsRequest(cmdsRequest);
+        resp = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
 
         // check response
         assertNotNull( "Null response", resp);
@@ -128,7 +128,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         // - The ProcessInstanceIdContext constructor gets a null value for the process instance id
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new SignalEventCommand(TEST_PROCESS_INST_ID, "test", null));
         cmdsRequest.setProcessInstanceId(TEST_PROCESS_INST_ID);
-        resp = this.processJaxbCommandsRequest(cmdsRequest);
+        resp = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
       
         // check response
         assertNotNull( "Null response", resp);

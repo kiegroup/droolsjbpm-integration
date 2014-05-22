@@ -196,7 +196,7 @@ public class RequestMessageBean implements MessageListener {
         cmdsRequest.setUserPass(getUserPass(message));
 
         // 3. process request
-        jaxbResponse = processJaxbCommandsRequest(cmdsRequest);
+        jaxbResponse = jmsProcessJaxbCommandsRequest(cmdsRequest);
         
         // 4. serialize response
         Message msg = serializeResponse(session, msgCorrId, serializationType, serializationProvider, jaxbResponse);
@@ -343,7 +343,7 @@ public class RequestMessageBean implements MessageListener {
     }
 
     // Runtime / KieSession / TaskService helper methods --------------------------------------------------------------------------
-    protected JaxbCommandsResponse processJaxbCommandsRequest(JaxbCommandsRequest request) {
+    protected JaxbCommandsResponse jmsProcessJaxbCommandsRequest(JaxbCommandsRequest request) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command> commands = request.getCommands();

@@ -70,9 +70,9 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
 
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
-        this.processJaxbCommandsRequest(cmdsRequest);
+        this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         cmdsRequest = new JaxbCommandsRequest(new CompleteTaskCommand(TASK_ID, USER, null));
-        this.processJaxbCommandsRequest(cmdsRequest);
+        this.jmsProcessJaxbCommandsRequest(cmdsRequest);
        
         // verify
         verify(injectedTaskService, times(2)).execute(any(TaskCommand.class));
@@ -85,9 +85,9 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
 
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
-        this.processJaxbCommandsRequest(cmdsRequest);
+        this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         cmdsRequest = new JaxbCommandsRequest(new CompleteTaskCommand(TASK_ID, USER, null));
-        this.processJaxbCommandsRequest(cmdsRequest);
+        this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         
         // verify
         verify(injectedTaskService, times(1)).execute(any(TaskCommand.class));
@@ -104,7 +104,7 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new FindProcessInstancesCommand());
         JaxbCommandsResponse 
-        response = this.processJaxbCommandsRequest(cmdsRequest);
+        response = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
        
         // check result
         assertEquals( "Number of response objects", 1, response.getResponses().size() );
@@ -114,7 +114,7 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         
         // run cmd (no deploymentId set on JaxbConmandsRequest object
         cmdsRequest = new JaxbCommandsRequest(new ClearHistoryLogsCommand());
-        response = this.processJaxbCommandsRequest(cmdsRequest);
+        response = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         
         // check result
         assertEquals( "Number of response objects", 0, response.getResponses().size() );
