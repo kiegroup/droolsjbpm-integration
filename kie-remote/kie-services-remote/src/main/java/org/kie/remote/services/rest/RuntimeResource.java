@@ -35,6 +35,7 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.jbpm.kie.services.api.RuntimeDataService;
+import org.jbpm.kie.services.api.bpmn2.BPMN2DataService;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
@@ -81,6 +82,9 @@ public class RuntimeResource extends ResourceBase {
    
     @Inject
     private RuntimeDataService runtimeDataService;
+   
+    @Inject
+    private BPMN2DataService bpmn2DataService;
 
     /* KIE information and processing */
     
@@ -121,6 +125,8 @@ public class RuntimeResource extends ResourceBase {
     public Response process_defId(@PathParam("processDefId") String processId) {
         ProcessAssetDesc processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
         JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDescList);
+        Map<String, String> variables = bpmn2DataService.getProcessData(processId);
+        jaxbProcDef.setVariables(variables);
         return createCorrectVariant(jaxbProcDef, headers);
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 JBoss by Red Hat.
+ * Copyright 2014 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,9 @@ public class JaxbProcessDefinition implements Serializable {
     @XmlElement
     private Map<String, String> forms = new HashMap<String, String>();
 
+    @XmlElement
+    private Map<String, String> variables = new HashMap<String, String>();
+    
     public JaxbProcessDefinition() { 
         // default constructor for JAXB
     }
@@ -108,6 +111,14 @@ public class JaxbProcessDefinition implements Serializable {
 
     public void setForms(Map<String, String> forms) {
         this.forms = forms;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
+    }
+    
+    public Map<String, String> getVariables() { 
+        return variables;
     }
 
 }
