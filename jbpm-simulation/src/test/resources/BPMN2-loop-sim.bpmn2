@@ -4,12 +4,12 @@
   <bpmn2:itemDefinition id="_55759183-83A1-4E72-823B-249F10FD85A8_InMessageType"/>
   <bpmn2:message id="_0A3B73F5-65FF-4AE9-9531-98A6870F5A8D_InMessage" itemRef="_0A3B73F5-65FF-4AE9-9531-98A6870F5A8D_InMessageType"/>
   <bpmn2:message id="_55759183-83A1-4E72-823B-249F10FD85A8_InMessage" itemRef="_55759183-83A1-4E72-823B-249F10FD85A8_InMessageType"/>
-  <bpmn2:interface id="_0A3B73F5-65FF-4AE9-9531-98A6870F5A8D_ServiceInterface" name="" implementationRef="">
+  <bpmn2:interface id="_0A3B73F5-65FF-4AE9-9531-98A6870F5A8D_ServiceInterface" name="Service1" implementationRef="">
     <bpmn2:operation id="_0A3B73F5-65FF-4AE9-9531-98A6870F5A8D_ServiceOperation" name="" implementationRef="">
       <bpmn2:inMessageRef>_0A3B73F5-65FF-4AE9-9531-98A6870F5A8D_InMessage</bpmn2:inMessageRef>
     </bpmn2:operation>
   </bpmn2:interface>
-  <bpmn2:interface id="_55759183-83A1-4E72-823B-249F10FD85A8_ServiceInterface" name="" implementationRef="">
+  <bpmn2:interface id="_55759183-83A1-4E72-823B-249F10FD85A8_ServiceInterface" name="Service2" implementationRef="">
     <bpmn2:operation id="_55759183-83A1-4E72-823B-249F10FD85A8_ServiceOperation" name="" implementationRef="">
       <bpmn2:inMessageRef>_55759183-83A1-4E72-823B-249F10FD85A8_InMessage</bpmn2:inMessageRef>
     </bpmn2:operation>
