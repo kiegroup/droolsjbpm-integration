@@ -62,6 +62,12 @@
       <optional>true</optional>
     </dependency>
 
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-audit</artifactId>
+      <optional>true</optional>
+    </dependency>
+
     <!-- disabling human task module to avoid new modules in 6.0.x-->
     <!--
     <dependency>

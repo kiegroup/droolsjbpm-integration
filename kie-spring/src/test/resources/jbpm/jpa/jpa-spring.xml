@@ -42,5 +42,8 @@
     <constructor-arg>
       <ref bean="entityManagerFactoryBpmn"/>
     </constructor-arg>
+    <constructor-arg>
+      <value>STANDALONE_LOCAL_SPRING_SHARED_EM</value>
+    </constructor-arg>
   </bean>
 </beans>

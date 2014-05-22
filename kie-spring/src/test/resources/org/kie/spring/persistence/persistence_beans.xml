@@ -28,10 +28,10 @@
           <bean class="org.drools.core.event.DebugProcessEventListener"/>
         </kie:processEventListener>
         <kie:agendaEventListener>
-          <bean class="org.drools.core.event.DebugAgendaEventListener"/>
+          <bean class="org.kie.api.event.rule.DebugAgendaEventListener"/>
         </kie:agendaEventListener>
         <kie:ruleRuntimeEventListener>
-          <bean class="org.drools.core.event.DebugRuleRuntimeEventListener"/>
+          <bean class="org.kie.api.event.rule.DebugRuleRuntimeEventListener"/>
         </kie:ruleRuntimeEventListener>
         <kie:configuration>
           <kie:jpa-persistence>
