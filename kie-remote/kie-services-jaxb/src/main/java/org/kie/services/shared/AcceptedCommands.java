@@ -51,6 +51,7 @@ import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
+import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
@@ -111,7 +112,10 @@ public class AcceptedCommands {
         acceptedCommands.add(FailTaskCommand.class);
         acceptedCommands.add(ForwardTaskCommand.class);
         acceptedCommands.add(GetAttachmentCommand.class);
+
         acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetTaskContentCommand.class);
+
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
