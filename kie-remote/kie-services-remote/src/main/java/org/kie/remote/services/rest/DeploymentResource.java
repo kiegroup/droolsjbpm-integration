@@ -105,16 +105,23 @@ public class DeploymentResource extends ResourceBase {
     public Response getConfig() { 
         DeployedUnit deployedUnit = deploymentService.getDeployedUnit(deploymentId);
         JaxbDeploymentUnit jaxbDepUnit;
+        String [] gavKK;
         if( deployedUnit == null ) { 
             logger.debug("No deployment unit found, getting status");
             JaxbDeploymentStatus status = jobExecutor.getStatus(deploymentId);
             switch(status) { 
+            case NONEXISTENT:
+                gavKK = deploymentId.split(":");
+                jaxbDepUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
+                jaxbDepUnit.setStatus(status);
+                logger.info("Deployment " + deploymentId + " does not exist.");
+                return createCorrectVariant(jaxbDepUnit, headers, Status.NOT_FOUND);
             case DEPLOYING:
             case UNDEPLOYING:
             case DEPLOY_FAILED:
             case UNDEPLOY_FAILED: 
             case UNDEPLOYED:
-                String [] gavKK = deploymentId.split(":");
+                gavKK = deploymentId.split(":");
                 jaxbDepUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2]);
                 jaxbDepUnit.setStatus(status);
                 break;
@@ -127,8 +134,6 @@ public class DeploymentResource extends ResourceBase {
                     jaxbDepUnit.setStatus(status);
                 }
                 break;
-            case NONEXISTENT:
-                throw new DeploymentNotFoundException("Deployment " + deploymentId + " does not exist");
             default: 
                 throw new KieRemoteServicesInternalError("Unknown deployment status (" + status.toString() + "), contact the developers.");
             }

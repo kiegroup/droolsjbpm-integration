@@ -190,9 +190,7 @@ public class AsyncDeploymentJobExecutor {
             try {
                 jobSuccess = job.get(1, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
-                logger.warn("Unable to retrieve status of job {}", jobId, e);
-                // Technically, this should never happen, but if it has, then there's probably something wrong.
-                // It is possible that this is a false negative though..
+                return JaxbDeploymentStatus.DEPLOYING;
             }
 
             if (jobId.matches(JobType.DEPLOY)) {

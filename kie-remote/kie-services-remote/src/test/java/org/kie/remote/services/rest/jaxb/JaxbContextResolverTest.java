@@ -1,6 +1,8 @@
 package org.kie.remote.services.rest.jaxb;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.kie.remote.services.rest.jaxb.JavaCompilerTest.getClassFromSource;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -9,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,52 +19,59 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
-import org.jbpm.kie.services.impl.event.DeploymentEvent;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.services.client.serialization.SerializationException;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
+import org.kie.remote.services.cdi.DeploymentProcessedEvent;
+import org.kie.services.client.serialization.SerializationException;
 
-public class JaxbContextManagerTest {
+/**
+ * This tests test scenarios where: 
+ * 1. different deployments have different versions of the same class
+ * 
+ *
+ */
+public class JaxbContextResolverTest {
 
     private JaxbContextResolver resolver;
-    private JaxbContextManager jaxbContextMgr;
+    private DynamicJaxbContext dynamicJaxbContext = new DynamicJaxbContext();
     
     private DeploymentInfoBean mockDepInfoBean;
     private Map<String, Collection<Class<?>>> deploymentIdClassesMap = new HashMap<String, Collection<Class<?>>>();
     private MultivaluedMap<String, String> pathParams = new MultivaluedMapImpl<String, String>();
     
     @Before
-    public void before() { 
+    public void before() throws URISyntaxException { 
        resolver = new JaxbContextResolver();
        
-       UriInfo mockUriInfo = mock(UriInfo.class);
-       doReturn(pathParams).when(mockUriInfo).getPathParameters();
-       resolver.uriInfo = mockUriInfo;
-       
-       jaxbContextMgr = new JaxbContextManager();
-       resolver.dynamicContext = jaxbContextMgr;
+       // Only created once to simulate Application scope
+       resolver.dynamicContext = dynamicJaxbContext;
        mockDepInfoBean = mock(DeploymentInfoBean.class);
-       jaxbContextMgr.deploymentClassNameBean = mockDepInfoBean;
-       
+       dynamicJaxbContext.deploymentInfoBean = mockDepInfoBean;
+    }
+    
+    @After
+    public void cleanUp() { 
+        DynamicJaxbContext.clearDeploymentJaxbContext();
     }
    
     // Helper methods -------------------------------------------------------------------------------------------------------------
    
     private void undeploy(String deploymentid) { 
-        jaxbContextMgr.cleanUpOnUndeploy(new DeploymentEvent(deploymentid, null));
+        dynamicJaxbContext.cleanUpOnUndeploy(new DeploymentProcessedEvent(deploymentid));
         deploymentIdClassesMap.remove(deploymentid);
     }
     
-    private void addClassesToDeployment(String deploymentId, Class<?>... clazz) { 
+    private void addClassesToDeploymentAndInitializeDeploymentJaxbContext(String deploymentId, Class<?>... clazz) { 
        Collection<Class<?>> depClasses = deploymentIdClassesMap.get(deploymentId);
        boolean initialize = false;
        if( depClasses == null ) { 
@@ -73,11 +83,13 @@ public class JaxbContextManagerTest {
        if( initialize ) { 
            doReturn(depClasses).when(mockDepInfoBean).getDeploymentClasses(deploymentId);
        }
+       // setup jaxb context instance for deployment 
+       dynamicJaxbContext.setupDeploymentJaxbContext(new DeploymentProcessedEvent(deploymentId));
     }
     
     private void setDeploymentId(String deploymentId) { 
        pathParams.putSingle("deploymentId", deploymentId); 
-       jaxbContextMgr.createDeploymentLockObjectOnDeploy(new DeploymentEvent(deploymentId, null));
+       dynamicJaxbContext.setupDeploymentJaxbContext(new DeploymentProcessedEvent(deploymentId));
     }
     
     public String serialize(JAXBContext jaxbContext, Object object) {
@@ -145,8 +157,11 @@ public class JaxbContextManagerTest {
         String depId = "org.kie.remote:test:1.0";
         setDeploymentId(depId);
         Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeployment(depId, myTypeClass);
+        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
 
+        // after request
+        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
         
         Constructor<?> myTypeCstr = myTypeClass.getConstructor(String.class, int.class);
@@ -156,14 +171,21 @@ public class JaxbContextManagerTest {
         Object roundTripTypeObj = deserialize(jaxbContext, xmlStr, myTypeClass);
        
         verifyMyTypeInstance(myTypeClass, myTypeObj, roundTripTypeObj);
+        
+        // after request
+        DynamicJaxbContext.clearDeploymentJaxbContext();
     }
    
     @Test
     public void cacheJaxbContextTest() throws Exception { 
+        // setup
         String depId = "org.kie.remote:test:1.0";
         setDeploymentId(depId);
         Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeployment(depId, myTypeClass);
+        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
+       
+        // before request
+        DynamicJaxbContext.setDeploymentJaxbContext(depId);
 
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
         
@@ -185,9 +207,12 @@ public class JaxbContextManagerTest {
         String depId = "org.kie.remote:test:1.0";
         setDeploymentId(depId);
         Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeployment(depId, myTypeClass);
+        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
 
         { 
+        // before request
+        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
         
@@ -201,15 +226,20 @@ public class JaxbContextManagerTest {
        
         // check object content/round-trip correctness
         verifyMyTypeInstance(myTypeClass, myTypeObj, roundTripTypeObj);
+        
+        // after request
+        DynamicJaxbContext.clearDeploymentJaxbContext();
         }
         
         // setup OTHER deployment
         String otherDepId = "org.kie.remote:other-test:1.0";
         setDeploymentId(otherDepId);
         Class<?> newMyTypeClass = getClassFromSource("NewMyType.java");
-        addClassesToDeployment(otherDepId, newMyTypeClass);
+        addClassesToDeploymentAndInitializeDeploymentJaxbContext(otherDepId, newMyTypeClass);
       
         {
+        // before request
+        DynamicJaxbContext.setDeploymentJaxbContext(otherDepId);
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(newMyTypeClass);
      
@@ -222,6 +252,8 @@ public class JaxbContextManagerTest {
        
         // check object content/round-trip correctness
         verifyNewMyTypeInstance(newMyTypeClass, newMyTypeObj, roundTripNewMyTypeObject);
+        // after request
+        DynamicJaxbContext.clearDeploymentJaxbContext();
         }
     }
     
@@ -233,8 +265,11 @@ public class JaxbContextManagerTest {
         // setup deployment
         setDeploymentId(depId);
         Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeployment(depId, myTypeClass);
+        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
 
+        // before request
+        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
         
@@ -248,6 +283,8 @@ public class JaxbContextManagerTest {
        
         // compare round trip results
         verifyMyTypeInstance(myTypeClass, myTypeObj, roundTripTypeObj);
+        // after request
+        DynamicJaxbContext.clearDeploymentJaxbContext();
         }
         
         // undeploy!
@@ -257,8 +294,10 @@ public class JaxbContextManagerTest {
         // new deployment of same deployment -- with a different class definition
         setDeploymentId(depId);
         Class<?> newMyTypeClass = getClassFromSource("NewMyType.java");
-        addClassesToDeployment(depId, newMyTypeClass);
+        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, newMyTypeClass);
         
+        // before request
+        DynamicJaxbContext.setDeploymentJaxbContext(depId);
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(newMyTypeClass);
      
@@ -279,6 +318,41 @@ public class JaxbContextManagerTest {
         } catch( Exception e ) { 
             // ignore
         }
+        // after request
+        DynamicJaxbContext.clearDeploymentJaxbContext();
         }
+    }
+    
+    @Test
+    public void requestDeploymentIdParsingTest() { 
+        // setup
+       HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+    
+       // tests
+       String deploymentId = "org.test:kjar:1.0";
+       String requestUri = "/rest/deployment/"+ deploymentId + "/deploy";
+       doReturn(requestUri).when(mockRequest).getRequestURI();
+       doReturn(null).when(mockRequest).getParameter("deploymentId");
+       String parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
+       assertEquals( "deployment operation URL: deployment id", deploymentId, parsedDepId);
+       
+       requestUri = "/rest/history/instance/23/variable";
+       doReturn(requestUri).when(mockRequest).getRequestURI();
+       doReturn(null).when(mockRequest).getParameter("deploymentId");
+       parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
+       assertEquals( "history operation URL: (default) deployment id", 
+               DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID, parsedDepId);
+       
+       requestUri = "/rest/runtime/" + deploymentId + "/execute";
+       doReturn(requestUri).when(mockRequest).getRequestURI();
+       doReturn(null).when(mockRequest).getParameter("deploymentId");
+       parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
+       assertEquals( "runtime operation URL: deployment id", deploymentId, parsedDepId);
+       
+       requestUri = "/rest/task/execute?deploymentId=" + deploymentId;
+       doReturn(requestUri).when(mockRequest).getRequestURI();
+       doReturn(deploymentId).when(mockRequest).getParameter("deploymentId");
+       parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
+       assertEquals( "task operation URL (with parameter): deployment id", deploymentId, parsedDepId);
     }
 }
