@@ -46,6 +46,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
@@ -76,6 +77,7 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "process-instance-list", type = JaxbProcessInstanceListResponse.class),
             @XmlElement(name = "task-response", type = JaxbTaskResponse.class),
             @XmlElement(name = "content-response", type = JaxbContentResponse.class ),
+            @XmlElement(name = "task-content-response", type = JaxbTaskContentResponse.class ),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
             @XmlElement(name = "work-item", type = JaxbWorkItem.class),
             @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
@@ -185,7 +187,11 @@ public class JaxbCommandsResponse {
         } else if (result instanceof JaxbTask) {
             this.responses.add(new JaxbTaskResponse((JaxbTask) result, i, cmd));
         } else if (result instanceof JaxbContent) {
-            this.responses.add(new JaxbContentResponse((JaxbContent) result, i, cmd));
+            if (((JaxbContent) result).getId() == -1) {
+                this.responses.add(new JaxbTaskContentResponse((JaxbContent) result, i, cmd));
+            } else {
+                this.responses.add(new JaxbContentResponse((JaxbContent) result, i, cmd));
+            }
         } else if (List.class.isInstance(result)) { 
             // Neccessary to determine return type of empty lists
             Class listType = cmdListTypes.get(cmd.getClass());

@@ -96,7 +96,10 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "fail-task", type = FailTaskCommand.class),
             @XmlElement(name = "forward-task", type = ForwardTaskCommand.class),
             @XmlElement(name = "get-attachment", type = GetAttachmentCommand.class),
+
             @XmlElement(name = "get-content", type = GetContentCommand.class),
+            @XmlElement(name = "get-task-content-command", type = GetTaskContentCommand.class),
+
             @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
             @XmlElement(name = "get-task-by-workitemid", type = GetTaskByWorkItemIdCommand.class),

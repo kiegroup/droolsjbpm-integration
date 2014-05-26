@@ -1,5 +1,7 @@
 package org.kie.remote.services.util;
 
+import java.util.Map;
+
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
@@ -29,6 +31,11 @@ public class ExecuteAndSerializeCommand extends TaskCommand<Object>{
             cmdResult = new JaxbTask((Task) cmdResult);
         } else if( cmdResult instanceof Content) {
             cmdResult = new JaxbContent((Content) cmdResult);
+        } else if (cmdResult instanceof Map) {
+            Map output = (Map) cmdResult;
+            cmdResult = new JaxbContent();
+            ((JaxbContent) cmdResult).setContentMap(output);
+            ((JaxbContent) cmdResult).setId(-1L);
         }
         return cmdResult;
     }

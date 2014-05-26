@@ -22,7 +22,39 @@ import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
-import org.jbpm.services.task.commands.*;
+import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.AddTaskCommand;
+import org.jbpm.services.task.commands.CancelDeadlineCommand;
+import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
+import org.jbpm.services.task.commands.ClaimTaskCommand;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.CompositeCommand;
+import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
+import org.jbpm.services.task.commands.ExitTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
+import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.GetAttachmentCommand;
+import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
+import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
+import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
+import org.jbpm.services.task.commands.GetTaskCommand;
+import org.jbpm.services.task.commands.GetTaskContentCommand;
+import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
+import org.jbpm.services.task.commands.GetTasksOwnedCommand;
+import org.jbpm.services.task.commands.NominateTaskCommand;
+import org.jbpm.services.task.commands.ProcessSubTaskCommand;
+import org.jbpm.services.task.commands.ReleaseTaskCommand;
+import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SkipTaskCommand;
+import org.jbpm.services.task.commands.StartTaskCommand;
+import org.jbpm.services.task.commands.StopTaskCommand;
+import org.jbpm.services.task.commands.SuspendTaskCommand;
+import org.jbpm.services.task.commands.TaskCommand;
+
 import org.kie.api.command.Command;
 
 @SuppressWarnings("rawtypes")
@@ -70,7 +102,10 @@ public class AcceptedCommands {
         acceptedCommands.add(FailTaskCommand.class);
         acceptedCommands.add(ForwardTaskCommand.class);
         acceptedCommands.add(GetAttachmentCommand.class);
+
         acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetTaskContentCommand.class);
+
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
