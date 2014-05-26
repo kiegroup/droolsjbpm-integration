@@ -1,12 +1,16 @@
 package org.kie.remote.services.cdi;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.util.TypeLiteral;
+import javax.inject.Inject;
 
 import org.jbpm.kie.services.impl.event.Deploy;
 import org.jbpm.kie.services.impl.event.DeploymentEvent;
@@ -38,6 +42,14 @@ public class DeploymentInfoBean {
     private Map<String, Collection<Class<?>>> deploymentClassesMap = new ConcurrentHashMap<String, Collection<Class<?>>>();
     
     private Map<String, RuntimeManager> domainRuntimeManagers = new ConcurrentHashMap<String, RuntimeManager>();  
+   
+    @Inject
+    @Deploy
+    private Event<DeploymentProcessedEvent> deployEvent;
+    
+    @Inject
+    @Undeploy
+    private Event<DeploymentProcessedEvent> undeployEvent;
     
     // Observer methods -----------------------------------------------------------------------------------------------------------
    
@@ -51,6 +63,9 @@ public class DeploymentInfoBean {
             logger.warn("RuntimeManager for domain {} has been replaced", event.getDeploymentId());
         }
         deploymentClassesMap.put(event.getDeploymentId(), event.getDeployedUnit().getDeployedClasses());
+        if( deployEvent != null ) { 
+            deployEvent.fire(new DeploymentProcessedEvent(event.getDeploymentId()));
+        }
     }
    
     /**
@@ -63,6 +78,9 @@ public class DeploymentInfoBean {
             logger.warn("RuntimeManager for domain {}  does not exist and can not be undeployed.", event.getDeploymentId());
         }
         deploymentClassesMap.remove(event.getDeploymentId());
+        if( undeployEvent != null ) { 
+            undeployEvent.fire(new DeploymentProcessedEvent(event.getDeploymentId()));
+        }
     }
     
     // Methods for other beans/resources ------------------------------------------------------------------------------------------
@@ -96,6 +114,7 @@ public class DeploymentInfoBean {
                 if( processInstanceId != null ) { 
                     processInstanceId = null;
                 }
+                // TODO: only warn if it's not a "start process instance" command
                 logger.warn("No process instance id supplied for operation!");
                 // Use the static method here instead of the constructor in order to use mock static magic in the tests
                 runtimeContext = ProcessInstanceIdContext.get();

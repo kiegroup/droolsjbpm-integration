@@ -1,8 +1,6 @@
 package org.kie.remote.services.rest.jaxb;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
@@ -19,18 +17,12 @@ import org.slf4j.LoggerFactory;
 @Provider
 public class JaxbContextResolver implements ContextResolver<JAXBContext> {
 
-    private static final Logger logger = LoggerFactory.getLogger(JaxbContextResolver.class);
-   
     @Inject
-    JaxbContextManager dynamicContext;
-
-    @Context
-    UriInfo uriInfo;
+    DynamicJaxbContext dynamicContext;
 
     @Override
     public JAXBContext getContext(Class<?> type) {
-        logger.debug("Retrieving JAXBContext for '{}'", type.getCanonicalName());
-        return dynamicContext.getJaxbContext(type, uriInfo);
+        return dynamicContext;
     }
 
 }
