@@ -18,6 +18,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.drools.core.util.StringUtils;
 import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.*;
 import org.jbpm.services.task.impl.model.command.DeleteBAMTaskSummariesCommand;
@@ -29,6 +30,7 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.workbench.common.services.rest.RestOperationException;
@@ -61,6 +63,9 @@ public class TaskResource extends ResourceBase {
     
     @Context
     protected Request restRequest;
+
+    @Inject
+    private org.kie.remote.services.util.FormURLGenerator formURLGenerator;
 
     /* KIE information and processing */
 
@@ -255,6 +260,30 @@ public class TaskResource extends ResourceBase {
             throw RestOperationException.notFound("Content for task " + taskId + " could not be found.");
         }
         return createCorrectVariant(content, headers);
+    }
+
+    @GET
+    @Path("/{taskId: [0-9-]+}/showTaskForm")
+    public Response taskId_form(@PathParam("taskId") long taskId) {
+        TaskCommand<?> cmd = new GetTaskCommand(taskId);
+        Object result = doRestTaskOperation(taskId, cmd);
+
+        if (result != null) {
+            Map<String, List<String>> requestParams = getRequestParams(uriInfo);
+
+            String opener = "";
+
+            List<String> openers = headers.getRequestHeader("host");
+            if (openers.size() == 1) {
+                opener = openers.get(0);
+            }
+                String formUrl = formURLGenerator.generateFormTaskURL(uriInfo.getBaseUri().toString(), taskId, opener, requestParams);
+            if (!StringUtils.isEmpty(formUrl)) {
+                JaxbTaskFormResponse response = new JaxbTaskFormResponse(formUrl, uriInfo.getRequestUri().toString());
+                return createCorrectVariant(response, headers);
+            }
+        }
+        throw RestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
     @GET

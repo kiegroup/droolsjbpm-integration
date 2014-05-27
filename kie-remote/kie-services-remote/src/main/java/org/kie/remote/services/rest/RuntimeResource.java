@@ -26,14 +26,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
-import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
-import org.drools.core.command.runtime.process.AbortWorkItemCommand;
-import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
-import org.drools.core.command.runtime.process.GetWorkItemCommand;
-import org.drools.core.command.runtime.process.SignalEventCommand;
-import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.process.*;
 import org.drools.core.process.instance.WorkItem;
+import org.drools.core.util.StringUtils;
 import org.jbpm.kie.services.api.RuntimeDataService;
 import org.jbpm.kie.services.api.bpmn2.BPMN2DataService;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
@@ -43,12 +38,9 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.process.*;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.workbench.common.services.rest.RestOperationException;
 
 /**
@@ -85,6 +77,9 @@ public class RuntimeResource extends ResourceBase {
    
     @Inject
     private BPMN2DataService bpmn2DataService;
+
+    @Inject
+    private FormURLGenerator formURLGenerator;
 
     /* KIE information and processing */
     
@@ -141,6 +136,30 @@ public class RuntimeResource extends ResourceBase {
 
         JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse(result, uriInfo.getRequestUri().toString());
         return createCorrectVariant(responseObj, headers);
+    }
+
+    @POST
+    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/startform")
+    public Response process_defId_startform(@PathParam("processDefId") String processId) {
+        List<String> result = (List<String>) processRequestBean.doKieSessionOperation(new GetProcessIdsCommand(), deploymentId, null);
+
+        if (result != null && result.contains(processId)) {
+            Map<String, List<String>> requestParams = getRequestParams(uriInfo);
+
+            String opener = "";
+
+            List<String> openers = headers.getRequestHeader("host");
+            if (openers.size() == 1) {
+                opener = openers.get(0);
+            }
+
+            String formUrl = formURLGenerator.generateFormProcessURL(uriInfo.getBaseUri().toString(), processId, deploymentId, opener, requestParams);
+            if (!StringUtils.isEmpty(formUrl)) {
+                JaxbProcessInstanceFormResponse response = new JaxbProcessInstanceFormResponse(formUrl, uriInfo.getRequestUri().toString());
+                return createCorrectVariant(response, headers);
+            }
+        }
+        throw RestOperationException.notFound("Process " + processId + " is not available.");
     }
 
     @GET

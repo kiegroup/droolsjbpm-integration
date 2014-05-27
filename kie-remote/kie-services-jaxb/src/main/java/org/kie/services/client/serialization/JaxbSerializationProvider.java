@@ -32,13 +32,9 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.process.*;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
@@ -62,9 +58,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbContentResponse.class,
                 JaxbTaskResponse.class,
                 JaxbTaskSummaryListResponse.class,
+                JaxbTaskFormResponse.class,
                 JaxbProcessInstanceListResponse.class,
                 JaxbProcessInstanceResponse.class,
                 JaxbProcessInstanceWithVariablesResponse.class,
+                JaxbProcessInstanceFormResponse.class,
 
                 // REST other
                 JaxbGenericResponse.class,
