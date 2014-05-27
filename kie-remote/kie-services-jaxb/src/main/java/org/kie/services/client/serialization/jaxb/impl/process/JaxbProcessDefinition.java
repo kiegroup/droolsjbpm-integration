@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
 
 @XmlRootElement(name="process-definition")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -56,9 +58,11 @@ public class JaxbProcessDefinition implements Serializable {
     private String deploymentId;
    
     @XmlElement
+    @XmlJavaTypeAdapter(value=StringObjectMapXmlAdapter.class)
     private Map<String, String> forms = new HashMap<String, String>();
 
     @XmlElement
+    @XmlJavaTypeAdapter(value=StringObjectMapXmlAdapter.class)
     private Map<String, String> variables = new HashMap<String, String>();
     
     public JaxbProcessDefinition() { 

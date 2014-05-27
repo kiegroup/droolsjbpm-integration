@@ -1,11 +1,11 @@
 package org.kie.services.client.serialization.jaxb.impl.process;
 
-import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-form")
 @XmlAccessorType(XmlAccessType.FIELD)

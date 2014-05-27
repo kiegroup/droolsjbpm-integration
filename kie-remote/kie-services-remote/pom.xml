@@ -176,6 +176,13 @@
       <version>${version.org.powermock}</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- reflection -->
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

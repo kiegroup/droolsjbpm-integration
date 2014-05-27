@@ -1,10 +1,5 @@
 package org.kie.services.client;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,6 +132,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         KieSession ksession = (StatefulKnowledgeSession) kbase.newKieSession(conf, env);
         return ksession;
     }
+    
     @After
     public void after() throws Exception { 
         super.tearDown();
@@ -146,10 +142,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     
     // TESTS
     
-    
-
-    
-
     /*
      * Tests
      */
@@ -157,7 +149,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     @Test
     public void commandRequestTest() throws Exception {
         // Don't run with JSON: /execute is only JAXB
-        Assume.assumeTrue(!getType().equals(TestType.JSON));
+        Assume.assumeFalse(getType().equals(TestType.JSON));
 
         String userId = "krisv";
         long taskId = 1;
@@ -372,7 +364,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     @Test
     public void factHandleTest() throws Exception {
         // Don't run with YAML?
-        Assume.assumeTrue(!getType().equals(TestType.YAML));
+        Assume.assumeFalse(getType().equals(TestType.YAML));
 
         KieSession ksession = createKnowledgeSession(null);
 
@@ -427,7 +419,8 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("test", "driving");
         workitemObject.setParameters(params);
-        testRoundTrip(workitemObject);
+        JaxbWorkItem roundTripWorkItem = testRoundTrip(workitemObject);
+        ComparePair.compareObjectsViaFields(workitemObject, roundTripWorkItem);
     }
 
     @Test
@@ -461,7 +454,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     
     @Test
     public void deploymentObjectsTest() throws Exception {
-        Assume.assumeFalse(TestType.YAML.equals(getType()));
+        Assume.assumeFalse(getType().equals(TestType.YAML));
         
         // for test at end, fill during test
         JaxbDeploymentUnitList depUnitList = new JaxbDeploymentUnitList();
@@ -662,22 +655,5 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         JaxbProcessDefinition copyJaxbProcDef = testRoundTrip(jaxbProcDef);
         ComparePair.compareObjectsViaFields(jaxbProcDef, copyJaxbProcDef);
     }
-    
-    private static String convertFileToString(InputStream in) {
-        InputStreamReader input = new InputStreamReader(in);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutputStreamWriter output = new OutputStreamWriter(baos);
-        char[] buffer = new char[4096];
-        int n = 0;
-        try {
-            while (-1 != (n = input.read(buffer))) {
-                output.write(buffer, 0, n);
-            }
-            output.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return baos.toString();
-    }
-    
+   
 }

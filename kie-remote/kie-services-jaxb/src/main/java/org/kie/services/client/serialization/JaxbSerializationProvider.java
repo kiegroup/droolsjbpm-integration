@@ -290,4 +290,10 @@ public class JaxbSerializationProvider implements SerializationProvider {
     public boolean getPrettyPrint() { 
         return this.prettyPrint;
     }
+    
+    public static Object unsupported(Class<?> realClass) { 
+        String methodName = (new Throwable()).getStackTrace()[1].getMethodName();
+        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + realClass.getSimpleName() + " implementation.");
+    }
+
 }

@@ -7,7 +7,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
 import org.kie.api.command.Command;
 import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
@@ -16,6 +18,7 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 public class JaxbVariablesResponse extends AbstractJaxbCommandResponse<Map<String,String>> {
 
     @XmlElement
+    @XmlJavaTypeAdapter(value=StringObjectMapXmlAdapter.class)
     private Map<String, String> variables = new HashMap<String, String>();
     
     public JaxbVariablesResponse() {

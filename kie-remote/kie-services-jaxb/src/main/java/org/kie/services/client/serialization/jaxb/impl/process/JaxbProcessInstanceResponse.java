@@ -1,5 +1,7 @@
 package org.kie.services.client.serialization.jaxb.impl.process;
 
+import static org.kie.services.client.serialization.JaxbSerializationProvider.unsupported;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,8 +103,7 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
     
     @Override
     public Process getProcess() {
-        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
-        throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
+        return (Process) unsupported(ProcessInstance.class);
     }
 
     public String[] getEventTypes() {
@@ -111,8 +112,7 @@ public class JaxbProcessInstanceResponse extends AbstractJaxbCommandResponse<Pro
 
     @Override
     public void signalEvent(String type, Object event) {
-        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
-        throw new UnsupportedOperationException( methodName + " is not supported on the JAXB " + ProcessInstance.class.getSimpleName() + " implementation.");
+        unsupported(ProcessInstance.class);
     }
 
     @Override

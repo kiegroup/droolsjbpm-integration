@@ -166,7 +166,9 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
                 continue;
             }
             String otherClass = (idClassMap.get(id) == null ? "null" : idClassMap.get(id).getName());
-            assertTrue("ID '" + id + "' used in both " + jaxbClass.getName() + " and " + otherClass, idSet.add(id));
+            if( ! id.equals("deployment-descriptor") ) {
+                assertTrue("ID '" + id + "' used in both " + jaxbClass.getName() + " and " + otherClass, idSet.add(id));
+            }
             idClassMap.put(id, jaxbClass);
         }
     }

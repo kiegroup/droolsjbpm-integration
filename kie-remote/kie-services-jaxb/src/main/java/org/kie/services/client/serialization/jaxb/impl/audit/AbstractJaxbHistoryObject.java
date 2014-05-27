@@ -1,5 +1,6 @@
 package org.kie.services.client.serialization.jaxb.impl.audit;
 
+import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -94,15 +95,11 @@ public abstract class AbstractJaxbHistoryObject<T extends AuditEvent> {
     }
     
     public void readExternal(ObjectInput arg0) throws IOException, ClassNotFoundException {
-        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
-        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + realClass.getSimpleName()
-                + " implementation.");
+        unsupported(realClass);
     }
 
     public void writeExternal(ObjectOutput arg0) throws IOException {
-        String methodName = (new Throwable()).getStackTrace()[0].getMethodName();
-        throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + realClass.getSimpleName()
-                + " implementation.");
+        unsupported(realClass);
     }
 
 }

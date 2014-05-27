@@ -29,7 +29,7 @@
         </xs:appinfo>
       </xs:annotation> 
 
-      <xs:element name="CommandWebServiceException" type="tns:WebServiceFaultInfo"/>
+      <xs:element name="CommandServiceException" type="tns:WebServiceFaultInfo"/>
       <xs:element name="command-request" type="tns:jaxbCommandsRequest"/>
       <xs:element name="command-response" type="tns:jaxbCommandsResponse"/>
 
@@ -89,14 +89,21 @@
   <message name="executeResponse">
     <part name="parameters" element="tns:executeResponse"/>
   </message>
-  <message name="CommandWebServiceException">
-    <part name="fault" element="tns:CommandWebServiceException"/>
+  <message name="CommandServiceException">
+    <part name="fault" element="tns:CommandServiceException"/>
   </message>
   <portType name="CommandService">
+    <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+      <jaxws:class name="CommandWebService"/>
+    </jaxws:bindings>
     <operation name="execute">
       <input wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/executeRequest" message="tns:execute"/>
       <output wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/executeResponse" message="tns:executeResponse"/>
-      <fault message="tns:CommandWebServiceException" name="CommandWebServiceException" wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/execute/Fault/CommandWebServiceException"/>
+      <fault message="tns:CommandServiceException" name="CommandServiceException" wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/execute/Fault/CommandServiceException">
+        <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+          <jaxws:class name="CommandWebServiceException"/>
+        </jaxws:bindings>
+      </fault>
     </operation>
   </portType>
   <binding name="CommandServicePortBinding" type="tns:CommandService">
@@ -109,15 +116,17 @@
       <output>
         <soap:body use="literal"/>
       </output>
-      <fault name="CommandWebServiceException">
-        <soap:fault name="CommandWebServiceException" use="literal"/>
+      <fault name="CommandServiceException">
+        <soap:fault name="CommandServiceException" use="literal"/>
       </fault>
     </operation>
   </binding>
-  <service name="CommandServicePort">
+  <service name="CommandServiceClient">
+    <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+      <jaxws:class name="CommandWebServiceClient"/>
+    </jaxws:bindings>
     <port name="CommandServicePort" binding="tns:CommandServicePortBinding">
       <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
     </port>
   </service>
 </definitions>
-
