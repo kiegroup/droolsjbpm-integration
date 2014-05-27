@@ -68,7 +68,7 @@ public class DynamicJaxbContext extends JAXBContext {
     
     public DynamicJaxbContext() {
         if( ! instanceCreated.compareAndSet(0, 1) ) {
-            logger.error("Instance {} of the {} created!", instanceCreated.incrementAndGet(), DynamicJaxbContext.class.getSimpleName() ); 
+            logger.debug("Instance {} of the {} created!", instanceCreated.incrementAndGet(), DynamicJaxbContext.class.getSimpleName() ); 
         }
     }
   
@@ -77,7 +77,7 @@ public class DynamicJaxbContext extends JAXBContext {
     public static void setDeploymentJaxbContext(String deploymentId) {
         JAXBContext jaxbContext = contextsCache.get(deploymentId);
         if( jaxbContext == null ) { 
-           logger.error("No JAXBContext available for deployment '" + deploymentId + "', using default JAXBContext instance."); 
+           logger.debug("No JAXBContext available for deployment '" + deploymentId + "', using default JAXBContext instance."); 
            jaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
         }
         requestJaxbContextLocal.set(jaxbContext);

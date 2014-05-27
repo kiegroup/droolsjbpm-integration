@@ -7,12 +7,15 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.drools.core.util.StringUtils;
 import org.kie.internal.deployment.DeploymentUnit;
 
 
 @XmlRootElement(name="deployment-unit")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties({"identifier"})
 public class JaxbDeploymentUnit implements DeploymentUnit {
 
     @XmlElement
@@ -43,11 +46,12 @@ public class JaxbDeploymentUnit implements DeploymentUnit {
     private String identifier;
     
     @XmlElement(type = JaxbDeploymentStatus.class)
-    private JaxbDeploymentStatus status;
+    private volatile JaxbDeploymentStatus status;
     
     @XmlEnum
     public static enum JaxbDeploymentStatus { 
         NONEXISTENT,
+        ACCEPTED,
         DEPLOYING,
         DEPLOYED,
         DEPLOY_FAILED,

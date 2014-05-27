@@ -6,25 +6,42 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 
 @XmlRootElement(name="deployment-job-result")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties({"jobId"})
 public class JaxbDeploymentJobResult {
 
+    /**
+     * An internal field used to track the job on the server side
+     */
+    private transient String jobId;
+
+    /**
+     * The id of the jbpm-executor job
+     */
     @XmlElement
     @XmlSchemaType(name="long")
-    private Long identifier;
+    private volatile Long identifier;
 
+    /**
+     * The operation (deploy, undeploy) requested
+     */
     @XmlElement
     @XmlSchemaType(name="string")
     private String operation;
-    
+   
+    /**
+     * Information about the deployment unit
+     */
     @XmlElement(type = JaxbDeploymentUnit.class)
     private JaxbDeploymentUnit deploymentUnit;
-    
+   
     @XmlElement
     @XmlSchemaType(name="boolean")
-    private boolean success;
+    private volatile Boolean success;
     
     @XmlElement
     @XmlSchemaType(name="string")
@@ -34,12 +51,12 @@ public class JaxbDeploymentJobResult {
         // default
     }
     
-    public JaxbDeploymentJobResult(Long id, String explanation, boolean success, JaxbDeploymentUnit depUnit, String operation ) {
+    public JaxbDeploymentJobResult(String jobId, String explanation, JaxbDeploymentUnit depUnit, String operation ) {
+        this.jobId = jobId;
         this.explanation = explanation;
         this.success = success;
         this.deploymentUnit = depUnit;
         this.operation = operation;
-        this.identifier = id;
     }
 
     public String getOperation() {
@@ -66,11 +83,11 @@ public class JaxbDeploymentJobResult {
         this.explanation = explanation;
     }
 
-    public boolean isSuccess() {
+    public Boolean isSuccess() {
         return success;
     }
 
-    public void setSuccess(boolean success) {
+    public void setSuccess(Boolean success) {
         this.success = success;
     }
 
@@ -81,4 +98,9 @@ public class JaxbDeploymentJobResult {
     public void setIdentifier(Long identifier) {
         this.identifier = identifier;
     }
+
+    public String getJobId() {
+        return jobId;
+    }
+
 }

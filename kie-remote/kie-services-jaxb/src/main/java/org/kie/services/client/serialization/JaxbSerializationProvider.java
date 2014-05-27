@@ -29,6 +29,7 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
@@ -78,6 +79,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbDeploymentJobResult.class,
                 JaxbDeploymentUnit.class,
                 JaxbDeploymentUnitList.class,
+                JaxbDeploymentDescriptor.class,
                 
                 // process
                 JaxbProcessIdList.class,

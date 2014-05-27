@@ -461,6 +461,8 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     
     @Test
     public void deploymentObjectsTest() throws Exception {
+        Assume.assumeFalse(TestType.YAML.equals(getType()));
+        
         // for test at end, fill during test
         JaxbDeploymentUnitList depUnitList = new JaxbDeploymentUnitList();
        
@@ -479,9 +481,11 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         depUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
         depUnitList.getDeploymentUnitList().add(depUnit);
 
-        jaxbJob = new JaxbDeploymentJobResult(null, "test", false, depUnit, "deploy");
+        jaxbJob = new JaxbDeploymentJobResult(null, "test", depUnit, "deploy");
+        jaxbJob.setIdentifier(23L);
+        jaxbJob.setSuccess(false);
         JaxbDeploymentJobResult copyJaxbJob = testRoundTrip(jaxbJob);
-        ComparePair.compareObjectsViaFields(jaxbJob, copyJaxbJob, "identifier");
+        ComparePair.compareObjectsViaFields(jaxbJob, copyJaxbJob, "jobId", "identifier");
         
         depUnit = new JaxbDeploymentUnit("g", "a", "v");
         depUnit.setKbaseName("kbase");
@@ -494,13 +498,14 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         
         ComparePair.compareObjectsViaFields(depUnit, copyDepUnit, "identifier");
 
-        JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult(null, "testing stuff", true, copyDepUnit, "test");
+        JaxbDeploymentJobResult depJob = new JaxbDeploymentJobResult(null, "testing stuff", copyDepUnit, "test");
+        depJob.setSuccess(true); 
         JaxbDeploymentJobResult copyDepJob = testRoundTrip(depJob);
         
-        ComparePair.compareObjectsViaFields(copyDepJob, depJob, "identifier");
+        ComparePair.compareObjectsViaFields(copyDepJob, depJob, "jobId", "identifier");
         
         JaxbDeploymentUnitList roundTripUnitList = testRoundTrip(depUnitList);
-        ComparePair.compareObjectsViaFields(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "identifier");
+        ComparePair.compareObjectsViaFields(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList().get(0), "jobId", "identifier");
     }
     
     @Test

@@ -6,8 +6,6 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
 import org.kie.api.runtime.KieSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * We use this class in order to use (user) classes from Kjar deployments in serialization. 
