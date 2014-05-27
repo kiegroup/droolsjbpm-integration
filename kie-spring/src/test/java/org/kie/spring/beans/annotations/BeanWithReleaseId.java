@@ -24,7 +24,7 @@ import org.kie.api.runtime.KieContainer;
 
 public class BeanWithReleaseId {
 
-    @KReleaseId(groupId = "org.drools", artifactId = "named-kiesession", version = "6.1.0-SNAPSHOT")
+    @KReleaseId(groupId = "org.drools", artifactId = "named-kiesession", version = "6.1.0.Beta4")
     @KBase("kbase1")
     KieBase kieBase;
 
@@ -36,7 +36,7 @@ public class BeanWithReleaseId {
     }
 
     @KContainer
-    @KReleaseId(groupId = "org.drools", artifactId = "named-kiesession", version = "6.1.0-SNAPSHOT")
+    @KReleaseId(groupId = "org.drools", artifactId = "named-kiesession", version = "6.1.0.Beta4")
     KieContainer kieContainer;
 
     public KieContainer getKieContainer() {
