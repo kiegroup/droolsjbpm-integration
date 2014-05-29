@@ -190,11 +190,7 @@ public class TaskResource extends ResourceBase {
         } else if ("claim".equalsIgnoreCase(operation)) {
             cmd = new ClaimTaskCommand(taskId, userId);
         } else if ("claimnextavailable".equalsIgnoreCase(operation)) {
-            String language = getStringParam("language", false, params, operation);
-            if (language == null) {
-                language = "en-UK";
-            }
-            cmd = new ClaimNextAvailableTaskCommand(userId, language);
+            cmd = new ClaimNextAvailableTaskCommand(userId);
         } else if ("complete".equalsIgnoreCase(operation)) {
             Map<String, Object> data = extractMapFromParams(params, operation);
             cmd = new CompleteTaskCommand(taskId, userId, data);

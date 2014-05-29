@@ -293,7 +293,6 @@ public class ResourceBase {
     protected static TaskSummaryImpl convertTaskToTaskSummary(InternalTask task) {
        TaskSummaryImpl taskSummary = new TaskSummaryImpl(
                task.getId().longValue(),
-               task.getTaskData().getProcessInstanceId(),
                task.getNames().get(0).getText(),
                task.getSubjects().get(0).getText(),
                task.getDescriptions().get(0).getText(),
@@ -307,6 +306,8 @@ public class ResourceBase {
                task.getTaskData().getExpirationTime(),
                task.getTaskData().getProcessId(),
                task.getTaskData().getProcessSessionId(),
+               task.getTaskData().getProcessInstanceId(),
+               task.getTaskData().getDeploymentId(),
                task.getSubTaskStrategy(),
                task.getTaskData().getParentId()
                );

@@ -49,9 +49,7 @@
     <class>org.jbpm.services.task.impl.model.TaskDataImpl</class>
     <class>org.jbpm.services.task.impl.model.UserImpl</class>
 
-    <class>org.jbpm.services.task.audit.impl.model.GroupAuditTaskImpl</class>
-    <class>org.jbpm.services.task.audit.impl.model.UserAuditTaskImpl</class>
-    <class>org.jbpm.services.task.audit.impl.model.HistoryAuditTaskImpl</class>
+    <class>org.jbpm.services.task.audit.impl.model.AuditTaskImpl</class>
 
     <class>org.jbpm.services.task.audit.impl.model.TaskEventImpl</class>
     

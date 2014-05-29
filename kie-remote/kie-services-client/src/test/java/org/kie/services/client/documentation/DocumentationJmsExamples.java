@@ -59,7 +59,7 @@ public class DocumentationJmsExamples {
         Command<?> cmd = new StartProcessCommand(PROCESS_ID_1);
         int oompaProcessingResultIndex = 0;
         JaxbCommandsRequest req = new JaxbCommandsRequest(DEPLOYMENT_ID, cmd);
-        req.getCommands().add(new GetTaskAssignedAsPotentialOwnerCommand(USER, "en-UK"));
+        req.getCommands().add(new GetTaskAssignedAsPotentialOwnerCommand(USER));
         int loompaMonitoringResultIndex = 1;
 
         // Get JNDI context from server

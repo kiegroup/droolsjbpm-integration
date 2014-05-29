@@ -61,6 +61,7 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.TaskQueryService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
@@ -256,7 +257,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         
         Map<String, List<?>> fieldVals = new HashMap<String, List<?>>();
         fieldVals.put(TaskQueryService.PROCESS_INST_ID_LIST, statuses);
-        List<TaskSummary> taskSumList = taskService.getTasksByVariousFields(fieldVals, true);
+        List<TaskSummary> taskSumList = ((InternalTaskService)taskService).getTasksByVariousFields(fieldVals, true);
         assertEquals( "Task summary list size", 1, taskSumList.size());
         TaskSummaryImpl taskSumImpl = (TaskSummaryImpl) taskSumList.get(0);
         taskSumImpl.setActualOwner(new UserImpl("Minnie"));
