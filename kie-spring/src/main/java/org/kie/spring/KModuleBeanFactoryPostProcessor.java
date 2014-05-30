@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -205,6 +206,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     }
 
     private void addKieBaseModels(ConfigurableListableBeanFactory beanFactory, KieModuleModelImpl kieModuleModel) {
+        BeanExpressionContext context = new BeanExpressionContext(beanFactory, null);
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
             if ( beanDefinition.getBeanClassName() != null && beanDefinition.getBeanClassName().equalsIgnoreCase(KBaseFactoryBean.class.getName())){
@@ -216,6 +218,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
                 String packages = getPropertyValue( beanDefinition, "packages" );
                 if ( !packages.isEmpty() ) {
+                    packages = checkAndResolveSpringExpression(beanFactory, context, packages);
                     for ( String pkg : packages.split( "," ) ) {
                         kBase.addPackage( pkg.trim() );
                     }
@@ -223,6 +226,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
                 String includes = getPropertyValue( beanDefinition, "includes" );
                 if ( !includes.isEmpty() ) {
+                    includes = checkAndResolveSpringExpression(beanFactory, context, includes);
                     for ( String include : includes.split( "," ) ) {
                         kBase.addInclude(include.trim());
                     }
@@ -230,21 +234,25 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
                 String eventMode = getPropertyValue(beanDefinition, "eventProcessingMode");
                 if ( !eventMode.isEmpty() ) {
+                    eventMode = checkAndResolveSpringExpression(beanFactory, context, eventMode);
                     kBase.setEventProcessingMode( EventProcessingOption.determineEventProcessingMode(eventMode) );
                 }
 
                 String equalsBehavior = getPropertyValue(beanDefinition, "equalsBehavior");
                 if ( !equalsBehavior.isEmpty() ) {
+                    equalsBehavior = checkAndResolveSpringExpression(beanFactory, context, equalsBehavior);
                     kBase.setEqualsBehavior( EqualityBehaviorOption.determineEqualityBehavior(equalsBehavior) );
                 }
 
                 String declarativeAgenda = getPropertyValue(beanDefinition, "declarativeAgenda");
                 if ( !declarativeAgenda.isEmpty() ) {
+                    declarativeAgenda = checkAndResolveSpringExpression(beanFactory, context, declarativeAgenda);
                     kBase.setDeclarativeAgenda(DeclarativeAgendaOption.determineDeclarativeAgenda(declarativeAgenda));
                 }
 
                 String scope = getPropertyValue(beanDefinition, "scope");
                 if ( !scope.isEmpty() ) {
+                    scope = checkAndResolveSpringExpression(beanFactory, context, scope);
                     kBase.setScope( scope.trim() );
                 }
 
@@ -253,6 +261,13 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 addKieSessionModels(beanFactory, kBase);
             }
         }
+    }
+
+    protected String checkAndResolveSpringExpression(ConfigurableListableBeanFactory beanFactory, BeanExpressionContext context, String expression) {
+        if ( expression.startsWith("#{") && expression.endsWith("}")) {
+            return (String) beanFactory.getBeanExpressionResolver().evaluate(expression, context);
+        }
+        return expression;
     }
 
     private String getPropertyValue(BeanDefinition beanDefinition, String propertyName) {
