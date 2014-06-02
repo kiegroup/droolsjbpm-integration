@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.drools.core.factmodel.traits.TraitFactory;
 import org.drools.core.factmodel.traits.TraitableBean;
+import org.drools.core.factmodel.traits.VirtualPropertyMode;
 import org.drools.persistence.util.PersistenceUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -228,7 +229,7 @@ public class InfinispanPersistenceTraitTest {
                 ResourceType.DRL );
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
-        TraitFactory.setMode( TraitFactory.VirtualPropertyMode.MAP, kbase );
+        TraitFactory.setMode( VirtualPropertyMode.MAP, kbase );
 
         if ( kbuilder.hasErrors() ) {
             fail( kbuilder.getErrors().toString() );
@@ -275,7 +276,7 @@ public class InfinispanPersistenceTraitTest {
 
 
 
-    public void traitsLegacyWrapperWithInfinispan( TraitFactory.VirtualPropertyMode mode ) {
+    public void traitsLegacyWrapperWithInfinispan( VirtualPropertyMode mode ) {
         String str = "package org.drools.trait.test; \n" +
                      "import org.drools.core.factmodel.traits.*; \n" +
                 "global java.util.List list; \n" +
@@ -373,12 +374,12 @@ public class InfinispanPersistenceTraitTest {
 
     @Test
     public void testTraitsOnLegacyInfinispanTriple() {
-        traitsLegacyWrapperWithInfinispan( TraitFactory.VirtualPropertyMode.TRIPLES );
+        traitsLegacyWrapperWithInfinispan( VirtualPropertyMode.TRIPLES );
     }
 
     @Test
     public void testTraitsOnLegacyInfinispanMap() {
-        traitsLegacyWrapperWithInfinispan( TraitFactory.VirtualPropertyMode.MAP );
+        traitsLegacyWrapperWithInfinispan( VirtualPropertyMode.MAP );
     }
 
 }
