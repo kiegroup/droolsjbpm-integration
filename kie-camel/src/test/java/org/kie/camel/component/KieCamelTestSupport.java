@@ -154,6 +154,8 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
             ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader( ((KnowledgeBaseImpl) kbase).getRootClassLoader() );
+                routeBuilder.getContext().setApplicationContextClassLoader( ((KnowledgeBaseImpl) kbase).getRootClassLoader() );
+
                 def = KiePolicy.augmentJaxbDataFormatDefinition( def );
 
                 org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat) def.getDataFormat( this.context.getRoutes().get( 0 ).getRouteContext() );

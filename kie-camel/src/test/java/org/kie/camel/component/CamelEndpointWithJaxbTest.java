@@ -67,7 +67,7 @@ public class CamelEndpointWithJaxbTest extends KieCamelTestSupport {
     @Test
     public void testSessionInsert() throws Exception {
 
-        BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
+         BatchExecutionCommandImpl cmd = new BatchExecutionCommandImpl();
         cmd.setLookup( "ksession1" );
         cmd.getCommands().add( new InsertObjectCommand( new Person( "lucaz",
                                                                     25 ),

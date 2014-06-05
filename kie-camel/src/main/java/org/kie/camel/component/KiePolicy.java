@@ -34,6 +34,7 @@ import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.apache.camel.spi.Policy;
 import org.apache.camel.spi.RouteContext;
 import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
+import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.jax.soap.PostCxfSoapProcessor;
@@ -307,7 +308,10 @@ public class KiePolicy implements Policy {
                 }
 
                 // Set the classloader to the one used by the CommandExecutor
+                // Have to set it in both places, as not all places yet use the camel ApplicationContextClassLoader (like xstream dataformats)
                 Thread.currentThread().setContextClassLoader( localClassLoader );
+                exchange.getContext().setApplicationContextClassLoader( localClassLoader );
+
                 ExecutionNodePipelineContextImpl context = new ExecutionNodePipelineContextImpl( localClassLoader );
                 context.setCommandExecutor( exec );
 
@@ -329,6 +333,7 @@ public class KiePolicy implements Policy {
                 }
             } finally {
                 Thread.currentThread().setContextClassLoader( originalClassLoader );
+                exchange.getContext().setApplicationContextClassLoader( originalClassLoader );
             }
         }
     }

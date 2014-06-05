@@ -1,25 +1,37 @@
 package org.kie.camel.component;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.drools.core.runtime.help.impl.XStreamJSon;
+import org.drools.core.runtime.help.impl.XStreamJSon.JSonQueryResultsConverter;
 import org.junit.BeforeClass;
+
+import java.io.StringWriter;
 
 public class JSonBatchExecutionTest extends BatchTest {
 
     public JSonBatchExecutionTest() {
         super();
         this.dataformat = "json";
-        //copyToDataFormat = "jaxb";
     }
 
     public void assertXMLEqual(String expectedXml,
                                 String resultXml) {
         try {
             ObjectMapper mapper = new ObjectMapper();
+
             JsonNode expectedTree = mapper.readTree( expectedXml );
             JsonNode resultTree = mapper.readTree( resultXml );
+
             assertEquals("Expected:" + expectedXml + "\nwas:" + resultXml,
                     expectedTree, resultTree);
+
         } catch ( Exception e ) {
             throw new RuntimeException( "XML Assertion failure",
                                         e );
@@ -28,6 +40,7 @@ public class JSonBatchExecutionTest extends BatchTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
+        XStreamJSon.SORT_MAPS = true; // allows us to test results easier
         //new PrintWriter(new BufferedWriter( new FileWriter( "jaxb.mvt", false )));
     }
 

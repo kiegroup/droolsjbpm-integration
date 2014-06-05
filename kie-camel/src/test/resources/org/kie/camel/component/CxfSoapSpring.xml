@@ -49,6 +49,7 @@
     <cxf:properties>
       <entry key="dataFormat" value="MESSAGE"/>
       <entry key="defaultOperationName" value="execute"/>
+      <entry key="synchronous" value="true"/>
     </cxf:properties>
   </cxf:cxfEndpoint>
 

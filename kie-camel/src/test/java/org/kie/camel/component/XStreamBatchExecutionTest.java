@@ -29,6 +29,7 @@ import org.drools.core.common.InternalFactHandle;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.impl.StatelessKnowledgeSessionImpl;
+import org.drools.core.runtime.help.impl.XStreamXML;
 import org.jbpm.process.core.context.variable.VariableScope;
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.junit.Before;
@@ -75,8 +76,12 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 
     protected Context createJndiContext() throws Exception {
         Context context = super.createJndiContext();
-        context.bind( "ksession1", this.exec );
-        context.bind( "ksession2", this.exec2 );
+        if ( exec != null ) {
+            context.bind("ksession1", this.exec);
+        }
+        if ( exec2 != null ) {
+            context.bind("ksession2", this.exec2);
+        }
         return context;
     }
 
@@ -116,6 +121,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         XMLUnit.setIgnoreAttributeOrder( true );
         XMLUnit.setNormalizeWhitespace( true );
         XMLUnit.setNormalize( true );
+        XStreamXML.SORT_MAPS = true; // allows us to test results easier
     }
 
     private void assertXMLEqual(String expectedXml,
@@ -1960,7 +1966,7 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
                                               inXml,
                                               String.class );
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        
+
         Thread.currentThread().setContextClassLoader( getClassLoader(ksession) );
         ExecutionResults result = template.requestBody( "direct:unmarshal",
                                                         outXml,
@@ -1979,8 +1985,8 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
         String outXml2 = template.requestBody( "direct:execWithLookup",
                                               inXml2,
                                               String.class );
-        
-        
+
+
         Thread.currentThread().setContextClassLoader( getClassLoader(ksession2) );
         ExecutionResults result2 = template.requestBody( "direct:unmarshal",
                                                         outXml2,
@@ -1999,10 +2005,10 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
 //        stilton2 = (Cheese2) ksession2.getObject( factHandle );
 //        assertEquals( 35,
 //                      stilton2.getPrice() );
-        
-        
+
+
         Thread.currentThread().setContextClassLoader( originalClassLoader );
-        
+
         String expectedXml = "";
         expectedXml += "<execution-results>\n";
         expectedXml += "  <result identifier=\"outStilton\">\n";
