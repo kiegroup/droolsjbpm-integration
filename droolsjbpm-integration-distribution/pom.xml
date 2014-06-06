@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>droolsjbpm-integration-distribution</artifactId>
@@ -42,24 +42,6 @@
 
   <dependencies>
     <!-- Binaries and sources -->
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-camel-server-example</artifactId>
