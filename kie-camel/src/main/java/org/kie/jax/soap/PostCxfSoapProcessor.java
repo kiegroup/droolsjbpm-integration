@@ -36,8 +36,8 @@ public class PostCxfSoapProcessor
         InputStream is = (InputStream) exchange.getIn().getBody();
         //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
         //I need to copy the results here because I loose them at the end of the method
-        String results = StringUtils.toString( is );
         if ( is != null ) {
+            String results = StringUtils.toString( is );
             SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
             SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
             QName payloadName = new QName( "http://soap.jax.drools.org/",
