@@ -23,7 +23,7 @@
   
   <bean id="process" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
   	<constructor-arg>
-  		<value>jbpm/processes/sample.bpmn</value>
+  		<value>jbpm/processes/expense.bpmn2</value>
 	  </constructor-arg>
   </bean>
   

@@ -1,6 +1,9 @@
 package org.kie.spring.jbpm;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.naming.InitialContext;
 import javax.transaction.UserTransaction;
 
@@ -15,10 +18,15 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.task.api.InternalTaskService;
+import org.kie.internal.task.api.TaskQueryService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static junit.framework.Assert.*;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
 
@@ -74,27 +82,71 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
         TaskService taskService = engine.getTaskService();
 
 
-        AuditLogService logService = (AuditLogService) context.getBean("logService");
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("owner", "john");
 
+        UserTransaction ut = null;
+
+        try {
+            ut = beginTransaction();
+
+            ProcessInstance processInstance = ksession.startProcess("expense", parameters);
+
+            executeTasksByProcessByTaskName(processInstance.getId(), "create", taskService);
+
+            ut.commit();
+            ut = beginTransaction();
+
+            executeTasksByProcessByTaskName(processInstance.getId(), "edit", taskService);
+
+            ut.commit();
+            ut = beginTransaction();
+
+            //The problem happens here. There is no task "edit", but it should be.
+            executeTasksByProcessByTaskName(processInstance.getId(), "edit", taskService);
+
+            ut.commit();
+            ut = beginTransaction();
+
+            executeTasksByProcessByTaskName(processInstance.getId(), "edit", taskService);
+
+            ut.commit();
+            ut = beginTransaction();
+
+            executeTasksByProcessByTaskName(processInstance.getId(), "delete", taskService);
+
+            ut.commit();
+        } finally {
+            if (ut != null && javax.transaction.Status.STATUS_ACTIVE == ut.getStatus()) {
+                ut.rollback();
+            }
+        }
+    }
+
+    private UserTransaction beginTransaction() throws Exception {
         UserTransaction ut = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
         ut.begin();
-        ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
-        long processInstanceId = processInstance.getId();
-        ut.rollback();
 
-        processInstance = ksession.getProcessInstance(processInstanceId);
+        return ut;
+    }
 
-        if (processInstance == null) {
-            System.out.println("Process instance rolled back");
-        } else {
-            throw new IllegalArgumentException("Process instance not rolled back");
+    private void executeTasksByProcessByTaskName(long processId, String taskName, TaskService taskService) {
+        Map<String, List<?>> parameters = new HashMap<String, List<?>>();
+        parameters.put(TaskQueryService.PROCESS_INST_ID_LIST, Arrays.asList(processId));
+        parameters.put(TaskQueryService.STATUS_LIST, Arrays.asList(Status.Ready, Status.Created, Status.Reserved));
+        List<TaskSummary> tasks = ((InternalTaskService) taskService).getTasksByVariousFields(parameters, false);
+
+        TaskSummary task = null;
+        for (TaskSummary t : tasks) {
+            if (t.getName().equalsIgnoreCase(taskName)) {
+                task = t;
+                break;
+            }
         }
 
-        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'john'");
-        assertEquals(0, tasks.size());
+        assertThat(task, notNullValue(TaskSummary.class));
 
-        ProcessInstanceLog log = logService.findProcessInstance(processInstanceId);
-        assertNull(log);
+        taskService.start(task.getId(), "john");
+        taskService.complete(task.getId(), "john", null);
     }
 }
