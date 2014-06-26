@@ -33,6 +33,7 @@ package org.kie.camel.component;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.impl.DefaultProducer;
 import org.drools.core.command.impl.GenericCommand;
@@ -51,12 +52,12 @@ public class KieExecuteProducer extends DefaultProducer {
     }
 
     public void process(Exchange exchange) throws Exception {
-        KieEndpoint de = (KieEndpoint) getEndpoint();
+        KieEndpoint ke = (KieEndpoint) getEndpoint();
 
         Command<?> cmd = exchange.getIn().getBody( Command.class );
 
         if ( cmd == null ) {
-            throw new RuntimeCamelException( "Body of in message not of the expected type 'org.kie.api.command.Command' for uri" + de.getEndpointUri() );
+            throw new RuntimeCamelException( "Body of in message not of the expected type 'org.kie.api.command.Command' for uri" + ke.getEndpointUri() );
         }
 
         if ( !(cmd instanceof BatchExecutionCommandImpl) ) {
@@ -69,7 +70,7 @@ public class KieExecuteProducer extends DefaultProducer {
         if ( droolsContext != null ) {
             exec = droolsContext.getCommandExecutor();
         } else {
-            exec = de.getExecutor();
+            exec = ke.getExecutor();
             if ( exec == null ) {
                 String lookup = exchange.getIn().getHeader( KieComponent.KIE_LOOKUP,
                                                             String.class );
@@ -78,23 +79,23 @@ public class KieExecuteProducer extends DefaultProducer {
                 }
 
                 if ( !StringUtils.isEmpty( lookup ) ) {
-                    exec = de.getComponent().getCamelContext().getRegistry().lookup( lookup,
+                    exec = ke.getComponent().getCamelContext().getRegistry().lookup( lookup,
                                                                                      CommandExecutor.class );
                     if ( exec == null ) {
-                        throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
+                        throw new RuntimeException( "ExecutionNode is unable to find ksession=" + lookup + " for uri" + ke.getEndpointUri() );
                     }
                 } else {
-                    throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup + " for uri" + de.getEndpointUri() );
+                    throw new RuntimeException( "No ExecutionNode, unable to find ksession=" + lookup + " for uri" + ke.getEndpointUri() );
                 }
             }
         }
 
         if ( exec == null ) {
-            throw new RuntimeException( "No defined ksession for uri " + de.getEndpointUri() );
+            throw new RuntimeException( "No defined ksession for uri " + ke.getEndpointUri() );
         }
 
-        ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );;
-        exchange.getOut().setBody( results );
-        exchange.getOut().setHeaders(exchange.getIn().getHeaders());
+        ExecutionResults results = exec.execute( (BatchExecutionCommandImpl) cmd );
+
+        exchange.getIn().setBody( results );
     }
 }
