@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://jboss.org/kie/6.0.0/kmodule">
+
+    <kbase name="ConwayRFKB" packages="org.drools.examples.conway,org.drools.examples.conway.ruleflow">
+        <ksession name="ConwayRFKS"/>
+    </kbase>
+    <kbase name="ConwayAGKB" packages="org.drools.examples.conway.agendagroup">
+        <ksession name="ConwayAGKS"/>
+    </kbase>
+
+    <kbase name="BrokerKB" packages="org.drools.examples.broker.rules" eventProcessingMode="stream">
+        <ksession name="BrokerKS"/>
+    </kbase>
+
+  <kbase name="NumberGuessKB" packages="org.drools.examples.numberguess">
+    <ksession name="NumberGuessKS"/>
+  </kbase>
+</kmodule>

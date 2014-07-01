@@ -22,16 +22,9 @@ import org.drools.examples.broker.model.Company;
 import org.drools.examples.broker.model.CompanyRegistry;
 import org.drools.examples.broker.model.StockTick;
 import org.drools.examples.broker.ui.BrokerWindow;
-import org.kie.internal.KnowledgeBase;
-import org.kie.api.KieBaseConfiguration;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.api.conf.EventProcessingOption;
-import org.kie.api.conf.MBeansOption;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.api.io.ResourceType;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.EntryPoint;
 
 /**
@@ -39,15 +32,9 @@ import org.kie.api.runtime.rule.EntryPoint;
  */
 public class Broker implements EventReceiver, BrokerServices {
 
-    private static final String[] ASSET_FILES = {
-            "/org/drools/examples/broker/rules/broker.drl",
-            "/org/drools/examples/broker/rules/notify.drl",
-            "/org/drools/examples/broker/rules/position.rf",
-            "/org/drools/examples/broker/rules/position.drl"};
-    
-    private BrokerWindow window;
+   private BrokerWindow window;
     private CompanyRegistry companies;
-    private StatefulKnowledgeSession session;
+    private KieSession session;
     private EntryPoint tickStream;
 
     public Broker(BrokerWindow window,
@@ -77,43 +64,17 @@ public class Broker implements EventReceiver, BrokerServices {
         }
     }
     
-    private StatefulKnowledgeSession createSession() {
-        KnowledgeBase kbase = loadRuleBase();
-        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
-//        session.addEventListener( new DebugAgendaEventListener() );
-//        session.addEventListener( new DebugWorkingMemoryEventListener() );
-//        session.addEventListener( new DebugProcessEventListener() );         
-        
-        //KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger( session );
+    private KieSession createSession() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kc = ks.getKieClasspathContainer();
+        session = kc.newKieSession("BrokerKS");
+
         session.setGlobal( "services", this );
         for( Company company : this.companies.getCompanies() ) {
             session.insert( company );
         }
         session.fireAllRules();
         return session;
-    }
-
-    private KnowledgeBase loadRuleBase() {
-        KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        try {
-            for( int i = 0; i < ASSET_FILES.length; i++ ) {
-                builder.add( ResourceFactory.newInputStreamResource( Broker.class.getResourceAsStream( ASSET_FILES[i] ) ),
-                             ResourceType.determineResourceType( ASSET_FILES[i] ));
-            }
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            System.exit( 0 );
-        }
-        if( builder.hasErrors() ) {
-            System.err.println(builder.getErrors());
-            System.exit( 0 );
-        }
-        KieBaseConfiguration conf = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
-        conf.setOption( EventProcessingOption.STREAM );
-        conf.setOption( MBeansOption.ENABLED );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase( "Stock Broker", conf );
-        kbase.addKnowledgePackages( builder.getKnowledgePackages() );
-        return kbase;
     }
 
     public void log(String message) {
