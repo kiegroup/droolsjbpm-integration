@@ -16,39 +16,23 @@
 
 package org.drools.examples.conway;
 
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.api.io.ResourceType;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 public class RuleFlowDelegate implements ConwayRuleDelegate {
-    private StatefulKnowledgeSession session;
+    private KieSession session;
     
     public RuleFlowDelegate() {
-        try {
-            KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-            kbuilder.add( ResourceFactory.newClassPathResource( "ruleflow/conway-ruleflow.drl",getClass()), ResourceType.DRL );
-            kbuilder.add( ResourceFactory.newClassPathResource( "generation.rf",getClass()), ResourceType.DRF );
-            kbuilder.add( ResourceFactory.newClassPathResource( "killAll.rf",getClass()), ResourceType.DRF );
-            kbuilder.add( ResourceFactory.newClassPathResource( "registerNeighbor.rf",getClass()), ResourceType.DRF );
-            
-            KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-            kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-            
-            this.session = kbase.newStatefulKnowledgeSession();
-
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
-        }
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kc = ks.getKieClasspathContainer();
+        session = kc.newKieSession("ConwayRFKS");
     }
     
     /* (non-Javadoc)
      * @see org.drools.examples.conway.ConwayRuleDelegate#getSession()
      */
-    public StatefulKnowledgeSession getSession() {
+    public KieSession getSession() {
         return this.session;
     }
     

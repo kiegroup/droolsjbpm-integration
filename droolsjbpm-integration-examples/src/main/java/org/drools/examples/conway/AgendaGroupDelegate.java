@@ -16,39 +16,25 @@
 
 package org.drools.examples.conway;
 
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.api.io.ResourceType;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 public class AgendaGroupDelegate
     implements
     ConwayRuleDelegate {
-    private StatefulKnowledgeSession session;
+    private KieSession session;
 
     public AgendaGroupDelegate() {
-        try {
-            KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-            kbuilder.add( ResourceFactory.newClassPathResource("agendagroup/conway-agendagroup.drl",
-                    getClass()),
-                                  ResourceType.DRL );
-
-            KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-            kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-
-            this.session = kbase.newStatefulKnowledgeSession();
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
-        }
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kc = ks.getKieClasspathContainer();
+        session = kc.newKieSession("ConwayAGKS");
     }
 
     /* (non-Javadoc)
      * @see org.drools.examples.conway.ConwayRuleDelegate#getSession()
      */
-    public StatefulKnowledgeSession getSession() {
+    public KieSession getSession() {
         return this.session;
     }
 
