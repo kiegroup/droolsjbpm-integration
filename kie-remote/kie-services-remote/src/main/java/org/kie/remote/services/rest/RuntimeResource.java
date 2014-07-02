@@ -103,18 +103,7 @@ public class RuntimeResource extends ResourceBase {
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
         return restProcessJaxbCommandsRequest(cmdsRequest);
     } 
-
-    /**
-     * Return a list of process definition ids available in this deployment.
-     * @return A {@link JaxbProcessIdList} instance.
-     */
-    @GET
-    @Path("/process")
-    public Response process() { 
-        Collection<String> processIdList = runtimeDataService.getProcessIds(deploymentId);
-        return createCorrectVariant(new JaxbProcessIdList(processIdList), headers);
-    }
-    
+ 
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
     public Response process_defId(@PathParam("processDefId") String processId) {
@@ -326,19 +315,7 @@ public class RuntimeResource extends ResourceBase {
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
-
-    private JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessAssetDesc procAssetDesc) { 
-        JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
-        jaxbProcDef.setDeploymentId(procAssetDesc.getDeploymentId());
-        jaxbProcDef.setForms(procAssetDesc.getForms());
-        jaxbProcDef.setId(procAssetDesc.getId());
-        jaxbProcDef.setName(procAssetDesc.getName());
-        jaxbProcDef.setPackageName(procAssetDesc.getPackageName());
-        jaxbProcDef.setVersion(procAssetDesc.getVersion());
-        
-        return jaxbProcDef;
-    }
-    
+ 
     private ProcessInstance getProcessInstance(long procInstId) { 
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);

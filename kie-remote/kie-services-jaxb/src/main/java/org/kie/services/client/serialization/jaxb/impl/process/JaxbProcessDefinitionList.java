@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.impl.deploy;
+package org.kie.services.client.serialization.jaxb.impl.process;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +13,15 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 
-@XmlRootElement(name="deployment-unit-list")
+@XmlRootElement(name="process-definition-list")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso(value={JaxbDeploymentUnit.class})
-public class JaxbDeploymentUnitList implements JaxbPaginatedList<JaxbDeploymentUnit> {
+@XmlSeeAlso(value={JaxbProcessDefinition.class})
+public class JaxbProcessDefinitionList implements JaxbPaginatedList<JaxbProcessDefinition> {
 
     @XmlElements({
-        @XmlElement(name ="deployment-unit", type=JaxbDeploymentUnit.class)
+        @XmlElement(name ="process-definition", type=JaxbProcessDefinition.class)
     })
-    private List<JaxbDeploymentUnit> deploymentUnitList = new ArrayList<JaxbDeploymentUnit>();
+    private List<JaxbProcessDefinition> processDefinitionList = new ArrayList<JaxbProcessDefinition>();
 
     @XmlElement(name="page-number")
     @XmlSchemaType(name="int")
@@ -31,20 +31,20 @@ public class JaxbDeploymentUnitList implements JaxbPaginatedList<JaxbDeploymentU
     @XmlSchemaType(name="int")
     private Integer pageSize;
     
-    public JaxbDeploymentUnitList() { 
+    public  JaxbProcessDefinitionList() { 
         // default for JAXB, etc.
     }
     
-    public JaxbDeploymentUnitList(List<JaxbDeploymentUnit> depUnitList) {
-        this.deploymentUnitList = depUnitList;
-    }
-    
-    public List<JaxbDeploymentUnit> getDeploymentUnitList() {
-        return deploymentUnitList;
+    public JaxbProcessDefinitionList(List<JaxbProcessDefinition> procDefList) {
+        this.processDefinitionList = procDefList;
     }
 
-    public void setDeploymentUnitList(List<JaxbDeploymentUnit> deploymentUnitList) {
-        this.deploymentUnitList = deploymentUnitList;
+    public List<JaxbProcessDefinition> getProcessDefinitionList() {
+        return processDefinitionList;
+    }
+
+    public void setProcessDefinitionList(List<JaxbProcessDefinition> processDefinitionList) {
+        this.processDefinitionList = processDefinitionList;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class JaxbDeploymentUnitList implements JaxbPaginatedList<JaxbDeploymentU
 
     @Override
     public Integer getPageSize() {
-        return this.pageSize;
+        return pageSize;
     }
 
     @Override
@@ -68,8 +68,7 @@ public class JaxbDeploymentUnitList implements JaxbPaginatedList<JaxbDeploymentU
     }
 
     @Override
-    public void addContents(List<JaxbDeploymentUnit> contentList) {
-        this.deploymentUnitList = contentList;
+    public void addContents(List<JaxbProcessDefinition> contentList) {
+        this.processDefinitionList = contentList;
     }
-    
 }

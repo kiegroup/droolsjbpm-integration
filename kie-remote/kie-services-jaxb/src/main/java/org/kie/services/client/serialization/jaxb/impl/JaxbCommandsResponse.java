@@ -72,6 +72,7 @@ public class JaxbCommandsResponse {
     @XmlElements({ 
             @XmlElement(name = "exception", type = JaxbExceptionResponse.class),
             @XmlElement(name = "long-list", type = JaxbLongListResponse.class),
+            @XmlElement(name = "string-list", type = JaxbStringListResponse.class),
             @XmlElement(name = "primitive", type = JaxbPrimitiveResponse.class),
             @XmlElement(name = "process-instance", type = JaxbProcessInstanceResponse.class),
             @XmlElement(name = "process-instance-list", type = JaxbProcessInstanceListResponse.class),
@@ -201,6 +202,8 @@ public class JaxbCommandsResponse {
                 this.responses.add(new JaxbTaskSummaryListResponse((List<TaskSummary>) result, i, cmd));
             } else if( listType.equals(Long.class) ) {
                 this.responses.add(new JaxbLongListResponse((List<Long>)result, i, cmd));
+            } else if( listType.equals(String.class) ) {
+                this.responses.add(new JaxbStringListResponse((List<String>)result, i, cmd));
             } else if( listType.equals(ProcessInstance.class) ) {
                List<JaxbProcessInstanceResponse> procInstList = new ArrayList<JaxbProcessInstanceResponse>();
                for( ProcessInstance procInst : (List<ProcessInstance>) result) { 

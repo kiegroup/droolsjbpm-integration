@@ -30,6 +30,7 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -156,11 +157,10 @@ public class TaskResource extends ResourceBase {
         List<TaskSummary> results = (List<TaskSummary>) doRestTaskOperation(null, queryCmd);
         
         logger.debug("{} results found.", results.size());
-        results = paginate(pageInfo, results);
-        logger.debug("Returning {} results after pagination.", results.size());
+        JaxbTaskSummaryListResponse resultList = paginateAndCreateResult(pageInfo, results, new JaxbTaskSummaryListResponse());
+        logger.debug("Returning {} results after pagination.", resultList.getList().size());
         
-        JaxbTaskSummaryListResponse responseObj = new JaxbTaskSummaryListResponse(results);
-        return createCorrectVariant(responseObj, headers);
+        return createCorrectVariant(resultList, headers);
     }
 
     @GET

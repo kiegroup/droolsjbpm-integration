@@ -22,6 +22,7 @@ import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.kie.workbench.common.services.rest.RestOperationException;
 import org.kie.remote.services.cdi.ProcessRequestBean;
@@ -81,25 +82,22 @@ public class HistoryResource extends ResourceBase {
         String oper = getRelativePath(uriInfo);
         Map<String, List<String>> params = getRequestParams(uriInfo);
         
-        List<ProcessInstanceLog> results = getAuditLogService().findProcessInstances();
+        List<ProcessInstanceLog> procInstLogResults = getAuditLogService().findProcessInstances();
         
-        results = paginate(getPageNumAndPageSize(params, oper), results);
-        return createCorrectVariant(new JaxbHistoryLogList(results), headers);
+        List<AuditEvent> results = new ArrayList<AuditEvent>(procInstLogResults);
+        JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
+        
+        return createCorrectVariant(resultList, headers);
     }
 
     @GET
     @Path("/instance/{procInstId: [0-9]+}")
+    // TODO: docs
     public Response instance_procInstId(@PathParam("procInstId") long procInstId) {
-        Map<String, List<String>> params = getRequestParams(uriInfo);
-        String oper = getRelativePath(uriInfo);
-        
         ProcessInstanceLog procInstLog = getAuditLogService().findProcessInstance(procInstId);
+        JaxbProcessInstanceLog jaxbProcLog = new JaxbProcessInstanceLog(procInstLog);
         
-        List<ProcessInstanceLog> logList = new ArrayList<ProcessInstanceLog>();
-        logList.add(procInstLog);
-        
-        logList = paginate(getPageNumAndPageSize(params, oper), logList);
-        return createCorrectVariant(new JaxbHistoryLogList(logList), headers);
+        return createCorrectVariant(jaxbProcLog, headers);
     }
 
     @GET
@@ -120,8 +118,7 @@ public class HistoryResource extends ResourceBase {
         }
 
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
-        varInstLogList = paginate(getPageNumAndPageSize(params, oper), varInstLogList);
-        JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
+        JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, varInstLogList, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
     }
@@ -143,8 +140,7 @@ public class HistoryResource extends ResourceBase {
         }
         
         List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
-        varInstLogList = paginate(getPageNumAndPageSize(params, oper), varInstLogList);
-        JaxbHistoryLogList resultList = new JaxbHistoryLogList(varInstLogList);
+        JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, varInstLogList, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
     }
@@ -170,8 +166,9 @@ public class HistoryResource extends ResourceBase {
         
         List<ProcessInstanceLog> procInstLogList = (List<ProcessInstanceLog>) result;
         
+        List<ProcessInstanceLog> filteredProcLogList = procInstLogList;
         if (statusParam != null && !statusParam.equals(ProcessInstance.STATE_ACTIVE)) {
-            List<ProcessInstanceLog> filteredProcLogList = new ArrayList<ProcessInstanceLog>();
+            filteredProcLogList = new ArrayList<ProcessInstanceLog>();
             for (int i = 0; 
                     i < procInstLogList.size() && filteredProcLogList.size() < getMaxNumResultsNeeded(pageInfo);
                     ++i) {
@@ -181,8 +178,10 @@ public class HistoryResource extends ResourceBase {
                 }
             }
         }
-        procInstLogList = paginate(pageInfo, procInstLogList);
-        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
+        List<AuditEvent> results = new ArrayList<AuditEvent>(filteredProcLogList);
+        
+        JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
+        return createCorrectVariant(resultList, headers);
     }
 
     @GET
@@ -190,10 +189,13 @@ public class HistoryResource extends ResourceBase {
     public Response variable_varId(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
-        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
-        varLogList = paginate(getPageNumAndPageSize(params, oper), varLogList);
         
-        return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
+        
+        List<AuditEvent> results = new ArrayList<AuditEvent>(varLogList);
+        JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
+        
+        return createCorrectVariant(resultList, headers);
     }
     
     @GET
@@ -201,15 +203,17 @@ public class HistoryResource extends ResourceBase {
     public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
-        List<VariableInstanceLog> varLogList 
-            = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
-        varLogList = paginate(getPageNumAndPageSize(params, oper), varLogList);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         
-        return createCorrectVariant(new JaxbHistoryLogList(varLogList), headers);
+        List<AuditEvent> results = new ArrayList<AuditEvent>(varLogList);
+        JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
+        
+        return createCorrectVariant(resultList, headers);
     } 
    
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
+    // TODO: docs
     public Response variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, List<String>> params = getRequestParams(uriInfo);
         String oper = getRelativePath(uriInfo);
@@ -218,9 +222,15 @@ public class HistoryResource extends ResourceBase {
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         
         // get process instance logs
-        int maxNumResults = getMaxNumResultsNeeded(getPageNumAndPageSize(params, oper));
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
+        int maxNumResults = getMaxNumResultsNeeded(pageInfo);
         List<ProcessInstanceLog> procInstLogList = getProcessInstanceLogsByVariable(varLogList, maxNumResults);
-        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
+       
+        // paginate
+        List<AuditEvent> results = new ArrayList<AuditEvent>(procInstLogList);
+        JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
+        
+        return createCorrectVariant(resultList, headers);
     }
     
     @GET
@@ -233,13 +243,15 @@ public class HistoryResource extends ResourceBase {
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         
         // get process instance logs
-        int maxNumResults = getMaxNumResultsNeeded(getPageNumAndPageSize(params, oper));
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
+        int maxNumResults = getMaxNumResultsNeeded(pageInfo);
         List<ProcessInstanceLog> procInstLogList = getProcessInstanceLogsByVariable(varLogList, maxNumResults);
-        return createCorrectVariant(new JaxbHistoryLogList(procInstLogList), headers);
+        List<AuditEvent> results = new ArrayList<AuditEvent>(procInstLogList);
+        
+        JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
+        return createCorrectVariant(resultList, headers);
     }
     
-    
-
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
     private List<VariableInstanceLog> internalGetVariableInstancesByVarAndValue(String varId, String value, 
