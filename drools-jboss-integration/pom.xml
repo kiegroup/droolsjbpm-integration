@@ -59,28 +59,7 @@
       <artifactId>maven-model</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.guvnor</groupId>
-      <artifactId>guvnor-project-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.guvnor</groupId>
-      <artifactId>guvnor-project-backend</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-datamodel-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-commons</artifactId>
-    </dependency>
-
     <!-- Kie-Spring -->
-
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-spring</artifactId>
