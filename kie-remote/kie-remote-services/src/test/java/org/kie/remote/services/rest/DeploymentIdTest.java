@@ -83,6 +83,10 @@ public class DeploymentIdTest extends DeploymentResource {
         assertFalse(test, Pattern.matches(regex, test));
         test = "$:#:v";
         assertFalse(test, Pattern.matches(regex, test));
+        
+        // Test: process def id's url doesn't match
+        test = "processes";
+        assertFalse(test, Pattern.matches(regex, test));
     }
 
     @Test

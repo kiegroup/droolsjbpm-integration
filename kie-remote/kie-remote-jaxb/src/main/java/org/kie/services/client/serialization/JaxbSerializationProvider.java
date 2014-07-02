@@ -26,6 +26,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbStringListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
@@ -36,7 +37,7 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobR
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
@@ -75,6 +76,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 // REST other
                 JaxbGenericResponse.class,
                 JaxbLongListResponse.class,
+                JaxbStringListResponse.class,
                 JaxbOtherResponse.class,
                 JaxbPrimitiveResponse.class,
                 JaxbVariablesResponse.class,
@@ -89,8 +91,8 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbDeploymentDescriptor.class,
                 
                 // process
-                JaxbProcessIdList.class,
                 JaxbProcessDefinition.class,
+                JaxbProcessDefinitionList.class,
 
                 // workitem
                 JaxbWorkItem.class,

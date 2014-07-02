@@ -72,7 +72,6 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
@@ -627,13 +626,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     
     @Test
     public void processIdAndProcessDefinitionTest() throws Exception {
-        // JaxbProcessIdList 
-        String [] procIdArr = { "org.test.process.multiplex", "org.test.process.demultiplex" };
-        List<String> processIdList = Arrays.asList(procIdArr);
-        JaxbProcessIdList jaxbProcIdList = new JaxbProcessIdList(processIdList);
-        JaxbProcessIdList roundTripList = testRoundTrip(jaxbProcIdList);
-        ComparePair.compareObjectsViaFields(jaxbProcIdList, roundTripList);
-        
         // JaxbProcessDefinition
         ProcessAssetDesc assetDesc = new ProcessAssetDesc(
                 "org.test.proc.id", "The Name Of The Process", 

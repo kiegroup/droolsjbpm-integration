@@ -22,11 +22,12 @@ import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 
 @XmlRootElement(name="log-instance-list")
 @XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("rawtypes")
-public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>{
+public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>, JaxbPaginatedList<AuditEvent> {
 
     @XmlElements({ 
         @XmlElement(name = "process-instance-log", type = JaxbProcessInstanceLog.class),
@@ -48,6 +49,14 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
     @XmlElement(name = "command-name")
     @XmlSchemaType(name = "string")
     private String commandName;
+   
+    @XmlElement(name="page-number")
+    @XmlSchemaType(name="int")
+    private Integer pageNumber;
+    
+    @XmlElement(name="page-size")
+    @XmlSchemaType(name="int")
+    private Integer pageSize;
     
     public JaxbHistoryLogList() { 
         // Default constructor
@@ -143,5 +152,30 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
     public void setList(List<AbstractJaxbHistoryObject> historyLogList) { 
         this.historyLogList = historyLogList;
     }
-    
+
+    @Override
+    public Integer getPageNumber() {
+        return this.pageNumber;
+    }
+
+    @Override
+    public void setPageNumber(Integer page) {
+        this.pageNumber = page;
+    }
+
+    @Override
+    public Integer getPageSize() {
+        return this.pageSize;
+    }
+
+    @Override
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    @Override
+    public void addContents(List<AuditEvent> contentList) {
+        initialize(contentList);
+    }
+ 
 }

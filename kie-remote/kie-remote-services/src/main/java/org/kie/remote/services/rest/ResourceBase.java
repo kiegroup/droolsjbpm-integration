@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
@@ -31,6 +32,9 @@ import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
+import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -374,7 +378,33 @@ public class ResourceBase {
         } 
         return numResults;
     }
-    
+   
+    protected static <T, R extends JaxbPaginatedList<T>> R 
+        paginateAndCreateResult(Map<String, List<String>> params, String oper, List<T> results, R resultList) { 
+        
+        // paginate
+        int [] pageInfo = getPageNumAndPageSize(params, oper); 
+        return paginateAndCreateResult(pageInfo, results, resultList);
+    }
+        
+    protected static <T, R extends JaxbPaginatedList<T>> R 
+        paginateAndCreateResult(int [] pageInfo, List<T> results, R resultList) { 
+        
+        if( pageInfo[0] == 0 && pageInfo[1] == 0 ) { 
+            // no pagination
+            resultList.addContents(results);
+            return resultList;
+        }
+        
+        results = paginate(pageInfo, results);
+       
+        // create result
+        resultList.addContents(results);
+        resultList.setPageNumber(pageInfo[PAGE_NUM]);
+        resultList.setPageSize(pageInfo[PAGE_SIZE]);
+        
+        return resultList;
+    }
     // Other helper methods ------------------------------------------------------------------------------------------------------
     
     public static String getRelativePath(UriInfo uriInfo) { 
@@ -393,5 +423,17 @@ public class ResourceBase {
            throw iae;
         }
     }
-    
+   
+    protected JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessAssetDesc procAssetDesc) { 
+        JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
+        jaxbProcDef.setDeploymentId(procAssetDesc.getDeploymentId());
+        jaxbProcDef.setForms(procAssetDesc.getForms());
+        jaxbProcDef.setId(procAssetDesc.getId());
+        jaxbProcDef.setName(procAssetDesc.getName());
+        jaxbProcDef.setPackageName(procAssetDesc.getPackageName());
+        jaxbProcDef.setVersion(procAssetDesc.getVersion());
+        
+        return jaxbProcDef;
+    }
+   
 }
