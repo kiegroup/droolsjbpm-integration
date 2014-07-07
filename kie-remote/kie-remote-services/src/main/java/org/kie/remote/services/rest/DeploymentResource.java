@@ -21,19 +21,18 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.jbpm.kie.services.api.Kjar;
+
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
-import org.kie.internal.deployment.DeployedUnit;
-import org.kie.internal.deployment.DeploymentService;
-import org.kie.internal.deployment.DeploymentUnit;
-import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
+import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.cdi.Kjar;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.remote.common.exception.RestOperationException;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
 import org.kie.remote.services.rest.async.cmd.JobType;

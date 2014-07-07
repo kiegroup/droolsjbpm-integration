@@ -13,6 +13,8 @@ import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
@@ -30,8 +32,9 @@ import org.kie.remote.services.cdi.ProcessRequestBean;
 public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
-    private InternalTaskService injectedTaskService;
-    private InternalTaskService runtimeTaskService;
+
+    private ProcessService processServiceMock;
+    private UserTaskService userTaskServiceMock;
     
     private AuditLogService auditLogService = mock(AuditLogService.class);
 
@@ -41,22 +44,21 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
     }
 
     @Override
-    public void setInjectedTaskServiceMock(InternalTaskService mock) {
-        this.injectedTaskService = mock;
+    public void setProcessServiceMock(ProcessService processServiceMock) {
+        this.processServiceMock = processServiceMock;
     }
 
     @Override
-    public void setRuntimeTaskServiceMock(InternalTaskService mock) {
-        this.runtimeTaskService = mock;
+    public void setUserTaskServiceMock(UserTaskService userTaskServiceMock) {
+        this.userTaskServiceMock = userTaskServiceMock;
     }
 
     public void setupTestMocks() {
         this.runtimeMgrMgr = runtimeMgrMgrMock;
 
         this.processRequestBean = new ProcessRequestBean();
-        this.processRequestBean.setRuntimeMgrMgr(runtimeMgrMgrMock);
-        this.processRequestBean.setInjectedTaskService(injectedTaskService);
-        this.processRequestBean.setInjectedTaskService(injectedTaskService);
+        this.processRequestBean.setProcessService(processServiceMock);
+        this.processRequestBean.setUserTaskService(userTaskServiceMock);
         
         // audit log service
         doReturn(new ArrayList<ProcessInstanceLog>()).when(auditLogService).findProcessInstances();
@@ -75,8 +77,7 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         this.jmsProcessJaxbCommandsRequest(cmdsRequest);
        
         // verify
-        verify(injectedTaskService, times(2)).execute(any(TaskCommand.class));
-        verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
     @Test
@@ -90,10 +91,7 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         
         // verify
-        verify(injectedTaskService, times(1)).execute(any(TaskCommand.class));
-        verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
-        // complete operation should be done by runtime task service
-        verify(runtimeTaskService, times(1)).execute(any(TaskCommand.class));
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
     @Test

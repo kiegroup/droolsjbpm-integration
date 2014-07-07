@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 import javax.ws.rs.Path;
 
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
+import org.jbpm.services.api.model.DeploymentUnit;
 import org.junit.Test;
-import org.kie.internal.deployment.DeploymentUnit;
 
 public class DeploymentIdTest extends DeploymentResource {
 
@@ -128,7 +128,7 @@ public class DeploymentIdTest extends DeploymentResource {
       return builder.toString();
     }
     
-    private void checkDepUnit(DeploymentUnit depUnit, String [] test) { 
+    private void checkDepUnit(DeploymentUnit depUnit, String [] test) {
        String [] depUnitArr = depUnit.getIdentifier().split(":");
        assertEquals( "size/# components", test.length, depUnitArr.length);
        for( int i = 0; i < depUnitArr.length; ++i ) { 

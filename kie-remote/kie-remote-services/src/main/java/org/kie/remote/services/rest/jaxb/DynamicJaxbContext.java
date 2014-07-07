@@ -19,9 +19,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Validator;
 
-import org.jbpm.kie.services.impl.event.Deploy;
-import org.jbpm.kie.services.impl.event.DeploymentEvent;
-import org.jbpm.kie.services.impl.event.Undeploy;
+import org.jbpm.services.cdi.Deploy;
+import org.jbpm.services.cdi.Undeploy;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.DeploymentProcessedEvent;
 import org.slf4j.Logger;

@@ -35,11 +35,12 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.drools.core.util.StringUtils;
-import org.jbpm.kie.services.api.RuntimeDataService;
-import org.jbpm.kie.services.api.bpmn2.BPMN2DataService;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
+import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.remote.common.exception.RestOperationException;
@@ -86,7 +87,7 @@ public class RuntimeResource extends ResourceBase {
     private RuntimeDataService runtimeDataService;
    
     @Inject
-    private BPMN2DataService bpmn2DataService;
+    private DefinitionService bpmn2DataService;
 
     @Inject
     private FormURLGenerator formURLGenerator;
@@ -117,9 +118,9 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
     public Response process_defId(@PathParam("processDefId") String processId) {
-        ProcessAssetDesc processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
+        ProcessDefinition processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId);
         JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDescList);
-        Map<String, String> variables = bpmn2DataService.getProcessData(processId);
+        Map<String, String> variables = bpmn2DataService.getProcessVariables(deploymentId, processId);
         jaxbProcDef.setVariables(variables);
         return createCorrectVariant(jaxbProcDef, headers);
     }
@@ -325,7 +326,7 @@ public class RuntimeResource extends ResourceBase {
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
- 
+
     private ProcessInstance getProcessInstance(long procInstId) { 
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);

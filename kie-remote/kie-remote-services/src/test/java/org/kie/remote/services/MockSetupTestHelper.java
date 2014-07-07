@@ -8,12 +8,16 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import java.util.ArrayList;
 
 import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.jbpm.kie.services.impl.event.DeploymentEvent;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
 import org.jbpm.runtime.manager.impl.PerRequestRuntimeManager;
 import org.jbpm.runtime.manager.impl.RuntimeEngineImpl;
 import org.jbpm.runtime.manager.impl.SingletonRuntimeManager;
+import org.jbpm.services.api.DeploymentEvent;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
@@ -27,9 +31,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.deployment.DeployedUnit;
-import org.kie.internal.deployment.DeploymentUnit;
-import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
@@ -58,15 +60,17 @@ public class MockSetupTestHelper {
         doReturn(runtimeEngineMock).when(runtimeMgrMgrMock).getRuntimeEngine(anyString(), anyLong());
         // - return mock of TaskService
         InternalTaskService runtimeTaskServiceMock = mock(InternalTaskService.class);
-        test.setRuntimeTaskServiceMock(runtimeTaskServiceMock);
         // - throw exception if if you try to get a KieSession via RuntimeEngine
         doThrow(new IllegalStateException("ksession")).when(runtimeEngineMock).getKieSession();
         // - let disposeRuntimeEngine() happen.
         doNothing().when(runtimeMgrMgrMock).disposeRuntimeEngine(any(RuntimeEngine.class));
 
+        // UserTaskService setup
+        UserTaskService userTaskServiceMock = mock(UserTaskService.class);
+        test.setUserTaskServiceMock(userTaskServiceMock);
+
         // TaskService
         InternalTaskService injectedTaskServiceMock = mock(InternalTaskService.class);
-        test.setInjectedTaskServiceMock(injectedTaskServiceMock);
 
         // - set task instance
         InternalTask task = new TaskImpl();
@@ -173,8 +177,15 @@ public class MockSetupTestHelper {
         
         // ksession setup
         KieSession kieSessionMock = mock(KieSession.class);
-        test.setKieSessionMock(kieSessionMock);
         doReturn(kieSessionMock).when(runtimeEngineMock).getKieSession();
+
+        // ProcessService setup
+        ProcessService processServiceMock = mock(ProcessService.class);
+        test.setProcessServiceMock(processServiceMock);
+
+        // UserTaskService setup
+        UserTaskService userTaskServiceMock = mock(UserTaskService.class);
+        test.setUserTaskServiceMock(userTaskServiceMock);
 
         // start process
         RuleFlowProcessInstance procInst = new RuleFlowProcessInstance();
@@ -182,6 +193,8 @@ public class MockSetupTestHelper {
         
         ProcessInstance procInstMock = spy(procInst);
         doReturn(procInstMock).when(kieSessionMock).execute(any(StartProcessCommand.class));
+
+        doReturn(procInstMock).when(processServiceMock).execute(any(String.class), any(StartProcessCommand.class));
         
         // have test setup mocks
         test.setupTestMocks();

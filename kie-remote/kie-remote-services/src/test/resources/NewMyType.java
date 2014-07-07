@@ -19,19 +19,19 @@ public class MyType implements Serializable {
     @XmlElement
     @XmlSchemaType(name="string")
     private String notText;
-    
+
     public MyType() {
-       // default constructor 
+       // default constructor
     }
-    
+
     public MyType(String text) {
         this.notText = text;
     }
-    
+
     public String getNotText() {
         return notText;
     }
-    
+
     public void setNotText(String text) {
         this.notText = text;
     }

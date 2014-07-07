@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.runtime.conf.AuditMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.PersistenceMode;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 
 @XmlRootElement(name="deployment-descriptor")
 @XmlAccessorType(XmlAccessType.FIELD)

@@ -12,11 +12,13 @@ import java.util.List;
 
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
@@ -40,21 +42,30 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class JmsStartProcessEveryStrategyTest extends RequestMessageBean implements StartProcessEveryStrategyTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
-    private KieSession kieSessionMock;
+
+    private ProcessService processServiceMock;
+    private UserTaskService userTaskServiceMock;
     
     public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
         this.runtimeMgrMgrMock = mock;
     }
 
-    public void setKieSessionMock(KieSession kieSessionMock) {
-        this.kieSessionMock = kieSessionMock;
+    @Override
+    public void setProcessServiceMock(ProcessService processServiceMock) {
+        this.processServiceMock = processServiceMock;
+    }
+
+    @Override
+    public void setUserTaskServiceMock(UserTaskService userTaskServiceMock) {
+        this.userTaskServiceMock = userTaskServiceMock;
     }
 
     public void setupTestMocks() {
         this.runtimeMgrMgr = runtimeMgrMgrMock;
 
         this.processRequestBean = new ProcessRequestBean();
-        this.processRequestBean.setRuntimeMgrMgr(runtimeMgrMgrMock);
+        this.processRequestBean.setProcessService(processServiceMock);
+        this.processRequestBean.setUserTaskService(userTaskServiceMock);
     }
 
     @Test
@@ -67,13 +78,6 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         // test
         runStartProcessAndDoStuffTest();
 
-        // verify
-        PowerMockito.verifyStatic(times(0));
-        EmptyContext.get();
-        PowerMockito.verifyStatic(times(1));
-        ProcessInstanceIdContext.get();
-        PowerMockito.verifyStatic(times(1));
-        ProcessInstanceIdContext.get(anyLong());
     }
 
     @Test
@@ -82,10 +86,6 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         
         // test
         runStartProcessAndDoStuffTest();
-        
-        // verify
-        PowerMockito.verifyStatic(times(2));
-        EmptyContext.get();
     }
 
     @Test
@@ -94,10 +94,6 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         
         // test
         runStartProcessAndDoStuffTest();
-        
-        // verify
-        PowerMockito.verifyStatic(times(2));
-        EmptyContext.get();
     }
 
     /**
@@ -139,7 +135,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         assertFalse( "An exception was thrown!", realResp instanceof JaxbExceptionResponse );
         
        // verify ksession is called
-       verify(kieSessionMock, times(2)).execute(any(Command.class));
+       verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
     }
     
 }

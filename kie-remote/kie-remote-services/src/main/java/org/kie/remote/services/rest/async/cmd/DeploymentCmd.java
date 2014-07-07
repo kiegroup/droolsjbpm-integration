@@ -5,9 +5,9 @@ import javax.enterprise.util.AnnotationLiteral;
 
 import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.jbpm.executor.cdi.CDIUtils;
-import org.jbpm.kie.services.api.Kjar;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
-import org.kie.internal.deployment.DeploymentService;
+import org.jbpm.services.api.DeploymentService;
+import org.jbpm.services.cdi.Kjar;
 import org.kie.internal.executor.api.Command;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutionResults;

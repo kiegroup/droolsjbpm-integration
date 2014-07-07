@@ -24,6 +24,8 @@ import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
@@ -43,8 +45,9 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
     private final static String USER = "user";
 
     private DeploymentInfoBean runtimeMgrMgrMock;
-    private InternalTaskService injectedTaskService;
-    private InternalTaskService runtimeTaskService;
+
+    private ProcessService processServiceMock;
+    private UserTaskService userTaskServiceMock;
 
     private AuditLogService auditLogService = mock(AuditLogService.class);
     
@@ -53,14 +56,15 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         this.runtimeMgrMgrMock = mock;
     }
 
+
     @Override
-    public void setInjectedTaskServiceMock(InternalTaskService mock) {
-        this.injectedTaskService = mock;
+    public void setProcessServiceMock(ProcessService processServiceMock) {
+        this.processServiceMock = processServiceMock;
     }
 
     @Override
-    public void setRuntimeTaskServiceMock(InternalTaskService mock) {
-        this.runtimeTaskService = mock;
+    public void setUserTaskServiceMock(UserTaskService userTaskServiceMock) {
+        this.userTaskServiceMock = userTaskServiceMock;
     }
 
     public void setupTestMocks() {
@@ -71,8 +75,9 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         doReturn(USER).when(identityProvider).getName();
 
         this.processRequestBean = new ProcessRequestBean();
-        this.processRequestBean.setRuntimeMgrMgr(runtimeMgrMgrMock);
-        this.processRequestBean.setInjectedTaskService(injectedTaskService);
+        this.processRequestBean.setProcessService(processServiceMock);
+        this.processRequestBean.setUserTaskService(userTaskServiceMock);
+
        
         HttpHeaders headersMock = mock(HttpHeaders.class);
         this.headers = headersMock; 
@@ -91,8 +96,7 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
         this.taskId_oper(TASK_ID, oper);
         
-        verify(injectedTaskService, times(2)).execute(any(TaskCommand.class));
-        verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
     /**
@@ -110,8 +114,7 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         this.execute(cmdsRequest);
        
         // verify
-        verify(injectedTaskService, times(2)).execute(any(TaskCommand.class));
-        verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
     @Test
@@ -127,10 +130,7 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         this.taskId_oper(TASK_ID, oper);
         
         // verify
-        verify(injectedTaskService, times(1)).execute(any(TaskCommand.class));
-        verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
-        // complete operation should be done by runtime task service
-        verify(runtimeTaskService, times(1)).execute(any(TaskCommand.class));
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
     @Test
@@ -143,10 +143,7 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         this.execute(cmdsRequest);
     
         // verify
-        verify(injectedTaskService, times(1)).execute(any(TaskCommand.class));
-        verify(injectedTaskService, times(1)).getTaskById(eq(TASK_ID));
-        // complete operation should be done by runtime task service
-        verify(runtimeTaskService, times(1)).execute(any(TaskCommand.class));
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
     
     @Test

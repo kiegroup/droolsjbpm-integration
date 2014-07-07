@@ -19,6 +19,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
+import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
@@ -424,10 +425,10 @@ public class ResourceBase {
         }
     }
    
-    protected JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessAssetDesc procAssetDesc) { 
+    protected JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessDefinition procAssetDesc) {
         JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
-        jaxbProcDef.setDeploymentId(procAssetDesc.getDeploymentId());
-        jaxbProcDef.setForms(procAssetDesc.getForms());
+        jaxbProcDef.setDeploymentId(((ProcessAssetDesc)procAssetDesc).getDeploymentId());
+        jaxbProcDef.setForms(((ProcessAssetDesc)procAssetDesc).getForms());
         jaxbProcDef.setId(procAssetDesc.getId());
         jaxbProcDef.setName(procAssetDesc.getName());
         jaxbProcDef.setPackageName(procAssetDesc.getPackageName());

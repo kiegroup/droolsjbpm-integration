@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -44,16 +44,11 @@
       <artifactId>kie-internal</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <!--  drools/jbpm -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-flow</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -83,7 +78,17 @@
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-services-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
       <artifactId>jbpm-kie-services</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-services-cdi</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -111,8 +116,8 @@
     </dependency>
     <!--  temp addition to allow hosted mode testing -->
     <dependency>
-       <groupId>org.jboss.resteasy</groupId>
-       <artifactId>resteasy-jaxrs</artifactId>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
     </dependency>
 
     <!-- general -->
@@ -142,7 +147,7 @@
     </dependency>
 
     <!-- security -->
-   <dependency>
+    <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
       <artifactId>jboss-jacc-api_1.4_spec</artifactId>
       <scope>provided</scope>
@@ -169,7 +174,7 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
@@ -190,14 +195,14 @@
       <artifactId>powermock-api-mockito</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- reflection -->
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- test REST -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -207,4 +212,3 @@
   </dependencies>
 
 </project>
-

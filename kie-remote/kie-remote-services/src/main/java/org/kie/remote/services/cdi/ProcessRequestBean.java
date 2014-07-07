@@ -1,9 +1,5 @@
 package org.kie.remote.services.cdi;
 
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.FAILURE;
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.PERMISSIONS_CONFLICT;
-import static org.kie.services.shared.ServicesVersion.VERSION;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,23 +9,20 @@ import javax.persistence.PersistenceUnit;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.command.AuditCommand;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
-import org.jbpm.workflow.instance.impl.WorkflowProcessInstanceImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
-import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
-import org.kie.internal.task.api.InternalTaskService;
 import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
-import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
 import org.kie.remote.services.rest.RuntimeResource;
 import org.kie.remote.services.rest.TaskResource;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
@@ -38,6 +31,9 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.remote.common.jaxb.JaxbRequestStatus.*;
+import static org.kie.services.shared.ServicesVersion.*;
 
 /**
  * This class is used by both the {@link RuntimeResource} and {@link TaskResource} to do the core operations on
@@ -55,11 +51,12 @@ public class ProcessRequestBean {
     private static final Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);
     
     /* KIE processing */
-    @Inject
-    private DeploymentInfoBean runtimeMgrMgr;
 
     @Inject
-    private TaskService injectedTaskService;
+    private ProcessService processService;
+
+    @Inject
+    private UserTaskService userTaskService;
 
     /** AuditLogService **/
     private static final String PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
@@ -70,13 +67,13 @@ public class ProcessRequestBean {
     private AuditLogService auditLogService;
   
     // Injection methods for tests
-    
-    public void setRuntimeMgrMgr(DeploymentInfoBean runtimeMgrMgr) {
-        this.runtimeMgrMgr = runtimeMgrMgr;
+
+    public void setProcessService(ProcessService processService) {
+        this.processService = processService;
     }
 
-    public void setInjectedTaskService(TaskService taskService) {
-        this.injectedTaskService = taskService;
+    public void setUserTaskService(UserTaskService userTaskService) {
+        this.userTaskService = userTaskService;
     }
 
     public void setAuditLogService(AuditLogService auditLogService) {
@@ -164,16 +161,8 @@ public class ProcessRequestBean {
         if( deploymentId == null ) {
             throw new DeploymentNotFoundException("No deployment id supplied! Could not retrieve runtime to execute " + cmd.getClass().getSimpleName());
         }
-        
-        Object result = null;
-        RuntimeEngine runtimeEngine = null;
-        try {
-            runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
-            KieSession kieSession = runtimeEngine.getKieSession();
-            result = kieSession.execute(cmd);
-        } finally {
-            runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
-        }
+
+        Object result = processService.execute(deploymentId, cmd);
         return result;
     }
 
@@ -189,24 +178,8 @@ public class ProcessRequestBean {
      */
     public Object getVariableObjectInstanceFromRuntime(String deploymentId, long processInstanceId, String varName) { 
         String errorMsg = "Unable to retrieve variable '" + varName + "' from process instance " + processInstanceId;
-        Object procVar = null;
-        RuntimeEngine runtimeEngine = null;
-        try {
-            runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
-            KieSession kieSession = runtimeEngine.getKieSession();
-            ProcessInstance procInst = kieSession.getProcessInstance(processInstanceId);
-            if( procInst == null ) { 
-                throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
-            }
-            procVar = ((WorkflowProcessInstanceImpl) procInst).getVariable(varName);
-            if( procVar == null ) { 
-                throw RestOperationException.notFound("Variable " + varName + " does not exist in process instance " + processInstanceId + "!");
-            }
-        } catch (RuntimeException re) {
-            throw RestOperationException.internalServerError(errorMsg, re);
-        } finally {
-            runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
-        }
+        Object procVar = processService.getProcessInstanceVariable(processInstanceId, varName);
+
         return procVar;
     }
 
@@ -239,43 +212,8 @@ public class ProcessRequestBean {
                 || cmd instanceof GetTaskContentCommand ) { 
            cmd = new ExecuteAndSerializeCommand(cmd); 
         }
-        
-        if( ! onDeployment ) { 
-            return ((InternalTaskService) injectedTaskService).execute(cmd);
-        } else {
-            if( task == null && deploymentId == null ) { 
-                if( taskId == null ) { 
-                    throw new KieRemoteServicesRuntimeException("A task id should be available at this point! Please contact the developers.");
-                }
-                if( task == null ) {
-                    task = injectedTaskService.getTaskById(taskId);
-                }
-                if( task == null ) { 
-                    throw new KieRemoteServicesRuntimeException("Task " + taskId + " does not exist!");
-                }
-                deploymentId = task.getTaskData().getDeploymentId();
-                if( processInstanceId == null ) { 
-                    processInstanceId = task.getTaskData().getProcessInstanceId();
-                }
-            }
-            
-            if( deploymentId == null ) { 
-                // This is an independent task 
-                return ((InternalTaskService) injectedTaskService).execute(cmd);
-            } else { 
-                RuntimeEngine runtimeEngine = null;
-                try { 
-                    runtimeEngine = runtimeMgrMgr.getRuntimeEngine(deploymentId, processInstanceId);
-                    if( runtimeEngine == null ) { 
-                        throw new DeploymentNotFoundException("Unable to find deployment '" + deploymentId + "' when executing " + cmd.getClass().getSimpleName());
-                    }
-                    TaskService runtimeTaskService = runtimeEngine.getTaskService();
-                    return ((InternalTaskService) runtimeTaskService).execute(cmd);
-                } finally { 
-                    runtimeMgrMgr.disposeRuntimeEngine(runtimeEngine);
-                }
-            }
-        }
+
+        return userTaskService.execute(deploymentId, cmd);
     }
 
 

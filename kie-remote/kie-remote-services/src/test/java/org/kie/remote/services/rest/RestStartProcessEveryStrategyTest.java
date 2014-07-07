@@ -11,18 +11,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
-
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
+import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.UserTaskService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.remote.services.StartProcessEveryStrategyTest;
@@ -33,12 +34,20 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.junit.Assert.*;
+import static org.kie.remote.services.MockSetupTestHelper.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.*;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ EmptyContext.class, ProcessInstanceIdContext.class })
 public class RestStartProcessEveryStrategyTest extends RuntimeResource implements StartProcessEveryStrategyTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
     private KieSession kieSessionMock;
+    private ProcessService processServiceMock;
+    private UserTaskService userTaskServiceMock;
 
     private MultivaluedMapImpl<String, String> queryParams;
 
@@ -46,8 +55,14 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         this.runtimeMgrMgrMock = mock;
     }
 
-    public void setKieSessionMock(KieSession kieSessionMock) {
-        this.kieSessionMock = kieSessionMock;
+    @Override
+    public void setProcessServiceMock(ProcessService processServiceMock) {
+        this.processServiceMock = processServiceMock;
+    }
+
+    @Override
+    public void setUserTaskServiceMock(UserTaskService userTaskServiceMock) {
+        this.userTaskServiceMock = userTaskServiceMock;
     }
 
     @Override
@@ -56,12 +71,14 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         doReturn(queryParams).when(uriInfo).getQueryParameters();
 
         this.processRequestBean = new ProcessRequestBean();
-        this.processRequestBean.setRuntimeMgrMgr(runtimeMgrMgrMock);
+        this.processRequestBean.setProcessService(processServiceMock);
+        this.processRequestBean.setUserTaskService(userTaskServiceMock);
 
         HttpHeaders headersMock = mock(HttpHeaders.class);
         this.headers = headersMock;
         doReturn(new MultivaluedMapImpl<String, String>()).when(headersMock).getRequestHeaders();
     }
+
 
     @Before
     public void before() {
@@ -74,6 +91,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         // This method does some static mock magic to make sure
         // that EmptyContext.get() throws an exception if it is called here
         // (since a ProcessInstanceIdContext should be used instead
+
         setupProcessMocks(this, RuntimeStrategy.PER_PROCESS_INSTANCE);
         doReturn(new URI("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(uriInfo)
                 .getRequestUri();
@@ -91,13 +109,9 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         resp = signal();
 
         // verify ksession is called
-        verify(kieSessionMock, times(2)).execute(any(Command.class));
+        verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
         PowerMockito.verifyStatic(times(0));
         EmptyContext.get();
-        PowerMockito.verifyStatic(times(1));
-        ProcessInstanceIdContext.get();
-        PowerMockito.verifyStatic(times(1));
-        ProcessInstanceIdContext.get(anyLong());
     }
 
     @Test
@@ -115,9 +129,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         resp = signal();
 
         // verify ksession is called
-        verify(kieSessionMock, times(2)).execute(any(Command.class));
-        PowerMockito.verifyStatic(times(2));
-        EmptyContext.get();
+        verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
     }
 
     @Test
@@ -135,9 +147,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         resp = signal();
 
         // verify ksession is called
-        verify(kieSessionMock, times(2)).execute(any(Command.class));
-        PowerMockito.verifyStatic(times(2));
-        EmptyContext.get();
+        verify(processServiceMock, times(2)).execute(any(String.class),any(Command.class));
     }
 
 }

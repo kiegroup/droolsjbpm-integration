@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.drools.core.util.StringUtils;
-import org.kie.internal.deployment.DeploymentUnit;
-
+import org.jbpm.services.api.model.DeploymentUnit;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 
 @XmlRootElement(name="deployment-unit")
 @XmlAccessorType(XmlAccessType.FIELD)

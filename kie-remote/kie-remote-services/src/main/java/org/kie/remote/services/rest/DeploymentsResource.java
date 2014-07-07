@@ -1,12 +1,10 @@
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.DeploymentResource.convertKModuleDepUnitToJaxbDepUnit;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -16,19 +14,22 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.jbpm.kie.services.api.Kjar;
-import org.jbpm.kie.services.api.RuntimeDataService;
-import org.jbpm.kie.services.api.bpmn2.BPMN2DataService;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
-import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
-import org.kie.internal.deployment.DeployedUnit;
+import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.cdi.Kjar;
+
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
+
+import static org.kie.remote.services.rest.DeploymentResource.*;
 
 @Path("/deployment")
 @RequestScoped
@@ -53,7 +54,7 @@ public class DeploymentsResource extends ResourceBase {
     private RuntimeDataService runtimeDataService;
    
     @Inject
-    private BPMN2DataService bpmn2DataService;
+    private DefinitionService bpmn2DataService;
     
     // REST operations -----------------------------------------------------------------------------------------------------------
 
@@ -113,7 +114,7 @@ public class DeploymentsResource extends ResourceBase {
                 continue; 
             }
             for( String processId : processIdList ) { 
-                ProcessAssetDesc processAssetDesc;
+                ProcessDefinition processAssetDesc;
                 try { 
                     processAssetDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(deploymentId, processId); 
                     if( processAssetDesc == null ) { 
@@ -130,7 +131,7 @@ public class DeploymentsResource extends ResourceBase {
                 JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDesc);
                 Map<String, String> variables; 
                 try { 
-                    variables = bpmn2DataService.getProcessData(processId);
+                    variables = bpmn2DataService.getProcessVariables(deploymentId, processId);
                 } catch( Exception e) { 
                     // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
                     logger.debug( "Unable to retrieve process definition data for process '{}' in deployment '{}': {}", 
