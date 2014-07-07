@@ -43,8 +43,7 @@ import org.slf4j.LoggerFactory;
  * where "_" characters should be used for all "/" characters in the path. 
  * <p>
  * For example: 
- * <pre>
- * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
+ * <pre>@Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
  */
