@@ -9,7 +9,9 @@ import javax.persistence.PersistenceUnit;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.command.AuditCommand;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
@@ -28,7 +30,6 @@ import org.kie.remote.services.rest.TaskResource;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,8 +163,17 @@ public class ProcessRequestBean {
             throw new DeploymentNotFoundException("No deployment id supplied! Could not retrieve runtime to execute " + cmd.getClass().getSimpleName());
         }
 
-        Object result = processService.execute(deploymentId, cmd);
-        return result;
+        try {
+            Object result = processService.execute(deploymentId, cmd);
+
+            return result;
+        } catch (ProcessInstanceNotFoundException e) {
+            throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
+        } catch (org.jbpm.services.api.DeploymentNotFoundException e) {
+            throw RestOperationException.notFound(e.getMessage());
+        }  catch (RuntimeException re) {
+            throw RestOperationException.internalServerError(re.getMessage(), re);
+        }
     }
 
    
@@ -178,9 +188,17 @@ public class ProcessRequestBean {
      */
     public Object getVariableObjectInstanceFromRuntime(String deploymentId, long processInstanceId, String varName) { 
         String errorMsg = "Unable to retrieve variable '" + varName + "' from process instance " + processInstanceId;
-        Object procVar = processService.getProcessInstanceVariable(processInstanceId, varName);
+        try {
+            Object procVar = processService.getProcessInstanceVariable(processInstanceId, varName);
 
-        return procVar;
+            return procVar;
+        } catch (ProcessInstanceNotFoundException e) {
+            throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
+        } catch (org.jbpm.services.api.DeploymentNotFoundException e) {
+            throw RestOperationException.notFound(e.getMessage());
+        }  catch (RuntimeException re) {
+            throw RestOperationException.internalServerError(re.getMessage(), re);
+        }
     }
 
     // task operations ------------------------------------------------------------------------------------------------------------
@@ -201,19 +219,24 @@ public class ProcessRequestBean {
      * @return
      */
     private Object doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<?> cmd) { 
-        boolean onDeployment = false;
-        if( AcceptedCommands.TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.contains(cmd.getClass()) )  {
-           onDeployment = true;
-        }
-      
+
         // take care of serialization
         if( cmd instanceof GetTaskCommand 
                 || cmd instanceof GetContentCommand 
                 || cmd instanceof GetTaskContentCommand ) { 
            cmd = new ExecuteAndSerializeCommand(cmd); 
         }
-
-        return userTaskService.execute(deploymentId, cmd);
+        try {
+            return userTaskService.execute(deploymentId, cmd);
+        } catch (TaskNotFoundException e) {
+            throw RestOperationException.notFound("Task " + taskId + " could not be found!");
+        } catch (ProcessInstanceNotFoundException e) {
+            throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
+        } catch (org.jbpm.services.api.DeploymentNotFoundException e) {
+            throw RestOperationException.notFound(e.getMessage());
+        }  catch (RuntimeException re) {
+            throw RestOperationException.internalServerError(re.getMessage(), re);
+        }
     }
 
 

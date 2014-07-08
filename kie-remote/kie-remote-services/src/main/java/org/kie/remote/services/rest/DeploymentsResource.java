@@ -20,6 +20,7 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.QueryContextImpl;
 import org.jbpm.services.cdi.Kjar;
 
 import org.kie.remote.services.cdi.DeploymentInfoBean;
@@ -106,7 +107,7 @@ public class DeploymentsResource extends ResourceBase {
         DEPLOYMENTS: for( String deploymentId : deploymentIds ) {
             List<String> processIdList;
             try { 
-                processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId));
+                processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContextImpl(pageInfo[0], pageInfo[1])));
                 Collections.sort(processIdList);
             } catch( Exception e) { 
                 // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 

@@ -28,7 +28,7 @@ public class BackupIdentityProviderProducer {
     public RequestScopedBackupIdentityProvider createBackupIdentityProvider(String commandUser) {
         logger.debug( "Creating identity provider for user: {}", commandUser);
         if( commandUser == null ) { 
-            commandUser = "unknown";
+            commandUser = RequestScopedBackupIdentityProvider.UNKNOWN;
         }
         final String nameValue = commandUser;
         this.backupIdentityProvider =  new RequestScopedBackupIdentityProvider() {
@@ -52,7 +52,7 @@ public class BackupIdentityProviderProducer {
             return new RequestScopedBackupIdentityProvider() {
                 @Override
                 public String getName() {
-                    return "unknown";
+                    return RequestScopedBackupIdentityProvider.UNKNOWN;
                 }
             };
         }
