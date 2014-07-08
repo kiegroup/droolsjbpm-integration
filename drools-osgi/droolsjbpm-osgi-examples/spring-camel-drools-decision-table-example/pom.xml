@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-osgi-examples</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.1.0.CR2</version>
   </parent>
 
   <artifactId>spring-camel-drools-decision-table-example</artifactId>
