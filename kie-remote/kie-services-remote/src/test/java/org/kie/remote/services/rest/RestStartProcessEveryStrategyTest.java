@@ -5,7 +5,10 @@ import static org.kie.remote.services.MockSetupTestHelper.DEPLOYMENT_ID;
 import static org.kie.remote.services.MockSetupTestHelper.setupProcessMocks;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 
@@ -22,10 +25,10 @@ import org.kie.api.runtime.KieSession;
 import org.kie.internal.deployment.DeploymentUnit.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.remote.services.StartProcessEveryStrategyTest;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;

@@ -22,6 +22,7 @@
   </properties>
 
   <modules>
+    <module>kie-remote-common</module>
     <module>kie-services-jaxb</module>
     <module>kie-services-client</module>
     <module>kie-remote-ws</module>

@@ -1,6 +1,6 @@
 package org.kie.remote.services.exception;
 
-import org.kie.workbench.common.services.rest.RestOperationException;
+import org.kie.remote.common.exception.RestOperationException;
 
 
 /**

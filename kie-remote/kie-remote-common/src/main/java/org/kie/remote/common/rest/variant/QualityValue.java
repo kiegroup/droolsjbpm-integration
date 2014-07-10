@@ -1,6 +1,6 @@
-package org.kie.remote.services.rest.variant;
+package org.kie.remote.common.rest.variant;
 
-import org.kie.workbench.common.services.rest.RestOperationException;
+import org.kie.remote.common.exception.RestOperationException;
 
 
 /**

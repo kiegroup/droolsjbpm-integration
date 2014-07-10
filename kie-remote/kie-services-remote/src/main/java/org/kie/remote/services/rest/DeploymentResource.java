@@ -1,6 +1,8 @@
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.*;
+import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.DEPLOYMENT_UNIT;
+import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_ID;
+import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_TYPE;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,7 @@ import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
+import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
 import org.kie.remote.services.rest.async.cmd.JobType;
@@ -38,7 +41,6 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDesc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
-import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

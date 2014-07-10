@@ -19,6 +19,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import org.kie.remote.common.jaxb.JaxbException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
@@ -92,7 +93,10 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbHistoryLogList.class,
                 JaxbNodeInstanceLog.class,
                 JaxbProcessInstanceLog.class,
-                JaxbVariableInstanceLog.class
+                JaxbVariableInstanceLog.class,
+                
+                // exception
+                JaxbException.class
         };
         KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
     };

@@ -6,7 +6,6 @@ import static org.kie.services.shared.ServicesVersion.VERSION;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -28,6 +27,7 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
 import org.kie.remote.services.rest.RuntimeResource;
@@ -36,7 +36,6 @@ import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.shared.AcceptedCommands;
-import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

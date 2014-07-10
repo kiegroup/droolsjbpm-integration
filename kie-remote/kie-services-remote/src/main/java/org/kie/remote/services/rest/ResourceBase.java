@@ -1,5 +1,8 @@
 package org.kie.remote.services.rest;
 
+import static org.kie.remote.common.rest.RestEasy960Util.defaultVariant;
+import static org.kie.remote.common.rest.RestEasy960Util.getVariant;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +13,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -26,12 +27,11 @@ import org.kie.api.task.model.User;
 import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.internal.task.api.model.InternalOrganizationalEntity;
 import org.kie.internal.task.api.model.InternalTask;
+import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.kie.remote.services.rest.variant.ServerDrivenNegotiation;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.shared.AcceptedCommands;
-import org.kie.workbench.common.services.rest.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,40 +78,6 @@ public class ResourceBase {
     }
     
     // JSON / JAXB ---------------------------------------------------------------------------------------------------------------
-    
-    private static List<Variant> variants 
-        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE).add().build();
-    private static Variant defaultVariant 
-        = Variant.mediaTypes(MediaType.APPLICATION_XML_TYPE).add().build().get(0);
-   
-    private static final String ACCEPT = "Accept";
-    private static final String ACCEPT_CHARSET = "Accept-Charset";
-    private static final String ACCEPT_ENCODING = "Accept-Encoding";
-    private static final String ACCEPT_LANGUAGE = "Accept-Language";
-    
-    public static Variant getVariant(HttpHeaders headers) { 
-        // copied (except for the acceptHeaders fix) from RestEasy's RequestImpl class
-        ServerDrivenNegotiation negotiation = new ServerDrivenNegotiation();
-        MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
-        List<String> acceptHeaders = requestHeaders.get(ACCEPT);
-        // Fix
-        if( acceptHeaders != null && ! acceptHeaders.isEmpty() ) { 
-            List<String> fixedAcceptHeaders = new ArrayList<String>();
-            for(String header : acceptHeaders ) { 
-                fixedAcceptHeaders.add(header.replaceAll("q=\\.", "q=0.")); 
-            }
-            acceptHeaders = fixedAcceptHeaders;
-        }
-        negotiation.setAcceptHeaders(acceptHeaders);
-        negotiation.setAcceptCharsetHeaders(requestHeaders.get(ACCEPT_CHARSET));
-        negotiation.setAcceptEncodingHeaders(requestHeaders.get(ACCEPT_ENCODING));
-        negotiation.setAcceptLanguageHeaders(requestHeaders.get(ACCEPT_LANGUAGE));
-
-        return negotiation.getBestMatch(variants);
-        // ** use below instead of above when RESTEASY-960 is fixed **
-        // return restRequest.selectVariant(variants); 
-    }
-    
     
     protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) { 
         return createCorrectVariant(responseObj, headers, null);

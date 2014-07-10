@@ -1,12 +1,11 @@
-package org.kie.remote.services.rest.exception;
+package org.kie.remote.common.exception;
 
-import static org.kie.remote.services.rest.ResourceBase.getRelativePath;
-import static org.kie.remote.services.rest.ResourceBase.getVariant;
+import static org.kie.remote.common.rest.RestEasy960Util.getVariant;
+import static org.kie.remote.common.rest.RestEasy960Util.jsonVariant;
 
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -15,9 +14,8 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
-import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
-import org.kie.workbench.common.services.rest.RestOperationException;
+import org.kie.remote.common.jaxb.JaxbException;
+import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +36,7 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     @Context
     protected HttpHeaders headers;
 
-    private static final Variant jsonVariant = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE).add().build().get(0);
-   
+
     private static final String [] kieServicesRemotePaths = { 
        "deployment",
        "history",
@@ -105,15 +102,15 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         }
        
         // Build and send response
-        JaxbExceptionResponse response = new JaxbExceptionResponse(uriInfo.getRequestUri().toString(), e, requestStatus);
+        JaxbException response = new JaxbException(uriInfo.getRequestUri().toString(), e, requestStatus);
         try {
             responseBuilder.entity(response.prettyPrint());
         } catch (JAXBException jaxbe) {
-            responseBuilder.entity(JaxbExceptionResponse.convertStackTraceToString(jaxbe));
+            responseBuilder.entity(JaxbException.convertStackTraceToString(jaxbe));
         }
        
-        // Determine if the exception came from kie-services-remote or drools-wb-rest
-        // - if drools-wb-rest, use JSON
+        // Determine if the exception came from kie-services-remote or guvnor
+        // - if guvnor use JSON
         boolean knowledgeStoreUrl = true;
         String path = uriInfo.getRequestUri().toString().replaceAll( ".*/rest/", "");
         for( String resourcePath : kieServicesRemotePaths ) { 
@@ -132,4 +129,8 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         return responseBuilder.variant(variant).build();
     }
 
+    public static String getRelativePath(UriInfo uriInfo) { 
+        return uriInfo.getRequestUri().toString().replaceAll( ".*/rest", "");
+    }
+    
 }

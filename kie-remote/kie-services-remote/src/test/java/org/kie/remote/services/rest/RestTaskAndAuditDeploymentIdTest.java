@@ -2,10 +2,16 @@ package org.kie.remote.services.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.kie.remote.services.MockSetupTestHelper.*;
+import static org.kie.remote.services.MockSetupTestHelper.FOR_INDEPENDENT_TASKS;
+import static org.kie.remote.services.MockSetupTestHelper.FOR_PROCESS_TASKS;
+import static org.kie.remote.services.MockSetupTestHelper.TASK_ID;
+import static org.kie.remote.services.MockSetupTestHelper.setupTaskMocks;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,13 +29,13 @@ import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.remote.services.TaskDeploymentIdTest;
+import org.kie.remote.services.cdi.DeploymentInfoBean;
+import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.remote.services.TaskDeploymentIdTest;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
-import org.kie.remote.services.cdi.ProcessRequestBean;
 
 @SuppressWarnings("unchecked")
 public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements TaskDeploymentIdTest {

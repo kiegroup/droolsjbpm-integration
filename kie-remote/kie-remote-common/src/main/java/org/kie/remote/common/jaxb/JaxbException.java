@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.rest;
+package org.kie.remote.common.jaxb;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -13,16 +13,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.kie.api.command.Command;
-import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
-
 @XmlRootElement(name="exception")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
+public class JaxbException {
 
     @XmlTransient
     public Exception cause;
-   
+  
+    @XmlElement
+    protected JaxbRequestStatus status;
+    
+    @XmlElement
+    @XmlSchemaType(name="anyURI")
+    protected String url;
+    
     @XmlElement
     @XmlSchemaType(name="string")
     private String message;
@@ -31,17 +35,16 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
     @XmlSchemaType(name="string")
     private String stackTrace;
     
-    public JaxbExceptionResponse() {
+    public JaxbException() {
         // JAXB default constructor
     }
     
-    public JaxbExceptionResponse(Exception e, int i, Command<?> cmd, JaxbRequestStatus status) {
-       super(i, cmd);
+    public JaxbException(Exception e, JaxbRequestStatus status) {
        initializeExceptionAndMessage(e);
        this.status = status;
     }
     
-    public JaxbExceptionResponse(String requestUrl, Exception e, JaxbRequestStatus status) { 
+    public JaxbException(String requestUrl, Exception e, JaxbRequestStatus status) { 
         this.url = requestUrl;
         this.status = status;
         initializeExceptionAndMessage(e);
@@ -76,12 +79,10 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
     
     // GETTER/SETTTERS ------------------------------------------------------------------------------------------------------------
     
-    @Override
     public String getResult() {
         return message;
     }
 
-    @Override
     public void setResult(String result) {
         this.message = result;
     }

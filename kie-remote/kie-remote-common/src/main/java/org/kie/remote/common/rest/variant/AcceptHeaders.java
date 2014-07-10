@@ -1,4 +1,4 @@
-package org.kie.remote.services.rest.variant;
+package org.kie.remote.common.rest.variant;
 
 
 import java.util.Iterator;
@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MediaType;
 
-import org.kie.workbench.common.services.rest.RestOperationException;
+import org.kie.remote.common.exception.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

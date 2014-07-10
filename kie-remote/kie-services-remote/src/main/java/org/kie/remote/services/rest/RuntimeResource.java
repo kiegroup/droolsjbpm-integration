@@ -26,7 +26,14 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
-import org.drools.core.command.runtime.process.*;
+import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
+import org.drools.core.command.runtime.process.AbortWorkItemCommand;
+import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.core.command.runtime.process.GetProcessIdsCommand;
+import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
+import org.drools.core.command.runtime.process.GetWorkItemCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.drools.core.util.StringUtils;
 import org.jbpm.kie.services.api.RuntimeDataService;
@@ -36,12 +43,17 @@ import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.remote.common.exception.RestOperationException;
+import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.*;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceFormResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.remote.services.util.FormURLGenerator;
-import org.kie.workbench.common.services.rest.RestOperationException;
 
 /**
  * If a method in this class is annotated by a @Path annotation, 

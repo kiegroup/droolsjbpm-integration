@@ -18,8 +18,8 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.remote.services.rest.exception.DescriptiveExceptionHandler;
-import org.kie.workbench.common.services.rest.RestOperationException;
+import org.kie.remote.common.exception.DescriptiveExceptionHandler;
+import org.kie.remote.common.exception.RestOperationException;
 import org.slf4j.Logger;
 
 

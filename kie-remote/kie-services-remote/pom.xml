@@ -22,6 +22,10 @@
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-services-jaxb</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+    </dependency>
 
     <!-- webservices -->
     <dependency>
@@ -29,7 +33,7 @@
       <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
     </dependency>
 
-    <!-- kie/drools/jbpm: provided in jbpm-console, kie-wb, etc -->
+    <!-- kie/drools/jbpm -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
@@ -74,10 +78,6 @@
     </dependency>
 
     <!-- Rest -->
-    <dependency>
-      <groupId>org.kie.workbench.services</groupId>
-      <artifactId>kie-wb-common-rest</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>

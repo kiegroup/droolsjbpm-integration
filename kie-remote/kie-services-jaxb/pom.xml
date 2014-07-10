@@ -23,6 +23,11 @@
       <artifactId>kie-internal</artifactId>
     </dependency>
    
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+    </dependency>
+    
     <!--  command jars --> 
     <dependency>
       <groupId>org.drools</groupId>

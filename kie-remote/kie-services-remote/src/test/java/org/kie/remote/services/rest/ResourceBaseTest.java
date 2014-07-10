@@ -1,5 +1,9 @@
 package org.kie.remote.services.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +11,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.kie.api.task.model.Status;
-
-import static org.junit.Assert.*;
 
 public class ResourceBaseTest extends ResourceBase {
 

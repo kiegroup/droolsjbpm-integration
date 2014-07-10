@@ -1,6 +1,5 @@
 package org.kie.remote.services.cdi;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -9,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
-import javax.enterprise.util.TypeLiteral;
 import javax.inject.Inject;
 
 import org.jbpm.kie.services.impl.event.Deploy;
@@ -23,6 +21,7 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
+import org.kie.remote.services.rest.jaxb.JaxbContextResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

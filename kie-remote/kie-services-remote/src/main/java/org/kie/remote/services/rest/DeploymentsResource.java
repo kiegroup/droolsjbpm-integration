@@ -17,10 +17,10 @@ import org.jbpm.kie.services.api.Kjar;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.kie.internal.deployment.DeployedUnit;
+import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
 
 @Path("/deployment")
 @RequestScoped
