@@ -8,7 +8,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-services-jaxb</artifactId>
+  <artifactId>kie-remote-jaxb</artifactId>
   <name>KIE Remote Services :: JAXB classes</name>
 
   <dependencies>

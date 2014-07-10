@@ -22,7 +22,7 @@
     <module>kie-remote-ws-wsdl</module>
     -->
     <!-- 
-    Eventually, we'll refactor the impl code out of kie-services-remote, 
+    Eventually, we'll refactor the impl code out of kie-remote-services, 
     but that's premature optimization at this point
     <module>kie-remote-ws-impl</module>
     -->

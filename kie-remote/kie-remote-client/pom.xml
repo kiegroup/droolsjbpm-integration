@@ -8,7 +8,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-services-client</artifactId>
+  <artifactId>kie-remote-client</artifactId>
   <name>KIE Remote Services :: Client</name>
 
   <!-- IF YOU AUTOFORMAT THIS, MAKE SURE THAT THE LINES MARKED WITH "FORMAT CHECK" ARE BACK TO NORMAL -->
@@ -16,7 +16,7 @@
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-jaxb</artifactId>
+      <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
