@@ -12,10 +12,10 @@
   <name>KIE Remote Services :: Common</name>
 
   <dependencies>
-    <!-- rest -->
+    <!-- REST -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
+      <artifactId>jaxrs-api</artifactId>
     </dependency>
   
     <!-- CDI/inject --> 

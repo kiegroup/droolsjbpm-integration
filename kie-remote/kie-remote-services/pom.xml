@@ -80,12 +80,17 @@
     <!-- Rest -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <scope>provided</scope>
+      <artifactId>jaxrs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
+      <artifactId>resteasy-cdi</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- general -->
@@ -120,7 +125,6 @@
       <artifactId>jboss-jacc-api_1.4_spec</artifactId>
       <scope>provided</scope>
     </dependency>
-
 
     <!-- async processing using jbpm executor -->
     <dependency>
@@ -169,6 +173,13 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- test REST -->
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
