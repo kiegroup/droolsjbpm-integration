@@ -16,8 +16,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.command.Command;
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)

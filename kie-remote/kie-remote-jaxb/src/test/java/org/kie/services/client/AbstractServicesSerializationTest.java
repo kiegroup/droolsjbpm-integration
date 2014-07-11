@@ -58,6 +58,7 @@ import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.TaskQueryService;
+import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
@@ -79,7 +80,6 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

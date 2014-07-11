@@ -1,7 +1,7 @@
 package org.kie.remote.services.cdi;
 
-import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.FAILURE;
-import static org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus.PERMISSIONS_CONFLICT;
+import static org.kie.remote.common.jaxb.JaxbRequestStatus.FAILURE;
+import static org.kie.remote.common.jaxb.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
 import javax.annotation.PostConstruct;

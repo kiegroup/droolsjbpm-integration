@@ -20,6 +20,7 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
 import org.kie.remote.common.jaxb.JaxbException;
+import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
@@ -34,14 +35,19 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDesc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
-import org.kie.services.client.serialization.jaxb.impl.process.*;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessIdList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceFormResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 

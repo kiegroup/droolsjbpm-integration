@@ -38,6 +38,7 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
@@ -50,7 +51,6 @@ import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentRespo
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbRequestStatus;
 
 @XmlRootElement(name = "command-response")
 @XmlAccessorType(XmlAccessType.FIELD)

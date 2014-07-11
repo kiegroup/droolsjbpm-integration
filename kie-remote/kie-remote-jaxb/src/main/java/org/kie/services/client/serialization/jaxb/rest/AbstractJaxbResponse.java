@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.remote.common.jaxb.JaxbRequestStatus;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AbstractJaxbResponse {
 
