@@ -29,14 +29,4 @@
     <module>kie-remote-services</module>
   </modules>
 
-  <!-- move to droolsjbpm-buildbootstrap! -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-jaxb</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

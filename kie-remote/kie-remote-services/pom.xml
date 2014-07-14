@@ -92,6 +92,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!--  temp addition to allow hosted mode testing -->
+    <dependency>
+       <groupId>org.jboss.resteasy</groupId>
+       <artifactId>resteasy-jaxrs</artifactId>
+    </dependency>
 
     <!-- general -->
     <dependency>
