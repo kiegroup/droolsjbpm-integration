@@ -28,16 +28,16 @@ import org.kie.internal.runtime.KnowledgeRuntime;
  */
 public class KieConsumer extends DefaultConsumer {
 
-    private KieEndpoint de;
+    private KieEndpoint ke;
     private KnowledgeRuntime krt;
     private String channelId;
 
     public KieConsumer(Endpoint endpoint,
                        Processor processor) {
         super( endpoint, processor );
-        de = (KieEndpoint) endpoint;
-        krt = (KnowledgeRuntime) de.getExecutor();
-        channelId = de.getChannel();
+        ke = (KieEndpoint) endpoint;
+        krt = (KnowledgeRuntime) ke.getExecutor();
+        channelId = ke.getChannel();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class KieConsumer extends DefaultConsumer {
 
     class KSessionChannel implements Channel {
         public void send(Object pojo) {
-            Exchange exchange = de.createExchange( pojo );
+            Exchange exchange = ke.createExchange( pojo );
             try {
                 getProcessor().process(exchange);
             } catch (Exception e) {
