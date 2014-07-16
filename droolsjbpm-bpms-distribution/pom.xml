@@ -102,11 +102,11 @@
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-client</artifactId>
+      <artifactId>kie-remote-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-remote</artifactId>
+      <artifactId>kie-remote-services</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>

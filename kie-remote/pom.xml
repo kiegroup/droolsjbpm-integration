@@ -22,20 +22,11 @@
   </properties>
 
   <modules>
-    <module>kie-services-jaxb</module>
-    <module>kie-services-client</module>
+    <module>kie-remote-common</module>
+    <module>kie-remote-jaxb</module>
+    <module>kie-remote-client</module>
     <module>kie-remote-ws</module>
-    <module>kie-services-remote</module>
+    <module>kie-remote-services</module>
   </modules>
 
-  <!-- move to droolsjbpm-buildbootstrap! -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-services-jaxb</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

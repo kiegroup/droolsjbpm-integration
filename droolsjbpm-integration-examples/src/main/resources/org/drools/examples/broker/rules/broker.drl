@@ -112,6 +112,6 @@ then
         percent = $dt,
         timestamp = $ts
     }
-    entryPoints["Analysis Events"].insert( sde );
+    drools.getEntryPoint("Analysis Events").insert( sde );
 end
 
