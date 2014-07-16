@@ -9,7 +9,6 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
-import org.kie.services.client.api.RemoteRestRuntimeFactory;
 import org.kie.services.client.api.RemoteRuntimeEngineFactory;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
@@ -20,7 +19,12 @@ public class DocumentationApiExamples {
         
         // Setup remote JMS runtime engine factory
         RemoteJmsRuntimeEngineFactory remoteJmsFactory 
-            = new RemoteJmsRuntimeEngineFactory(deploymentId, serverUrl, user, password);
+            = RemoteRuntimeEngineFactory.newJmsBuilder()
+            .addDeploymentId(deploymentId)
+            .addJbossServerUrl(serverUrl)
+            .addUserName(user)
+            .addPassword(password)
+            .buildFactory();
 
         // Interface with JMS api
         RuntimeEngine engine = remoteJmsFactory.newRuntimeEngine();
@@ -37,7 +41,12 @@ public class DocumentationApiExamples {
         
         // Setup the factory class with the necessarry information to communicate with the REST services
         RemoteRuntimeEngineFactory restSessionFactory 
-            = new RemoteRestRuntimeFactory(deploymentId, instanceUrl, user, password);
+            = RemoteRuntimeEngineFactory.newRestBuilder()
+            .addUrl(instanceUrl)
+            .addDeploymentId(deploymentId)
+            .addUserName(user)
+            .addPassword(password)
+            .buildFactory();
 
         // Create KieSession and TaskService instances and use them
         RemoteRuntimeEngine engine = restSessionFactory.newRuntimeEngine();

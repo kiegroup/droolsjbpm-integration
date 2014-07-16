@@ -25,8 +25,11 @@
     <module>kie-remote-common</module>
     <module>kie-remote-jaxb</module>
     <module>kie-remote-client</module>
-    <module>kie-remote-ws</module>
     <module>kie-remote-services</module>
+    <module>kie-remote-ws</module>
+    <!-- finish me.. :/ 
+    <module>kie-remote-osgi</module>
+    -->
   </modules>
 
 </project>

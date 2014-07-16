@@ -1,7 +1,9 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.services.shared.ServicesVersion.*;
-import static org.kie.services.client.serialization.SerializationConstants.*;
+import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
+import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+import static org.kie.services.shared.ServicesVersion.VERSION;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -47,7 +49,7 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
-import org.kie.services.client.api.builder.exception.MissingRequiredInfoException;
+import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 import org.kie.services.client.api.command.exception.RemoteApiException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.api.command.exception.RemoteTaskException;

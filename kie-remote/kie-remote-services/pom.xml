@@ -33,7 +33,7 @@
       <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
     </dependency>
 
-    <!-- kie/drools/jbpm -->
+    <!-- kie -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
@@ -44,9 +44,26 @@
       <artifactId>kie-internal</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <!--  drools/jbpm -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-kie-services</artifactId>
+      <artifactId>jbpm-flow</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-runtime-manager</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -56,18 +73,18 @@
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-shared-services</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!--  remove after the IllegalTaskStateException has been moved back to -core -->
     <dependency>
       <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-human-task-jpa</artifactId>
+      <artifactId>jbpm-human-task-audit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-kie-services</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- jms -->

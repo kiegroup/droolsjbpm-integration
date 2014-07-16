@@ -46,7 +46,6 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.spi.interception.ClientExecutionContext;
 import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
-import org.kie.api.runtime.manager.Context;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
@@ -710,4 +709,11 @@ public final class RemoteConfiguration {
        return new RemoteConfiguration(this);
     }
 
+    public RemoteSessionCommandService newRemoteSessionCommandService() { 
+        return new RemoteSessionCommandService(this);
+    }
+
+    public RemoteTaskCommandExecutor newRemoteTaskCommandExecutor() { 
+        return new RemoteTaskCommandExecutor(this);
+    }
 }

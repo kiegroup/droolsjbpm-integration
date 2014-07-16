@@ -22,7 +22,7 @@ public class RemoteApiTest extends Assert {
                 .addUrl(deploymentUrl)
                 .addUserName("mary")
                 .addPassword("pass")
-                .build();
+                .buildFactory();
         
         WorkItemHandler wih = new DoNothingWorkItemHandler();
         try { 

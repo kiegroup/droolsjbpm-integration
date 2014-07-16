@@ -5,7 +5,7 @@ import org.kie.services.client.api.builder.RemoteRuntimeEngineFactoryBuilder;
 /**
  * This exception is thrown by the *RuntimeFactoryBuilder classes
  * when insufficient information is called during 
- * {@link RemoteRuntimeEngineFactoryBuilder#build()} and similar methods.
+ * {@link RemoteRuntimeEngineFactoryBuilder#buildFactory()} and similar methods.
  * </p>
  * It indicates that the builder can not create an instance because
  * there is insufficient information. 

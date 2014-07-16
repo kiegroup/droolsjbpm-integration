@@ -1,6 +1,8 @@
 package org.kie.services.client.api;
 
-import static org.kie.services.client.api.command.RemoteConfiguration.*;
+import static org.kie.services.client.api.command.RemoteConfiguration.DEFAULT_TIMEOUT;
+import static org.kie.services.client.api.command.RemoteConfiguration.createAuthenticatingRequestFactory;
+import static org.kie.services.client.api.command.RemoteConfiguration.createFormBasedAuthenticatingRequestFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,8 +63,10 @@ public class RestRequestHelper {
      * 
      * @param serverPortUrl in the format of "http://server:port/"
      * @param username The username (registered on the kie-wb or business-central server)
-     * @param password The password associated with the username.
-     * @param timeout The timeout used for REST requests.
+     * @param password The password associated with the username
+     * @param timeout The timeout used for REST requests
+     * @param mediaType The media type used for REST requests
+     * @param formBasedAuth Whether the request should use form based authentication (only recommended for tomcat instances)
      */
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout, MediaType mediaType, boolean formBasedAuth) {
         RestRequestHelper inst = new RestRequestHelper();

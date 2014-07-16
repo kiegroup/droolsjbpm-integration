@@ -7,19 +7,21 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.api.RemoteRestRuntimeFactory;
 import org.kie.services.client.api.RemoteRuntimeEngineFactory;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 public class DocumentationRestExamples {
 
-    public void JavaRemoteApiRestExample(String deploymentId, URL baseUrl, String user, String password) {
-        // Setup the factory class with the necessarry information to communicate with the REST services
-        RemoteRuntimeEngineFactory restSessionFactory 
-            = new RemoteRestRuntimeFactory(deploymentId, baseUrl, user, password);
+    public void javaRemoteApiRestExample(String deploymentId, URL baseUrl, String user, String password) {
+        // Configure the RuntimeEngine instance with the necessarry information to communicate with the REST services, and build it
+        RemoteRuntimeEngine engine = RemoteRuntimeEngineFactory.newRestBuilder()
+                .addDeploymentId(deploymentId)
+                .addUrl(baseUrl)
+                .addUserName(user)
+                .addPassword(password)
+                .build();
 
         // Create KieSession and TaskService instances and use them
-        RemoteRuntimeEngine engine = restSessionFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         TaskService taskService = engine.getTaskService();
 
@@ -47,4 +49,5 @@ public class DocumentationRestExamples {
 
         taskService.start(taskId, taskUserId);
     }
+   
 }

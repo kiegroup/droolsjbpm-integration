@@ -53,11 +53,14 @@ public class LiveServerTest {
     public void restRemoteApi() {
         String taskUserId = userId;
         
-        RemoteRestRuntimeFactory restSessionFactory 
-            = new RemoteRestRuntimeFactory(deploymentId, deploymentUrl, userId, password);
+        RuntimeEngine engine = RemoteRuntimeEngineFactory.newRestBuilder()
+                .addDeploymentId(deploymentId)
+                .addUrl(deploymentUrl)
+                .addUserName(userId)
+                .addPassword(password)
+                .build();
 
         // create REST request
-        RuntimeEngine engine = restSessionFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("employee", taskUserId);
@@ -116,8 +119,6 @@ public class LiveServerTest {
         String urlString = new URL(deploymentUrl, 
                 deploymentUrl.getPath() + "rest/runtime/" + deploymentId + "/process/evaluation/start").toExternalForm();
         urlString = urlString + "?map_employee=mary";
-        RemoteRestRuntimeFactory restSessionFactory 
-            = new RemoteRestRuntimeFactory(deploymentId, deploymentUrl, userId, password);
         ClientRequest restRequest = requestFactory.createRequest(urlString);
         logger.debug(">> " + urlString);
         
@@ -128,7 +129,12 @@ public class LiveServerTest {
         long procInstId = processInstance.getId();
 
         // Check that task has correct info
-        RuntimeEngine engine = restSessionFactory.newRuntimeEngine();
+        RuntimeEngine engine = RemoteRestRuntimeEngineFactory.newRestBuilder()
+                .addDeploymentId(deploymentId)
+                .addUrl(deploymentUrl)
+                .addUserName(userId)
+                .addPassword(password)
+                .build();
         TaskService taskService = engine.getTaskService();
         List<Long> taskIds = taskService.getTasksByProcessInstanceId(procInstId);
         List<Task> tasks = new ArrayList<Task>();

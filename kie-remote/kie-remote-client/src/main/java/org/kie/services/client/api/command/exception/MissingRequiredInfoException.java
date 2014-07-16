@@ -1,4 +1,4 @@
-package org.kie.services.client.api.builder.exception;
+package org.kie.services.client.api.command.exception;
 
 import org.kie.services.client.api.RemoteRuntimeEngineFactory;
 
