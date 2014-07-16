@@ -16,11 +16,11 @@
 
 package org.drools.examples.conway;
 
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 public interface ConwayRuleDelegate {
 
-    public abstract StatefulKnowledgeSession getSession();
+    public abstract KieSession getSession();
 
     public abstract void init();
 

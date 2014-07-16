@@ -15,7 +15,9 @@
  */
 package org.kie.spring;
 
-import org.drools.compiler.kie.builder.impl.*;
+import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieBaseModelImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
@@ -24,7 +26,6 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
-
 import org.kie.api.conf.DeclarativeAgendaOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
@@ -47,7 +48,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
@@ -81,7 +82,11 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     }
 
     protected void initConfigFilePath() {
-        configFilePath = getClass().getResource("/").getPath();
+        try {
+            configFilePath = getClass().getResource("/").toURI().getPath();
+        } catch (URISyntaxException e) {
+            configFilePath = getClass().getResource("/").getPath();
+        }
     }
 
     public void setReleaseId(ReleaseId releaseId) {

@@ -11,19 +11,45 @@
 
   <xsd:element name="kmodule">
     <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="kbase" minOccurs="0" maxOccurs="unbounded"/>
-      </xsd:sequence>
-      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:complexContent>
+      <xsd:extension base="identifiedType">
+        <xsd:group ref="kmoduleElements"/>
+      </xsd:extension>
+      </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
+
+  <!-- base types-->
+  <!-- this can be removed and we can use the type declared in the spring xsd -->
+  <!-- once we upgrade to Spring 3.1+ -->
+  <xsd:complexType name="identifiedType" abstract="true">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+	The unique identifier for a bean. The scope of the identifier
+	is the enclosing bean factory.
+			]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+	The unique identifier for a bean.
+				]]></xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:group name="kmoduleElements">
+    <xsd:sequence>
+      <xsd:element ref="kbase" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:group>
 
   <xsd:element name="kbase">
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element type="ksessionComplexType" name="ksession" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
-      <xsd:attribute name="name" use="required" type="xsd:ID"/>
+      <xsd:attribute name="name" use="required" type="xsd:string"/>
       <xsd:attribute name="includes" type="xsd:string"/>
       <xsd:attribute name="packages" type="xsd:string"/>
       <xsd:attribute name="default" type="xsd:boolean"/>
@@ -56,7 +82,7 @@
       <xsd:element ref="workItemHandlers" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="listeners" minOccurs="0" maxOccurs="1"/>
     </xsd:sequence>
-    <xsd:attribute name="name" use="required" type="xsd:ID"/>
+    <xsd:attribute name="name" use="required" type="xsd:string"/>
     <xsd:attribute name="type" type="ksessionType"/>
     <xsd:attribute name="default" type="xsd:boolean"/>
     <xsd:attribute name="scope" type="xsd:string"/>
@@ -87,7 +113,7 @@
       <xsd:sequence>
         <xsd:element name="variablePersisters" type="variablePersistersType" minOccurs="0" maxOccurs="1"/>
       </xsd:sequence>
-      <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+      <xsd:attribute name="id" use="optional" type="xsd:string"/>
       <xsd:attribute name="kbase" use="required" type="xsd:string"/>
       <xsd:attribute name="entityManagerFactory" use="required" type="xsd:string"/>
       <xsd:attribute name="transactionManager" use="required" type="xsd:string"/>
@@ -155,7 +181,7 @@
 
   <xsd:element name="kstore">
     <xsd:complexType>
-      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="id" use="required" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 

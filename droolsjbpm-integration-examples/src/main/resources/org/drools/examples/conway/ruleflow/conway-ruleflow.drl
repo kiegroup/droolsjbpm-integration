@@ -23,8 +23,6 @@ import org.drools.examples.conway.Phase;
 import org.drools.examples.conway.CellState;
 
 import org.drools.core.WorkingMemory;
-import org.drools.core.common.InternalWorkingMemoryActions;
-import org.drools.core.RuleBase;
 
 
 rule "register north east"

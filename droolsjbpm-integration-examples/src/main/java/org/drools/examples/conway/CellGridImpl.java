@@ -17,7 +17,7 @@
 package org.drools.examples.conway;
 
 import org.drools.examples.conway.patterns.ConwayPattern;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 /**
  * A <code>CellGrid</code> represents a grid of <code>Cell</code> objects.
@@ -29,7 +29,7 @@ public class CellGridImpl implements CellGrid {
 
     private final Cell[][]     cells;
 
-    private final StatefulKnowledgeSession    session;
+    private final KieSession session;
 
     private final ConwayRuleDelegate delegate;
 

@@ -16,31 +16,17 @@
 
 package org.drools.examples.numberguess;
 
-import java.util.Random;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieSession;
 
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import java.util.Random;
 
 public class NumberGuessExample {
 
     public static final void main(String[] args) {
-        final KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        kbuilder.add( ResourceFactory.newClassPathResource( "/org/drools/examples/numberguess/NumberGuess.drl",
-                NumberGuessExample.class ),
-                              ResourceType.DRL );
-        kbuilder.add( ResourceFactory.newClassPathResource( "/org/drools/examples/numberguess/NumberGuess.rf",
-                NumberGuessExample.class  ),
-                              ResourceType.DRF );
-
-        final KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-
-        final StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+        KieSession ksession = KieServices.Factory.get()
+                                        .getKieClasspathContainer()
+                                        .newKieSession("NumberGuessKS");
 
 //        KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/numberguess");
 

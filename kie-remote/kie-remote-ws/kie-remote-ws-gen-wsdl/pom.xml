@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
-      <artifactId>kie-services-jaxb</artifactId>
+      <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
   </dependencies>
 
