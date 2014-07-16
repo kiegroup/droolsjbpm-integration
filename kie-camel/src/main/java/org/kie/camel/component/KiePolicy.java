@@ -34,6 +34,7 @@ import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.apache.camel.spi.Policy;
 import org.apache.camel.spi.RouteContext;
 import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
+import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.jax.soap.PostCxfSoapProcessor;
@@ -254,7 +255,7 @@ public class KiePolicy implements Policy {
         Processor {
 
         private String      kieUri;
-        private KieEndpoint ke;
+        private KieEndpoint dep;
         private Processor   processor;
 
         public KieProcess(String kieUri,
@@ -268,13 +269,13 @@ public class KiePolicy implements Policy {
             //I need to copy the body of the exachange because for some reason
             // the getContext().getEndpoint() erase the content/or loose the reference
             String body = exchange.getIn().getBody( String.class );
-            if ( ke == null ) {
+            if ( dep == null ) {
                 
-                this.ke = exchange.getContext().getEndpoint( this.kieUri,
+                this.dep = exchange.getContext().getEndpoint( this.kieUri,
                                                               KieEndpoint.class );
             }
 
-            if ( ke == null ) {
+            if ( dep == null ) {
                 throw new RuntimeException( "Could not find DroolsEndPoint for uri=" + this.kieUri);
             }
 
@@ -282,28 +283,28 @@ public class KiePolicy implements Policy {
             try {
                 originalClassLoader = Thread.currentThread().getContextClassLoader();
 
-                CommandExecutor exec = ke.executor;
+                CommandExecutor exec = dep.executor;
                 if ( exec == null ) {
                     String lookup = exchange.getIn().getHeader( KieComponent.KIE_LOOKUP,
                                                                 String.class );
                     if ( StringUtils.isEmpty( lookup ) ) {
                         //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
-                        lookup = ke.getLookup( body );
-                        //lookup = ke.getLookup( exchange.getIn().getBody( String.class ) );
+                        lookup = dep.getLookup( body );
+                        //lookup = dep.getLookup( exchange.getIn().getBody( String.class ) );
                     }
 
                     if ( StringUtils.isEmpty( lookup ) ) {
-                        throw new RuntimeException( "No Executor defined and no lookup information available for uri " + this.ke.getEndpointUri() );
+                        throw new RuntimeException( "No Executor defined and no lookup information available for uri " + this.dep.getEndpointUri() );
                     }
-                    exec = ke.getCommandExecutor( lookup );
+                    exec = dep.getCommandExecutor( lookup );
                 }
 
                 if ( exec == null ) {
-                    throw new RuntimeException( "CommandExecutor cannot be found for uri " + this.ke.getEndpointUri() );
+                    throw new RuntimeException( "CommandExecutor cannot be found for uri " + this.dep.getEndpointUri() );
                 }
-                ClassLoader localClassLoader = ke.getClassLoader( exec );
+                ClassLoader localClassLoader = dep.getClassLoader( exec );
                 if ( localClassLoader == null ) {
-                    throw new RuntimeException( "CommandExecutor Classloader cannot be null for uri " + this.ke.getEndpointUri() );
+                    throw new RuntimeException( "CommandExecutor Classloader cannot be null for uri " + this.dep.getEndpointUri() );
                 }
 
                 // Set the classloader to the one used by the CommandExecutor

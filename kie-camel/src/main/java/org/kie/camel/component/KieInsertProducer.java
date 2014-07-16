@@ -50,7 +50,7 @@ import org.kie.internal.runtime.StatelessKnowledgeSession;
 public class KieInsertProducer extends DefaultProducer {
 
     // the corresponding endpoint
-    private KieEndpoint ke;
+    private KieEndpoint de;
     // the actual insert is executed by a worker class that 
     // implements the GoF strategy pattern to avoid conditionals
     // at insert time and hopefully improve performance
@@ -58,11 +58,11 @@ public class KieInsertProducer extends DefaultProducer {
 
     public KieInsertProducer(Endpoint endpoint) {
         super( endpoint );
-        ke = (KieEndpoint) endpoint;
+        de = (KieEndpoint) endpoint;
 
         // Configures this Producer with the proper action
         // by composing strategy objects
-        KieEndpoint.Action action = ke.getAction();
+        KieEndpoint.Action action = de.getAction();
         Unwrapper unwrapper = null;
         switch ( action ) {
             case INSERT_BODY :
@@ -77,10 +77,10 @@ public class KieInsertProducer extends DefaultProducer {
         }
 
         // Creates the actual worker
-        CommandExecutor exec = ke.getExecutor();
+        CommandExecutor exec = de.getExecutor();
         if ( exec instanceof StatefulKnowledgeSession ) {
         	EntryPoint wmep;
-            String ep = ke.getEntryPoint();
+            String ep = de.getEntryPoint();
             if ( ep != null ) {
                 wmep = ((StatefulKnowledgeSession) exec).getEntryPoint( ep );
             } else {

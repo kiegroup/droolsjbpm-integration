@@ -32,7 +32,7 @@ public class PostCxfrs
         if ( object instanceof Response ) {
             Response res = (Response) object;
             if ( res.getStatus() == Status.OK.getStatusCode() ) {
-                exchange.getIn().setBody( StringUtils.toString( (InputStream) ((Response) object).getEntity() ) );
+                exchange.getOut().setBody( StringUtils.toString( (InputStream) ((Response) object).getEntity() ) );
             }
         }
     }
