@@ -105,6 +105,7 @@ public class KieEndpoint extends DefaultEndpoint {
     public Action               action     = Action.EXECUTE;
     public String               entryPoint = null;
     public String               channel    = null;
+    public String               eventType    = null;
 
     public KieEndpoint(String endpointUri,
                        String remaining,
@@ -246,7 +247,15 @@ public class KieEndpoint extends DefaultEndpoint {
     public void setChannel(String channel) {
         this.channel = channel;
     }
-    
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
     public Exchange createExchange( Object pojo ) {
         DefaultMessage msg = new DefaultMessage();
         msg.setBody( pojo );
