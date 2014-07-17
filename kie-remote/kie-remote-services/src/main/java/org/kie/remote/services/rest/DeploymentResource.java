@@ -166,7 +166,6 @@ public class DeploymentResource extends ResourceBase {
      * @return A {@link JaxbDeploymentUnit} instance
      */
     @GET
-    @Path("/")
     public Response getConfig() { 
         JaxbDeploymentUnit jaxbDepUnit = determineStatus(true);
         logger.debug("Returning deployment unit information for " + deploymentId);

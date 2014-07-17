@@ -56,9 +56,8 @@ public class DeploymentsResource extends ResourceBase {
     private BPMN2DataService bpmn2DataService;
     
     // REST operations -----------------------------------------------------------------------------------------------------------
-    
+
     @GET
-    @Path("/")
     // TODO: docs pagination
     public Response listDeployments() { 
         String oper = getRelativePath(uriInfo);
