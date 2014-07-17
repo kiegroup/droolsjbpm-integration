@@ -2,11 +2,11 @@
 <definitions 
 	xmlns="http://schemas.xmlsoap.org/wsdl/" 
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-	xmlns:tns="http://services.remote.kie.org/6.1.0.1/command" 
+	xmlns:tns="http://services.remote.kie.org/VERSION/command" 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
 	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
 	name="CommandService" 
-	targetNamespace="http://services.remote.kie.org/6.1.0.1/command" 
+	targetNamespace="http://services.remote.kie.org/VERSION/command" 
 	>
   <!-- JAX-WS Customizations: Wrapper styles, async. -->
   <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
@@ -19,7 +19,7 @@
         xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
         jxb:extensionBindingPrefixes="xjc" 
         jxb:version="1.0" 
-        targetNamespace="http://services.remote.kie.org/6.1.0.1/command" 
+        targetNamespace="http://services.remote.kie.org/VERSION/command" 
         version="1.0">
       <xs:annotation>
         <xs:appinfo>
@@ -97,9 +97,9 @@
       <jaxws:class name="CommandWebService"/>
     </jaxws:bindings>
     <operation name="execute">
-      <input wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/executeRequest" message="tns:execute"/>
-      <output wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/executeResponse" message="tns:executeResponse"/>
-      <fault message="tns:CommandServiceException" name="CommandServiceException" wsam:Action="http://services.remote.kie.org/6.1.0.1/command/CommandService/execute/Fault/CommandServiceException">
+      <input wsam:Action="http://services.remote.kie.org/VERSION/command/CommandService/executeRequest" message="tns:execute"/>
+      <output wsam:Action="http://services.remote.kie.org/VERSION/command/CommandService/executeResponse" message="tns:executeResponse"/>
+      <fault message="tns:CommandServiceException" name="CommandServiceException" wsam:Action="http://services.remote.kie.org/VERSION/command/CommandService/execute/Fault/CommandServiceException">
         <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
           <jaxws:class name="CommandWebServiceException"/>
         </jaxws:bindings>
