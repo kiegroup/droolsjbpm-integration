@@ -66,7 +66,7 @@ public class JaxbCommandsResponse {
     private Long processInstanceId;
 
     @XmlElement(name = "ver")
-    @XmlSchemaType(name = "String")
+    @XmlSchemaType(name = "string")
     private String version;
 
     @XmlElements({ 
