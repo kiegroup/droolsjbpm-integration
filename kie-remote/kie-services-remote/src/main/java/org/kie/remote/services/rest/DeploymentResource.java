@@ -101,7 +101,6 @@ public class DeploymentResource extends ResourceBase {
     // REST operations -----------------------------------------------------------------------------------------------------------
 
     @GET
-    @Path("/")
     public Response getConfig() { 
         DeployedUnit deployedUnit = deploymentService.getDeployedUnit(deploymentId);
         JaxbDeploymentUnit jaxbDepUnit;

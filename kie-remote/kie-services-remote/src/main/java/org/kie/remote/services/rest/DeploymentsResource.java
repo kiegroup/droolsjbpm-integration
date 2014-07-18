@@ -41,7 +41,6 @@ public class DeploymentsResource extends ResourceBase {
     // REST operations -----------------------------------------------------------------------------------------------------------
     
     @GET
-    @Path("/")
     public Response listDeployments() { 
         Collection<String> deploymentIds = deploymentInfoBean.getDeploymentIds();
         
