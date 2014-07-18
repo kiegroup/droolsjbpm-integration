@@ -48,6 +48,11 @@ public class JaxbDeploymentUnitList implements JaxbPaginatedList<JaxbDeploymentU
     }
 
     @Override
+    public void addContents(List<JaxbDeploymentUnit> contentList) {
+        this.deploymentUnitList = contentList;
+    }
+    
+    @Override
     public Integer getPageNumber() {
         return pageNumber;
     }
@@ -67,9 +72,4 @@ public class JaxbDeploymentUnitList implements JaxbPaginatedList<JaxbDeploymentU
         this.pageSize = pageSize;
     }
 
-    @Override
-    public void addContents(List<JaxbDeploymentUnit> contentList) {
-        this.deploymentUnitList = contentList;
-    }
-    
 }

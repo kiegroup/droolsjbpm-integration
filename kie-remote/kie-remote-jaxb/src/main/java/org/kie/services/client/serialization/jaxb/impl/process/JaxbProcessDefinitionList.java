@@ -48,6 +48,10 @@ public class JaxbProcessDefinitionList implements JaxbPaginatedList<JaxbProcessD
     }
 
     @Override
+    public void addContents(List<JaxbProcessDefinition> contentList) {
+        this.processDefinitionList = contentList;
+    }
+    @Override
     public Integer getPageNumber() {
         return pageNumber;
     }
@@ -65,10 +69,5 @@ public class JaxbProcessDefinitionList implements JaxbPaginatedList<JaxbProcessD
     @Override
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
-    }
-
-    @Override
-    public void addContents(List<JaxbProcessDefinition> contentList) {
-        this.processDefinitionList = contentList;
     }
 }
