@@ -139,6 +139,11 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
         initialize(result);;
     }
 
+    @Override
+    public void addContents(List<AuditEvent> contentList) {
+        initialize(contentList);
+    }
+ 
     @JsonTypeInfo(use=Id.CLASS, include=As.WRAPPER_OBJECT)
     @JsonSubTypes({
             @Type(value=JaxbProcessInstanceLog.class),
@@ -173,9 +178,4 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
         this.pageSize = pageSize;
     }
 
-    @Override
-    public void addContents(List<AuditEvent> contentList) {
-        initialize(contentList);
-    }
- 
 }

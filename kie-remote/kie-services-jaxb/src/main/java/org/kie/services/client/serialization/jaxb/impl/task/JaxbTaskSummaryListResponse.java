@@ -15,7 +15,6 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
 import org.jbpm.services.task.impl.model.xml.JaxbTaskSummary;
-import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
@@ -28,7 +27,7 @@ public class JaxbTaskSummaryListResponse extends AbstractJaxbCommandResponse<Lis
     @XmlElements({
         @XmlElement(name="task-summary",type=JaxbTaskSummary.class)
     })
-    @JsonTypeInfo(defaultImpl=TaskSummaryImpl.class, use=Id.CLASS)
+    @JsonTypeInfo(defaultImpl=JaxbTaskSummary.class, use=Id.CLASS)
     private List<TaskSummary> taskSummaryList;
 
     @XmlElement(name="page-number")
@@ -77,15 +76,20 @@ public class JaxbTaskSummaryListResponse extends AbstractJaxbCommandResponse<Lis
 
     @Override
     public void setResult(List<TaskSummary> result) {
-        this.taskSummaryList = result;
+        this.taskSummaryList = convertToJaxbTaskSummaryList(result);
     }
 
-    @JsonTypeInfo(defaultImpl=TaskSummaryImpl.class, use=Id.CLASS)
+    @Override
+    public void addContents(List<TaskSummary> contentList) {
+        this.taskSummaryList = convertToJaxbTaskSummaryList(contentList);
+    }
+
+    @JsonTypeInfo(defaultImpl=JaxbTaskSummary.class, use=Id.CLASS)
     public List<TaskSummary> getList() {
         return taskSummaryList;
     }
 
-    @JsonTypeInfo(defaultImpl=TaskSummaryImpl.class, use=Id.CLASS)
+    @JsonTypeInfo(defaultImpl=JaxbTaskSummary.class, use=Id.CLASS)
     public void setList(List<TaskSummary> result) {
         this.taskSummaryList = result;
     }
@@ -108,11 +112,6 @@ public class JaxbTaskSummaryListResponse extends AbstractJaxbCommandResponse<Lis
     @Override
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
-    }
-
-    @Override
-    public void addContents(List<TaskSummary> contentList) {
-        this.taskSummaryList = contentList;
     }
 
 }
