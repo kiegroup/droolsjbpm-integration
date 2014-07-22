@@ -1,7 +1,5 @@
 package org.kie.server.impl;
 
-import static org.kie.scanner.MavenRepository.getMavenRepository;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -292,7 +290,7 @@ public class KieServerTest {
             e.printStackTrace();
         }
 
-        repository = getMavenRepository();
+        repository = MavenRepository.getMavenRepository();
         repository.deployArtifact(releaseId, jar, pom);
         return jar;
     }

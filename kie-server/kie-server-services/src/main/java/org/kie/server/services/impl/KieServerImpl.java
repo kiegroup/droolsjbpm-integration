@@ -22,6 +22,7 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.Version;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -119,7 +120,9 @@ public class KieServerImpl implements KieServer {
 
     private ServiceResponse<KieServerInfo> getInfo(KieContainersRegistry context) {
         try {
-            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(KieServerEnvironment.getVersion().toString()));
+            Version version = KieServerEnvironment.getVersion();
+            String versionStr = version != null ? version.toString() : "Unknown-Version";
+            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(versionStr));
         } catch (Exception e) {
             logger.error("Error retrieving server info:", e);
             return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: " +
