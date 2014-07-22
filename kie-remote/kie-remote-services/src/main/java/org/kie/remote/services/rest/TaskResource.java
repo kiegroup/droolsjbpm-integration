@@ -14,9 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.drools.core.util.StringUtils;
 import org.jbpm.kie.services.api.IdentityProvider;
@@ -47,9 +45,9 @@ import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.remote.common.exception.RestOperationException;
+import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -77,17 +75,10 @@ public class TaskResource extends ResourceBase {
     @Context
     protected HttpHeaders headers;
     
-    @Context
-    protected UriInfo uriInfo;
-    
-    @Context
-    protected Request restRequest;
-
-    @Inject
-    private org.kie.remote.services.util.FormURLGenerator formURLGenerator;
-
     /* KIE information and processing */
 
+    @Inject
+    private FormURLGenerator formURLGenerator;
 
     @Inject
     protected IdentityProvider identityProvider;
@@ -134,9 +125,9 @@ public class TaskResource extends ResourceBase {
 
     @GET
     @Path("/query")
-    public Response query(@Context UriInfo uriInfo) {
-        Map<String, List<String>> params = getRequestParams(uriInfo);
-        String oper = getRelativePath(uriInfo);
+    public Response query() {
+        Map<String, String []> params = getRequestParams();
+        String oper = getRelativePath();
         
         for( String queryParam : params.keySet() ) { 
             boolean allowed = false;
@@ -154,15 +145,15 @@ public class TaskResource extends ResourceBase {
         List<Long> workItemIds = getLongListParam(allowedQueryParams[0], false, params, "query", true);
         List<Long> taskIds = getLongListParam(allowedQueryParams[1], false, params, "query", true);
         List<Long> procInstIds = getLongListParam(allowedQueryParams[6], false, params, "query", true);
-        List<String> busAdmins = getStringListParam(allowedQueryParams[2], false, params, "query");
-        List<String> potOwners = getStringListParam(allowedQueryParams[3], false, params, "query");
-        List<String> taskOwners = getStringListParam(allowedQueryParams[5], false, params, "query");
-        List<String> language = getStringListParam(allowedQueryParams[7], false, params, "query");
+        List<String> busAdmins = getStringListParamAsList(allowedQueryParams[2], false, params, "query");
+        List<String> potOwners = getStringListParamAsList(allowedQueryParams[3], false, params, "query");
+        List<String> taskOwners = getStringListParamAsList(allowedQueryParams[5], false, params, "query");
+        List<String> language = getStringListParamAsList(allowedQueryParams[7], false, params, "query");
         
         String unionStr = getStringParam(allowedQueryParams[8], false, params, "query");
         boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
         
-        List<String> statusStrList = getStringListParam(allowedQueryParams[4], false, params, "query");
+        List<String> statusStrList = getStringListParamAsList(allowedQueryParams[4], false, params, "query");
         List<Status> statuses = convertStringListToStatusList(statusStrList);
         
         int [] pageInfo = getPageNumAndPageSize(params, oper);
@@ -195,9 +186,9 @@ public class TaskResource extends ResourceBase {
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
-        Map<String, List<String>> params = getRequestParams(uriInfo);
+        Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
-        String oper = getRelativePath(uriInfo);
+        String oper = getRelativePath();
         String userId = identityProvider.getName();
         logger.debug("Executing " + operation + " on task " + taskId + " by user " + userId );
        
@@ -243,7 +234,7 @@ public class TaskResource extends ResourceBase {
         }
         
         doRestTaskOperation(taskId, cmd);
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
     private static String checkThatOperationExists(String operation, String[] possibleOperations) {
@@ -283,7 +274,7 @@ public class TaskResource extends ResourceBase {
         Object result = doRestTaskOperation(taskId, cmd);
 
         if (result != null) {
-            Map<String, List<String>> requestParams = getRequestParams(uriInfo);
+            Map<String, String[]> requestParams = getRequestParams();
 
             String opener = "";
 
@@ -291,9 +282,9 @@ public class TaskResource extends ResourceBase {
             if (openers.size() == 1) {
                 opener = openers.get(0);
             }
-                String formUrl = formURLGenerator.generateFormTaskURL(uriInfo.getBaseUri().toString(), taskId, opener, requestParams);
+                String formUrl = formURLGenerator.generateFormTaskURL(getBaseUri(), taskId, opener);
             if (!StringUtils.isEmpty(formUrl)) {
-                JaxbTaskFormResponse response = new JaxbTaskFormResponse(formUrl, uriInfo.getRequestUri().toString());
+                JaxbTaskFormResponse response = new JaxbTaskFormResponse(formUrl, getRequestUri());
                 return createCorrectVariant(response, headers);
             }
         }
@@ -315,7 +306,7 @@ public class TaskResource extends ResourceBase {
     @Path("/history/bam/clear")
     public Response bam_clear() { 
         doRestTaskOperation(null, new DeleteBAMTaskSummariesCommand());
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
+        return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);
     }
  
     public Object doRestTaskOperation(Long taskId, TaskCommand<?> cmd) { 

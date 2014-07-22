@@ -11,7 +11,7 @@ public class FormURLGenerator {
     protected static final String KIE_WB_GWT_MODULE = "org.kie.workbench.KIEWebapp/KIEWebapp.html";
     protected static final String FORM_PERSPECTIVE = "FormDisplayPerspective";
 
-    public String generateFormProcessURL(String baseURL, String processId, String deploymentId, String opener, Map<String, List<String>> params) {
+    public String generateFormProcessURL(String baseURL, String processId, String deploymentId, String opener) { 
         if (StringUtils.isEmpty(baseURL) || StringUtils.isEmpty(processId) || StringUtils.isEmpty(deploymentId) || StringUtils.isEmpty(opener)) return "";
 
         Map urlParams = new HashMap();
@@ -24,7 +24,7 @@ public class FormURLGenerator {
     }
 
 
-    public String generateFormTaskURL(String baseURL, long taskId, String opener, Map<String, List<String>> params) {
+    public String generateFormTaskURL(String baseURL, long taskId, String opener) { 
         if (StringUtils.isEmpty(baseURL) || taskId < 0 || StringUtils.isEmpty(opener)) return "";
 
         Map<String, String> urlParams = new HashMap<String, String>();
@@ -37,8 +37,11 @@ public class FormURLGenerator {
 
     protected String generateURL(String baseURL, Map<String, String> params) {
         StringBuilder resultURL = new StringBuilder();
-        if (baseURL.contains("/rest/")) resultURL.append(baseURL.substring(0, baseURL.indexOf("/rest/"))).append("/");
-        else resultURL.append(baseURL);
+        if (baseURL.contains("/rest/")) { 
+            resultURL.append(baseURL.substring(0, baseURL.indexOf("/rest/"))).append("/");
+        } else { 
+            resultURL.append(baseURL);
+        }
         resultURL.append(KIE_WB_GWT_MODULE).append("?perspective=").append(FORM_PERSPECTIVE).append("&standalone=true");
 
         if (params != null && !params.isEmpty()) {

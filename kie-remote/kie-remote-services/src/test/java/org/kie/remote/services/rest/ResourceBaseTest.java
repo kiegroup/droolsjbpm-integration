@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -26,9 +24,8 @@ public class ResourceBaseTest extends ResourceBase {
     public void testReadNumberAsString() {
         String numberAsString = "\"10\"";
 
-        Map<String, List<String>> params = new HashMap<String, List<String>>();
-        List<String> data = new ArrayList<String>();
-        data.add(numberAsString);
+        Map<String, String[]> params = new HashMap<String, String[]>();
+        String [] data = {numberAsString};
         params.put("stringnumber", data);
 
         Object value = getObjectParam("stringnumber", true, params, "dummy");
@@ -41,9 +38,8 @@ public class ResourceBaseTest extends ResourceBase {
     public void testReadNumberAsNumber() {
         String numberString = "10";
 
-        Map<String, List<String>> params = new HashMap<String, List<String>>();
-        List<String> data = new ArrayList<String>();
-        data.add(numberString);
+        Map<String, String[]> params = new HashMap<String, String[]>();
+        String [] data = {numberString};
         params.put("number", data);
 
         Object value = getObjectParam("number", true, params, "dummy");

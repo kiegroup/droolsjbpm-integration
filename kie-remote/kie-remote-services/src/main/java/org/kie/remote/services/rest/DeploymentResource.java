@@ -4,7 +4,6 @@ import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.DEPLOYMENT_UN
 import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_ID;
 import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_TYPE;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,10 +15,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -64,19 +61,14 @@ public class DeploymentResource extends ResourceBase {
     private static final Logger logger = LoggerFactory.getLogger(DeploymentResource.class);
     
     /* REST information */
+    
     @Context
     private HttpHeaders headers;
     
-    @Context
-    private UriInfo uriInfo;
-    
-    @Context
-    private Request restRequest;
-
     @PathParam("deploymentId")
     private String deploymentId;
     
-    /* KIE resources */
+    /* KIE information and processing */
    
     @Inject
     @Kjar
@@ -242,8 +234,8 @@ public class DeploymentResource extends ResourceBase {
             jobResult.setSuccess(false);
         } else { 
             // parse request/options and schedule deployment
-            Map<String, List<String>> params = getRequestParams(uriInfo);
-            String oper = getRelativePath(uriInfo);
+            Map<String, String []> params = getRequestParams();
+            String oper = getRelativePath();
             String strategy = getStringParam("strategy", false, params, oper);
             String mergeMode = getStringParam("mergemode", false, params, oper);
 

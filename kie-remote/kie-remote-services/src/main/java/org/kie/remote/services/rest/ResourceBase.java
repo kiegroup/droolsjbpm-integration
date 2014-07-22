@@ -4,6 +4,8 @@ import static org.kie.remote.common.rest.RestEasy960Util.defaultVariant;
 import static org.kie.remote.common.rest.RestEasy960Util.getVariant;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -34,7 +38,6 @@ import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
-import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
@@ -49,7 +52,29 @@ public class ResourceBase {
     @Inject
     protected ProcessRequestBean processRequestBean;
     
-    // Seam-Transaction ----------------------------------------------------------------------------------------------------------
+    @Context
+    private UriInfo uriInfo;
+    
+    @Context
+    private HttpServletRequest httpRequest;
+  
+    /**
+     * In order to be able to inject a mock instance for tests.
+     * @param httpRequest 
+     */
+    protected void setHttpServletRequest(HttpServletRequest httpRequest) { 
+        this.httpRequest = httpRequest;
+    }
+    
+     /**
+      * In order to be able to inject a mock instance for tests.
+      * @param uriInfo
+      */
+    protected void setUriInfo(UriInfo uriInfo) { 
+        this.uriInfo = uriInfo;
+    }
+    
+    // execute --------------------------------------------------------------------------------------------------------------------
     
     @SuppressWarnings("rawtypes")
     protected JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request) {
@@ -105,25 +130,35 @@ public class ResourceBase {
 
     // Request Params -------------------------------------------------------------------------------------------------------------
     
-    protected static Map<String, List<String>> getRequestParams(UriInfo uriInfo) {
-        return uriInfo.getQueryParameters();
+    protected Map<String, String[]> getRequestParams() {
+        return httpRequest.getParameterMap();
     }
 
-    protected static String getStringParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
-        List<String> paramValues = getStringListParam(paramName, required, params, operation);
-        if( ! required && paramValues.isEmpty() ) { 
+    protected static String getStringParam(String paramName, boolean required, Map<String, String[]> params, String operation) {
+        String [] paramValues = getStringListParam(paramName, required, params, operation);
+        if( ! required && (paramValues.length == 0) ) { 
             return null;
         }
-        if (paramValues.size() != 1) {
+        if (paramValues.length != 1) {
             throw RestOperationException.badRequest("One and only one '" + paramName + "' query parameter required for '" + operation
-                    + "' operation (" + paramValues.size() + " passed).");
+                    + "' operation (" + paramValues.length + " passed).");
         }
-        return paramValues.get(0);
+        return paramValues[0];
     }
 
-    protected static List<String> getStringListParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
-        List<String> paramValues = null;
-        for (Entry<String, List<String>> entry : params.entrySet()) {
+    private static final String [] EMPTY_STRING_ARR = new String[0];
+    
+    protected static List<String> getStringListParamAsList(String paramName, boolean required, Map<String, String[]> params, String operation) {
+        String [] strList = getStringListParam(paramName, required, params, operation);
+        if( strList.length == 0 ) { 
+            return Collections.EMPTY_LIST;
+        }
+        return Arrays.asList(strList);
+    }
+    
+    protected static String[] getStringListParam(String paramName, boolean required, Map<String, String[]> params, String operation) {
+        String[] paramValues = null;
+        for (Entry<String, String[]> entry : params.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(paramName)) {
                 paramValues = entry.getValue();
                 break;
@@ -134,13 +169,13 @@ public class ResourceBase {
                 throw RestOperationException.badRequest("Query parameter '" + paramName + "' required for '" + operation
                         + "' operation.");
             }
-            return new ArrayList<String>();
+            return EMPTY_STRING_ARR;
         }
         return paramValues;
     }
 
     
-    protected static Object getObjectParam(String paramName, boolean required, Map<String, List<String>> params, String operation) {
+    protected static Object getObjectParam(String paramName, boolean required, Map<String, String[]> params, String operation) {
         String paramVal = getStringParam(paramName, required, params, operation);
         if (!required && paramVal == null) {
             return null;
@@ -149,9 +184,9 @@ public class ResourceBase {
 
     }
 
-    protected static List<Long> getLongListParam(String paramName, boolean required, Map<String, List<String>> params, String operation,
+    protected static List<Long> getLongListParam(String paramName, boolean required, Map<String, String[]> params, String operation,
             boolean mustBeLong) {
-        List<String> paramValues = getStringListParam(paramName, required, params, operation);
+        String [] paramValues = getStringListParam(paramName, required, params, operation);
         List<Long> longValues = new ArrayList<Long>();
         for( String strVal : paramValues ) { 
            longValues.add((Long) getNumberFromString(paramName, strVal, mustBeLong));
@@ -159,7 +194,7 @@ public class ResourceBase {
         return longValues;
     }
     
-    protected static Number getNumberParam(String paramName, boolean required, Map<String, List<String>> params, String operation,
+    protected static Number getNumberParam(String paramName, boolean required, Map<String, String[]> params, String operation,
             boolean mustBeLong) {
         String paramVal = getStringParam(paramName, required, params, operation);
         if (!required && paramVal == null) {
@@ -218,19 +253,19 @@ public class ResourceBase {
         throw RestOperationException.badRequest(paramName + " parameter does not have a numerical format (" + paramVal + ")");
     }
 
-    protected static Map<String, Object> extractMapFromParams(Map<String, List<String>> params, String operation) {
+    protected static Map<String, Object> extractMapFromParams(Map<String, String[]> params, String operation) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        for (Entry<String, List<String>> entry : params.entrySet()) {
+        for (Entry<String, String[]> entry : params.entrySet()) {
             if (entry.getKey().startsWith("map_")) {
                 String key = entry.getKey();
-                List<String> paramValues = entry.getValue();
-                if (paramValues.size() != 1) {
+                String[] paramValues = entry.getValue();
+                if (paramValues.length != 1) {
                     throw RestOperationException.badRequest("Only one map_* (" + key + ") query parameter allowed for '" + operation
-                            + "' operation (" + paramValues.size() + " passed).");
+                            + "' operation (" + paramValues.length + " passed).");
                 }
                 String mapKey = key.substring("map_".length());
-                String mapVal = paramValues.get(0).trim();
+                String mapVal = paramValues[0].trim();
 
                 map.put(mapKey, getObjectFromString(key, mapVal));
             }
@@ -238,12 +273,12 @@ public class ResourceBase {
         return map;
     }
 
-    protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, List<String>> params, boolean required, String operation) {
+    protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, String[]> params, boolean required, String operation) {
         List<OrganizationalEntity> orgEntList = new ArrayList<OrganizationalEntity>();
 
-        List<String> users = getStringListParam("user", false, params, operation);
-        List<String> groups = getStringListParam("group", false, params, operation);
-        if (required && (users.isEmpty() && groups.isEmpty()) ) {
+        String [] users = getStringListParam("user", false, params, operation);
+        String [] groups = getStringListParam("group", false, params, operation);
+        if (required && (users.length == 0) && (groups.length == 0)) {
             throw RestOperationException.badRequest("At least 1 query parameter (either 'user' or 'group') is required for the '" + operation + "' operation.");
         }
         
@@ -318,7 +353,7 @@ public class ResourceBase {
         paginationParams.add(SIZE_SHORT_PARAM);
     };
     
-    protected static int [] getPageNumAndPageSize(Map<String, List<String>> params, String oper) {
+    protected static int [] getPageNumAndPageSize(Map<String, String[]> params, String oper) {
         int [] pageInfo = new int[2];
         
         int p = 0;
@@ -381,7 +416,7 @@ public class ResourceBase {
     }
    
     protected static <T, R extends JaxbPaginatedList<T>> R 
-        paginateAndCreateResult(Map<String, List<String>> params, String oper, List<T> results, R resultList) { 
+        paginateAndCreateResult(Map<String, String[]> params, String oper, List<T> results, R resultList) { 
         
         // paginate
         int [] pageInfo = getPageNumAndPageSize(params, oper); 
@@ -406,11 +441,23 @@ public class ResourceBase {
         
         return resultList;
     }
-    // Other helper methods ------------------------------------------------------------------------------------------------------
+    // URL/Context helper methods -------------------------------------------------------------------------------------------------
     
-    public static String getRelativePath(UriInfo uriInfo) { 
-        return uriInfo.getRequestUri().toString().replaceAll( ".*/rest", "");
+    protected String getBaseUri() { 
+        return uriInfo.getBaseUri().toString();
     }
+    
+    protected String getRequestUri() { 
+        return httpRequest.getRequestURI();
+    }
+    
+    protected String getRelativePath() { 
+        String url =  httpRequest.getRequestURI();
+        url.replaceAll( ".*/rest", "");
+        return url;
+    }
+    
+    // Other helper methods ------------------------------------------------------------------------------------------------------
     
     protected static Status getEnum(String value) {
         value = value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();

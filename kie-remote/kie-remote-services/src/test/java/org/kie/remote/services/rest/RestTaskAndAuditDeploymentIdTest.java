@@ -7,15 +7,14 @@ import static org.kie.remote.services.MockSetupTestHelper.FOR_PROCESS_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.TASK_ID;
 import static org.kie.remote.services.MockSetupTestHelper.setupTaskMocks;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
@@ -30,7 +29,6 @@ import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
-import org.kie.internal.task.api.InternalTaskService;
 import org.kie.remote.services.TaskDeploymentIdTest;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
@@ -41,13 +39,16 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
 @SuppressWarnings("unchecked")
 public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements TaskDeploymentIdTest {
-
+    
     private final static String USER = "user";
 
     private DeploymentInfoBean runtimeMgrMgrMock;
 
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
+    
+    private UriInfo uriInfoMock;
+    private HttpServletRequest httpRequestMock;
 
     private AuditLogService auditLogService = mock(AuditLogService.class);
     
@@ -69,8 +70,12 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
 
     public void setupTestMocks() {
         // REST
-        this.uriInfo = mock(UriInfo.class);
-        doReturn(new MultivaluedMapImpl<String,String>()).when(uriInfo).getQueryParameters();
+        uriInfoMock = mock(UriInfo.class);
+        setUriInfo(uriInfoMock);
+        doReturn(new MultivaluedMapImpl<String,String>()).when(uriInfoMock).getQueryParameters();
+        httpRequestMock = mock(HttpServletRequest.class);
+        setHttpServletRequest(httpRequestMock);
+        
         this.identityProvider = mock(IdentityProvider.class);
         doReturn(USER).when(identityProvider).getName();
 
@@ -81,6 +86,7 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
        
         HttpHeaders headersMock = mock(HttpHeaders.class);
         this.headers = headersMock; 
+        
         doReturn(new MultivaluedMapImpl<String, String>()).when(headersMock).getRequestHeaders();
     }
 
@@ -89,11 +95,11 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
         
         String oper = "claim";
-        doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
         this.taskId_oper(TASK_ID, oper);
         
         oper = "complete";
-        doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
         this.taskId_oper(TASK_ID, oper);
         
         verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
@@ -122,11 +128,11 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements Ta
         setupTaskMocks(this, FOR_PROCESS_TASKS);
         
         String oper = "claim";
-        doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
         this.taskId_oper(TASK_ID, oper);
         
         oper = "complete";
-        doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(uriInfo).getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
         this.taskId_oper(TASK_ID, oper);
         
         // verify

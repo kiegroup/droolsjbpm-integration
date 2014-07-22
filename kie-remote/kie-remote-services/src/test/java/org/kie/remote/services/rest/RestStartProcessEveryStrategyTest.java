@@ -4,16 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.kie.remote.services.MockSetupTestHelper.DEPLOYMENT_ID;
 import static org.kie.remote.services.MockSetupTestHelper.setupProcessMocks;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.services.api.ProcessService;
@@ -34,22 +35,19 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.junit.Assert.*;
-import static org.kie.remote.services.MockSetupTestHelper.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ EmptyContext.class, ProcessInstanceIdContext.class })
 public class RestStartProcessEveryStrategyTest extends RuntimeResource implements StartProcessEveryStrategyTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
     private KieSession kieSessionMock;
+
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
+    
+    private HttpServletRequest httpRequestMock;
 
-    private MultivaluedMapImpl<String, String> queryParams;
+    private Map<String, String[]> queryParams;
 
     public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
         this.runtimeMgrMgrMock = mock;
@@ -67,8 +65,9 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
 
     @Override
     public void setupTestMocks() {
-        this.uriInfo = mock(UriInfo.class);
-        doReturn(queryParams).when(uriInfo).getQueryParameters();
+        httpRequestMock = mock(HttpServletRequest.class);
+        setHttpServletRequest(httpRequestMock);
+        doReturn(queryParams).when(httpRequestMock).getParameterMap();
 
         this.processRequestBean = new ProcessRequestBean();
         this.processRequestBean.setProcessService(processServiceMock);
@@ -82,7 +81,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
 
     @Before
     public void before() {
-        this.queryParams = new MultivaluedMapImpl<String, String>();
+        this.queryParams = new HashMap<String, String[]>();
         this.deploymentId = DEPLOYMENT_ID;
     }
 
@@ -93,8 +92,8 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         // (since a ProcessInstanceIdContext should be used instead
 
         setupProcessMocks(this, RuntimeStrategy.PER_PROCESS_INSTANCE);
-        doReturn(new URI("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(uriInfo)
-                .getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
+                .getRequestURI();
 
         Response resp = process_defId_start(TEST_PROCESS_DEF_NAME);
         // verify ksession is called
@@ -104,8 +103,10 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
         // Do rest call with process instance id this time. This will fail if:
         // - the ProcessInstanceIdContext is not used (and an EmptyContext is used instead)
         // - The ProcessInstanceIdContext constructor gets a null value for the process instance id
-        queryParams.add(PROC_INST_ID_PARAM_NAME, String.valueOf(TEST_PROCESS_INST_ID));
-        queryParams.add("signal", "test");
+        String [] procInstParamVal = {String.valueOf(TEST_PROCESS_INST_ID)};
+        queryParams.put(PROC_INST_ID_PARAM_NAME, procInstParamVal);
+        String [] signalParamVal = { "test" };
+        queryParams.put("signal", signalParamVal);
         resp = signal();
 
         // verify ksession is called
@@ -117,15 +118,16 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
     @Test
     public void startProcessAndDoStuffPerRequestStrategyTest() throws Exception {
         setupProcessMocks(this, RuntimeStrategy.PER_REQUEST);
-        doReturn(new URI("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(uriInfo)
-                .getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
+                .getRequestURI();
 
         Response resp = process_defId_start(TEST_PROCESS_DEF_NAME);
         // verify non-process contexts are used
         JaxbProcessInstanceResponse procInstResp = (JaxbProcessInstanceResponse) resp.getEntity();
         assertEquals("Invalid process instance id", TEST_PROCESS_INST_ID, procInstResp.getId());
 
-        queryParams.add("signal", "test");
+        String [] signalParamVal = {"test"};
+        queryParams.put("signal", signalParamVal);
         resp = signal();
 
         // verify ksession is called
@@ -135,15 +137,16 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResource implement
     @Test
     public void startProcessAndDoStuffSingletonStrategyTest() throws Exception {
         setupProcessMocks(this, RuntimeStrategy.SINGLETON);
-        doReturn(new URI("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(uriInfo)
-                .getRequestUri();
+        doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
+                .getRequestURI();
 
         Response resp = process_defId_start(TEST_PROCESS_DEF_NAME);
         // verify non-process contexts are used
         JaxbProcessInstanceResponse procInstResp = (JaxbProcessInstanceResponse) resp.getEntity();
         assertEquals("Invalid process instance id", TEST_PROCESS_INST_ID, procInstResp.getId());
 
-        queryParams.add("signal", "test");
+        String [] signalParamVal = { "test" };
+        queryParams.put("signal", signalParamVal);
         resp = signal();
 
         // verify ksession is called

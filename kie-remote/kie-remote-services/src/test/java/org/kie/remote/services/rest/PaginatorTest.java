@@ -19,16 +19,14 @@ public class PaginatorTest extends ResourceBase {
         }
         
         String oper = "/test/paginate";
-        Map<String, List<String>> params = new HashMap<String, List<String>>();
+        Map<String, String[]> params = new HashMap<String, String[]>();
         int [] pageInfo = getPageNumAndPageSize(params, oper);
         
         List<Integer> pagedList = paginate(pageInfo, results);
         assertEquals( results, pagedList );
         
-        List<String> pageValues = new ArrayList<String>();
-        pageValues.add("2");
-        List<String> sizeValues = new ArrayList<String>();
-        sizeValues.add("3");
+        String [] pageValues = {"2"};
+        String [] sizeValues = {"3"};
         
         params.put("page", pageValues );
         params.put("pageSize", sizeValues );
@@ -38,10 +36,8 @@ public class PaginatorTest extends ResourceBase {
         assertEquals( new Integer(3),  pagedList.get(0));
         assertEquals( 3, pagedList.size() );
         
-        pageValues.clear();
-        pageValues.add("4");
-        sizeValues.clear();
-        sizeValues.add("5");
+        pageValues[0] = "4";
+        sizeValues[0] = "5";
         params.put("p", pageValues );
         params.put("s", sizeValues );
         pageInfo = getPageNumAndPageSize(params, oper);
@@ -65,9 +61,8 @@ public class PaginatorTest extends ResourceBase {
         }
 
         int pageSize = 10;
-        List<String> sizeValues = new ArrayList<String>();
-        sizeValues.add(String.valueOf(pageSize));
-        Map<String, List<String>> params = new HashMap<String, List<String>>();
+        String [] sizeValues = {String.valueOf(pageSize)};
+        Map<String, String[]> params = new HashMap<String, String[]>();
         params.put("pageSize", sizeValues );
         
         List<Integer> pagedResults = paginate(getPageNumAndPageSize(params, oper), results);

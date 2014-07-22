@@ -12,7 +12,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
@@ -39,10 +38,7 @@ public class DeploymentsResource extends ResourceBase {
     @Context
     private HttpHeaders headers;
    
-    @Context
-    private UriInfo uriInfo;
-    
-    /* KIE resources */
+    /* KIE information and processing */
    
     @Inject
     @Kjar
@@ -62,8 +58,8 @@ public class DeploymentsResource extends ResourceBase {
     @GET
     // TODO: docs pagination
     public Response listDeployments() { 
-        String oper = getRelativePath(uriInfo);
-        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath();
+        Map<String, String[]> params = getRequestParams();
         int [] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo); 
         
@@ -94,8 +90,8 @@ public class DeploymentsResource extends ResourceBase {
     @Path("/processes")
     // TODO: docs (+ pagination)
     public Response listProcessDefinitions() { 
-        String oper = getRelativePath(uriInfo);
-        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath();
+        Map<String, String[]> params = getRequestParams();
         int [] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo); 
         

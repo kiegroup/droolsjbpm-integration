@@ -20,7 +20,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
@@ -74,15 +73,15 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 public class RuntimeResource extends ResourceBase {
 
     /* REST information */
+    
     @Context
     protected HttpHeaders headers;
     
-    @Context
-    protected UriInfo uriInfo;
+    @PathParam("deploymentId")
+    protected String deploymentId;
     
-    @Context
-    private Request restRequest;
-   
+    /* KIE information and processing */
+    
     @Inject
     private RuntimeDataService runtimeDataService;
    
@@ -92,10 +91,6 @@ public class RuntimeResource extends ResourceBase {
     @Inject
     private FormURLGenerator formURLGenerator;
 
-    /* KIE information and processing */
-    
-    @PathParam("deploymentId")
-    protected String deploymentId;
 
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
@@ -128,13 +123,13 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public Response process_defId_start(@PathParam("processDefId") String processId) {
-        Map<String, List<String>> requestParams = getRequestParams(uriInfo);
-        String oper = getRelativePath(uriInfo);
+        Map<String, String[]> requestParams = getRequestParams();
+        String oper = getRelativePath();
         Map<String, Object> params = extractMapFromParams(requestParams, oper);
 
         ProcessInstance result = startProcessInstance(processId, params);
 
-        JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse(result, uriInfo.getRequestUri().toString());
+        JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse(result, getRequestUri());
         return createCorrectVariant(responseObj, headers);
     }
 
@@ -144,8 +139,6 @@ public class RuntimeResource extends ResourceBase {
         List<String> result = (List<String>) processRequestBean.doKieSessionOperation(new GetProcessIdsCommand(), deploymentId, null);
 
         if (result != null && result.contains(processId)) {
-            Map<String, List<String>> requestParams = getRequestParams(uriInfo);
-
             String opener = "";
 
             List<String> openers = headers.getRequestHeader("host");
@@ -153,9 +146,9 @@ public class RuntimeResource extends ResourceBase {
                 opener = openers.get(0);
             }
 
-            String formUrl = formURLGenerator.generateFormProcessURL(uriInfo.getBaseUri().toString(), processId, deploymentId, opener, requestParams);
+            String formUrl = formURLGenerator.generateFormProcessURL(getBaseUri(), processId, deploymentId, opener);
             if (!StringUtils.isEmpty(formUrl)) {
-                JaxbProcessInstanceFormResponse response = new JaxbProcessInstanceFormResponse(formUrl, uriInfo.getRequestUri().toString());
+                JaxbProcessInstanceFormResponse response = new JaxbProcessInstanceFormResponse(formUrl, getRequestUri());
                 return createCorrectVariant(response, headers);
             }
         }
@@ -187,21 +180,21 @@ public class RuntimeResource extends ResourceBase {
             throw iae;
         }
                 
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
     public Response process_instance_procInstId_signal(@PathParam("procInstId") Long procInstId) {
-        String oper = getRelativePath(uriInfo);
-        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath();
+        Map<String, String[]> params = getRequestParams();
         String eventType = getStringParam("signal", true, params, oper);
         Object event = getObjectParam("event", false, params, oper);
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
         
         processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId);
         
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
 
     }
 
@@ -223,8 +216,8 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/signal")
     public Response signal() {
-        String oper = getRelativePath(uriInfo);
-        Map<String, List<String>> requestParams = getRequestParams(uriInfo);
+        String oper = getRelativePath();
+        Map<String, String[]> requestParams = getRequestParams();
         String eventType = getStringParam("signal", true, requestParams, oper);
         Object event = getObjectParam("event", false, requestParams, oper);
 
@@ -233,17 +226,17 @@ public class RuntimeResource extends ResourceBase {
                 deploymentId, 
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
         
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
     @GET
     @Path("/workitem/{workItemId: [0-9-]+}")
     public Response workitem_workItemId(@PathParam("workItemId") Long workItemId) { 
-        String oper = getRelativePath(uriInfo);
+        String oper = getRelativePath();
         WorkItem workItem = (WorkItem) processRequestBean.doKieSessionOperation(
                 new GetWorkItemCommand(workItemId),
                 deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(uriInfo), oper, true));
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(), oper, true));
                
         if( workItem == null ) { 
             throw RestOperationException.notFound("WorkItem " + workItemId + " does not exist.");
@@ -255,8 +248,8 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response worktiem_workItemId_oper(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
-        String oper = getRelativePath(uriInfo);
-        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath();
+        Map<String, String[]> params = getRequestParams();
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
             Map<String, Object> results = extractMapFromParams(params, operation);
@@ -273,7 +266,7 @@ public class RuntimeResource extends ResourceBase {
                 deploymentId, 
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true));
                 
-        return createCorrectVariant(new JaxbGenericResponse(uriInfo.getRequestUri().toString()), headers);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
     /**
@@ -283,14 +276,14 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public Response withvars_process_processDefId_start(@PathParam("processDefId") String processId) {
-        Map<String, List<String>> requestParams = getRequestParams(uriInfo);
-        String oper = getRelativePath(uriInfo);
+        Map<String, String[]> requestParams = getRequestParams();
+        String oper = getRelativePath();
         Map<String, Object> params = extractMapFromParams(requestParams, oper );
 
         ProcessInstance procInst = startProcessInstance(processId, params);
         
         Map<String, String> vars = getVariables(procInst.getId());
-        JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, uriInfo.getRequestUri().toString());
+        JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
         
         return createCorrectVariant(resp, headers);
     }
@@ -301,7 +294,8 @@ public class RuntimeResource extends ResourceBase {
         
         ProcessInstance procInst = getProcessInstance(procInstId);
         Map<String, String> vars = getVariables(procInstId);
-        JaxbProcessInstanceWithVariablesResponse responseObj = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, uriInfo.getRequestUri().toString());
+        JaxbProcessInstanceWithVariablesResponse responseObj 
+            = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
         
         return createCorrectVariant(responseObj, headers);
     }
@@ -309,8 +303,8 @@ public class RuntimeResource extends ResourceBase {
     @POST
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
     public Response withvars_process_instance_procInstid_signal(@PathParam("procInstId") Long procInstId) {
-        String oper = getRelativePath(uriInfo);
-        Map<String, List<String>> params = getRequestParams(uriInfo);
+        String oper = getRelativePath();
+        Map<String, String[]> params = getRequestParams();
         String eventType = getStringParam("signal", true, params, oper);
         Object event = getObjectParam("event", false, params, oper);
 

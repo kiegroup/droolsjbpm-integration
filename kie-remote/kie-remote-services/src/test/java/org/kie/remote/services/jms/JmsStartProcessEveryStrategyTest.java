@@ -1,10 +1,12 @@
 package org.kie.remote.services.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.kie.remote.services.MockSetupTestHelper.DEPLOYMENT_ID;
 import static org.kie.remote.services.MockSetupTestHelper.setupProcessMocks;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -17,20 +19,18 @@ import org.jbpm.services.api.UserTaskService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
-import org.kie.api.runtime.KieSession;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
+import org.kie.remote.services.MockSetupTestHelper;
+import org.kie.remote.services.StartProcessEveryStrategyTest;
+import org.kie.remote.services.cdi.DeploymentInfoBean;
+import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.remote.services.MockSetupTestHelper;
-import org.kie.remote.services.StartProcessEveryStrategyTest;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
-import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
