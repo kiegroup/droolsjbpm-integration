@@ -394,7 +394,7 @@ public abstract class AbstractRemoteCommandObject {
         }
         restRequest.body(MediaType.APPLICATION_XML, jaxbRequestString);
         
-        ClientResponse<Object> response = null;
+        ClientResponse<?> response = null;
         try {
             logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + restRequest.getUri());
             response = restRequest.post(Object.class);
@@ -403,32 +403,34 @@ public abstract class AbstractRemoteCommandObject {
         }
 
         // Get response
-        JaxbCommandsResponse commandResponse;
+        JaxbExceptionResponse exceptionResponse = null;
+        JaxbCommandsResponse commandResponse = null;
+        int responseStatus = response.getStatus();
         try { 
-            commandResponse = response.getEntity(JaxbCommandsResponse.class);
-        } catch(ClientResponseFailure crf) { 
-           String setCookie = (String) response.getHeaders().getFirst(HttpHeaders.SET_COOKIE); 
-           String contentType = (String) response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
-           if( setCookie != null && contentType.startsWith(MediaType.TEXT_HTML) ) { 
-               throw new RemoteCommunicationException("The remote server requires form-based authentication.", crf);
-           } else { 
-               throw crf;
-           }
-        }
-        List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
-        JaxbExceptionResponse exceptionResponse;
-        if (responses.size() == 0) {
-            return null;
-        } else if (responses.size() == 1) {
-            JaxbCommandResponse<?> responseObject = responses.get(0);
-            if (responseObject instanceof JaxbExceptionResponse) {
-                exceptionResponse = (JaxbExceptionResponse) responseObject;
-            } else {
-                return (T) responseObject.getResult();
+            if( responseStatus < 300 ) { 
+                commandResponse = response.getEntity(JaxbCommandsResponse.class);
+            } else { 
+                exceptionResponse = response.getEntity(JaxbExceptionResponse.class);
             }
-        } else { 
-            throw new RemoteCommunicationException("Unexpected number of results from " + command.getClass().getSimpleName() + ":"
-                    + responses.size() + " results instead of only 1");
+        } catch(Exception e)  {
+            logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);
+            throw new RemoteCommunicationException("Unable to retrieve content from response!", e);
+        }
+        if( exceptionResponse == null && commandResponse != null ) { 
+            List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
+            if (responses.size() == 0) {
+                return null;
+            } else if (responses.size() == 1) {
+                JaxbCommandResponse<?> responseObject = responses.get(0);
+                if (responseObject instanceof JaxbExceptionResponse) {
+                    exceptionResponse = (JaxbExceptionResponse) responseObject;
+                } else {
+                    return (T) responseObject.getResult();
+                }
+            } else { 
+                throw new RemoteCommunicationException("Unexpected number of results from " + command.getClass().getSimpleName() + ":"
+                        + responses.size() + " results instead of only 1");
+            }
         }
         
         // Process exception response
