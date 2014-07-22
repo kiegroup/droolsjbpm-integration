@@ -249,7 +249,7 @@ public final class RemoteConfiguration {
 
         private static final Logger logger = LoggerFactory.getLogger(FormBasedAuthenticatingInterceptor.class);
        
-        private static final String LOGIN_FORM = "/uf_security_check";
+        private static final String LOGIN_FORM = "/j_security_check";
         private static final String FORM_BASED_AUTH_PROPERTY = "org.kie.remote.form.based.auth";
 
         private final String username;
@@ -319,7 +319,7 @@ public final class RemoteConfiguration {
                 URL appBaseUrl = new URL(restUrl.getProtocol(), restUrl.getHost(), restUrl.getPort(), appBase);
                 ClientRequestFactory requestFactory = new ClientRequestFactory(appBaseUrl.toURI());
                 ClientRequest formRequest = requestFactory.createRelativeRequest(LOGIN_FORM);
-                formRequest = formRequest.formParameter("uf_username", username).formParameter("uf_password", password);
+                formRequest = formRequest.formParameter("j_username", username).formParameter("j_password", password);
                 if( sessionCookie != null ) { 
                     formRequest.header(HttpHeaders.COOKIE, sessionCookie);
                 }
