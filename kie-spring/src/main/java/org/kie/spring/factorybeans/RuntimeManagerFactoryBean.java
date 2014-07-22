@@ -25,6 +25,7 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
 import org.kie.internal.runtime.conf.ObjectModelResolver;
 import org.kie.internal.runtime.conf.ObjectModelResolverProvider;
+import org.kie.internal.runtime.manager.RuntimeManagerRegistry;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -59,17 +60,23 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
 
     @Override
     public Object getObject() throws Exception {
-        RuntimeManager manager = null;
-        if ("PER_REQUEST".equalsIgnoreCase(type)) {
-            manager = factory.newPerRequestRuntimeManager(runtimeEnvironment, identifier);
-        } else if ("PER_PROCESS_INSTANCE".equalsIgnoreCase(type)) {
-            manager = factory.newPerProcessInstanceRuntimeManager(runtimeEnvironment, identifier);
-        } else {
-            manager = factory.newSingletonRuntimeManager(runtimeEnvironment, identifier);
+        if(RuntimeManagerRegistry.get().isRegistered(getIdentifier())) {
+            // get the runtime manager from the registry
+            return RuntimeManagerRegistry.get().getManager(getIdentifier());
         }
+        else {
+            RuntimeManager manager = null;
+            if ("PER_REQUEST".equalsIgnoreCase(type)) {
+                manager = factory.newPerRequestRuntimeManager(runtimeEnvironment, identifier);
+            } else if ("PER_PROCESS_INSTANCE".equalsIgnoreCase(type)) {
+                manager = factory.newPerProcessInstanceRuntimeManager(runtimeEnvironment, identifier);
+            } else {
+                manager = factory.newSingletonRuntimeManager(runtimeEnvironment, identifier);
+            }
 
-        runtimeManagerSet.add(manager);
-        return manager;
+            runtimeManagerSet.add(manager);
+            return manager;
+        }
     }
 
     @Override
@@ -79,7 +86,7 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
 
     @Override
     public boolean isSingleton() {
-        return false;
+        return true;
     }
 
     @Override

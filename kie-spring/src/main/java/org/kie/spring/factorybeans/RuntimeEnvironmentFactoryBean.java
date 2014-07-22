@@ -190,7 +190,7 @@ public class RuntimeEnvironmentFactoryBean implements FactoryBean, InitializingB
 
     @Override
     public boolean isSingleton() {
-        return false;
+        return true;
     }
 
     @Override
