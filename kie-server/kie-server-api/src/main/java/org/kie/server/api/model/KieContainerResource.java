@@ -16,6 +16,10 @@ public class KieContainerResource {
     public KieContainerResource() {
     }
 
+    public KieContainerResource(ReleaseId releaseId) {
+        this( null, releaseId, null, null );
+    }
+    
     public KieContainerResource(String containerId, ReleaseId releaseId) {
         this( containerId, releaseId, null, null );
     }
