@@ -35,7 +35,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     
     private InitialContext remoteInitialContext = null;
     
-    private URL jbossServerUrl = null;
+    private String jbossServerHostName = null;
     
     private boolean createOwnFactory = false;
     private String hostName = null;
@@ -119,7 +119,13 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
 
     @Override
     public RemoteJmsRuntimeEngineBuilder addJbossServerUrl(URL serverUrl) {
-        this.jbossServerUrl = serverUrl;
+        this.jbossServerHostName = serverUrl.getHost();
+        return this;
+    }
+
+    @Override
+    public RemoteJmsRuntimeEngineBuilder addJbossServerHostName(String hostname) {
+        this.jbossServerHostName = hostname;
         return this;
     }
 
@@ -247,8 +253,8 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
            this.config.setConnectionFactory(createdConnectionFactory);
         } 
                 
-        if( jbossServerUrl != null && this.remoteInitialContext == null ) { 
-            this.remoteInitialContext = getRemoteJbossInitialContext(jbossServerUrl, this.config.getUserName(), this.config.getPassword());
+        if( jbossServerHostName != null && this.remoteInitialContext == null ) { 
+            this.remoteInitialContext = getRemoteJbossInitialContext(jbossServerHostName, this.config.getUserName(), this.config.getPassword());
         }
         
         if( remoteInitialContext != null ) {

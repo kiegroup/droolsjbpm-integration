@@ -19,7 +19,9 @@ public interface RemoteJmsRuntimeEngineBuilder extends RemoteRuntimeEngineBuilde
      * @return
      */
     RemoteJmsRuntimeEngineBuilder addRemoteInitialContext(InitialContext remoteInitialContext); 
+    @Deprecated
     RemoteJmsRuntimeEngineBuilder addJbossServerUrl(URL serverUrl);
+    RemoteJmsRuntimeEngineBuilder addJbossServerHostName(String hostname);
     
     RemoteJmsRuntimeEngineBuilder addKieSessionQueue(Queue ksessionQueue);
     RemoteJmsRuntimeEngineBuilder addTaskServiceQueue(Queue taskServiceQueue);
