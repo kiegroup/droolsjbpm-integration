@@ -1,5 +1,6 @@
 package org.kie.server.services;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -9,11 +10,11 @@ import org.kie.server.services.impl.KieServerImpl;
 
 public class KieServerApplication extends Application {
     
-    private final Set<Class<?>> classes = new CopyOnWriteArraySet<Class<?>>() {
-        private static final long serialVersionUID = 1763183096852523317L;
-    {
-       add(KieServerImpl.class); 
-    }};
+//    private final Set<Class<?>> classes = new CopyOnWriteArraySet<Class<?>>() {
+//        private static final long serialVersionUID = 1763183096852523317L;
+//    {
+//       add(KieServerImpl.class); 
+//    }};
     
     private final Set<Object> instances = new CopyOnWriteArraySet<Object>() {
         private static final long serialVersionUID = 1763183096852523317L;
@@ -23,7 +24,7 @@ public class KieServerApplication extends Application {
     
     @Override
     public Set<Class<?>> getClasses() {
-        return classes;
+        return Collections.emptySet();
     }
     
     @Override
