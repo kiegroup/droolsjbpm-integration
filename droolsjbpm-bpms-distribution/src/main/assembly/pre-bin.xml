@@ -14,6 +14,7 @@
         <include>org.jbpm:jbpm-bpmn2</include>
         <include>org.jbpm:jbpm-audit</include>
         <include>org.jbpm:jbpm-workitems</include>
+        <include>org.jbpm:jbpm-services-api</include>
         <include>org.jbpm:jbpm-kie-services</include>
         <include>org.jbpm:jbpm-executor</include>
         <include>org.jbpm:jbpm-human-task-core</include>
@@ -28,9 +29,13 @@
         <include>org.kie:kie-internal</include>
         <include>org.kie:kie-maven-plugin</include>
         <include>org.kie:kie-ci</include>
-        <include>org.kie.remote:kie-services-client</include>
-        <include>org.kie.remote:kie-services-remote</include>
-        <include>org.kie.remote:kie-services-jaxb</include>
+        <include>org.kie:kie-ci-osgi</include>
+        <include>org.kie.remote:kie-remote-client</include>
+        <include>org.kie.remote:kie-remote-services</include>
+        <include>org.kie.remote:kie-remote-jaxb</include>
+        <include>org.kie.remote:kie-remote-common</include>
+        <include>org.kie.remote.ws:kie-remote-ws-common</include>
+        <include>org.kie.remote.ws:kie-remote-ws-wsdl-cmd</include>
         <include>org.kie:kie-camel</include>
         <include>org.kie:kie-spring</include>
         <include>org.drools:drools-core</include>
@@ -58,6 +63,7 @@
         <exclude>org.jbpm:jbpm-bpmn2</exclude>
         <exclude>org.jbpm:jbpm-audit</exclude>
         <exclude>org.jbpm:jbpm-workitems</exclude>
+        <exclude>org.jbpm:jbpm-services-api</exclude>
         <exclude>org.jbpm:jbpm-kie-services</exclude>
         <exclude>org.jbpm:jbpm-executor</exclude>
         <exclude>org.jbpm:jbpm-human-task-core</exclude>
@@ -72,9 +78,13 @@
         <exclude>org.kie:kie-internal</exclude>
         <exclude>org.kie:kie-maven-plugin</exclude>
         <exclude>org.kie:kie-ci</exclude>
-        <exclude>org.kie.remote:kie-services-client</exclude>
-        <exclude>org.kie.remote:kie-services-remote</exclude>
-        <exclude>org.kie.remote:kie-services-jaxb</exclude>
+        <exclude>org.kie:kie-ci-osgi</exclude>
+        <exclude>org.kie.remote:kie-remote-client</exclude>
+        <exclude>org.kie.remote:kie-remote-services</exclude>
+        <exclude>org.kie.remote:kie-remote-jaxb</exclude>
+        <exclude>org.kie.remote:kie-remote-common</exclude>
+        <exclude>org.kie.remote.ws:kie-remote-ws-common</exclude>
+        <exclude>org.kie.remote.ws:kie-remote-ws-wsdl-cmd</exclude>
         <exclude>org.kie:kie-camel</exclude>
         <exclude>org.kie:kie-spring</exclude>
         <exclude>org.drools:drools-core</exclude>

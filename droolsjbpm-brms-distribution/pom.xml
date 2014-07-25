@@ -80,10 +80,6 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-karaf-features</artifactId>
     </dependency>
-<!--    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-itest</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-rhq-plugin</artifactId>
@@ -111,6 +107,10 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci-osgi</artifactId>
     </dependency>
 
     <!-- The old assembly also included this optional dependency -->
