@@ -107,7 +107,7 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
     public Response process_defId(@PathParam("processDefId") String processId) {
-        ProcessAssetDesc processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(processId, processId); 
+        ProcessAssetDesc processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(deploymentId, processId); 
         JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDescList);
         Map<String, String> variables = bpmn2DataService.getProcessData(processId);
         jaxbProcDef.setVariables(variables);
