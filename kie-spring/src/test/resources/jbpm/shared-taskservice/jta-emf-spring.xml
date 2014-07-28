@@ -32,7 +32,9 @@
     <property name="transactionManager" ref="jbpmTxManager"/>
     <property name="listeners">
       <list>
-        <bean class="org.jbpm.services.task.audit.JPATaskLifeCycleEventListener" />
+        <bean class="org.jbpm.services.task.audit.JPATaskLifeCycleEventListener">
+        	<constructor-arg value="true"/>
+        </bean>
       </list>
     </property>
   </bean>
@@ -56,7 +58,10 @@
   
   <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService">
   	<constructor-arg>
-  		<ref bean="jbpmEMF"/>
-	  </constructor-arg>
+  	  <ref bean="jbpmEMF"/>
+	</constructor-arg>
+    <constructor-arg>
+      <value>STANDALONE_JTA_SPRING_SHARED_EM</value>
+    </constructor-arg>	
   </bean>
 </beans>
