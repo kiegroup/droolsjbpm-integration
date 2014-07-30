@@ -44,24 +44,6 @@
     <!-- Binaries and sources -->
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-spring-legacy5</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-legacy5</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
       <artifactId>drools-camel-server-example</artifactId>
       <type>war</type>
     </dependency>
