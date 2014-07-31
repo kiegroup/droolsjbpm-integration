@@ -60,6 +60,7 @@
     <karaf.servicemix.version.scripting-api>2.4.0</karaf.servicemix.version.scripting-api>
     <!-- Special overwrites -->
     <karaf.version.org.apache.aries.jpa>1.0.1</karaf.version.org.apache.aries.jpa>
+    <h2.version>1.4.178</h2.version>    
   </properties>
 
   <build>
