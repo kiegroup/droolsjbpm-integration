@@ -34,7 +34,9 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
+import org.h2.tools.Server;
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
+import org.jbpm.test.JBPMHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -133,6 +135,7 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
     @Test
     public void testJbpmRuntimeManagerWithPersistence() {
+    	Server server = startH2Server();
         refresh();
         EntityManagerFactory emf = (EntityManagerFactory) applicationContext.getBean("myEmf");
         PlatformTransactionManager txManager = (PlatformTransactionManager) applicationContext.getBean("txManager");
@@ -189,8 +192,21 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 		
 		runtimeManager.disposeRuntimeEngine(runtimeEngine);
 		runtimeManager.close();
+		
+		server.shutdown();
     }
 
+    public static Server startH2Server() {
+        try {
+            // start h2 in memory database
+            Server server = Server.createTcpServer(new String[0]);
+            server.start();
+            return server;
+        } catch (Throwable t) {
+            throw new RuntimeException("Could not start H2 server", t);
+        }
+    }
+    
     @Configuration
     public static Option[] configure() {
         return new Option[]{
