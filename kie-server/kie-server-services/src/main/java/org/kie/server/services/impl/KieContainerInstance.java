@@ -37,8 +37,8 @@ public class KieContainerInstance {
     public void setKieContainer(InternalKieContainer kieContainer) {
         this.kieContainer = kieContainer;
         if (kieContainer != null) {
-            this.resource.setReleaseId(new ReleaseId(kieContainer.getReleaseId()));
-            this.resource.setResolvedReleaseId(new ReleaseId(kieContainer.getContainerReleaseId()));
+            this.resource.setReleaseId(new ReleaseId(kieContainer.getContainerReleaseId()));
+            this.resource.setResolvedReleaseId(new ReleaseId(kieContainer.getReleaseId()));
         }
     }
 

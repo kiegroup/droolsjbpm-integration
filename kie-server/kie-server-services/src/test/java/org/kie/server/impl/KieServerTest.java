@@ -46,7 +46,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.rest.KieServerRestImpl;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -155,7 +155,7 @@ public class KieServerTest {
         Object message = messageClass.newInstance();
         Method setter = messageClass.getMethod("setText", String.class);
         Method getter = messageClass.getMethod("getText");
-        setter.invoke(message, "HelloWorld");
+        setter.invoke( message, "HelloWorld");
 
         KieCommands kcmd = ks.getCommands();
         Command<?> insert = kcmd.newInsert(message, "message");
@@ -299,7 +299,7 @@ public class KieServerTest {
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(PORT);
         server.start();
-        server.getDeployment().getRegistry().addSingletonResource(new KieServerImpl());
+        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
     }
 
     private void startClient() throws Exception {

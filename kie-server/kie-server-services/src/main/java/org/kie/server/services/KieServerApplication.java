@@ -6,20 +6,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.ws.rs.core.Application;
 
-import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.rest.KieServerRestImpl;
 
 public class KieServerApplication extends Application {
-    
-//    private final Set<Class<?>> classes = new CopyOnWriteArraySet<Class<?>>() {
-//        private static final long serialVersionUID = 1763183096852523317L;
-//    {
-//       add(KieServerImpl.class); 
-//    }};
     
     private final Set<Object> instances = new CopyOnWriteArraySet<Object>() {
         private static final long serialVersionUID = 1763183096852523317L;
     {
-       add(new KieServerImpl()); 
+       add(new KieServerRestImpl()); 
     }};
     
     @Override
