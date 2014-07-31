@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.drools.core.util.StringUtils;
 import org.jbpm.kie.services.api.IdentityProvider;
+import org.jbpm.services.task.audit.commands.DeleteBAMTaskSummariesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
@@ -37,7 +38,6 @@ import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.impl.model.command.DeleteBAMTaskSummariesCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.task.model.OrganizationalEntity;
