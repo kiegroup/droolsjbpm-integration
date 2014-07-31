@@ -87,7 +87,7 @@ public class KieSpringIntegrationTestSupport {
             result.add(feature);
         }
 
-        return scanFeatures(getFeaturesUrl("org.drools","drools-karaf-features",DroolsVersion), result.toArray(new String[4 + features.length]));
+        return scanFeatures(getFeaturesUrl("org.drools","drools-karaf-features",DroolsVersion), result.toArray(new String[1 + features.length]));
     }
 
 }

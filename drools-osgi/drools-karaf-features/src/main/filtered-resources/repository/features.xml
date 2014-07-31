@@ -105,13 +105,13 @@
 
   <feature name="jbpm-commons" version="${drools.version}" description="jBPM Commons">
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
-    <bundle>mvn:org.jboss.spec.javax.servlet/jboss-servlet-api_3.0_spec/1.0.2.Final</bundle>
     <bundle>mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/1.0.0.Final</bundle>
     <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
     <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/1.0.0.Final</bundle>
-    <bundle>mvn:org.jboss.spec.javax.jms/jboss-jms-api_1.1_spec/</bundle>
-    <bundle>mvn:org.hibernate.javax.persistence/hibernate-jpa-2.1-api/1.0.0.Final</bundle>
-    <bundle>mvn:org.jboss.spec.javax.transaction/jboss-transaction-api_1.2_spec/1.0.0.Final</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/1.0</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
   </feature>
 
   <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
@@ -180,6 +180,51 @@
   <feature name="jbpm-example" version="${drools.version}" description="jBPM Spring Example">
     <feature version="${drools.version}">jbpm</feature>
     <bundle>mvn:org.drools/spring-jbpm-osgi-example/${drools.version}</bundle>
+  </feature>
+
+  <!-- This bundle should be removed with next release of Drools 6.1.Beta4 -->
+  <feature name="lib" version="${project.version}">
+      <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/2.4.0</bundle>
+  </feature>
+
+  <!-- Spring jBPM Persistent OSGI -->
+  <feature name="jbpm-spring-persistent" version="${drools.version}" description="jBPM Spring OSGI Example">
+      <feature version="${drools.version}">jbpm</feature>
+      <feature version="${project.version}">lib</feature>
+      <feature>spring-dm</feature>
+      <feature version="${drools.version}">kie-spring</feature>
+      <feature>hibernate</feature>
+      <feature version="${h2.version}">h2</feature>
+  </feature>
+
+  <feature name="hibernate" version="4.3.1.Final" description="Hibernate 4.3.x JPA persistence engine support">
+      <details>Enable Hibernate 4.3.x as persistence engine.</details>
+      <feature>transaction</feature>
+      <feature>jpa</feature>
+      <bundle start-level="30" dependency="true">mvn:org.hibernate.javax.persistence/hibernate-jpa-2.1-api/1.0.0.Final</bundle>
+      <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/2.7.7_5</bundle>
+      <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/1.8.2_2</bundle>
+      <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/1.6.1_5</bundle>
+      <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.serp/1.14.1_1</bundle>
+      <bundle dependency="true">mvn:com.fasterxml/classmate/0.9.0</bundle>
+      <bundle dependency="true">mvn:org.javassist/javassist/3.18.1-GA</bundle>
+      <bundle dependency="true">mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.4_spec/1.0.2.Final</bundle>
+      <bundle dependency="true">wrap:mvn:org.jboss/jandex/1.1.0.Final</bundle>
+      <bundle dependency="true">mvn:org.jboss.logging/jboss-logging/3.1.4.GA</bundle>
+      <bundle dependency="true">mvn:org.hibernate.common/hibernate-commons-annotations/4.0.4.Final</bundle>
+      <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-core/4.3.1.Final$overwrite=merge&amp;DynamicImport-Package=*</bundle>
+      <bundle start-level="100">mvn:org.hibernate/hibernate-entitymanager/4.3.1.Final</bundle>
+      <bundle start-level="100">mvn:org.hibernate/hibernate-osgi/4.3.1.Final</bundle>
+  </feature>
+
+  <feature name="hibernate-validator" version="4.3.1.Final">
+      <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.1.0/2.4.0</bundle>
+      <bundle>mvn:org.jboss.logging/jboss-logging/3.1.4.GA</bundle>
+      <bundle>mvn:org.hibernate/hibernate-validator/4.3.1.Final</bundle>
+  </feature>
+
+  <feature name="h2" version="${h2.version}" description="h2 database">
+      <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
   </feature>
 
 </features>
