@@ -16,17 +16,43 @@
 
 package org.drools.karaf.itest;
 
+import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.configureConsole;
+import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.logLevel;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
+
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
-import org.drools.compiler.kproject.ReleaseIdImpl;
+import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.runtime.manager.RuntimeEnvironment;
+import org.kie.api.runtime.manager.RuntimeEnvironmentBuilder;
+import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.manager.RuntimeManagerFactory;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.TaskService;
+import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
@@ -36,11 +62,7 @@ import org.ops4j.pax.exam.spi.reactors.EagerSingleStagedReactorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-
-import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
-import static org.junit.Assert.*;
-import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
@@ -87,6 +109,87 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
         assertNotNull(obj);
         assertTrue(obj instanceof KieSession);
     }
+    
+    @Test
+    public void testJbpmRuntimeManager() {
+        refresh();
+        RuntimeEnvironment environment = RuntimeEnvironmentBuilder.Factory.get().newEmptyBuilder()
+            .addAsset(
+        		KieServices.Factory.get().getResources().newClassPathResource(
+    				"Evaluation.bpmn",getClass().getClassLoader()), ResourceType.BPMN2)
+            .get();
+        RuntimeManager runtimeManager = RuntimeManagerFactory.Factory.get().newSingletonRuntimeManager(environment);
+        KieSession ksession = runtimeManager.getRuntimeEngine(EmptyContext.get()).getKieSession();
+        ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new SystemOutWorkItemHandler());
+
+        LOG.info("Start process Evaluation (bpmn2)");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("employee", "krisv");
+		params.put("reason", "Yearly performance evaluation");
+		ProcessInstance processInstance = 
+			ksession.startProcess("com.sample.evaluation", params);
+        LOG.info("Started process instance " + processInstance.getId());
+    }
+
+    @Test
+    public void testJbpmRuntimeManagerWithPersistence() {
+        refresh();
+        EntityManagerFactory emf = (EntityManagerFactory) applicationContext.getBean("myEmf");
+        PlatformTransactionManager txManager = (PlatformTransactionManager) applicationContext.getBean("txManager");
+        RuntimeEnvironment environment = RuntimeEnvironmentBuilder.Factory.get().newDefaultBuilder()
+        	.entityManagerFactory(emf)
+        	.addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, txManager)
+            .addAsset(
+        		KieServices.Factory.get().getResources().newClassPathResource(
+    				"Evaluation.bpmn",getClass().getClassLoader()), ResourceType.BPMN2)
+            .get();
+        RuntimeManager runtimeManager = RuntimeManagerFactory.Factory.get().newSingletonRuntimeManager(environment);
+        RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(EmptyContext.get());
+        KieSession ksession = runtimeEngine.getKieSession();
+        TaskService taskService = runtimeEngine.getTaskService();
+
+		// start a new process instance
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("employee", "krisv");
+		params.put("reason", "Yearly performance evaluation");
+		ProcessInstance processInstance = 
+			ksession.startProcess("com.sample.evaluation", params);
+		System.out.println("Process instance " + processInstance.getId() + " started ...");
+		
+//		// complete Self Evaluation
+//		List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("krisv", "en-UK");
+//		TaskSummary task = tasks.get(0);
+//		System.out.println("'krisv' completing task " + task.getName() + ": " + task.getDescription());
+//		taskService.start(task.getId(), "krisv");
+//		Map<String, Object> results = new HashMap<String, Object>();
+//		results.put("performance", "exceeding");
+//		taskService.complete(task.getId(), "krisv", results);
+//		
+//		// john from HR
+//		tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
+//		task = tasks.get(0);
+//		System.out.println("'john' completing task " + task.getName() + ": " + task.getDescription());
+//		taskService.claim(task.getId(), "john");
+//		taskService.start(task.getId(), "john");
+//		results = new HashMap<String, Object>();
+//		results.put("performance", "acceptable");
+//		taskService.complete(task.getId(), "john", results);
+//		
+//		// mary from PM
+//		tasks = taskService.getTasksAssignedAsPotentialOwner("mary", "en-UK");
+//		task = tasks.get(0);
+//		System.out.println("'mary' completing task " + task.getName() + ": " + task.getDescription());
+//		taskService.claim(task.getId(), "mary");
+//		taskService.start(task.getId(), "mary");
+//		results = new HashMap<String, Object>();
+//		results.put("performance", "outstanding");
+//		taskService.complete(task.getId(), "mary", results);
+//		
+//		System.out.println("Process instance completed");
+		
+		runtimeManager.disposeRuntimeEngine(runtimeEngine);
+		runtimeManager.close();
+    }
 
     @Configuration
     public static Option[] configure() {
@@ -116,13 +219,13 @@ public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
                 ),
 
                 // Load Kie-Spring
-                loadDroolsKieFeatures("kie-spring")
+                loadDroolsKieFeatures("jbpm-spring-persistent")
 
         };
 
     }
 
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
-        return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/kie-beans.xml"});
+        return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/kie-beans-persistence.xml"});
     }
 }
