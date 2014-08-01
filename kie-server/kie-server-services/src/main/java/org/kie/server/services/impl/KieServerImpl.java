@@ -18,6 +18,8 @@ import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.KieServices;
+import org.kie.api.builder.Message.Level;
+import org.kie.api.builder.Results;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
@@ -59,14 +61,14 @@ public class KieServerImpl {
     private static final Logger             logger               = LoggerFactory.getLogger(KieServerRestImpl.class);
 
     private final KieContainersRegistryImpl context;
-    private final IOService                 ios;
-    private FileSystem                fs;
+    private IOService                       ios                  = null;
+    private FileSystem                      fs                   = null;
 
     public KieServerImpl() {
-        ios = initializeIOService();
-        fs = initializeSystemFS(ios);
-        this.context = new KieContainersRegistryImpl(ios, fs);
-        restoreContainers();
+        //ios = initializeIOService();
+        //fs = initializeSystemFS(ios);
+        this.context = new KieContainersRegistryImpl();
+        //restoreContainers();
     }
 
     private IOService initializeIOService() {
@@ -79,17 +81,23 @@ public class KieServerImpl {
         FileSystem fs = null;
         try {
             fs = ios.getFileSystem(uri);
-            if( fs == null ) {
+            if (fs == null) {
                 // new filesystem. create.
-                fs = ios.newFileSystem(uri, new HashMap<String, Object>() {{
-                  put("init", true);  
-                }});
+                fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
+
+                    {
+                        put("init", true);
+                    }
+                });
             }
-        } catch(Exception e ) {
+        } catch (Exception e) {
             // new filesystem. create.
-            fs = ios.newFileSystem(uri, new HashMap<String, Object>() {{
-              put("init", true);  
-            }});
+            fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
+
+                {
+                    put("init", true);
+                }
+            });
         }
         return fs;
     }
@@ -434,6 +442,44 @@ public class KieServerImpl {
         }
     }
 
+    public ServiceResponse<ReleaseId> getContainerReleaseId(String id) {
+        try {
+            KieContainerInstance ci = context.getContainer(id);
+            if (ci != null) {
+                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "ReleaseId for container " + id, ci.getResource().getReleaseId());
+            }
+            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
+        } catch (Exception e) {
+            logger.error("Error retrieving releaseId for container '" + id + "'", e);
+            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error retrieving container releaseId: " +
+                    e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    public ServiceResponse<ReleaseId> updateContainerReleaseId(String id, ReleaseId releaseId) {
+        try {
+            KieContainerInstance kci = (KieContainerInstance) context.getContainer(id);
+            // the following code is subject to a concurrent call to dispose(), but the cost of synchronizing it
+            // would likely not be worth it. At this point a decision was made to fail the execution if a concurrent 
+            // call do dispose() is executed.
+            if (kci != null && kci.getKieContainer() != null) {
+                Results results = kci.getKieContainer().updateToVersion(releaseId);
+                if (results.hasMessages(Level.ERROR)) {
+                    logger.error("Error updating releaseId for container " + id + " to version " + releaseId + "\nMessages: " + results.getMessages());
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId, kci.getResource().getReleaseId());
+                } else {
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfuly updated.", kci.getResource().getReleaseId());
+                }
+            } else {
+                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
+            }
+        } catch (Exception e) {
+            logger.error("Error updating releaseId for container '" + id + "'", e);
+            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ": " +
+                    e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
     private KieScannerStatus mapStatus(InternalKieScanner.Status status) {
         switch (status) {
             case STARTING:
@@ -455,12 +501,8 @@ public class KieServerImpl {
     public static class KieContainersRegistryImpl implements KieContainersRegistry {
 
         private final ConcurrentMap<String, KieContainerInstance> containers;
-        private final IOService                                   ios;
-        private final FileSystem                                  fs;
 
-        public KieContainersRegistryImpl(IOService ios, FileSystem fs) {
-            this.ios = ios;
-            this.fs = fs;
+        public KieContainersRegistryImpl() {
             this.containers = new ConcurrentHashMap<String, KieContainerInstance>();
         }
 
@@ -486,8 +528,9 @@ public class KieServerImpl {
         DirectoryStream<Path> ds = null;
         try {
             Path containersPath = fs.getPath("/containers");
-            if( ios.exists(containersPath) ) {
+            if (ios.exists(containersPath)) {
                 ds = ios.newDirectoryStream(containersPath, new Filter<Path>() {
+
                     @Override
                     public boolean accept(Path entry) throws IOException {
                         return Files.isDirectory(entry);
@@ -524,28 +567,31 @@ public class KieServerImpl {
     }
 
     private void persistContainer(KieContainerInstance ci) {
-        BufferedWriter writer = null;
-        try {
-            logger.info("Persisting state for kie container '" + ci.getContainerId() + "'");
-            XStream xs = XStreamXml.newXStreamMarshaller(KieServerImpl.class.getClassLoader());
-            Path file = fs.getPath("/containers/"+ci.getContainerId()+"/"+CONTAINER_STATE_FILE);
-            writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"));
-            xs.toXML(ci.getResource(), writer);
-        } catch (Exception e) {
-            logger.error("Error persisting state for kie container '"+ci.getContainerId()+"'", e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (java.io.IOException e) {
+        if( fs != null ) {
+            BufferedWriter writer = null;
+            try {
+                logger.info("Persisting state for kie container '" + ci.getContainerId() + "'");
+                XStream xs = XStreamXml.newXStreamMarshaller(KieServerImpl.class.getClassLoader());
+                Path file = fs.getPath("/containers/" + ci.getContainerId() + "/" + CONTAINER_STATE_FILE);
+                writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"));
+                xs.toXML(ci.getResource(), writer);
+            } catch (Exception e) {
+                logger.error("Error persisting state for kie container '" + ci.getContainerId() + "'", e);
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (java.io.IOException e) {
+                    }
                 }
             }
         }
-        
     }
 
     private void restore(KieContainerResource resource) {
-        System.out.println(">>>>>>>>> RESTORING STATE FOR = " + resource);
+        if( fs != null ) {
+            System.out.println(">>>>>>>>> RESTORING STATE FOR = " + resource);
+        }
     }
 
 }

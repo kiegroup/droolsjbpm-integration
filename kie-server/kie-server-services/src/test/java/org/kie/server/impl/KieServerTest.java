@@ -54,13 +54,16 @@ public class KieServerTest {
 
     private static final int       PORT = findFreePort();
     private static MavenRepository  repository;
-    private static ReleaseId        releaseId;
+    private static ReleaseId        releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
+    private static ReleaseId        releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
+
     private TJWSEmbeddedJaxrsServer server;
     private KieServicesClient       client;
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar();
+        createAndDeployKJar( releaseId1 );
+        createAndDeployKJar( releaseId2 );
         // this initialization only needs to be done once per VM
         RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
     }
@@ -91,13 +94,13 @@ public class KieServerTest {
 
     @Test
     public void testCreateContainer() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testGetContainerInfo() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         
@@ -113,8 +116,8 @@ public class KieServerTest {
 
     @Test
     public void testListContainers() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
-        client.createContainer("kie2", new KieContainerResource("kie2", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        client.createContainer("kie2", new KieContainerResource("kie2", releaseId1));
         ServiceResponse<KieContainerResourceList> reply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         Assert.assertEquals(2, reply.getResult().getContainers().size());
@@ -122,14 +125,14 @@ public class KieServerTest {
 
     @Test
     public void testDisposeContainer() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
         ServiceResponse<Void> reply = client.disposeContainer("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testCallContainer() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
 
         String payload = "<batch-execution lookup=\"defaultKieSession\">\n" +
                 "  <insert out-identifier=\"message\">\n" +
@@ -145,11 +148,23 @@ public class KieServerTest {
     }
 
     @Test
+    public void testUpdateVersion() throws Exception {
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        
+        ServiceResponse<ReleaseId> v = client.updateReleaseId("kie1", releaseId2);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, v.getType());
+        Assert.assertEquals(releaseId2, v.getResult());
+        
+        ServiceResponse<Void> reply = client.disposeContainer("kie1");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+    }
+
+    @Test
     public void testCallContainerMarshallCommands() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
 
         KieServices ks = KieServices.Factory.get();
-        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId1).getFile();
         URLClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});
         Class<?> messageClass = cl.loadClass("org.pkg1.Message");
         Object message = messageClass.newInstance();
@@ -177,7 +192,7 @@ public class KieServerTest {
     @Test
     public void testCommandScript() throws Exception {
         KieServices ks = KieServices.Factory.get();
-        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId1).getFile();
         URLClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});
         Class<?> messageClass = cl.loadClass("org.pkg1.Message");
         Object message = messageClass.newInstance();
@@ -191,7 +206,7 @@ public class KieServerTest {
 
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
 
-        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( "kie1", releaseId, null));
+        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( "kie1", releaseId1, null));
         KieServerCommand call = new CallContainerCommand("kie1", payload);
         KieServerCommand dispose = new DisposeContainerCommand("kie1");
 
@@ -207,7 +222,7 @@ public class KieServerTest {
 
     @Test
     public void testCallContainerLookupError() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
 
         String payload = "<batch-execution lookup=\"xyz\">\n" +
                 "  <insert out-identifier=\"message\">\n" +
@@ -223,7 +238,7 @@ public class KieServerTest {
 
     @Test
     public void testScanner() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         
@@ -306,7 +321,7 @@ public class KieServerTest {
         client = new KieServicesClient("http://localhost:" + PORT + "/server");
     }
 
-    private static void createAndDeployKJar() {
+    private static void createAndDeployKJar(ReleaseId releaseId) {
         String drl = "package org.pkg1\n"
                 + "global java.util.List list;"
                 + "declare Message\n"
@@ -324,7 +339,6 @@ public class KieServerTest {
                 + "    list.add(msg);\n"
                 + "end\n";
         KieServices ks = KieServices.Factory.get();
-        releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
         createAndDeployJar(ks, releaseId, drl);
 
         // make sure it is not deployed in the in-memory repository

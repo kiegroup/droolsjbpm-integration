@@ -36,10 +36,7 @@ public class KieContainerInstance {
 
     public void setKieContainer(InternalKieContainer kieContainer) {
         this.kieContainer = kieContainer;
-        if (kieContainer != null) {
-            this.resource.setReleaseId(new ReleaseId(kieContainer.getContainerReleaseId()));
-            this.resource.setResolvedReleaseId(new ReleaseId(kieContainer.getReleaseId()));
-        }
+        updateReleaseId(kieContainer);
     }
 
     public KieContainerStatus getStatus() {
@@ -51,6 +48,7 @@ public class KieContainerInstance {
     }
 
     public KieContainerResource getResource() {
+        updateReleaseId(kieContainer);
         return resource;
     }
 
@@ -64,6 +62,13 @@ public class KieContainerInstance {
 
     public InternalKieScanner getScanner() {
         return this.scanner;
+    }
+
+    private void updateReleaseId(InternalKieContainer kieContainer) {
+        if (kieContainer != null) {
+            this.resource.setReleaseId(new ReleaseId(kieContainer.getContainerReleaseId()));
+            this.resource.setResolvedReleaseId(new ReleaseId(kieContainer.getReleaseId()));
+        }
     }
 
     @Override

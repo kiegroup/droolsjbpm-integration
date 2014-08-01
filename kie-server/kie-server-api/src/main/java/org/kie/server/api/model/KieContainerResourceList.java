@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType (XmlAccessType.FIELD)
 public class KieContainerResourceList {
     
-    @XmlElement
+    @XmlElement(name="kie-container")
     private List<KieContainerResource> containers;
 
     public KieContainerResourceList() {

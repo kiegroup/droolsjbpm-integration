@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.ReleaseId;
 
 @Path("/server")
 public interface KieServer {
@@ -53,6 +54,17 @@ public interface KieServer {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response execute( @PathParam("id") String id, String cmdPayload );
+    
+    @GET
+    @Path("containers/{id}/release-id")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getReleaseId( @PathParam("id") String id);
+
+    @POST
+    @Path("containers/{id}/release-id")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response updateReleaseId( @PathParam("id") String id, ReleaseId releaseId );
     
     @GET
     @Path("containers/{id}/scanner")

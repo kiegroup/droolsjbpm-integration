@@ -23,7 +23,8 @@ public class ServiceResponse<T> {
         @XmlElement(name = "kie-container", type = KieContainerResource.class),
         @XmlElement(name = "results", type = String.class),
         @XmlElement(name = "kie-containers", type = KieContainerResourceList.class),
-        @XmlElement(name = "kie-scanner", type = KieScannerResource.class)
+        @XmlElement(name = "kie-scanner", type = KieScannerResource.class),
+        @XmlElement(name = "release-id", type = ReleaseId.class)
     })
     private T result;
     

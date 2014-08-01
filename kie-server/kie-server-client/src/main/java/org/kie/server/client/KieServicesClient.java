@@ -14,6 +14,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 
@@ -166,6 +167,22 @@ public class KieServicesClient {
             throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception scanner for container '"+id+"'.", e, response );
+        }
+    }
+
+    public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
+        ClientResponse<ServiceResponse<ReleaseId>> response = null;
+        try {
+            ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id+"/release-id");
+            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, releaseId).post(new GenericType<ServiceResponse<ReleaseId>>(){});
+            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
+                return response.getEntity();
+            }
+            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ClientResponseFailure("Unexpected exception updating releaseId for container '"+id+"'.", e, response );
         }
     }
     

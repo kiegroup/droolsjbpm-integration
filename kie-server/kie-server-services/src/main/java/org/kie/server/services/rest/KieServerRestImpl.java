@@ -10,20 +10,21 @@ import javax.ws.rs.core.Response.Status;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.impl.KieServerImpl;
 
 @Path("/server")
 public class KieServerRestImpl implements KieServer {
-    
+
     private KieServerImpl server;
 
     public KieServerRestImpl() {
         // for now, if no server impl is passed as parameter, create one
         this.server = new KieServerImpl();
     }
-    
+
     public KieServerRestImpl(KieServerImpl server) {
         this.server = server;
     }
@@ -31,7 +32,7 @@ public class KieServerRestImpl implements KieServer {
     public KieServerImpl getServer() {
         return server;
     }
-    
+
     public void setServer(KieServerImpl server) {
         this.server = server;
     }
@@ -71,7 +72,7 @@ public class KieServerRestImpl implements KieServer {
     public Response execute(String id, String cmdPayload) {
         return Response.ok(server.callContainer(id, cmdPayload)).build();
     }
-    
+
     @Override
     public Response getScannerInfo(String id) {
         return Response.ok(server.getScannerInfo(id)).build();
@@ -81,6 +82,15 @@ public class KieServerRestImpl implements KieServer {
     public Response updateScanner(String id, KieScannerResource resource) {
         return Response.ok(server.updateScanner(id, resource)).build();
     };
-    
+
+    @Override
+    public Response getReleaseId(String id) {
+        return Response.ok(server.getContainerReleaseId(id)).build();
+    }
+
+    @Override
+    public Response updateReleaseId(String id, ReleaseId releaseId) {
+        return Response.ok(server.updateContainerReleaseId(id, releaseId)).build();
+    }
 
 }
