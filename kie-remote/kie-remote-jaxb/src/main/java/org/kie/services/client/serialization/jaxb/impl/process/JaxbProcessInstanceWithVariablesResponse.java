@@ -57,6 +57,9 @@ public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbRespon
 
     public void setProcessInstance(ProcessInstance processInstance) {
         JaxbProcessInstanceResponse xmlProcessInstance;
+        if( processInstance == null ) { 
+            return;
+        }
         if( ! (processInstance instanceof JaxbProcessInstanceResponse) ) { 
             xmlProcessInstance = new JaxbProcessInstanceResponse(processInstance);
         }  else { 

@@ -158,7 +158,7 @@ public class RuntimeResource extends ResourceBase {
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}")
     public Response process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
-        ProcessInstance result = getProcessInstance(procInstId);
+        ProcessInstance result = getProcessInstance(procInstId, true);
         return createCorrectVariant(new JaxbProcessInstanceResponse(result), headers);
     }
 
@@ -292,7 +292,7 @@ public class RuntimeResource extends ResourceBase {
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
     public Response withvars_process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
         
-        ProcessInstance procInst = getProcessInstance(procInstId);
+        ProcessInstance procInst = getProcessInstance(procInstId, true);
         Map<String, String> vars = getVariables(procInstId);
         JaxbProcessInstanceWithVariablesResponse responseObj 
             = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
@@ -313,7 +313,7 @@ public class RuntimeResource extends ResourceBase {
                 deploymentId, 
                 procInstId);
         
-        ProcessInstance processInstance = getProcessInstance(procInstId);
+        ProcessInstance processInstance = getProcessInstance(procInstId, false);
         Map<String, String> vars = getVariables(processInstance.getId());
         
         return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars), headers);
@@ -321,7 +321,7 @@ public class RuntimeResource extends ResourceBase {
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
 
-    private ProcessInstance getProcessInstance(long procInstId) { 
+    private ProcessInstance getProcessInstance(long procInstId, boolean throwEx ) { 
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         Object procInstResult = processRequestBean.doKieSessionOperation(
@@ -331,9 +331,11 @@ public class RuntimeResource extends ResourceBase {
         
         if (procInstResult != null) {
             return (ProcessInstance) procInstResult;
-        } else {
+        } else if( throwEx ) {
             throw RestOperationException.notFound("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
+        } else { 
+            return null;
         }
         
     }
