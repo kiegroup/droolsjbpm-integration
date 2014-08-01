@@ -105,6 +105,7 @@ public class ProcessRequestBean {
         if( ! version.equals(VERSION) ) { 
             logger.warn( "Request received from client version [{}] while server is version [{}]! THIS MAY CAUSE PROBLEMS!", version, VERSION);
         }
+        jaxbResponse.setVersion(VERSION);
         
         String cmdName = cmd.getClass().getSimpleName();
         logger.debug("Processing command " + cmdName);
