@@ -29,8 +29,10 @@ import org.jbpm.process.audit.event.AuditEvent;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
+import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
+import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
@@ -99,6 +101,7 @@ public class JaxbCommandsResponse {
         cmdListTypes.put(GetTaskAssignedAsPotentialOwnerCommand.class, TaskSummary.class);
         cmdListTypes.put(GetTasksByStatusByProcessInstanceIdCommand.class, TaskSummary.class);
         cmdListTypes.put(GetTasksOwnedCommand.class, TaskSummary.class);
+        cmdListTypes.put(GetTasksByVariousFieldsCommand.class, TaskSummary.class);
         
         // long
         cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
@@ -237,7 +240,11 @@ public class JaxbCommandsResponse {
             this.responses.add(new JaxbVariableInstanceLog((VariableInstanceLog) result));
         } else if( result instanceof DefaultFactHandle ) { 
            this.responses.add(new JaxbOtherResponse(result, i, cmd));
-        } 
+        } else if( cmd instanceof GetTaskContentCommand ) { 
+           JaxbContent jaxbTaskContent = new JaxbContent();
+           jaxbTaskContent.setContentMap((Map<String, Object>) result);
+           this.responses.add(new JaxbTaskContentResponse(jaxbTaskContent, i, cmd));
+        }
         // Other
         else if( result instanceof JaxbExceptionResponse ) { 
            this.responses.add((JaxbExceptionResponse) result);
