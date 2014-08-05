@@ -43,6 +43,7 @@ import javax.persistence.EntityManagerFactory;
 import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.h2.tools.Server;
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
+import org.jbpm.services.task.identity.JBossUserGroupCallbackImpl;
 import org.jbpm.test.JBPMHelper;
 
 import org.junit.Before;
@@ -127,7 +128,7 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
         assertNotNull(obj);
         assertTrue(obj instanceof KieSession);
     }
-    
+
     @Test
     public void testJbpmRuntimeManager() {
         refresh();
@@ -144,7 +145,7 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("employee", "krisv");
 		params.put("reason", "Yearly performance evaluation");
-		ProcessInstance processInstance = 
+		ProcessInstance processInstance =
 			ksession.startProcess("com.sample.evaluation", params);
         LOG.info("Started process instance " + processInstance.getId());
     }
@@ -153,6 +154,10 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
     public void testJbpmRuntimeManagerWithPersistence() {
     	Server server = startH2Server();
         refresh();
+        Properties props = new Properties();
+        props.setProperty("krisv", "IT");
+        props.setProperty("john", "HR");
+        props.setProperty("mary", "PM");
         EntityManagerFactory emf = (EntityManagerFactory) applicationContext.getBean("myEmf");
         PlatformTransactionManager txManager = (PlatformTransactionManager) applicationContext.getBean("txManager");
         RuntimeEnvironment environment = RuntimeEnvironmentBuilder.Factory.get().newDefaultBuilder()
@@ -161,6 +166,7 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
             .addAsset(
         		KieServices.Factory.get().getResources().newClassPathResource(
     				"Evaluation.bpmn",getClass().getClassLoader()), ResourceType.BPMN2)
+            .userGroupCallback(new JBossUserGroupCallbackImpl(props))
             .get();
         RuntimeManager runtimeManager = RuntimeManagerFactory.Factory.get().newSingletonRuntimeManager(environment);
         RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(EmptyContext.get());
@@ -174,37 +180,43 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
 		ProcessInstance processInstance = 
 			ksession.startProcess("com.sample.evaluation", params);
 		System.out.println("Process instance " + processInstance.getId() + " started ...");
+
+        ProcessInstance pi = ksession.getProcessInstance(processInstance.getId());
+        System.out.println(pi);
 		
-//		// complete Self Evaluation
-//		List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("krisv", "en-UK");
-//		TaskSummary task = tasks.get(0);
-//		System.out.println("'krisv' completing task " + task.getName() + ": " + task.getDescription());
-//		taskService.start(task.getId(), "krisv");
-//		Map<String, Object> results = new HashMap<String, Object>();
-//		results.put("performance", "exceeding");
-//		taskService.complete(task.getId(), "krisv", results);
-//		
-//		// john from HR
-//		tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
-//		task = tasks.get(0);
-//		System.out.println("'john' completing task " + task.getName() + ": " + task.getDescription());
-//		taskService.claim(task.getId(), "john");
-//		taskService.start(task.getId(), "john");
-//		results = new HashMap<String, Object>();
-//		results.put("performance", "acceptable");
-//		taskService.complete(task.getId(), "john", results);
-//		
-//		// mary from PM
-//		tasks = taskService.getTasksAssignedAsPotentialOwner("mary", "en-UK");
-//		task = tasks.get(0);
-//		System.out.println("'mary' completing task " + task.getName() + ": " + task.getDescription());
-//		taskService.claim(task.getId(), "mary");
-//		taskService.start(task.getId(), "mary");
-//		results = new HashMap<String, Object>();
-//		results.put("performance", "outstanding");
-//		taskService.complete(task.getId(), "mary", results);
-//		
-//		System.out.println("Process instance completed");
+		// complete Self Evaluation
+		List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("krisv", "en-UK");
+		TaskSummary task = tasks.get(0);
+		System.out.println("'krisv' completing task " + task.getName() + ": " + task.getDescription());
+		taskService.start(task.getId(), "krisv");
+
+        Map<String, Object> vars = taskService.getTaskContent(task.getId());
+
+		Map<String, Object> results = new HashMap<String, Object>();
+		results.put("performance", "exceeding");
+		taskService.complete(task.getId(), "krisv", results);
+
+		// john from HR
+		tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
+		task = tasks.get(0);
+		System.out.println("'john' completing task " + task.getName() + ": " + task.getDescription());
+		taskService.claim(task.getId(), "john");
+		taskService.start(task.getId(), "john");
+		results = new HashMap<String, Object>();
+		results.put("performance", "acceptable");
+		taskService.complete(task.getId(), "john", results);
+
+		// mary from PM
+		tasks = taskService.getTasksAssignedAsPotentialOwner("mary", "en-UK");
+		task = tasks.get(0);
+		System.out.println("'mary' completing task " + task.getName() + ": " + task.getDescription());
+		taskService.claim(task.getId(), "mary");
+		taskService.start(task.getId(), "mary");
+		results = new HashMap<String, Object>();
+		results.put("performance", "outstanding");
+		taskService.complete(task.getId(), "mary", results);
+
+		System.out.println("Process instance completed");
 		
 		runtimeManager.disposeRuntimeEngine(runtimeEngine);
 		runtimeManager.close();
@@ -242,7 +254,7 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                //debugConfiguration("5005", true),
+//                debugConfiguration("5005", true),
 
                 // Load Spring DM Karaf Feature
                 scanFeatures(
