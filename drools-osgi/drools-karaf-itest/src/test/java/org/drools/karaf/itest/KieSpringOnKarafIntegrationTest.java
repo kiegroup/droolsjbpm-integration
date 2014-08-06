@@ -241,7 +241,7 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
 
                 // Install Karaf Container
                 karafDistributionConfiguration().frameworkUrl(
-                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz"))
+                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
                         .karafVersion(MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf")).name("Apache Karaf")
                         .unpackDirectory(new File("target/exam/unpack/")),
 
