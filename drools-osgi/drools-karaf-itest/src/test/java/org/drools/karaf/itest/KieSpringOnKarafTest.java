@@ -68,7 +68,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
-@Ignore("This test succeed in isolation but produces a false negative failure when run in the test suite. FIXME")
 public class KieSpringOnKarafTest extends KieSpringIntegrationTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(KieSpringOnKarafTest.class);
