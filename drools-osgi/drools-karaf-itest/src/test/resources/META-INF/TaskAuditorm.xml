@@ -7,41 +7,11 @@
         <query>select t from TaskEventImpl t where t.taskId = :taskId</query>
         <!-- hint name="org.hibernate.timeout" value="200"/ -->
     </named-query>
-    <named-query name="getAllTasksEventsByProcessInstanceId">
-        <query>select t from TaskEventImpl t where t.processInstanceId = :processInstanceId</query>
-        <!-- hint name="org.hibernate.timeout" value="200"/ -->
-    </named-query>
     
     <named-query name="getAllBAMTaskSummaries">
         <query>select b from BAMTaskSummaryImpl b where b.taskId = :taskId</query>
         <!-- hint name="org.hibernate.timeout" value="200"/ -->
     </named-query>
-    <named-query name="deleteBAMTaskSummariesForTask">
-        <query>delete from BAMTaskSummaryImpl b where b.taskId = :taskId</query>
-        <!-- hint name="org.hibernate.timeout" value="200"/ -->
-    </named-query>
-    <named-query name="deleteAllBAMTaskSummaries">
-        <query>delete from BAMTaskSummaryImpl b</query>
-        <!-- hint name="org.hibernate.timeout" value="200"/ -->
-    </named-query>
-   
-    <named-query name="getAllAuditTasks">
-        <query>
-            select a from AuditTaskImpl a order by a.taskId DESC  
-        </query>
-        <!-- hint name="org.hibernate.timeout" value="200"/ -->
-    </named-query>
-    <named-query name="getAllAuditTasksByUser">
-        <query>
-            select a from AuditTaskImpl a where a.actualOwner = :owner order by a.taskId DESC  
-        </query>
-        <!-- hint name="org.hibernate.timeout" value="200"/ -->
-    </named-query>
-    <named-query name="getAuditTaskById">
-        <query>
-            select a from AuditTaskImpl a where a.taskId = :taskId 
-        </query>
-        <!-- hint name="org.hibernate.timeout" value="200"/ -->
-    </named-query>
+
     
 </entity-mappings>
