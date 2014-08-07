@@ -23,7 +23,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
+import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.QueryContextImpl;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
@@ -39,6 +42,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -471,7 +475,52 @@ public class ResourceBase {
            throw iae;
         }
     }
-   
+  
+   protected void fillProcessDefinitionList(String deploymentId, int [] pageInfo, int maxNumResults, RuntimeDataService runtimeDataService, DefinitionService bpmn2DataService, 
+           List<JaxbProcessDefinition> procDefList) { 
+       List<String> processIdList = Collections.EMPTY_LIST;
+       try { 
+           processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContextImpl(pageInfo[0], pageInfo[1])));
+           Collections.sort(processIdList);
+       } catch( Exception e) { 
+           // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
+           logger.debug( "Unable to retrieve process ids for deployment '{}': {}", deploymentId, e.getMessage(), e);
+       }
+       for( String processId : processIdList ) { 
+           ProcessDefinition processAssetDesc;
+           try { 
+               processAssetDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(deploymentId, processId); 
+               if( processAssetDesc == null ) { 
+                   logger.error( "No process definition information available for process definition '{}' in deployment '{}'!", 
+                           processId, deploymentId); 
+                   continue;
+               }
+           } catch( Exception e ) {
+               // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
+               logger.debug( "Unable to retrieve process definition for process '{}' in deployment '{}': {}", 
+                       processId, deploymentId, e.getMessage(), e);
+               continue; 
+           }
+           JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDesc);
+           Map<String, String> variables; 
+           try { 
+               variables = bpmn2DataService.getProcessVariables(deploymentId, processId);
+           } catch( Exception e) { 
+               // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
+               logger.debug( "Unable to retrieve process definition data for process '{}' in deployment '{}': {}", 
+                       processId, deploymentId, e.getMessage(), e);
+               continue; 
+           }
+           jaxbProcDef.setVariables(variables);
+           procDefList.add(jaxbProcDef);
+
+           if( procDefList.size() == maxNumResults) { 
+               // pagination parameters indicate that no more than current list is needed
+               break;
+           }
+       }
+   }
+    
     protected JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessDefinition procAssetDesc) {
         JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
         jaxbProcDef.setDeploymentId(((ProcessAssetDesc)procAssetDesc).getDeploymentId());

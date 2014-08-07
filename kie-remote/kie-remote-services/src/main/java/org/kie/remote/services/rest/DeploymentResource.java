@@ -4,6 +4,9 @@ import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.DEPLOYMENT_UN
 import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_ID;
 import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_TYPE;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -18,11 +21,14 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
+import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.api.model.QueryContextImpl;
 import org.jbpm.services.cdi.Kjar;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
@@ -37,6 +43,8 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDesc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +81,13 @@ public class DeploymentResource extends ResourceBase {
     @Inject
     @Kjar
     private KModuleDeploymentService deploymentService;
-   
+  
+    @Inject
+    private RuntimeDataService runtimeDataService;
+    
+    @Inject
+    private DefinitionService bpmn2DataService;
+    
     /* Async */
     
     @Inject
@@ -352,5 +366,22 @@ public class DeploymentResource extends ResourceBase {
         } 
                 
         return jobResult;
+    }
+    
+    @GET
+    @Path("/processes")
+    // DOCS: (+ pagination)
+    public Response listProcessDefinitions() { 
+        String oper = getRelativePath();
+        Map<String, String[]> params = getRequestParams();
+        int [] pageInfo = getPageNumAndPageSize(params, oper);
+        int maxNumResults = getMaxNumResultsNeeded(pageInfo); 
+        
+        JaxbProcessDefinitionList jaxbProcDefList  = new JaxbProcessDefinitionList();
+        fillProcessDefinitionList(deploymentId, pageInfo, maxNumResults, runtimeDataService, bpmn2DataService, 
+                jaxbProcDefList.getProcessDefinitionList());
+        JaxbProcessDefinitionList resultList 
+            = paginateAndCreateResult(pageInfo, jaxbProcDefList.getProcessDefinitionList(), new JaxbProcessDefinitionList());
+        return createCorrectVariant(resultList, headers);
     }
 }
