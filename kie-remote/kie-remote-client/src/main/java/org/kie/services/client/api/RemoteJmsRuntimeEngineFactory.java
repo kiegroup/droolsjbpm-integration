@@ -8,7 +8,6 @@ import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.http.pool.ConnFactory;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineBuilder;
 import org.kie.services.client.api.command.RemoteConfiguration;

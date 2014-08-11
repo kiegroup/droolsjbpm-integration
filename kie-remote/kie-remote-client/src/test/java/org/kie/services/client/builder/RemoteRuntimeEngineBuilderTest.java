@@ -26,7 +26,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jbpm.bpmn2.objects.Person;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,7 +35,6 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
-import org.kie.services.client.api.RemoteJmsRuntimeEngineFactoryBuilderImpl;
 import org.kie.services.client.api.RemoteRestRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteRuntimeEngineFactory;
 import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineBuilder;
@@ -582,7 +580,6 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
        orig.setUseSsl(false);
        
        setField(orig, "jmsSerializationType", 4);
-       setField(orig, "requestFactory", mock(ClientRequestFactory.class));
        
        RemoteConfiguration copy = orig.clone();
        

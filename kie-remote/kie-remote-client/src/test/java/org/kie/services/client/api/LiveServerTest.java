@@ -1,7 +1,8 @@
 package org.kie.services.client.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,15 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.jboss.resteasy.client.ClientExecutor;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientRequestFactory;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
@@ -27,7 +19,6 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +88,7 @@ public class LiveServerTest {
         return taskId;
     }
 
+    /**
     @Test
     // BZ 994905
     public void restAnonymousTaskInitiatorTest() throws Exception {
@@ -146,9 +138,7 @@ public class LiveServerTest {
         assertEquals("Potential owner of task: ", userId, tasks.get(0).getPeopleAssignments().getPotentialOwners().get(0).getId());
     }
 
-    /**
-     * Helper methods
-     */
+     // Helper methods
 
     private ClientResponse<?> checkResponse(ClientResponse<?> responseObj) throws Exception {
         responseObj.resetStream();
@@ -159,5 +149,7 @@ public class LiveServerTest {
         }
         return responseObj;
     }
+
+     */
 
 }

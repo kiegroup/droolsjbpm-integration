@@ -40,9 +40,12 @@ public class JsonSerializationProvider implements SerializationProvider {
             throw new UnsupportedOperationException(JaxbSerializationProvider.class.getSimpleName() + " can only deserialize Strings");
         }
         String jsonStr = (String) jsonStrObject;
-        
+        return deserialize(jsonStr, this.outputType);
+    }
+    
+    public <T> T deserialize(String jsonStr, Class<T> type) { 
         try {
-            return mapper.readValue(jsonStr, this.outputType);
+            return mapper.readValue(jsonStr, type);
         } catch (JsonGenerationException jge) {
             throw new SerializationException("Unable to deserialize String " + outputType.getClass().getSimpleName() + " instance", jge);
         } catch (JsonMappingException jme) {

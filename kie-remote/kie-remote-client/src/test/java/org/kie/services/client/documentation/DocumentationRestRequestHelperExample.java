@@ -2,9 +2,6 @@ package org.kie.services.client.documentation;
 
 import java.net.URL;
 
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.task.model.Task;
 import org.kie.services.client.api.RestRequestHelper;
 
@@ -21,11 +18,15 @@ public class DocumentationRestRequestHelperExample {
     public Task getTaskInstanceInfo(URL serverUrl, long taskId, String user, String password) throws Exception {
         // serverUrl should look something like this: "http://192.178.168.1:8080/"
         RestRequestHelper requestHelper = RestRequestHelper.newInstance(serverUrl, user, password);
-        ClientRequest restRequest = requestHelper.createRequest("task/" + taskId);
         
-        ClientResponse<?> responseObj = restRequest.get();
-        JaxbTask jaxbTask = responseObj.getEntity(JaxbTask.class);
-        return (Task) jaxbTask;
+        // TODO
+        
+//        ClientRequest restRequest = requestHelper.createRequest("task/" + taskId);
+//        
+//        ClientResponse<?> responseObj = restRequest.get();
+//        JaxbTask jaxbTask = responseObj.getEntity(JaxbTask.class);
+//        return (Task) jaxbTask;
+        return null;
     }
 
 }

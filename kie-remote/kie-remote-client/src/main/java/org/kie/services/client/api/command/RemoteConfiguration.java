@@ -1,56 +1,21 @@
 package org.kie.services.client.api.command;
 
-import java.io.IOException;
-import java.net.Inet6Address;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.auth.AuthScheme;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthState;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpContext;
-import org.jboss.resteasy.client.ClientExecutor;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientRequestFactory;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.jboss.resteasy.spi.interception.ClientExecutionContext;
-import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
+import org.kie.services.client.api.rest.KieRemoteHttpRequest;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * In order to protect the Remote (Java) API, this class may not be extended nor may its constructor be made public.
@@ -77,8 +42,7 @@ public final class RemoteConfiguration {
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     // REST
-    private ClientRequestFactory requestFactory;
-    private boolean useFormBasedAuth = false;
+    private KieRemoteHttpRequest httpRequest;
 
     // JMS
     private boolean useSsl = false;
@@ -111,18 +75,17 @@ public final class RemoteConfiguration {
     }
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout) {
-        this(deploymentId, url, username, password, timeout, false);
-    }
-
-    public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout, boolean formBasedAuth) {
         this.type = Type.REST;
         this.deploymentId = deploymentId;
         this.timeout = timeout;
-        this.useFormBasedAuth = formBasedAuth;
-        createRequestFactory(url, username, password);
+        createHttpRequest(url, username, password);
     }
 
-    public void createRequestFactory(URL url, String username, String password) { 
+    public void createHttpRequest(URL url, String username, String password) { 
+      createHttpRequest(url, username, password, (int) timeout)  ;
+    }
+    
+    public void createHttpRequest(URL url, String username, String password, int timeout) { 
         URL serverPlusRestUrl = initializeRestServicesUrl(url);
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
@@ -130,11 +93,7 @@ public final class RemoteConfiguration {
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        if( useFormBasedAuth ) { 
-            this.requestFactory = createFormBasedAuthenticatingRequestFactory(serverPlusRestUrl, username, password, (int) timeout);
-        } else { 
-            this.requestFactory = createAuthenticatingRequestFactory(serverPlusRestUrl, username, password, (int) timeout);
-        }
+        this.httpRequest = new KieRemoteHttpRequest(serverPlusRestUrl, username, password, timeout);
     }
     
     /**
@@ -172,216 +131,10 @@ public final class RemoteConfiguration {
         return serverPlusRestUrl;
     }
 
-    /**
-     * Creates an request factory that authenticates using the given username and password
-     * 
-     * @param url
-     * @param username
-     * @param password
-     * @param timeout
-     * 
-     * @return A request factory that can be used to send (authenticating) requests to REST services
-     */
-    public static ClientRequestFactory createAuthenticatingRequestFactory(URL url, String username, String password, int timeout) {
-        BasicHttpContext localContext = new BasicHttpContext();
-        HttpClient preemptiveAuthClient = createPreemptiveAuthHttpClient(username, password, timeout, localContext);
-        ClientExecutor clientExecutor = new ApacheHttpClient4Executor(preemptiveAuthClient, localContext);
-        try {
-            return new ClientRequestFactory(clientExecutor, url.toURI());
-        } catch (URISyntaxException urise) {
-            throw new IllegalArgumentException("URL (" + url.toExternalForm() + ") is not formatted correctly.", urise);
-        }
-    }
-
-    /**
-     * Creates an request factory that authenticates using the given username and password
-     * 
-     * @param url
-     * @param username
-     * @param password
-     * @param timeout
-     * 
-     * @return A request factory that can be used to send (authenticating) requests to REST services
-     */
-    public static ClientRequestFactory createFormBasedAuthenticatingRequestFactory(URL url, 
-            final String username, final String password, 
-            int timeout) {
-        try {
-            return new FormBasedAuthenticatingClientRequestFactory(url.toURI(), username, password, timeout);
-        } catch (URISyntaxException urise) {
-            throw new RemoteCommunicationException("Invalid URL: " + url.toExternalForm(), urise);
-        }
-    }
-
-    static class FormBasedAuthenticatingClientRequestFactory extends ClientRequestFactory { 
-     
-        private final String username;
-        private final String password;
-        private final ClientExecutor executor;
-        
-        public FormBasedAuthenticatingClientRequestFactory(URI uri, String username, String password, int timeout) { 
-            super(uri);
-            this.username = username;
-            this.password = password;
-           
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpParams params = httpClient.getParams();
-            HttpConnectionParams.setConnectionTimeout(params, timeout*1000);
-            HttpConnectionParams.setSoTimeout(params, timeout*1000);
-            
-            executor = new ApacheHttpClient4Executor(httpClient);
-        }
-        
-        public ClientRequest createRelativeRequest(String uriTemplate) {
-           ClientRequest request =  executor.createRequest(getBase().toString() + uriTemplate);
-           request.registerInterceptor(new FormBasedAuthenticatingInterceptor(username, password));
-           return request;
-        }
-
-        public ClientRequest createRequest(String uriTemplate) {
-           ClientRequest request =  executor.createRequest(uriTemplate);
-           request.registerInterceptor(new FormBasedAuthenticatingInterceptor(username, password));
-           return request;
-        }
+    public KieRemoteHttpRequest getHttpRequest() { 
+        return this.httpRequest;
     }
     
-    static class FormBasedAuthenticatingInterceptor implements ClientExecutionInterceptor {
-
-        private static final Logger logger = LoggerFactory.getLogger(FormBasedAuthenticatingInterceptor.class);
-       
-        private static final String LOGIN_FORM = "/j_security_check";
-        private static final String FORM_BASED_AUTH_PROPERTY = "org.kie.remote.form.based.auth";
-
-        private final String username;
-        private final String password;
-        private String sessionCookie = null;
-
-        public FormBasedAuthenticatingInterceptor(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        /**
-         * This method is called </b>every time</b> a {@link ClientRequest} is executed.
-         * </p>
-         * This interceptor method is thus triggered from {@link ClientRequest} calls within the method itself,
-         * making it a recursively called method [*]. 
-         */
-        @Override
-        public ClientResponse<?> execute(ClientExecutionContext ctx) throws Exception {
-            
-            // Setup
-            ClientRequest origRequest = ctx.getRequest();
-            if( sessionCookie != null ) { 
-                // Try with session cookie if it already exists
-                origRequest.header(HttpHeaders.COOKIE, sessionCookie);
-            }
-            URL restUrl = new URL(origRequest.getUri());
-            String restUrlString = restUrl.toExternalForm();
-            String origRequestMethod = origRequest.getHttpMethod();
-            debug("Processing request: [" + origRequestMethod + "] " + restUrlString 
-                    + (sessionCookie == null ? "" : " (session: " + sessionCookie + ")"));
-
-            // Do request (whichever request it may be!)
-            ClientResponse<?> response = ctx.proceed();
-            int status = response.getStatus();
-            debug("Response received [" + status + "]" );
-           
-            // If 
-            // 1. this is the form-based auth request, or
-            // 2. if the form-based auth has completed, 
-            // then we're done.. 
-            if( restUrlString.endsWith(LOGIN_FORM) ||
-                Boolean.parseBoolean((String) origRequest.getAttributes().get(FORM_BASED_AUTH_PROPERTY)) ) { 
-                return response;
-            }
-           
-            // Check response to see if form-based auth is necessary
-            String requestCookie = (String) response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
-            Object contentTypeObj = response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
-            boolean doFormBasedAuth = false;
-            if (contentTypeObj != null && (contentTypeObj instanceof String)) {
-                if (((String) contentTypeObj).startsWith(MediaType.TEXT_HTML)
-                        && requestCookie != null
-                        && !requestCookie.equals(sessionCookie) ) {
-                    debug( "New session cookie: " + requestCookie );
-                    doFormBasedAuth = true;
-                    sessionCookie = requestCookie;
-                }
-            }
-
-            // If form-based auth is required, do it
-            if (doFormBasedAuth) {
-                response.releaseConnection();
-
-                // Create form-based auth URL
-                String appBase = "/" + restUrl.getPath().substring(1).replaceAll("/.*", "");
-                URL appBaseUrl = new URL(restUrl.getProtocol(), restUrl.getHost(), restUrl.getPort(), appBase);
-                ClientRequestFactory requestFactory = new ClientRequestFactory(appBaseUrl.toURI());
-                ClientRequest formRequest = requestFactory.createRelativeRequest(LOGIN_FORM);
-                formRequest = formRequest.formParameter("j_username", username).formParameter("j_password", password);
-                if( sessionCookie != null ) { 
-                    formRequest.header(HttpHeaders.COOKIE, sessionCookie);
-                }
-
-                // Do form-based auth
-                try {
-                    debug("Trying form-based authentication for session '" + sessionCookie + "'");
-                    // [*] triggers recursive call of this method
-                    response = formRequest.post();
-                    int formRequestStatus = response.getStatus();
-                    if (formRequestStatus != 302) {
-                        String errMsg = "Unable to complete form-based authentication in via " + formRequest.getUri();
-                        System.err.println(errMsg + "\n [" + formRequestStatus + "] " + response.getEntity(String.class));
-                        throw new RemoteCommunicationException(errMsg + " (see output)");
-                    } 
-                    debug("Form-based authentication succeeded.");
-                } catch (RemoteCommunicationException rce) {
-                    throw rce;
-                } catch (Exception e) {
-                    if (e instanceof RuntimeException) {
-                        throw (RuntimeException) e;
-                    } else {
-                        String errMsg = "Unable to complete form-based authentication in via " + formRequest.getUri();
-                        throw new RemoteCommunicationException(errMsg, e);
-                    }
-                } finally {
-                    try {
-                        response.releaseConnection();
-                    } catch (Exception e) {
-                        // do nothing..
-                    }
-                }
-
-                // Somehow, query parameters are being added a second time here.. 
-                // As long we use UriInfo in the service-side resources to get the query parameters
-                //  instead of the HttpServletRequest, then things work..
-                try {
-                    if( sessionCookie == null ) { 
-                        throw new IllegalStateException("A cookie for a authenticated session should be available at this point!" );
-                    }
-                    debug("Retrying original request (proceed): [" + origRequestMethod + "] " + restUrlString );
-                   
-                    // [*] triggers recursive call of this method
-                    response = ctx.proceed();
-                } catch (Exception e) {
-                    if (e instanceof RuntimeException) {
-                        throw (RuntimeException) e;
-                    } else {
-                        throw new RemoteCommunicationException("Unable to " + origRequestMethod + " to " + restUrlString, e);
-                    }
-                }
-            }
-
-            return response;
-        }
-        
-        private void debug(String msg) { 
-            logger.debug(msg);
-        }
-        
-    }
-
     /**
      * This method is used in order to create the authenticating REST client factory.
      * 
@@ -392,6 +145,7 @@ public final class RemoteConfiguration {
      * 
      * @return A {@link DefaultHttpClient} instance that will authenticate using the given username and password.
      */
+    /**
     private static DefaultHttpClient createPreemptiveAuthHttpClient(String userName, String password, int timeout,
             BasicHttpContext localContext) {
         BasicHttpParams params = new BasicHttpParams();
@@ -428,9 +182,8 @@ public final class RemoteConfiguration {
         return client;
     }
 
-    /**
      * This class is used in order to effect preemptive authentication in the REST request factory.
-     */
+     
     static class PreemptiveAuth implements HttpRequestInterceptor {
 
         private final String contextId;
@@ -458,6 +211,7 @@ public final class RemoteConfiguration {
             }
         }
     }
+    */
 
     // JMS ----------------------------------------------------------------------------------------------------------------------
 
@@ -558,14 +312,6 @@ public final class RemoteConfiguration {
 
     public enum Type {
         REST, JMS, CONSTRUCTOR;
-    }
-
-    // ----
-    // REST
-    // ----
-
-    ClientRequestFactory getRequestFactory() {
-        return this.requestFactory;
     }
 
     // ----
@@ -677,10 +423,6 @@ public final class RemoteConfiguration {
         this.responseQueue = responseQueue;
     }
 
-    public void setUseFormBasedAuth(boolean useFormBasedAuth) {
-        this.useFormBasedAuth = useFormBasedAuth;
-    }
-    
     public void setUseSsl(boolean useSsl) {
         this.useSsl = useSsl;
     }
@@ -696,11 +438,10 @@ public final class RemoteConfiguration {
        this.password = config.password;
        this.processInstanceId = config.processInstanceId;
        this.responseQueue = config.responseQueue;
-       this.requestFactory = config.requestFactory;
+       this.httpRequest = config.httpRequest;
        this.taskQueue = config.taskQueue;
        this.timeout = config.timeout;
        this.type = config.type;
-       this.useFormBasedAuth = config.useFormBasedAuth;
        this.userName = config.userName;
        this.useSsl = config.useSsl;
     }

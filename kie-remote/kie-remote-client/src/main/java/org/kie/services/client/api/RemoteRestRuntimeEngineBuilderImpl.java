@@ -81,8 +81,9 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
     }
     
     @Override
+    @Deprecated
     public RemoteRestRuntimeEngineBuilder useFormBasedAuth(boolean formBasedAuth) {
-        this.config.setUseFormBasedAuth(formBasedAuth);
+        // TODO: delete me after 6.2.0.x
         return this;
     }
 
@@ -96,7 +97,7 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
         if( password == null ) { 
             throw new InsufficientInfoToBuildException("A password is required to build the factory.");
         }
-        this.config.createRequestFactory(url, username, password);
+        this.config.createHttpRequest(url, username, password);
     }
     
     @Override

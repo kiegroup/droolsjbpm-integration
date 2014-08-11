@@ -25,7 +25,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -37,10 +36,6 @@ import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientRequestFactory;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jbpm.process.audit.command.AuditCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
@@ -53,6 +48,7 @@ import org.kie.services.client.api.command.exception.MissingRequiredInfoExceptio
 import org.kie.services.client.api.command.exception.RemoteApiException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.api.command.exception.RemoteTaskException;
+import org.kie.services.client.api.rest.KieRemoteHttpRequest;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
@@ -374,30 +370,27 @@ public abstract class AbstractRemoteCommandObject {
         JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
         String deploymentId = config.getDeploymentId();
         
-        ClientRequestFactory requestFactory = config.getRequestFactory();
-        ClientRequest restRequest;
+        KieRemoteHttpRequest httpRequest = config.getHttpRequest();
         if (config.getExtraJaxbClasses().isEmpty() && (isTaskService || command instanceof AuditCommand) ) {
-            restRequest = requestFactory.createRelativeRequest("/task/execute");
+            httpRequest = httpRequest.relativeRequest("/task/execute");
         } else {
-            restRequest = requestFactory.createRelativeRequest("/runtime/" + deploymentId + "/execute");
+            httpRequest = httpRequest.relativeRequest("/runtime/" + deploymentId + "/execute");
         }
        
-        
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) { 
             try {
-                logger.trace("Sending {} via POST to {}", command.getClass().getSimpleName(), restRequest.getUri());
+                logger.trace("Sending {} via POST to {}", command.getClass().getSimpleName(), httpRequest.getUri());
             } catch (Exception e) {
                 // do nothing because this should never happen..  
             }
             logger.trace("Serialized JaxbCommandsRequest:\n {}", jaxbRequestString);
         }
-        restRequest.body(MediaType.APPLICATION_XML, jaxbRequestString);
+        httpRequest.contentType(MediaType.APPLICATION_XML).send(jaxbRequestString);
         
-        ClientResponse<?> response = null;
         try {
-            logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + restRequest.getUri());
-            response = restRequest.post(Object.class);
+            logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + httpRequest.getUri());
+            httpRequest.post();
         } catch (Exception e) {
             throw new RemoteCommunicationException("Unable to post request: " + e.getMessage(), e);
         }
@@ -405,12 +398,12 @@ public abstract class AbstractRemoteCommandObject {
         // Get response
         JaxbExceptionResponse exceptionResponse = null;
         JaxbCommandsResponse commandResponse = null;
-        int responseStatus = response.getStatus();
+        int responseStatus = httpRequest.code();
         try { 
             if( responseStatus < 300 ) { 
-                commandResponse = response.getEntity(JaxbCommandsResponse.class);
+                commandResponse = httpRequest.getEntity(JaxbCommandsResponse.class);
             } else { 
-                exceptionResponse = response.getEntity(JaxbExceptionResponse.class);
+                exceptionResponse = httpRequest.getEntity(JaxbExceptionResponse.class);
             }
         } catch(Exception e)  {
             logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);
@@ -434,10 +427,10 @@ public abstract class AbstractRemoteCommandObject {
         }
         
         // Process exception response
-        switch( response.getResponseStatus() ) { 
-        case CONFLICT: 
+        switch( httpRequest.code() ) { 
+        case 409:
             throw new RemoteTaskException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
-        case OK: 
+        case 200:
         default: 
             throw new RemoteApiException(exceptionResponse.getMessage()+ ":\n" + exceptionResponse.getStackTrace());
         }

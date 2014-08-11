@@ -3,9 +3,6 @@ package org.kie.services.client.api;
 
 import java.net.URL;
 
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientRequestFactory;
-import org.jboss.resteasy.client.ClientResponse;
 import org.jbpm.process.instance.impl.demo.DoNothingWorkItemHandler;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,17 +30,4 @@ public class RemoteApiTest extends Assert {
         }
     }
     
-    @Test
-    public void reRequestTest() throws Exception { 
-        String urlString = "http://localhost:8080/appBase/";
-        URL appBaseUrl = new URL(urlString);
-        ClientRequestFactory factory = new ClientRequestFactory(appBaseUrl.toURI());
-       
-        String pathAdd = "/j_security_check";
-        ClientRequest formRequest = factory.createRelativeRequest(pathAdd);
-        formRequest.formParameter("test", "test");
-       
-        assertEquals(urlString + pathAdd , formRequest.getUri());
-    }
-
 }

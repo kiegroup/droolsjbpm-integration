@@ -10,11 +10,15 @@ import org.kie.services.client.api.RemoteRestRuntimeEngineFactory;
 public interface RemoteRestRuntimeEngineBuilder extends RemoteRuntimeEngineBuilder<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory> {
 
     /**
-     * Form-based authentication is sometimes necessary to use, for example when using Tomcat
-     * as the underlying application server. 
+     * As of the Drools/jBPM 6.2.0 release, form based authentication is no longer necessary 
+     * for tomcat instances. All instances of kie-wb, kie-drools-wb, or jbpm-console
+     * now always use normal ("preemptive") http authentication. 
+     * </p>
+     * <b>This method thus no longer does anything</b> and has been deprecated.
      * @param formBasedAuth Indicates whether or not to use form-based authentication.
      * @return The builder instance
      */
+    @Deprecated
     RemoteRestRuntimeEngineBuilder useFormBasedAuth(boolean formBasedAuth);
     
     /**
