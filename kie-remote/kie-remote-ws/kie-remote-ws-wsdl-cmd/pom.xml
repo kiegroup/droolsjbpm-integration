@@ -33,16 +33,8 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <!-- 1. create parsedVersion variables for use later (when replacing VERSION in wsdl)-->
         <executions>
-          <execution>
-            <id>parse-version</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>parse-version</goal>
-            </goals>
-          </execution>
-          <!-- 2. add src/main/generated so that generated classes are added to jar -->
+          <!-- 1. add src/main/generated so that generated classes are added to jar -->
           <execution>
             <id>add-generated-sources</id>
             <phase>generate-sources</phase>
@@ -60,7 +52,7 @@
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
-          <!-- 3. copy wsdl file to target/classes so that "VERSION" in wsdl file can be replaced with appropriate value, before compile -->
+          <!-- 2. copy wsdl file to target/classes so that "VERSION" in wsdl file can be replaced with appropriate value, before compile -->
           <execution>
             <id>copy-wsdl-to-target</id>
             <!-- here the phase you need -->
@@ -83,7 +75,7 @@
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
         <executions>
-          <!-- 4. replace "VERSION" in WSDL file with project version + bugfix version -->
+          <!-- 3. replace "VERSION" in WSDL file with project version + bugfix version -->
           <execution>
             <phase>process-resources</phase>
             <goals>
@@ -110,7 +102,7 @@
         <artifactId>jaxws-maven-plugin</artifactId>
         <version>2.3</version>
         <executions>
-          <!-- 5. generate classes based on WSDL to be included in jar -->
+          <!-- 4. generate classes based on WSDL to be included in jar -->
           <execution>
             <id>wsimport-from-jdk</id>
             <phase>process-resources</phase>
