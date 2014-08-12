@@ -212,7 +212,7 @@
         <repository>
             <id>apache</id>
             <!-- <url>http://repo1.maven.org/maven2/</url> -->
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 
