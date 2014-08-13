@@ -23,6 +23,7 @@
 
   <modules>
     <module>kie-remote-common</module>
+    <module>kie-remote-jaxb-gen</module>
     <module>kie-remote-jaxb</module>
     <module>kie-remote-client</module>
     <module>kie-remote-services</module>

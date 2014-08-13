@@ -1,0 +1,309 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.remote</groupId>
+    <artifactId>kie-remote</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-remote-jaxb-gen</artifactId>
+  <name>KIE Remote Services :: Generated flat JAXB command classes</name>
+
+  <dependencies>
+    <!-- jaxb -->
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+    </dependency>
+
+    <!-- command sources -->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+      <optional>true</optional>
+    </dependency>
+    
+    <!-- test -->
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- 0. deleted unpacked and generated classes -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}/src/main/java/org/drools</directory>
+            </fileset>
+            <fileset>
+              <directory>${basedir}/src/main/java/org/jbpm</directory>
+            </fileset>
+            <fileset>
+              <directory>${basedir}/src/main/generated</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+      <!-- 0. add src/main/generated so that generated classes are added to jar -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-generated-sources</id>
+            <phase>inititalize</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/generated</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- 1. unpack original sources of Command implementation java code -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-cmd-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.drools</groupId>
+                  <artifactId>drools-core</artifactId>
+                  <classifier>sources</classifier>
+                  <type>jar</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${basedir}/src/main/java</outputDirectory>
+                  <includes>org/drools/core/command/impl/GenericCommand.java,
+                    org.drools.core.xml.jaxb.util.JaxbUnknownAdapter.java,
+                    org/drools/core/command/runtime/process/*WorkItemCommand.java,
+                    org/drools/core/command/runtime/process/AbortProcessInstanceCommand.java,
+                    org/drools/core/command/runtime/process/GetProcess*Command.java,
+                    org/drools/core/command/runtime/process/SetProcess*Command.java,
+                    org/drools/core/command/runtime/process/SignalEventCommand.java,
+                    org/drools/core/command/runtime/process/Start*ProcessCommand.java,
+                    org/drools/core/command/runtime/SetGlobalCommand.java,
+                    org/drools/core/command/runtime/GetFactCountCommand.java,
+                    org/drools/core/command/runtime/GetGlobalCommand.java,
+                    org/drools/core/command/runtime/GetIdCommand.java,
+                    org/drools/core/command/GetVariableCommand.java,
+                    org/drools/core/command/SetGlobalCommand.java,
+                    org/drools/core/command/runtime/rule/DeleteCommand.java,
+                    org/drools/core/command/runtime/rule/FireAllRulesCommand.java,
+                    org/drools/core/command/runtime/rule/InsertObjectCommand.java,
+                    org/drools/core/command/runtime/rule/UpdateCommand.java</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jbpm</groupId>
+                  <artifactId>jbpm-human-task-core</artifactId>
+                  <classifier>sources</classifier>
+                  <type>jar</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${basedir}/src/main/java</outputDirectory>
+                  <includes>org/jbpm/services/task/commands/Activate*.java,
+                    org/jbpm/services/task/commands/AddTaskCommand.java,
+                    org/jbpm/services/task/commands/Claim*.java,
+                    org/jbpm/services/task/commands/Complete*.java,
+                    org/jbpm/services/task/commands/Delegate*.java,
+                    org/jbpm/services/task/commands/Exit*.java,
+                    org/jbpm/services/task/commands/Fail*.java,
+                    org/jbpm/services/task/commands/Forward*.java,
+                    org/jbpm/services/task/commands/Nominate*.java,
+                    org/jbpm/services/task/commands/Release*.java,
+                    org/jbpm/services/task/commands/Resume*.java,
+                    org/jbpm/services/task/commands/Skip*.java,
+                    org/jbpm/services/task/commands/Start*.java,
+                    org/jbpm/services/task/commands/Stop*.java,
+                    org/jbpm/services/task/commands/Suspend*.java,
+                    org/jbpm/services/task/commands/ProcessSubTaskCommand.java,
+                    org/jbpm/services/task/commands/ExecuteTaskRulesCommand.java,
+                    org/jbpm/services/task/commands/CancelDeadlineCommand.java,
+                    org/jbpm/services/task/commands/GetAttachmentCommand.java,
+                    org/jbpm/services/task/commands/GetContentCommand.java,
+                    org/jbpm/services/task/commands/GetTask*Command.java,
+                    org/jbpm/services/task/impl/model/xml/JaxbTaskSummary.java,
+                    org/jbpm/services/task/impl/model/xml/JaxbContent.java</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jbpm</groupId>
+                  <artifactId>jbpm-audit</artifactId>
+                  <classifier>sources</classifier>
+                  <type>jar</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${basedir}/src/main/java</outputDirectory>
+                  <includes>org/jbpm/process/audit/command/*.java</includes>
+                </artifactItem>
+              </artifactItems>
+              <includes>**/*.java</includes>
+              <excludes>**/*.properties</excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+     
+       <!-- 
+       <plugin>
+           <groupId>org.codehaus.mojo</groupId>
+           <artifactId>xml-maven-plugin</artifactId>
+           <version>1.0</version>                      
+           <executions>                        
+             <execution>
+               <id>modify-xsd-schema</id>
+               <phase>process-resources</phase>
+               <goals>
+                 <goal>transform</goal>
+               </goals>
+               <configuration>                                 
+                 <transformationSets>
+                   <transformationSet> 
+                     <dir>${project.build.directory}/generated-xsd</dir>
+                     <outputDir>${project.build.directory}/generated-xsd</outputDir>
+                     <includes> 
+                       <include>schema1.xsd</include> 
+                     </includes>
+                     <stylesheet>src/main/resources/xslt/addNamespace.xslt</stylesheet>
+                   </transformationSet> 
+                 </transformationSets>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin> 
+         -->
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxb2-maven-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <!-- 2. generate xsd's based on unpacked sources -->
+          <execution>
+            <id>generate-xsd</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>schemagen</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>org/drools/**/*.java</include>
+                <include>org/jbpm/**/*.java</include>
+              </includes>
+              <verbose>true</verbose>
+              <outputDirectory>${project.build.directory}/generated-xsd/</outputDirectory>
+            </configuration>
+          </execution>
+          <!-- 3. generate java classes based on generated xsd's -->
+          <execution>
+            <id>generate-java-from-xsd</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>xjc</goal>
+            </goals>
+            <configuration>
+              <packageName>org.kie.remote.jaxb.gen</packageName>
+              <outputDirectory>${basedir}/src/main/generated</outputDirectory>
+              <schemaDirectory>${project.build.directory}/generated-xsd/</schemaDirectory>
+              <bindingDirectory>${basedir}/src/main/resources/xjb/</bindingDirectory>
+              <extension>true</extension>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    
+     <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>                    
+          </execution>
+        </executions>
+        <configuration>
+          <basedir>${basedir}/src/main/generated/org/kie/remote/jaxb/gen/</basedir>
+          <includes>
+            <include>*.java</include>
+          </includes>
+          <excludes>
+            <exclude>*Command.java</exclude>
+          </excludes>
+          <unescape>true</unescape>
+          <replacements>
+            <replacement>
+              <token>implements Command</token>
+              <!--  @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
+              <value>extends Object</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+       
+      <!-- 4. exclude unpacked command sources from jar/sources -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/org/drools/**/*.*</exclude>
+            <exclude>**/org/jbpm/**/*.*</exclude>
+            <exclude>**/xjb/*.*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/org/drools/**/*.*</exclude>
+            <exclude>**/org/jbpm/**/*.*</exclude>
+            <exclude>**/xjb/*.*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
