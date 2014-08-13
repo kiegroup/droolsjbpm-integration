@@ -11,8 +11,6 @@
   <artifactId>kie-remote-client</artifactId>
   <name>KIE Remote Services :: Client</name>
 
-  <!-- IF YOU AUTOFORMAT THIS, MAKE SURE THAT THE LINES MARKED WITH "FORMAT CHECK" ARE BACK TO NORMAL -->
-
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
@@ -55,6 +53,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
@@ -144,5 +147,66 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}/src/main/unpacked/org</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      
+      <!-- 0. add src/main/unpacked so that unpacked classes are added to jar -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-unpacked-sources</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/unpacked</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 1. unpack flat command class sourc from kie-remote-jaxb-gen -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-cmd-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.kie.remote</groupId>
+                  <artifactId>kie-remote-jaxb-gen</artifactId>
+                  <classifier>sources</classifier>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${basedir}/src/main/unpacked</outputDirectory>
+                  <includes>**/*.java</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 

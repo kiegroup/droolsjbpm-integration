@@ -17,17 +17,16 @@ import org.codehaus.jackson.annotate.JsonSubTypes.Type;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeInfo.As;
 import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
-import org.jbpm.process.audit.NodeInstanceLog;
-import org.jbpm.process.audit.ProcessInstanceLog;
-import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.event.AuditEvent;
+import org.kie.api.runtime.manager.audit.NodeInstanceLog;
+import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
+import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 
 @XmlRootElement(name="log-instance-list")
 @XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("rawtypes")
-public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>, JaxbPaginatedList<AuditEvent> {
+public class JaxbHistoryLogList implements JaxbCommandResponse<List<Object>>, JaxbPaginatedList<Object> {
 
     @XmlElements({ 
         @XmlElement(name = "process-instance-log", type = JaxbProcessInstanceLog.class),
@@ -62,11 +61,11 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
         // Default constructor
     }
     
-    public JaxbHistoryLogList( List<? extends AuditEvent> logList ) { 
+    public JaxbHistoryLogList( List<? extends Object> logList ) { 
         initialize(logList);
     }
     
-    private void initialize( List<? extends AuditEvent> logList ) { 
+    private void initialize( List<? extends Object> logList ) { 
         this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
         if( logList == null || logList.size() == 0 ) { 
             return;
@@ -125,22 +124,22 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<AuditEvent>>
 
     @Override
     @JsonIgnore
-    public List<AuditEvent> getResult() {
+    public List<Object> getResult() {
         lazyInitResponseList();
-        List<AuditEvent> results = new ArrayList<AuditEvent>();
-        for( AbstractJaxbHistoryObject<?> jaxbHistLog : this.historyLogList ) { 
-            results.add(jaxbHistLog.createEntityInstance());
+        List<Object> results = new ArrayList<Object>();
+        for( AbstractJaxbHistoryObject<Object> jaxbHistLog : this.historyLogList ) { 
+            results.add(jaxbHistLog );
         }
         return results;
     }
 
     @Override
-    public void setResult(List<AuditEvent> result) {
+    public void setResult(List<Object> result) {
         initialize(result);;
     }
 
     @Override
-    public void addContents(List<AuditEvent> contentList) {
+    public void addContents(List<Object> contentList) {
         initialize(contentList);
     }
  

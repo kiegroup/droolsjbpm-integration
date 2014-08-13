@@ -32,9 +32,9 @@ import org.junit.Test;
 import org.kie.remote.services.TaskDeploymentIdTest;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
+import org.kie.remote.services.jaxb.JaxbCommandsRequest;
+import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
 @SuppressWarnings("unchecked")

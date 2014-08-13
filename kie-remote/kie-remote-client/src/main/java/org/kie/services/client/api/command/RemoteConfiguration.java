@@ -450,11 +450,4 @@ public final class RemoteConfiguration {
        return new RemoteConfiguration(this);
     }
 
-    public RemoteSessionCommandService newRemoteSessionCommandService() { 
-        return new RemoteSessionCommandService(this);
-    }
-
-    public RemoteTaskCommandExecutor newRemoteTaskCommandExecutor() { 
-        return new RemoteTaskCommandExecutor(this);
-    }
 }

@@ -12,13 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 
 public class DynamicJaxbContextFilter implements Filter {
 
-    private FilterConfig _filterConfig;
+    // private FilterConfig _filterConfig; // not used
   
     // "**" not accepted in URL's.. 
     public static final String DEFAULT_JAXB_CONTEXT_ID = "**DEFAULT";
     
     public void init(FilterConfig filterConfig) throws ServletException {
-        _filterConfig = filterConfig;
+        // do nothing
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -34,7 +34,7 @@ public class DynamicJaxbContextFilter implements Filter {
 
     @Override
     public void destroy() {
-        _filterConfig = null;
+        // _filterConfig = null; // not used
     }
 
     // pkg static for tests

@@ -1,37 +1,21 @@
 package org.kie.services.client.jaxb;
 
-import static org.junit.Assert.*;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.jbpm.services.task.commands.CompositeCommand;
-import org.jbpm.services.task.commands.GetTaskContentCommand;
-import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.command.Command;
-import org.kie.services.client.AbstractServicesSerializationTest;
+import org.kie.services.client.AbstractRemoteServicesSerializationTest;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
-import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.shared.AcceptedCommands;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -39,7 +23,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
-public class JaxbServicesSerializationTest extends AbstractServicesSerializationTest {
+public class JaxbRemoteServicesSerializationTest extends AbstractRemoteServicesSerializationTest {
 
     private static final String PROCESS_INSTANCE_ID_NAME = "process-instance-id";
 
@@ -68,17 +52,6 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
     }
 
     @Test
-    public void acceptedCommandsTest() throws Exception {
-        for (Class<?> cmdClass : AcceptedCommands.getSet()) {
-            try {
-                cmdClass.getConstructor(new Class[0]);
-            } catch (Exception e) {
-                fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor.");
-            }
-        }
-    }
-
-    @Test
     public void jaxbClassesAreKnownToJaxbSerializationProvider() throws Exception {
         int i = 0;
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
@@ -90,150 +63,6 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
         assertTrue( i > 20 );
     }
 
-    /**
-     * If you think this test is a mistake: beware, this test is smarter than you. Seriously.
-     * Heck, this test is smarter than *me*, and I wrote it!
-     *
-     * @throws Exception
-     */
-    @Test
-    public void acceptedCommandsCanBeSerializedTest() throws Exception {
-        // Only neccessary to run once
-        Assume.assumeTrue(getType().equals(TestType.JAXB));
-
-        Field commandsField = JaxbCommandsRequest.class.getDeclaredField("commands");
-        XmlElements xmlElemsAnno = (XmlElements) commandsField.getAnnotations()[0];
-        XmlElement[] xmlElems = xmlElemsAnno.value();
-
-        Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
-        assertEquals(AcceptedCommands.class.getSimpleName() + " contains a different set of Commands than "
-                + JaxbCommandsRequest.class.getSimpleName(), cmdSet.size(), xmlElems.length);
-        Set<String> xmlElemNameSet = new HashSet<String>();
-        for (XmlElement xmlElemAnno : xmlElems) {
-            Class cmdClass = xmlElemAnno.type();
-            String name = xmlElemAnno.name();
-            assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
-            assertTrue(cmdClass.getSimpleName() + " is present in " + AcceptedCommands.class.getSimpleName() + " but not in "
-                    + JaxbCommandsRequest.class.getSimpleName(), cmdSet.remove(cmdClass));
-        }
-        for (Class cmdClass : cmdSet) {
-            logger.error("Missing: " + cmdClass.getSimpleName());
-        }
-        assertEquals("See output for classes in " + AcceptedCommands.class.getSimpleName() + " that are not in "
-                + JaxbCommandsRequest.class.getSimpleName(), 0, cmdSet.size());
-    }
-
-    /**
-     * This test is the above one's little brother, and he takes after him. Damn.. these are some smart tests, yo!
-     *
-     * (HA!)
-     */
-    @Test
-    public void allCommandResponseTypesNeedXmlElemIdTest() throws Exception {
-        Field commandsField = JaxbCommandsResponse.class.getDeclaredField("responses");
-        XmlElements xmlElemsAnno = (XmlElements) commandsField.getAnnotations()[0];
-        XmlElement[] xmlElems = xmlElemsAnno.value();
-
-        Set<Class<?>> cmdSet = new HashSet<Class<?>>();
-        for (Class<?> cmdRespImpl : reflections.getSubTypesOf(JaxbCommandResponse.class)) {
-            cmdSet.add(cmdRespImpl);
-        }
-        cmdSet.remove(AbstractJaxbCommandResponse.class);
-
-        int numAnnos = xmlElems.length;
-        int numClass = cmdSet.size();
-
-        Set<String> xmlElemNameSet = new HashSet<String>();
-        for (XmlElement xmlElemAnno : xmlElems) {
-            Class cmdClass = xmlElemAnno.type();
-            String name = xmlElemAnno.name();
-            assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
-            assertTrue(cmdClass.getSimpleName() + " is present in " + JaxbCommandsResponse.class.getSimpleName() + " but does not "
-                    + "implement " + JaxbCommandResponse.class.getSimpleName(), cmdSet.remove(cmdClass));
-        }
-        for (Class cmdClass : cmdSet) {
-            logger.error("Missing: " + cmdClass.getSimpleName());
-        }
-        assertTrue("See above output for difference between " + JaxbCommandResponse.class.getSimpleName() + " implementations "
-                + "and classes listed in " + JaxbCommandsResponse.class.getSimpleName(), cmdSet.size() == 0);
-
-        assertEquals((numClass > numAnnos ? "Not all classes" : "Non " + JaxbCommandResponse.class.getSimpleName() + " classes")
-                + " are listed in the " + JaxbCommandResponse.class.getSimpleName() + ".response @XmlElements list.", numClass,
-                numAnnos);
-    }
-
-    @Test
-    public void commandsWithListReturnTypesAreInCmdTypesList() throws Exception {
-        // Only neccessary to run once
-        Assume.assumeTrue(getType().equals(TestType.JAXB));
-
-        Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
-        // remove "meta" command types
-        cmdSet.remove(CompositeCommand.class);
-        cmdSet.remove(GetTaskContentCommand.class); // handled on ~l.244 of JaxbCommandsResponse
-
-        // retrieve cmd list types set
-        String cmdListTypesFieldName = "cmdListTypes";
-        Field cmdListTypesField = JaxbCommandsResponse.class.getDeclaredField(cmdListTypesFieldName);
-        assertNotNull("Unable to find " + JaxbCommandsResponse.class.getSimpleName() + "." + cmdListTypesFieldName + " field!",
-                cmdListTypesField);
-        cmdListTypesField.setAccessible(true);
-        Map<Class, Class> cmdListTypesMap = (Map<Class, Class>) cmdListTypesField.get(null);
-        assertNotNull(cmdListTypesFieldName + " value is null!", cmdListTypesMap);
-
-        // Check that all accepted commands with a list return type are in the cmd list types set
-        Set<Class> classesChecked = new HashSet<Class>();
-        classesChecked.addAll(cmdSet);
-        for( Class cmdClass : cmdSet ) {
-            Class origClass = cmdClass;
-            if( cmdClass.getInterfaces().length == 0 ) {
-                // no interfaces, look at superclass
-                Type superClass = cmdClass.getGenericSuperclass();
-                assertNotNull("No generic super class found for " + cmdClass.getSimpleName(), superClass);
-                assertTrue("Super class [" + superClass + "] of " + origClass.getSimpleName() + " should be a generic class!",
-                        superClass instanceof ParameterizedType);
-                checkIfClassShouldBeInCmdListTypes(origClass, (ParameterizedType) superClass, cmdListTypesMap, classesChecked);
-            } else {
-                assertTrue(origClass.getSimpleName() + " should have a generic interface!",
-                        cmdClass.getGenericInterfaces().length > 0);
-                for( Type genericCmdInterface : cmdClass.getGenericInterfaces() ) {
-                    if( genericCmdInterface instanceof ParameterizedType ) {
-                        ParameterizedType pType = ((ParameterizedType) genericCmdInterface);
-                        checkIfClassShouldBeInCmdListTypes(origClass, pType, cmdListTypesMap, classesChecked);
-                    }
-                }
-            }
-        }
-        if( !classesChecked.isEmpty() ) {
-            fail(classesChecked.iterator().next().getSimpleName() + " was not checked!");
-        }
-    }
-
-    private void checkIfClassShouldBeInCmdListTypes( Class origClass, ParameterizedType genericSuperClassOrInterface,
-            Map<Class, Class> cmdListTypesMap, Set<Class> classesChecked ) {
-        Type returnType = genericSuperClassOrInterface.getActualTypeArguments()[0];
-        // check that (generic) superclass has a parameterized type parameter
-        // i.e. OrigClass extends ThatCommand<ParamTypeParam<InnerType>>
-        if( !(returnType instanceof ParameterizedType) ) {
-            // No parameterized type for generica super class
-            // i.e. OrigClass extends ThatCommand<TypeParam>
-            classesChecked.remove(origClass);
-            return;
-        }
-        // If type parameter is a list, then do the checks on the cmdListType map
-        Type listType = ((ParameterizedType) returnType).getRawType();
-        if( List.class.isAssignableFrom((Class) listType) || Collection.class.isAssignableFrom((Class) listType) ) {
-            assertTrue("Cmd list type set should include " + origClass.getSimpleName(), cmdListTypesMap.containsKey(origClass));
-            Type listTypeType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
-            Class cmdListTypesKeyType = cmdListTypesMap.get(origClass);
-            assertEquals("Expected cmd list type for " + origClass.getSimpleName(), cmdListTypesKeyType, listTypeType);
-            classesChecked.remove(origClass);
-        } else {
-            fail(origClass.getSimpleName() + "/" + ((Class) ((ParameterizedType) returnType).getRawType()).getSimpleName());
-            classesChecked.remove(origClass);
-        }
-    }
-    
     @Test
     public void uniqueRootElementTest() throws Exception {
         Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.jbpm.kie.services.client"),
@@ -342,15 +171,16 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
         testRoundTripClassesSet(extraJaxbClasses);
 
         // 1
-        extraJaxbClasses.add(JaxbServicesSerializationTest.class);
+        extraJaxbClasses.add(JaxbRemoteServicesSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
 
         // 2
-        extraJaxbClasses.add(JsonServicesSerializationTest.class);
+        extraJaxbClasses.add(JsonRemoteServicesSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
     }
 
     @Test
+    @Ignore
     public void processInstanceIdFieldInCommands() throws Exception {
         Reflections cmdReflections = new Reflections(
                 ClasspathHelper.forPackage("org.drools.command.*"),
@@ -364,7 +194,6 @@ public class JaxbServicesSerializationTest extends AbstractServicesSerialization
             }
         }
         for( Class<?> jaxbCmdClass : cmdClasses ) {
-            Field procInstIdField = null;
             for( Field field : jaxbCmdClass.getDeclaredFields() ) {
                 String fullFieldName = jaxbCmdClass.getSimpleName() + "." + field.getName();
                 field.setAccessible(true);

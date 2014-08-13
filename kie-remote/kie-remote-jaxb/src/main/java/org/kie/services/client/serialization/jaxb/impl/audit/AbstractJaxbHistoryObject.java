@@ -1,6 +1,7 @@
 package org.kie.services.client.serialization.jaxb.impl.audit;
 
-import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.unsupported;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -8,21 +9,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.jbpm.process.audit.event.AuditEvent;
-
-public abstract class AbstractJaxbHistoryObject<T extends AuditEvent> {
+public abstract class AbstractJaxbHistoryObject<T> {
     
-    protected Class<? extends AuditEvent> realClass;
+    protected Class<? extends Object> realClass;
    
     public AbstractJaxbHistoryObject() {
         throw new UnsupportedOperationException("No-arg constructor must be implemented by the concrete class.");
     }
     
-    public AbstractJaxbHistoryObject(Class<? extends AuditEvent> realClass) { 
+    public AbstractJaxbHistoryObject(Class<? extends Object> realClass) { 
        this.realClass = realClass; 
     }
     
-    public AbstractJaxbHistoryObject(T historyObject, Class<? extends AuditEvent> objectInterface) {
+    public AbstractJaxbHistoryObject(T historyObject, Class<? extends Object> objectInterface) {
         this(objectInterface);
         initialize(historyObject);
     }
@@ -54,44 +53,6 @@ public abstract class AbstractJaxbHistoryObject<T extends AuditEvent> {
             }
 
         }
-    }
-    
-    protected T createEntityInstance() { 
-        Class [] constructorArgTypes = new Class[0];
-        T entity;
-        try { 
-            Constructor<?> constructor = this.realClass.getConstructor(constructorArgTypes);
-            Object [] initArgs = new Object[0];
-            entity = (T) constructor.newInstance(initArgs);
-        } catch( Exception e ) { 
-            throw new RuntimeException("Unable to construct " + this.realClass.getSimpleName() );
-        }
-        
-        for (Field field : this.getClass().getDeclaredFields() ) { 
-            String fieldName = field.getName();
-            if( fieldName.equals("index") || fieldName.equals("commandName") || fieldName.equals("result") ) {
-                // JaxbCommandResponse
-                continue;
-            }
-            try { 
-                Field entityField = this.realClass.getDeclaredField(fieldName);
-                
-                boolean origAccessStatus = field.isAccessible();
-                boolean entityOrigAccessStatus = entityField.isAccessible();
-                field.setAccessible(true);
-                entityField.setAccessible(true);
-                
-                Object setObject = field.get(this);
-                entityField.set(entity, setObject);
-                
-                field.setAccessible(origAccessStatus);
-                entityField.setAccessible(entityOrigAccessStatus);
-            } catch( Exception e ) { 
-               throw new RuntimeException("Unable to initialize " + fieldName + " when creating " + this.getClass().getSimpleName() + ".", e ); 
-            }
-        }
-        
-        return entity;
     }
     
     public void readExternal(ObjectInput arg0) throws IOException, ClassNotFoundException {

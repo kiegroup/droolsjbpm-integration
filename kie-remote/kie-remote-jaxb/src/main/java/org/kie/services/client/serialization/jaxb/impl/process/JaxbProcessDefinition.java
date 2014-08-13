@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
+import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
 @XmlRootElement(name="process-definition")
 @XmlAccessorType(XmlAccessType.FIELD)

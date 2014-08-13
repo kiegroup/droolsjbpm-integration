@@ -1,4 +1,4 @@
-package org.kie.services.client.jaxb;
+package org.kie.remote.services.jaxb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,8 +14,6 @@ import org.kie.api.command.Command;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

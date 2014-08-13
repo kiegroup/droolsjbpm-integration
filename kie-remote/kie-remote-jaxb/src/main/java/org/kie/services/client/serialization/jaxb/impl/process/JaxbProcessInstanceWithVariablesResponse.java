@@ -9,8 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-with-vars")

@@ -1,5 +1,9 @@
 package org.kie.remote.services.cdi;
 
+import static org.kie.remote.common.jaxb.JaxbRequestStatus.FAILURE;
+import static org.kie.remote.common.jaxb.JaxbRequestStatus.PERMISSIONS_CONFLICT;
+import static org.kie.services.shared.ServicesVersion.VERSION;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,16 +29,13 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
+import org.kie.remote.services.jaxb.JaxbCommandsRequest;
+import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.RuntimeResource;
 import org.kie.remote.services.rest.TaskResource;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.*;
-import static org.kie.services.shared.ServicesVersion.*;
 
 /**
  * This class is used by both the {@link RuntimeResource} and {@link TaskResource} to do the core operations on

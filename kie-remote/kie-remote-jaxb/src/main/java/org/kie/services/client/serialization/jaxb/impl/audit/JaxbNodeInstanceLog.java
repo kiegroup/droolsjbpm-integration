@@ -9,12 +9,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.jbpm.process.audit.NodeInstanceLog;
+import org.kie.api.runtime.manager.audit.NodeInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="node-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceLog> implements JaxbCommandResponse<NodeInstanceLog> {
+public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceLog> implements NodeInstanceLog, JaxbCommandResponse<NodeInstanceLog> {
 
     @XmlAttribute
     @XmlSchemaType(name="long")
@@ -198,7 +198,7 @@ public class JaxbNodeInstanceLog extends AbstractJaxbHistoryObject<NodeInstanceL
     }
 
     public NodeInstanceLog getResult() {
-        return createEntityInstance();
+        return this;
     }
 
     public void setResult(NodeInstanceLog result) { 

@@ -10,10 +10,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.jbpm.services.task.impl.model.xml.JaxbContent;
-import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
 import org.kie.api.command.Command;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
+import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
 @XmlRootElement(name = "task-content-response")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -72,10 +71,10 @@ public class JaxbTaskContentResponse implements JaxbCommandResponse<Map<String, 
         this.commandName = cmdName;
     }
 
-    public JaxbTaskContentResponse(JaxbContent content, int i, Command<?> cmd) {
+    public JaxbTaskContentResponse(Map<String, Object> contentMap, int i, Command<?> cmd) {
         this.index = i;
         this.commandName = cmd.getClass().getSimpleName();
-        this.contentMap = content.getContentMap();
+        this.contentMap = contentMap;
     }
 
     public Map<String, Object> getResult() {

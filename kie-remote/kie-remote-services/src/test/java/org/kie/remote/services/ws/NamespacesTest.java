@@ -22,6 +22,8 @@ public class NamespacesTest {
     @Test
     public void nameSpacesAreCoorrectTest() throws Exception { 
         Set<Class<?>> webServiceImplClasses = reflections.getTypesAnnotatedWith(WebService.class);
+        assertTrue( "No classes found!", webServiceImplClasses.size() > 0 );
+
         for( Class wsCl : webServiceImplClasses ) { 
             if( wsCl.getSimpleName().endsWith("Impl") ) { 
                Field nsField = wsCl.getDeclaredField("NAMESPACE");

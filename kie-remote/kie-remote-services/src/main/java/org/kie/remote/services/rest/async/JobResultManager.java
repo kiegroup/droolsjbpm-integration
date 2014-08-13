@@ -27,6 +27,9 @@ public class JobResultManager {
 
     private static class Cache<T> extends LinkedHashMap<String, T> {
 
+        /** generated serial version UID */
+        private static final long serialVersionUID = -5369827812060944667L;
+        
         private int maxSize = 1000;
 
         public Cache(int maxSize) {
@@ -36,10 +39,6 @@ public class JobResultManager {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, T> stringFutureEntry) {
             return size() > maxSize;
-        }
-
-        public void setMaxSize(int maxSize) {
-            this.maxSize = maxSize;
         }
     }
 

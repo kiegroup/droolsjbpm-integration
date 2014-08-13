@@ -21,8 +21,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.kie.remote.common.jaxb.JaxbException;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
@@ -43,10 +41,8 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
-import org.kie.services.client.serialization.jaxb.impl.task.JaxbContentResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
-import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskResponse;
-import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
@@ -59,14 +55,8 @@ public class JaxbSerializationProvider implements SerializationProvider {
     public static Set<Class<?>> KIE_JAXB_CLASS_SET;
     static { 
         Class<?> [] kieJaxbClasses = { 
-                // Command Request/Response
-                JaxbCommandsRequest.class, 
-                JaxbCommandsResponse.class,
-
                 // command response
-                JaxbContentResponse.class,
-                JaxbTaskResponse.class,
-                JaxbTaskSummaryListResponse.class,
+                JaxbTaskContentResponse.class,
                 JaxbTaskFormResponse.class,
                 JaxbProcessInstanceListResponse.class,
                 JaxbProcessInstanceResponse.class,
@@ -106,7 +96,42 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 // exception
                 JaxbException.class
         };
-        KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
+       
+        String [] serviceSideClasses = { 
+                "org.kie.remote.services.jaxb.JaxbCommandsRequest",
+                "org.kie.remote.services.jaxb.JaxbCommandsResponse",
+                "org.kie.remote.services.jaxb.JaxbContentResponse",
+                "org.kie.remote.services.jaxb.JaxbTaskResponse",
+                "org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse"
+        };
+        String [] clientSideClasses = { 
+                "org.kie.remote.client.jaxb.JaxbCommandsRequest",
+                "org.kie.remote.client.jaxb.JaxbCommandsResponse",
+                "org.kie.remote.client.jaxb.JaxbContentResponse",
+                "org.kie.remote.client.jaxb.JaxbTaskResponse",
+                "org.kie.remote.client.jaxb.JaxbTaskSummaryListResponse"
+        };
+        
+        List<Class<?>> kieJaxbClassList = new ArrayList<Class<?>>(kieJaxbClasses.length + serviceSideClasses.length);
+        kieJaxbClassList.addAll(Arrays.asList(kieJaxbClasses));
+        
+        Class serviceSideClass = null;
+        try { 
+            for( int i = 0; i < serviceSideClasses.length; ++i ) { 
+                serviceSideClass = Class.forName(serviceSideClasses[i]);
+                kieJaxbClassList.add(serviceSideClass);
+            }
+        } catch( ClassNotFoundException cnfe ) { 
+            try { 
+                for( int i = 0; i < clientSideClasses.length; ++i ) { 
+                    serviceSideClass = Class.forName(clientSideClasses[i]);
+                    kieJaxbClassList.add(serviceSideClass);
+                }
+            } catch( ClassNotFoundException clientCnfe ) { 
+                // do nothing
+            }
+        }
+        KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(kieJaxbClassList);
     };
 
     public static Set<Class<?>> PRIMITIVE_ARRAY_CLASS_SET;

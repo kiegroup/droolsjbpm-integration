@@ -4,9 +4,6 @@ import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.DEPLOYMENT_UN
 import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_ID;
 import static org.kie.remote.services.rest.async.cmd.DeploymentCmd.JOB_TYPE;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,17 +22,17 @@ import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
 import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.DeployedUnit;
-import org.jbpm.services.api.model.ProcessDefinition;
-import org.jbpm.services.api.model.QueryContextImpl;
+import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.services.cdi.Kjar;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
-import org.kie.remote.common.exception.RestOperationException;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
 import org.kie.remote.services.rest.async.cmd.JobType;
@@ -43,7 +40,6 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDesc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

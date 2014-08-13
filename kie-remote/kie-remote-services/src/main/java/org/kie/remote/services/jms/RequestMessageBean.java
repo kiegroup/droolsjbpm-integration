@@ -1,6 +1,6 @@
 package org.kie.remote.services.jms;
 
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.*;
+import static org.kie.remote.common.jaxb.JaxbRequestStatus.FORBIDDEN;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
@@ -40,19 +40,19 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.services.task.identity.adapter.UserGroupAdapter;
 import org.kie.api.command.Command;
+import org.kie.remote.services.AcceptedCommands;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
+import org.kie.remote.services.jaxb.JaxbCommandsRequest;
+import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.jms.request.BackupIdentityProviderProducer;
 import org.kie.remote.services.jms.security.JmsUserGroupAdapter;
 import org.kie.remote.services.jms.security.UserPassCallbackHandler;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.SerializationProvider;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
-import org.kie.services.shared.AcceptedCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

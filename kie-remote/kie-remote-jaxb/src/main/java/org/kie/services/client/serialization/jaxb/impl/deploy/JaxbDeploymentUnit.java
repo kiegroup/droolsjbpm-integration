@@ -7,16 +7,13 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.drools.core.util.StringUtils;
-import org.jbpm.services.api.model.DeploymentUnit;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 
 @XmlRootElement(name="deployment-unit")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonIgnoreProperties({"identifier"})
-public class JaxbDeploymentUnit implements DeploymentUnit {
+public class JaxbDeploymentUnit {
 
     @XmlElement
     @XmlSchemaType(name="string")
@@ -134,8 +131,8 @@ public class JaxbDeploymentUnit implements DeploymentUnit {
 
     public String getIdentifier() {
         String id = getGroupId() + ":" + getArtifactId() + ":" + getVersion();
-        boolean kbaseFilled = !StringUtils.isEmpty(kbaseName);
-        boolean ksessionFilled = !StringUtils.isEmpty(ksessionName);
+        boolean kbaseFilled = kbaseName != null  && !kbaseName.isEmpty();
+        boolean ksessionFilled = ksessionName != null && !ksessionName.isEmpty();
         if( kbaseFilled || ksessionFilled) {
             id = id.concat(":");
             if( kbaseFilled ) {

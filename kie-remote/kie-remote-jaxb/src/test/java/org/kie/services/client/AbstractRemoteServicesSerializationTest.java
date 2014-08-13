@@ -2,7 +2,6 @@ package org.kie.services.client;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,27 +9,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.drools.core.SessionConfiguration;
-import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
-import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.common.DisconnectedFactHandle;
 import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
-import org.jbpm.persistence.correlation.CorrelationKeyInfo;
-import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
-import org.jbpm.process.audit.NodeInstanceLog;
-import org.jbpm.process.audit.ProcessInstanceLog;
-import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.command.FindProcessInstanceCommand;
 import org.jbpm.process.instance.event.DefaultSignalManagerFactory;
 import org.jbpm.process.instance.impl.DefaultProcessInstanceManagerFactory;
-import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
-import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.StartTaskCommand;
-import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.jaxb.ComparePair;
-import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.After;
 import org.junit.Assume;
@@ -41,26 +27,21 @@ import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message.Level;
-import org.kie.api.command.Command;
 import org.kie.api.definition.KieDefinition.KnowledgeType;
 import org.kie.api.io.Resource;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.manager.audit.NodeInstanceLog;
+import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
+import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.api.task.TaskService;
-import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
-import org.kie.internal.task.api.InternalTaskService;
-import org.kie.internal.task.api.TaskQueryService;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
@@ -76,15 +57,14 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
-import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummaryListResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTestCase {
+public abstract class AbstractRemoteServicesSerializationTest extends JbpmJUnitBaseTestCase {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractServicesSerializationTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteServicesSerializationTest.class);
 
     protected enum TestType {
         JAXB, JSON, YAML;
@@ -93,12 +73,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     abstract public TestType getType();
     abstract public void addClassesToSerializationProvider(Class<?>... extraClass);
     public abstract <T> T testRoundTrip(T in) throws Exception;
-    
-    private Object getField(String fieldName, Class<?> clazz, Object obj) throws Exception {
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return field.get(obj);
-    }
   
     // TESTS
     
@@ -146,126 +120,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
      */
 
     @Test
-    public void commandRequestTest() throws Exception {
-        // Don't run with JSON: /execute is only JAXB
-        Assume.assumeFalse(getType().equals(TestType.JSON));
-
-        String userId = "krisv";
-        long taskId = 1;
-        Command<?> cmd = new StartTaskCommand(taskId, "krisv");
-        JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        Command<?> newCmd = testRoundTrip(req).getCommands().get(0);
-        assertNotNull(newCmd);
-        assertEquals("taskId is not equal", taskId, getField("taskId", TaskCommand.class, newCmd));
-        assertEquals("userId is not equal", userId, getField("userId", TaskCommand.class, newCmd));
-
-        req = new JaxbCommandsRequest();
-        req.setUser("krampus");
-        List<Command> cmds = new ArrayList<Command>();
-        req.setCommands(cmds);
-        req.setDeploymentId("depId");
-        req.setProcessInstanceId(43l);
-        req.setVersion("6.0.1.0");
-        StartProcessCommand spCmd = new StartProcessCommand("test.proc.yaml");
-        cmds.add(spCmd);
-        spCmd.getParameters().put("one", "a");
-        spCmd.getParameters().put("two", "B");
-        Object weirdParam = new Integer[] { 59, 2195 };
-        spCmd.getParameters().put("thr", weirdParam);
-        
-        addClassesToSerializationProvider(weirdParam.getClass());
-
-        JaxbCommandsRequest newReq = testRoundTrip(req);
-        assertEquals(((StartProcessCommand) newReq.getCommands().get(0)).getParameters().get("two"), "B");
-
-        req = new JaxbCommandsRequest("deployment", new StartProcessCommand("org.jbpm.humantask"));
-        newReq = testRoundTrip(req);
-
-        CorrelationKeyInfo corrKey = new CorrelationKeyInfo();
-        corrKey.addProperty(new CorrelationPropertyInfo("null", "val"));
-    
-        GetProcessInstanceByCorrelationKeyCommand gpibckCmd = new GetProcessInstanceByCorrelationKeyCommand(corrKey);
-        req = new JaxbCommandsRequest("test", gpibckCmd);
-        testRoundTrip(req);
-    }
-    
-    @Test
-    public void commandsResponseTest() throws Exception {
-        this.setupDataSource = true;
-        this.sessionPersistence = true;
-        super.setUp();
-        
-        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
-        KieSession ksession = runtimeEngine.getKieSession();
-    
-        Map<String, Object> params = new HashMap<String, Object>();
-        String val = "initial-val";
-        params.put("test", val);
-        Command cmd = new StartProcessCommand("StructureRef");
-        ((StartProcessCommand) cmd).setParameters(params);
-        ProcessInstance processInstance = ksession.execute((StartProcessCommand) cmd);
-        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
-    
-        JaxbCommandsResponse resp = new JaxbCommandsResponse();
-        resp.setDeploymentId("deploy");
-        resp.setProcessInstanceId(processInstance.getId());
-        resp.addResult(processInstance, 0, cmd);
-    
-        testRoundTrip(resp);
-    
-        cmd = new GetTaskAssignedAsBusinessAdminCommand();
-        List<TaskSummary> result = new ArrayList<TaskSummary>();
-
-        resp = new JaxbCommandsResponse();
-        resp.addResult(result, 0, cmd);
-
-        cmd = new GetTasksByProcessInstanceIdCommand();
-        List<Long> resultTwo = new ArrayList<Long>();
-        resp.addResult(resultTwo, 1, cmd);
-
-        Object newResp = testRoundTrip(resp);
-        assertNotNull(newResp);
-        assertEquals( 2, ((JaxbCommandsResponse) newResp).getResponses().size());
-    }
-
-    @Test
-    public void taskSummaryListTest() throws Exception {
-        Assume.assumeFalse(getType().equals(TestType.YAML));
-        this.setupDataSource = true;
-        this.sessionPersistence = true;
-        super.setUp();
-        
-        RuntimeManager runtimeManager = createRuntimeManager(Strategy.SINGLETON, "test", "BPMN2-HumanTaskWithTaskContent.bpmn2");
-        RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(null);
-        KieSession ksession = runtimeEngine.getKieSession();
-        TaskService taskService = runtimeEngine.getTaskService();
-        
-        ProcessInstance procInst = ksession.startProcess("org.kie.remote.test.usertask.UserTask");
-        long procInstId = procInst.getId();
-
-        List<Long> statuses = new ArrayList<Long>();
-        statuses.add(procInstId);
-        
-        Map<String, List<?>> fieldVals = new HashMap<String, List<?>>();
-        fieldVals.put(TaskQueryService.PROCESS_INST_ID_LIST, statuses);
-        List<TaskSummary> taskSumList = ((InternalTaskService)taskService).getTasksByVariousFields(fieldVals, true);
-        assertEquals( "Task summary list size", 1, taskSumList.size());
-        TaskSummaryImpl taskSumImpl = (TaskSummaryImpl) taskSumList.get(0);
-        taskSumImpl.setActualOwner(new UserImpl("Minnie"));
-        taskSumImpl.setCreatedBy(new UserImpl("Mickey"));
-        
-        JaxbTaskSummaryListResponse jaxbTaskSumListResp = new JaxbTaskSummaryListResponse(taskSumList);
-        JaxbTaskSummaryListResponse jaxbTaskSumListRespCopy = testRoundTrip(jaxbTaskSumListResp);
-        assertEquals( jaxbTaskSumListResp.getList().size(), jaxbTaskSumListRespCopy.getList().size() );
-        TaskSummary taskSum = jaxbTaskSumListResp.getList().get(0);
-        TaskSummary taskSumCopy = jaxbTaskSumListRespCopy.getList().get(0);
-        ComparePair.compareObjectsViaFields(taskSum, taskSumCopy, 
-                "potentialOwners", // null
-                "createdOn", "activationTime", "expirationTime",
-                "subTaskStrategy"); // dates
-    }
-    
-    @Test
     public void genericResponseTest() throws Exception {
         JaxbGenericResponse resp = new JaxbGenericResponse();
         resp.setMessage("error");
@@ -310,18 +164,18 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         testRoundTrip(resp);
 
         // vLog
-        VariableInstanceLog vLog = new VariableInstanceLog(23, "process", "varInst", "var", "two", "one");
+        org.jbpm.process.audit.VariableInstanceLog vLog = new org.jbpm.process.audit.VariableInstanceLog(23, "process", "varInst", "var", "two", "one");
         vLog.setExternalId("domain");
-        Field dateField = VariableInstanceLog.class.getDeclaredField("date");
+        Field dateField = org.jbpm.process.audit.VariableInstanceLog.class.getDeclaredField("date");
         dateField.setAccessible(true);
         dateField.set(vLog, new Date());
-        Field idField = VariableInstanceLog.class.getDeclaredField("id");
+        Field idField = org.jbpm.process.audit.VariableInstanceLog.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(vLog, 32l);
         resp.getHistoryLogList().add(new JaxbVariableInstanceLog(vLog));
 
         // pLog
-        ProcessInstanceLog pLog = new ProcessInstanceLog(23, "process");
+        org.jbpm.process.audit.ProcessInstanceLog pLog = new org.jbpm.process.audit.ProcessInstanceLog(23, "process");
         pLog.setDuration(2000l);
         pLog.setEnd(new Date());
         pLog.setExternalId("domain");
@@ -331,17 +185,17 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         pLog.setProcessName("name");
         pLog.setProcessVersion("1-SNAP");
         pLog.setStatus(2);
-        idField = ProcessInstanceLog.class.getDeclaredField("id");
+        idField = org.jbpm.process.audit.ProcessInstanceLog.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(pLog, 32l);
         resp.getHistoryLogList().add(new JaxbProcessInstanceLog(pLog));
 
         // nLog
-        NodeInstanceLog nLog = new NodeInstanceLog(0, 23, "process", "nodeInst", "node", "wally");
-        idField = NodeInstanceLog.class.getDeclaredField("id");
+        org.jbpm.process.audit.NodeInstanceLog nLog = new org.jbpm.process.audit.NodeInstanceLog(0, 23, "process", "nodeInst", "node", "wally");
+        idField = org.jbpm.process.audit.NodeInstanceLog.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(nLog, 32l);
-        dateField = NodeInstanceLog.class.getDeclaredField("date");
+        dateField = org.jbpm.process.audit.NodeInstanceLog.class.getDeclaredField("date");
         dateField.setAccessible(true);
         dateField.set(nLog, new Date());
         nLog.setNodeType("type");
@@ -354,13 +208,6 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     }
 
     @Test
-    public void auditCommandsTest() throws Exception {
-        FindProcessInstanceCommand cmd = new FindProcessInstanceCommand(23);
-
-        testRoundTrip(cmd);
-    }
-
-    @Test
     public void factHandleTest() throws Exception {
         // Don't run with YAML?
         Assume.assumeFalse(getType().equals(TestType.YAML));
@@ -369,7 +216,9 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
 
         InsertObjectCommand cmd = new InsertObjectCommand("The Sky is Green");
         FactHandle factHandle = ksession.execute(cmd);
-        JaxbOtherResponse jor = new JaxbOtherResponse(factHandle, 0, cmd);
+       
+        addClassesToSerializationProvider(DisconnectedFactHandle.class);
+        JaxbOtherResponse jor = new JaxbOtherResponse(DisconnectedFactHandle.newFrom(factHandle), 0, cmd);
         testRoundTrip(jor);
     }
 
@@ -422,31 +271,11 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         ComparePair.compareObjectsViaFields(workitemObject, roundTripWorkItem);
     }
 
-    @Test
-    public void serializingPrimitiveArraysTest() throws Exception  {
-        // Don't run with JSON: /execute is only JAXB
-        Assume.assumeFalse(getType().equals(TestType.JSON));
-
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("url", "http://soaptest.parasoft.com/calculator.wsdl");
-        parameters.put("namespace", "http://www.parasoft.com/wsdl/calculator/");
-        parameters.put("interface", "Calculator");
-        parameters.put("operation", "add");
-        Object arrayParam = new Float[]{9.0f, 12.0f};
-        parameters.put("parameters", arrayParam);
-        
-        addClassesToSerializationProvider(arrayParam.getClass());
-        
-        Command<?> cmd = new StartProcessCommand("proc.with.array.params", parameters);
-        JaxbCommandsRequest req = new JaxbCommandsRequest("test", cmd);
-        Command<?> newCmd = testRoundTrip(req).getCommands().get(0);
-        assertNotNull(newCmd);
-    }
 
     @Test
     // JBPM-4170
     public void nodeInstanceLogNpeTest() throws Exception { 
-        NodeInstanceLog nodeLog = new NodeInstanceLog();
+        org.jbpm.process.audit.NodeInstanceLog nodeLog = new org.jbpm.process.audit.NodeInstanceLog();
         JaxbNodeInstanceLog jaxbNodeLog = new JaxbNodeInstanceLog(nodeLog);
         testRoundTrip(jaxbNodeLog);
     }
@@ -504,7 +333,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
     public void processInstanceLogTest() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
         
-        ProcessInstanceLog origLog = new ProcessInstanceLog(54, "org.hospital.patient.triage");
+        org.jbpm.process.audit.ProcessInstanceLog origLog = new org.jbpm.process.audit.ProcessInstanceLog(54, "org.hospital.patient.triage");
         origLog.setDuration(65l);
         origLog.setDuration(234l);
         origLog.setEnd(new Date((new Date()).getTime() + 1000));
@@ -523,17 +352,29 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         xmlLog.setCommandName("test-cmd");
         xmlLog.setIndex(2);
         JaxbProcessInstanceLog newXmlLog = testRoundTrip(xmlLog);
-        ComparePair.compareOrig(xmlLog, newXmlLog, JaxbProcessInstanceLog.class);
+        ComparePair.compareObjectsViaFields(xmlLog, newXmlLog, "id");
         
         ProcessInstanceLog newLog = newXmlLog.getResult();
-        ComparePair.compareOrig(origLog, newLog, ProcessInstanceLog.class);
+        ProcessInstanceLog origCmpLog = (ProcessInstanceLog) origLog;
+        assertEquals( origLog.getExternalId(), newLog.getExternalId() );
+        assertEquals( origCmpLog.getIdentity(), newLog.getIdentity());
+        assertEquals( origCmpLog.getOutcome(), newLog.getOutcome());
+        assertEquals( origCmpLog.getProcessId(), newLog.getProcessId() );
+        assertEquals( origCmpLog.getProcessName(), newLog.getProcessName() );
+        assertEquals( origCmpLog.getProcessVersion(), newLog.getProcessVersion() );
+        assertEquals( origCmpLog.getDuration(), newLog.getDuration() );
+        assertEquals( origCmpLog.getEnd(), newLog.getEnd() );
+        assertEquals( origCmpLog.getParentProcessInstanceId(), newLog.getParentProcessInstanceId() );
+        assertEquals( origCmpLog.getProcessInstanceId(), newLog.getProcessInstanceId() );
+        assertEquals( origCmpLog.getStart(), newLog.getStart() );
+        assertEquals( origCmpLog.getStatus(), newLog.getStatus() );
     }
     
     @Test
     public void processInstanceLogNillable() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
         
-        ProcessInstanceLog origLog = new ProcessInstanceLog(54, "org.hospital.patient.triage");
+        org.jbpm.process.audit.ProcessInstanceLog origLog = new org.jbpm.process.audit.ProcessInstanceLog(54, "org.hospital.patient.triage");
         origLog.setDuration(65l);
         origLog.setEnd(new Date((new Date()).getTime() + 1000));
         origLog.setExternalId("testDomainId");
@@ -577,7 +418,7 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         String nodeId = "1";
         String nodeName = "notification";
         
-        NodeInstanceLog origLog = new NodeInstanceLog(type, processInstanceId, processId, nodeInstanceId, nodeId, nodeName);
+        org.jbpm.process.audit.NodeInstanceLog origLog = new org.jbpm.process.audit.NodeInstanceLog(type, processInstanceId, processId, nodeInstanceId, nodeId, nodeName);
         
         origLog.setWorkItemId(78l);
         origLog.setConnection("link");
@@ -587,11 +428,12 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         JaxbNodeInstanceLog xmlLog = new JaxbNodeInstanceLog(origLog);
         xmlLog.setCommandName("test-cmd");
         xmlLog.setIndex(2);
+        xmlLog.setId(2l);
         JaxbNodeInstanceLog newXmlLog = testRoundTrip(xmlLog);
         ComparePair.compareOrig(xmlLog, newXmlLog, JaxbNodeInstanceLog.class);
         
         NodeInstanceLog newLog = newXmlLog.getResult();
-        ComparePair.compareOrig(origLog, newLog, NodeInstanceLog.class);
+        ComparePair.compareOrig((NodeInstanceLog) origLog, newLog, NodeInstanceLog.class);
     }
     
     @Test
@@ -605,8 +447,8 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         String value = "33";
         String oldValue = "32";
         
-        VariableInstanceLog origLog 
-            = new VariableInstanceLog(processInstanceId, processId, variableInstanceId, variableId, value, oldValue);
+        org.jbpm.process.audit.VariableInstanceLog origLog 
+            = new org.jbpm.process.audit.VariableInstanceLog(processInstanceId, processId, variableInstanceId, variableId, value, oldValue);
         
         origLog.setExternalId("outside-identity-representation");
         origLog.setOldValue("previous-data-that-this-variable-contains");
@@ -618,10 +460,10 @@ public abstract class AbstractServicesSerializationTest extends JbpmJUnitBaseTes
         xmlLog.setCommandName("test-cmd");
         xmlLog.setIndex(2);
         JaxbVariableInstanceLog newXmlLog = testRoundTrip(xmlLog);
-        ComparePair.compareOrig(xmlLog, newXmlLog, JaxbVariableInstanceLog.class);
+        ComparePair.compareObjectsViaFields(xmlLog, newXmlLog, "id");
         
         VariableInstanceLog newLog = newXmlLog.getResult();
-        ComparePair.compareOrig(origLog, newLog, VariableInstanceLog.class);
+        ComparePair.compareOrig((VariableInstanceLog) origLog, newLog, VariableInstanceLog.class);
     }
     
     @Test

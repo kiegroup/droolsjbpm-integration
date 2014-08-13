@@ -1,9 +1,9 @@
 package org.kie.services.client.yaml;
 
-import org.kie.services.client.AbstractServicesSerializationTest;
+import org.kie.services.client.AbstractRemoteServicesSerializationTest;
 import org.yaml.snakeyaml.Yaml;
 
-public class YamlServicesSerializationTest extends AbstractServicesSerializationTest {
+public class YamlRemoteServicesSerializationTest extends AbstractRemoteServicesSerializationTest {
 
     public TestType getType() { 
         return TestType.YAML;

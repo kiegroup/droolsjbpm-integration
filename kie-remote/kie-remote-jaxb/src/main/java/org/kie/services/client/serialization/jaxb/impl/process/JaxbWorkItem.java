@@ -10,10 +10,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
+import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
 @XmlRootElement(name = "work-item")
 @XmlAccessorType(XmlAccessType.FIELD)

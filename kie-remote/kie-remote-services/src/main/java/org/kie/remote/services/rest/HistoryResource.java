@@ -79,7 +79,7 @@ public class HistoryResource extends ResourceBase {
         
         List<ProcessInstanceLog> procInstLogResults = getAuditLogService().findProcessInstances();
         
-        List<AuditEvent> results = new ArrayList<AuditEvent>(procInstLogResults);
+        List<Object> results = new ArrayList<Object>(procInstLogResults);
         JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
@@ -112,7 +112,7 @@ public class HistoryResource extends ResourceBase {
             throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
 
-        List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
+        List<Object> varInstLogList = (List<Object>) result;
         JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, varInstLogList, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
@@ -134,7 +134,7 @@ public class HistoryResource extends ResourceBase {
             throw RestOperationException.badRequest("Unsupported operation: " + oper );
         }
         
-        List<AuditEvent> varInstLogList = (List<AuditEvent>) result;
+        List<Object> varInstLogList = (List<Object>) result;
         JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, varInstLogList, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
@@ -173,8 +173,7 @@ public class HistoryResource extends ResourceBase {
                 }
             }
         }
-        List<AuditEvent> results = new ArrayList<AuditEvent>(filteredProcLogList);
-        
+        List<Object> results = new ArrayList<Object>(filteredProcLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
         return createCorrectVariant(resultList, headers);
     }
@@ -187,7 +186,7 @@ public class HistoryResource extends ResourceBase {
         
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         
-        List<AuditEvent> results = new ArrayList<AuditEvent>(varLogList);
+        List<Object> results = new ArrayList<Object>(varLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
@@ -200,7 +199,7 @@ public class HistoryResource extends ResourceBase {
         String oper = getRelativePath();
         List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         
-        List<AuditEvent> results = new ArrayList<AuditEvent>(varLogList);
+        List<Object> results = new ArrayList<Object>(varLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
@@ -222,7 +221,7 @@ public class HistoryResource extends ResourceBase {
         List<ProcessInstanceLog> procInstLogList = getProcessInstanceLogsByVariable(varLogList, maxNumResults);
        
         // paginate
-        List<AuditEvent> results = new ArrayList<AuditEvent>(procInstLogList);
+        List<Object> results = new ArrayList<Object>(procInstLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
@@ -241,8 +240,8 @@ public class HistoryResource extends ResourceBase {
         int [] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo);
         List<ProcessInstanceLog> procInstLogList = getProcessInstanceLogsByVariable(varLogList, maxNumResults);
-        List<AuditEvent> results = new ArrayList<AuditEvent>(procInstLogList);
         
+        List<Object> results = new ArrayList<Object>(procInstLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
         return createCorrectVariant(resultList, headers);
     }

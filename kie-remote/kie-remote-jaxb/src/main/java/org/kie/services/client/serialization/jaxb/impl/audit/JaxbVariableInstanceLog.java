@@ -9,12 +9,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.jbpm.process.audit.VariableInstanceLog;
+import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="variable-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableInstanceLog> implements JaxbCommandResponse<VariableInstanceLog>{
+public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableInstanceLog> implements VariableInstanceLog, JaxbCommandResponse<VariableInstanceLog> {
 
     @XmlAttribute
     @XmlSchemaType(name="long")
@@ -161,7 +161,7 @@ public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableI
     }
 
     public VariableInstanceLog getResult() {
-        return createEntityInstance();
+        return this;
     }
 
     public void setResult(VariableInstanceLog result) { 

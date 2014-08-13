@@ -17,7 +17,7 @@ import org.kie.api.command.Command;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 
-@XmlRootElement(name="exception")
+@XmlRootElement(name="exception-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
 

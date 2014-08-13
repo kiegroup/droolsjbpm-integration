@@ -5,10 +5,8 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.drools.core.common.DefaultFactHandle;
 import org.kie.api.command.Command;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
 
@@ -16,9 +14,7 @@ import org.kie.remote.common.jaxb.JaxbRequestStatus;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbOtherResponse extends AbstractJaxbCommandResponse<Object> {
 
-    @XmlElements({ 
-        @XmlElement(name = "fact-handle", type = DefaultFactHandle.class)
-        })
+    @XmlElement
     private Object result;
 
     public JaxbOtherResponse() {

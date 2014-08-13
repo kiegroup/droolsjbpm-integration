@@ -79,6 +79,7 @@ public class DeploymentCmd implements Command {
         return results;
     }
     
+    @SuppressWarnings("serial")
     private DeploymentService getDeploymentService(CommandContext ctx) throws Exception {
         BeanManager beanManager = getBeanManager();
         return CDIUtils.createBean(DeploymentService.class, beanManager, new AnnotationLiteral<Kjar>(){});

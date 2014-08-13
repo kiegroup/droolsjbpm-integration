@@ -19,6 +19,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Validator;
 
+import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.cdi.Deploy;
 import org.jbpm.services.cdi.Undeploy;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
@@ -132,6 +133,7 @@ public class DynamicJaxbContext extends JAXBContext {
      * @see javax.xml.bind.JAXBContext#createValidator()
      */
     @Override
+    @SuppressWarnings("deprecation")
     public Validator createValidator() throws JAXBException {
         JAXBContext context = getRequestContext();
         if (context != null) {

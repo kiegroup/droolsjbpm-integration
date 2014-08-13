@@ -9,12 +9,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.jbpm.process.audit.ProcessInstanceLog;
+import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="process-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessInstanceLog> implements JaxbCommandResponse<ProcessInstanceLog>{
+public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessInstanceLog> implements ProcessInstanceLog, JaxbCommandResponse<ProcessInstanceLog>{
 
     @XmlAttribute
     @XmlSchemaType(name="long")
@@ -209,7 +209,7 @@ public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessIns
     }
 
     public ProcessInstanceLog getResult() {
-        return createEntityInstance();
+        return this;
     }
 
     public void setResult(ProcessInstanceLog result) { 

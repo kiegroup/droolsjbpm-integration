@@ -1,4 +1,4 @@
-package org.kie.services.client.serialization.jaxb.impl;
+package org.kie.remote.client.jaxb;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,70 +12,67 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.drools.core.command.GetVariableCommand;
-import org.drools.core.command.runtime.GetFactCountCommand;
-import org.drools.core.command.runtime.GetGlobalCommand;
-import org.drools.core.command.runtime.GetIdCommand;
-import org.drools.core.command.runtime.SetGlobalCommand;
-import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
-import org.drools.core.command.runtime.process.AbortWorkItemCommand;
-import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
-import org.drools.core.command.runtime.process.GetProcessIdsCommand;
-import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
-import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
-import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
-import org.drools.core.command.runtime.process.GetWorkItemCommand;
-import org.drools.core.command.runtime.process.SetProcessInstanceVariablesCommand;
-import org.drools.core.command.runtime.process.SignalEventCommand;
-import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
-import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.drools.core.command.runtime.rule.DeleteCommand;
-import org.drools.core.command.runtime.rule.FireAllRulesCommand;
-import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.core.command.runtime.rule.UpdateCommand;
-import org.jbpm.process.audit.command.AuditCommand;
-import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
-import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
-import org.jbpm.process.audit.command.FindNodeInstancesCommand;
-import org.jbpm.process.audit.command.FindProcessInstanceCommand;
-import org.jbpm.process.audit.command.FindProcessInstancesCommand;
-import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
-import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
-import org.jbpm.process.audit.command.FindVariableInstancesCommand;
-import org.jbpm.services.task.commands.ActivateTaskCommand;
-import org.jbpm.services.task.commands.AddTaskCommand;
-import org.jbpm.services.task.commands.CancelDeadlineCommand;
-import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
-import org.jbpm.services.task.commands.ClaimTaskCommand;
-import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.CompositeCommand;
-import org.jbpm.services.task.commands.DelegateTaskCommand;
-import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
-import org.jbpm.services.task.commands.ExitTaskCommand;
-import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.ForwardTaskCommand;
-import org.jbpm.services.task.commands.GetAttachmentCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
-import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
-import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
-import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
-import org.jbpm.services.task.commands.GetTaskCommand;
-import org.jbpm.services.task.commands.GetTaskContentCommand;
-import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
-import org.jbpm.services.task.commands.GetTasksOwnedCommand;
-import org.jbpm.services.task.commands.NominateTaskCommand;
-import org.jbpm.services.task.commands.ProcessSubTaskCommand;
-import org.jbpm.services.task.commands.ReleaseTaskCommand;
-import org.jbpm.services.task.commands.ResumeTaskCommand;
-import org.jbpm.services.task.commands.SkipTaskCommand;
-import org.jbpm.services.task.commands.StartTaskCommand;
-import org.jbpm.services.task.commands.StopTaskCommand;
-import org.jbpm.services.task.commands.SuspendTaskCommand;
-import org.jbpm.services.task.commands.TaskCommand;
-import org.kie.api.command.Command;
-import org.kie.services.shared.AcceptedCommands;
+import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
+import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
+import org.kie.remote.jaxb.gen.ActivateTaskCommand;
+import org.kie.remote.jaxb.gen.AddTaskCommand;
+import org.kie.remote.jaxb.gen.AuditCommand;
+import org.kie.remote.jaxb.gen.CancelDeadlineCommand;
+import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
+import org.kie.remote.jaxb.gen.ClaimTaskCommand;
+import org.kie.remote.jaxb.gen.ClearHistoryLogsCommand;
+import org.kie.remote.jaxb.gen.CompleteTaskCommand;
+import org.kie.remote.jaxb.gen.CompleteWorkItemCommand;
+import org.kie.remote.jaxb.gen.DelegateTaskCommand;
+import org.kie.remote.jaxb.gen.DeleteCommand;
+import org.kie.remote.jaxb.gen.ExecuteTaskRulesCommand;
+import org.kie.remote.jaxb.gen.ExitTaskCommand;
+import org.kie.remote.jaxb.gen.FailTaskCommand;
+import org.kie.remote.jaxb.gen.FindActiveProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.FindNodeInstancesCommand;
+import org.kie.remote.jaxb.gen.FindProcessInstanceCommand;
+import org.kie.remote.jaxb.gen.FindProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.FindSubProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.FindVariableInstancesByNameCommand;
+import org.kie.remote.jaxb.gen.FindVariableInstancesCommand;
+import org.kie.remote.jaxb.gen.FireAllRulesCommand;
+import org.kie.remote.jaxb.gen.ForwardTaskCommand;
+import org.kie.remote.jaxb.gen.GetAttachmentCommand;
+import org.kie.remote.jaxb.gen.GetContentCommand;
+import org.kie.remote.jaxb.gen.GetFactCountCommand;
+import org.kie.remote.jaxb.gen.GetGlobalCommand;
+import org.kie.remote.jaxb.gen.GetIdCommand;
+import org.kie.remote.jaxb.gen.GetProcessIdsCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstanceByCorrelationKeyCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstanceCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
+import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
+import org.kie.remote.jaxb.gen.GetTaskByWorkItemIdCommand;
+import org.kie.remote.jaxb.gen.GetTaskCommand;
+import org.kie.remote.jaxb.gen.GetTaskContentCommand;
+import org.kie.remote.jaxb.gen.GetTasksByProcessInstanceIdCommand;
+import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
+import org.kie.remote.jaxb.gen.GetTasksByVariousFieldsCommand;
+import org.kie.remote.jaxb.gen.GetTasksOwnedCommand;
+import org.kie.remote.jaxb.gen.GetVariableCommand;
+import org.kie.remote.jaxb.gen.GetWorkItemCommand;
+import org.kie.remote.jaxb.gen.InsertObjectCommand;
+import org.kie.remote.jaxb.gen.NominateTaskCommand;
+import org.kie.remote.jaxb.gen.ProcessSubTaskCommand;
+import org.kie.remote.jaxb.gen.ReleaseTaskCommand;
+import org.kie.remote.jaxb.gen.ResumeTaskCommand;
+import org.kie.remote.jaxb.gen.SetGlobalCommand;
+import org.kie.remote.jaxb.gen.SetProcessInstanceVariablesCommand;
+import org.kie.remote.jaxb.gen.SignalEventCommand;
+import org.kie.remote.jaxb.gen.SkipTaskCommand;
+import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
+import org.kie.remote.jaxb.gen.StartProcessCommand;
+import org.kie.remote.jaxb.gen.StartTaskCommand;
+import org.kie.remote.jaxb.gen.StopTaskCommand;
+import org.kie.remote.jaxb.gen.SuspendTaskCommand;
+import org.kie.remote.jaxb.gen.TaskCommand;
+import org.kie.remote.jaxb.gen.UpdateCommand;
 
 @XmlRootElement(name = "command-request")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -157,7 +154,6 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "start-task", type = StartTaskCommand.class),
             @XmlElement(name = "stop-task", type = StopTaskCommand.class),
             @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class),
-            @XmlElement(name = "task-composite-command", type = CompositeCommand.class),
             @XmlElement(name = "process-sub-tasks-command", type = ProcessSubTaskCommand.class),
             @XmlElement(name = "execute-task-rules-command", type = ExecuteTaskRulesCommand.class),
             @XmlElement(name = "cancel-deadline-command", type = CancelDeadlineCommand.class),
@@ -172,56 +168,56 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "find-variable-instances", type = FindVariableInstancesCommand.class),
             @XmlElement(name = "find-variable-instances-by-name", type = FindVariableInstancesByNameCommand.class)
     })
-    protected List<Command> commands;
+    protected List<Object> commands;
 
     public JaxbCommandsRequest() {
         // Default constructor
     }
 
-    public JaxbCommandsRequest(Command command) {
+    public JaxbCommandsRequest(Object command) {
         checkThatCommandIsAccepted(command);
-        this.commands = new ArrayList<Command>();
+        this.commands = new ArrayList<Object>();
         this.commands.add(command);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
     
-    public JaxbCommandsRequest(List<Command> commands) {
+    public JaxbCommandsRequest(List<Object> commands) {
         checkThatCommandsAreAccepted(commands);
-        this.commands = new ArrayList<Command>();
+        this.commands = new ArrayList<Object>();
         this.commands.addAll(commands);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
 
-    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
-        for( Command<?> command : checkCommands ) { 
-            if( ! (command instanceof TaskCommand<?>) && ! (command instanceof AuditCommand<?>) ) { 
+    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Object> checkCommands) {
+        for( Object command : checkCommands ) { 
+            if( ! (command instanceof TaskCommand) && ! (command instanceof AuditCommand) ) { 
                 throw new UnsupportedOperationException( "A " + command.getClass().getSimpleName() + " requires that the deployment id has been set!" );
             }
         }
     }
 
-    public JaxbCommandsRequest(String deploymentId, Command<?> command) {
+    public JaxbCommandsRequest(String deploymentId, Object command) {
         checkThatCommandIsAccepted(command);
         this.deploymentId = deploymentId;
-        this.commands = new ArrayList<Command>();
+        this.commands = new ArrayList<Object>();
         this.commands.add(command);
     }
 
-    public JaxbCommandsRequest(String deploymentId, List<Command> commands) {
+    public JaxbCommandsRequest(String deploymentId, List<Object> commands) {
         checkThatCommandsAreAccepted(commands);
         this.deploymentId = deploymentId;
-        this.commands = new ArrayList<Command>();
+        this.commands = new ArrayList<Object>();
         this.commands.addAll(commands);
     }
 
-    private void checkThatCommandsAreAccepted(Collection<Command> cmds) { 
-       for( Command cmd : cmds ) { 
+    private void checkThatCommandsAreAccepted(Collection<Object> cmds) { 
+       for( Object cmd : cmds ) { 
           checkThatCommandIsAccepted(cmd); 
        }
     }
     
-    private void checkThatCommandIsAccepted(Command<?> cmd) { 
-        if( ! AcceptedCommands.getSet().contains(cmd.getClass()) ) {
+    private void checkThatCommandIsAccepted(Object cmd) { 
+        if( ! AcceptedClientCommands.isAcceptedCommandClass(cmd.getClass()) ) {
            throw new UnsupportedOperationException(cmd.getClass().getName() + " is not an accepted command." ); 
         }
     }
@@ -258,14 +254,14 @@ public class JaxbCommandsRequest {
         this.user = user;
     }
 
-    public void setCommands(List<Command> commands) {
+    public void setCommands(List<Object> commands) {
         checkThatCommandsAreAccepted(commands);
         this.commands = commands;
     }
 
-    public List<Command> getCommands() {
+    public List<Object> getCommands() {
         if( this.commands == null ) { 
-            this.commands = new ArrayList<Command>();
+            this.commands = new ArrayList<Object>();
         }
         return this.commands;
     }
@@ -283,8 +279,8 @@ public class JaxbCommandsRequest {
     public String toString() {
     	StringBuffer result = new StringBuffer("JaxbCommandsRequest " + deploymentId + "\n");
     	if (commands != null) {
-	    	for (Command<?> command: commands) {
-	    		result.append(command + "\n");
+	    	for (Object command: commands) {
+	    		result.append(command.getClass().getSimpleName() + "\n");
 	    	}
     	}
     	return result.toString();

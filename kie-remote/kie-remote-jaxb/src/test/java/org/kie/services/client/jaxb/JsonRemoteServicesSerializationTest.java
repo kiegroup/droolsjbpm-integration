@@ -1,9 +1,9 @@
 package org.kie.services.client.jaxb;
 
-import org.kie.services.client.AbstractServicesSerializationTest;
+import org.kie.services.client.AbstractRemoteServicesSerializationTest;
 import org.kie.services.client.serialization.JsonSerializationProvider;
 
-public class JsonServicesSerializationTest extends AbstractServicesSerializationTest {
+public class JsonRemoteServicesSerializationTest extends AbstractRemoteServicesSerializationTest {
 
     public TestType getType() { 
         return TestType.JSON;

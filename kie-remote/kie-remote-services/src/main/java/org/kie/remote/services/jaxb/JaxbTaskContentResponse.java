@@ -1,4 +1,6 @@
-package org.kie.services.client.serialization.jaxb.impl.task;
+package org.kie.remote.services.jaxb;
+
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -6,15 +8,16 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
+import org.jbpm.services.task.impl.model.xml.adapter.StringObjectMapXmlAdapter;
 import org.kie.api.command.Command;
-import org.kie.api.task.model.Content;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
-@XmlRootElement(name = "content-response")
+@XmlRootElement(name = "task-content-response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbContentResponse extends JaxbContent implements JaxbCommandResponse<Content> {
+public class JaxbTaskContentResponse implements JaxbCommandResponse<Map<String, Object>> {
 
     @XmlAttribute
     @XmlSchemaType(name = "int")
@@ -24,18 +27,22 @@ public class JaxbContentResponse extends JaxbContent implements JaxbCommandRespo
     @XmlSchemaType(name = "string")
     private String commandName;
 
-    public JaxbContentResponse() {
+    @XmlElement(name="content-map")
+    @XmlJavaTypeAdapter(StringObjectMapXmlAdapter.class)
+    private Map<String, Object> contentMap = null;
+
+    public JaxbTaskContentResponse() {
         // Default constructor
     }
 
-    public JaxbContentResponse(int i, Command<?> cmd) {
+    public JaxbTaskContentResponse(int i, Command<?> cmd) {
         this.index = i;
         this.commandName = cmd.getClass().getSimpleName();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse#getIndex()
      */
     @Override
@@ -47,12 +54,12 @@ public class JaxbContentResponse extends JaxbContent implements JaxbCommandRespo
     @Override
     public void setIndex(Integer index) {
         this.index = index;
-        
+
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse#getCommandName()
      */
     @Override
@@ -64,20 +71,20 @@ public class JaxbContentResponse extends JaxbContent implements JaxbCommandRespo
     public void setCommandName(String cmdName) {
         this.commandName = cmdName;
     }
-    
-    public JaxbContentResponse(JaxbContent content, int i, Command<?> cmd) {
-        super(content);
+
+    public JaxbTaskContentResponse(JaxbContent content, int i, Command<?> cmd) {
         this.index = i;
         this.commandName = cmd.getClass().getSimpleName();
+        this.contentMap = content.getContentMap();
     }
 
-    public Content getResult() {
-        return this;
-   }
+    public Map<String, Object> getResult() {
+        return contentMap;
+    }
 
     @Override
-    public void setResult(Content result) {
-        initialize(result);
+    public void setResult(Map<String, Object> contentMap) {
+        this.contentMap = contentMap;
     }
 
 }

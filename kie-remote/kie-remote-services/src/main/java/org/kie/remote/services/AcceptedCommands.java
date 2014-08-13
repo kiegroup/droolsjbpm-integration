@@ -1,4 +1,4 @@
-package org.kie.services.shared;
+package org.kie.remote.services;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -71,7 +71,7 @@ public class AcceptedCommands {
         acceptedCommands.add(GetWorkItemCommand.class);
 
         acceptedCommands.add(AbortProcessInstanceCommand.class);
-        acceptedCommands.add(GetProcessIdsCommand.class);
+        acceptedCommands.add(GetProcessIdsCommand.class); // non KieSession
         acceptedCommands.add(GetProcessInstanceByCorrelationKeyCommand.class);
         acceptedCommands.add(GetProcessInstanceCommand.class);
         acceptedCommands.add(GetProcessInstancesCommand.class);
@@ -81,11 +81,12 @@ public class AcceptedCommands {
         acceptedCommands.add(StartProcessCommand.class);
 
         acceptedCommands.add(GetVariableCommand.class);
+        
         acceptedCommands.add(GetFactCountCommand.class);
         acceptedCommands.add(GetGlobalCommand.class);
         acceptedCommands.add(GetIdCommand.class);
         acceptedCommands.add(SetGlobalCommand.class);
-
+        
         acceptedCommands.add(DeleteCommand.class);
         acceptedCommands.add(FireAllRulesCommand.class);
         acceptedCommands.add(InsertObjectCommand.class);

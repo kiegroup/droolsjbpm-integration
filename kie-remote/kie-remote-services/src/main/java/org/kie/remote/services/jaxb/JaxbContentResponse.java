@@ -1,4 +1,9 @@
-package org.kie.services.client.serialization.jaxb.impl.task;
+package org.kie.remote.services.jaxb;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -7,14 +12,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.jbpm.services.task.impl.model.xml.JaxbTask;
+import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.kie.api.command.Command;
-import org.kie.api.task.model.Task;
+import org.kie.api.task.model.Content;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
-@XmlRootElement(name = "task-response")
+@XmlRootElement(name = "content-response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandResponse<Task> {
+public class JaxbContentResponse extends JaxbContent implements JaxbCommandResponse<Content> {
 
     @XmlAttribute
     @XmlSchemaType(name = "int")
@@ -24,11 +29,11 @@ public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandRespo
     @XmlSchemaType(name = "string")
     private String commandName;
 
-    public JaxbTaskResponse() {
+    public JaxbContentResponse() {
         // Default constructor
     }
 
-    public JaxbTaskResponse(int i, Command<?> cmd) {
+    public JaxbContentResponse(int i, Command<?> cmd) {
         this.index = i;
         this.commandName = cmd.getClass().getSimpleName();
     }
@@ -65,18 +70,18 @@ public class JaxbTaskResponse extends JaxbTask implements Task, JaxbCommandRespo
         this.commandName = cmdName;
     }
     
-    public JaxbTaskResponse(Task task, int i, Command<?> cmd) {
-        super(task);
+    public JaxbContentResponse(JaxbContent content, int i, Command<?> cmd) {
+        super(content);
         this.index = i;
         this.commandName = cmd.getClass().getSimpleName();
     }
 
-    public Task getResult() {
+    public Content getResult() {
         return this;
    }
 
     @Override
-    public void setResult(Task result) {
+    public void setResult(Content result) {
         initialize(result);
     }
 
