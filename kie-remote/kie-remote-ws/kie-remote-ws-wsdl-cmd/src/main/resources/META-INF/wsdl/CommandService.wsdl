@@ -30,39 +30,31 @@
       </xs:annotation> 
 
       <xs:element name="CommandServiceException" type="tns:WebServiceFaultInfo"/>
-      <xs:element name="command-request" type="tns:jaxbCommandsRequest"/>
-      <xs:element name="command-response" type="tns:jaxbCommandsResponse"/>
+      <xs:element name="command-request" type="tns:webServiceCommandsRequest"/>
+      <xs:element name="command-response" type="tns:webServiceCommandsResponse"/>
 
       <xs:element name="execute" type="tns:execute"/>
       <xs:element name="executeResponse" type="tns:executeResponse"/>
 
       <xs:complexType name="execute">
         <xs:sequence>
-          <xs:element name="request" type="tns:jaxbCommandsRequest" minOccurs="0"/>
+          <xs:element name="request" type="tns:webServiceCommandsRequest" minOccurs="0"/>
         </xs:sequence>
       </xs:complexType>
 
-      <xs:complexType name="jaxbCommandsRequest">
-         <xs:annotation>
-          <xs:appinfo>
-            <jxb:class ref="org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest"/>
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:complexType>
+       <xs:complexType name="webServiceCommandsRequest">
+         <xs:sequence/>
+       </xs:complexType>
 
       <xs:complexType name="executeResponse">
         <xs:sequence>
-          <xs:element name="return" type="tns:jaxbCommandsResponse" minOccurs="0"/>
+           <xs:element name="return" type="tns:webServiceCommandsResponse" minOccurs="0"/>
         </xs:sequence>
       </xs:complexType>
 
-      <xs:complexType name="jaxbCommandsResponse">
-        <xs:annotation>
-          <xs:appinfo>
-            <jxb:class ref="org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse"/>
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:complexType>
+       <xs:complexType name="webServiceCommandsResponse">
+         <xs:sequence/>
+       </xs:complexType> 
 
       <xs:complexType name="serializableServiceObject" abstract="true">
         <xs:annotation>

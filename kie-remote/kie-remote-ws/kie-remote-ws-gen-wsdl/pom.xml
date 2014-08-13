@@ -19,16 +19,86 @@
     <dependency>
       <groupId>javax.xml.ws</groupId>
       <artifactId>jaxws-api</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.remote.ws</groupId>
-      <artifactId>kie-remote-ws-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>                    
+          </execution>
+        </executions>
+        <configuration>
+          <basedir>${basedir}/src/main/java/org/kie/remote/services/ws/sei</basedir>
+          <includes>
+            <include>ServicesVersion.java</include>
+          </includes>
+          <regex>true</regex>
+          <replacements>
+            <replacement>
+              <token>VERSION = ".*</token>
+              <value>VERSION = "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${bugfix.version}";</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+      
+       <plugin>
+        <groupId>org.jvnet.jax-ws-commons</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <!-- 4. generate classes based on WSDL to be included in jar -->
+          <execution>
+            <id>generate-wsdls</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsgen}</executable>
+              <sei>org.kie.remote.services.ws.sei.command.CommandWebServiceWsdlGenerationImpl</sei>
+              <genWsdl>true</genWsdl>
+              <inlineSchemas>true</inlineSchemas>
+              <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build> 
+  
+   <!-- setup corresponding executables on win/*nix -->
+  <profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <tool.wsgen>${java.home}/../bin/wsgen.exe</tool.wsgen>
+        <tool.wsimport>${java.home}/../bin/wsimport.exe</tool.wsimport>
+      </properties>
+    </profile>
+    <profile>
+      <id>nix</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <properties>
+        <tool.wsgen>${java.home}/../bin/wsgen</tool.wsgen>
+        <tool.wsimport>${java.home}/../bin/wsimport</tool.wsimport>
+      </properties>
+    </profile>
+  </profiles>
 </project>

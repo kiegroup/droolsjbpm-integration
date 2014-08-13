@@ -9,7 +9,7 @@ import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
 import org.kie.remote.services.ws.common.KieRemoteWebServiceException;
-import org.kie.services.shared.ServicesVersion;
+import org.kie.remote.services.ws.sei.ServicesVersion;
 
 
 /**

@@ -1,12 +1,12 @@
-package org.kie.remote.services.ws.command;
+package org.kie.services.remote.ws.command;
 
 import javax.jws.WebService;
 
+import org.kie.remote.services.jaxb.JaxbCommandsRequest;
+import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.ws.wsdl.generated.CommandWebService;
 import org.kie.remote.services.ws.wsdl.generated.CommandWebServiceException;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsRequest;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandsResponse;
 import org.kie.services.shared.ServicesVersion;
 
 
