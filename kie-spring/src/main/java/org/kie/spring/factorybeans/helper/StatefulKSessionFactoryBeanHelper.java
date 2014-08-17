@@ -72,6 +72,14 @@ public class StatefulKSessionFactoryBeanHelper extends KSessionFactoryBeanHelper
         return kieSession;
     }
 
+    @Override
+    public Object internalNewObject() {
+        if (kieBase != null) {
+            return kieBase.newKieSession(factoryBean.getConf(), null);
+        }
+        return null;
+    }
+
     public static class JpaConfiguration {
         private EntityManagerFactory emf;
         private PlatformTransactionManager tm;

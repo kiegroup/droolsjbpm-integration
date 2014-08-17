@@ -15,17 +15,28 @@
  */
 package org.kie.spring.factorybeans.helper;
 
+import org.kie.api.KieBase;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
 
 public abstract class KSessionFactoryBeanHelper {
 
     protected KSessionFactoryBean factoryBean;
+    protected KieBase kieBase;
 
     public KSessionFactoryBeanHelper(KSessionFactoryBean factoryBean) {
         this.factoryBean = factoryBean;
     }
 
     public abstract Object internalGetObject();
+    public abstract Object internalNewObject();
 
     public abstract void internalAfterPropertiesSet() throws Exception;
+
+    public KieBase getKieBase() {
+        return kieBase;
+    }
+
+    public void setKieBase(KieBase kieBase) {
+        this.kieBase = kieBase;
+    }
 }

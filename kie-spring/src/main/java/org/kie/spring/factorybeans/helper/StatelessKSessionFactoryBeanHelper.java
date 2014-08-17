@@ -37,4 +37,11 @@ public class StatelessKSessionFactoryBeanHelper extends KSessionFactoryBeanHelpe
         return kieSession;
     }
 
+    @Override
+    public Object internalNewObject() {
+        if (kieBase != null) {
+            return kieBase.newStatelessKieSession(factoryBean.getConf());
+        }
+        return null;
+    }
 }

@@ -155,6 +155,13 @@ public class KSessionFactoryBean
     }
 
     public Object getObject() throws Exception {
+        if ("prototype".equalsIgnoreCase(scope)) {
+            helper.setKieBase(kBase);
+            kSession = helper.internalNewObject();
+            attachLoggers((KieRuntimeEventManager) kSession);
+            attachListeners((KieRuntimeEventManager) kSession);
+            return kSession;
+        }
         return helper.internalGetObject();
     }
 
@@ -163,23 +170,32 @@ public class KSessionFactoryBean
     }
 
     public boolean isSingleton() {
-        return true;
+        return "singleton".equalsIgnoreCase(scope);
     }
 
     public void afterPropertiesSet() throws Exception {
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
 
-        kSession = kieObjectsResolver.resolveKSession(name, releaseId);
-        if (kSession instanceof StatelessKieSession) {
-            helper = new StatelessKSessionFactoryBeanHelper(this, (StatelessKieSession) kSession);
-        } else if (kSession instanceof KieSession) {
-            helper = new StatefulKSessionFactoryBeanHelper(this, (KieSession) kSession);
+        if ( "singleton".equalsIgnoreCase(scope) ) {
+            KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
+
+            kSession = kieObjectsResolver.resolveKSession(name, releaseId);
+            if (kSession instanceof StatelessKieSession) {
+                helper = new StatelessKSessionFactoryBeanHelper(this, (StatelessKieSession) kSession);
+            } else if (kSession instanceof KieSession) {
+                helper = new StatefulKSessionFactoryBeanHelper(this, (KieSession) kSession);
+            }
+            helper.internalAfterPropertiesSet();
+            // get ksession from helper as it might change the ksession when persistence is configured
+            kSession = helper.internalGetObject();
+            attachLoggers((KieRuntimeEventManager) kSession);
+            attachListeners((KieRuntimeEventManager) kSession);
+        } else {
+            if ("stateless".equalsIgnoreCase(type)) {
+                helper = new StatelessKSessionFactoryBeanHelper(this, null);
+            } else {
+                helper = new StatefulKSessionFactoryBeanHelper(this, null);
+            }
         }
-        helper.internalAfterPropertiesSet();
-        // get ksession from helper as it might change the ksession when persistence is configured
-        kSession = helper.internalGetObject();
-        attachLoggers((KieRuntimeEventManager) kSession);
-        attachListeners((KieRuntimeEventManager) kSession);
     }
 
     public StatefulKSessionFactoryBeanHelper.JpaConfiguration getJpaConfiguration() {

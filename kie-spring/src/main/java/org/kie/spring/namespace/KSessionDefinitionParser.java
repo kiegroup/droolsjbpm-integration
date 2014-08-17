@@ -85,8 +85,10 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
         factory.addPropertyValue(ATTRIBUTE_TYPE, type);
 
         String scope = element.getAttribute(SCOPE);
-        if (!StringUtils.hasLength(scope)){
-            factory.addPropertyValue(SCOPE, type);
+        if (StringUtils.hasLength(scope)){
+            factory.addPropertyValue(SCOPE, scope);
+        } else {
+            factory.addPropertyValue(SCOPE, "singleton");
         }
 
         String listeners = element.getAttribute(LISTENERS_REF_ATTRIBUTE);

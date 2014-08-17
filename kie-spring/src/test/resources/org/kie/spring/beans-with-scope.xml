@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd">
+
+  <kie:kmodule id="scope-test-kmodule">
+
+    <kie:kbase name="drl_kiesample3" packages="drl_kiesample3">
+      <kie:ksession name="statelessPrototypeSession" type="stateless" scope="prototype"/>
+      <kie:ksession name="statelessSingletonSession" type="stateless"/>
+      <kie:ksession name="statefulPrototypeSession" scope="prototype"/>
+      <kie:ksession name="statefulSingletonSession"/>
+    </kie:kbase>
+
+  </kie:kmodule>
+
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
+</beans>
