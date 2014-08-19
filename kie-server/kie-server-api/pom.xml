@@ -35,6 +35,9 @@
     </resources>
 
     <plugins>
+      <!-- Eclipse does not read the pom.xml by default, so it does not know it should process the filtered-resources.
+           The config below is needed and makes sure the resources are properly processed, e.g. when running the tests
+           directly from the Eclipse. Without the config tests that depend on those filtered resources will fail. -->
       <plugin>
         <artifactId>maven-eclipse-plugin</artifactId>
         <configuration>
