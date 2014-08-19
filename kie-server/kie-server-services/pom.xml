@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.kie</groupId>
@@ -19,12 +19,6 @@
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-spring</artifactId>
         <version>2.3.7.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
@@ -146,8 +140,8 @@
 
     <!-- test dependencies -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -170,7 +164,6 @@
 
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.1</version>
         <configuration>
           <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
         </configuration>
