@@ -1,57 +1,57 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.kie</groupId>
-		<artifactId>kie-server</artifactId>
-		<version>6.2.0-SNAPSHOT</version>
-	</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-server</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
 
-	<artifactId>kie-server-api</artifactId>
-	<packaging>jar</packaging>
+  <artifactId>kie-server-api</artifactId>
+  <packaging>jar</packaging>
 
-	<name>KIE :: Execution Server :: API</name>
-	<description>KIE Execution Server API</description>
+  <name>KIE :: Execution Server :: API</name>
+  <description>KIE Execution Server API</description>
 
-	<dependencies>
-		<!-- core dependencies -->
-		<dependency>
-			<groupId>org.kie</groupId>
-			<artifactId>kie-api</artifactId>
-			<!-- scope>provided</scope -->
-		</dependency>
+  <dependencies>
+    <!-- core dependencies -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+      <!-- scope>provided</scope -->
+    </dependency>
 
-	</dependencies>
+  </dependencies>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<filtering>true</filtering>
-				<directory>src/main/filtered-resources</directory>
-			</resource>
-		</resources>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/filtered-resources</directory>
+      </resource>
+    </resources>
 
-		<plugins>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<additionalBuildcommands>
-						<buildCommand>
-							<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-							<triggers>auto,full,incremental,</triggers>
-							<arguments>
-								<LaunchConfigHandle>&lt;project&gt;/.externalToolBuilders/mvn-resources.launch</LaunchConfigHandle>
-							</arguments>
-						</buildCommand>
-					</additionalBuildcommands>
-					<additionalConfig>
-						<file>
-							<name>.externalToolBuilders/mvn-resources.launch</name>
-							<content>
-<![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <plugins>
+      <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <additionalBuildcommands>
+            <buildCommand>
+              <name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+              <triggers>auto,full,incremental,</triggers>
+              <arguments>
+                <LaunchConfigHandle>&lt;project&gt;/.externalToolBuilders/mvn-resources.launch</LaunchConfigHandle>
+              </arguments>
+            </buildCommand>
+          </additionalBuildcommands>
+          <additionalConfig>
+            <file>
+              <name>.externalToolBuilders/mvn-resources.launch</name>
+              <content>
+                <![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.ui.externaltools.ProgramBuilderLaunchConfigurationType">
 <booleanAttribute key="org.eclipse.debug.ui.ATTR_LAUNCH_IN_BACKGROUND" value="true"/>
 <booleanAttribute key="org.eclipse.ui.externaltools.ATTR_BUILDER_ENABLED" value="true"/>
@@ -62,14 +62,13 @@
 <booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="&#36;{workspace_loc:/${artifactId}}"/>
 </launchConfiguration>]]>
-							</content>
-						</file>
-					</additionalConfig>
-				</configuration>
-			</plugin>
-		</plugins>
+              </content>
+            </file>
+          </additionalConfig>
+        </configuration>
+      </plugin>
+    </plugins>
 
-	</build>
-
+  </build>
 
 </project>
