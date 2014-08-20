@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.services.client.AbstractRemoteServicesSerializationTest;
+import org.kie.services.client.AbstractRemoteSerializationTest;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -23,7 +23,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
-public class JaxbRemoteServicesSerializationTest extends AbstractRemoteServicesSerializationTest {
+public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest {
 
     private static final String PROCESS_INSTANCE_ID_NAME = "process-instance-id";
 
@@ -171,11 +171,11 @@ public class JaxbRemoteServicesSerializationTest extends AbstractRemoteServicesS
         testRoundTripClassesSet(extraJaxbClasses);
 
         // 1
-        extraJaxbClasses.add(JaxbRemoteServicesSerializationTest.class);
+        extraJaxbClasses.add(JaxbRemoteSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
 
         // 2
-        extraJaxbClasses.add(JsonRemoteServicesSerializationTest.class);
+        extraJaxbClasses.add(JsonRemoteSerializationTest.class);
         testRoundTripClassesSet(extraJaxbClasses);
     }
 

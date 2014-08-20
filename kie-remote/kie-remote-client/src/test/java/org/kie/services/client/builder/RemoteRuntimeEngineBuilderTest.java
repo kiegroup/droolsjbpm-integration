@@ -111,7 +111,6 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
                .addPassword("koek")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .addExtraJaxbClasses(MyType.class, Person.class)
                .buildFactory();
        assertNotNull( restRuntimeFactory );
@@ -122,7 +121,6 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
                .addPassword("poffertje")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .buildFactory();
            fail( "A user name should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
@@ -135,7 +133,6 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
                .addUserName("A")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .buildFactory();
            fail( "A password should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
@@ -148,7 +145,6 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
                .addUserName("E")
                .addPassword("suiker")
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .buildFactory();
            fail( "A URL should always be required!");
        } catch(InsufficientInfoToBuildException e) { 

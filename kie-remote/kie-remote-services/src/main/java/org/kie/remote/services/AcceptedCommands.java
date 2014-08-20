@@ -110,6 +110,7 @@ public class AcceptedCommands {
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
+        acceptedCommands.add(GetTaskContentCommand.class);
         acceptedCommands.add(GetTaskCommand.class);
         acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);

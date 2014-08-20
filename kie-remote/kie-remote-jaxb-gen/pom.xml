@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>kie-remote-jaxb-gen</artifactId>
-  <name>KIE Remote Services :: Generated flat JAXB command classes</name>
+  <name>KIE Remote Services :: JAXB Generated commands</name>
 
   <dependencies>
     <!-- jaxb -->

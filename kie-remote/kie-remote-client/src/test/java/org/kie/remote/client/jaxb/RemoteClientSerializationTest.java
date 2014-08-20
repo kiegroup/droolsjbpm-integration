@@ -49,8 +49,6 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
     
     @Test
     public void taskSummaryListTest() throws Exception {
-        addClassesToSerializationProvider(JaxbTaskSummary.class);
-        
         this.setupDataSource = true;
         this.sessionPersistence = true;
         super.setUp();
@@ -85,6 +83,7 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         TaskSummary taskSum = jaxbTaskSumListResp.getList().get(0);
         TaskSummary taskSumCopy = jaxbTaskSumListRespCopy.getList().get(0);
         ComparePair.compareObjectsViaFields(taskSum, taskSumCopy, 
+                "actualOwner", "createdBy",
                 "potentialOwners", // null
                 "createdOn", "activationTime", "expirationTime",
                 "subTaskStrategy"); // dates

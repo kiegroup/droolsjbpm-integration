@@ -54,6 +54,7 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanc
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
 @XmlRootElement(name = "command-response")
@@ -194,7 +195,7 @@ public class JaxbCommandsResponse {
             this.responses.add(new JaxbTaskResponse((JaxbTask) result, i, cmd));
         } else if (result instanceof JaxbContent) {
             if (((JaxbContent) result).getId() == -1) {
-                this.responses.add(new JaxbTaskContentResponse((JaxbContent) result, i, cmd));
+                this.responses.add(new JaxbTaskContentResponse(((JaxbContent) result).getContentMap(), i, cmd));
             } else {
                 this.responses.add(new JaxbContentResponse((JaxbContent) result, i, cmd));
             }
@@ -243,9 +244,7 @@ public class JaxbCommandsResponse {
         } else if( result instanceof DefaultFactHandle ) { 
            this.responses.add(new JaxbOtherResponse(result, i, cmd));
         } else if( cmd instanceof GetTaskContentCommand ) { 
-           JaxbContent jaxbTaskContent = new JaxbContent();
-           jaxbTaskContent.setContentMap((Map<String, Object>) result);
-           this.responses.add(new JaxbTaskContentResponse(jaxbTaskContent, i, cmd));
+           this.responses.add(new JaxbTaskContentResponse((Map<String, Object>) result, i, cmd));
         }
         // Other
         else if( result instanceof JaxbExceptionResponse ) { 

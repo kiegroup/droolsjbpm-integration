@@ -96,7 +96,7 @@ public abstract class AbstractRemoteCommandObject {
     // Execute methods -----------------------------------------------------------------------------------------------------
 
 
-    protected Object execute( Object cmd ) {
+    protected Object executeCommand( Object cmd ) {
         if( AcceptedClientCommands.isSendObjectParameterCommandClass(cmd.getClass()) ) {
             List<Object> extraClassInstanceList = new ArrayList<Object>();
             preprocessCommand(cmd, extraClassInstanceList);
@@ -490,8 +490,7 @@ public abstract class AbstractRemoteCommandObject {
 
     public static <T> T unsupported( Class<?> realClass, Class<T> returnClass ) {
         String methodName = (new Throwable()).getStackTrace()[1].getMethodName();
-        throw new UnsupportedOperationException(methodName + " is not supported on the Remote Client  " + realClass.getSimpleName()
-                + " implementation.");
+        throw new UnsupportedOperationException("The " + realClass.getSimpleName() + "." + methodName + "(..) method is not supported on the Remote Client instance.");
     }
 
 }

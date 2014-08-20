@@ -50,21 +50,21 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
    
     public KieSessionClientCommandObject(RemoteConfiguration config) {
         super(config);
-        if( config.getKsessionQueue() == null ) { 
+        if( config.isJms() && config.getKsessionQueue() == null ) { 
             throw new MissingRequiredInfoException("A KieSession queue is necessary in order to create a Remote Client KieSession instance.");
         }
     }
     
     @Override
     public int fireAllRules() {
-        return (Integer) execute(new FireAllRulesCommand());
+        return (Integer) executeCommand(new FireAllRulesCommand());
     }
 
     @Override
     public int fireAllRules( int max ) {
         FireAllRulesCommand cmd = new FireAllRulesCommand();
         cmd.setMax(max);
-        return (Integer) execute(new FireAllRulesCommand());
+        return (Integer) executeCommand(new FireAllRulesCommand());
     }
 
     @Override
@@ -102,14 +102,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         SetGlobalCommand cmd = new SetGlobalCommand();
         cmd.setIdentifier(identifier);
         cmd.setObject(value);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
     public Object getGlobal( String identifier ) {
         GetGlobalCommand cmd = new GetGlobalCommand();
         cmd.setIdentifier(identifier);
-        return execute(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         cmd.setObject(object);
         DisconnectedFactHandle discFactHandle = factHandleToGenDisconnectedFactHandle(handle);
         cmd.setHandle(discFactHandle);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     static DisconnectedFactHandle factHandleToGenDisconnectedFactHandle(FactHandle handle) { 
@@ -265,14 +265,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public long getFactCount() {
-        return (Long) execute(new GetFactCountCommand());
+        return (Long) executeCommand(new GetFactCountCommand());
     }
 
     @Override
     public ProcessInstance startProcess( String processId ) {
         StartProcessCommand cmd = new StartProcessCommand();
         cmd.setProcessId(processId);
-        return (ProcessInstance) execute(cmd);
+        return (ProcessInstance) executeCommand(cmd);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         cmd.setProcessId(processId);
         JaxbStringObjectPairArray arrayMap = convertMapToPairArray(parameters);
         cmd.setParameter(arrayMap);
-        return (ProcessInstance) execute(cmd);
+        return (ProcessInstance) executeCommand(cmd);
     }
 
     @Override
@@ -299,7 +299,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         SignalEventCommand cmd = new SignalEventCommand();
         cmd.setEvent(event);
         cmd.setEventType(type);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -308,12 +308,12 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         cmd.setEvent(event);
         cmd.setEventType(type);
         cmd.setProcessInstanceId(processInstanceId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
     public Collection<ProcessInstance> getProcessInstances() {
-        return (Collection<ProcessInstance>) execute(new GetProcessInstancesCommand());
+        return (Collection<ProcessInstance>) executeCommand(new GetProcessInstancesCommand());
     }
 
     @Override
@@ -321,7 +321,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         GetProcessInstanceCommand cmd = new GetProcessInstanceCommand();
         cmd.setProcessInstanceId(processInstanceId);
         cmd.setReadOnly(true);
-        return (ProcessInstance) execute(cmd);
+        return (ProcessInstance) executeCommand(cmd);
     }
 
     @Override
@@ -329,14 +329,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         GetProcessInstanceCommand cmd = new GetProcessInstanceCommand();
         cmd.setProcessInstanceId(processInstanceId);
         cmd.setReadOnly(readonly);
-        return (ProcessInstance) execute(cmd);
+        return (ProcessInstance) executeCommand(cmd);
     }
 
     @Override
     public void abortProcessInstance( long processInstanceId ) {
         AbortProcessInstanceCommand cmd = new AbortProcessInstanceCommand();
         cmd.setProcessInstanceId(processInstanceId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -355,14 +355,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
                 cmd.setId(id);
                 JaxbStringObjectPairArray arrayMap = convertMapToPairArray(results);
                 cmd.setResult(arrayMap);
-                execute(cmd);
+                executeCommand(cmd);
             }
             
             @Override
             public void abortWorkItem( long id ) {
                 AbortWorkItemCommand cmd = new AbortWorkItemCommand();
                 cmd.setId(id);
-                execute(cmd);
+                executeCommand(cmd);
             }
         }; 
         }

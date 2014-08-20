@@ -50,7 +50,9 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
 
     protected static final Logger logger = LoggerFactory.getLogger(JaxbRemoteServicesSerializationTest.class);
    
-    private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.remote.services.jaxb"),
+    private static Reflections reflections = new Reflections(
+            ClasspathHelper.forPackage("org.kie.remote.services.jaxb"),
+            ClasspathHelper.forPackage("org.kie.services.client.serialization.jaxb.rest"),
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
    
 
@@ -71,10 +73,7 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
 
     
     /**
-     * If you think this test is a mistake: beware, this test is smarter than you. Seriously.
-     * Heck, this test is smarter than *me*, and I wrote it!
-     *
-     * @throws Exception
+     * If you think this test is a mistake: beware, this test is smarter than you.
      */
     @Test
     public void acceptedCommandsCanBeSerializedTest() throws Exception {
@@ -91,7 +90,7 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
             String name = xmlElemAnno.name();
             assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
             assertTrue(cmdClass.getSimpleName() + " is present in " + AcceptedCommands.class.getSimpleName() + " but not in "
-                    + JaxbCommandsRequest.class.getSimpleName(), cmdSet.remove(cmdClass.getSimpleName()));
+                    + JaxbCommandsRequest.class.getSimpleName(), cmdSet.remove(cmdClass));
         }
         for (Class cmdClass : cmdSet) {
             logger.error("Missing: " + cmdClass.getSimpleName());
@@ -100,11 +99,6 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
                 + JaxbCommandsRequest.class.getSimpleName(), 0, cmdSet.size());
     }
  
-    /**
-     * This test is the above one's little brother, and he takes after him. Damn.. these are some smart tests, yo!
-     *
-     * (HA!)
-     */
     @Test
     public void allCommandResponseTypesNeedXmlElemIdTest() throws Exception {
         Field commandsField = JaxbCommandsResponse.class.getDeclaredField("responses");
@@ -112,8 +106,13 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
         XmlElement[] xmlElems = xmlElemsAnno.value();
 
         Set<Class<?>> cmdSet = new HashSet<Class<?>>();
-        for (Class<?> cmdRespImpl : reflections.getSubTypesOf(JaxbCommandResponse.class)) {
-            cmdSet.add(cmdRespImpl);
+        { 
+            Set<Class<? extends JaxbCommandResponse>> subTypes = reflections.getSubTypesOf(JaxbCommandResponse.class);
+            cmdSet.addAll(subTypes);
+        }
+        {
+            Set<Class<? extends AbstractJaxbCommandResponse>> subTypes = reflections.getSubTypesOf(AbstractJaxbCommandResponse.class);
+            cmdSet.addAll(subTypes);
         }
         cmdSet.remove(AbstractJaxbCommandResponse.class);
 
@@ -143,10 +142,8 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
     public void commandsWithListReturnTypesAreInCmdTypesList() throws Exception {
         Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
         // remove "meta" command types
-        assertTrue( "Removing " + CompositeCommand.class.getSimpleName(), 
-                cmdSet.remove(CompositeCommand.class.getSimpleName()));
         assertTrue( "Removing " + GetTaskContentCommand.class.getSimpleName(), 
-                cmdSet.remove(GetTaskContentCommand.class.getSimpleName())); // handled on ~l.244 of JaxbCommandsResponse
+                cmdSet.remove(GetTaskContentCommand.class)); // handled on ~l.244 of JaxbCommandsResponse
 
         // retrieve cmd list types set
         String cmdListTypesFieldName = "cmdListTypes";

@@ -23,40 +23,40 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
     
     @Override
     public List<? extends ProcessInstanceLog> findProcessInstances() {
-        return (List<ProcessInstanceLog>) execute(new FindProcessInstancesCommand());
+        return (List<ProcessInstanceLog>) executeCommand(new FindProcessInstancesCommand());
     }
 
     @Override
     public List<? extends ProcessInstanceLog> findProcessInstances( String processId ) {
         FindProcessInstancesCommand cmd = new FindProcessInstancesCommand();
         cmd.setProcessId(processId);
-        return (List<ProcessInstanceLog>) execute(cmd);
+        return (List<ProcessInstanceLog>) executeCommand(cmd);
     }
 
     @Override
     public List<? extends ProcessInstanceLog> findActiveProcessInstances( String processId ) {
         FindActiveProcessInstancesCommand cmd = new FindActiveProcessInstancesCommand();
         cmd.setProcessId(processId);
-        return (List<ProcessInstanceLog>) execute(cmd);
+        return (List<ProcessInstanceLog>) executeCommand(cmd);
     }
 
     @Override
     public ProcessInstanceLog findProcessInstance( long processInstanceId ) {
         FindProcessInstanceCommand cmd = new FindProcessInstanceCommand();
         cmd.setProcessInstanceId(processInstanceId);
-        return (ProcessInstanceLog) execute(cmd);
+        return (ProcessInstanceLog) executeCommand(cmd);
     }
 
     @Override
     public List<? extends ProcessInstanceLog> findSubProcessInstances( long processInstanceId ) {
         FindSubProcessInstancesCommand cmd = new FindSubProcessInstancesCommand();
         cmd.setProcessInstanceId(processInstanceId);
-        return (List<ProcessInstanceLog>) execute(cmd);
+        return (List<ProcessInstanceLog>) executeCommand(cmd);
     }
 
     @Override
     public List<? extends NodeInstanceLog> findNodeInstances( long processInstanceId ) {
-        return (List<NodeInstanceLog>) execute(new org.kie.remote.jaxb.gen.FindNodeInstancesCommand());
+        return (List<NodeInstanceLog>) executeCommand(new org.kie.remote.jaxb.gen.FindNodeInstancesCommand());
     }
 
     @Override
@@ -64,14 +64,14 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
         FindNodeInstancesCommand cmd = new FindNodeInstancesCommand();
         cmd.setProcessInstanceId(processInstanceId);
         cmd.setNodeId(nodeId);
-        return (List<NodeInstanceLog>) execute(cmd);
+        return (List<NodeInstanceLog>) executeCommand(cmd);
     }
 
     @Override
     public List<? extends VariableInstanceLog> findVariableInstances( long processInstanceId ) {
         FindVariableInstancesCommand cmd = new FindVariableInstancesCommand();
         cmd.setProcessInstanceId(processInstanceId);
-        return (List<VariableInstanceLog>) execute(cmd);
+        return (List<VariableInstanceLog>) executeCommand(cmd);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
         FindVariableInstancesCommand cmd = new FindVariableInstancesCommand();
         cmd.setProcessInstanceId(processInstanceId);
         cmd.setVariableId(variableId);
-        return (List<VariableInstanceLog>) execute(cmd);
+        return (List<VariableInstanceLog>) executeCommand(cmd);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
         FindVariableInstancesByNameCommand cmd = new FindVariableInstancesByNameCommand();
         cmd.setVariableId(variableId);
         cmd.setActiveProcesses(onlyActiveProcesses);
-        return (List<VariableInstanceLog>) execute(cmd);
+        return (List<VariableInstanceLog>) executeCommand(cmd);
     }
 
     @Override
@@ -97,12 +97,12 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
         cmd.setVariableId(variableId);
         cmd.setValue(value);
         cmd.setActiveProcesses(onlyActiveProcesses);
-        return (List<VariableInstanceLog>) execute(cmd);
+        return (List<VariableInstanceLog>) executeCommand(cmd);
     }
 
     @Override
     public void clear() {
-        execute(new ClearHistoryLogsCommand());
+        executeCommand(new ClearHistoryLogsCommand());
     }
 
     @Override

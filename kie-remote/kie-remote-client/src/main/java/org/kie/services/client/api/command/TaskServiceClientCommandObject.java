@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.api.command.Command;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Attachment;
 import org.kie.api.task.model.Comment;
@@ -55,7 +56,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     public TaskServiceClientCommandObject(RemoteConfiguration config) {
         super(config);
-        if( config.getTaskQueue() == null ) { 
+        if( config.isJms() && config.getTaskQueue() == null ) { 
             throw new MissingRequiredInfoException("A Task queue is necessary in order to create a Remote Client TaskService instance.");
         }
     }
@@ -239,7 +240,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         ActivateTaskCommand cmd = new ActivateTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -247,14 +248,14 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         ClaimTaskCommand cmd = new ClaimTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
     public void claimNextAvailable( String userId, String language ) {
         ClaimNextAvailableTaskCommand cmd = new ClaimNextAvailableTaskCommand();
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -264,7 +265,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setUserId(userId);
         JaxbStringObjectPairArray values = convertMapToPairArray(data);
         cmd.setData(values);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -273,7 +274,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
         cmd.setTargetEntityId(targetUserId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -281,7 +282,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         ExitTaskCommand cmd = new ExitTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -291,7 +292,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setUserId(userId);
         JaxbStringObjectPairArray values = convertMapToPairArray(faultData);
         cmd.setData(values);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -300,21 +301,21 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
         cmd.setTargetEntityId(targetEntityId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
     public Task getTaskByWorkItemId( long workItemId ) {
         GetTaskByWorkItemIdCommand cmd = new GetTaskByWorkItemIdCommand();
         cmd.setWorkItemId(workItemId);
-        return (Task) execute(cmd);
+        return (Task) executeCommand(cmd);
     }
 
     @Override
     public Task getTaskById( long taskId ) {
         GetTaskCommand cmd = new GetTaskCommand();
         cmd.setTaskId(taskId);
-        return (Task) execute(cmd);
+        return (Task) executeCommand(cmd);
     }
 
     @Override
@@ -322,7 +323,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTaskAssignedAsBusinessAdminCommand cmd = new GetTaskAssignedAsBusinessAdminCommand();
         cmd.setUserId(userId);
         // no query filter for language
-        return (List<TaskSummary>) execute(cmd);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
     @Override
@@ -330,7 +331,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
         cmd.setUserId(userId);
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) execute(cmd);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
     @Override
@@ -343,7 +344,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             }
         }
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) execute(cmd);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
     @Override
@@ -351,7 +352,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
         cmd.setUserId(userId);
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) execute(cmd);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
     @Override
@@ -364,7 +365,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             }
         }
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) execute(cmd);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
     @Override
@@ -377,14 +378,14 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             }
         }
         // no query filter for language
-        return (List<TaskSummary>) execute(cmd);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
     @Override
     public List<Long> getTasksByProcessInstanceId( long processInstanceId ) {
         GetTasksByProcessInstanceIdCommand cmd = new GetTasksByProcessInstanceIdCommand();
         cmd.setProcessInstanceId(processInstanceId);
-        return (List<Long>) execute(cmd);
+        return (List<Long>) executeCommand(cmd);
     }
 
     @Override
@@ -394,7 +395,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setJaxbTask(genTask);
         JaxbStringObjectPairArray values = convertMapToPairArray(params);
         cmd.setParameter(values);
-        return (Long) execute(cmd);
+        return (Long) executeCommand(cmd);
     }
 
     @Override
@@ -402,7 +403,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         ReleaseTaskCommand cmd = new ReleaseTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -410,7 +411,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         ResumeTaskCommand cmd = new ResumeTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -418,7 +419,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         SkipTaskCommand cmd = new SkipTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -426,7 +427,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         StartTaskCommand cmd = new StartTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -434,7 +435,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         StopTaskCommand cmd = new StopTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -442,7 +443,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         SuspendTaskCommand cmd = new SuspendTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
@@ -454,28 +455,28 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         if( genOrgEntList != null ) {
             cmd.getPotentialOwners().addAll(genOrgEntList);
         }
-        execute(cmd);
+        executeCommand(cmd);
     }
 
     @Override
     public Content getContentById( long contentId ) {
         GetContentCommand cmd = new GetContentCommand();
         cmd.setContentId(contentId);
-        return (Content) execute(cmd);
+        return (Content) executeCommand(cmd);
     }
 
     @Override
     public Attachment getAttachmentById( long attachId ) {
         GetAttachmentCommand cmd = new GetAttachmentCommand();
         cmd.setAttachmentId(attachId);
-        return (Attachment) execute(cmd);
+        return (Attachment) executeCommand(cmd);
     }
 
     @Override
     public Map<String, Object> getTaskContent( long taskId ) {
         GetTaskContentCommand cmd = new GetTaskContentCommand();
         cmd.setTaskId(taskId);
-        return (Map<String, Object>) execute(cmd);
+        return (Map<String, Object>) executeCommand(cmd);
     }
 
 }

@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.jbpm.services.task.commands.CompositeCommand;
 import org.junit.Test;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
@@ -77,6 +78,7 @@ public class RemoteCommandObjectTest {
             }
         });
         classes = new LinkedHashSet<Class<?>>(classList);
+        classes.remove(CompositeCommand.class);
         
         Map<Class, Class> kieCmdGenCmdClassMap = new LinkedHashMap<Class, Class>();
         for( Class<?> cmdClass : classes ) {
@@ -101,6 +103,9 @@ public class RemoteCommandObjectTest {
         Object copyKieCmd = roundTripFromFlatToOrigCmd(genCmd, genCmdClass, kieCmdClass);
         
         for( Field field : kieCmdClass.getDeclaredFields() ) { 
+            if( field.getAnnotation(XmlTransient.class) != null) { 
+               continue; 
+            }
             field.setAccessible(true);
             Object kieCmdFieldVal = field.get(copyKieCmd);
             assertNotNull( kieCmdClass.getSimpleName() + "."  + field.getName(), kieCmdFieldVal );

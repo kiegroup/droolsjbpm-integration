@@ -62,9 +62,9 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractRemoteServicesSerializationTest extends JbpmJUnitBaseTestCase {
+public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestCase {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteServicesSerializationTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteSerializationTest.class);
 
     protected enum TestType {
         JAXB, JSON, YAML;
@@ -209,8 +209,8 @@ public abstract class AbstractRemoteServicesSerializationTest extends JbpmJUnitB
 
     @Test
     public void factHandleTest() throws Exception {
-        // Don't run with YAML?
-        Assume.assumeFalse(getType().equals(TestType.YAML));
+        // Only run with JAXB/XML
+        Assume.assumeTrue(getType().equals(TestType.JAXB));
 
         KieSession ksession = createKnowledgeSession(null);
 

@@ -14,7 +14,7 @@
   <logger name="org.kie.services.client.builder" level="info"/>
   
   <!--  gen classes tests.. -->
-  <logger name="org.kie.services.client.api.command" level="debug" />
+  <logger name="org.kie.services.client.api.command" level="info" />
   
   <root level="info">
     <appender-ref ref="consoleAppender" />
