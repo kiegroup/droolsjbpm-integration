@@ -39,16 +39,6 @@
         <artifactId>kie-server-services</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-management</artifactId>
-        <version>2.7.11</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-local</artifactId>
-        <version>2.7.11</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 </project>
