@@ -149,6 +149,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
