@@ -17,11 +17,6 @@
     <dependencies>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-spring</artifactId>
-        <version>2.3.7.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
         <artifactId>tjws</artifactId>
         <version>2.3.7.Final</version>
       </dependency>
@@ -46,6 +41,14 @@
       <!-- scope>provided</scope -->
     </dependency>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
       <!-- scope>provided</scope -->
@@ -54,6 +57,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
       <!-- scope>provided</scope -->
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-api</artifactId>
     </dependency>
 
     <dependency>
@@ -81,6 +88,14 @@
 
     <dependency>
       <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-nio2-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-nio2-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.uberfire</groupId>
       <artifactId>uberfire-nio2-jgit</artifactId>
     </dependency>
     <dependency>
@@ -103,28 +118,6 @@
       <artifactId>resteasy-jaxb-provider</artifactId>
       <!-- scope>provided</scope -->
     </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-spring</artifactId>
-      <!-- scope>provided</scope -->
-    </dependency>
-
-    <!-- Spring dependencies -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <!-- scope>provided</scope -->
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <!-- scope>provided</scope -->
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <!-- scope>provided</scope -->
-    </dependency>
 
     <!-- log -->
     <dependency>
@@ -138,6 +131,10 @@
       <!-- scope>provided</scope -->
     </dependency>
 
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+    </dependency>
     <!-- test dependencies -->
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
@@ -147,6 +144,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
