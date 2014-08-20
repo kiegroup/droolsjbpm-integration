@@ -537,7 +537,7 @@ public class KieRemoteHttpRequest {
         this.baseUrl = baseRestUrl;
         this.user = username;
         this.password = password;
-        this.timeout = timeout * 1000;
+        this.timeout = timeoutInSeconds * 1000;
     }
 
     public KieRemoteHttpRequest(final URL url, final String method) throws KieRemoteHttpRequestException {

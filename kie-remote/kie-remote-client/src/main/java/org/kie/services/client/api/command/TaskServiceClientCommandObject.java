@@ -1,15 +1,11 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.remote.client.jaxb.ConversionUtil.*;
+import static org.kie.remote.client.jaxb.ConversionUtil.convertDateToXmlGregorianCalendar;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.kie.api.command.Command;
 import org.kie.api.task.TaskService;
@@ -53,13 +49,15 @@ import org.kie.remote.jaxb.gen.StartTaskCommand;
 import org.kie.remote.jaxb.gen.StopTaskCommand;
 import org.kie.remote.jaxb.gen.SuspendTaskCommand;
 import org.kie.remote.jaxb.gen.Type;
+import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 
 public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject implements TaskService {
 
-
-    
     public TaskServiceClientCommandObject(RemoteConfiguration config) {
         super(config);
+        if( config.getTaskQueue() == null ) { 
+            throw new MissingRequiredInfoException("A Task queue is necessary in order to create a Remote Client TaskService instance.");
+        }
     }
 
     // helper methods -------------------------------------------------------------------------------------------------------------

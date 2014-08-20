@@ -1,5 +1,6 @@
 package org.kie.services.client.api.command;
 
+import org.jbpm.process.audit.AuditLogService;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.audit.AuditService;

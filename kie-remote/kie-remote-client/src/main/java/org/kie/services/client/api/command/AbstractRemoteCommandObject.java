@@ -72,6 +72,9 @@ public abstract class AbstractRemoteCommandObject {
 
     AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
+        if( this.config.isJms() ) { 
+            
+        }
     }
 
     protected boolean isTaskService = false;

@@ -42,6 +42,7 @@ import org.kie.remote.jaxb.gen.SignalEventCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
 import org.kie.remote.jaxb.gen.TraitTypeEnum;
 import org.kie.remote.jaxb.gen.UpdateCommand;
+import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 
 public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession {
 
@@ -49,6 +50,9 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
    
     public KieSessionClientCommandObject(RemoteConfiguration config) {
         super(config);
+        if( config.getKsessionQueue() == null ) { 
+            throw new MissingRequiredInfoException("A KieSession queue is necessary in order to create a Remote Client KieSession instance.");
+        }
     }
     
     @Override
