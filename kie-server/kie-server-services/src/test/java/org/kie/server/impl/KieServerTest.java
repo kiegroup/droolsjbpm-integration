@@ -11,10 +11,17 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.jboss.resteasy.util.GenericType;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -52,18 +59,19 @@ import com.thoughtworks.xstream.XStream;
 
 public class KieServerTest {
 
-    private static final int       PORT = findFreePort();
-    private static MavenRepository  repository;
-    private static ReleaseId        releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
-    private static ReleaseId        releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
+    private static final int PORT = findFreePort();
+    public static final String BASE_URI = "http://localhost:" + PORT + "/server";
+    private static MavenRepository repository;
+    private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
+    private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
 
     private TJWSEmbeddedJaxrsServer server;
     private KieServicesClient       client;
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar( releaseId1 );
-        createAndDeployKJar( releaseId2 );
+        createAndDeployKJar(releaseId1);
+        createAndDeployKJar(releaseId2);
         // this initialization only needs to be done once per VM
         RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
     }
@@ -94,8 +102,52 @@ public class KieServerTest {
 
     @Test
     public void testCreateContainer() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1",
+                                                                                                              releaseId1));
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+    }
+
+    @Test
+    public void testCreateContainerNonExistingGAV() throws Exception {
+        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1",
+                                                                                                              new ReleaseId(
+                                                                                                                      "foo",
+                                                                                                                      "bar",
+                                                                                                                      "0.0.0")));
+        Assert.assertEquals(ResponseType.FAILURE, reply.getType());
+    }
+
+    @Test
+    public void testCreateContainerNonExistingGAV2() throws Exception {
+        KieContainerResource resource = new KieContainerResource("kie1", new ReleaseId("foo", "bar", "0.0.0"));
+
+        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        try {
+            ClientRequest clientRequest = new ClientRequest(BASE_URI + "/containers/" + resource.getContainerId());
+            response = clientRequest.body(
+                    MediaType.APPLICATION_XML_TYPE, resource).put(
+                    new GenericType<ServiceResponse<KieContainerResource>>() {
+                    });
+            Assert.assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+            Assert.assertEquals( ResponseType.FAILURE, response.getEntity().getType());
+        } catch (Exception e) {
+            throw new ClientResponseFailure("Unexpected exception creating container: "+resource.getContainerId()+" with release-id "+resource.getReleaseId(), e, response );
+        }
+    }
+
+    @Test
+    public void testCreateContainerEmptyBody() throws Exception {
+        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        try {
+            ClientRequest clientRequest = new ClientRequest(BASE_URI + "/containers/kie1");
+            response = clientRequest.body(
+                    MediaType.APPLICATION_XML_TYPE, "").put(
+                    new GenericType<ServiceResponse<KieContainerResource>>() {
+                    });
+            Assert.assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+        } catch (Exception e) {
+            throw new ClientResponseFailure("Unexpected exception on empty body", e, response );
+        }
     }
 
     @Test
@@ -318,7 +370,7 @@ public class KieServerTest {
     }
 
     private void startClient() throws Exception {
-        client = new KieServicesClient("http://localhost:" + PORT + "/server");
+        client = new KieServicesClient(BASE_URI);
     }
 
     private static void createAndDeployKJar(ReleaseId releaseId) {

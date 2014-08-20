@@ -104,15 +104,17 @@ public class KieServerImpl {
 
     public List<ServiceResponse<? extends Object>> executeScript(CommandScript commands) {
         List<ServiceResponse<? extends Object>> response = new ArrayList<ServiceResponse<? extends Object>>();
-        for (KieServerCommand command : commands.getCommands()) {
-            if (command instanceof CreateContainerCommand) {
-                response.add(createContainer(((CreateContainerCommand) command).getContainer().getContainerId(), ((CreateContainerCommand) command).getContainer()));
-            } else if (command instanceof ListContainersCommand) {
-                response.add(listContainers());
-            } else if (command instanceof CallContainerCommand) {
-                response.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload()));
-            } else if (command instanceof DisposeContainerCommand) {
-                response.add(disposeContainer(((DisposeContainerCommand) command).getContainerId()));
+        if( commands != null ) {
+            for (KieServerCommand command : commands.getCommands()) {
+                if (command instanceof CreateContainerCommand) {
+                    response.add(createContainer(((CreateContainerCommand) command).getContainer().getContainerId(), ((CreateContainerCommand) command).getContainer()));
+                } else if (command instanceof ListContainersCommand) {
+                    response.add(listContainers());
+                } else if (command instanceof CallContainerCommand) {
+                    response.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload()));
+                } else if (command instanceof DisposeContainerCommand) {
+                    response.add(disposeContainer(((DisposeContainerCommand) command).getContainerId()));
+                }
             }
         }
         return response;
@@ -131,11 +133,11 @@ public class KieServerImpl {
     }
 
     public ServiceResponse<KieContainerResource> createContainer(String containerId, KieContainerResource container) {
-        ReleaseId releaseId = container.getReleaseId();
-        if (releaseId == null) {
+        if (container == null || container.getReleaseId() == null) {
             logger.error("Error creating container. Release Id is null: " + container);
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + ". Release Id is null: " + container + ".");
         }
+        ReleaseId releaseId = container.getReleaseId();
         try {
             KieContainerInstance ci = new KieContainerInstance(containerId, KieContainerStatus.CREATING);
             KieContainerInstance previous = null;
@@ -201,6 +203,9 @@ public class KieServerImpl {
     }
 
     public ServiceResponse<String> callContainer(String containerId, String payload) {
+        if( payload == null ) {
+            return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
+        }
         try {
             KieContainerInstance kci = (KieContainerInstance) context.getContainer(containerId);
             // the following code is subject to a concurrent call to dispose(), but the cost of synchronizing it
@@ -304,11 +309,11 @@ public class KieServerImpl {
     }
 
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
-        KieScannerStatus status = resource.getStatus();
-        if (status == null) {
+        if (resource == null || resource.getStatus() == null) {
             logger.error("Error updating scanner for container " + id + ". Status is null: " + resource);
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE, "Error updating scanner for container " + id + ". Status is null: " + resource);
         }
+        KieScannerStatus status = resource.getStatus();
         try {
             KieContainerInstance kci = (KieContainerInstance) context.getContainer(id);
             if (kci != null && kci.getKieContainer() != null) {
@@ -457,6 +462,10 @@ public class KieServerImpl {
     }
 
     public ServiceResponse<ReleaseId> updateContainerReleaseId(String id, ReleaseId releaseId) {
+        if( releaseId == null ) {
+            logger.error("Error updating releaseId for container '" + id + "'. ReleaseId is null.");
+            return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ". ReleaseId is null. ");
+        }
         try {
             KieContainerInstance kci = (KieContainerInstance) context.getContainer(id);
             // the following code is subject to a concurrent call to dispose(), but the cost of synchronizing it

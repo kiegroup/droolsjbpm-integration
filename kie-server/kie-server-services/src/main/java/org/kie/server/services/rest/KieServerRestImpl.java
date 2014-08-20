@@ -55,7 +55,11 @@ public class KieServerRestImpl implements KieServer {
 
     @Override
     public Response createContainer(String id, KieContainerResource container) {
-        return Response.status(Status.CREATED).entity(server.createContainer(id, container)).build();
+        ServiceResponse<KieContainerResource> response = server.createContainer(id, container);
+        if( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
+            return Response.status(Status.CREATED).entity(response).build();
+        }
+        return Response.status(Status.BAD_REQUEST).entity(response).build();
     }
 
     @Override

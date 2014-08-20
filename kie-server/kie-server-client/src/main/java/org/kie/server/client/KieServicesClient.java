@@ -65,6 +65,8 @@ public class KieServicesClient {
             response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, resource).put(new GenericType<ServiceResponse<KieContainerResource>>(){});
             if( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
                 return response.getEntity();
+            } else if( response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode() ) {
+                return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
         } catch (ClientResponseFailure e) {
