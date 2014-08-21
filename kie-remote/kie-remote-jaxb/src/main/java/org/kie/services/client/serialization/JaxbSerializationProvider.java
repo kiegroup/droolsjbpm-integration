@@ -241,7 +241,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return jaxbObj;
     }
 
-    public void addJaxbClasses(Class<?>... jaxbClass) {
+    public void addJaxbClasses(Class... jaxbClass) {
         for (int i = 0; i < jaxbClass.length; ++i) {
             jaxbClasses.add(jaxbClass[i]);
             extraJaxbClasses.add(jaxbClass[i]);

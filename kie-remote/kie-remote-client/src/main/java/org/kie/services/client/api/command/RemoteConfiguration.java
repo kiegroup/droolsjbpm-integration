@@ -131,7 +131,7 @@ public final class RemoteConfiguration {
         return serverPlusRestUrl;
     }
 
-    public KieRemoteHttpRequest getHttpRequest() { 
+    KieRemoteHttpRequest getHttpRequest() { 
         return this.httpRequest;
     }
     

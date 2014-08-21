@@ -170,7 +170,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         assertEquals("GET", method.get());
         assertEquals("OK", request.message());
         assertEquals(HTTP_OK, code);
-        assertEquals("", request.body());
+        assertEquals("", request.responseBody());
         assertNotNull(request.toString());
         assertFalse(request.toString().length() == 0);
         assertEquals(request, request.disconnect());
@@ -202,7 +202,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         assertEquals("GET", method.get());
         assertEquals("OK", request.message());
         assertEquals(HTTP_OK, code);
-        assertEquals("", request.body());
+        assertEquals("", request.responseBody());
     }
 
     /**
@@ -228,7 +228,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         assertEquals("GET", method.get());
         assertEquals("No Content", request.message());
         assertEquals(HTTP_NO_CONTENT, code);
-        assertEquals("", request.body());
+        assertEquals("", request.responseBody());
     }
 
     /**
@@ -317,7 +317,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         assertNotNull(request.getConnection());
         assertEquals(200, request.code());
         assertEquals("DELETE", method.get());
-        assertEquals("", request.body());
+        assertEquals("", request.responseBody());
         assertEquals("DELETE", request.getMethod());
     }
 
@@ -341,7 +341,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         assertNotNull(request.getConnection());
         assertEquals(200, request.code());
         assertEquals("DELETE", method.get());
-        assertEquals("", request.body());
+        assertEquals("", request.responseBody());
     }
 
     /**
@@ -595,7 +595,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         KieRemoteHttpRequest request = getRequest(url);
         assertEquals(HTTP_OK, request.code());
-        assertEquals("hello", request.body());
+        assertEquals("hello", request.responseBody());
         assertEquals("hello".getBytes().length, request.contentLength());
         assertFalse(request.contentLength() == 0);
     }
@@ -714,7 +714,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         KieRemoteHttpRequest request = getRequest(url);
         assertEquals(HTTP_OK, request.code());
-        assertTrue(Arrays.equals("hello".getBytes(), request.bytes()));
+        assertTrue(Arrays.equals("hello".getBytes(), request.responseBytes()));
     }
 
     /**
@@ -734,7 +734,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         KieRemoteHttpRequest request = getRequest(url);
         assertEquals(HttpServletResponse.SC_NOT_FOUND, request.code());
-        assertEquals("error", request.body());
+        assertEquals("error", request.responseBody());
     }
 
     /**
@@ -753,7 +753,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         KieRemoteHttpRequest request = getRequest(url);
         assertEquals(HTTP_OK, request.code());
-        assertEquals("", request.body());
+        assertEquals("", request.responseBody());
     }
 
     /**
@@ -1245,7 +1245,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         KieRemoteHttpRequest request = getRequest(url).acceptGzipEncoding().setUncompress(true);
         assertEquals(HTTP_OK, request.code());
-        assertEquals("hello compressed", request.body(CHARSET_UTF8));
+        assertEquals("hello compressed", request.responseBody(CHARSET_UTF8));
     }
 
     /**
@@ -1268,7 +1268,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         KieRemoteHttpRequest request = getRequest(url).acceptGzipEncoding().setUncompress(true);
         assertEquals(HTTP_OK, request.code());
-        assertEquals("hello not compressed", request.body(CHARSET_UTF8));
+        assertEquals("hello not compressed", request.responseBody(CHARSET_UTF8));
     }
 
     /**
@@ -2239,7 +2239,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
 
         KieRemoteHttpRequest request = postRequest(url).ignoreCloseExceptions(false);
-        assertEquals("world", request.send("hello").body());
+        assertEquals("world", request.send("hello").responseBody());
         assertEquals("hello", body.get());
     }
 
@@ -2331,7 +2331,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(200);
             }
         };
-        assertEquals("", getRequest(url).body());
+        assertEquals("", getRequest(url).responseBody());
     }
 
     /**
@@ -2348,7 +2348,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_BAD_REQUEST);
             }
         };
-        assertEquals("", getRequest(url).body());
+        assertEquals("", getRequest(url).responseBody());
     }
 
     /**
@@ -2370,7 +2370,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 }
             }
         };
-        assertEquals("error", getRequest(url).body());
+        assertEquals("error", getRequest(url).responseBody());
     }
 
 }

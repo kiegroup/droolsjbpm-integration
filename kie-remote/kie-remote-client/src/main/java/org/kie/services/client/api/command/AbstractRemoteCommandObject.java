@@ -54,6 +54,7 @@ import org.kie.services.client.api.command.exception.RemoteApiException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.api.command.exception.RemoteTaskException;
 import org.kie.services.client.api.rest.KieRemoteHttpRequest;
+import org.kie.services.client.api.rest.KieRemoteHttpRequestException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
@@ -132,7 +133,10 @@ public abstract class AbstractRemoteCommandObject {
             addPossiblyNullObjectList(((StartCorrelatedProcessCommand) cmd).getData().getDatas(), extraClassInstanceList);
             addPossiblyNullObjectMap(((StartCorrelatedProcessCommand) cmd).getParameter(), extraClassInstanceList);
         } else if( cmd instanceof StartProcessCommand ) {
-            addPossiblyNullObjectList(((StartProcessCommand) cmd).getData().getDatas(), extraClassInstanceList);
+            StartProcessCommand startProcCmd = (StartProcessCommand) cmd;
+            if( startProcCmd.getData() != null ) { 
+                addPossiblyNullObjectList(startProcCmd.getData().getDatas(), extraClassInstanceList);
+            } 
             addPossiblyNullObjectMap(((StartProcessCommand) cmd).getParameter(), extraClassInstanceList);
         } else if( cmd instanceof SetGlobalCommand ) {
             addPossiblyNullObject(((SetGlobalCommand) cmd).getObject(), extraClassInstanceList);
@@ -384,11 +388,10 @@ public abstract class AbstractRemoteCommandObject {
             }
             logger.trace("Serialized JaxbCommandsRequest:\n {}", jaxbRequestString);
         }
-        httpRequest.contentType(MediaType.APPLICATION_XML).send(jaxbRequestString);
 
         try {
             logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + httpRequest.getUri());
-            httpRequest.post();
+            httpRequest.post().contentType(MediaType.APPLICATION_XML).send(jaxbRequestString).code();
         } catch( Exception e ) {
             throw new RemoteCommunicationException("Unable to post request: " + e.getMessage(), e);
         }
@@ -399,9 +402,9 @@ public abstract class AbstractRemoteCommandObject {
         int responseStatus = httpRequest.code();
         try {
             if( responseStatus < 300 ) {
-                commandResponse = httpRequest.getEntity(JaxbCommandsResponse.class);
+                commandResponse = httpRequest.responseEntity(JaxbCommandsResponse.class);
             } else {
-                exceptionResponse = httpRequest.getEntity(JaxbExceptionResponse.class);
+                exceptionResponse = httpRequest.responseEntity(JaxbExceptionResponse.class);
             }
         } catch( Exception e ) {
             logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);

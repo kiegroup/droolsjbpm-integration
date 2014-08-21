@@ -149,7 +149,7 @@ public class KieRemoteHttpRequest {
      *
      * @param <V>
      */
-    protected static abstract class Operation<V> implements Callable<V> {
+    private static abstract class Operation<V> implements Callable<V> {
 
         /**
          * Run operation
@@ -195,7 +195,7 @@ public class KieRemoteHttpRequest {
      *
      * @param <V>
      */
-    protected static abstract class CloseOperation<V> extends Operation<V> {
+    private static abstract class CloseOperation<V> extends Operation<V> {
 
         private final Closeable closeable;
 
@@ -233,7 +233,7 @@ public class KieRemoteHttpRequest {
      *
      * @param <V>
      */
-    protected static abstract class FlushOperation<V> extends Operation<V> {
+    private static abstract class FlushOperation<V> extends Operation<V> {
 
         private final Flushable flushable;
 
@@ -564,13 +564,11 @@ public class KieRemoteHttpRequest {
 
     public KieRemoteHttpRequest get( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, GET);
-        openConnectionAndDoHttpMethod();
         return this;
     }
 
     public KieRemoteHttpRequest get() throws KieRemoteHttpRequestException {
         this.requestMethod = GET;
-        openConnectionAndDoHttpMethod();
         return this;
     }
     
@@ -586,13 +584,11 @@ public class KieRemoteHttpRequest {
 
     public KieRemoteHttpRequest post( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, POST);
-        openConnectionAndDoHttpMethod();
         return this;
     }
 
     public KieRemoteHttpRequest post() throws KieRemoteHttpRequestException {
         this.requestMethod = POST;
-        openConnectionAndDoHttpMethod();
         return this;
     }
 
@@ -608,13 +604,11 @@ public class KieRemoteHttpRequest {
 
     public KieRemoteHttpRequest put( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, PUT);
-        openConnectionAndDoHttpMethod();
         return this;
     }
 
     public KieRemoteHttpRequest put() throws KieRemoteHttpRequestException {
         this.requestMethod = PUT;
-        openConnectionAndDoHttpMethod();
         return this;
     }
 
@@ -630,13 +624,11 @@ public class KieRemoteHttpRequest {
 
     public KieRemoteHttpRequest delete( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, DELETE);
-        openConnectionAndDoHttpMethod();
         return this;
     }
 
     public KieRemoteHttpRequest delete() throws KieRemoteHttpRequestException {
         this.requestMethod = DELETE;
-        openConnectionAndDoHttpMethod();
         return this;
     }
     
@@ -658,7 +650,7 @@ public class KieRemoteHttpRequest {
      * @return this request
      * @throws IOException
      */
-    protected KieRemoteHttpRequest copy( final InputStream input, final OutputStream output ) throws IOException {
+    private KieRemoteHttpRequest copy( final InputStream input, final OutputStream output ) throws IOException {
         return new CloseOperation<KieRemoteHttpRequest>(input, ignoreCloseExceptions) {
 
             @Override
@@ -681,7 +673,7 @@ public class KieRemoteHttpRequest {
      * @return this request
      * @throws IOException
      */
-    protected KieRemoteHttpRequest copy( final Reader input, final Writer output ) throws IOException {
+    private KieRemoteHttpRequest copy( final Reader input, final Writer output ) throws IOException {
         return new CloseOperation<KieRemoteHttpRequest>(input, ignoreCloseExceptions) {
 
             @Override
@@ -717,8 +709,7 @@ public class KieRemoteHttpRequest {
     private String httpProxyHost;
     private int httpProxyPort;
 
-    // Fluent setter's/ property getter's
-    // -----------------------------------------------------------------------------------------------------
+    // Fluent setter's/ property getter's -----------------------------------------------------------------------------------------
 
     public KieRemoteHttpRequest ignoreCloseExceptions( final boolean ignore ) {
         ignoreCloseExceptions = ignore;
@@ -759,12 +750,28 @@ public class KieRemoteHttpRequest {
         return this;
     }
 
-    protected ByteArrayOutputStream byteStream() {
+    private ByteArrayOutputStream byteStream() {
         final int size = contentLength();
         if( size > 0 )
             return new ByteArrayOutputStream(size);
         else
             return new ByteArrayOutputStream();
+    }
+
+    public URI getUri() {
+        try {
+            return this.requestUrl.toURI();
+        } catch( URISyntaxException urise ) {
+            throw new KieRemoteHttpRequestException("Invalid request URL", urise);
+        }
+    }
+    
+    private void setRequestUrl( String urlString ) {
+        try {
+            this.requestUrl = new URL(urlString);
+        } catch( MalformedURLException e ) {
+            throw new KieRemoteHttpRequestException("Unable to create request with url'" + urlString + "'", e);
+        }
     }
 
     // Connection methods --------------------------------------------------------------------------------------------------------
@@ -791,10 +798,36 @@ public class KieRemoteHttpRequest {
     }
 
     HttpURLConnection getConnection() {
+        if( requestMethod == null ) { 
+            throw new KieRemoteHttpRequestException("Please set HTTP request method before opening a connection.");
+        }
         if( connection == null ) {
             connection = createConnection();
         }
         return connection;
+    }
+
+    // relative request methods ---------------------------------------------------------------------------------------------------
+
+    public KieRemoteHttpRequest relativeRequest( String relativeUrlString, String httpMethod ) {
+        relativeRequest(relativeUrlString);
+        this.requestMethod = httpMethod;
+        return this;
+    }
+
+    public KieRemoteHttpRequest relativeRequest( String relativeUrlString ) {
+        String baseUrlString = baseUrl.toExternalForm();
+        boolean urlSlash = baseUrlString.endsWith("/");
+        boolean postfixSlash = relativeUrlString.startsWith("/");
+        String separator = "";
+        if( !urlSlash && !postfixSlash ) {
+            separator = "/";
+        } else if( urlSlash && postfixSlash ) {
+            relativeUrlString = relativeUrlString.substring(1);
+        }
+    
+        setRequestUrl(baseUrlString + separator + relativeUrlString);
+        return this;
     }
 
     // Fluent connection manipulation methods -------------------------------------------------------------------------------------
@@ -1002,7 +1035,7 @@ public class KieRemoteHttpRequest {
      * @return this request
      * @throws IOException
      */
-    protected KieRemoteHttpRequest openOutput() throws IOException {
+    private KieRemoteHttpRequest openOutput() throws IOException {
         if( output != null ) {
             return this;
         }
@@ -1019,7 +1052,7 @@ public class KieRemoteHttpRequest {
      * @throws KieRemoteHttpRequestException
      * @throws IOException
      */
-    protected KieRemoteHttpRequest closeOutput() throws IOException {
+    private KieRemoteHttpRequest closeOutput() throws IOException {
         if( output == null ) {
             return this;
         }
@@ -1043,7 +1076,7 @@ public class KieRemoteHttpRequest {
      * @return this request
      * @throws KieRemoteHttpRequestException
      */
-    protected KieRemoteHttpRequest closeOutputQuietly() throws KieRemoteHttpRequestException {
+    private KieRemoteHttpRequest closeOutputQuietly() throws KieRemoteHttpRequestException {
         try {
             return closeOutput();
         } catch( IOException ioe ) {
@@ -1175,10 +1208,10 @@ public class KieRemoteHttpRequest {
      * @return string
      * @throws KieRemoteHttpRequestException
      */
-    public String body( final String charset ) throws KieRemoteHttpRequestException {
+    public String responseBody( final String charset ) throws KieRemoteHttpRequestException {
         final ByteArrayOutputStream output = byteStream();
         try {
-            copy(buffer(), output);
+            copy(responseBuffer(), output);
             return output.toString(getValidCharset(charset));
         } catch( IOException ioe ) {
             throw new KieRemoteHttpRequestException("Error occurred when retrieving response body", ioe);
@@ -1191,8 +1224,8 @@ public class KieRemoteHttpRequest {
      * @return string
      * @throws KieRemoteHttpRequestException
      */
-    public String body() throws KieRemoteHttpRequestException {
-        return body(charset());
+    public String responseBody() throws KieRemoteHttpRequestException {
+        return responseBody(charset());
     }
 
     /**
@@ -1201,10 +1234,10 @@ public class KieRemoteHttpRequest {
      * @return byte array
      * @throws KieRemoteHttpRequestException
      */
-    public byte[] bytes() throws KieRemoteHttpRequestException {
+    public byte[] responseBytes() throws KieRemoteHttpRequestException {
         final ByteArrayOutputStream output = byteStream();
         try {
-            copy(buffer(), output);
+            copy(responseBuffer(), output);
         } catch( IOException ioe ) {
             throw new KieRemoteHttpRequestException("Error occurred when retrieving byte content of response", ioe);
         }
@@ -1217,7 +1250,7 @@ public class KieRemoteHttpRequest {
      * @return stream
      * @throws KieRemoteHttpRequestException
      */
-    public InputStream stream() throws KieRemoteHttpRequestException {
+    public InputStream responseStream() throws KieRemoteHttpRequestException {
         InputStream stream;
         if( code() < HTTP_BAD_REQUEST ) {
             try {
@@ -1256,8 +1289,20 @@ public class KieRemoteHttpRequest {
      * @return stream
      * @throws KieRemoteHttpRequestException
      */
-    public BufferedInputStream buffer() throws KieRemoteHttpRequestException {
-        return new BufferedInputStream(stream(), bufferSize);
+    public BufferedInputStream responseBuffer() throws KieRemoteHttpRequestException {
+        return new BufferedInputStream(responseStream(), bufferSize);
+    }
+
+    public <T> T responseEntity( Class<T> entityClass ) {
+        String output = responseBody();
+        String acceptHeader = responseHeader(CONTENT_TYPE);
+        if( acceptHeader.equals(MediaType.APPLICATION_JSON) ) {
+            return JSON_SERIALIZER.deserialize(output, entityClass);
+        } else if( acceptHeader.equals(MediaType.APPLICATION_JSON) ) {
+            return (T) XML_SERIALIZER.deserialize(output);
+        } else {
+            throw new KieRemoteHttpRequestException("Unknown " + ACCEPT + " header in response: " + acceptHeader);
+        }
     }
 
     // Response header related methods -------------------------------------------------------------------------------------------
@@ -1333,7 +1378,7 @@ public class KieRemoteHttpRequest {
      * @param header
      * @return parameter value or null if none
      */
-    protected Map<String, String> getHeaderParams( final String header ) {
+    private static Map<String, String> getHeaderParams( final String header ) {
         if( header == null || header.length() == 0 )
             return Collections.emptyMap();
 
@@ -1378,7 +1423,7 @@ public class KieRemoteHttpRequest {
      * @param paramName
      * @return parameter value or null if none
      */
-    protected String getHeaderParam( final String value, final String paramName ) {
+    private static String getHeaderParam( final String value, final String paramName ) {
         if( value == null || value.length() == 0 )
             return null;
 
@@ -1590,57 +1635,7 @@ public class KieRemoteHttpRequest {
         return proxyAuthorization("Basic " + Base64Util.encode(name + ':' + password));
     }
 
-    // OTHER / CLEAN UP -----------------------------------------------------------------------------------------------------------
-
-    public KieRemoteHttpRequest relativeRequest( String relativeUrlString, String httpMethod ) {
-        relativeRequest(relativeUrlString);
-        this.requestMethod = httpMethod;
-        return this;
-    }
-
-    public KieRemoteHttpRequest relativeRequest( String relativeUrlString ) {
-        String baseUrlString = baseUrl.toExternalForm();
-        boolean urlSlash = baseUrlString.endsWith("/");
-        boolean postfixSlash = relativeUrlString.startsWith("/");
-        String separator = "";
-        if( !urlSlash && !postfixSlash ) {
-            separator = "/";
-        } else if( urlSlash && postfixSlash ) {
-            relativeUrlString = relativeUrlString.substring(1);
-        }
-
-        setRequestUrl(baseUrlString + separator + relativeUrlString);
-        return this;
-    }
-
-    private void setRequestUrl( String urlString ) {
-        try {
-            this.requestUrl = new URL(urlString);
-        } catch( MalformedURLException e ) {
-            throw new KieRemoteHttpRequestException("Unable to create request with url'" + urlString + "'", e);
-        }
-    }
-
-    public URI getUri() {
-        try {
-
-            return this.requestUrl.toURI();
-        } catch( URISyntaxException urise ) {
-            throw new KieRemoteHttpRequestException("Invalid request URL", urise);
-        }
-    }
-
-    public <T> T getEntity( Class<T> entityClass ) {
-        String output = body();
-        String acceptHeader = responseHeader(CONTENT_TYPE);
-        if( acceptHeader.equals(MediaType.APPLICATION_JSON) ) {
-            return JSON_SERIALIZER.deserialize(output, entityClass);
-        } else if( acceptHeader.equals(MediaType.APPLICATION_JSON) ) {
-            return (T) XML_SERIALIZER.deserialize(output);
-        } else {
-            throw new KieRemoteHttpRequestException("Unknown " + ACCEPT + " header in response: " + acceptHeader);
-        }
-    }
+    // OTHER ----------------------------------------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
