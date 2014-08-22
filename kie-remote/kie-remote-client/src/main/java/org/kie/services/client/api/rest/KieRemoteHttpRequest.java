@@ -140,13 +140,15 @@ public class KieRemoteHttpRequest {
         boolean form = false;
         String charset;
 
-        String body;
+        StringBuilder body;
         MediaType bodyContentType;
 
         boolean followRedirects = false;
 
         String httpProxyHost;
         int httpProxyPort;
+        
+        Integer contentLength;
 
         public URL getRequestUrl() {
             if( requestUrl == null ) {
@@ -197,6 +199,13 @@ public class KieRemoteHttpRequest {
             this.headers.get(name).add(value == null ? null : value.toString());
         }
 
+        public void addToBody(CharSequence addToBody) { 
+           if( this.body == null ) { 
+               this.body = new StringBuilder();
+           }
+           this.body.append(addToBody);
+        }
+        
         @Override
         public RequestInfo clone() { 
             RequestInfo clone = new RequestInfo();
@@ -876,6 +885,9 @@ public class KieRemoteHttpRequest {
             connection.setReadTimeout(getRequestInfo().timeoutInMilliSecs);
             connection.setConnectTimeout(getRequestInfo().timeoutInMilliSecs);
             RequestInfo requestInfo = getRequestInfo();
+            if( requestInfo.contentLength != null ) { 
+                connection.setFixedLengthStreamingMode(requestInfo.contentLength);
+            }
             if( requestInfo.user != null && requestInfo.password != null ) {
                 basicAuthorization(requestInfo.user, requestInfo.password);
             }
@@ -888,6 +900,14 @@ public class KieRemoteHttpRequest {
                 }
             }
             addFormParametersToConnection();
+            if( requestInfo.body != null ) { 
+                try {
+                    openOutput();
+                    output.write(requestInfo.body.toString());
+                } catch( IOException ioe ) {
+                    throw new KieRemoteHttpRequestException("Unable to add char sequence to request body", ioe);
+                }
+            }
         }
     }
 
@@ -930,18 +950,8 @@ public class KieRemoteHttpRequest {
      * @return this request
      */
     public KieRemoteHttpRequest contentLength( final int contentLength ) {
-        getConnection().setFixedLengthStreamingMode(contentLength);
+        getRequestInfo().contentLength = contentLength;
         return this;
-    }
-
-    /**
-     * Set the 'Content-Length' request header to the given value
-     *
-     * @param contentLength
-     * @return this request
-     */
-    public KieRemoteHttpRequest contentLength( final String contentLength ) {
-        return contentLength(Integer.parseInt(contentLength));
     }
 
     public URL getUrl() {
@@ -1101,46 +1111,10 @@ public class KieRemoteHttpRequest {
         }
     }
 
-    // Request/Input helper methods
-    // -------------------------------------------------------------------------------------------------------
+    // Request/Input helper methods -----------------------------------------------------------------------------------------------
 
-    public KieRemoteHttpRequest send( final byte[] input ) throws KieRemoteHttpRequestException {
-        return send(new ByteArrayInputStream(input));
-    }
-
-    public KieRemoteHttpRequest send( final InputStream input ) throws KieRemoteHttpRequestException {
-        try {
-            openOutput();
-            copy(input, output);
-        } catch( IOException ioe ) {
-            throw new KieRemoteHttpRequestException("Unable to write stream to request body", ioe);
-        }
-        return this;
-    }
-
-    public KieRemoteHttpRequest send( final Reader input ) throws KieRemoteHttpRequestException {
-        try {
-            openOutput();
-        } catch( IOException ioe ) {
-            throw new KieRemoteHttpRequestException("Unable to add reader content to request body", ioe);
-        }
-        final Writer writer = new OutputStreamWriter(output, output.encoder.charset());
-        return new FlushOperation<KieRemoteHttpRequest>(writer) {
-
-            @Override
-            protected KieRemoteHttpRequest run() throws IOException {
-                return copy(input, writer);
-            }
-        }.call();
-    }
-
-    public KieRemoteHttpRequest send( final CharSequence value ) throws KieRemoteHttpRequestException {
-        try {
-            openOutput();
-            output.write(value.toString());
-        } catch( IOException ioe ) {
-            throw new KieRemoteHttpRequestException("Unable to add char sequence to request body", ioe);
-        }
+    public KieRemoteHttpRequest body( final CharSequence value ) throws KieRemoteHttpRequestException {
+        getRequestInfo().addToBody(value);
         return this;
     }
 
@@ -1153,7 +1127,7 @@ public class KieRemoteHttpRequest {
         }
     }
 
-    // query parameter methods -----------------------------------------------------------------------------------------------------
+    // query parameter methods ----------------------------------------------------------------------------------------------------
     
     public KieRemoteHttpRequest query( final Object name, final Object value) throws KieRemoteHttpRequestException {
         getRequestInfo().setQueryParameter(name.toString(), value != null ? value.toString() : null );

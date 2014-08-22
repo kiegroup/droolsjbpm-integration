@@ -397,52 +397,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        int code = postRequest(new URL(url)).send("hello").code();
-        assertEquals(HTTP_OK, code);
-        assertEquals("hello", body.get());
-    }
-
-    /**
-     * Make a POST request with a non-empty request body
-     *
-     * @throws Exception
-     */
-    @Test
-    public void postNonEmptyReader() throws Exception {
-        final AtomicReference<String> body = new AtomicReference<String>();
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                body.set(new String(read()));
-                response.setStatus(HTTP_OK);
-            }
-        };
-        File file = File.createTempFile("post", ".txt");
-        new FileWriter(file).append("hello").close();
-        int code = postRequest(new URL(url)).send(new FileReader(file)).code();
-        assertEquals(HTTP_OK, code);
-        assertEquals("hello", body.get());
-    }
-
-    /**
-     * Make a POST request with a non-empty request body
-     *
-     * @throws Exception
-     */
-    @Test
-    public void postNonEmptyByteArray() throws Exception {
-        final AtomicReference<String> body = new AtomicReference<String>();
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                body.set(new String(read()));
-                response.setStatus(HTTP_OK);
-            }
-        };
-        byte[] bytes = "hello".getBytes(CHARSET_UTF8);
-        int code = postRequest(new URL(url)).contentLength(Integer.toString(bytes.length)).send(bytes).code();
+        int code = postRequest(new URL(url)).body("hello").code();
         assertEquals(HTTP_OK, code);
         assertEquals("hello", body.get());
     }
@@ -467,7 +422,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         String data = "hello";
         int sent = data.getBytes().length;
-        int code = postRequest(new URL(url)).contentLength(sent).send(data).code();
+        int code = newRequest(new URL(url)).contentLength(sent).body(data).post().code();
         assertEquals(HTTP_OK, code);
         assertEquals(sent, length.get().intValue());
         assertEquals(data, body.get());
@@ -1099,83 +1054,6 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         assertNotNull(((HttpsURLConnection) request2.getConnection()).getSSLSocketFactory());
         assertEquals(((HttpsURLConnection) request1.getConnection()).getSSLSocketFactory(),
                 ((HttpsURLConnection) request2.getConnection()).getSSLSocketFactory());
-    }
-
-    /**
-     * Send a stream that throws an exception when read from
-     *
-     * @throws Exception
-     */
-    @Test
-    public void sendErrorReadStream() throws Exception {
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                response.setStatus(HTTP_OK);
-                try {
-                    response.getWriter().print("content");
-                } catch( IOException e ) {
-                    fail();
-                }
-            }
-        };
-        final IOException readCause = new IOException();
-        final IOException closeCause = new IOException();
-        InputStream stream = new InputStream() {
-
-            public int read() throws IOException {
-                throw readCause;
-            }
-
-            public void close() throws IOException {
-                throw closeCause;
-            }
-        };
-        try {
-            postRequest(new URL(url)).send(stream);
-            fail("Exception not thrown");
-        } catch( KieRemoteHttpRequestException e ) {
-            assertEquals(readCause, e.getCause());
-        }
-    }
-
-    /**
-     * Send a stream that throws an exception when read from
-     *
-     * @throws Exception
-     */
-    @Test
-    public void sendErrorCloseStream() throws Exception {
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                response.setStatus(HTTP_OK);
-                try {
-                    response.getWriter().print("content");
-                } catch( IOException e ) {
-                    fail();
-                }
-            }
-        };
-        final IOException closeCause = new IOException();
-        InputStream stream = new InputStream() {
-
-            public int read() throws IOException {
-                return -1;
-            }
-
-            public void close() throws IOException {
-                throw closeCause;
-            }
-        };
-        try {
-            postRequest(new URL(url)).ignoreCloseExceptions(false).send(stream);
-            fail("Exception not thrown");
-        } catch( KieRemoteHttpRequestException e ) {
-            assertEquals(closeCause, e.getCause());
-        }
     }
 
     /**
@@ -2173,8 +2051,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
 
-        KieRemoteHttpRequest request = postRequest(new URL(url)).ignoreCloseExceptions(false);
-        assertEquals("world", request.send("hello").responseBody());
+        KieRemoteHttpRequest request = newRequest(new URL(url)).ignoreCloseExceptions(false);
+        assertEquals("world", request.body("hello").post().responseBody());
         assertEquals("hello", body.get());
     }
 
@@ -2197,8 +2075,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
 
-        KieRemoteHttpRequest request = postRequest(new URL(url)).ignoreCloseExceptions(false);
-        Map<String, List<String>> headers = request.send("hello").responseHeaders();
+        KieRemoteHttpRequest request = newRequest(new URL(url)).ignoreCloseExceptions(false);
+        Map<String, List<String>> headers = request.body("hello").post().responseHeaders();
         assertEquals("v1", headers.get("h1").get(0));
         assertEquals("v2", headers.get("h2").get(0));
         assertEquals("hello", body.get());
@@ -2223,8 +2101,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
 
-        KieRemoteHttpRequest request = postRequest(new URL(url)).ignoreCloseExceptions(false);
-        assertEquals(9876, request.send("hello").intResponseHeader("Width"));
+        KieRemoteHttpRequest request = newRequest(new URL(url)).ignoreCloseExceptions(false);
+        assertEquals(9876, request.body("hello").post().intResponseHeader("Width"));
         assertEquals("hello", body.get());
     }
 

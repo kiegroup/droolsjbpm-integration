@@ -391,7 +391,7 @@ public abstract class AbstractRemoteCommandObject {
 
         try {
             logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + httpRequest.getUri());
-            httpRequest.post().contentType(MediaType.APPLICATION_XML).send(jaxbRequestString).code();
+            httpRequest.post().contentType(MediaType.APPLICATION_XML).body(jaxbRequestString).code();
         } catch( Exception e ) {
             throw new RemoteCommunicationException("Unable to post request: " + e.getMessage(), e);
         }
