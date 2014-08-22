@@ -115,18 +115,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
         List<Class<?>> kieJaxbClassList = new ArrayList<Class<?>>(kieJaxbClasses.length + serviceSideClasses.length);
         kieJaxbClassList.addAll(Arrays.asList(kieJaxbClasses));
         
-        Class serviceSideClass = null;
         try { 
-            for( int i = 0; i < serviceSideClasses.length; ++i ) { 
-                serviceSideClass = Class.forName(serviceSideClasses[i]);
-                kieJaxbClassList.add(serviceSideClass);
-            }
+            addClassesToList(clientSideClasses, kieJaxbClassList);
         } catch( ClassNotFoundException cnfe ) { 
             try { 
-                for( int i = 0; i < clientSideClasses.length; ++i ) { 
-                    serviceSideClass = Class.forName(clientSideClasses[i]);
-                    kieJaxbClassList.add(serviceSideClass);
-                }
+                addClassesToList(serviceSideClasses, kieJaxbClassList);
             } catch( ClassNotFoundException clientCnfe ) { 
                 // do nothing
             }
@@ -134,6 +127,13 @@ public class JaxbSerializationProvider implements SerializationProvider {
         KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(kieJaxbClassList);
     };
 
+    private static void addClassesToList(String [] classes, List<Class<?>> list) throws ClassNotFoundException { 
+        for( int i = 0; i < classes.length; ++i ) { 
+            Class moduleDependentClass = Class.forName(classes[i]);
+            list.add(moduleDependentClass);
+        }
+    }
+    
     public static Set<Class<?>> PRIMITIVE_ARRAY_CLASS_SET;
     static { 
         Class<?> [] primitiveClasses = { 
