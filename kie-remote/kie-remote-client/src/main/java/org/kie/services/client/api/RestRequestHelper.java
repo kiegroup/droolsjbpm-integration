@@ -77,14 +77,14 @@ public class RestRequestHelper {
      * @param serverPortUrl in the format of "http://server:port/"
      * @param username The username (registered on the kie-wb or business-central server)
      * @param password The password associated with the username
-     * @param timeout The timeout used for REST requests
+     * @param timeoutInSecs The timeout used for REST requests in seconds
      * @param mediaType The media type used for REST requests
      * @param formBasedAuth Whether the request should use form based authentication (only recommended for tomcat instances)
      */
-    public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout, MediaType mediaType) {
+    public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeoutInSecs, MediaType mediaType) {
         RestRequestHelper inst = new RestRequestHelper();
         URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
-        inst.httpRequest = new KieRemoteHttpRequest(serverPlusRestUrl, username, password, timeout);
+        inst.httpRequest = KieRemoteHttpRequest.newRequest(serverPlusRestUrl, username, password).timeout(timeoutInSecs * 1000);
         inst.type = mediaType;
         inst.username = username;
         inst.password = password;
@@ -124,9 +124,12 @@ public class RestRequestHelper {
         return this.type;
     }
 
-    public RestRequestHelper setTimeout(int timeout) { 
+    public RestRequestHelper setTimeout(int timeoutInMillisecs) { 
         this.timeout = timeout;
-        this.httpRequest = new KieRemoteHttpRequest(serverPlusRestUrl, username, password, timeout);
+        if( this.httpRequest == null ) { 
+            this.httpRequest = KieRemoteHttpRequest.newRequest(serverPlusRestUrl, username, password);
+        }
+        this.httpRequest.timeout(timeoutInMillisecs);
         return this;
     }
     

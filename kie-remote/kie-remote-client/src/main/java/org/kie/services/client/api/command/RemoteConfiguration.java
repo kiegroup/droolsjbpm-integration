@@ -85,7 +85,7 @@ public final class RemoteConfiguration {
       createHttpRequest(url, username, password, (int) timeout)  ;
     }
     
-    public void createHttpRequest(URL url, String username, String password, int timeout) { 
+    public void createHttpRequest(URL url, String username, String password, int timeoutInSecs) { 
         URL serverPlusRestUrl = initializeRestServicesUrl(url);
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
@@ -93,7 +93,7 @@ public final class RemoteConfiguration {
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        this.httpRequest = new KieRemoteHttpRequest(serverPlusRestUrl, username, password, timeout);
+        this.httpRequest = KieRemoteHttpRequest.newRequest(serverPlusRestUrl, username, password).timeout(timeoutInSecs * 1000);
     }
     
     /**
@@ -431,6 +431,8 @@ public final class RemoteConfiguration {
    
     private RemoteConfiguration(RemoteConfiguration config) { 
        this.connectionFactory = config.connectionFactory;
+       this.httpRequest = config.httpRequest == null ? null : config.httpRequest.clone();
+       
        this.deploymentId = config.deploymentId;
        this.extraJaxbClasses = config.extraJaxbClasses;
        this.jmsSerializationType = config.jmsSerializationType;
@@ -438,7 +440,6 @@ public final class RemoteConfiguration {
        this.password = config.password;
        this.processInstanceId = config.processInstanceId;
        this.responseQueue = config.responseQueue;
-       this.httpRequest = config.httpRequest;
        this.taskQueue = config.taskQueue;
        this.timeout = config.timeout;
        this.type = config.type;

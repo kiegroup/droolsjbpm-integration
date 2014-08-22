@@ -27,18 +27,14 @@ import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.CHARSET_UTF8;
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.append;
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.deleteRequest;
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.encode;
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.getRequest;
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.postRequest;
+import static org.kie.services.client.api.rest.KieRemoteHttpRequest.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -117,17 +113,17 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      * Create request with malformed URL
      */
     @Test(expected = KieRemoteHttpRequestException.class)
-    public void malformedStringUrl() {
-        new KieRemoteHttpRequest("\\m/", HttpMethod.GET);
+    public void malformedStringUrlTest() {
+        KieRemoteHttpRequest.newRequest("\\m/");
     }
 
     /**
      * Create request with malformed URL
      */
     @Test
-    public void malformedStringUrlCause() {
+    public void malformedStringUrlCauseTest() {
         try {
-            new KieRemoteHttpRequest("\\m/", HttpMethod.DELETE);
+            KieRemoteHttpRequest.newRequest("\\m/");
             fail("Exception not thrown");
         } catch( KieRemoteHttpRequestException e ) {
             assertNotNull(e.getCause());
@@ -139,7 +135,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test(expected = IllegalArgumentException.class)
     public void negativeBufferSize() {
-        new KieRemoteHttpRequest("http://localhost").bufferSize(-1);
+        KieRemoteHttpRequest.newRequest("http://localhost").bufferSize(-1);
     }
 
     /**
@@ -148,7 +144,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      * @throws Exception
      */
     @Test
-    public void getEmpty() throws Exception {
+    public void getEmptyTest() throws Exception {
         final AtomicReference<String> method = new AtomicReference<String>();
         handler = new RequestHandler() {
 
@@ -158,14 +154,13 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
+        
+        KieRemoteHttpRequest request = getRequest(new URL(url));
         assertNotNull(request.getConnection());
-        assertEquals(30000, request.readTimeout(30000).getConnection().getReadTimeout());
-        assertEquals(50000, request.connectTimeout(50000).getConnection().getConnectTimeout());
+        assertEquals(30000, request.timeout(30000).getConnection().getReadTimeout());
         assertEquals(2500, request.bufferSize(2500).bufferSize());
         assertFalse(request.ignoreCloseExceptions(false).ignoreCloseExceptions());
-        assertFalse(request.useCaches(false).getConnection().getUseCaches());
-        int code = request.code();
+        int code = request.get().code();
         assertEquals(200, code);
         assertEquals("GET", method.get());
         assertEquals("OK", request.message());
@@ -248,8 +243,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(encode(url + unencoded));
-        assertEquals(200, request.code());
+        KieRemoteHttpRequest request = newRequest(url + unencoded);
+        assertEquals(200, request.get().code());
         assertEquals(unencoded, path.get());
     }
 
@@ -270,8 +265,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(encode(url + unencoded));
-        assertEquals(200, request.code());
+        KieRemoteHttpRequest request = newRequest(url + unencoded);
+        assertEquals(200, request.get().code());
         assertEquals(unencoded, path.get());
     }
 
@@ -292,8 +287,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(encode(url + unencoded));
-        assertEquals(200, request.code());
+        KieRemoteHttpRequest request = newRequest(url + unencoded);
+        assertEquals(200, request.get().code());
         assertEquals(unencoded, path.get());
     }
 
@@ -313,9 +308,9 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = deleteRequest(url);
+        KieRemoteHttpRequest request = deleteRequest(new URL(url));
         assertNotNull(request.getConnection());
-        assertEquals(200, request.code());
+        assertEquals(200, request.delete().code());
         assertEquals("DELETE", method.get());
         assertEquals("", request.responseBody());
         assertEquals("DELETE", request.getMethod());
@@ -360,8 +355,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_CREATED);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url);
-        assertEquals(HTTP_CREATED, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_CREATED, request.post().code());
         assertEquals("POST", method.get());
     }
 
@@ -381,8 +376,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_CREATED);
             }
         };
-        KieRemoteHttpRequest request = postRequest(new URL(url));
-        assertEquals(HTTP_CREATED, request.code());
+        KieRemoteHttpRequest request = getRequest(new URL(url));
+        assertEquals(HTTP_CREATED, request.post().code());
         assertEquals("POST", method.get());
     }
 
@@ -402,7 +397,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        int code = postRequest(url).send("hello").code();
+        int code = postRequest(new URL(url)).send("hello").code();
         assertEquals(HTTP_OK, code);
         assertEquals("hello", body.get());
     }
@@ -425,7 +420,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         File file = File.createTempFile("post", ".txt");
         new FileWriter(file).append("hello").close();
-        int code = postRequest(url).send(new FileReader(file)).code();
+        int code = postRequest(new URL(url)).send(new FileReader(file)).code();
         assertEquals(HTTP_OK, code);
         assertEquals("hello", body.get());
     }
@@ -447,7 +442,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
         byte[] bytes = "hello".getBytes(CHARSET_UTF8);
-        int code = postRequest(url).contentLength(Integer.toString(bytes.length)).send(bytes).code();
+        int code = postRequest(new URL(url)).contentLength(Integer.toString(bytes.length)).send(bytes).code();
         assertEquals(HTTP_OK, code);
         assertEquals("hello", body.get());
     }
@@ -472,7 +467,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         String data = "hello";
         int sent = data.getBytes().length;
-        int code = postRequest(url).contentLength(sent).send(data).code();
+        int code = postRequest(new URL(url)).contentLength(sent).send(data).code();
         assertEquals(HTTP_OK, code);
         assertEquals(sent, length.get().intValue());
         assertEquals(data, body.get());
@@ -499,7 +494,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         Map<String, String> data = new LinkedHashMap<String, String>();
         data.put("name", "user");
         data.put("number", "100");
-        int code = postRequest(url).form(data).form("zip", "12345").code();
+        int code = postRequest(new URL(url)).form(data).form("zip", "12345").code();
         assertEquals(HTTP_OK, code);
         assertEquals("name=user&number=100&zip=12345", body.get());
         assertEquals("application/x-www-form-urlencoded; charset=UTF-8", contentType.get());
@@ -526,7 +521,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         Map<String, String> data = new LinkedHashMap<String, String>();
         data.put("name", "user");
         data.put("number", "100");
-        int code = postRequest(url).form(data, null).form("zip", "12345").code();
+        int code = postRequest(new URL(url)).form(data, null).form("zip", "12345").code();
         assertEquals(HTTP_OK, code);
         assertEquals("name=user&number=100&zip=12345", body.get());
         assertEquals("application/x-www-form-urlencoded", contentType.get());
@@ -548,34 +543,9 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        int code = postRequest(url).form(new HashMap<String, String>()).code();
+        int code = postRequest(new URL(url)).form(new HashMap<String, String>()).code();
         assertEquals(HTTP_OK, code);
         assertEquals("", body.get());
-    }
-
-    /**
-     * Make a post in chunked mode
-     *
-     * @throws Exception
-     */
-    @Test
-    public void chunkPost() throws Exception {
-        final AtomicReference<String> body = new AtomicReference<String>();
-        final AtomicReference<String> encoding = new AtomicReference<String>();
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                body.set(new String(read()));
-                response.setStatus(HTTP_OK);
-                encoding.set(request.getHeader("Transfer-Encoding"));
-            }
-        };
-        String data = "hello";
-        int code = postRequest(url).chunk(2).send(data).code();
-        assertEquals(HTTP_OK, code);
-        assertEquals(data, body.get());
-        assertEquals("chunked", encoding.get());
     }
 
     /**
@@ -593,8 +563,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 write("hello");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("hello", request.responseBody());
         assertEquals("hello".getBytes().length, request.contentLength());
         assertFalse(request.contentLength() == 0);
@@ -615,8 +585,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setContentType("text/html; charset=UTF-8");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals(CHARSET_UTF8, request.charset());
     }
 
@@ -635,8 +605,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setContentType("text/html; param1=val1; charset=UTF-8");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals(CHARSET_UTF8, request.charset());
     }
 
@@ -666,8 +636,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).basic("user", "p4ssw0rd");
-        assertEquals(200, request.code());
+        KieRemoteHttpRequest request = newRequest(url).basicAuthorization("user", "p4ssw0rd");
+        assertEquals(200, request.post().code());
         assertEquals("user", user.get());
         assertEquals("p4ssw0rd", password.get());
     }
@@ -689,8 +659,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).useProxy("localhost", proxyPort).proxyBasic("user", "p4ssw0rd");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).useProxy("localhost", proxyPort).proxyBasic("user", "p4ssw0rd");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("user", proxyUser.get());
         assertEquals("p4ssw0rd", proxyPassword.get());
         assertEquals(true, finalHostReached.get());
@@ -712,8 +682,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 write("hello");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertTrue(Arrays.equals("hello".getBytes(), request.responseBytes()));
     }
 
@@ -732,8 +702,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 write("error");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HttpServletResponse.SC_NOT_FOUND, request.get().code());
         assertEquals("error", request.responseBody());
     }
 
@@ -751,8 +721,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("", request.responseBody());
     }
 
@@ -771,7 +741,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("Content-Encoding", "gzip");
             }
         };
-        assertEquals("gzip", getRequest(url).contentEncoding());
+        assertEquals("gzip", newRequest(url).get().contentEncoding());
     }
 
     /**
@@ -789,7 +759,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("Content-Type", "text/html");
             }
         };
-        assertEquals("text/html", getRequest(url).contentType());
+        assertEquals("text/html", newRequest(url).get().contentType());
     }
 
     /**
@@ -808,8 +778,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url).contentType("text/html", "UTF-8");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).contentType("text/html", "UTF-8");
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("text/html; charset=UTF-8", contentType.get());
     }
 
@@ -829,8 +799,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url).contentType("text/html", null);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).contentType("text/html", null);
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("text/html", contentType.get());
     }
 
@@ -850,8 +820,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url).contentType("text/html", "");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).contentType("text/html", "");
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("text/html", contentType.get());
     }
 
@@ -876,8 +846,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("h1", "v1");
         headers.put("h2", "v2");
-        KieRemoteHttpRequest request = getRequest(url).headers(headers);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).headers(headers);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("v1", h1.get());
         assertEquals("v2", h2.get());
     }
@@ -896,8 +866,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).headers(Collections.<String, String> emptyMap());
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).headers(Collections.<String, String> emptyMap());
+        assertEquals(HTTP_OK, request.get().code());
     }
 
     /**
@@ -917,7 +887,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.addHeader("a", "another");
             }
         };
-        Map<String, List<String>> headers = getRequest(url).responseHeaders();
+        Map<String, List<String>> headers = newRequest(url).get().responseHeaders();
         assertEquals(headers.size(), 5);
         assertEquals(headers.get("a").size(), 2);
         assertTrue(headers.get("b").get(0).equals("b"));
@@ -941,8 +911,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 h2.set(request.getHeader("h2"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).header("h1", 5).header("h2", (Number) null);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).header("h1", 5).header("h2", (Number) null);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("5", h1.get());
         assertEquals("", h2.get());
     }
@@ -963,8 +933,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 header.set(request.getHeader("User-Agent"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).header(USER_AGENT, "browser 1.0");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).header(USER_AGENT, "browser 1.0");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("browser 1.0", header.get());
     }
 
@@ -984,8 +954,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 header.set(request.getHeader("Accept"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).accept("application/json");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).accept("application/json");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("application/json", header.get());
     }
 
@@ -1005,8 +975,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 header.set(request.getHeader("Accept"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).acceptJson();
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).accept(APPLICATION_JSON);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("application/json", header.get());
     }
 
@@ -1026,8 +996,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 header.set(request.getHeader("If-None-Match"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).header(IF_NONE_MATCH, "eid");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).header(IF_NONE_MATCH, "eid");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("eid", header.get());
     }
 
@@ -1047,8 +1017,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 header.set(request.getHeader("Accept-Charset"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).acceptCharset(CHARSET_UTF8);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).acceptCharset(CHARSET_UTF8);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals(CHARSET_UTF8, header.get());
     }
 
@@ -1068,8 +1038,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 header.set(request.getHeader("Accept-Encoding"));
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).acceptEncoding("compress");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).acceptEncoding("compress");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("compress", header.get());
     }
 
@@ -1163,7 +1133,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
         try {
-            postRequest(url).send(stream);
+            postRequest(new URL(url)).send(stream);
             fail("Exception not thrown");
         } catch( KieRemoteHttpRequestException e ) {
             assertEquals(readCause, e.getCause());
@@ -1201,7 +1171,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
         try {
-            postRequest(url).ignoreCloseExceptions(false).send(stream);
+            postRequest(new URL(url)).ignoreCloseExceptions(false).send(stream);
             fail("Exception not thrown");
         } catch( KieRemoteHttpRequestException e ) {
             assertEquals(closeCause, e.getCause());
@@ -1243,7 +1213,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 }
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).acceptGzipEncoding().setUncompress(true);
+        KieRemoteHttpRequest request = getRequest(url).acceptEncoding("gzip").setUncompress(true);
         assertEquals(HTTP_OK, request.code());
         assertEquals("hello compressed", request.responseBody(CHARSET_UTF8));
     }
@@ -1266,7 +1236,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 write("hello not compressed");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url).acceptGzipEncoding().setUncompress(true);
+        KieRemoteHttpRequest request = getRequest(url).acceptEncoding("gzip").setUncompress(true);
         assertEquals(HTTP_OK, request.code());
         assertEquals("hello not compressed", request.responseBody(CHARSET_UTF8));
     }
@@ -1414,8 +1384,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "b;c=d");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertNull(request.responseHeaderParameter("a", "e"));
     }
 
@@ -1434,8 +1404,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "b;c=d");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertNull(request.responseHeaderParameter("b", "c"));
         assertTrue(request.responseHeaderParameters("b").isEmpty());
     }
@@ -1455,8 +1425,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "b;c=");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertNull(request.responseHeaderParameter("a", "c"));
         assertTrue(request.responseHeaderParameters("a").isEmpty());
     }
@@ -1476,8 +1446,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "b;");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         assertNull(request.responseHeaderParameter("a", "c"));
         assertTrue(request.responseHeaderParameters("a").isEmpty());
     }
@@ -1497,8 +1467,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "value;b=c;d=e");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         Map<String, String> params = request.responseHeaderParameters("a");
         assertNotNull(params);
         assertEquals(2, params.size());
@@ -1521,8 +1491,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "value;b=\"c\";d=\"e\"");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         Map<String, String> params = request.responseHeaderParameters("a");
         assertNotNull(params);
         assertEquals(2, params.size());
@@ -1545,48 +1515,13 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setHeader("a", "value; b=c; d=\"e\"");
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url);
+        assertEquals(HTTP_OK, request.get().code());
         Map<String, String> params = request.responseHeaderParameters("a");
         assertNotNull(params);
         assertEquals(2, params.size());
         assertEquals("c", params.get("b"));
         assertEquals("e", params.get("d"));
-    }
-
-    /**
-     * Verify getting int header with default value
-     *
-     * @throws Exception
-     */
-    @Test
-    public void missingIntHeader() throws Exception {
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                response.setStatus(HTTP_OK);
-            }
-        };
-        assertEquals(4321, getRequest(url).intResponseHeader("missing", 4321));
-    }
-
-    /**
-     * Verify getting int header with default value
-     *
-     * @throws Exception
-     */
-    @Test
-    public void malformedIntHeader() throws Exception {
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                response.setStatus(HTTP_OK);
-                response.setHeader("malformed", "not an integer");
-            }
-        };
-        assertEquals(4321, getRequest(url).intResponseHeader("malformed", 4321));
     }
 
     /**
@@ -1608,8 +1543,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         Map<String, String> data = new LinkedHashMap<String, String>();
         data.put("name", "user");
         data.put("number", "100");
-        KieRemoteHttpRequest request = postRequest(url).form(data);
-        int code = request.code();
+        KieRemoteHttpRequest request = newRequest(url).form(data);
+        int code = request.post().code();
         assertEquals(HTTP_OK, code);
         assertEquals("name=user&number=100", body.get());
     }
@@ -1632,8 +1567,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         Map<String, String> data = new LinkedHashMap<String, String>();
         data.put("name", null);
-        KieRemoteHttpRequest request = postRequest(url).form(data);
-        int code = request.code();
+        KieRemoteHttpRequest request = newRequest(url).form(data);
+        int code = request.post().code();
         assertEquals(HTTP_OK, code);
         assertEquals("name=", body.get());
     }
@@ -1660,8 +1595,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url, inputParams, false);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("POST", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1686,8 +1621,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url, false, "name", "user", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "user").query("number", "100");
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("POST", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1715,8 +1650,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url, inputParams, true);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("POST", method.get());
         assertEquals("us er", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1741,8 +1676,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url, true, "name", "us er", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "us er").query("number", "100");
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("POST", method.get());
         assertEquals("us er", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1770,8 +1705,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url, inputParams, false);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("POST", method.get());
         assertEquals("2", outputParams.get("1"));
         assertEquals("4", outputParams.get("3"));
@@ -1799,8 +1734,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url, inputParams, false);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("GET", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1825,8 +1760,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url, false, "name", "user", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "user").query("number", "100");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("GET", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1854,8 +1789,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url, inputParams, true);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("GET", method.get());
         assertEquals("us er", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1880,8 +1815,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url, true, "name", "us er", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "us er").query("number", "100");
+        assertEquals(HTTP_OK, request.get().code());
         assertEquals("GET", method.get());
         assertEquals("us er", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1909,8 +1844,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = deleteRequest(url, inputParams, false);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.delete().code());
         assertEquals("DELETE", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1935,8 +1870,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = deleteRequest(url, false, "name", "user", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "user").query("number", "100");
+        assertEquals(HTTP_OK, request.delete().code());
         assertEquals("DELETE", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1964,8 +1899,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = deleteRequest(url, inputParams, true);
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query(inputParams);
+        assertEquals(HTTP_OK, request.delete().code());
         assertEquals("DELETE", method.get());
         assertEquals("us er", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -1990,15 +1925,15 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = deleteRequest(url, true, "name", "us er", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "us er").query("number", "100");
+        assertEquals(HTTP_OK, request.delete().code());
         assertEquals("DELETE", method.get());
         assertEquals("us er", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
     }
 
     /**
-     * Verify PUT with query parameters
+     * Verify POST with query parameters
      *
      * @throws Exception
      */
@@ -2016,8 +1951,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_OK);
             }
         };
-        KieRemoteHttpRequest request = postRequest(url, false, "name", "user", "number", "100");
-        assertEquals(HTTP_OK, request.code());
+        KieRemoteHttpRequest request = newRequest(url).query("name", "user").query("number", "100");
+        assertEquals(HTTP_OK, request.post().code());
         assertEquals("POST", method.get());
         assertEquals("user", outputParams.get("name"));
         assertEquals("100", outputParams.get("number"));
@@ -2030,7 +1965,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendMappedQueryParamsWithNoPath() throws Exception {
-        assertEquals("http://test.com/?a=b", append("http://test.com", Collections.singletonMap("a", "b")));
+        assertEquals("http://test.com/?a=b", appendQueryParameters("http://test.com", Collections.singletonMap("a", "b")));
     }
 
     /**
@@ -2040,7 +1975,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendVarargsQueryParmasWithNoPath() throws Exception {
-        assertEquals("http://test.com/?a=b", append("http://test.com", "a", "b"));
+        assertEquals("http://test.com/?a=b", appendQueryParameters("http://test.com", "a", "b"));
     }
 
     /**
@@ -2051,8 +1986,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
     @Test
     public void appendMappedQueryParamsWithPath() throws Exception {
         assertEquals("http://test.com/segment1?a=b",
-                KieRemoteHttpRequest.append("http://test.com/segment1", Collections.singletonMap("a", "b")));
-        assertEquals("http://test.com/?a=b", KieRemoteHttpRequest.append("http://test.com/", Collections.singletonMap("a", "b")));
+                KieRemoteHttpRequest.appendQueryParameters("http://test.com/segment1", Collections.singletonMap("a", "b")));
+        assertEquals("http://test.com/?a=b", KieRemoteHttpRequest.appendQueryParameters("http://test.com/", Collections.singletonMap("a", "b")));
     }
 
     /**
@@ -2062,8 +1997,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendVarargsQueryParamsWithPath() throws Exception {
-        assertEquals("http://test.com/segment1?a=b", KieRemoteHttpRequest.append("http://test.com/segment1", "a", "b"));
-        assertEquals("http://test.com/?a=b", KieRemoteHttpRequest.append("http://test.com/", "a", "b"));
+        assertEquals("http://test.com/segment1?a=b", KieRemoteHttpRequest.appendQueryParameters("http://test.com/segment1", "a", "b"));
+        assertEquals("http://test.com/?a=b", KieRemoteHttpRequest.appendQueryParameters("http://test.com/", "a", "b"));
     }
 
     /**
@@ -2076,7 +2011,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         params.put("a", "b");
         params.put("c", "d");
-        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.append("http://test.com/1", params));
+        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", params));
     }
 
     /**
@@ -2086,7 +2021,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendMultipleVarargsQueryParams() throws Exception {
-        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.append("http://test.com/1", "a", "b", "c", "d"));
+        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", "a", "b", "c", "d"));
     }
 
     /**
@@ -2096,7 +2031,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendNullMappedQueryParams() throws Exception {
-        assertEquals("http://test.com/1", KieRemoteHttpRequest.append("http://test.com/1", (Map<?, ?>) null));
+        assertEquals("http://test.com/1", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", (Map<?, ?>) null));
     }
 
     /**
@@ -2106,7 +2041,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendNullVaragsQueryParams() throws Exception {
-        assertEquals("http://test.com/1", KieRemoteHttpRequest.append("http://test.com/1", (Object[]) null));
+        assertEquals("http://test.com/1", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", (Object[]) null));
     }
 
     /**
@@ -2116,7 +2051,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendEmptyMappedQueryParams() throws Exception {
-        assertEquals("http://test.com/1", KieRemoteHttpRequest.append("http://test.com/1", Collections.<String, String> emptyMap()));
+        assertEquals("http://test.com/1", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", Collections.<String, String> emptyMap()));
     }
 
     /**
@@ -2126,7 +2061,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendEmptyVarargsQueryParams() throws Exception {
-        assertEquals("http://test.com/1", KieRemoteHttpRequest.append("http://test.com/1", new Object[0]));
+        assertEquals("http://test.com/1", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", new Object[0]));
     }
 
     /**
@@ -2139,7 +2074,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         params.put("a", null);
         params.put("b", null);
-        assertEquals("http://test.com/1?a=&b=", KieRemoteHttpRequest.append("http://test.com/1", params));
+        assertEquals("http://test.com/1?a=&b=", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", params));
     }
 
     /**
@@ -2149,7 +2084,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendWithNullVaragsQueryParamValues() throws Exception {
-        assertEquals("http://test.com/1?a=&b=", KieRemoteHttpRequest.append("http://test.com/1", "a", null, "b", null));
+        assertEquals("http://test.com/1?a=&b=", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1", "a", null, "b", null));
     }
 
     /**
@@ -2157,7 +2092,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test(expected = IllegalArgumentException.class)
     public void appendOddNumberOfParams() {
-        KieRemoteHttpRequest.append("http://test.com", "1");
+        KieRemoteHttpRequest.appendQueryParameters("http://test.com", "1");
     }
 
     /**
@@ -2165,7 +2100,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendMappedQueryParamsWithExistingQueryStart() {
-        assertEquals("http://test.com/1?a=b", KieRemoteHttpRequest.append("http://test.com/1?", Collections.singletonMap("a", "b")));
+        assertEquals("http://test.com/1?a=b", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1?", Collections.singletonMap("a", "b")));
     }
 
     /**
@@ -2173,7 +2108,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendVarargsQueryParamsWithExistingQueryStart() {
-        assertEquals("http://test.com/1?a=b", KieRemoteHttpRequest.append("http://test.com/1?", "a", "b"));
+        assertEquals("http://test.com/1?a=b", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1?", "a", "b"));
     }
 
     /**
@@ -2182,9 +2117,9 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
     @Test
     public void appendMappedQueryParamsWithExistingParams() {
         assertEquals("http://test.com/1?a=b&c=d",
-                KieRemoteHttpRequest.append("http://test.com/1?a=b", Collections.singletonMap("c", "d")));
+                KieRemoteHttpRequest.appendQueryParameters("http://test.com/1?a=b", Collections.singletonMap("c", "d")));
         assertEquals("http://test.com/1?a=b&c=d",
-                KieRemoteHttpRequest.append("http://test.com/1?a=b&", Collections.singletonMap("c", "d")));
+                KieRemoteHttpRequest.appendQueryParameters("http://test.com/1?a=b&", Collections.singletonMap("c", "d")));
 
     }
 
@@ -2193,8 +2128,8 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
      */
     @Test
     public void appendWithVarargsQueryParamsWithExistingParams() {
-        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.append("http://test.com/1?a=b", "c", "d"));
-        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.append("http://test.com/1?a=b&", "c", "d"));
+        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1?a=b", "c", "d"));
+        assertEquals("http://test.com/1?a=b&c=d", KieRemoteHttpRequest.appendQueryParameters("http://test.com/1?a=b&", "c", "d"));
     }
 
     /**
@@ -2211,9 +2146,9 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_BAD_REQUEST);
             }
         };
-        KieRemoteHttpRequest request = getRequest(url);
+        KieRemoteHttpRequest request = newRequest(url);
         assertNotNull(request);
-        assertEquals(HTTP_BAD_REQUEST, request.code());
+        assertEquals(HTTP_BAD_REQUEST, request.get().code());
     }
 
     /**
@@ -2238,7 +2173,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
 
-        KieRemoteHttpRequest request = postRequest(url).ignoreCloseExceptions(false);
+        KieRemoteHttpRequest request = postRequest(new URL(url)).ignoreCloseExceptions(false);
         assertEquals("world", request.send("hello").responseBody());
         assertEquals("hello", body.get());
     }
@@ -2262,34 +2197,10 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
 
-        KieRemoteHttpRequest request = postRequest(url).ignoreCloseExceptions(false);
+        KieRemoteHttpRequest request = postRequest(new URL(url)).ignoreCloseExceptions(false);
         Map<String, List<String>> headers = request.send("hello").responseHeaders();
         assertEquals("v1", headers.get("h1").get(0));
         assertEquals("v2", headers.get("h2").get(0));
-        assertEquals("hello", body.get());
-    }
-
-    /**
-     * Verify data is send when receiving response date header without first
-     * calling {@link KieRemoteHttpRequest#code()}
-     *
-     * @throws Exception
-     */
-    @Test
-    public void sendDateHeaderWithoutCode() throws Exception {
-        final AtomicReference<String> body = new AtomicReference<String>();
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                body.set(new String(read()));
-                response.setDateHeader("Date", 1000);
-                response.setStatus(HTTP_OK);
-            }
-        };
-
-        KieRemoteHttpRequest request = postRequest(url).ignoreCloseExceptions(false);
-        assertEquals(1000, request.send("hello").dateResponseHeader(HttpHeaders.DATE, -1L));
         assertEquals("hello", body.get());
     }
 
@@ -2312,7 +2223,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
 
-        KieRemoteHttpRequest request = postRequest(url).ignoreCloseExceptions(false);
+        KieRemoteHttpRequest request = postRequest(new URL(url)).ignoreCloseExceptions(false);
         assertEquals(9876, request.send("hello").intResponseHeader("Width"));
         assertEquals("hello", body.get());
     }
@@ -2331,7 +2242,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(200);
             }
         };
-        assertEquals("", getRequest(url).responseBody());
+        assertEquals("", newRequest(url).get().responseBody());
     }
 
     /**
@@ -2348,7 +2259,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 response.setStatus(HTTP_BAD_REQUEST);
             }
         };
-        assertEquals("", getRequest(url).responseBody());
+        assertEquals("", newRequest(url).get().responseBody());
     }
 
     /**
@@ -2370,7 +2281,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
                 }
             }
         };
-        assertEquals("error", getRequest(url).responseBody());
+        assertEquals("error", newRequest(url).get().responseBody());
     }
 
 }

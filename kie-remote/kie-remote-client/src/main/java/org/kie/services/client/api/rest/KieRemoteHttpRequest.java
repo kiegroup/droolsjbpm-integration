@@ -66,7 +66,9 @@ import java.security.GeneralSecurityException;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -99,7 +101,6 @@ import org.kie.services.client.serialization.JsonSerializationProvider;
 public class KieRemoteHttpRequest {
 
     public static final String CHARSET_UTF8 = "UTF-8";
-    public static final String ENCODING_GZIP = "gzip";
     public static final String HEADER_PROXY_AUTHORIZATION = "Proxy-Authorization";
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_SERVER = "Server";
@@ -108,6 +109,123 @@ public class KieRemoteHttpRequest {
 
     private static JsonSerializationProvider JSON_SERIALIZER = new JsonSerializationProvider();
     private static JaxbSerializationProvider XML_SERIALIZER = new JaxbSerializationProvider();
+
+    // Request information
+
+    private static final int DEFAULT_TIMEOUT_SECS = 5;
+
+    private RequestInfo requestInfo;
+
+    private int bufferSize = 8192;
+    private boolean ignoreCloseExceptions = true;
+    boolean uncompress = false;
+
+    private HttpURLConnection connection = null;
+    private RequestOutputStream output;
+
+    private static class RequestInfo {
+        URL baseUrl;
+        URL requestUrl;
+
+        String user;
+        String password;
+
+        Integer timeoutInMilliSecs = DEFAULT_TIMEOUT_SECS * 1000;
+
+        String requestMethod;
+
+        Map<String, List<String>> headers;
+        Map<String, List<String>> queryParameters;
+        Map<String, List<String>> formParameters;
+        boolean form = false;
+        String charset;
+
+        String body;
+        MediaType bodyContentType;
+
+        boolean followRedirects = false;
+
+        String httpProxyHost;
+        int httpProxyPort;
+
+        public URL getRequestUrl() {
+            if( requestUrl == null ) {
+                requestUrl = baseUrl;
+            }
+            return requestUrl;
+        }
+
+        public void setRequestUrl(String urlString) { 
+            requestUrl = convertStringToUrl(urlString);
+        }
+        
+        public List<String> getHeader( String name ) {
+            if( headers == null ) {
+                return Collections.EMPTY_LIST;
+            } else {
+                return headers.get(name);
+            }
+        }
+
+        public void setQueryParameter( String name, Object value ) {
+            if( this.queryParameters == null ) {
+                this.queryParameters = new LinkedHashMap<String, List<String>>();
+            }
+            if( this.queryParameters.get(name) == null ) {
+                this.queryParameters.put(name, new ArrayList<String>());
+            }
+            this.queryParameters.get(name).add(value == null ? null : value.toString());
+        }
+
+        public void setFormParameter( String name, Object value ) {
+            if( this.formParameters == null ) {
+                this.formParameters = new LinkedHashMap<String, List<String>>();
+            }
+            if( this.formParameters.get(name) == null ) {
+                this.formParameters.put(name, new ArrayList<String>());
+            }
+            this.formParameters.get(name).add(value == null ? null : value.toString());
+        }
+
+        public void setHeader( String name, Object value ) {
+            if( this.headers == null ) {
+                this.headers = new LinkedHashMap<String, List<String>>();
+            }
+            if( this.headers.get(name) == null ) {
+                this.headers.put(name, new ArrayList<String>());
+            }
+            this.headers.get(name).add(value == null ? null : value.toString());
+        }
+
+        @Override
+        public RequestInfo clone() { 
+            RequestInfo clone = new RequestInfo();
+            clone.baseUrl = baseUrl;
+            clone.body = body;
+            clone.bodyContentType = bodyContentType;
+            clone.charset = charset;
+            clone.followRedirects = followRedirects;
+            clone.form = form;
+            clone.formParameters = formParameters;
+            clone.headers = headers;
+            clone.httpProxyHost = httpProxyHost;
+            clone.httpProxyPort = httpProxyPort;
+            clone.password = password;
+            clone.queryParameters = queryParameters;
+            clone.requestMethod = requestMethod;
+            clone.requestUrl = requestUrl;
+            clone.timeoutInMilliSecs = timeoutInMilliSecs;
+            clone.user = user;
+            return clone;
+        }
+    }
+
+    private RequestInfo getRequestInfo() {
+        if( requestInfo == null ) {
+            requestInfo = new RequestInfo();
+        }
+        return requestInfo;
+    }
 
     /**
      * Creates {@link HttpURLConnection HTTP connections} for {@link URL urls}.
@@ -328,7 +446,7 @@ public class KieRemoteHttpRequest {
      * @return encoded URL
      * @throws KieRemoteHttpRequestException
      */
-    static String encode( final CharSequence url ) throws KieRemoteHttpRequestException {
+    static String encodeUrlToUTF8( final CharSequence url ) throws KieRemoteHttpRequestException {
         URL parsed;
         try {
             parsed = new URL(url.toString());
@@ -362,7 +480,7 @@ public class KieRemoteHttpRequest {
      * @param params
      * @return URL with appended query params
      */
-    static String append( final CharSequence url, final Map<?, ?> params ) {
+    static String appendQueryParameters( final CharSequence url, final Map<?, ?> params ) {
         final String baseUrl = url.toString();
         if( params == null || params.isEmpty() )
             return baseUrl;
@@ -405,7 +523,7 @@ public class KieRemoteHttpRequest {
      * name/value pairs
      * @return URL with appended query params
      */
-    static String append( final CharSequence url, final Object... params ) {
+    static String appendQueryParameters( final CharSequence url, final Object... params ) {
         final String baseUrl = url.toString();
         if( params == null || params.length == 0 ) {
             return baseUrl;
@@ -469,175 +587,137 @@ public class KieRemoteHttpRequest {
 
     // Factory methods ------------------------------------------------------------------------------------------------------------
 
-    public static KieRemoteHttpRequest getRequest( final String url ) throws KieRemoteHttpRequestException {
-        return new KieRemoteHttpRequest(url, GET);
+    public static KieRemoteHttpRequest deleteRequest( final URL url ) throws KieRemoteHttpRequestException {
+        KieRemoteHttpRequest request = new KieRemoteHttpRequest(url);
+        request.getRequestInfo().requestMethod = DELETE;
+        return request;
+    }
+
+    public static KieRemoteHttpRequest putRequest( final URL url ) throws KieRemoteHttpRequestException {
+        KieRemoteHttpRequest request = new KieRemoteHttpRequest(url);
+        request.getRequestInfo().requestMethod = PUT;
+        return request;
+    }
+
+    public static KieRemoteHttpRequest getRequest( final String urlString ) throws KieRemoteHttpRequestException {
+        KieRemoteHttpRequest request = new KieRemoteHttpRequest(urlString);
+        request.getRequestInfo().requestMethod = GET;
+        return request;
     }
 
     public static KieRemoteHttpRequest getRequest( final URL url ) throws KieRemoteHttpRequestException {
-        return new KieRemoteHttpRequest(url, GET);
-    }
-
-    public static KieRemoteHttpRequest getRequest( final String baseUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(baseUrl, params);
-        return getRequest(encode ? encode(url) : url);
-    }
-
-    public static KieRemoteHttpRequest getRequest( final String baseUrl, final boolean encode, final Object... params ) {
-        String url = append(baseUrl, params);
-        return getRequest(encode ? encode(url) : url);
-    }
-
-    public static KieRemoteHttpRequest postRequest( final String url ) throws KieRemoteHttpRequestException {
-        return new KieRemoteHttpRequest(url, POST);
+        KieRemoteHttpRequest request = new KieRemoteHttpRequest(url);
+        request.getRequestInfo().requestMethod = GET;
+        return request;
     }
 
     public static KieRemoteHttpRequest postRequest( final URL url ) throws KieRemoteHttpRequestException {
-        return new KieRemoteHttpRequest(url, POST);
+        KieRemoteHttpRequest request = new KieRemoteHttpRequest(url);
+        request.getRequestInfo().requestMethod = POST;
+        return request;
     }
 
-    public static KieRemoteHttpRequest postRequest( final String baseUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(baseUrl, params);
-        return postRequest(encode ? encode(url) : url);
+    public static KieRemoteHttpRequest newRequest( final String url ) throws KieRemoteHttpRequestException {
+        return new KieRemoteHttpRequest(url);
     }
 
-    public static KieRemoteHttpRequest postRequest( final String baseUrl, final boolean encode, final Object... params ) {
-        String url = append(baseUrl, params);
-        return postRequest(encode ? encode(url) : url);
+    public static KieRemoteHttpRequest newRequest( final URL url ) throws KieRemoteHttpRequestException {
+        return new KieRemoteHttpRequest(url);
     }
 
-    public static KieRemoteHttpRequest deleteRequest( final String url ) throws KieRemoteHttpRequestException {
-        return new KieRemoteHttpRequest(url, DELETE);
+    public static KieRemoteHttpRequest newRequest( final String url, String username, String password ) throws KieRemoteHttpRequestException {
+        return new KieRemoteHttpRequest(url, username, password);
     }
 
-    public static KieRemoteHttpRequest deleteRequest( final URL url ) throws KieRemoteHttpRequestException {
-        return new KieRemoteHttpRequest(url, DELETE);
+    public static KieRemoteHttpRequest newRequest( final URL url, String username, String password ) throws KieRemoteHttpRequestException {
+        return new KieRemoteHttpRequest(url, username, password);
     }
 
-    public static KieRemoteHttpRequest deleteRequest( final CharSequence baseUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(baseUrl, params);
-        return deleteRequest(encode ? encode(url) : url);
+    private KieRemoteHttpRequest(final URL url) throws KieRemoteHttpRequestException {
+        getRequestInfo().baseUrl = url;
     }
-
-    public static KieRemoteHttpRequest deleteRequest( final CharSequence baseUrl, final boolean encode, final Object... params ) {
-        String url = append(baseUrl, params);
-        return deleteRequest(encode ? encode(url) : url);
+    
+    private KieRemoteHttpRequest(final String urlString) throws KieRemoteHttpRequestException {
+        getRequestInfo().baseUrl = convertStringToUrl(urlString);
     }
-
-    public KieRemoteHttpRequest(final String urlString) throws KieRemoteHttpRequestException {
+    
+    private static URL convertStringToUrl(final String urlString) throws KieRemoteHttpRequestException { 
         try {
-            this.baseUrl = new URL(urlString);
+            return new URL(urlString);
         } catch( MalformedURLException e ) {
             throw new KieRemoteHttpRequestException("Unable to create request with url '" + urlString + "'", e);
         }
+        
     }
 
     // Constructors --------------------------------------------------------------------------------------------------------------
 
-    public KieRemoteHttpRequest(URL baseRestUrl, String username, String password, int timeoutInSeconds) {
-        this.baseUrl = baseRestUrl;
-        this.user = username;
-        this.password = password;
-        this.timeout = timeoutInSeconds * 1000;
+    private KieRemoteHttpRequest(RequestInfo requestInfo) { 
+        this.requestInfo = requestInfo;
     }
 
-    public KieRemoteHttpRequest(final URL url, final String method) throws KieRemoteHttpRequestException {
-        this.baseUrl = url;
-        this.requestMethod = method;
+    private KieRemoteHttpRequest(URL stringUrl, String username, String password) {
+        RequestInfo requestInfo = getRequestInfo();
+        requestInfo.baseUrl = stringUrl;
+        requestInfo.user = username;
+        requestInfo.password = password;
     }
 
-    public KieRemoteHttpRequest(final String urlString, final String method) throws KieRemoteHttpRequestException {
-        this(urlString);
-        this.requestMethod = method;
+    private KieRemoteHttpRequest(String stringUrl, String username, String password) {
+        this(stringUrl);
+        RequestInfo requestInfo = getRequestInfo();
+        requestInfo.user = username;
+        requestInfo.password = password;
     }
 
     // HTTP methods --------------------------------------------------------------------------------------------------------------
 
-    public KieRemoteHttpRequest get( final CharSequence baseUrl, final boolean encode, final Object... params ) {
-        String url = append(baseUrl, params);
-        return get(encode ? encode(url) : url);
-    }
-
-    public KieRemoteHttpRequest get( final CharSequence baseUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(baseUrl, params);
-        return get(encode ? encode(url) : url);
-    }
-
     public KieRemoteHttpRequest get( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, GET);
+        code();
         return this;
     }
 
     public KieRemoteHttpRequest get() throws KieRemoteHttpRequestException {
-        this.requestMethod = GET;
+        getRequestInfo().requestMethod = GET;
+        code();
         return this;
-    }
-    
-    public KieRemoteHttpRequest post( final CharSequence baseUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(baseUrl, params);
-        return post(encode ? encode(url) : url);
-    }
-
-    public KieRemoteHttpRequest post( final String relativeUrl, final boolean encode, final Object... params ) {
-        String url = append(relativeUrl, params);
-        return post(encode ? encode(url) : url);
     }
 
     public KieRemoteHttpRequest post( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, POST);
+        code();
         return this;
     }
 
     public KieRemoteHttpRequest post() throws KieRemoteHttpRequestException {
-        this.requestMethod = POST;
+        getRequestInfo().requestMethod = POST;
+        code();
         return this;
-    }
-
-    public KieRemoteHttpRequest put( final String relativeUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(relativeUrl, params);
-        return put(encode ? encode(url) : url);
-    }
-
-    public KieRemoteHttpRequest put( final CharSequence baseUrl, final boolean encode, final Object... params ) {
-        String url = append(baseUrl, params);
-        return put(encode ? encode(url) : url);
     }
 
     public KieRemoteHttpRequest put( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, PUT);
+        code();
         return this;
     }
 
     public KieRemoteHttpRequest put() throws KieRemoteHttpRequestException {
-        this.requestMethod = PUT;
+        getRequestInfo().requestMethod = PUT;
+        code();
         return this;
-    }
-
-    public KieRemoteHttpRequest delete( final CharSequence baseUrl, final Map<?, ?> params, final boolean encode ) {
-        String url = append(baseUrl, params);
-        return delete(encode ? encode(url) : url);
-    }
-
-    public KieRemoteHttpRequest delete( final CharSequence baseUrl, final boolean encode, final Object... params ) {
-        String url = append(baseUrl, params);
-        return delete(encode ? encode(url) : url);
     }
 
     public KieRemoteHttpRequest delete( final String relativeUrl ) throws KieRemoteHttpRequestException {
         relativeRequest(relativeUrl, DELETE);
+        code();
         return this;
     }
 
     public KieRemoteHttpRequest delete() throws KieRemoteHttpRequestException {
-        this.requestMethod = DELETE;
-        return this;
-    }
-    
-    private void openConnectionAndDoHttpMethod() {
-        if( user != null && password != null ) {
-            basic(user, password);
-        }
-        setTimeout();
+        getRequestInfo().requestMethod = DELETE;
         code();
+        return this;
     }
 
     // General Input/Output helper methods ----------------------------------------------------------------------------------------
@@ -687,27 +767,6 @@ public class KieRemoteHttpRequest {
             }
         }.call();
     }
-
-    private final URL baseUrl;
-    private URL requestUrl;
-    private String user;
-    private String password;
-    private Integer timeout;
-    private static final int DEFAULT_TIMEOUT_SECS = 5;
-
-    private HttpURLConnection connection = null;
-    private RequestOutputStream output;
-
-    private String requestMethod;
-
-    private boolean form;
-    private boolean ignoreCloseExceptions = true;
-
-    private boolean uncompress = false;
-    private int bufferSize = 8192;
-
-    private String httpProxyHost;
-    private int httpProxyPort;
 
     // Fluent setter's/ property getter's -----------------------------------------------------------------------------------------
 
@@ -760,63 +819,88 @@ public class KieRemoteHttpRequest {
 
     public URI getUri() {
         try {
-            return this.requestUrl.toURI();
+            return getRequestInfo().requestUrl.toURI();
         } catch( URISyntaxException urise ) {
             throw new KieRemoteHttpRequestException("Invalid request URL", urise);
         }
     }
-    
-    private void setRequestUrl( String urlString ) {
-        try {
-            this.requestUrl = new URL(urlString);
-        } catch( MalformedURLException e ) {
-            throw new KieRemoteHttpRequestException("Unable to create request with url'" + urlString + "'", e);
+
+    public KieRemoteHttpRequest timeout( final int timeoutInMilliseconds ) {
+        if( connection != null ) { 
+            connection.setReadTimeout(timeoutInMilliseconds);
+        } else { 
+            getRequestInfo().timeoutInMilliSecs = timeoutInMilliseconds;
         }
+        return this;
+    }
+
+    private void setRequestUrl( String urlString ) {
+
     }
 
     // Connection methods --------------------------------------------------------------------------------------------------------
 
     private HttpURLConnection createConnection() {
-        if( requestUrl == null ) {
-            requestUrl = baseUrl;
+        String urlString = getRequestInfo().getRequestUrl().toString();
+        if( getRequestInfo().requestMethod == null ) { 
+            throw new KieRemoteHttpRequestException("Please specify (and execute?) a HTTP method first.");
         }
-        String urlString = requestUrl.toString();
         try {
             final HttpURLConnection connection;
-            if( httpProxyHost != null ) {
-                Proxy proxy = new Proxy(HTTP, new InetSocketAddress(httpProxyHost, httpProxyPort));
-                connection = CONNECTION_FACTORY.create(requestUrl, proxy);
+            if( getRequestInfo().httpProxyHost != null ) {
+                Proxy proxy = new Proxy(HTTP, new InetSocketAddress(getRequestInfo().httpProxyHost, getRequestInfo().httpProxyPort));
+                connection = CONNECTION_FACTORY.create(getRequestInfo().getRequestUrl(), proxy);
             } else {
-                connection = CONNECTION_FACTORY.create(requestUrl);
+                connection = CONNECTION_FACTORY.create(getRequestInfo().getRequestUrl());
             }
-            connection.setRequestMethod(requestMethod);
+            connection.setRequestMethod(getRequestInfo().requestMethod);
             return connection;
         } catch( IOException ioe ) {
-            throw new KieRemoteHttpRequestException("Unable to create (" + requestMethod + ") connection to '" + urlString + "'",
-                    ioe);
+            throw new KieRemoteHttpRequestException("Unable to create (" + getRequestInfo().requestMethod + ") connection to '"
+                    + urlString + "'", ioe);
         }
     }
 
     HttpURLConnection getConnection() {
-        if( requestMethod == null ) { 
+        if( getRequestInfo().requestMethod == null ) {
             throw new KieRemoteHttpRequestException("Please set HTTP request method before opening a connection.");
         }
-        if( connection == null ) {
-            connection = createConnection();
-        }
+        initializeConnection();
         return connection;
+    }
+    
+    private void initializeConnection() { 
+        if( connection == null ) { 
+            addQueryParametersToUrl();
+            connection = createConnection();
+            connection.setReadTimeout(getRequestInfo().timeoutInMilliSecs);
+            connection.setConnectTimeout(getRequestInfo().timeoutInMilliSecs);
+            RequestInfo requestInfo = getRequestInfo();
+            if( requestInfo.user != null && requestInfo.password != null ) {
+                basicAuthorization(requestInfo.user, requestInfo.password);
+            }
+            if( requestInfo.headers != null ) {
+                for( Entry<String, List<String>> entry : requestInfo.headers.entrySet() ) {
+                    List<String> headerVals = entry.getValue();
+                    for( String val : headerVals ) {
+                        connection.setRequestProperty(entry.getKey(), val);
+                    }
+                }
+            }
+            addFormParametersToConnection();
+        }
     }
 
     // relative request methods ---------------------------------------------------------------------------------------------------
 
     public KieRemoteHttpRequest relativeRequest( String relativeUrlString, String httpMethod ) {
         relativeRequest(relativeUrlString);
-        this.requestMethod = httpMethod;
+        getRequestInfo().requestMethod = httpMethod;
         return this;
     }
 
     public KieRemoteHttpRequest relativeRequest( String relativeUrlString ) {
-        String baseUrlString = baseUrl.toExternalForm();
+        String baseUrlString = getRequestInfo().baseUrl.toExternalForm();
         boolean urlSlash = baseUrlString.endsWith("/");
         boolean postfixSlash = relativeUrlString.startsWith("/");
         String separator = "";
@@ -825,7 +909,7 @@ public class KieRemoteHttpRequest {
         } else if( urlSlash && postfixSlash ) {
             relativeUrlString = relativeUrlString.substring(1);
         }
-    
+
         setRequestUrl(baseUrlString + separator + relativeUrlString);
         return this;
     }
@@ -837,53 +921,7 @@ public class KieRemoteHttpRequest {
         return this;
     }
 
-    public KieRemoteHttpRequest chunk( final int size ) {
-        getConnection().setChunkedStreamingMode(size);
-        return this;
-    }
-
-    public KieRemoteHttpRequest readTimeout( final int timeout ) {
-        getConnection().setReadTimeout(timeout);
-        return this;
-    }
-
-    public KieRemoteHttpRequest connectTimeout( final int timeout ) {
-        getConnection().setConnectTimeout(timeout);
-        return this;
-    }
-
-    private void setTimeout() {
-        if( timeout == null ) {
-            timeout = DEFAULT_TIMEOUT_SECS * 1000;
-        }
-        HttpURLConnection connection = getConnection();
-        connection.setReadTimeout(timeout);
-        connection.setConnectTimeout(timeout);
-    }
-
     // Connection related getter methods -----------------------------------------------------------------------------------------
-
-    /**
-     * Set value of {@link HttpURLConnection#setUseCaches(boolean)}
-     *
-     * @param useCaches
-     * @return this request
-     */
-    public KieRemoteHttpRequest useCaches( final boolean useCaches ) {
-        getConnection().setUseCaches(useCaches);
-        return this;
-    }
-
-    /**
-     * Set the 'If-Modified-Since' request header to the given value
-     *
-     * @param ifModifiedSince
-     * @return this request
-     */
-    public KieRemoteHttpRequest ifModifiedSince( final long ifModifiedSince ) {
-        getConnection().setIfModifiedSince(ifModifiedSince);
-        return this;
-    }
 
     /**
      * Set the 'Content-Length' request header to the given value
@@ -907,17 +945,17 @@ public class KieRemoteHttpRequest {
     }
 
     public URL getUrl() {
-        return getConnection().getURL();
+        return getRequestInfo().getRequestUrl();
     }
 
     public String getMethod() {
-        return getConnection().getRequestMethod();
+        return getRequestInfo().requestMethod;
     }
 
     // Request header related methods -------------------------------------------------------------------------------------------
 
     public KieRemoteHttpRequest header( final String name, final Object value ) {
-        getConnection().setRequestProperty(name, value != null ? value.toString() : null);
+        getRequestInfo().setHeader(name, value);
         return this;
     }
 
@@ -928,6 +966,11 @@ public class KieRemoteHttpRequest {
             }
         }
         return this;
+    }
+
+    public List<String> getRequestHeader( String headerName ) {
+        return getRequestInfo().getHeader(headerName);
+        // return getConnection().getRequestProperties().get(headerName);
     }
 
     /**
@@ -941,16 +984,6 @@ public class KieRemoteHttpRequest {
     }
 
     /**
-     * Set the 'Accept-Encoding' header to 'gzip'
-     *
-     * @see #setUncompress(boolean)
-     * @return this request
-     */
-    public KieRemoteHttpRequest acceptGzipEncoding() {
-        return acceptEncoding(ENCODING_GZIP);
-    }
-
-    /**
      * Set the 'Accept-Charset' header to given value
      *
      * @param acceptCharset
@@ -961,16 +994,6 @@ public class KieRemoteHttpRequest {
     }
 
     /**
-     * Set the 'Authorization' header to given value
-     *
-     * @param authorization
-     * @return this request
-     */
-    public KieRemoteHttpRequest authorization( final String authorization ) {
-        return header(AUTHORIZATION, authorization);
-    }
-
-    /**
      * Set the 'Authorization' header to given values in Basic authentication
      * format
      *
@@ -978,8 +1001,8 @@ public class KieRemoteHttpRequest {
      * @param password
      * @return this request
      */
-    public KieRemoteHttpRequest basic( final String name, final String password ) {
-        return authorization("Basic " + Base64Util.encode(name + ':' + password));
+    public KieRemoteHttpRequest basicAuthorization( final String name, final String password ) {
+        return header(AUTHORIZATION, "Basic " + Base64Util.encode(name + ':' + password));
     }
 
     /**
@@ -1017,15 +1040,6 @@ public class KieRemoteHttpRequest {
         return header(ACCEPT, accept);
     }
 
-    /**
-     * Set the 'Accept' header to 'application/json'
-     *
-     * @return this request
-     */
-    public KieRemoteHttpRequest acceptJson() {
-        return accept(APPLICATION_JSON);
-    }
-
     // Request/Output management methods
     // --------------------------------------------------------------------------------------------------
 
@@ -1053,6 +1067,9 @@ public class KieRemoteHttpRequest {
      * @throws IOException
      */
     private KieRemoteHttpRequest closeOutput() throws IOException {
+        if( connection == null ) { 
+            throw new KieRemoteHttpRequestException("Please execute a HTTP method first on the request.");
+        }
         if( output == null ) {
             return this;
         }
@@ -1136,30 +1153,58 @@ public class KieRemoteHttpRequest {
         }
     }
 
-    // Form parameter methods -----------------------------------------------------------------------------------------------------
-
-    public KieRemoteHttpRequest form( final Object name, final Object value, String charset ) throws KieRemoteHttpRequestException {
-        final boolean first = !form;
-        if( first ) {
-            contentType(APPLICATION_FORM_URLENCODED, charset);
-            form = true;
-        }
-        charset = getValidCharset(charset);
-        try {
-            openOutput();
-            if( !first )
-                output.write('&');
-            output.write(URLEncoder.encode(name.toString(), charset));
-            output.write('=');
-            if( value != null )
-                output.write(URLEncoder.encode(value.toString(), charset));
-        } catch( IOException ioe ) {
-            throw new KieRemoteHttpRequestException("Unable to add form parameter (" + name + "/" + value + ") to request body",
-                    ioe);
+    // query parameter methods -----------------------------------------------------------------------------------------------------
+    
+    public KieRemoteHttpRequest query( final Object name, final Object value) throws KieRemoteHttpRequestException {
+        getRequestInfo().setQueryParameter(name.toString(), value != null ? value.toString() : null );
+        return this;
+    }
+    
+    public KieRemoteHttpRequest query(final Map<?, ?> values) throws KieRemoteHttpRequestException {
+        if( !values.isEmpty() ) {
+            for( Entry<?, ?> entry : values.entrySet() ) {
+                query(entry.getKey(), entry.getValue());
+            }
         }
         return this;
     }
 
+    private void addQueryParametersToUrl() { 
+       RequestInfo requestInfo = getRequestInfo();
+       Object [] paramList = null;
+       if( requestInfo.queryParameters != null ) { 
+           List<String> queryParamList = new ArrayList<String>();
+           for( Entry<String, List<String>> paramListEntry : requestInfo.queryParameters.entrySet() ) { 
+              String name = paramListEntry.getKey();
+              for( String val : paramListEntry.getValue() ) { 
+                  queryParamList.add(name);
+                  queryParamList.add(val);
+              }
+           }
+           paramList = queryParamList.toArray();
+       }
+       String unencodedUrlString = appendQueryParameters(requestInfo.getRequestUrl().toString(), paramList);
+       String urlString = encodeUrlToUTF8(unencodedUrlString);
+       requestInfo.setRequestUrl(urlString);
+    }
+    
+    // Form parameter methods -----------------------------------------------------------------------------------------------------
+
+    public KieRemoteHttpRequest form( final Object name, final Object value, String charset ) throws KieRemoteHttpRequestException {
+        if( ! getRequestInfo().form ) {
+            contentType(APPLICATION_FORM_URLENCODED, charset);
+            getRequestInfo().form = true;
+        }
+        charset = getValidCharset(charset);
+        
+        RequestInfo requestInfo = getRequestInfo();
+        requestInfo.form = true;
+        requestInfo.charset = charset;
+        requestInfo.setFormParameter(name.toString(), value);
+        
+        return this;
+    }
+    
     public KieRemoteHttpRequest form( final Object name, final Object value ) throws KieRemoteHttpRequestException {
         return form(name, value, CHARSET_UTF8);
     }
@@ -1177,9 +1222,42 @@ public class KieRemoteHttpRequest {
         return form(values, CHARSET_UTF8);
     }
 
+    private void addFormParametersToConnection() { 
+        RequestInfo requestInfo = getRequestInfo();
+        if( requestInfo.form && requestInfo.formParameters != null ) { 
+    
+            String name = null;
+            String value = null;
+            try {
+                openOutput();
+                boolean first = true;
+    
+                for( Entry<String, List<String>> entry : requestInfo.formParameters.entrySet() ) { 
+                    name = entry.getKey();
+                    for( String formValue : entry.getValue() ) {  
+                        value = formValue;
+                        if( !first ) { 
+                            output.write('&');
+                        } 
+                        first = false;
+                        output.write(URLEncoder.encode(name.toString(), requestInfo.charset));
+                        output.write('=');
+                        if( value != null ) { 
+                            output.write(URLEncoder.encode(value.toString(), requestInfo.charset));
+                        }
+                    }
+                }
+            } catch( IOException ioe ) {
+                throw new KieRemoteHttpRequestException("Unable to add form parameter (" + name + "/" + value + ") to request body",
+                        ioe);
+            }
+        }
+    }
+
     // Response related methods --------------------------------------------------------------------------------------------------
 
     public int code() throws KieRemoteHttpRequestException {
+        initializeConnection();
         try {
             closeOutput();
             return getConnection().getResponseCode();
@@ -1189,6 +1267,7 @@ public class KieRemoteHttpRequest {
     }
 
     public String message() throws KieRemoteHttpRequestException {
+        initializeConnection();
         try {
             closeOutput();
             return getConnection().getResponseMessage();
@@ -1271,7 +1350,7 @@ public class KieRemoteHttpRequest {
                 }
         }
 
-        if( !uncompress || !ENCODING_GZIP.equals(contentEncoding()) ) {
+        if( !uncompress || !"gzip".equals(contentEncoding()) ) {
             return stream;
         } else {
             try {
@@ -1312,23 +1391,15 @@ public class KieRemoteHttpRequest {
         return getConnection().getHeaderField(name);
     }
 
+    int intResponseHeader( final String name ) throws KieRemoteHttpRequestException {
+        closeOutputQuietly();
+        return getConnection().getHeaderFieldInt(name, -1);
+    }
+
+
     public Map<String, List<String>> responseHeaders() throws KieRemoteHttpRequestException {
         closeOutputQuietly();
         return getConnection().getHeaderFields();
-    }
-
-    public long dateResponseHeader( final String name, final long defaultValue ) throws KieRemoteHttpRequestException {
-        closeOutputQuietly();
-        return getConnection().getHeaderFieldDate(name, defaultValue);
-    }
-
-    public int intResponseHeader( final String name ) throws KieRemoteHttpRequestException {
-        return intResponseHeader(name, -1);
-    }
-
-    public int intResponseHeader( final String name, final int defaultValue ) throws KieRemoteHttpRequestException {
-        closeOutputQuietly();
-        return getConnection().getHeaderFieldInt(name, defaultValue);
     }
 
     /**
@@ -1477,11 +1548,12 @@ public class KieRemoteHttpRequest {
 
     /**
      * Get the 'Content-Length' header from the response
-     *
+     *    
      * @return response header value
      */
     public int contentLength() {
-        return intResponseHeader(CONTENT_LENGTH);
+        closeOutputQuietly();
+        return getConnection().getHeaderFieldInt(CONTENT_LENGTH, -1);
     }
 
     /**
@@ -1608,8 +1680,8 @@ public class KieRemoteHttpRequest {
                     "The connection has already been created. This method must be called before reading or writing to the request.");
         }
 
-        this.httpProxyHost = proxyHost;
-        this.httpProxyPort = proxyPort;
+        getRequestInfo().httpProxyHost = proxyHost;
+        getRequestInfo().httpProxyPort = proxyPort;
         return this;
     }
 
@@ -1640,6 +1712,14 @@ public class KieRemoteHttpRequest {
     @Override
     public String toString() {
         return getMethod() + ' ' + getUrl();
+    }
+    
+    @Override
+    public KieRemoteHttpRequest clone() { 
+        if( connection != null ) { 
+            throw new KieRemoteHttpRequestException("Unable to clone request with open or completed connection.");
+        }
+        return new KieRemoteHttpRequest(getRequestInfo().clone());
     }
 
 }
