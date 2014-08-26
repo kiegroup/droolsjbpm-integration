@@ -1,9 +1,9 @@
 package org.kie.remote.services.rest.jaxb;
 
 import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.KIE_JAXB_CLASS_SET;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.PRIMITIVE_ARRAY_CLASS_SET;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.getAllBaseJaxbClasses;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -174,12 +174,7 @@ public class DynamicJaxbContext extends JAXBContext {
      */
     private static void setupDefaultJaxbContext() {
         try {
-            int kieJaxbClassSetLength = KIE_JAXB_CLASS_SET.size();
-            Class<?> [] types = new Class<?> [kieJaxbClassSetLength + PRIMITIVE_ARRAY_CLASS_SET.size()];
-            System.arraycopy(KIE_JAXB_CLASS_SET.toArray(new Class<?>[kieJaxbClassSetLength]), 0, types, 0, kieJaxbClassSetLength);
-            int primArrClassSetLength = PRIMITIVE_ARRAY_CLASS_SET.size();
-            System.arraycopy(PRIMITIVE_ARRAY_CLASS_SET.toArray(new Class<?>[primArrClassSetLength]), 0, types, kieJaxbClassSetLength, primArrClassSetLength);
-
+            Class<?> [] types = getAllBaseJaxbClasses();
             JAXBContext defaultJaxbContext = JAXBContext.newInstance(types);
 
             contextsCache.put(DEFAULT_JAXB_CONTEXT_ID, defaultJaxbContext);
@@ -211,8 +206,7 @@ public class DynamicJaxbContext extends JAXBContext {
         }
         
         // create set of all classes needed
-        Set<Class<?>> allClasses = new HashSet<Class<?>>(KIE_JAXB_CLASS_SET);
-        allClasses.addAll(PRIMITIVE_ARRAY_CLASS_SET);
+        Set<Class<?>> allClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses()));
         allClasses.addAll(depClasses);
         Class [] allClassesArr = allClasses.toArray(new Class[allClasses.size()]);
 
@@ -227,4 +221,15 @@ public class DynamicJaxbContext extends JAXBContext {
             // This is a serious problem if it goes wrong here. 
         }
     }
+    
+    public JAXBContext getDeploymentJaxbContext(String deploymentId) {
+        JAXBContext jaxbContext = contextsCache.get(deploymentId);
+        if( jaxbContext == null ) { 
+           logger.debug("No JAXBContext available for deployment '" + deploymentId + "', using default JAXBContext instance."); 
+           jaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
+        }
+        return jaxbContext;
+    }
+    
+    
 }

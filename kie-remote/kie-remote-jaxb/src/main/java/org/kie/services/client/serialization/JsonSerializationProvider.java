@@ -19,6 +19,7 @@ public class JsonSerializationProvider implements SerializationProvider {
         mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
     }
 
+    @Override
     public String serialize(Object object) {
         try {
             return mapper.writeValueAsString(object);
@@ -31,27 +32,24 @@ public class JsonSerializationProvider implements SerializationProvider {
         }
     }
 
+    @Override
+    public Object deserialize(String jsonStr) {
+        return deserialize(jsonStr, this.outputType);
+    }
+    
     public void setDeserializeOutputClass(Class<?> type) {
         this.outputType = type;
     }
 
-    public Object deserialize(Object jsonStrObject) {
-        if( ! (jsonStrObject instanceof String) ) { 
-            throw new UnsupportedOperationException(JaxbSerializationProvider.class.getSimpleName() + " can only deserialize Strings");
-        }
-        String jsonStr = (String) jsonStrObject;
-        return deserialize(jsonStr, this.outputType);
-    }
-    
     public <T> T deserialize(String jsonStr, Class<T> type) { 
         try {
             return mapper.readValue(jsonStr, type);
         } catch (JsonGenerationException jge) {
-            throw new SerializationException("Unable to deserialize String " + outputType.getClass().getSimpleName() + " instance", jge);
+            throw new SerializationException("Unable to deserialize String " + type.getClass().getSimpleName() + " instance", jge);
         } catch (JsonMappingException jme) {
-            throw new SerializationException("Unable to deserialize String " + outputType.getClass().getSimpleName() + " instance", jme);
+            throw new SerializationException("Unable to deserialize String " + type.getClass().getSimpleName() + " instance", jme);
         } catch (IOException ie) {
-            throw new SerializationException("Unable to deserialize String to " + outputType.getClass().getSimpleName() + " instance", ie);
+            throw new SerializationException("Unable to deserialize String to " + type.getClass().getSimpleName() + " instance", ie);
         }
     }
 
@@ -69,6 +67,13 @@ public class JsonSerializationProvider implements SerializationProvider {
             this.setSerializationConfig(this.getSerializationConfig().withAnnotationIntrospector(introspector));
 
             this.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        if( this.mapper != null ) { 
+            this.mapper = null;
         }
     }
 

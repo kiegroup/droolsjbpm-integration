@@ -1,4 +1,4 @@
-package org.kie.services.client.jaxb;
+package org.kie.services.client.serialization;
 
 import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
 
@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.services.client.AbstractRemoteSerializationTest;
+import org.kie.services.client.jaxb.JsonRemoteSerializationTest;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -144,7 +145,7 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         classList.add(Long.class);
 
         String commaString = JaxbSerializationProvider.classSetToCommaSeperatedString(classList);
-        Set<Class<?>> copyClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(commaString);
+        Set<Class<?>> copyClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(this.getClass().getClassLoader(), commaString);
         assertEquals( classList, copyClasses );
         String newCommaString = JaxbSerializationProvider.classSetToCommaSeperatedString(copyClasses);
         assertEquals( commaString.length(), newCommaString.length() );
@@ -254,7 +255,8 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
                 && ( ! classesStrProp.contains(" ") )
                 && ( classesStrProp.length() > 10 || emptySet) );
         
-        Set<Class<?>> copyExtraJaxbClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(classesStrProp);
+        Set<Class<?>> copyExtraJaxbClasses 
+            = JaxbSerializationProvider.commaSeperatedStringToClassSet(this.getClass().getClassLoader(), classesStrProp);
         assertNotNull( "Round-tripped classes set is null!", copyExtraJaxbClasses );
         assertTrue( "Round-tripped classes set is empty!", ! copyExtraJaxbClasses.isEmpty() || emptySet );
         

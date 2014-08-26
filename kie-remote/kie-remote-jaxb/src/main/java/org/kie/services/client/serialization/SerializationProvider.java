@@ -2,8 +2,9 @@ package org.kie.services.client.serialization;
 
 public interface SerializationProvider {
 
-    Object serialize(Object objectInput);
+    String serialize(Object objectInput);
 
-    Object deserialize(Object serializedInput);
-    
+    Object deserialize(String serializedInput);
+   
+    void dispose();
 }

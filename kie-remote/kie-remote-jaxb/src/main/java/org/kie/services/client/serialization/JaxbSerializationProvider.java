@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.xml.bind.JAXBContext;
@@ -50,6 +51,8 @@ import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 
 public class JaxbSerializationProvider implements SerializationProvider {
 
+    // Classes -------------------------------------------------------------------------------------------------------------------
+    
     public final static int JMS_SERIALIZATION_TYPE = 0;
 
     public static Set<Class<?>> KIE_JAXB_CLASS_SET;
@@ -151,41 +154,67 @@ public class JaxbSerializationProvider implements SerializationProvider {
         };
         PRIMITIVE_ARRAY_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(primitiveClasses));
     };
-    
-    private Set<Class<?>> jaxbClasses;
-    {
-        jaxbClasses = new HashSet<Class<?>>(KIE_JAXB_CLASS_SET);
-        jaxbClasses.addAll(PRIMITIVE_ARRAY_CLASS_SET);
-    }
-    
-    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
-    
-    private JAXBContext jaxbContext;
-    private boolean prettyPrint = false;
 
+    private static Class<?> [] ALL_BASE_JAXB_CLASSES = null;
+    static { 
+        int kieJaxbClassSetLength = KIE_JAXB_CLASS_SET.size();
+        Class<?> [] types = new Class<?> [kieJaxbClassSetLength + PRIMITIVE_ARRAY_CLASS_SET.size()];
+        System.arraycopy(KIE_JAXB_CLASS_SET.toArray(new Class<?>[kieJaxbClassSetLength]), 0, types, 0, kieJaxbClassSetLength);
+        int primArrClassSetLength = PRIMITIVE_ARRAY_CLASS_SET.size();
+        System.arraycopy(PRIMITIVE_ARRAY_CLASS_SET.toArray(new Class<?>[primArrClassSetLength]), 0, types, kieJaxbClassSetLength, primArrClassSetLength);
+        ALL_BASE_JAXB_CLASSES = types;
+    }
+            
+    public static Class<?> [] getAllBaseJaxbClasses() { 
+        Class<?> [] copy = new Class<?>[ALL_BASE_JAXB_CLASSES.length];
+        System.arraycopy(ALL_BASE_JAXB_CLASSES, 0, copy, 0, ALL_BASE_JAXB_CLASSES.length);
+        return copy;
+    }
+
+    // Local/instance methods ----------------------------------------------------------------------------------------------------
+    
+    private boolean prettyPrint = false;
+    private JAXBContext jaxbContext = null;
+    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+  
     public JaxbSerializationProvider() {
-        initializeJaxbContext();
+        initializeJaxbContext(getAllBaseJaxbClasses());
     }
 
     public JaxbSerializationProvider(Collection<Class<?>> extraJaxbClassList) {
-        extraJaxbClassList.addAll(extraJaxbClassList);
+        Set<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses()));
         jaxbClasses.addAll(extraJaxbClassList);
-        initializeJaxbContext();
+        initializeJaxbContext(jaxbClasses.toArray(new Class<?>[jaxbClasses.size()]));
     }
-
-    private void initializeJaxbContext() {
+   
+    private void initializeJaxbContext(Class<?> [] jaxbClasses) {
         try {
-            jaxbContext = JAXBContext.newInstance(jaxbClasses.toArray(new Class[jaxbClasses.size()]));
+            jaxbContext = JAXBContext.newInstance(jaxbClasses);
         } catch (JAXBException jaxbe) {
-            throw new UnsupportedOperationException("Unsupported JAXB Class during initialization: " + jaxbe.getMessage(), jaxbe);
+            throw new SerializationException("Unsupported JAXB Class encountered during initialization: " + jaxbe.getMessage(), jaxbe);
         }
     }
-    
-    public JAXBContext getJaxbContext() { 
-        return this.jaxbContext;
+
+    public void dispose() { 
+       if( this.extraJaxbClasses != null ) { 
+           this.extraJaxbClasses.clear();
+           this.extraJaxbClasses = null;
+       }
+    }
+   
+    public void setPrettyPrint(boolean prettyPrint) { 
+        this.prettyPrint = prettyPrint;
     }
 
-    public String serialize(Object object) {
+    public boolean getPrettyPrint() { 
+        return this.prettyPrint;
+    }
+
+    public synchronized String serialize(Object object) {
+        return serialize(jaxbContext, prettyPrint, object);
+    }
+    
+    public static String serialize(JAXBContext jaxbContext, boolean prettyPrint, Object object) {
         Marshaller marshaller = null;
         try { 
             marshaller = jaxbContext.createMarshaller();
@@ -218,11 +247,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return output;
     }
 
-    public Object deserialize(Object xmlStrObject) {
-        if( ! (xmlStrObject instanceof String) ) { 
-            throw new UnsupportedOperationException(JaxbSerializationProvider.class.getSimpleName() + " can only deserialize Strings");
-        }
-        String xmlStr = (String) xmlStrObject;
+    public synchronized Object deserialize(String xmlStr) {
+       return deserialize(jaxbContext, xmlStr);
+    }
+    
+    public static Object deserialize(JAXBContext jaxbContext, String xmlStr) {
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = jaxbContext.createUnmarshaller();
@@ -243,27 +272,18 @@ public class JaxbSerializationProvider implements SerializationProvider {
 
     public void addJaxbClasses(Class... jaxbClass) {
         for (int i = 0; i < jaxbClass.length; ++i) {
-            jaxbClasses.add(jaxbClass[i]);
             extraJaxbClasses.add(jaxbClass[i]);
         }
-        initializeJaxbContext();
-    }
-
-    public void addJaxbClasses(Collection<Class<?>> jaxbClassList) {
-        for (Class<?> jaxbClass : jaxbClassList) {
-            jaxbClasses.add(jaxbClass);
-            extraJaxbClasses.add(jaxbClass);
-        }
-        initializeJaxbContext();
+        Set<Class<?>> jaxbClassSet = new HashSet<Class<?>>(extraJaxbClasses); 
+        jaxbClassSet.addAll(Arrays.asList(getAllBaseJaxbClasses()));
+        initializeJaxbContext(jaxbClassSet.toArray(new Class<?>[jaxbClassSet.size()]));
     }
 
     public Collection<Class<?>> getExtraJaxbClasses() { 
         return new HashSet<Class<?>>(extraJaxbClasses);
     }
-    
-    public static Set<Class<?>> commaSeperatedStringToClassSet(String extraClassNames) throws SerializationException { 
-        return commaSeperatedStringToClassSet(JaxbSerializationProvider.class.getClassLoader(), extraClassNames);
-    }
+   
+    // methods for class set properties (JMS messages) ----------------------------------------------------------------------------
     
     public static Set<Class<?>> commaSeperatedStringToClassSet(ClassLoader classloader, String extraClassNames) throws SerializationException { 
         Set<Class<?>> classList = new HashSet<Class<?>>();
@@ -308,7 +328,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return out.toString();
     }
     
-    public static String[] split(String in) {
+    static String[] split(String in) {
         String[] splitIn = in.split(",");
         List<String> outList = new ArrayList<String>();
         for (int i = 0; i < splitIn.length; ++i) {
@@ -320,14 +340,6 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return outList.toArray(new String[outList.size()]);
     }
 
-    public void setPrettyPrint(boolean prettyPrint) { 
-        this.prettyPrint = prettyPrint;
-    }
-    
-    public boolean getPrettyPrint() { 
-        return this.prettyPrint;
-    }
-    
     public static Object unsupported(Class<?> realClass) { 
         String methodName = (new Throwable()).getStackTrace()[1].getMethodName();
         throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + realClass.getSimpleName() + " implementation.");

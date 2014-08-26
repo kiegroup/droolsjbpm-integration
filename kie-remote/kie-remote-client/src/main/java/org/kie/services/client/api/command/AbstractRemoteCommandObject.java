@@ -75,6 +75,7 @@ public abstract class AbstractRemoteCommandObject {
         if( config.isJms() && config.getResponseQueue() == null ) { 
             throw new MissingRequiredInfoException("A Response queue is necessary in order to create a Remote JMS Client instance.");
         }
+        this.config.initializeJaxbSerializationProvider();
     }
 
     protected void dispose() { 
@@ -408,9 +409,9 @@ public abstract class AbstractRemoteCommandObject {
         try {
             String content = httpResponse.body();
             if( responseStatus < 300 ) {
-                commandResponse = httpRequest.responseEntity(JaxbCommandsResponse.class);
+                commandResponse = deserializeResponseContent(content, JaxbCommandsResponse.class);
             } else {
-                exceptionResponse = httpRequest.responseEntity(JaxbExceptionResponse.class);
+                exceptionResponse = deserializeResponseContent(content, JaxbExceptionResponse.class);
             }
         } catch( Exception e ) {
             logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);
@@ -449,6 +450,17 @@ public abstract class AbstractRemoteCommandObject {
                         + "'" + httpRequest.getUri().toString() + "'");
             }
         }
+    }
+    
+    private <T> T deserializeResponseContent(String responseBody, Class<T> entityClass) { 
+       JaxbSerializationProvider jaxbSerializationProvider = config.getJaxbSerializationProvider();
+       T responseEntity = null;
+       try { 
+           responseEntity = (T) jaxbSerializationProvider.deserialize(responseBody);
+       } catch( ClassCastException cce ) { 
+           throw new RemoteApiException("Unexpected entity in response body, expected " + entityClass.getName() + " instance.", cce);
+       }
+       return responseEntity;
     }
 
     // TODO: https://issues.jboss.org/browse/JBPM-4296

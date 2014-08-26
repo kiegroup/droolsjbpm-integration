@@ -42,6 +42,7 @@ public final class RemoteConfiguration {
     private URL serverBaseRestUrl;
 
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+    private JaxbSerializationProvider jaxbSerializationProvider;
 
     // JMS
     private boolean useSsl = false;
@@ -58,7 +59,38 @@ public final class RemoteConfiguration {
     public RemoteConfiguration(Type type) { 
         this.type = type;
     }
+   
+    public void dispose() { 
+       if( jaxbSerializationProvider != null ) { 
+           jaxbSerializationProvider.dispose();
+           jaxbSerializationProvider = null;
+       }
+       if( extraJaxbClasses != null ) { 
+           extraJaxbClasses.clear();
+           extraJaxbClasses = null;
+       }
+       if( connectionFactory != null ) { 
+          connectionFactory = null; 
+       }
+       if( ksessionQueue != null ) { 
+           ksessionQueue = null; 
+       }
+       if( taskQueue != null ) { 
+           taskQueue = null; 
+       }
+       if( responseQueue != null ) { 
+           responseQueue = null; 
+       }
+    }
     
+    public void initializeJaxbSerializationProvider() {
+        if( extraJaxbClasses != null ) { 
+            jaxbSerializationProvider = new JaxbSerializationProvider(extraJaxbClasses);
+        } else {  
+            jaxbSerializationProvider = new JaxbSerializationProvider();
+        }
+    }
+
     // REST ----------------------------------------------------------------------------------------------------------------------
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password) {
@@ -263,10 +295,9 @@ public final class RemoteConfiguration {
     Set<Class<?>> getExtraJaxbClasses() {
         return this.extraJaxbClasses;
     }
-
-    JaxbSerializationProvider getJaxbSerializationProvider() {
-        JaxbSerializationProvider provider = new JaxbSerializationProvider(extraJaxbClasses);
-        return provider;
+    
+    JaxbSerializationProvider getJaxbSerializationProvider() { 
+        return jaxbSerializationProvider;
     }
 
     public Type getType() { 
