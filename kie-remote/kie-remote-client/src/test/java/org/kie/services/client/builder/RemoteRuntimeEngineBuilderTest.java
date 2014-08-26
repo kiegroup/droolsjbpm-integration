@@ -554,7 +554,7 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
     }
     
     private RemoteConfiguration getConfig(RemoteJmsRuntimeEngineFactory factory) throws Exception { 
-        Field configField = RemoteJmsRuntimeEngineFactory.class.getDeclaredField("config");
+        Field configField = RemoteRuntimeEngineFactory.class.getDeclaredField("config");
         configField.setAccessible(true);
         Object configObj = configField.get(factory);
         assertNotNull("No config found.", configObj);

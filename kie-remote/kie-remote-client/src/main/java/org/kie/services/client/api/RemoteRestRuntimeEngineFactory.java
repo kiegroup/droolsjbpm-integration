@@ -11,12 +11,6 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
  */
 public class RemoteRestRuntimeEngineFactory extends RemoteRuntimeEngineFactory {
 
-    private RemoteConfiguration config;
-
-    RemoteRestRuntimeEngineFactory() { 
-        // default constructor for builder use
-    }
-    
     RemoteRestRuntimeEngineFactory(RemoteConfiguration config) { 
         this.config = config;
     }

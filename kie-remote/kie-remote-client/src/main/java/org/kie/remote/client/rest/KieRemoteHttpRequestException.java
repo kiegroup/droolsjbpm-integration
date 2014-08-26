@@ -1,4 +1,4 @@
-package org.kie.services.client.api.rest;
+package org.kie.remote.client.rest;
 
 import java.io.IOException;
 

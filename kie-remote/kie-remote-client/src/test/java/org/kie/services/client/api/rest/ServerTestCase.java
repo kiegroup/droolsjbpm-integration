@@ -22,7 +22,6 @@
 package org.kie.services.client.api.rest;
 
 import org.eclipse.jetty.util.B64Code;
-
 import org.junit.Before;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -35,7 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.kie.services.client.api.rest.KieRemoteHttpRequest.CHARSET_UTF8;
+import static org.kie.remote.client.rest.KieRemoteHttpRequest.CHARSET_UTF8;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

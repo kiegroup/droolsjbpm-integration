@@ -1,5 +1,7 @@
 package org.kie.services.client.api.command;
 
+import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -47,11 +49,11 @@ import org.kie.services.client.api.command.exception.MissingRequiredInfoExceptio
 public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession {
 
     private WorkItemManager workItemManager;
-   
+    
     public KieSessionClientCommandObject(RemoteConfiguration config) {
         super(config);
         if( config.isJms() && config.getKsessionQueue() == null ) { 
-            throw new MissingRequiredInfoException("A KieSession queue is necessary in order to create a Remote Client KieSession instance.");
+            throw new MissingRequiredInfoException("A KieSession queue is necessary in order to create a Remote JMS Client KieSession instance.");
         }
     }
     
@@ -279,7 +281,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
     public ProcessInstance startProcess( String processId, Map<String, Object> parameters ) {
         StartProcessCommand cmd = new StartProcessCommand();
         cmd.setProcessId(processId);
-        JaxbStringObjectPairArray arrayMap = convertMapToPairArray(parameters);
+        JaxbStringObjectPairArray arrayMap = convertMapToJaxbStringObjectPairArray(parameters);
         cmd.setParameter(arrayMap);
         return (ProcessInstance) executeCommand(cmd);
     }
@@ -353,7 +355,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
             public void completeWorkItem( long id, Map<String, Object> results ) {
                 CompleteWorkItemCommand cmd = new CompleteWorkItemCommand();
                 cmd.setId(id);
-                JaxbStringObjectPairArray arrayMap = convertMapToPairArray(results);
+                JaxbStringObjectPairArray arrayMap = convertMapToJaxbStringObjectPairArray(results);
                 cmd.setResult(arrayMap);
                 executeCommand(cmd);
             }

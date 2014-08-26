@@ -20,9 +20,7 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
 
     private RemoteConfiguration config;
     
-    private String username;
-    private String password;
-    private URL url;
+    URL url;
     
     RemoteRestRuntimeEngineBuilderImpl() { 
         this.config = new RemoteConfiguration(Type.REST);
@@ -42,19 +40,19 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
 
     @Override
     public RemoteRestRuntimeEngineBuilder addUserName(String userName) {
-        this.username = userName;
+        config.setUserName(userName);
         return this;
     }
 
     @Override
     public RemoteRestRuntimeEngineBuilder addPassword(String password) {
-        this.password = password;
+        config.setPassword(password);
         return this;
     }
 
     @Override
     public RemoteRestRuntimeEngineBuilder addUrl(URL url) {
-        this.url = url;
+        config.setServerBaseRestUrl(url);
         return this;
     }
 
@@ -88,16 +86,7 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
     }
 
     private void checkAndFinalizeConfig() { 
-        if( url == null ) { 
-            throw new InsufficientInfoToBuildException("A URL is required to build the factory.");
-        }
-        if( username == null ) { 
-            throw new InsufficientInfoToBuildException("A user name is required to build the factory.");
-        }
-        if( password == null ) { 
-            throw new InsufficientInfoToBuildException("A password is required to build the factory.");
-        }
-        this.config.createHttpRequest(url, username, password);
+        RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
     
     @Override

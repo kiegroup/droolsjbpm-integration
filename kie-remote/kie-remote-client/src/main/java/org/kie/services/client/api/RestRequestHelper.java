@@ -1,14 +1,13 @@
 package org.kie.services.client.api;
 
-import static org.kie.services.client.api.command.RemoteConfiguration.DEFAULT_TIMEOUT;
-import static org.kie.services.client.api.command.RemoteConfiguration.*;
+import static org.kie.services.client.api.command.RemoteConfiguration.DEFAULT_TIMEOUT_IN_SECS;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
-import org.kie.services.client.api.rest.KieRemoteHttpRequest;
+import org.kie.remote.client.rest.KieRemoteHttpRequest;
 
 /**
  * This class is meant to help users help interact with the (kie-wb or business-central) REST api by creating 
@@ -17,14 +16,12 @@ import org.kie.services.client.api.rest.KieRemoteHttpRequest;
  */
 public class RestRequestHelper {
 
-    private KieRemoteHttpRequest httpRequest;
-    
     // Just for building/config, not for use
     private URL serverPlusRestUrl = null;
     private MediaType type = null;
     private String username = null;
     private String password = null;
-    private int timeout = DEFAULT_TIMEOUT;
+    private int timeoutInMilliseconds = DEFAULT_TIMEOUT_IN_SECS;
 
     /**
      * Helper methods
@@ -68,7 +65,7 @@ public class RestRequestHelper {
      */
     @Deprecated
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeout, MediaType mediaType, boolean formBasedAuth) {
-       return newInstance(serverPortUrl, username, password, timeout);
+       return newInstance(serverPortUrl, username, password, timeout, mediaType);
     }
     
     /**
@@ -84,10 +81,11 @@ public class RestRequestHelper {
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password, int timeoutInSecs, MediaType mediaType) {
         RestRequestHelper inst = new RestRequestHelper();
         URL serverPlusRestUrl = inst.addRestToPath(serverPortUrl);
-        inst.httpRequest = KieRemoteHttpRequest.newRequest(serverPlusRestUrl, username, password).timeout(timeoutInSecs * 1000);
+        inst.serverPlusRestUrl = serverPlusRestUrl;
         inst.type = mediaType;
         inst.username = username;
         inst.password = password;
+        inst.timeoutInMilliseconds = timeoutInSecs * 1000;
         return inst;
     }
     
@@ -112,7 +110,7 @@ public class RestRequestHelper {
      * 
      */
     public static RestRequestHelper newInstance(URL serverPortUrl, String username, String password) {
-        return newInstance(serverPortUrl, username, password, DEFAULT_TIMEOUT, null);
+        return newInstance(serverPortUrl, username, password, DEFAULT_TIMEOUT_IN_SECS, null);
     }
     
     public RestRequestHelper setMediaType(MediaType type) { 
@@ -120,21 +118,13 @@ public class RestRequestHelper {
         return this;
     }
     
-    public MediaType getMediaType() { 
-        return this.type;
-    }
-
     public RestRequestHelper setTimeout(int timeoutInMillisecs) { 
-        this.timeout = timeout;
-        if( this.httpRequest == null ) { 
-            this.httpRequest = KieRemoteHttpRequest.newRequest(serverPlusRestUrl, username, password);
-        }
-        this.httpRequest.timeout(timeoutInMillisecs);
+        this.timeoutInMilliseconds = timeoutInMillisecs;
         return this;
     }
     
     public int getTimeout() { 
-        return this.timeout;
+        return this.timeoutInMilliseconds;
     }
   
     /**
@@ -147,6 +137,10 @@ public class RestRequestHelper {
         return this;
     }
     
+    /**
+     * This method no longer does anything.
+     */
+    @Deprecated
     public boolean getFormBasedAuth() { 
         return false;
     }
@@ -165,7 +159,9 @@ public class RestRequestHelper {
      * given to the constructor of this {@link RestRequestHelper} instance.
      */
     public KieRemoteHttpRequest createRequest(String restOperationUrl) {
-        KieRemoteHttpRequest request =  httpRequest.relativeRequest(restOperationUrl);
+        KieRemoteHttpRequest request =  KieRemoteHttpRequest.newRequest(serverPlusRestUrl).relativeRequest(restOperationUrl);
+        request.timeout(timeoutInMilliseconds);
+        request.basicAuthorization(username, password);
         if( type != null ) { 
             request.accept(type.toString());
         }

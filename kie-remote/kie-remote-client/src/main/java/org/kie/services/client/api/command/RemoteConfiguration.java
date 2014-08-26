@@ -5,16 +5,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.kie.remote.client.rest.KieRemoteHttpRequest;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
-import org.kie.services.client.api.rest.KieRemoteHttpRequest;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 
 /**
@@ -28,8 +27,8 @@ public final class RemoteConfiguration {
     public static final String TASK_QUEUE_NAME = "jms/queue/KIE.TASK";
     public static final String RESPONSE_QUEUE_NAME = "jms/queue/KIE.RESPONSE";
 
-    public static final int DEFAULT_TIMEOUT = 5;
-    private long timeout = DEFAULT_TIMEOUT; // in seconds
+    public static final int DEFAULT_TIMEOUT_IN_SECS = 5;
+    private long timeoutInMillisecs = DEFAULT_TIMEOUT_IN_SECS * 1000;; // in seconds
     
     // REST or JMS
     private final Type type;
@@ -37,12 +36,12 @@ public final class RemoteConfiguration {
     // General
     private String deploymentId;
     private Long processInstanceId;
+    
     private String userName;
     private String password;
-    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+    private URL serverBaseRestUrl;
 
-    // REST
-    private KieRemoteHttpRequest httpRequest;
+    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     // JMS
     private boolean useSsl = false;
@@ -52,17 +51,9 @@ public final class RemoteConfiguration {
     private Queue responseQueue;
     private int jmsSerializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
 
-    private static final AtomicInteger idGen = new AtomicInteger(0);
-    
     /**
      * Public constructors and setters
      */
-
-    @SuppressWarnings("unused")
-    private RemoteConfiguration() {
-        // no public constructor!
-        this.type = Type.CONSTRUCTOR;
-    }
 
     public RemoteConfiguration(Type type) { 
         this.type = type;
@@ -71,31 +62,18 @@ public final class RemoteConfiguration {
     // REST ----------------------------------------------------------------------------------------------------------------------
 
     public RemoteConfiguration(String deploymentId, URL url, String username, String password) {
-        this(deploymentId, url, username, password, DEFAULT_TIMEOUT);
+        this(deploymentId, url, username, password, DEFAULT_TIMEOUT_IN_SECS);
     }
 
-    public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeout) {
+    public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeoutInSecs) {
         this.type = Type.REST;
         this.deploymentId = deploymentId;
-        this.timeout = timeout;
-        createHttpRequest(url, username, password);
+        
+        this.userName = username;
+        this.password = password;
+        this.timeoutInMillisecs = timeoutInSecs * 1000;
     }
 
-    public void createHttpRequest(URL url, String username, String password) { 
-      createHttpRequest(url, username, password, (int) timeout)  ;
-    }
-    
-    public void createHttpRequest(URL url, String username, String password, int timeoutInSecs) { 
-        URL serverPlusRestUrl = initializeRestServicesUrl(url);
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("The user name may not be empty or null.");
-        }
-        if (password == null) {
-            throw new IllegalArgumentException("The password may not be null.");
-        }
-        this.httpRequest = KieRemoteHttpRequest.newRequest(serverPlusRestUrl, username, password).timeout(timeoutInSecs * 1000);
-    }
-    
     /**
      * Initializes the URL that will be used for the request factory
      * 
@@ -103,7 +81,7 @@ public final class RemoteConfiguration {
      * @param url URL of the server instance
      * @return An URL that can be used for the REST request factory
      */
-    private URL initializeRestServicesUrl(URL url) {
+    URL initializeRestServicesUrl(URL url) {
         if (url == null) {
             throw new IllegalArgumentException("The url may not be empty or null.");
         }
@@ -131,88 +109,10 @@ public final class RemoteConfiguration {
         return serverPlusRestUrl;
     }
 
-    KieRemoteHttpRequest getHttpRequest() { 
-        return this.httpRequest;
+    KieRemoteHttpRequest createHttpRequest() { 
+        return KieRemoteHttpRequest.newRequest(serverBaseRestUrl, userName, password).timeout(timeoutInMillisecs);
     }
     
-    /**
-     * This method is used in order to create the authenticating REST client factory.
-     * 
-     * @param userName
-     * @param password
-     * @param timeout
-     * @param localContext
-     * 
-     * @return A {@link DefaultHttpClient} instance that will authenticate using the given username and password.
-     */
-    /**
-    private static DefaultHttpClient createPreemptiveAuthHttpClient(String userName, String password, int timeout,
-            BasicHttpContext localContext) {
-        BasicHttpParams params = new BasicHttpParams();
-        int timeoutMilliSeconds = timeout * 1000;
-        HttpConnectionParams.setConnectionTimeout(params, timeoutMilliSeconds);
-        HttpConnectionParams.setSoTimeout(params, timeoutMilliSeconds);
-        DefaultHttpClient client = new DefaultHttpClient(params);
-
-        if (userName != null && !"".equals(userName)) {
-            client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                    new UsernamePasswordCredentials(userName, password));
-            // Generate BASIC scheme object and stick it to the local execution context
-            BasicScheme basicAuth = new BasicScheme();
-
-            String contextId = UUID.randomUUID().toString();
-            localContext.setAttribute(contextId, basicAuth);
-
-            // Add as the first request interceptor
-            client.addRequestInterceptor(new PreemptiveAuth(contextId), 0);
-        }
-
-        String hostname = "localhost";
-
-        try {
-            hostname = Inet6Address.getLocalHost().toString();
-        } catch (Exception e) {
-            // do nothing
-        }
-
-        // set the following user agent with each request
-        String userAgent = "org.kie.services.client (" + idGen.incrementAndGet() + " / " + hostname + ")";
-        HttpProtocolParams.setUserAgent(client.getParams(), userAgent);
-
-        return client;
-    }
-
-     * This class is used in order to effect preemptive authentication in the REST request factory.
-     
-    static class PreemptiveAuth implements HttpRequestInterceptor {
-
-        private final String contextId;
-
-        public PreemptiveAuth(String contextId) {
-            this.contextId = contextId;
-        }
-
-        public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-
-            AuthState authState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);
-
-            // If no auth scheme available yet, try to initialize it preemptively
-            if (authState.getAuthScheme() == null) {
-                AuthScheme authScheme = (AuthScheme) context.getAttribute(contextId);
-                CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(ClientContext.CREDS_PROVIDER);
-                HttpHost targetHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
-                if (authScheme != null) {
-                    Credentials creds = credsProvider.getCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()));
-                    if (creds == null) {
-                        throw new HttpException("No credentials for preemptive authentication");
-                    }
-                    authState.update(authScheme, creds);
-                }
-            }
-        }
-    }
-    */
-
     // JMS ----------------------------------------------------------------------------------------------------------------------
 
     public RemoteConfiguration(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) {
@@ -318,6 +218,10 @@ public final class RemoteConfiguration {
     // JMS
     // ----
 
+    public URL getServerBaseRestUrl() { 
+        return serverBaseRestUrl;
+    }
+    
     public String getUserName() {
         // assert userName != null : "username value should not be null!"; // disabled for tests
         return userName;
@@ -370,7 +274,7 @@ public final class RemoteConfiguration {
     }
 
     public long getTimeout() {
-        return timeout;
+        return timeoutInMillisecs;
     }
     
     public boolean getUseUssl() {
@@ -384,7 +288,7 @@ public final class RemoteConfiguration {
     // Setters -------------------------------------------------------------------------------------------------------------------
 
     public void setTimeout(long timeout) {
-        this.timeout = timeout;
+        this.timeoutInMillisecs = timeout;
     }
 
     public void setDeploymentId(String deploymentId) {
@@ -393,6 +297,11 @@ public final class RemoteConfiguration {
 
     public void setProcessInstanceId(long processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    public void setServerBaseRestUrl(URL url) {
+        URL checkedModifiedUrl = initializeRestServicesUrl(url);
+        this.serverBaseRestUrl = checkedModifiedUrl;
     }
 
     public void setUserName(String userName) {
@@ -431,7 +340,6 @@ public final class RemoteConfiguration {
    
     private RemoteConfiguration(RemoteConfiguration config) { 
        this.connectionFactory = config.connectionFactory;
-       this.httpRequest = config.httpRequest == null ? null : config.httpRequest.clone();
        
        this.deploymentId = config.deploymentId;
        this.extraJaxbClasses = config.extraJaxbClasses;
@@ -440,8 +348,9 @@ public final class RemoteConfiguration {
        this.password = config.password;
        this.processInstanceId = config.processInstanceId;
        this.responseQueue = config.responseQueue;
+       this.serverBaseRestUrl = config.serverBaseRestUrl;
        this.taskQueue = config.taskQueue;
-       this.timeout = config.timeout;
+       this.timeoutInMillisecs = config.timeoutInMillisecs;
        this.type = config.type;
        this.userName = config.userName;
        this.useSsl = config.useSsl;

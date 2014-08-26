@@ -19,8 +19,6 @@ import org.kie.services.client.api.command.exception.RemoteCommunicationExceptio
  * @see {@link RemoteRuntimeEngineFactory}
  */
 public class RemoteJmsRuntimeEngineFactory extends RemoteRuntimeEngineFactory {
-
-    protected RemoteConfiguration config;
    
     protected RemoteJmsRuntimeEngineFactory() {
         // private constructor 

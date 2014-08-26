@@ -28,9 +28,9 @@ import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
+public class JaxbRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
 
-    protected static final Logger logger = LoggerFactory.getLogger(RemoteClientSerializationTest.class); 
+    protected static final Logger logger = LoggerFactory.getLogger(JaxbRemoteClientSerializationTest.class); 
 
     protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
     { 

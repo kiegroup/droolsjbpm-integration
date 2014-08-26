@@ -1,6 +1,7 @@
 package org.kie.services.client.api.command;
 
 import static org.kie.remote.client.jaxb.ConversionUtil.convertDateToXmlGregorianCalendar;
+import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.api.command.Command;
-import org.kie.api.runtime.KieSession;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Attachment;
 import org.kie.api.task.model.Comment;
@@ -57,7 +57,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public TaskServiceClientCommandObject(RemoteConfiguration config) {
         super(config);
         if( config.isJms() && config.getTaskQueue() == null ) { 
-            throw new MissingRequiredInfoException("A Task queue is necessary in order to create a Remote Client TaskService instance.");
+            throw new MissingRequiredInfoException("A Task queue is necessary in order to create a Remote JMS Client TaskService instance.");
         }
     }
 
@@ -263,7 +263,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         CompleteTaskCommand cmd = new CompleteTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        JaxbStringObjectPairArray values = convertMapToPairArray(data);
+        JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(data);
         cmd.setData(values);
         executeCommand(cmd);
     }
@@ -290,7 +290,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         FailTaskCommand cmd = new FailTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
-        JaxbStringObjectPairArray values = convertMapToPairArray(faultData);
+        JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(faultData);
         cmd.setData(values);
         executeCommand(cmd);
     }
@@ -393,7 +393,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         AddTaskCommand cmd = new AddTaskCommand();
         org.kie.remote.jaxb.gen.Task genTask = convertKieTaskToGenTask(task);
         cmd.setJaxbTask(genTask);
-        JaxbStringObjectPairArray values = convertMapToPairArray(params);
+        JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(params);
         cmd.setParameter(values);
         return (Long) executeCommand(cmd);
     }

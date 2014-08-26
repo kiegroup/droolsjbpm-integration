@@ -1,5 +1,6 @@
 package org.kie.services.client.api;
 
+import static org.kie.services.client.api.RemoteRuntimeEngineFactory.checkAndFinalizeConfig;
 import static org.kie.services.client.api.RemoteJmsRuntimeEngineFactory.getRemoteJbossInitialContext;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.hornetq.jms.client.HornetQJMSConnectionFactory;
 import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineBuilder;
+import org.kie.services.client.api.builder.RemoteRuntimeEngineBuilder;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
@@ -33,19 +35,18 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
 
     private RemoteConfiguration config;
     
-    private InitialContext remoteInitialContext = null;
+    InitialContext remoteInitialContext = null;
+    String jbossServerHostName = null;
     
-    private String jbossServerHostName = null;
-    
-    private boolean createOwnFactory = false;
-    private String hostName = null;
-    private Integer jmsConnectorPort = null;
+    boolean createOwnFactory = false;
+    String hostName = null;
+    Integer jmsConnectorPort = null;
 
-    private String keystorePassword;
-    private String keystoreLocation;
-    private String truststorePassword;
-    private String truststoreLocation;
-    private boolean useKeystoreAsTruststore = false;
+    String keystorePassword;
+    String keystoreLocation;
+    String truststorePassword;
+    String truststoreLocation;
+    boolean useKeystoreAsTruststore = false;
     
     /**
      * builder logic: 
@@ -208,61 +209,8 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
         return this;
     }
   
-    private void checkAndFinalizeConfig() { 
-        // check
-        if( config.getUserName() == null ) { 
-           throw new InsufficientInfoToBuildException("A user name is required to access the JMS queues!"); 
-        } 
-        if( config.getPassword() == null ) { 
-           throw new InsufficientInfoToBuildException("A password is required to access the JMS queues!"); 
-        }
-        
-        // Connection Factory
-        if( createOwnFactory ) { 
-            ConnectionFactory createdConnectionFactory = null;
-           if( hostName == null ) { 
-               throw new InsufficientInfoToBuildException("A host name or IP address is required to create a JMS ConnectionFactory!"); 
-           }
-           if( jmsConnectorPort == null ) { 
-               throw new InsufficientInfoToBuildException("A connector port is required to create a JMS ConnectionFactory!"); 
-           }
-           Map<String, Object> connParams;
-           if( config.getUseUssl() ) { 
-               connParams = new HashMap<String, Object>(7);  
-               connParams.put(TransportConstants.PORT_PROP_NAME, jmsConnectorPort);  
-               connParams.put(TransportConstants.HOST_PROP_NAME, hostName);
-              
-               checkKeyAndTruststoreInfo();
-
-               // SSL
-               connParams.put(TransportConstants.SSL_ENABLED_PROP_NAME, true);  
-               connParams.put(TransportConstants.KEYSTORE_PASSWORD_PROP_NAME, keystorePassword); 
-               connParams.put(TransportConstants.KEYSTORE_PATH_PROP_NAME, keystoreLocation);
-               connParams.put(TransportConstants.TRUSTSTORE_PASSWORD_PROP_NAME, truststorePassword); 
-               connParams.put(TransportConstants.TRUSTSTORE_PATH_PROP_NAME, truststoreLocation);
-           } else { 
-               // setup
-               connParams = new HashMap<String, Object>(3);  
-               connParams.put(TransportConstants.PORT_PROP_NAME, jmsConnectorPort);  
-               connParams.put(TransportConstants.HOST_PROP_NAME, hostName);
-               connParams.put(TransportConstants.SSL_ENABLED_PROP_NAME, false);  
-           }
-           // create connection factory
-           createdConnectionFactory = new HornetQJMSConnectionFactory(false, 
-                   new TransportConfiguration(NettyConnectorFactory.class.getName(), connParams));
-           this.config.setConnectionFactory(createdConnectionFactory);
-        } 
-                
-        if( jbossServerHostName != null && this.remoteInitialContext == null ) { 
-            this.remoteInitialContext = getRemoteJbossInitialContext(jbossServerHostName, this.config.getUserName(), this.config.getPassword());
-        }
-        
-        if( remoteInitialContext != null ) {
-            // sets connection factory, if null
-            this.config.setRemoteInitialContext(this.remoteInitialContext);
-        } else { 
-           this.config.checkValidJmsValues();
-        }
+    private void checkAndFinalizeConfig() {
+        RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
     
     /*
@@ -286,7 +234,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
        return new RemoteRuntimeEngine(config.clone());
     }
     
-    private void checkKeyAndTruststoreInfo() { 
+    void checkKeyAndTruststoreInfo() { 
         if( useKeystoreAsTruststore ) { 
             truststoreLocation = keystoreLocation;
             truststorePassword = keystorePassword;
