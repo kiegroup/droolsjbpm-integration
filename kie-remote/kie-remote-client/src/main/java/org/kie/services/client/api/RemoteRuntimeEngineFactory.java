@@ -127,5 +127,10 @@ public abstract class RemoteRuntimeEngineFactory {
                 throw new InsufficientInfoToBuildException("A password is required to build the factory.");
             }
         }
+        if( config.getExtraJaxbClasses() != null && ! config.getExtraJaxbClasses().isEmpty() ) { 
+           if( config.getDeploymentId() == null ) { 
+                throw new InsufficientInfoToBuildException("A deployment id is required if user-defined class instances are being sent.");
+           }
+        }
     }
 }

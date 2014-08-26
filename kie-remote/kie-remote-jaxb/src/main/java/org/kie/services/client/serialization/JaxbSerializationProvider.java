@@ -194,11 +194,17 @@ public class JaxbSerializationProvider implements SerializationProvider {
             throw new SerializationException("Unsupported JAXB Class encountered during initialization: " + jaxbe.getMessage(), jaxbe);
         }
     }
+    public JaxbSerializationProvider(JAXBContext jaxbContext) {
+        this.jaxbContext = jaxbContext;
+    }
 
     public void dispose() { 
        if( this.extraJaxbClasses != null ) { 
            this.extraJaxbClasses.clear();
            this.extraJaxbClasses = null;
+       }
+       if( this.jaxbContext != null ) { 
+           this.jaxbContext = null;
        }
     }
    

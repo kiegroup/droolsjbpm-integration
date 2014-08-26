@@ -50,6 +50,8 @@ import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.jms.request.BackupIdentityProviderProducer;
 import org.kie.remote.services.jms.security.JmsUserGroupAdapter;
 import org.kie.remote.services.jms.security.UserPassCallbackHandler;
+import org.kie.remote.services.rest.jaxb.DynamicJaxbContext;
+import org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.SerializationProvider;
@@ -92,6 +94,9 @@ public class RequestMessageBean implements MessageListener {
     @Inject
     private BackupIdentityProviderProducer backupIdentityProviderProducer;
 
+    @Inject
+    private DynamicJaxbContext dynamicJaxbContext;
+    
     // Constants / properties
     private String RESPONSE_QUEUE_NAME = null;
     private static String RESPONSE_QUEUE_NAME_PROPERTY = "kie.services.jms.queues.response";
@@ -203,6 +208,8 @@ public class RequestMessageBean implements MessageListener {
         // 4. serialize response
         Message msg = serializeResponse(session, msgCorrId, serializationType, serializationProvider, jaxbResponse);
 
+        serializationProvider.dispose();
+        
         // 5. send response
         sendResponse(msgCorrId, serializationType, msg);
 
@@ -265,41 +272,15 @@ public class RequestMessageBean implements MessageListener {
 
     private SerializationProvider getJaxbSerializationProvider(Message message) {
         SerializationProvider serializationProvider;
-        Set<Class<?>> serializationClasses = new HashSet<Class<?>>();
-
         try {
-            String deploymentId = null;
-            ClassLoader classLoader = null;
-
             // Add classes from deployment (and get deployment classloader)
             if (message.propertyExists(DEPLOYMENT_ID_PROPERTY_NAME)) {
-                deploymentId = message.getStringProperty(DEPLOYMENT_ID_PROPERTY_NAME);
-                Collection<Class<?>> deploymentClasses = runtimeMgrMgr.getDeploymentClasses(deploymentId);
-                if (!deploymentClasses.isEmpty()) {
-                    logger.debug("Added classes from {} to serialization context.", deploymentId);
-                    serializationClasses.addAll(deploymentClasses);
-                    // KieContainer (deployment) classloader
-                    classLoader = deploymentClasses.iterator().next().getClassLoader();
-                } else {
-                    logger.warn("Deployment id '{}' was included in message but no classes were retrieved from deployment!", deploymentId);
-                }
+                String deploymentId = message.getStringProperty(DEPLOYMENT_ID_PROPERTY_NAME);
+                DynamicJaxbContext.setDeploymentJaxbContext(deploymentId);
+            } else { 
+                DynamicJaxbContext.setDeploymentJaxbContext(DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID);
             }
-            if (classLoader == null) {
-                // Application classloader
-                classLoader = this.getClass().getClassLoader();
-            }
-
-            // Add other classes that might only have been added to the war/application
-            if (message.propertyExists(EXTRA_JAXB_CLASSES_PROPERTY_NAME)) {
-                String extraClassesString = message.getStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME);
-                Set<Class<?>> moreExtraClasses = JaxbSerializationProvider.commaSeperatedStringToClassSet(classLoader, extraClassesString);
-                for (Class<?> extraClass : moreExtraClasses) {
-                    logger.debug("Added {} to serialization context.", extraClass.getName());
-                }
-                serializationProvider = new JaxbSerializationProvider(moreExtraClasses);
-            } else {
-                serializationProvider = new JaxbSerializationProvider();
-            }
+            serializationProvider = new JaxbSerializationProvider(dynamicJaxbContext);
         } catch (JMSException jmse) {
             throw new KieRemoteServicesInternalError("Unable to check or read JMS message for property.", jmse);
         } catch (SerializationException se) {
@@ -319,16 +300,6 @@ public class RequestMessageBean implements MessageListener {
             switch (serializationType) {
             case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
                 msgStr = (String) serializationProvider.serialize(jaxbResponse);
-                Collection<Class<?>> extraJaxbClasses = ((JaxbSerializationProvider) serializationProvider).getExtraJaxbClasses();
-                if (!extraJaxbClasses.isEmpty()) {
-                    String propValue;
-                    try {
-                        propValue = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
-                    } catch (SerializationException se) {
-                        throw new KieRemoteServicesRuntimeException("Unable to get class names for extra JAXB classes.", se);
-                    }
-                    byteMsg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, propValue);
-                }
                 break;
             default:
                 throw new KieRemoteServicesRuntimeException("Unknown serialization type when deserializing message " + msgId + ":" + serializationType);

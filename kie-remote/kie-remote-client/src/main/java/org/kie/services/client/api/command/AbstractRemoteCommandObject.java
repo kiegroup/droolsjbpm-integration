@@ -264,9 +264,6 @@ public abstract class AbstractRemoteCommandObject {
                 msg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
                 Set<Class<?>> extraJaxbClasses = config.getExtraJaxbClasses();
                 if( !extraJaxbClasses.isEmpty() ) {
-                    String extraJaxbClassesPropertyValue = JaxbSerializationProvider
-                            .classSetToCommaSeperatedString(extraJaxbClasses);
-                    msg.setStringProperty(EXTRA_JAXB_CLASSES_PROPERTY_NAME, extraJaxbClassesPropertyValue);
                     if( deploymentId == null ) {
                         throw new MissingRequiredInfoException(
                                 "Deserialization of parameter classes requires a deployment id, which has not been configured.");

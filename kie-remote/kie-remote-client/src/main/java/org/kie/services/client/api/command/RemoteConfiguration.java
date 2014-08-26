@@ -224,7 +224,7 @@ public final class RemoteConfiguration {
      * (Package-scoped) Getters
      */
 
-    String getDeploymentId() {
+    public String getDeploymentId() {
         return deploymentId;
     }
 
@@ -245,10 +245,6 @@ public final class RemoteConfiguration {
     public enum Type {
         REST, JMS, CONSTRUCTOR;
     }
-
-    // ----
-    // JMS
-    // ----
 
     public URL getServerBaseRestUrl() { 
         return serverBaseRestUrl;
@@ -292,7 +288,7 @@ public final class RemoteConfiguration {
         this.extraJaxbClasses.clear();
     }
 
-    Set<Class<?>> getExtraJaxbClasses() {
+    public Set<Class<?>> getExtraJaxbClasses() {
         return this.extraJaxbClasses;
     }
     
