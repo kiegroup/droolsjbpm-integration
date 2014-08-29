@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Services</name>
   <description>KIE Execution Server Services</description>
 
+  <properties>
+    <eap630.download.url></eap630.download.url>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -167,9 +171,97 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <!--<version>2.15</version>-->
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-maven2-plugin</artifactId>
+        <version>1.4.9</version>
+        <configuration>
+          <container>
+            <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
+            <type>embedded</type>
+          </container>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-container</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop-container</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+
+      </plugin>
       <!-- plugin> <groupId>io.fabric8</groupId> <artifactId>fabric8-maven-plugin</artifactId> 
         <configuration> <profile>kieserver</profile> <parentProfiles>containers-tomcat</parentProfiles> 
         </configuration> </plugin -->
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>tomcat7x</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.4.9</version>
+            <configuration combine.self="override">
+              <container>
+                <containerId>tomcat7x</containerId>
+                <zipUrlInstaller>
+                  <url>http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</url>
+                  <downloadDir>${project.build.directory}/downloads</downloadDir>
+                  <extractDir>${project.build.directory}/extracts</extractDir>
+                </zipUrlInstaller>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>jboss74x</id><!-- aka EAP 6.3.x -->
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.4.9</version>
+            <configuration combine.self="override">
+              <container>
+                <containerId>jboss74x</containerId>
+                <zipUrlInstaller>
+                  <url>${eap630.download.url}</url>
+                  <downloadDir>${project.build.directory}/downloads</downloadDir>
+                  <extractDir>${project.build.directory}/extracts</extractDir>
+                </zipUrlInstaller>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
