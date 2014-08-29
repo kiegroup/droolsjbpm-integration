@@ -9,12 +9,18 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+import org.kie.remote.services.ws.sei.StringObjectEntryList;
+
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ProcessInstanceResponse", propOrder = {
     "id",
-    "state",
     "processId",
-    "eventTypes"
+    "state",
+    "eventTypes",
+    "variables"
 })
 public class ProcessInstanceResponse {
     
@@ -23,13 +29,17 @@ public class ProcessInstanceResponse {
     private Long id;
 
     @XmlElement(required=true)
-    @XmlSchemaType(name="int")
-    private Integer state; 
-
-    @XmlElement(required=true)
     @XmlSchemaType(name="string")
     private String processId;
 
+    @XmlElement(required=true)
+    @XmlSchemaType(name="int")
+    private ProcessInstanceState state; 
+
     @XmlElement
     private List<String> eventTypes = new ArrayList<String>();
+    
+    @XmlElement
+    private StringObjectEntryList variables;
+    
 }

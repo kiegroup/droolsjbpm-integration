@@ -21,7 +21,7 @@ public class HistoryWebServiceWsdlGenerationImpl implements HistoryWebService {
     }
 
     @Override
-    public VariableInstanceLogResponse findNodeInstanceLogs(HistoryInstanceLogRequest historyInstLogRequest)
+    public NodeInstanceLogResponse findNodeInstanceLogs(HistoryInstanceLogRequest historyInstLogRequest)
             throws KieRemoteWebServiceException {
         return null;
     }

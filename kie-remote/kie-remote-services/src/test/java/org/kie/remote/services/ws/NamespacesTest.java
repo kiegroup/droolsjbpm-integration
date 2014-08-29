@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import javax.jws.WebService;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -20,6 +21,7 @@ public class NamespacesTest {
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
     
     @Test
+    @Ignore
     public void nameSpacesAreCoorrectTest() throws Exception { 
         Set<Class<?>> webServiceImplClasses = reflections.getTypesAnnotatedWith(WebService.class);
         assertTrue( "No classes found!", webServiceImplClasses.size() > 0 );

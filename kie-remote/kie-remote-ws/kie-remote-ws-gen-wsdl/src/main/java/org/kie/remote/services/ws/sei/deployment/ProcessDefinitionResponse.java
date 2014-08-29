@@ -6,6 +6,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ProcessDefinitionResponse", propOrder = {
     "id",

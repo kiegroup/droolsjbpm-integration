@@ -1,21 +1,29 @@
 package org.kie.remote.services.ws.sei.process;
 
-import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+import org.kie.remote.services.ws.sei.StringObjectEntryList;
+
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProcessDefIdAndParametersRequest", propOrder = {
+@XmlType(name = "ManageProcessInstanceRequest", propOrder = {
+    "operation",
     "deploymentId",
     "processDefinitionId",
-    "parameters"
+    "parameters",
+    "getVariables"
 })
-public class ProcessDefIdAndParametersRequest {
+public class ManageProcessInstanceRequest {
 
+    @XmlElement
+    private ProcessInstanceOperationType operation;
+    
     @XmlElement(required=true)
     @XmlSchemaType(name="string")
     private String deploymentId;
@@ -25,6 +33,8 @@ public class ProcessDefIdAndParametersRequest {
     private String processDefinitionId;
 
     @XmlElement
-    private Map<String, Object> parameters;
+    private StringObjectEntryList parameters;
     
+    @XmlElement
+    private Boolean getVariables;
 }

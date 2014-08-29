@@ -2,7 +2,7 @@ package org.kie.remote.services.ws.sei.task;
 
 import javax.jws.WebService;
 
-import org.kie.remote.services.ws.common.KieRemoteWebServiceException;
+import org.kie.remote.client.jaxb.JaxbTaskSummaryListResponse;
 
 /**
  * Only used for WSDL generation
@@ -15,12 +15,13 @@ import org.kie.remote.services.ws.common.KieRemoteWebServiceException;
 public class TaskWebServiceWsdlGenerationImpl implements TaskWebService {
 
     @Override
-    public void taskOperation(TaskOperationRequest arg0) throws KieRemoteWebServiceException {
+    public void taskOperation( TaskOperationRequest arg0 ) throws TaskWebServiceException {
     }
 
     @Override
-    public TaskQueryResponse query(TaskQueryRequest arg0) throws KieRemoteWebServiceException {
+    public JaxbTaskSummaryListResponse query( TaskQueryRequest arg0 ) throws TaskWebServiceException {
         return null;
     }
+
 
 }

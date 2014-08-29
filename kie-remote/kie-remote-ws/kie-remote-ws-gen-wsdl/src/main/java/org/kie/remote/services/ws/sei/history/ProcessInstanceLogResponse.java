@@ -7,9 +7,11 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ProcessInstanceLogResponse", propOrder = {
-    "id",
     "processInstanceId",
     "processId",
     "startDate",
@@ -19,15 +21,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "outcome",
     "duration",
     "identity",
+    "externalId",
     "processVersion",
-    "processName",
-    "externalId"
+    "processName"
 })
 public class ProcessInstanceLogResponse {
-
-    @XmlElement
-    @XmlSchemaType(name="long")
-    private Long id;
 
     @XmlElement
     @XmlSchemaType(name="long")
@@ -67,14 +65,14 @@ public class ProcessInstanceLogResponse {
 
     @XmlElement
     @XmlSchemaType(name="string")
+    private String externalId;
+
+    @XmlElement
+    @XmlSchemaType(name="string")
     private String processVersion;
 
     @XmlElement
     @XmlSchemaType(name="string")
     private String processName;
-
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String externalId;
 
 }

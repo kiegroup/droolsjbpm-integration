@@ -2,10 +2,11 @@ package org.kie.remote.services.ws.sei.deployment;
 
 import javax.jws.WebService;
 
-import org.kie.remote.services.ws.common.KieRemoteWebServiceException;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 
 /**
- * Only used for WSDL generation
+ * Only used for initial WSDL generation
  */
 @WebService(
         serviceName = "DeploymentService", 
@@ -15,18 +16,23 @@ import org.kie.remote.services.ws.common.KieRemoteWebServiceException;
 public class DeploymentWebServiceWsdlGenerationImpl implements DeploymentWebService {
 
     @Override
-    public DeploymentInfoResponse manage(DeploymentIdRequest arg0) throws KieRemoteWebServiceException {
+    public DeploymentInfoResponse manage( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
         return null;
     }
 
     @Override
-    public ProcessIdsResponse getProcessDefinitionIds(DeploymentIdRequest arg0) throws KieRemoteWebServiceException {
+    public ProcessIdsResponse getProcessDefinitionIds( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
         return null;
     }
 
     @Override
-    public ProcessDefinitionResponse getProcessDefinition(DeploymentIdRequest arg0) throws KieRemoteWebServiceException {
+    public JaxbProcessDefinitionList getProcessDefinitionInfo( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
         return null;
     }
 
+    @Override
+    public JaxbDeploymentUnitList getDeploymentInfo( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
+        return null;
+    }
+    
 }

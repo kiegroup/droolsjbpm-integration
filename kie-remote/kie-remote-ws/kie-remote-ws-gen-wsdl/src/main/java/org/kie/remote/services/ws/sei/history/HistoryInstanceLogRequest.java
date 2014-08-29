@@ -6,22 +6,28 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HistoryInstanceLogRequest", propOrder = {
-    "logType",
     "processInstanceId",
+    "processDefId",
     "nodeId",
     "variableId",
-    "variableValue"
+    "variableValue",
+    "pageNumber",
+    "pageSize"
 })
 public class HistoryInstanceLogRequest {
 
-    @XmlElement
-    private HistoryInstanceLogType logType;
-    
+    @XmlElement(required=false)
+    @XmlSchemaType(name="long")
+    private Long processInstanceId;
+
     @XmlElement(required=false)
     @XmlSchemaType(name="string")
-    private Long processInstanceId;
+    private String processDefId;
 
     @XmlElement(required=false)
     @XmlSchemaType(name="string")
@@ -34,4 +40,10 @@ public class HistoryInstanceLogRequest {
     @XmlElement(required=false)
     @XmlSchemaType(name="string")
     private String variableValue;
+    
+    @XmlElement(required=false)
+    private Integer pageNumber;
+
+    @XmlElement(required=false)
+    private Integer pageSize;
 }

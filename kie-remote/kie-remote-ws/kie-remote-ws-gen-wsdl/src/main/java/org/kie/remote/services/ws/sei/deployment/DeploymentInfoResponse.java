@@ -6,54 +6,24 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
+
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DeploymentInfoResponse", propOrder = {
-    "groupId",
-    "artifactId",
-    "version",
-    "kbaseName",
-    "ksessionName",
-    "strategy",
-    "identifier",
-    "status",
-    "operation"
+    "deploymentUnit",
+    "operationRequested"
 })
 public class DeploymentInfoResponse {
 
     @XmlElement
-    @XmlSchemaType(name="string")
-    private String groupId;
+    private JaxbDeploymentUnit deploymentUnit;
     
     @XmlElement
     @XmlSchemaType(name="string")
-    private String artifactId;
-    
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String version;
-    
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String kbaseName;
-    
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String ksessionName;
-
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String strategy;
-    
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String identifier;
-    
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String status;
-   
-    @XmlElement
-    @XmlSchemaType(name="string")
-    private String operation;
+    private DeploymentOperationType operationRequested;
     
 }

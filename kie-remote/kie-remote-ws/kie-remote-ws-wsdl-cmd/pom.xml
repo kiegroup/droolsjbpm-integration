@@ -18,6 +18,10 @@
       <groupId>org.kie.remote.ws</groupId>
       <artifactId>kie-remote-ws-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-client</artifactId>
+    </dependency>
   </dependencies>
 
   <properties>
@@ -33,7 +37,7 @@
           <!-- 1. add src/main/generated so that generated classes are added to jar -->
           <execution>
             <id>add-generated-sources</id>
-            <phase>generate-sources</phase>
+            <phase>initialize</phase>
             <goals>
               <goal>add-source</goal>
             </goals>
@@ -107,8 +111,8 @@
             </goals>
             <configuration>
               <executable>${tool.wsimport}</executable>
-              <sourceDestDir>${basedir}//src/main/generated</sourceDestDir>
-              <packageName>org.kie.remote.services.ws.wsdl.generated</packageName>
+              <sourceDestDir>${project.build.directory}/classes/META-INF/wsdl</sourceDestDir>
+              <packageName>org.kie.remote.services.ws.command.generated</packageName>
               <target>2.1</target>
               <!-- Following configuration will invoke wsimport once for each wsdl. -->
               <wsdlLocation>file:///wsdl/*</wsdlLocation>

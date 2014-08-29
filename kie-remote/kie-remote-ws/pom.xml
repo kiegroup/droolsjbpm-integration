@@ -17,15 +17,9 @@
 
   <modules>
     <module>kie-remote-ws-common</module>
-    <module>kie-remote-ws-wsdl-cmd</module>
-    <!-- Need to import and setup WSDL's from Poc project
     <module>kie-remote-ws-wsdl</module>
-    -->
-    <!-- 
-    Eventually, we'll refactor the impl code out of kie-remote-services, 
-    but that's premature optimization at this point
     <module>kie-remote-ws-impl</module>
-    -->
+    <module>kie-remote-ws-wsdl-cmd</module>
   </modules>
 
   <!-- add to bom.xml -->

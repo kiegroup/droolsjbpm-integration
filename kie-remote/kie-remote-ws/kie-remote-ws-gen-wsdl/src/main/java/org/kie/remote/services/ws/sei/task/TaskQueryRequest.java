@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TaskQueryRequest", propOrder = {
     "workItemId",
@@ -17,10 +20,11 @@ import javax.xml.bind.annotation.XmlType;
     "potOwner",
     "taskOwner",
     "status",
-    "union",
     "language",
+    "union",
     "maxResults",
-    "page"
+    "pageNumber",
+    "pageSize"
 })
 public class TaskQueryRequest {
 
@@ -53,12 +57,12 @@ public class TaskQueryRequest {
     private List<String> status;
     
     @XmlElement(required=false)
-    @XmlSchemaType(name="boolean")
-    private Boolean union;
-    
-    @XmlElement(required=false)
     @XmlSchemaType(name="string")
     private List<String> language;
+    
+    @XmlElement(required=false)
+    @XmlSchemaType(name="boolean")
+    private Boolean union;
     
     @XmlElement(required=false)
     @XmlSchemaType(name="int")
@@ -66,5 +70,10 @@ public class TaskQueryRequest {
     
     @XmlElement(required=false)
     @XmlSchemaType(name="int")
-    private Integer page;
+    private Integer pageNumber;
+    
+    @XmlElement(required=false)
+    @XmlSchemaType(name="int")
+    private Integer pageSize;
+    
 }

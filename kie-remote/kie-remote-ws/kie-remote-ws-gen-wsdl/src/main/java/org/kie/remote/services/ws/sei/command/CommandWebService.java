@@ -8,14 +8,15 @@ import javax.jws.WebService;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
+import org.kie.remote.client.jaxb.JaxbCommandsRequest;
+import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.ws.sei.ServicesVersion;
-
+import org.kie.remote.services.ws.sei.process.ProcessWebService;
 
 /**
- * A simple service example.
- * 
+ * Only used for initial WSDL generation
  */
-@WebService(name = "CommandService", targetNamespace = CommandWebService.NAMESPACE)
+@WebService(serviceName = "CommandService", targetNamespace = ProcessWebService.NAMESPACE)
 public interface CommandWebService {
 
     final static String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
@@ -24,6 +25,6 @@ public interface CommandWebService {
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "executeRequest", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperCommandRequest")
     @ResponseWrapper(localName = "executeResponse", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperCommandResponse")
-    public WebServiceCommandsResponse execute(@WebParam(name = "arg0", targetNamespace = "") WebServiceCommandsRequest arg0) throws CommandWebServiceException;
+    public JaxbCommandsResponse execute(@WebParam(name = "arg0", targetNamespace = "") JaxbCommandsRequest arg0) throws CommandWebServiceException;
 
 }

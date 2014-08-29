@@ -7,26 +7,24 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NodeInstanceLogResponse", propOrder = {
-    "id",
     "processInstanceId",
     "processId",
-    "date",
-    "type",
     "nodeInstanceId",
     "nodeId",
     "nodeName",
-    "nodeType",
+    "date",
     "workItemId",
     "connection",
-    "externalId"
+    "externalId",
+    "nodeType",
+    "type"
 })
 public class NodeInstanceLogResponse {
-
-    @XmlElement
-    @XmlSchemaType(name="long")
-    private Long id;
 
     @XmlElement
     @XmlSchemaType(name="long")
@@ -35,14 +33,6 @@ public class NodeInstanceLogResponse {
     @XmlElement
     @XmlSchemaType(name="string")
     private String processId;
-
-    @XmlElement
-    @XmlSchemaType(name="dateTime")
-    private XMLGregorianCalendar date;
-
-    @XmlElement
-    @XmlSchemaType(name="int")
-    private Integer type;
 
     @XmlElement
     @XmlSchemaType(name="string")
@@ -57,8 +47,8 @@ public class NodeInstanceLogResponse {
     private String nodeName;
 
     @XmlElement
-    @XmlSchemaType(name="string")
-    private String nodeType;
+    @XmlSchemaType(name="dateTime")
+    private XMLGregorianCalendar date;
 
     @XmlElement
     @XmlSchemaType(name="long")
@@ -71,5 +61,13 @@ public class NodeInstanceLogResponse {
     @XmlElement
     @XmlSchemaType(name="string")
     private String externalId;
+
+    @XmlElement
+    @XmlSchemaType(name="string")
+    private String nodeType;
+
+    @XmlElement
+    @XmlSchemaType(name="int")
+    private Integer type;
 
 }

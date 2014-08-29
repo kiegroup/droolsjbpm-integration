@@ -1,3 +1,2 @@
 # generated wsdl files
-*.wsdl
-*.xsd
+/wsdl/

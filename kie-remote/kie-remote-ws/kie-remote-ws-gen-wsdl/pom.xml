@@ -20,10 +20,41 @@
       <groupId>javax.xml.ws</groupId>
       <artifactId>jaxws-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie.remote.ws</groupId>
+      <artifactId>kie-remote-ws-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+    </dependency>
+    
+    <!-- test -->
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- 0. deleted previously generated wsdl -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}/src/main/resources/wsdl</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
@@ -55,9 +86,8 @@
         <artifactId>jaxws-maven-plugin</artifactId>
         <version>2.3</version>
         <executions>
-          <!-- 4. generate classes based on WSDL to be included in jar -->
           <execution>
-            <id>generate-wsdls</id>
+            <id>generate-command-wsdl</id>
             <goals>
               <goal>wsgen</goal>
             </goals>
@@ -65,10 +95,77 @@
               <executable>${tool.wsgen}</executable>
               <sei>org.kie.remote.services.ws.sei.command.CommandWebServiceWsdlGenerationImpl</sei>
               <genWsdl>true</genWsdl>
+              <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
+              <inlineSchemas>true</inlineSchemas>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-deployment-wsdl</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsgen}</executable>
+              <sei>org.kie.remote.services.ws.sei.deployment.DeploymentWebServiceWsdlGenerationImpl</sei>
+              <genWsdl>true</genWsdl>
               <inlineSchemas>true</inlineSchemas>
               <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
             </configuration>
           </execution>
+          <execution>
+            <id>generate-history-wsdl</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsgen}</executable>
+              <sei>org.kie.remote.services.ws.sei.history.HistoryWebServiceWsdlGenerationImpl</sei>
+              <genWsdl>true</genWsdl>
+              <inlineSchemas>true</inlineSchemas>
+              <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-process-wsdl</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsgen}</executable>
+              <sei>org.kie.remote.services.ws.sei.process.ProcessWebServiceWsdlGenerationImpl</sei>
+              <genWsdl>true</genWsdl>
+              <inlineSchemas>true</inlineSchemas>
+              <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-task-wsdl</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsgen}</executable>
+              <sei>org.kie.remote.services.ws.sei.task.TaskWebServiceWsdlGenerationImpl</sei>
+              <genWsdl>true</genWsdl>
+              <inlineSchemas>true</inlineSchemas>
+              <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
+            </configuration>
+          </execution>
+          <!-- 
+          <execution> 
+            <id>generate-knowledge-wsdl</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsgen}</executable>
+              <sei>org.kie.remote.services.ws.sei.knowledge.KnowledgeWebServiceWsdlGenerationImpl</sei>
+              <genWsdl>true</genWsdl>
+              <inlineSchemas>true</inlineSchemas>
+              <resourceDestDir>${basedir}/src/main/resources/wsdl</resourceDestDir>
+            </configuration>
+          </execution> 
+          -->
         </executions>
       </plugin>
     </plugins>

@@ -7,23 +7,21 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+/**
+ * Only used for initial WSDL generation
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "VariableInstanceLogResponse", propOrder = {
-    "id",
     "processInstanceId",
     "processId",
-    "date",
     "variableInstanceId",
     "variableId",
     "value",
     "oldValue",
+    "date",
     "externalId"
 })
 public class VariableInstanceLogResponse {
-
-    @XmlElement(required=true)
-    @XmlSchemaType(name="long")
-    private Long id;
 
     @XmlElement
     @XmlSchemaType(name="long")
@@ -32,10 +30,6 @@ public class VariableInstanceLogResponse {
     @XmlElement
     @XmlSchemaType(name="string")
     private String processId;
-
-    @XmlElement
-    @XmlSchemaType(name="dateTime")
-    private XMLGregorianCalendar date;
 
     @XmlElement
     @XmlSchemaType(name="string")
@@ -52,6 +46,10 @@ public class VariableInstanceLogResponse {
     @XmlElement
     @XmlSchemaType(name="string")
     private String oldValue;
+
+    @XmlElement
+    @XmlSchemaType(name="dateTime")
+    private XMLGregorianCalendar date;
 
     @XmlElement
     @XmlSchemaType(name="string")
