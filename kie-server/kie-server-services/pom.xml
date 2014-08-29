@@ -14,7 +14,7 @@
   <description>KIE Execution Server Services</description>
 
   <properties>
-    <eap630.download.url></eap630.download.url>
+    <eap630.download.url>valid-url-for-eap-6.3.0-needs-to-be-specified-here-or-via-cmd-line</eap630.download.url>
   </properties>
 
   <dependencyManagement>
@@ -153,6 +153,15 @@
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-maven2-plugin</artifactId>
+          <version>1.4.9</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <!-- we need to fork always as we have mixture of both arquillian 
@@ -174,7 +183,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <!--<version>2.15</version>-->
         <executions>
           <execution>
             <goals>
@@ -188,7 +196,6 @@
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven2-plugin</artifactId>
-        <version>1.4.9</version>
         <configuration>
           <container>
             <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
@@ -226,7 +233,6 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.4.9</version>
             <configuration combine.self="override">
               <container>
                 <containerId>tomcat7x</containerId>
@@ -242,13 +248,12 @@
       </build>
     </profile>
     <profile>
-      <id>jboss74x</id><!-- aka EAP 6.3.x -->
+      <id>jboss74x</id> <!-- aka EAP 6.3.x -->
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.4.9</version>
             <configuration combine.self="override">
               <container>
                 <containerId>jboss74x</containerId>
