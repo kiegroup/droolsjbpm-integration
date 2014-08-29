@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.kie.api.command.Command;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
@@ -95,8 +96,6 @@ public class JaxbCommandsRequest {
     @XmlSchemaType(name = "string")
     private String user;
    
-    private transient String [] userPass;
-
     // This list should match the list in AcceptedCommands
     @XmlElements({
             @XmlElement(name = "complete-work-item", type = CompleteWorkItemCommand.class),
@@ -168,27 +167,27 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "find-variable-instances", type = FindVariableInstancesCommand.class),
             @XmlElement(name = "find-variable-instances-by-name", type = FindVariableInstancesByNameCommand.class)
     })
-    protected List<Object> commands;
+    protected List<Command> commands;
 
     public JaxbCommandsRequest() {
         // Default constructor
     }
 
-    public JaxbCommandsRequest(Object command) {
+    public JaxbCommandsRequest(Command command) {
         checkThatCommandIsAccepted(command);
-        this.commands = new ArrayList<Object>();
+        this.commands = new ArrayList<Command>();
         this.commands.add(command);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
     
-    public JaxbCommandsRequest(List<Object> commands) {
+    public JaxbCommandsRequest(List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
-        this.commands = new ArrayList<Object>();
+        this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
-
-    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Object> checkCommands) {
+    
+    private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
         for( Object command : checkCommands ) { 
             if( ! (command instanceof TaskCommand) && ! (command instanceof AuditCommand) ) { 
                 throw new UnsupportedOperationException( "A " + command.getClass().getSimpleName() + " requires that the deployment id has been set!" );
@@ -196,22 +195,22 @@ public class JaxbCommandsRequest {
         }
     }
 
-    public JaxbCommandsRequest(String deploymentId, Object command) {
+    public JaxbCommandsRequest(String deploymentId, Command command) {
         checkThatCommandIsAccepted(command);
         this.deploymentId = deploymentId;
-        this.commands = new ArrayList<Object>();
+        this.commands = new ArrayList<Command>();
         this.commands.add(command);
     }
 
-    public JaxbCommandsRequest(String deploymentId, List<Object> commands) {
+    public JaxbCommandsRequest(String deploymentId, List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
         this.deploymentId = deploymentId;
-        this.commands = new ArrayList<Object>();
+        this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
     }
 
-    private void checkThatCommandsAreAccepted(Collection<Object> cmds) { 
-       for( Object cmd : cmds ) { 
+    private void checkThatCommandsAreAccepted(Collection<Command> cmds) { 
+        for( Object cmd : cmds ) { 
           checkThatCommandIsAccepted(cmd); 
        }
     }
@@ -254,28 +253,18 @@ public class JaxbCommandsRequest {
         this.user = user;
     }
 
-    public void setCommands(List<Object> commands) {
+    public void setCommands(List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
         this.commands = commands;
     }
 
-    public List<Object> getCommands() {
+    public List<Command> getCommands() {
         if( this.commands == null ) { 
-            this.commands = new ArrayList<Object>();
+            this.commands = new ArrayList<Command>();
         }
         return this.commands;
     }
    
-    @JsonIgnore
-    public String [] getUserPass() {
-        return userPass;
-    }
-
-    @JsonIgnore
-    public void setUserPass(String [] userPass) {
-        this.userPass = userPass;
-    }
-
     public String toString() {
     	StringBuffer result = new StringBuffer("JaxbCommandsRequest " + deploymentId + "\n");
     	if (commands != null) {

@@ -280,8 +280,8 @@ public final class RemoteConfiguration {
         return responseQueue;
     }
 
-    public void addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
-        this.extraJaxbClasses.addAll(extraJaxbClassList);
+    public boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
+        return this.extraJaxbClasses.addAll(extraJaxbClassList);
     }
 
     public void clearJaxbClasses() {

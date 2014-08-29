@@ -1,7 +1,6 @@
 package org.kie.services.client.api.command;
 
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
-import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
@@ -98,7 +97,7 @@ public abstract class AbstractRemoteCommandObject {
 
     // Execute methods -----------------------------------------------------------------------------------------------------
 
-    protected Object executeCommand( Object cmd ) {
+    protected Object executeCommand( Command cmd ) {
         if( AcceptedClientCommands.isSendObjectParameterCommandClass(cmd.getClass()) ) {
             List<Object> extraClassInstanceList = new ArrayList<Object>();
             preprocessCommand(cmd, extraClassInstanceList);
@@ -114,7 +113,12 @@ public abstract class AbstractRemoteCommandObject {
                     }
                     extraJaxbClasses.add(jaxbClass);
                 }
-                config.addJaxbClasses(extraJaxbClasses);
+                if( config.addJaxbClasses(extraJaxbClasses) ) { 
+                    for( Class<?> extraClass : extraJaxbClasses ) { 
+                        logger.debug( "Adding {} to the JAXBContext instance in this client instance.", extraClass.getName() );
+                    }
+                    config.initializeJaxbSerializationProvider();
+                }
             }
         }
 
@@ -174,7 +178,7 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    private JaxbCommandsRequest prepareCommandRequest( Object command ) {
+    private JaxbCommandsRequest prepareCommandRequest( Command command ) {
         if( config.getDeploymentId() == null && !(command instanceof TaskCommand || command instanceof AuditCommand) ) {
             throw new MissingRequiredInfoException("A deployment id is required when sending commands involving the KieSession.");
         }
@@ -202,7 +206,7 @@ public abstract class AbstractRemoteCommandObject {
      * @param command The {@link Command} object to be executed.
      * @return The result of the {@link Command} object execution.
      */
-    private Object executeJmsCommand( Object command ) {
+    private Object executeJmsCommand( Command command ) {
         JaxbCommandsRequest req = prepareCommandRequest(command);
         String deploymentId = config.getDeploymentId();
 
@@ -366,7 +370,7 @@ public abstract class AbstractRemoteCommandObject {
      * @param command The {@link Command} object to be executed.
      * @return The result of the {@link Command} object execution.
      */
-    private <T> T executeRestCommand( Object command ) {
+    private <T> T executeRestCommand( Command command ) {
         JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
         String deploymentId = config.getDeploymentId();
 
@@ -377,7 +381,6 @@ public abstract class AbstractRemoteCommandObject {
             httpRequest = httpRequest.relativeRequest("/runtime/" + deploymentId + "/execute");
         }
 
-        
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) {
             try {

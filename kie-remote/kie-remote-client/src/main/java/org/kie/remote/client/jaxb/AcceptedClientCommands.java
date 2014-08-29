@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
+
 @SuppressWarnings("rawtypes")
 public class AcceptedClientCommands {
 
@@ -87,11 +89,14 @@ public class AcceptedClientCommands {
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
-    public static Set<String> getAcceptedClassNameSet() { 
-        return acceptedCommands;
+    public static Set<String> getAcceptedCommandNames() { 
+       return Collections.unmodifiableSet(acceptedCommands);
     }
     
     public static boolean isAcceptedCommandClass(Class<?> commandClass) { 
+        if( ! commandClass.getPackage().getName().equals(AbortWorkItemCommand.class.getPackage().getName()) ) { 
+           return false; 
+        }
         return acceptedCommands.contains(commandClass.getSimpleName());
     }
     

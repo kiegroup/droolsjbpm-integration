@@ -31,6 +31,7 @@ import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
+import org.kie.services.shared.ServicesVersion;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -104,6 +105,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         // test start process
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new StartProcessCommand(TEST_PROCESS_DEF_NAME));
+        cmdsRequest.setVersion(ServicesVersion.VERSION);
         JaxbCommandsResponse
         resp = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
 
@@ -123,6 +125,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         // - the ProcessInstanceIdContext is not used (and an EmptyContext is used instead)
         // - The ProcessInstanceIdContext constructor gets a null value for the process instance id
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new SignalEventCommand(TEST_PROCESS_INST_ID, "test", null));
+        cmdsRequest.setVersion(ServicesVersion.VERSION);
         cmdsRequest.setProcessInstanceId(TEST_PROCESS_INST_ID);
         resp = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
       

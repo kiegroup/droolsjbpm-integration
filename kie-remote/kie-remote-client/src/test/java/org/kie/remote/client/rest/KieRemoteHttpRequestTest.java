@@ -423,7 +423,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         };
         String data = "hello";
         int sent = data.getBytes().length;
-        int code = newRequest(new URL(url)).contentLength(sent).body(data).post().response().code();
+        int code = newRequest(new URL(url)).body(data).post().response().code();
         assertEquals(HTTP_OK, code);
         assertEquals(sent, length.get().intValue());
         assertEquals(data, body.get());

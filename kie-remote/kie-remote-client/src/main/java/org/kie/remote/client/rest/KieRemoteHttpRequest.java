@@ -112,10 +112,12 @@ public class KieRemoteHttpRequest {
 
     private HttpURLConnection connection = null;
     private RequestOutputStream output;
+    private int totalWritten = 0;
 
     boolean followRedirects = false;
     String httpProxyHost;
     int httpProxyPort;
+    
 
     private KieRemoteHttpResponse response = null;
 
@@ -138,8 +140,6 @@ public class KieRemoteHttpRequest {
 
         StringBuilder body;
         MediaType bodyContentType;
-
-        Integer contentLength;
 
         public URL getRequestUrl() {
             if( requestUrl == null ) {
@@ -740,6 +740,7 @@ public class KieRemoteHttpRequest {
                 final byte[] buffer = new byte[bufferSize];
                 int read;
                 while( (read = input.read(buffer)) != -1 ) {
+                    totalWritten += read;
                     output.write(buffer, 0, read);
                 }
                 return KieRemoteHttpRequest.this;
@@ -849,16 +850,26 @@ public class KieRemoteHttpRequest {
         if( connection == null ) {
             addQueryParametersToUrl();
             connection = createConnection();
+            // timeout
             connection.setReadTimeout(getRequestInfo().timeoutInMilliSecs);
             connection.setConnectTimeout(getRequestInfo().timeoutInMilliSecs);
+          
+            // various
             RequestInfo requestInfo = getRequestInfo();
-            if( requestInfo.contentLength != null ) {
-                connection.setFixedLengthStreamingMode(requestInfo.contentLength);
+            int contentLength = 0;
+            if( requestInfo.body != null ) {
+                contentLength = requestInfo.body.toString().getBytes().length;
+                connection.setFixedLengthStreamingMode(contentLength);
             }
+            requestInfo.setHeader(CONTENT_LENGTH, contentLength);
             connection.setInstanceFollowRedirects(followRedirects);
+            
+            // auth
             if( requestInfo.user != null && requestInfo.password != null ) {
                 basicAuthorization(requestInfo.user, requestInfo.password);
             }
+            
+            // headers
             if( requestInfo.headers != null ) {
                 for( Entry<String, List<String>> entry : requestInfo.headers.entrySet() ) {
                     List<String> headerVals = entry.getValue();
@@ -867,6 +878,8 @@ public class KieRemoteHttpRequest {
                     }
                 }
             }
+            
+            // output: form parameters, body
             addFormParametersToConnection();
             if( requestInfo.body != null ) {
                 try {
@@ -915,17 +928,6 @@ public class KieRemoteHttpRequest {
     }
 
     // Connection related getter methods -----------------------------------------------------------------------------------------
-
-    /**
-     * Set the 'Content-Length' request header to the given value
-     *
-     * @param contentLength
-     * @return this request
-     */
-    public KieRemoteHttpRequest contentLength( final int contentLength ) {
-        getRequestInfo().contentLength = contentLength;
-        return this;
-    }
 
     public KieRemoteHttpRequest followRedirets( final boolean followRedirects ) {
         this.followRedirects = followRedirects;

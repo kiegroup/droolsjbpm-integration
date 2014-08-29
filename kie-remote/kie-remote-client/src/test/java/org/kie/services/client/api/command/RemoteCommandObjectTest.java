@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.jbpm.services.task.commands.CompositeCommand;
 import org.junit.Test;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
@@ -67,6 +68,14 @@ public class RemoteCommandObjectTest {
     }
     
     @Test
+    public void isAcceptableCommandTest() throws Exception {
+       assertTrue( "The .isAcceptedCommandClass method is not functioning correctly: generated classes", 
+               AcceptedClientCommands.isAcceptedCommandClass(org.kie.remote.jaxb.gen.AbortWorkItemCommand.class) );
+       assertFalse( "The .isAcceptedCommandClass method is not functioning correctly: original command classes", 
+               AcceptedClientCommands.isAcceptedCommandClass(org.drools.core.command.runtime.process.AbortWorkItemCommand.class) );
+    }
+    
+    @Test
     public void reflectionMappingTest() throws Exception {
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(XmlAccessorType.class);
         assertFalse(classes.isEmpty());
@@ -82,13 +91,18 @@ public class RemoteCommandObjectTest {
         
         Map<Class, Class> kieCmdGenCmdClassMap = new LinkedHashMap<Class, Class>();
         for( Class<?> cmdClass : classes ) {
-            if( !AcceptedClientCommands.isAcceptedCommandClass(cmdClass) ) {
+            if( ! cmdClass.getSimpleName().endsWith("Command") ) { 
+               continue; 
+            }
+            if( !AcceptedClientCommands.getAcceptedCommandNames().contains(cmdClass.getSimpleName()) ) {  
                 continue;
             }
             Class genCmdClass = Class.forName("org.kie.remote.jaxb.gen." + cmdClass.getSimpleName());
+            assertTrue( genCmdClass.getSimpleName() + " is not an accepted command?", 
+                    AcceptedClientCommands.isAcceptedCommandClass(genCmdClass) );
             kieCmdGenCmdClassMap.put(cmdClass, genCmdClass);
         }
-        assertFalse(kieCmdGenCmdClassMap.isEmpty());
+        assertFalse("No generated command classes could be found to test.",  kieCmdGenCmdClassMap.isEmpty());
 
         for( Entry<Class, Class> classEntry : kieCmdGenCmdClassMap.entrySet() ) {
             compareKieClassInstanceToGenClassInstance(classEntry.getKey(), classEntry.getValue());
