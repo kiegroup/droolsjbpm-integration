@@ -38,7 +38,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
 @SuppressWarnings("unchecked")
-public class RestTaskAndAuditDeploymentIdTest extends TaskResource implements TaskDeploymentIdTest {
+public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implements TaskDeploymentIdTest {
     
     private final static String USER = "user";
 

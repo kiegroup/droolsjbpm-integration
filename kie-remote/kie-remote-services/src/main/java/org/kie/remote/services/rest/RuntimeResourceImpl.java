@@ -43,6 +43,7 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
+import org.kie.remote.services.rest.api.RuntimeResource;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceFormResponse;
@@ -68,7 +69,7 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 @Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
 @SuppressWarnings("unchecked")
-public class RuntimeResource extends ResourceBase {
+public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource {
 
     /* REST information */
     
@@ -108,6 +109,10 @@ public class RuntimeResource extends ResourceBase {
         return restProcessJaxbCommandsRequest(cmdsRequest);
     } 
  
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_defId(java.lang.String)
+     */
+    @Override
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
     public Response process_defId(@PathParam("processDefId") String processId) {
@@ -118,6 +123,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(jaxbProcDef, headers);
     }
     
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_defId_start(java.lang.String)
+     */
+    @Override
     @POST
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public Response process_defId_start(@PathParam("processDefId") String processId) {
@@ -131,6 +140,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(responseObj, headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_defId_startform(java.lang.String)
+     */
+    @Override
     @POST
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/startform")
     public Response process_defId_startform(@PathParam("processDefId") String processId) {
@@ -153,6 +166,10 @@ public class RuntimeResource extends ResourceBase {
         throw RestOperationException.notFound("Process " + processId + " is not available.");
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_instance_procInstId(java.lang.Long)
+     */
+    @Override
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}")
     public Response process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
@@ -160,6 +177,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbProcessInstanceResponse(result), headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_instance_procInstId_abort(java.lang.Long)
+     */
+    @Override
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
     public Response process_instance_procInstId_abort(@PathParam("procInstId") Long procInstId) {
@@ -181,6 +202,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_instance_procInstId_signal(java.lang.Long)
+     */
+    @Override
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
     public Response process_instance_procInstId_signal(@PathParam("procInstId") Long procInstId) {
@@ -196,6 +221,10 @@ public class RuntimeResource extends ResourceBase {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#process_instance_procInstId_variable_varName(java.lang.Long, java.lang.String)
+     */
+    @Override
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}/variable/{varName: [\\w\\.-]+}")
     public Response process_instance_procInstId_variable_varName(@PathParam("procInstId") Long procInstId,
@@ -211,6 +240,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(jaxbElem, headers);
     }
   
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#signal()
+     */
+    @Override
     @POST
     @Path("/signal")
     public Response signal() {
@@ -227,6 +260,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#workitem_workItemId(java.lang.Long)
+     */
+    @Override
     @GET
     @Path("/workitem/{workItemId: [0-9-]+}")
     public Response workitem_workItemId(@PathParam("workItemId") Long workItemId) { 
@@ -243,6 +280,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbWorkItem(workItem), headers);
     }
     
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#worktiem_workItemId_oper(java.lang.Long, java.lang.String)
+     */
+    @Override
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response worktiem_workItemId_oper(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
@@ -267,10 +308,15 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
+
     /**
      * WithVars methods
      */
-    
+
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#withvars_process_processDefId_start(java.lang.String)
+     */
+    @Override
     @POST
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public Response withvars_process_processDefId_start(@PathParam("processDefId") String processId) {
@@ -286,6 +332,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(resp, headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#withvars_process_instance_procInstId(java.lang.Long)
+     */
+    @Override
     @GET
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
     public Response withvars_process_instance_procInstId(@PathParam("procInstId") Long procInstId) {
@@ -298,6 +348,10 @@ public class RuntimeResource extends ResourceBase {
         return createCorrectVariant(responseObj, headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.RuntimeResource#withvars_process_instance_procInstid_signal(java.lang.Long)
+     */
+    @Override
     @POST
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
     public Response withvars_process_instance_procInstid_signal(@PathParam("procInstId") Long procInstId) {
@@ -335,7 +389,6 @@ public class RuntimeResource extends ResourceBase {
         } else { 
             return null;
         }
-        
     }
     
     private Map<String, String> getVariables(long processInstanceId) {

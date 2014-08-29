@@ -31,14 +31,14 @@ import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
-import org.kie.remote.services.rest.RuntimeResource;
-import org.kie.remote.services.rest.TaskResource;
+import org.kie.remote.services.rest.RuntimeResourceImpl;
+import org.kie.remote.services.rest.TaskResourceImpl;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is used by both the {@link RuntimeResource} and {@link TaskResource} to do the core operations on
+ * This class is used by both the {@link RuntimeResourceImpl} and {@link TaskResourceImpl} to do the core operations on
  * the Deployment/Runtime's {@link KieSession} and {@link TaskService}.
  * </p>
  * It contains the necessary logic to do the following:

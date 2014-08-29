@@ -12,16 +12,16 @@ import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.junit.Test;
 
-public class DeploymentIdTest extends DeploymentResource {
+public class DeploymentIdTest extends DeploymentResourceImpl {
 
     @Test
     public void sameRegexUsedEverywhereTest() {
-        Path pathAnno = RuntimeResource.class.getAnnotation(Path.class);
+        Path pathAnno = RuntimeResourceImpl.class.getAnnotation(Path.class);
         String path = pathAnno.value();
         path = path.replace("/runtime/{deploymentId: ", "");
         String runRegex = path.substring(0, path.length()-1);
 
-        pathAnno = DeploymentResource.class.getAnnotation(Path.class);
+        pathAnno = DeploymentResourceImpl.class.getAnnotation(Path.class);
         path = pathAnno.value();
         path = path.replace("/deployment/{deploymentId: ", "");
         String depRegex = path.substring(0, path.length()-1);
@@ -31,7 +31,7 @@ public class DeploymentIdTest extends DeploymentResource {
 
     @Test
     public void deploymentIdRegexTest() {
-        Path pathAnno = DeploymentResource.class.getAnnotation(Path.class);
+        Path pathAnno = DeploymentResourceImpl.class.getAnnotation(Path.class);
         String path = pathAnno.value();
         path = path.replace("/deployment/{deploymentId: ", "");
         String regex = path.substring(0, path.length()-1);

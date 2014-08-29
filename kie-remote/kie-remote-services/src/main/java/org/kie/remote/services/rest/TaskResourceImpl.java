@@ -48,6 +48,7 @@ import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
+import org.kie.remote.services.rest.api.TaskResource;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -67,9 +68,9 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/task")
 @RequestScoped
-public class TaskResource extends ResourceBase {
+public class TaskResourceImpl extends ResourceBase implements TaskResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(RuntimeResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(RuntimeResourceImpl.class);
     
     /* REST information */
     @Context
@@ -123,6 +124,10 @@ public class TaskResource extends ResourceBase {
         return restProcessJaxbCommandsRequest(cmdsRequest);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#query()
+     */
+    @Override
     @GET
     @Path("/query")
     public Response query() {
@@ -172,6 +177,10 @@ public class TaskResource extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#taskId(long)
+     */
+    @Override
     @GET
     @Path("/{taskId: [0-9-]+}")
     public Response taskId(@PathParam("taskId") long taskId) { 
@@ -183,6 +192,10 @@ public class TaskResource extends ResourceBase {
         return createCorrectVariant(task, headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#taskId_oper(long, java.lang.String)
+     */
+    @Override
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
@@ -246,6 +259,10 @@ public class TaskResource extends ResourceBase {
         throw RestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
     
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#taskId_content(long)
+     */
+    @Override
     @GET
     @Path("/{taskId: [0-9-]+}/content")
     public Response taskId_content(@PathParam("taskId") long taskId) { 
@@ -267,6 +284,10 @@ public class TaskResource extends ResourceBase {
         return createCorrectVariant(content, headers);
     }
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#taskId_form(long)
+     */
+    @Override
     @GET
     @Path("/{taskId: [0-9-]+}/showTaskForm")
     public Response taskId_form(@PathParam("taskId") long taskId) {
@@ -291,6 +312,10 @@ public class TaskResource extends ResourceBase {
         throw RestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#content_contentId(long)
+     */
+    @Override
     @GET
     @Path("/content/{contentId: [0-9-]+}")
     public Response content_contentId(@PathParam("contentId") long contentId) { 
@@ -302,6 +327,10 @@ public class TaskResource extends ResourceBase {
         return createCorrectVariant(new JaxbContent(content), headers);
     }
     
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.TaskResource#bam_clear()
+     */
+    @Override
     @POST
     @Path("/history/bam/clear")
     public Response bam_clear() { 
@@ -309,7 +338,7 @@ public class TaskResource extends ResourceBase {
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);
     }
  
-    public Object doRestTaskOperation(Long taskId, TaskCommand<?> cmd) { 
+    private Object doRestTaskOperation(Long taskId, TaskCommand<?> cmd) { 
         return processRequestBean.doRestTaskOperation(taskId, null, null, null, cmd);
     }
 }

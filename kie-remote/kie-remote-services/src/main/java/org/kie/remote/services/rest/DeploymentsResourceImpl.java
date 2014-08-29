@@ -1,6 +1,6 @@
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.DeploymentResource.convertKModuleDepUnitToJaxbDepUnit;
+import static org.kie.remote.services.rest.DeploymentResourceImpl.convertKModuleDepUnitToJaxbDepUnit;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +22,7 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.cdi.Kjar;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
+import org.kie.remote.services.rest.api.DeploymentsResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
@@ -30,7 +31,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefini
 
 @Path("/deployment")
 @RequestScoped
-public class DeploymentsResource extends ResourceBase {
+public class DeploymentsResourceImpl extends ResourceBase implements DeploymentsResource {
 
     @Context
     private HttpHeaders headers;
@@ -52,6 +53,10 @@ public class DeploymentsResource extends ResourceBase {
     
     // REST operations -----------------------------------------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.DeploymentsResource#listDeployments()
+     */
+    @Override
     @GET
     // TODO: docs pagination
     public Response listDeployments() { 
@@ -83,6 +88,10 @@ public class DeploymentsResource extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
    
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.DeploymentsResource#listProcessDefinitions()
+     */
+    @Override
     @GET
     @Path("/processes")
     // DOCS: (+ pagination)

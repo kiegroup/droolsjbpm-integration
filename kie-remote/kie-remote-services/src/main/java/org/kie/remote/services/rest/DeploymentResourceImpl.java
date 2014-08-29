@@ -25,7 +25,6 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.DeployedUnit;
-import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.services.cdi.Kjar;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
@@ -33,6 +32,7 @@ import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.remote.common.exception.RestOperationException;
+import org.kie.remote.services.rest.api.DeploymentResource;
 import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
 import org.kie.remote.services.rest.async.cmd.JobType;
@@ -60,9 +60,9 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
-public class DeploymentResource extends ResourceBase {
+public class DeploymentResourceImpl extends ResourceBase implements DeploymentResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeploymentResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentResourceImpl.class);
     
     /* REST information */
     
@@ -162,10 +162,10 @@ public class DeploymentResource extends ResourceBase {
 
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    /**
-     * Retrieve the status of the {@link DeploymentUnit} specified in the URL.
-     * @return A {@link JaxbDeploymentUnit} instance
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.DeploymentResource#getConfig()
      */
+    @Override
     @GET
     public Response getConfig() { 
         JaxbDeploymentUnit jaxbDepUnit = determineStatus(true);
@@ -220,13 +220,10 @@ public class DeploymentResource extends ResourceBase {
         return jaxbDepUnit;
     }
     
-    /**
-     * Queues a request to deploy the given deployment unit. If the deployment already exist, this
-     * operation will fail. 
-     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
-     *                         the deployment unit should be deployed.
-     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.DeploymentResource#deploy(org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor)
      */
+    @Override
     @POST
     @Path("/deploy")
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
@@ -278,10 +275,10 @@ public class DeploymentResource extends ResourceBase {
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-    /**
-     * Queues a request to undeploy the deployment unit specified in the URL
-     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.DeploymentResource#undeploy()
      */
+    @Override
     @POST
     @Path("/undeploy")
     public Response undeploy() { 
@@ -364,6 +361,10 @@ public class DeploymentResource extends ResourceBase {
         return jobResult;
     }
     
+    /* (non-Javadoc)
+     * @see org.kie.remote.services.rest.DeploymentResource#listProcessDefinitions()
+     */
+    @Override
     @GET
     @Path("/processes")
     // DOCS: (+ pagination)

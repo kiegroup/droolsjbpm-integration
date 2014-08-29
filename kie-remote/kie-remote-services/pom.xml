@@ -20,6 +20,10 @@
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
     <dependency>

@@ -37,7 +37,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ EmptyContext.class, ProcessInstanceIdContext.class })
-public class RestStartProcessEveryStrategyTest extends RuntimeResource implements StartProcessEveryStrategyTest {
+public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl implements StartProcessEveryStrategyTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;
     private KieSession kieSessionMock;
