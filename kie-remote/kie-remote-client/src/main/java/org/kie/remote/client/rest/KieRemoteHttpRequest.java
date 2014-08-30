@@ -83,13 +83,21 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 
 /**
+ * This class is only meant to be used internally by the kie-remote-client code! For interacting with the
+ * REST API, please use a proper REST framework such as RestEasy or Apache CXF. 
+ * </p>
+ * <b>Using this class to interact with the REST API w<i>ill not be supported</i> and any issues or problems
+ * that arise from such use will be dismissed with a referral to this exact text!</b>
+ * </p>
+ * <rr>
  * A fluid interface for making HTTP requests using an underlying {@link HttpURLConnection} (or sub-class).
  * <p>
  * Each instance supports making a single request and cannot be reused for further requests.
  * 
- * This code was originally copied from Kevin Sawicki's HttpRequest project (https://github.com/kevinsawicki/http-request).
+ * This code was originally copied from Kevin Sawicki's 
+ * <a href="https://github.com/kevinsawicki/http-request">HttpRequest project</a> * project.
  * </p>
- * However, it has been extensively modified and rewritten.
+ * However, it has been extensively modified and rewritten to fit the use case in this code.
  */
 public class KieRemoteHttpRequest {
 
@@ -112,7 +120,6 @@ public class KieRemoteHttpRequest {
 
     private HttpURLConnection connection = null;
     private RequestOutputStream output;
-    private int totalWritten = 0;
 
     boolean followRedirects = false;
     String httpProxyHost;
@@ -740,7 +747,6 @@ public class KieRemoteHttpRequest {
                 final byte[] buffer = new byte[bufferSize];
                 int read;
                 while( (read = input.read(buffer)) != -1 ) {
-                    totalWritten += read;
                     output.write(buffer, 0, read);
                 }
                 return KieRemoteHttpRequest.this;
