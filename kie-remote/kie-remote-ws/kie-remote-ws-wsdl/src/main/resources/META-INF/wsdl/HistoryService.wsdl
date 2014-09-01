@@ -62,7 +62,7 @@
 
       <xs:complexType name="findProcessInstanceLogs">
         <xs:sequence>
-          <xs:element name="arg0" type="tns:HistoryInstanceLogRequest" minOccurs="0" />
+          <xs:element name="request" type="tns:HistoryInstanceLogRequest" minOccurs="0" />
         </xs:sequence>
       </xs:complexType>
 
@@ -97,7 +97,7 @@
 
       <xs:complexType name="findVariableInstanceLogs">
         <xs:sequence>
-          <xs:element name="arg0" type="tns:HistoryInstanceLogRequest" minOccurs="0" />
+          <xs:element name="request" type="tns:HistoryInstanceLogRequest" minOccurs="0" />
         </xs:sequence>
       </xs:complexType>
 
@@ -130,7 +130,7 @@
 
       <xs:complexType name="findNodeInstanceLogs">
         <xs:sequence>
-          <xs:element name="arg0" type="tns:HistoryInstanceLogRequest" minOccurs="0" />
+          <xs:element name="request" type="tns:HistoryInstanceLogRequest" minOccurs="0" />
         </xs:sequence>
       </xs:complexType>
 

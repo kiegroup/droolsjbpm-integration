@@ -24,24 +24,24 @@ public interface DeploymentWebService {
     @WebResult(targetNamespace = "manage")
     @RequestWrapper(localName = "manage", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperDeploymentIdRequest")
     @ResponseWrapper(localName = "manageResponse", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperDeploymentInfoResponse")
-    public DeploymentInfoResponse manage(@WebParam(name = "arg0", targetNamespace = "") DeploymentIdRequest arg0) throws DeploymentWebServiceException;
+    public DeploymentInfoResponse manage(@WebParam(name = "request", targetNamespace = "") DeploymentIdRequest request) throws DeploymentWebServiceException;
 
     @WebMethod(action = "urn:GetDeploymentInfo")
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "getDeploymentInfo", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperGetDeploymentInfo")
     @ResponseWrapper(localName = "deploymentInfoResponse", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperDeploymentInfoResponse")
-    public JaxbDeploymentUnitList getDeploymentInfo(@WebParam(name = "arg0", targetNamespace = "") DeploymentIdRequest arg0) throws DeploymentWebServiceException;
+    public JaxbDeploymentUnitList getDeploymentInfo(@WebParam(name = "request", targetNamespace = "") DeploymentIdRequest request) throws DeploymentWebServiceException;
 
     @WebMethod(action = "urn:GetProcessDefinitionIds")
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "getProcessDefinitionIds", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperGetProcessDefinitionIds")
     @ResponseWrapper(localName = "processDefinitionIdsResponse", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperProcessDefinitionIdsResponse")
-    public ProcessIdsResponse getProcessDefinitionIds(@WebParam(name = "arg0", targetNamespace = "") DeploymentIdRequest arg0) throws DeploymentWebServiceException;
+    public ProcessIdsResponse getProcessDefinitionIds(@WebParam(name = "request", targetNamespace = "") DeploymentIdRequest request) throws DeploymentWebServiceException;
 
     @WebMethod(action = "urn:GetProcessDefinitionInfo")
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "getProcessDefinitionInfo", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperGetProcessDefinitionInfo")
     @ResponseWrapper(localName = "processDefinitionInfoResponse", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperProcessDefinitionInfoResponse")
-    public JaxbProcessDefinitionList getProcessDefinitionInfo(@WebParam(name = "arg0", targetNamespace = "") DeploymentIdRequest arg0) throws DeploymentWebServiceException;
+    public JaxbProcessDefinitionList getProcessDefinitionInfo(@WebParam(name = "request", targetNamespace = "") DeploymentIdRequest request) throws DeploymentWebServiceException;
 
 }

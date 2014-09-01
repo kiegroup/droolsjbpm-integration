@@ -16,22 +16,22 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefini
 public class DeploymentWebServiceWsdlGenerationImpl implements DeploymentWebService {
 
     @Override
-    public DeploymentInfoResponse manage( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
+    public DeploymentInfoResponse manage( DeploymentIdRequest request ) throws DeploymentWebServiceException {
         return null;
     }
 
     @Override
-    public ProcessIdsResponse getProcessDefinitionIds( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
+    public ProcessIdsResponse getProcessDefinitionIds( DeploymentIdRequest request ) throws DeploymentWebServiceException {
         return null;
     }
 
     @Override
-    public JaxbProcessDefinitionList getProcessDefinitionInfo( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
+    public JaxbProcessDefinitionList getProcessDefinitionInfo( DeploymentIdRequest request ) throws DeploymentWebServiceException {
         return null;
     }
 
     @Override
-    public JaxbDeploymentUnitList getDeploymentInfo( DeploymentIdRequest arg0 ) throws DeploymentWebServiceException {
+    public JaxbDeploymentUnitList getDeploymentInfo( DeploymentIdRequest request ) throws DeploymentWebServiceException {
         return null;
     }
     

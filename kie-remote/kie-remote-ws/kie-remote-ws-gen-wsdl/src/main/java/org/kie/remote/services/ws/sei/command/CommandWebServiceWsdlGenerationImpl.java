@@ -19,7 +19,7 @@ public class CommandWebServiceWsdlGenerationImpl implements CommandWebService {
     final static String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
     
     @Override
-    public JaxbCommandsResponse execute(JaxbCommandsRequest arg0) throws CommandWebServiceException {
+    public JaxbCommandsResponse execute(JaxbCommandsRequest request) throws CommandWebServiceException {
         return null;
     }
 

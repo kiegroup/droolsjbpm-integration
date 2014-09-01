@@ -39,9 +39,9 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's funtion.
  */
-@Path("/history")
 @RequestScoped
 @SuppressWarnings("unchecked")
+@Path("/history")
 public class HistoryResourceImpl extends ResourceBase implements HistoryResource {
 
     /* REST information */

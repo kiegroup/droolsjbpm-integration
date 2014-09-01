@@ -17,11 +17,30 @@
       <groupId>org.kie.remote.ws</groupId>
       <artifactId>kie-remote-ws-wsdl</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-services</artifactId>
+      <scope>provided</scope>
     </dependency>
+   
+    <!--  drools/jbpm --> 
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-kie-services</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-services-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-services-cdi</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
     
     <!-- reflection -->
     <dependency>

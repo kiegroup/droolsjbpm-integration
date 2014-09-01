@@ -1,5 +1,6 @@
 package org.kie.remote.services.rest;
 
+import static org.kie.remote.services.rest.DeployResourceBase.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

@@ -25,6 +25,6 @@ public interface CommandWebService {
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "executeRequest", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperCommandRequest")
     @ResponseWrapper(localName = "executeResponse", targetNamespace = NAMESPACE, className = "org.kie.remote.services.ws.wsdl.generated.WrapperCommandResponse")
-    public JaxbCommandsResponse execute(@WebParam(name = "arg0", targetNamespace = "") JaxbCommandsRequest arg0) throws CommandWebServiceException;
+    public JaxbCommandsResponse execute(@WebParam(name = "request", targetNamespace = "") JaxbCommandsRequest request) throws CommandWebServiceException;
 
 }

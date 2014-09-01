@@ -66,8 +66,8 @@ import org.slf4j.LoggerFactory;
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
  */
-@Path("/task")
 @RequestScoped
+@Path("/task")
 public class TaskResourceImpl extends ResourceBase implements TaskResource {
 
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResourceImpl.class);
@@ -295,8 +295,6 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         Object result = doRestTaskOperation(taskId, cmd);
 
         if (result != null) {
-            Map<String, String[]> requestParams = getRequestParams();
-
             String opener = "";
 
             List<String> openers = headers.getRequestHeader("host");

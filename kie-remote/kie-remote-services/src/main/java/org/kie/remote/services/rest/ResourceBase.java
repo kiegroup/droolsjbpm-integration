@@ -475,51 +475,6 @@ public class ResourceBase {
         }
     }
   
-   protected void fillProcessDefinitionList(String deploymentId, int [] pageInfo, int maxNumResults, RuntimeDataService runtimeDataService, DefinitionService bpmn2DataService, 
-           List<JaxbProcessDefinition> procDefList) { 
-       List<String> processIdList = Collections.EMPTY_LIST;
-       try { 
-           processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContextImpl(pageInfo[0], pageInfo[1])));
-           Collections.sort(processIdList);
-       } catch( Exception e) { 
-           // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
-           logger.debug( "Unable to retrieve process ids for deployment '{}': {}", deploymentId, e.getMessage(), e);
-       }
-       for( String processId : processIdList ) { 
-           ProcessDefinition processAssetDesc;
-           try { 
-               processAssetDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(deploymentId, processId); 
-               if( processAssetDesc == null ) { 
-                   logger.error( "No process definition information available for process definition '{}' in deployment '{}'!", 
-                           processId, deploymentId); 
-                   continue;
-               }
-           } catch( Exception e ) {
-               // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
-               logger.debug( "Unable to retrieve process definition for process '{}' in deployment '{}': {}", 
-                       processId, deploymentId, e.getMessage(), e);
-               continue; 
-           }
-           JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDesc);
-           Map<String, String> variables; 
-           try { 
-               variables = bpmn2DataService.getProcessVariables(deploymentId, processId);
-           } catch( Exception e) { 
-               // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
-               logger.debug( "Unable to retrieve process definition data for process '{}' in deployment '{}': {}", 
-                       processId, deploymentId, e.getMessage(), e);
-               continue; 
-           }
-           jaxbProcDef.setVariables(variables);
-           procDefList.add(jaxbProcDef);
-
-           if( procDefList.size() == maxNumResults) { 
-               // pagination parameters indicate that no more than current list is needed
-               break;
-           }
-       }
-   }
-    
     protected JaxbProcessDefinition convertProcAssetDescToJaxbProcDef(ProcessDefinition procAssetDesc) {
         JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition(); 
         jaxbProcDef.setDeploymentId(((ProcessAssetDesc)procAssetDesc).getDeploymentId());

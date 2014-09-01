@@ -66,9 +66,9 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's function.
  */
-@Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
-@RequestScoped
 @SuppressWarnings("unchecked")
+@RequestScoped
+@Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource {
 
     /* REST information */
