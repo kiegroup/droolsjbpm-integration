@@ -163,14 +163,8 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         if( kieTaskData != null ) { 
             genTaskData = new org.kie.remote.jaxb.gen.TaskData();
             
-            Status status = kieTaskData.getStatus();
-            if( status != null ) { 
-                genTaskData.setStatus(org.kie.remote.jaxb.gen.Status.fromValue(status.toString()));
-            }
-            status = kieTaskData.getPreviousStatus();
-            if( status != null ) { 
-                genTaskData.setPreviousStatus(org.kie.remote.jaxb.gen.Status.fromValue(status.toString()));
-            }
+            genTaskData.setStatus(kieTaskData.getStatus());
+            genTaskData.setPreviousStatus(kieTaskData.getPreviousStatus());
             User user = kieTaskData.getActualOwner();
             genTaskData.setActualOwner(convertKieUserToStringId(user));
             genTaskData.setCreatedBy(convertKieUserToStringId(kieTaskData.getCreatedBy()));
@@ -339,9 +333,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
         cmd.setUserId(userId);
         if( status != null ) {
-            for( Status kieStatus : status ) {
-                cmd.getStatuses().add(org.kie.remote.jaxb.gen.Status.fromValue(kieStatus.toString()));
-            }
+            cmd.getStatuses().addAll(status);
         }
         cmd.setFilter(addLanguageFilter(language));
         return (List<TaskSummary>) executeCommand(cmd);
@@ -360,9 +352,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
         cmd.setUserId(userId);
         if( status != null ) {
-            for( Status kieStatus : status ) {
-                cmd.getStatuses().add(org.kie.remote.jaxb.gen.Status.fromValue(kieStatus.toString()));
-            }
+            cmd.getStatuses().addAll(status);
         }
         cmd.setFilter(addLanguageFilter(language));
         return (List<TaskSummary>) executeCommand(cmd);
@@ -373,9 +363,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTasksByStatusByProcessInstanceIdCommand cmd = new GetTasksByStatusByProcessInstanceIdCommand();
         cmd.setProcessInstanceId(processInstanceId);
         if( status != null ) {
-            for( Status kieStatus : status ) {
-                cmd.getStatuses().add(org.kie.remote.jaxb.gen.Status.fromValue(kieStatus.toString()));
-            }
+            cmd.getStatuses().addAll(status);
         }
         // no query filter for language
         return (List<TaskSummary>) executeCommand(cmd);

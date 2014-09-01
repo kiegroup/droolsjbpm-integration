@@ -4,6 +4,7 @@ import static org.kie.services.client.serialization.JaxbSerializationProvider.sp
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,11 +13,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.jbpm.services.task.impl.model.UserImpl;
+import org.jbpm.services.task.jaxb.ComparePair;
+import org.jbpm.services.task.query.TaskSummaryImpl;
+import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.task.model.Status;
+import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.services.client.AbstractRemoteSerializationTest;
 import org.kie.services.client.jaxb.JsonRemoteSerializationTest;
-import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -267,4 +274,26 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         }
         assertTrue( "There is " + copyExtraJaxbClasses.size() + " class left over in the round-tripped class set!", copyExtraJaxbClasses.isEmpty() );
     }
+    
+    @Test
+    public void jaxbTaskSummarySerialization() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.YAML));
+
+        TaskSummaryImpl taskSumImpl = new TaskSummaryImpl(
+                1l, 
+                "a", "b", "c", 
+                Status.Completed, 
+                3, true, 
+                new UserImpl("d"), new UserImpl("e"), 
+                new Date(), new Date(), new Date(), 
+                "f", 5, 2l, "deploymentId",
+                SubTasksStrategy.EndParentOnAllSubTasksEnd, 6l);
+        taskSumImpl.setParentId(4l);
+
+        JaxbTaskSummary jaxbTaskSum = new JaxbTaskSummary(taskSumImpl);
+        JaxbTaskSummary jaxbTaskSumCopy = testRoundTrip(jaxbTaskSum);
+
+        ComparePair.compareObjectsViaFields(jaxbTaskSum, jaxbTaskSumCopy, "subTaskStrategy", "potentialOwners");
+    }
+    
 }

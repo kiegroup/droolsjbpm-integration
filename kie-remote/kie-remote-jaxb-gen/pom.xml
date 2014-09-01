@@ -34,14 +34,14 @@
       <artifactId>jbpm-audit</artifactId>
       <optional>true</optional>
     </dependency>
-    
+
     <!-- test -->
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -53,7 +53,7 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
 
   <build>
@@ -163,7 +163,6 @@
                     org/jbpm/services/task/commands/GetAttachmentCommand.java,
                     org/jbpm/services/task/commands/GetContentCommand.java,
                     org/jbpm/services/task/commands/GetTask*Command.java,
-                    org/jbpm/services/task/impl/model/xml/JaxbTaskSummary.java,
                     org/jbpm/services/task/impl/model/xml/JaxbContent.java</includes>
                 </artifactItem>
                 <artifactItem>
@@ -182,36 +181,35 @@
           </execution>
         </executions>
       </plugin>
-     
-       <!-- 
-       <plugin>
-           <groupId>org.codehaus.mojo</groupId>
-           <artifactId>xml-maven-plugin</artifactId>
-           <version>1.0</version>                      
-           <executions>                        
-             <execution>
-               <id>modify-xsd-schema</id>
-               <phase>process-resources</phase>
-               <goals>
-                 <goal>transform</goal>
-               </goals>
-               <configuration>                                 
-                 <transformationSets>
-                   <transformationSet> 
-                     <dir>${project.build.directory}/generated-xsd</dir>
-                     <outputDir>${project.build.directory}/generated-xsd</outputDir>
-                     <includes> 
-                       <include>schema1.xsd</include> 
-                     </includes>
-                     <stylesheet>src/main/resources/xslt/addNamespace.xslt</stylesheet>
-                   </transformationSet> 
-                 </transformationSets>
-               </configuration>
-             </execution>
-           </executions>
-         </plugin> 
-         -->
-      
+
+      <!-- 3. use existing classes where possible -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xml-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>modify-xsd-schema</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformationSets>
+                <transformationSet>
+                  <dir>${project.build.directory}/generated-xsd</dir>
+                  <outputDir>${project.build.directory}/generated-xsd</outputDir>
+                  <includes>
+                    <include>schema1.xsd</include>
+                  </includes>
+                  <stylesheet>src/main/resources/xslt/useExistingClasses.xslt</stylesheet>
+                </transformationSet>
+              </transformationSets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
@@ -233,7 +231,7 @@
               <outputDirectory>${project.build.directory}/generated-xsd/</outputDirectory>
             </configuration>
           </execution>
-          <!-- 3. generate java classes based on generated xsd's -->
+          <!-- 4. generate java classes based on generated xsd's -->
           <execution>
             <id>generate-java-from-xsd</id>
             <phase>process-resources</phase>
@@ -250,8 +248,9 @@
           </execution>
         </executions>
       </plugin>
-    
-     <plugin>
+
+      <!-- 5. we only want *Command classes to "implement Command" -->
+      <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
         <executions>
@@ -259,7 +258,7 @@
             <phase>process-resources</phase>
             <goals>
               <goal>replace</goal>
-            </goals>                    
+            </goals>
           </execution>
         </executions>
         <configuration>
@@ -274,14 +273,14 @@
           <replacements>
             <replacement>
               <token>implements Command</token>
-              <!--  @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
+              <!-- @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
               <value>extends Object</value>
             </replacement>
           </replacements>
         </configuration>
       </plugin>
-       
-      <!-- 4. exclude unpacked command sources from jar/sources -->
+
+      <!-- 6. exclude unpacked command sources from jar/sources -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

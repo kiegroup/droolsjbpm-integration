@@ -47,7 +47,7 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstance
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
@@ -79,7 +79,7 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "content-response", type = JaxbContentResponse.class ),
             @XmlElement(name = "task-content-response", type = JaxbTaskContentResponse.class ),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
-            @XmlElement(name = "work-item", type = JaxbWorkItem.class),
+            @XmlElement(name = "work-item", type = JaxbWorkItemResponse.class),
             @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
             @XmlElement(name = "other", type = JaxbOtherResponse.class),
             @XmlElement(name = "history-log-list", type = JaxbHistoryLogList.class),

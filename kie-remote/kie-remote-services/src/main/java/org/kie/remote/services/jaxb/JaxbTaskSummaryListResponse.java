@@ -14,13 +14,13 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
-import org.jbpm.services.task.impl.model.xml.JaxbTaskSummary;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 
-@XmlRootElement(name="task-summary-list")
+@XmlRootElement(name="task-summary-list-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbTaskSummaryListResponse extends AbstractJaxbCommandResponse<List<TaskSummary>> implements JaxbPaginatedList<TaskSummary> {
 

@@ -13,7 +13,7 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
-@XmlRootElement(name="process-instance-with-vars")
+@XmlRootElement(name="process-instance-with-vars-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={JaxbProcessInstanceResponse.class})
 public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbResponse {

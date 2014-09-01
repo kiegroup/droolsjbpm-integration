@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
-@XmlRootElement(name="process-instance-form")
+@XmlRootElement(name="process-instance-form-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbProcessInstanceFormResponse extends AbstractJaxbResponse {
 

@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.xml.bind.JAXBContext;
@@ -41,9 +40,12 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
+import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
+import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
@@ -88,13 +90,20 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbProcessDefinitionList.class,
 
                 // workitem
-                JaxbWorkItem.class,
+                JaxbWorkItemResponse.class,
 
                 // history
                 JaxbHistoryLogList.class,
                 JaxbNodeInstanceLog.class,
                 JaxbProcessInstanceLog.class,
                 JaxbVariableInstanceLog.class,
+                
+                // task
+                JaxbTaskSummary.class,
+               
+                // query
+                JaxbQueryTaskResult.class,
+                JaxbQueryProcessInstanceResult.class,
                 
                 // exception
                 JaxbException.class
@@ -346,7 +355,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return outList.toArray(new String[outList.size()]);
     }
 
-    public static Object unsupported(Class<?> realClass) { 
+    public static <T> T unsupported(Class<?> realClass, Class<T> returnType) { 
         String methodName = (new Throwable()).getStackTrace()[1].getMethodName();
         throw new UnsupportedOperationException(methodName + " is not supported on the JAXB " + realClass.getSimpleName() + " implementation.");
     }

@@ -20,7 +20,6 @@ import org.kie.api.task.model.PeopleAssignments;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
-import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
 import org.kie.remote.jaxb.gen.Type;
 
@@ -57,13 +56,6 @@ abstract class JaxbWrapper {
         return orgEntList;
     }
 
-    protected static Status convertGenStatusToStatus(org.kie.remote.jaxb.gen.Status genStatus) { 
-        if( genStatus == null ) { 
-            return null;
-        }
-         return Status.valueOf(genStatus.value());
-     }
-
     protected static List<I18NText> convertGenI18NTextToI18NText(List<org.kie.remote.jaxb.gen.I18NText> jaxbTextList) { 
         List<I18NText> textList = new ArrayList<I18NText>();
         if( jaxbTextList == null || jaxbTextList.isEmpty() ) { 
@@ -82,129 +74,6 @@ abstract class JaxbWrapper {
         return new UserWrapper(userId);
     }
    
-    /**
-     * Represents a {@link TaskSummary} instance
-     */
-    static class JaxbTaskSummaryWrapper extends JaxbWrapper implements TaskSummary {
-    
-        private final org.kie.remote.jaxb.gen.TaskSummary genJaxbTaskSummary;
-    
-        public JaxbTaskSummaryWrapper(org.kie.remote.jaxb.gen.TaskSummary genJaxbTaskSum) {
-            super(TaskSummary.class);
-            this.genJaxbTaskSummary = genJaxbTaskSum;
-        }
-    
-        @Override
-        public String getStatusId() {
-            return genJaxbTaskSummary.getStatus().toString();
-        }
-    
-        @Override
-        public Long getId() {
-            return genJaxbTaskSummary.getId();
-        }
-    
-        @Override
-        public String getName() {
-            return genJaxbTaskSummary.getName();
-        }
-    
-        @Override
-        public Integer getPriority() {
-            return genJaxbTaskSummary.getPriority();
-        }
-    
-        @Override
-        public String getActualOwnerId() {
-            return genJaxbTaskSummary.getActualOwner();
-        }
-    
-        @Override
-        public String getCreatedById() {
-            return genJaxbTaskSummary.getCreatedBy();
-        }
-    
-        @Override
-        public Date getCreatedOn() {
-            return convertXmlGregCalToDate(genJaxbTaskSummary.getCreatedOn());
-        }
-    
-        @Override
-        public Date getActivationTime() {
-            return convertXmlGregCalToDate(genJaxbTaskSummary.getActivationTime());
-        }
-    
-        @Override
-        public Date getExpirationTime() {
-            return convertXmlGregCalToDate(genJaxbTaskSummary.getExpirationTime());
-        }
-    
-        @Override
-        public String getProcessId() {
-            return genJaxbTaskSummary.getProcessId();
-        }
-    
-        @Override
-        public Long getProcessInstanceId() {
-            return genJaxbTaskSummary.getProcessInstanceId();
-        }
-    
-        @Override
-        public String getDeploymentId() {
-            return genJaxbTaskSummary.getDeploymentId();
-        }
-    
-        @Override
-        public Long getParentId() {
-            return genJaxbTaskSummary.getParentId();
-        }
-    
-        @Override
-        public String getSubject() {
-            return genJaxbTaskSummary.getSubject();
-        }
-    
-        @Override
-        public String getDescription() {
-            return genJaxbTaskSummary.getDescription();
-        }
-    
-        @Override
-        public Status getStatus() {
-            return Status.valueOf(genJaxbTaskSummary.getStatus().value());
-        }
-    
-        @Override
-        public Boolean isSkipable() {
-            return genJaxbTaskSummary.isSkipable();
-        }
-    
-        @Override
-        public User getActualOwner() {
-            return convertStringIdToUser(genJaxbTaskSummary.getActualOwner());
-        }
-    
-        @Override
-        public User getCreatedBy() {
-            return convertStringIdToUser(genJaxbTaskSummary.getCreatedBy());
-        }
-    
-        @Override
-        public Integer getProcessSessionId() {
-            return genJaxbTaskSummary.getProcessSessionId();
-        }
-    
-        @Override
-        public List<String> getPotentialOwners() {
-            return genJaxbTaskSummary.getPotentialOwners();
-        }
-    
-        @Override
-        public Boolean isQuickTaskSummary() {
-            return genJaxbTaskSummary.isQuickTaskSummary();
-        }
-    
-    }
 
     /**
      * Represents a {@link Task} instance
@@ -289,12 +158,12 @@ abstract class JaxbWrapper {
     
         @Override
         public Status getStatus() {
-            return convertGenStatusToStatus(this.taskData.getStatus());
+            return this.taskData.getStatus();
         }
     
         @Override
         public Status getPreviousStatus() {
-            return convertGenStatusToStatus(this.taskData.getPreviousStatus());
+            return this.taskData.getPreviousStatus();
         }
     
         @Override

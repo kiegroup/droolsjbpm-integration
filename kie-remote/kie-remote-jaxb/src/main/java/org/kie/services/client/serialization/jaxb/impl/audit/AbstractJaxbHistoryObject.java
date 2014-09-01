@@ -5,7 +5,6 @@ import static org.kie.services.client.serialization.JaxbSerializationProvider.un
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -56,11 +55,11 @@ public abstract class AbstractJaxbHistoryObject<T> {
     }
     
     public void readExternal(ObjectInput arg0) throws IOException, ClassNotFoundException {
-        unsupported(realClass);
+        unsupported(realClass, Void.class);
     }
 
     public void writeExternal(ObjectOutput arg0) throws IOException {
-        unsupported(realClass);
+        unsupported(realClass, Void.class);
     }
 
 }

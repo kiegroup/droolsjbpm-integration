@@ -13,7 +13,7 @@ import org.kie.api.command.Command;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
-@XmlRootElement(name="variables")
+@XmlRootElement(name="variables-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbVariablesResponse extends AbstractJaxbCommandResponse<Map<String,String>> {
 

@@ -49,7 +49,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefini
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 /**
@@ -277,7 +277,7 @@ public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource
             throw RestOperationException.notFound("WorkItem " + workItemId + " does not exist.");
         }
         
-        return createCorrectVariant(new JaxbWorkItem(workItem), headers);
+        return createCorrectVariant(new JaxbWorkItemResponse(workItem), headers);
     }
     
     /* (non-Javadoc)

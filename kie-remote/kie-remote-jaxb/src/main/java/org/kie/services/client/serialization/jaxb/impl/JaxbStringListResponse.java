@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
 
-@XmlRootElement(name="string-list")
+@XmlRootElement(name="string-list-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbStringListResponse extends AbstractJaxbCommandResponse<List<String>> {
 

@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.kie.api.command.Command;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
 
-@XmlRootElement(name = "other")
+@XmlRootElement(name = "other-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbOtherResponse extends AbstractJaxbCommandResponse<Object> {
 

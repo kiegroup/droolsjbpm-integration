@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
-@XmlRootElement(name="task-form")
+@XmlRootElement(name="task-form-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbTaskFormResponse extends AbstractJaxbResponse {
 

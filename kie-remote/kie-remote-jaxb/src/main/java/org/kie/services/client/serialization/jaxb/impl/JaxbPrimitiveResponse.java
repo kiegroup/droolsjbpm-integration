@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
 
-@XmlRootElement(name="primitive")
+@XmlRootElement(name="primitive-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbPrimitiveResponse extends AbstractJaxbCommandResponse<Object> {
 

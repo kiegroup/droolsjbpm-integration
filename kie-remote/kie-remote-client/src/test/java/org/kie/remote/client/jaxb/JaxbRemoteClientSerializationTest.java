@@ -1,7 +1,5 @@
 package org.kie.remote.client.jaxb;
 
-import static org.kie.remote.client.jaxb.ConversionUtil.convertDateToXmlGregorianCalendar;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.services.task.impl.model.UserImpl;
-import org.jbpm.services.task.impl.model.xml.JaxbTaskSummary;
 import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
@@ -20,11 +17,11 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.TaskQueryService;
-import org.kie.remote.jaxb.gen.Status;
-import org.kie.remote.jaxb.gen.TaskSummary;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,12 +69,12 @@ public class JaxbRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         taskSumImpl.setActualOwner(new UserImpl("Minnie"));
         taskSumImpl.setCreatedBy(new UserImpl("Mickey"));
        
-        List<TaskSummary> genTaskSumList = new ArrayList<TaskSummary>();
-        Iterator<org.kie.api.task.model.TaskSummary> iter = taskSumList.iterator();
+        List<JaxbTaskSummary> jaxbTaskSumList = new ArrayList<JaxbTaskSummary>();
+        Iterator<TaskSummary> iter = taskSumList.iterator();
         while( iter.hasNext() ) { 
-            genTaskSumList.add(convertTaskSumToGenJaxbTaskSum(iter.next()));
+            jaxbTaskSumList.add(new JaxbTaskSummary(iter.next()));
         }
-        JaxbTaskSummaryListResponse jaxbTaskSumListResp = new JaxbTaskSummaryListResponse(genTaskSumList);
+        JaxbTaskSummaryListResponse jaxbTaskSumListResp = new JaxbTaskSummaryListResponse(jaxbTaskSumList);
         JaxbTaskSummaryListResponse jaxbTaskSumListRespCopy = testRoundTrip(jaxbTaskSumListResp);
         assertEquals( jaxbTaskSumListResp.getList().size(), jaxbTaskSumListRespCopy.getList().size() );
         TaskSummary taskSum = jaxbTaskSumListResp.getList().get(0);
@@ -89,41 +86,16 @@ public class JaxbRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
                 "subTaskStrategy"); // dates
     }
    
-    private List<org.kie.remote.jaxb.gen.TaskSummary> convertToJaxbTaskSummaryList(Collection<org.kie.api.task.model.TaskSummary> list) {
+    private List<JaxbTaskSummary> convertToJaxbTaskSummaryList(Collection<org.kie.api.task.model.TaskSummary> list) {
         if( list == null || list.isEmpty() ) { 
-            return new ArrayList<org.kie.remote.jaxb.gen.TaskSummary>();
+            return new ArrayList<JaxbTaskSummary>();
         }
-        List<org.kie.remote.jaxb.gen.TaskSummary> newList = new ArrayList<org.kie.remote.jaxb.gen.TaskSummary>(list.size());
-        Iterator<org.kie.api.task.model.TaskSummary> iter = list.iterator();
+        List<JaxbTaskSummary> newList = new ArrayList<JaxbTaskSummary>(list.size());
+        Iterator<TaskSummary> iter = list.iterator();
         while(iter.hasNext()) { 
-            org.kie.remote.jaxb.gen.TaskSummary taskSum = convertTaskSumToGenJaxbTaskSum(iter.next());
+            JaxbTaskSummary taskSum = new JaxbTaskSummary(iter.next());
             newList.add(taskSum);
         }
         return newList;
-    }
-   
-    static org.kie.remote.jaxb.gen.TaskSummary convertTaskSumToGenJaxbTaskSum(org.kie.api.task.model.TaskSummary taskSum) { 
-        org.kie.remote.jaxb.gen.TaskSummary genTaskSum = new org.kie.remote.jaxb.gen.TaskSummary();
-       
-        genTaskSum.setActivationTime(convertDateToXmlGregorianCalendar(taskSum.getActivationTime()));
-        genTaskSum.setActualOwner(taskSum.getActualOwnerId());
-        genTaskSum.setCreatedBy(taskSum.getCreatedById());
-        genTaskSum.setCreatedOn(convertDateToXmlGregorianCalendar(taskSum.getCreatedOn()));
-        genTaskSum.setDeploymentId(taskSum.getDeploymentId());
-        genTaskSum.setDescription(taskSum.getDescription());
-        genTaskSum.setExpirationTime(convertDateToXmlGregorianCalendar(taskSum.getExpirationTime()));
-        genTaskSum.setId(taskSum.getId());
-        genTaskSum.setName(taskSum.getName());
-        genTaskSum.setParentId(taskSum.getParentId());
-        genTaskSum.setPriority(taskSum.getPriority());
-        genTaskSum.setProcessId(taskSum.getProcessId());
-        genTaskSum.setProcessInstanceId(taskSum.getProcessInstanceId());
-        genTaskSum.setProcessSessionId(taskSum.getProcessSessionId());
-        genTaskSum.setQuickTaskSummary(taskSum.isQuickTaskSummary());
-        genTaskSum.setSkipable(taskSum.isSkipable());
-        genTaskSum.setStatus(Status.fromValue(taskSum.getStatus().toString()));
-        genTaskSum.setSubject(taskSum.getSubject());
-        
-        return genTaskSum;
     }
 }

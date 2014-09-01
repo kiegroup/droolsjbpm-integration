@@ -15,9 +15,9 @@ import org.kie.api.runtime.process.WorkItem;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
-@XmlRootElement(name = "work-item")
+@XmlRootElement(name = "work-item-response")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbWorkItem extends AbstractJaxbCommandResponse<WorkItem> implements WorkItem {
+public class JaxbWorkItemResponse extends AbstractJaxbCommandResponse<WorkItem> implements WorkItem {
 
     @XmlElement
     @XmlSchemaType(name="long")
@@ -43,15 +43,15 @@ public class JaxbWorkItem extends AbstractJaxbCommandResponse<WorkItem> implemen
     @XmlSchemaType(name="long")
     private Long processInstanceId;
 
-    public JaxbWorkItem() { 
+    public JaxbWorkItemResponse() { 
         // Default
     }
     
-    public JaxbWorkItem(WorkItem workItem) { 
+    public JaxbWorkItemResponse(WorkItem workItem) { 
         setResult(workItem);
     }
     
-    public JaxbWorkItem(WorkItem result, int i, Command<?> cmd) {
+    public JaxbWorkItemResponse(WorkItem result, int i, Command<?> cmd) {
         super(i, cmd);
         setResult(result);
     }

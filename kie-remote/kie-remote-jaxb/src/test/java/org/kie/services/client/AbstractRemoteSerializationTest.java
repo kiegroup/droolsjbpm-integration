@@ -56,7 +56,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefini
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItem;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.slf4j.Logger;
@@ -112,8 +112,6 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         this.setupDataSource = false;
         this.sessionPersistence = false;
     }
-    
-    // TESTS
     
     /*
      * Tests
@@ -259,7 +257,7 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         // Don't run with YAML?
         Assume.assumeFalse(getType().equals(TestType.YAML));
 
-        JaxbWorkItem workitemObject = new JaxbWorkItem();
+        JaxbWorkItemResponse workitemObject = new JaxbWorkItemResponse();
         workitemObject.setId(35l);
         workitemObject.setName("Clau");
         workitemObject.setState(0);
@@ -267,7 +265,7 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("test", "driving");
         workitemObject.setParameters(params);
-        JaxbWorkItem roundTripWorkItem = testRoundTrip(workitemObject);
+        JaxbWorkItemResponse roundTripWorkItem = testRoundTrip(workitemObject);
         ComparePair.compareObjectsViaFields(workitemObject, roundTripWorkItem);
     }
 

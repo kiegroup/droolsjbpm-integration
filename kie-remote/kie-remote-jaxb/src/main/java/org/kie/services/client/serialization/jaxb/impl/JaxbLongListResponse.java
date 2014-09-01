@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
 
-@XmlRootElement(name="long-list")
+@XmlRootElement(name="long-list-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbLongListResponse extends AbstractJaxbCommandResponse<List<Long>> {
 
