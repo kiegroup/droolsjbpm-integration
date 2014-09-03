@@ -15,6 +15,10 @@
 
   <properties>
     <eap630.download.url>valid-url-for-eap-6.3.0-needs-to-be-specified-here-or-via-cmd-line</eap630.download.url>
+    <container.hostname>localhost</container.hostname>
+    <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
+         is not able to override the value of the property. The port number would then always be the same
+         (the default one, unless changed from outside) -->
   </properties>
 
   <dependencyManagement>
@@ -179,10 +183,32 @@
           <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
         </configuration>
       </plugin>
-
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>reserve-network-port</id>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <portNames>
+                <portName>container.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <kie.server.base.uri>http://${container.hostname}:${container.port}/kie-server-services/services/rest/server</kie.server.base.uri>
+          </systemPropertyVariables>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -201,6 +227,11 @@
             <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
             <type>embedded</type>
           </container>
+          <configuration>
+            <properties>
+              <cargo.servlet.port>${container.port}</cargo.servlet.port>
+            </properties>
+          </configuration>
         </configuration>
         <executions>
           <execution>
@@ -242,6 +273,11 @@
                   <extractDir>${project.build.directory}/extracts</extractDir>
                 </zipUrlInstaller>
               </container>
+              <configuration>
+                <properties>
+                  <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                </properties>
+              </configuration>
             </configuration>
           </plugin>
         </plugins>
@@ -263,6 +299,11 @@
                   <extractDir>${project.build.directory}/extracts</extractDir>
                 </zipUrlInstaller>
               </container>
+              <configuration>
+                <properties>
+                  <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                </properties>
+              </configuration>
             </configuration>
           </plugin>
         </plugins>
