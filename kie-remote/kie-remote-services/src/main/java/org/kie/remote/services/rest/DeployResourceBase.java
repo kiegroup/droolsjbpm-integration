@@ -136,6 +136,7 @@ public class DeployResourceBase extends ResourceBase {
         depDescImpl.setEnvironmentEntries(jaxbDepDesc.getEnvironmentEntries()); 
         depDescImpl.setConfiguration(jaxbDepDesc.getConfiguration()); 
         depDescImpl.setRequiredRoles(jaxbDepDesc.getRequiredRoles());
+        depDescImpl.setClasses(jaxbDepDesc.getClasses());
         
         return depDescImpl;
     }
