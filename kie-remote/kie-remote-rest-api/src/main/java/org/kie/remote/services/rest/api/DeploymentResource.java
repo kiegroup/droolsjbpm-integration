@@ -13,6 +13,7 @@ public interface DeploymentResource {
 
     /**
      * Retrieve the status of the {@link DeploymentUnit} specified in the URL.
+     * 
      * @return A {@link JaxbDeploymentUnit} instance
      */
     @GET
@@ -20,9 +21,10 @@ public interface DeploymentResource {
 
     /**
      * Queues a request to deploy the given deployment unit. If the deployment already exist, this
-     * operation will fail. 
+     * operation will fail.
+     * 
      * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
-     *                         the deployment unit should be deployed.
+     * the deployment unit should be deployed.
      * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
      */
     @POST
@@ -31,15 +33,15 @@ public interface DeploymentResource {
 
     /**
      * Queues a request to undeploy the deployment unit specified in the URL
+     * 
      * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
      */
-     @POST
-     @Path("/undeploy")
+    @POST
+    @Path("/undeploy")
     public Response undeploy();
 
-     @GET
-     @Path("/processes")
-    // DOCS: (+ pagination)
+    @GET
+    @Path("/processes")
     public Response listProcessDefinitions();
 
 }

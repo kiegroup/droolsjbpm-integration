@@ -10,15 +10,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.jbpm.kie.services.impl.KModuleDeploymentService;
-import org.jbpm.services.cdi.Kjar;
-import org.kie.remote.services.rest.api.DeploymentsResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 
-@RequestScoped
 @Path("/deployment")
-public class DeploymentsResourceImpl extends ResourceBase implements DeploymentsResource {
+@RequestScoped
+public class DeploymentsResourceImpl extends ResourceBase {
 
     @Context
     private HttpHeaders headers;
@@ -30,10 +27,6 @@ public class DeploymentsResourceImpl extends ResourceBase implements Deployments
   
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.DeploymentsResource#listDeployments()
-     */
-    @Override
     @GET
     // TODO: docs pagination
     public Response listDeployments() { 
@@ -47,10 +40,6 @@ public class DeploymentsResourceImpl extends ResourceBase implements Deployments
         return createCorrectVariant(resultList, headers);
     }
    
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.DeploymentsResource#listProcessDefinitions()
-     */
-    @Override
     @GET
     @Path("/processes")
     // DOCS: (+ pagination)

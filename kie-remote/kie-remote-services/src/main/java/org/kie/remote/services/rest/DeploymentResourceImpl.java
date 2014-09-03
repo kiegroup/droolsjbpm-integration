@@ -13,7 +13,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.kie.remote.services.rest.api.DeploymentResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
@@ -35,9 +34,9 @@ import org.slf4j.LoggerFactory;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's funtion.
  */
-@RequestScoped
 @Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
-public class DeploymentResourceImpl extends ResourceBase implements DeploymentResource {
+@RequestScoped
+public class DeploymentResourceImpl extends ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentResourceImpl.class);
     
@@ -56,10 +55,6 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
    
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.DeploymentResource#getConfig()
-     */
-    @Override
     @GET
     public Response getConfig() { 
         JaxbDeploymentUnit jaxbDepUnit = deployBase.determineStatus(deploymentId, true);
@@ -67,11 +62,6 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
         return createCorrectVariant(jaxbDepUnit, headers);
     }
 
-  
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.DeploymentResource#deploy(org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor)
-     */
-    @Override
     @POST
     @Path("/deploy")
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
@@ -86,10 +76,6 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.DeploymentResource#undeploy()
-     */
-    @Override
     @POST
     @Path("/undeploy")
     public Response undeploy() { 
@@ -97,14 +83,8 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.DeploymentResource#listProcessDefinitions()
-     */
-    @Override
     @GET
     @Path("/processes")
-    // DOCS: (+ pagination)
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();

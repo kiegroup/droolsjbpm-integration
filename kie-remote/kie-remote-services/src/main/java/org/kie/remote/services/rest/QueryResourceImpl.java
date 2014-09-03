@@ -2,16 +2,9 @@ package org.kie.remote.services.rest;
 
 import java.util.Map;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-
-import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 
 /**
  * Not done. 
@@ -30,8 +23,8 @@ public class QueryResourceImpl extends ResourceBase {
    
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    @GET
-    @Path("/task")
+//    @GET
+//    @Path("/task")
     // TODO: docs pagination
     public Response queryTasks() { 
         String oper = getRelativePath();
@@ -44,8 +37,8 @@ public class QueryResourceImpl extends ResourceBase {
         return createCorrectVariant(null, headers);
     }
    
-    @GET
-    @Path("/process")
+//    @GET
+//    @Path("/process")
     public Response queryProcessInstances() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();

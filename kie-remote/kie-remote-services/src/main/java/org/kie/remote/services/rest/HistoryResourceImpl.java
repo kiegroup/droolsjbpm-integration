@@ -20,7 +20,6 @@ import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.kie.remote.services.rest.api.HistoryResource;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -39,10 +38,10 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's funtion.
  */
+@Path("/history")
 @RequestScoped
 @SuppressWarnings("unchecked")
-@Path("/history")
-public class HistoryResourceImpl extends ResourceBase implements HistoryResource {
+public class HistoryResourceImpl extends ResourceBase {
 
     /* REST information */
     
@@ -61,11 +60,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
     
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#clear()
-     */
-    
-    @Override
     @POST
     @Path("/clear")
     public Response clear() {
@@ -73,10 +67,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#instances()
-     */
-    @Override
     @GET
     @Path("/instances")
     public Response instances() {
@@ -91,13 +81,8 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#instance_procInstId(long)
-     */
-    @Override
     @GET
     @Path("/instance/{procInstId: [0-9]+}")
-    // TODO: docs
     public Response instance_procInstId(@PathParam("procInstId") long procInstId) {
         ProcessInstanceLog procInstLog = getAuditLogService().findProcessInstance(procInstId);
         JaxbProcessInstanceLog jaxbProcLog = new JaxbProcessInstanceLog(procInstLog);
@@ -105,10 +90,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(jaxbProcLog, headers);
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#instance_procInstid_oper(java.lang.Long, java.lang.String)
-     */
-    @Override
     @GET
     @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
     public Response instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
@@ -132,10 +113,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#instance_procInstId_oper_logId(java.lang.Long, java.lang.String, java.lang.String)
-     */
-    @Override
     @GET
     @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
     public Response instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
@@ -158,10 +135,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#process_procDefId(java.lang.String)
-     */
-    @Override
     @GET
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}")
     public Response process_procDefId(@PathParam("processDefId") String processId) {
@@ -200,10 +173,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#variable_varId(java.lang.String)
-     */
-    @Override
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}")
     public Response variable_varId(@PathParam("varId") String variableId) {
@@ -218,10 +187,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     }
     
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#variable_varId_value_valueVal(java.lang.String, java.lang.String)
-     */
-    @Override
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
     public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
@@ -235,10 +200,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     } 
    
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#variable_varId_instances(java.lang.String)
-     */
-    @Override
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
     // TODO: docs
@@ -261,10 +222,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         return createCorrectVariant(resultList, headers);
     }
     
-    /* (non-Javadoc)
-     * @see org.kie.remote.services.rest.HistoryResource#variable_varId_value_valueVal_instances(java.lang.String, java.lang.String)
-     */
-    @Override
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\._]+}/instances")
     public Response variable_varId_value_valueVal_instances(@PathParam("varId") String variableId, @PathParam("value") String value) {

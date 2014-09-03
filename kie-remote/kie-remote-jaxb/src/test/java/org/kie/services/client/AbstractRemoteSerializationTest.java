@@ -2,16 +2,19 @@ package org.kie.services.client;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.common.DisconnectedFactHandle;
 import org.drools.core.impl.EnvironmentFactory;
+import org.hibernate.mapping.Array;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.process.instance.event.DefaultSignalManagerFactory;
@@ -40,6 +43,8 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.internal.runtime.conf.AuditMode;
+import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.remote.common.jaxb.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
@@ -48,6 +53,7 @@ import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbNodeInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbVariableInstanceLog;
+import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
@@ -487,5 +493,36 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         JaxbProcessDefinition copyJaxbProcDef = testRoundTrip(jaxbProcDef);
         ComparePair.compareObjectsViaFields(jaxbProcDef, copyJaxbProcDef);
     }
+ 
+    @Test
+    public void deploymentDescriptorTest() throws Exception {
+        JaxbDeploymentDescriptor depDescriptor = new JaxbDeploymentDescriptor();
+        
+        depDescriptor.setAuditMode(AuditMode.JMS);
+        depDescriptor.setAuditPersistenceUnit("myDatabasePersistenceUnit");
+        String [] classes = { "org.test.First", "org.more.test.Second" }; 
+        depDescriptor.setClasses(Arrays.asList(classes));
+        
+        depDescriptor.setConfiguration(getNamedObjectModeList("conf"));
+        depDescriptor.setEnvironmentEntries(getNamedObjectModeList("envEnt"));
+        
+    }
    
+    private List<NamedObjectModel> getNamedObjectModeList(String type) { 
+        type = "-" + type;
+        List<NamedObjectModel> namedObjectModelList = new ArrayList<NamedObjectModel>();
+        for( int i = 0; i < 2; ++i ) { 
+            NamedObjectModel nom = new NamedObjectModel();
+            nom.setIdentifier( "id-" + i + type);
+            nom.setName("name-"+i + type);
+            String [] params = { UUID.randomUUID().toString(), UUID.randomUUID().toString() };
+            List<Object> paramList = new ArrayList<Object>();
+            paramList.addAll(Arrays.asList(params));
+            nom.setParameters(paramList);
+            nom.setResolver(i + "-resolver" + type);
+            namedObjectModelList.add(nom);
+        }
+        return namedObjectModelList;
+    }
+    
 }
