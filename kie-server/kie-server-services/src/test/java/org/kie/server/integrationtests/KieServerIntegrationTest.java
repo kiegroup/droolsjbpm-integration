@@ -59,9 +59,9 @@ import org.kie.server.services.rest.KieServerRestImpl;
 import com.thoughtworks.xstream.XStream;
 
 public class KieServerIntegrationTest {
+    public static final String BASE_URI = System.getProperty("kie.server.base.uri",
+            "http://localhost:8080/kie-server-services/services/rest/server");
 
-    //private static final int PORT = findFreePort();
-    public static final String BASE_URI = "http://localhost:8080/kie-server-services/services/rest/server";
     private static MavenRepository repository;
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
@@ -72,12 +72,6 @@ public class KieServerIntegrationTest {
     public static void initialize() throws Exception {
         createAndDeployKJar(releaseId1);
         createAndDeployKJar(releaseId2);
-        // this initialization only needs to be done once per VM
-        //RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-    }
-
-    @AfterClass
-    public static void destroy() throws Exception {
     }
 
     @Before
@@ -383,21 +377,6 @@ public class KieServerIntegrationTest {
 
         // make sure it is not deployed in the in-memory repository
         ks.getRepository().removeKieModule(releaseId);
-    }
-
-    public static int findFreePort() {
-        int port = 0;
-        try {
-            ServerSocket server =
-                    new ServerSocket(0);
-            port = server.getLocalPort();
-            server.close();
-        } catch (IOException e) {
-            // failed to dynamically allocate port, try to use hard coded one
-            port = 9789;
-        }
-        System.out.println("Allocating port: "+port);
-        return port;
     }
 
 }
