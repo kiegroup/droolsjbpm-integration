@@ -14,7 +14,6 @@
   <description>KIE Execution Server Services</description>
 
   <properties>
-    <eap630.download.url>valid-url-for-eap-6.3.0-needs-to-be-specified-here-or-via-cmd-line</eap630.download.url>
     <container.hostname>localhost</container.hostname>
     <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
          is not able to override the value of the property. The port number would then always be the same
@@ -260,7 +259,12 @@
       </build>
     </profile>
     <profile>
-      <id>jboss74x</id> <!-- aka EAP 6.3.x -->
+      <id>eap63x</id>
+      <properties>
+        <!-- The EAP 6.3.x binary can't be anonymously download with each build. It needs to downloaded manually and
+             the location needs to be specified here or via system property when running the build. -->
+        <eap63x.download.url>valid-url-for-eap-6.3.x-needs-to-be-specified-here-or-via-cmd-line</eap63x.download.url>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -270,7 +274,7 @@
               <container>
                 <containerId>jboss74x</containerId>
                 <zipUrlInstaller>
-                  <url>${eap630.download.url}</url>
+                  <url>${eap63x.download.url}</url>
                   <downloadDir>${project.build.directory}/downloads</downloadDir>
                   <extractDir>${project.build.directory}/extracts</extractDir>
                 </zipUrlInstaller>
