@@ -141,6 +141,12 @@
   </dependencies>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <!-- we need to fork always as we have mixture of both arquillian 
@@ -178,6 +184,24 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-custom-maven-repo-dir</id>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <tasks>
+                <mkdir dir="${project.build.directory}/kie-server-testing-maven-repo"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
@@ -201,6 +225,9 @@
           <container>
             <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
             <type>embedded</type>
+            <systemProperties>
+              <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-custom-settings.xml</kie.maven.settings.custom>
+            </systemProperties>
           </container>
           <configuration>
             <properties>
@@ -239,9 +266,10 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="override">
+            <configuration combine.self="append">
               <container>
                 <containerId>tomcat7x</containerId>
+                <type>installed</type>
                 <zipUrlInstaller>
                   <url>http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</url>
                   <downloadDir>${project.build.directory}/downloads</downloadDir>
@@ -261,7 +289,7 @@
     <profile>
       <id>eap63x</id>
       <properties>
-        <!-- The EAP 6.3.x binary can't be anonymously download with each build. It needs to downloaded manually and
+        <!-- The EAP 6.3.x binary can't be anonymously downloaded with each build. It needs to downloaded manually and
              the location needs to be specified here or via system property when running the build. -->
         <eap63x.download.url>valid-url-for-eap-6.3.x-needs-to-be-specified-here-or-via-cmd-line</eap63x.download.url>
       </properties>
@@ -270,9 +298,10 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="override">
+            <configuration combine.self="append">
               <container>
                 <containerId>jboss74x</containerId>
+                <type>installed</type>
                 <zipUrlInstaller>
                   <url>${eap63x.download.url}</url>
                   <downloadDir>${project.build.directory}/downloads</downloadDir>
