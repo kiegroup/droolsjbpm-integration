@@ -58,10 +58,7 @@ import org.kie.server.services.rest.KieServerRestImpl;
 
 import com.thoughtworks.xstream.XStream;
 
-public class KieServerIntegrationTest {
-    public static final String BASE_URI = System.getProperty("kie.server.base.uri",
-            "http://localhost:8080/kie-server-services/services/rest/server");
-
+public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
     private static MavenRepository repository;
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
