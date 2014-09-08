@@ -58,25 +58,14 @@ import org.kie.server.services.rest.KieServerRestImpl;
 
 import com.thoughtworks.xstream.XStream;
 
-public class KieServerIntegrationTest {
-    public static final String BASE_URI = System.getProperty("kie.server.base.uri",
-            "http://localhost:8080/kie-server-services/services/rest/server");
-
-    private static MavenRepository repository;
+public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
-
-    private KieServicesClient       client;
 
     @BeforeClass
     public static void initialize() throws Exception {
         createAndDeployKJar(releaseId1);
         createAndDeployKJar(releaseId2);
-    }
-
-    @Before
-    public void setup() throws Exception {
-        startClient();
     }
 
     @Test
@@ -86,88 +75,6 @@ public class KieServerIntegrationTest {
         KieServerInfo info = reply.getResult();
         Assert.assertEquals(KieServerEnvironment.getVersion().toString(), info.getVersion());
         System.out.println(reply.getResult());
-    }
-
-    @Test
-    public void testCreateContainer() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1",
-                                                                                                              releaseId1));
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-    }
-
-    @Test
-    public void testCreateContainerNonExistingGAV() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1",
-                                                                                                              new ReleaseId(
-                                                                                                                      "foo",
-                                                                                                                      "bar",
-                                                                                                                      "0.0.0")));
-        Assert.assertEquals(ResponseType.FAILURE, reply.getType());
-    }
-
-    @Test
-    public void testCreateContainerNonExistingGAV2() throws Exception {
-        KieContainerResource resource = new KieContainerResource("kie1", new ReleaseId("foo", "bar", "0.0.0"));
-
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-        try {
-            ClientRequest clientRequest = new ClientRequest(BASE_URI + "/containers/" + resource.getContainerId());
-            response = clientRequest.body(
-                    MediaType.APPLICATION_XML_TYPE, resource).put(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
-            Assert.assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
-            Assert.assertEquals( ResponseType.FAILURE, response.getEntity().getType());
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception creating container: "+resource.getContainerId()+" with release-id "+resource.getReleaseId(), e, response );
-        }
-    }
-
-    @Test
-    public void testCreateContainerEmptyBody() throws Exception {
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-        try {
-            ClientRequest clientRequest = new ClientRequest(BASE_URI + "/containers/kie1");
-            response = clientRequest.body(
-                    MediaType.APPLICATION_XML_TYPE, "").put(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
-            Assert.assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception on empty body", e, response );
-        }
-    }
-
-    @Test
-    public void testGetContainerInfo() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
-        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        
-        KieContainerResource info = reply.getResult();
-        Assert.assertEquals( KieContainerStatus.STARTED, info.getStatus() );
-    }
-
-    @Test
-    public void testGetContainerInfoNonExisting() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("non-existing-container");
-        Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
-    }
-
-    @Test
-    public void testListContainers() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
-        client.createContainer("kie2", new KieContainerResource("kie2", releaseId1));
-        ServiceResponse<KieContainerResourceList> reply = client.listContainers();
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        Assert.assertEquals(2, reply.getResult().getContainers().size());
-    }
-
-    @Test
-    public void testDisposeContainer() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
-        ServiceResponse<Void> reply = client.disposeContainer("kie1");
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
@@ -184,18 +91,6 @@ public class KieServerIntegrationTest {
                 "</batch-execution>";
 
         ServiceResponse<String> reply = client.executeCommands("kie1", payload);
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-    }
-
-    @Test
-    public void testUpdateVersion() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
-        
-        ServiceResponse<ReleaseId> v = client.updateReleaseId("kie1", releaseId2);
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, v.getType());
-        Assert.assertEquals(releaseId2, v.getResult());
-        
-        ServiceResponse<Void> reply = client.disposeContainer("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
@@ -317,66 +212,6 @@ public class KieServerIntegrationTest {
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
-    }
-
-    public static byte[] createAndDeployJar(KieServices ks,
-            ReleaseId releaseId,
-            String... drls) {
-        KieFileSystem kfs = ks.newKieFileSystem().generateAndWritePomXML(
-                releaseId);
-        for (int i = 0; i < drls.length; i++) {
-            if (drls[i] != null) {
-                kfs.write("src/main/resources/org/pkg1/r" + i + ".drl", drls[i]);
-            }
-        }
-        byte[] pom = kfs.read("pom.xml");
-        KieBuilder kb = ks.newKieBuilder(kfs).buildAll();
-        Assert.assertFalse(kb.getResults().getMessages(org.kie.api.builder.Message.Level.ERROR).toString(),
-                kb.getResults().hasMessages(org.kie.api.builder.Message.Level.ERROR));
-        InternalKieModule kieModule = (InternalKieModule) ks.getRepository().getKieModule(releaseId);
-        byte[] jar = kieModule.getBytes();
-
-        try {
-            FileOutputStream fos = new FileOutputStream("target/baz-2.1.0.GA.jar");
-            fos.write(jar);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        repository = MavenRepository.getMavenRepository();
-        repository.deployArtifact(releaseId, jar, pom);
-        return jar;
-    }
-
-    private void startClient() throws Exception {
-        client = new KieServicesClient(BASE_URI);
-    }
-
-    private static void createAndDeployKJar(ReleaseId releaseId) {
-        String drl = "package org.pkg1\n"
-                + "global java.util.List list;"
-                + "declare Message\n"
-                + "    text : String\n"
-                + "end\n"
-                + "rule echo dialect \"mvel\"\n"
-                + "when\n"
-                + "    $m : Message()\n"
-                + "then\n"
-                + "    $m.text = \"echo:\" + $m.text;\n"
-                + "end\n"
-                + "rule X when\n"
-                + "    msg : String()\n"
-                + "then\n"
-                + "    list.add(msg);\n"
-                + "end\n";
-        KieServices ks = KieServices.Factory.get();
-        createAndDeployJar(ks, releaseId, drl);
-
-        // make sure it is not deployed in the in-memory repository
-        ks.getRepository().removeKieModule(releaseId);
     }
 
 }
