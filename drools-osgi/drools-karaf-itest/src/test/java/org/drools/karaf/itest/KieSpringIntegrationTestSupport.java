@@ -16,16 +16,6 @@
 
 package org.drools.karaf.itest;
 
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.inject.Inject;
-
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.ops4j.pax.exam.options.UrlReference;
@@ -33,6 +23,14 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
 public class KieSpringIntegrationTestSupport {
 
@@ -87,7 +85,7 @@ public class KieSpringIntegrationTestSupport {
             result.add(feature);
         }
 
-        return scanFeatures(getFeaturesUrl("org.drools","drools-karaf-features",DroolsVersion), result.toArray(new String[1 + features.length]));
+        return features(getFeaturesUrl("org.drools","drools-karaf-features",DroolsVersion), result.toArray(new String[1 + features.length]));
     }
 
 }

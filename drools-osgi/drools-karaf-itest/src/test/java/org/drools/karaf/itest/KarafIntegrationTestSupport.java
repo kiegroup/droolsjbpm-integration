@@ -16,16 +16,12 @@
 
 package org.drools.karaf.itest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.inject.Inject;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.osgi.CamelContextFactory;
 import org.apache.camel.test.junit4.CamelTestSupport;
+import org.drools.core.util.Drools;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.ops4j.pax.exam.options.UrlReference;
 import org.osgi.framework.Bundle;
@@ -33,23 +29,19 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
+import javax.inject.Inject;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
 public class KarafIntegrationTestSupport extends CamelTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(KarafIntegrationTestSupport.class);
-    private static final String CamelVersion = "2.10.3";
-    protected static final String DroolsVersion;
-    static { 
-        Properties testProps = new Properties();
-        try {
-            testProps.load(KieSpringIntegrationTestSupport.class.getResourceAsStream("/test.properties"));
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to initialize DroolsVersion property: " + e.getMessage(), e);
-        }
-        DroolsVersion = testProps.getProperty("project.version");
-    }
-    
+
     @Inject
     protected BundleContext bundleContext;
 
@@ -86,14 +78,18 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
         return mavenBundle().groupId(groupId).artifactId(camelId);
     }
 
+    public static UrlReference getCamelKarafFeatureUrl() {
+        return getCamelKarafFeatureUrl(null);
+    }
+
     public static UrlReference getCamelKarafFeatureUrl(String version) {
-        String type = "xml";
-        String classifier = "features";
-        MavenArtifactProvisionOption mavenOption = getFeatureUrl("org.apache.camel.karaf", "apache-camel");
+
+        String type = "xml/features";
+        MavenArtifactProvisionOption mavenOption = mavenBundle().groupId("org.apache.camel.karaf").artifactId("apache-camel");
         if (version == null) {
-            return mavenOption.versionAsInProject().type(type).classifier(classifier);
+            return mavenOption.versionAsInProject().type(type);
         } else {
-            return mavenOption.version(version).type(type).classifier(classifier);
+            return mavenOption.version(version).type(type);
         }
     }
 
@@ -105,7 +101,7 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
         for (String feature : features) {
             result.add(feature);
         }
-        return scanFeatures(getCamelKarafFeatureUrl(CamelVersion), result.toArray(new String[4 + features.length]));
+        return features(getCamelKarafFeatureUrl(), result.toArray(new String[result.size()]));
     }
 
     public static Option loadDroolsFeatures(String... features) {
@@ -114,7 +110,26 @@ public class KarafIntegrationTestSupport extends CamelTestSupport {
         for (String feature : features) {
             result.add(feature);
         }
-        return scanFeatures(getFeatureUrl("org.drools", "drools-karaf-features").type("xml").classifier("features").version(DroolsVersion), result.toArray(new String[4 + features.length]));
+        return features(getFeatureUrl("org.drools", "drools-karaf-features").type("xml").classifier("features").version(Drools.getFullVersion()), result.toArray(new String[4 + features.length]));
+    }
+
+    private static String getKarafVersion() {
+        String karafVersion = System.getProperty("karafVersion");
+        if (karafVersion == null) {
+            // setup the default version of it
+            karafVersion = "2.3.3";
+        }
+        return karafVersion;
+    }
+
+    public static Option getKarafDistributionOption() {
+        String karafVersion = getKarafVersion();
+        LOG.info("*** The karaf version is " + karafVersion + " ***");
+        return KarafDistributionOption.karafDistributionConfiguration()
+                                      .frameworkUrl(maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
+                                      .karafVersion(karafVersion)
+                                      .name("Apache Karaf")
+                                      .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/"));
     }
 
 }

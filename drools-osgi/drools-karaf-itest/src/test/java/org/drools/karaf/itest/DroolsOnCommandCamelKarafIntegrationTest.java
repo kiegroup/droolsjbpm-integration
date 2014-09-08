@@ -16,30 +16,28 @@
 
 package org.drools.karaf.itest;
 
-import java.io.File;
-import java.util.Collection;
-
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.apache.karaf.tooling.exam.options.LogLevelOption;
 import org.drools.camel.example.Person;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
-import static org.apache.karaf.tooling.exam.options.KarafDistributionOption.*;
-import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
-import static org.ops4j.pax.exam.CoreOptions.*;
+import java.util.Collection;
 
-@RunWith(JUnit4TestRunner.class)
+import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+
+@RunWith(PaxExam.class)
 public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpringTestSupport {
 
     protected static final transient Logger LOG = LoggerFactory.getLogger(DroolsOnCommandCamelKarafIntegrationTest.class);
@@ -103,17 +101,13 @@ public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpr
     @Configuration
     public static Option[] configure() {
         return new Option[]{
-                karafDistributionConfiguration().frameworkUrl(
-                        maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
-                        //This version doesn't affect the version of karaf we use
-                        .karafVersion(MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf")).name("Apache Karaf")
-                        .unpackDirectory(new File("target/exam/unpack/")),
+                getKarafDistributionOption(),
 
                 keepRuntimeFolder(),
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Load Spring DM Karaf Feature
-                scanFeatures(
+                features(
                         maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
                         "spring", "spring-dm"
                 ),

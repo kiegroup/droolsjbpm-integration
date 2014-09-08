@@ -108,12 +108,10 @@
     </dependency>
 
     <!-- Pax exam & karaf tooling -->
-    <dependency>
+    <!--dependency>
       <groupId>org.apache.karaf.tooling.exam</groupId>
       <artifactId>org.apache.karaf.tooling.exam.container</artifactId>
       <scope>test</scope>
-      <!-- inclusion added to avoid that karaf tooling transitive dependencies load pax-exam 2.4 -->
-      <!-- TODO ip-bom 6.0.0.CR9 will upgrade us from pax 2.6 to 3.4. Are these excludes still relevant? -->
       <exclusions>
         <exclusion>
           <groupId>org.ops4j.pax.exam</groupId>
@@ -136,10 +134,16 @@
           <artifactId>pax-exam-invoker-junit</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-container-karaf</artifactId>
       <scope>test</scope>
     </dependency>
 
