@@ -13,15 +13,12 @@
   <name>KIE :: Execution Server :: Services</name>
   <description>KIE Execution Server Services</description>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>tjws</artifactId>
-        <version>2.3.7.Final</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <properties>
+    <container.hostname>localhost</container.hostname>
+    <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
+         is not able to override the value of the property. The port number would then always be the same
+         (the default one, unless changed from outside) -->
+  </properties>
 
   <dependencies>
     <!-- kie server dependencies -->
@@ -141,11 +138,6 @@
       <artifactId>jboss-servlet-api_3.0_spec</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>tjws</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -166,10 +158,159 @@
           <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>reserve-network-port</id>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <portNames>
+                <portName>container.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <kie.server.base.uri>http://${container.hostname}:${container.port}/kie-server-services/services/rest/server</kie.server.base.uri>
+          </systemPropertyVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-maven2-plugin</artifactId>
+        <configuration>
+          <container>
+            <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
+            <type>embedded</type>
+          </container>
+          <configuration>
+            <properties>
+              <cargo.servlet.port>${container.port}</cargo.servlet.port>
+            </properties>
+          </configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-container</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop-container</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+
+      </plugin>
       <!-- plugin> <groupId>io.fabric8</groupId> <artifactId>fabric8-maven-plugin</artifactId> 
         <configuration> <profile>kieserver</profile> <parentProfiles>containers-tomcat</parentProfiles> 
         </configuration> </plugin -->
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>tomcat7x</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration combine.self="override">
+              <container>
+                <containerId>tomcat7x</containerId>
+                <zipUrlInstaller>
+                  <url>http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</url>
+                  <downloadDir>${project.build.directory}/downloads</downloadDir>
+                  <extractDir>${project.build.directory}/extracts</extractDir>
+                </zipUrlInstaller>
+              </container>
+              <configuration>
+                <properties>
+                  <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                </properties>
+              </configuration>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>eap63x</id>
+      <properties>
+        <!-- The EAP 6.3.x binary can't be anonymously download with each build. It needs to downloaded manually and
+             the location needs to be specified here or via system property when running the build. -->
+        <eap63x.download.url>valid-url-for-eap-6.3.x-needs-to-be-specified-here-or-via-cmd-line</eap63x.download.url>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration combine.self="override">
+              <container>
+                <containerId>jboss74x</containerId>
+                <zipUrlInstaller>
+                  <url>${eap63x.download.url}</url>
+                  <downloadDir>${project.build.directory}/downloads</downloadDir>
+                  <extractDir>${project.build.directory}/extracts</extractDir>
+                </zipUrlInstaller>
+              </container>
+              <configuration>
+                <properties>
+                  <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                </properties>
+              </configuration>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>custom-container</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>none</phase>
+                <goals/> <!-- do nothing, container is not managed by cargo -->
+              </execution>
+              <execution>
+                <id>stop-container</id>
+                <phase>none</phase>
+                <goals/> <!-- do nothing, container is not managed by cargo -->
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

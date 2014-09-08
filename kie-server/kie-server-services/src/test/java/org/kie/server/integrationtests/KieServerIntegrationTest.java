@@ -1,4 +1,4 @@
-package org.kie.server.impl;
+package org.kie.server.integrationtests;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,6 +27,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -57,38 +58,25 @@ import org.kie.server.services.rest.KieServerRestImpl;
 
 import com.thoughtworks.xstream.XStream;
 
-public class KieServerTest {
+public class KieServerIntegrationTest {
+    public static final String BASE_URI = System.getProperty("kie.server.base.uri",
+            "http://localhost:8080/kie-server-services/services/rest/server");
 
-    private static final int PORT = findFreePort();
-    public static final String BASE_URI = "http://localhost:" + PORT + "/server";
     private static MavenRepository repository;
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
 
-    private TJWSEmbeddedJaxrsServer server;
     private KieServicesClient       client;
 
     @BeforeClass
     public static void initialize() throws Exception {
         createAndDeployKJar(releaseId1);
         createAndDeployKJar(releaseId2);
-        // this initialization only needs to be done once per VM
-        RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
-    }
-
-    @AfterClass
-    public static void destroy() throws Exception {
     }
 
     @Before
     public void setup() throws Exception {
-        startServer();
         startClient();
-    }
-
-    @After
-    public void tearDown() {
-        server.stop();
     }
 
     @Test
@@ -162,7 +150,7 @@ public class KieServerTest {
 
     @Test
     public void testGetContainerInfoNonExisting() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("non-existing-container");
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 
@@ -258,9 +246,10 @@ public class KieServerTest {
 
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
 
-        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( "kie1", releaseId1, null));
-        KieServerCommand call = new CallContainerCommand("kie1", payload);
-        KieServerCommand dispose = new DisposeContainerCommand("kie1");
+        String containerId = "command-script-container";
+        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId1, null));
+        KieServerCommand call = new CallContainerCommand(containerId, payload);
+        KieServerCommand dispose = new DisposeContainerCommand(containerId);
 
         List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
         CommandScript script = new CommandScript(cmds);
@@ -362,13 +351,6 @@ public class KieServerTest {
         return jar;
     }
 
-    private void startServer() throws Exception {
-        server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(PORT);
-        server.start();
-        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
-    }
-
     private void startClient() throws Exception {
         client = new KieServicesClient(BASE_URI);
     }
@@ -395,21 +377,6 @@ public class KieServerTest {
 
         // make sure it is not deployed in the in-memory repository
         ks.getRepository().removeKieModule(releaseId);
-    }
-
-    public static int findFreePort() {
-        int port = 0;
-        try {
-            ServerSocket server =
-                    new ServerSocket(0);
-            port = server.getLocalPort();
-            server.close();
-        } catch (IOException e) {
-            // failed to dynamically allocate port, try to use hard coded one
-            port = 9789;
-        }
-        System.out.println("Allocating port: "+port);
-        return port;
     }
 
 }
