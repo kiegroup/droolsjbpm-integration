@@ -106,16 +106,6 @@ public abstract class KieServerBaseIntegrationTest {
         InternalKieModule kieModule = (InternalKieModule) ks.getRepository().getKieModule(releaseId);
         byte[] jar = kieModule.getBytes();
 
-        try {
-            FileOutputStream fos = new FileOutputStream("target/baz-2.1.0.GA.jar");
-            fos.write(jar);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         repository = MavenRepository.getMavenRepository();
         repository.deployArtifact(releaseId, jar, pom);
     }
