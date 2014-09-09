@@ -44,10 +44,10 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -138,7 +138,7 @@ public class TaskResourceImpl extends ResourceBase {
                 } 
             }
             if( ! allowed ) { 
-                throw RestOperationException.badRequest(queryParam + " is an unknown and unsupported query param for the task query operation." );
+                throw KieRemoteRestOperationException.badRequest(queryParam + " is an unknown and unsupported query param for the task query operation." );
             }
         }
         
@@ -178,7 +178,7 @@ public class TaskResourceImpl extends ResourceBase {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         JaxbTask task = (JaxbTask) doRestTaskOperation(taskId, cmd);
         if( task == null ) { 
-            throw RestOperationException.notFound("Task " + taskId + " could not be found.");
+            throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
         }
         return createCorrectVariant(task, headers);
     }
@@ -230,7 +230,7 @@ public class TaskResourceImpl extends ResourceBase {
             List<OrganizationalEntity> potentialOwners = getOrganizationalEntityListFromParams(params, true, oper);
             cmd = new NominateTaskCommand(taskId, userId, potentialOwners);
         } else {
-            throw RestOperationException.badRequest("Unsupported operation: " + oper);
+            throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper);
         }
         
         doRestTaskOperation(taskId, cmd);
@@ -243,7 +243,7 @@ public class TaskResourceImpl extends ResourceBase {
                 return oper;
             }
         }
-        throw RestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
+        throw KieRemoteRestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
     
     @GET
@@ -252,7 +252,7 @@ public class TaskResourceImpl extends ResourceBase {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperation(taskId, cmd);
         if( result == null ) {
-            throw RestOperationException.notFound("Task " + taskId + " could not be found.");
+            throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
         }
         Task task = ((Task) result);
         long contentId = task.getTaskData().getDocumentContentId();
@@ -262,7 +262,7 @@ public class TaskResourceImpl extends ResourceBase {
             result = processRequestBean.doRestTaskOperation(taskId, task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId(), task, cmd);
             content = (JaxbContent) result;
         } else { 
-            throw RestOperationException.notFound("Content for task " + taskId + " could not be found.");
+            throw KieRemoteRestOperationException.notFound("Content for task " + taskId + " could not be found.");
         }
         return createCorrectVariant(content, headers);
     }
@@ -286,7 +286,7 @@ public class TaskResourceImpl extends ResourceBase {
                 return createCorrectVariant(response, headers);
             }
         }
-        throw RestOperationException.notFound("Task " + taskId + " could not be found.");
+        throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
     @GET
@@ -295,7 +295,7 @@ public class TaskResourceImpl extends ResourceBase {
         TaskCommand<?> cmd = new GetContentCommand(contentId);
         JaxbContent content = (JaxbContent) doRestTaskOperation(null, cmd);
         if( content == null ) { 
-            throw RestOperationException.notFound("Content " + contentId + " could not be found.");
+            throw KieRemoteRestOperationException.notFound("Content " + contentId + " could not be found.");
         }
         return createCorrectVariant(new JaxbContent(content), headers);
     }

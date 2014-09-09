@@ -18,8 +18,8 @@ import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.cdi.ProcessRequestBean;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -104,7 +104,7 @@ public class HistoryResourceImpl extends ResourceBase {
         } else if ("variable".equalsIgnoreCase(operation)) {
             result = getAuditLogService().findVariableInstances(procInstId);
         } else {
-            throw RestOperationException.badRequest("Unsupported operation: " + oper );
+            throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper );
         }
 
         List<Object> varInstLogList = (List<Object>) result;
@@ -126,7 +126,7 @@ public class HistoryResourceImpl extends ResourceBase {
         } else if ("variable".equalsIgnoreCase(operation)) {
             result = getAuditLogService().findVariableInstances(procInstId, logId);
         } else {
-            throw RestOperationException.badRequest("Unsupported operation: " + oper );
+            throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper );
         }
         
         List<Object> varInstLogList = (List<Object>) result;

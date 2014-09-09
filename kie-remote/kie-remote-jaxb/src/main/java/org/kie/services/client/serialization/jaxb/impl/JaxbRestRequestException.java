@@ -1,4 +1,4 @@
-package org.kie.remote.common.jaxb;
+package org.kie.services.client.serialization.jaxb.impl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name="exception")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbException {
+public class JaxbRestRequestException {
 
     @XmlTransient
     public Exception cause;
@@ -35,16 +35,16 @@ public class JaxbException {
     @XmlSchemaType(name="string")
     private String stackTrace;
     
-    public JaxbException() {
+    public JaxbRestRequestException() {
         // JAXB default constructor
     }
     
-    public JaxbException(Exception e, JaxbRequestStatus status) {
+    public JaxbRestRequestException(Exception e, JaxbRequestStatus status) {
        initializeExceptionAndMessage(e);
        this.status = status;
     }
     
-    public JaxbException(String requestUrl, Exception e, JaxbRequestStatus status) { 
+    public JaxbRestRequestException(String requestUrl, Exception e, JaxbRequestStatus status) { 
         this.url = requestUrl;
         this.status = status;
         initializeExceptionAndMessage(e);

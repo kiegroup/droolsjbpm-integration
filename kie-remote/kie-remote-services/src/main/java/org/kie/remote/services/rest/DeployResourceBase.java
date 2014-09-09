@@ -28,11 +28,11 @@ import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
-import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
 import org.kie.remote.services.rest.async.cmd.JobType;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
@@ -183,7 +183,7 @@ public class DeployResourceBase extends ResourceBase {
             jaxbDepUnit = new JaxbDeploymentUnit(gavKK[0], gavKK[1], gavKK[2], gavKK[3], gavKK[4]);
             break;
         default:
-            throw RestOperationException.notFound("Invalid deployment id: " + deploymentId);
+            throw KieRemoteRestOperationException.notFound("Invalid deployment id: " + deploymentId);
         }
         jaxbDepUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
         return jaxbDepUnit;
@@ -212,7 +212,7 @@ public class DeployResourceBase extends ResourceBase {
                 try { 
                     runtimeStrategy = RuntimeStrategy.valueOf(strategy);
                 } catch( IllegalArgumentException iae ) { 
-                    throw RestOperationException.badRequest("Runtime strategy '" + strategy + "' does not exist.");
+                    throw KieRemoteRestOperationException.badRequest("Runtime strategy '" + strategy + "' does not exist.");
                 }
                 deploymentUnit.setStrategy(runtimeStrategy);
             }
@@ -222,7 +222,7 @@ public class DeployResourceBase extends ResourceBase {
                 try {
                     mode = MergeMode.valueOf(mergeMode);
                 }  catch( IllegalArgumentException iae ) {
-                    throw RestOperationException.badRequest("Merge mode '" + mergeMode + "' does not exist.");
+                    throw KieRemoteRestOperationException.badRequest("Merge mode '" + mergeMode + "' does not exist.");
                 }
                 deploymentUnit.setMergeMode(mode);
             }

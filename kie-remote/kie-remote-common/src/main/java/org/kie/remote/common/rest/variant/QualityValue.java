@@ -1,6 +1,5 @@
 package org.kie.remote.common.rest.variant;
 
-import org.kie.remote.common.exception.RestOperationException;
 
 
 /**
@@ -110,15 +109,15 @@ public final class QualityValue extends Number implements Comparable<QualityValu
    {
       int length = value.length();
       if (length == 0 || length > 5)
-         throw RestOperationException.badRequest(MALFORMED_VALUE_MESSAGE);
+         throw new IllegalArgumentException(MALFORMED_VALUE_MESSAGE);
       if (length > 1 && value.charAt(1) != '.')
-         throw RestOperationException.badRequest(MALFORMED_VALUE_MESSAGE);
+         throw new IllegalArgumentException(MALFORMED_VALUE_MESSAGE);
       int firstCharacter = value.codePointAt(0);
       if (firstCharacter == '1')
       {
          for (int i = 2; i < length; ++i)
             if (value.charAt(i) != '0')
-               throw RestOperationException.badRequest(MALFORMED_VALUE_MESSAGE);
+               throw new IllegalArgumentException(MALFORMED_VALUE_MESSAGE);
          return 1000;
       }
       else if (firstCharacter == '0')
@@ -131,14 +130,14 @@ public final class QualityValue extends Number implements Comparable<QualityValu
             {
                int digit = value.codePointAt(i) - '0';
                if (digit < 0 || digit > 9)
-                  throw RestOperationException.badRequest(MALFORMED_VALUE_MESSAGE);
+                  throw new IllegalArgumentException(MALFORMED_VALUE_MESSAGE);
                weight += digit;
             }
          }
          return weight;
       }
       else
-         throw RestOperationException.badRequest(MALFORMED_VALUE_MESSAGE);
+         throw new IllegalArgumentException(MALFORMED_VALUE_MESSAGE);
    }
 
 }

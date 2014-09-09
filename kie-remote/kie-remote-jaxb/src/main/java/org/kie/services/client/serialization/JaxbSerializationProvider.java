@@ -19,11 +19,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
-import org.kie.remote.common.jaxb.JaxbException;
-import org.kie.remote.common.jaxb.JaxbRequestStatus;
+import org.kie.services.client.serialization.jaxb.impl.JaxbRestRequestException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.JaxbStringListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
@@ -106,7 +106,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 JaxbQueryProcessInstanceResult.class,
                 
                 // exception
-                JaxbException.class
+                JaxbRestRequestException.class
         };
        
         String [] serviceSideClasses = { 

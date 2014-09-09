@@ -1,7 +1,7 @@
 package org.kie.remote.services.cdi;
 
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.FAILURE;
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.PERMISSIONS_CONFLICT;
+import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.FAILURE;
+import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
 import javax.annotation.PostConstruct;
@@ -27,12 +27,12 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
-import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.RuntimeResourceImpl;
 import org.kie.remote.services.rest.TaskResourceImpl;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,11 +170,11 @@ public class ProcessRequestBean {
 
             return result;
         } catch (ProcessInstanceNotFoundException e) {
-            throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
+            throw KieRemoteRestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
         } catch (org.jbpm.services.api.DeploymentNotFoundException e) {
-            throw RestOperationException.notFound(e.getMessage());
+            throw KieRemoteRestOperationException.notFound(e.getMessage());
         }  catch (RuntimeException re) {
-            throw RestOperationException.internalServerError(re.getMessage(), re);
+            throw KieRemoteRestOperationException.internalServerError(re.getMessage(), re);
         }
     }
 
@@ -195,11 +195,11 @@ public class ProcessRequestBean {
 
             return procVar;
         } catch (ProcessInstanceNotFoundException e) {
-            throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
+            throw KieRemoteRestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
         } catch (org.jbpm.services.api.DeploymentNotFoundException e) {
-            throw RestOperationException.notFound(e.getMessage());
+            throw KieRemoteRestOperationException.notFound(e.getMessage());
         }  catch (RuntimeException re) {
-            throw RestOperationException.internalServerError(re.getMessage(), re);
+            throw KieRemoteRestOperationException.internalServerError(re.getMessage(), re);
         }
     }
 
@@ -231,13 +231,13 @@ public class ProcessRequestBean {
         try {
             return userTaskService.execute(deploymentId, cmd);
         } catch (TaskNotFoundException e) {
-            throw RestOperationException.notFound("Task " + taskId + " could not be found!");
+            throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found!");
         } catch (ProcessInstanceNotFoundException e) {
-            throw RestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
+            throw KieRemoteRestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
         } catch (org.jbpm.services.api.DeploymentNotFoundException e) {
-            throw RestOperationException.notFound(e.getMessage());
+            throw KieRemoteRestOperationException.notFound(e.getMessage());
         }  catch (RuntimeException re) {
-            throw RestOperationException.internalServerError(re.getMessage(), re);
+            throw KieRemoteRestOperationException.internalServerError(re.getMessage(), re);
         }
     }
 
@@ -246,7 +246,7 @@ public class ProcessRequestBean {
         try { 
             return doTaskOperation(taskId, deploymentId, processInstanceId, task, cmd);
         } catch (PermissionDeniedException pde) {
-            throw RestOperationException.conflict(pde.getMessage(), pde);
+            throw KieRemoteRestOperationException.conflict(pde.getMessage(), pde);
         } catch (RuntimeException re) {
             throw re;
         }

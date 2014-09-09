@@ -13,11 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.kie.api.command.Command;
 import org.kie.api.definition.process.Process;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.common.jaxb.JaxbRequestStatus;
-import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)

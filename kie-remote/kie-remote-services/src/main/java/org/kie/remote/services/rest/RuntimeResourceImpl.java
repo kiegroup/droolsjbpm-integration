@@ -40,9 +40,9 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.common.exception.RestOperationException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceFormResponse;
@@ -149,7 +149,7 @@ public class RuntimeResourceImpl extends ResourceBase {
                 return createCorrectVariant(response, headers);
             }
         }
-        throw RestOperationException.notFound("Process " + processId + " is not available.");
+        throw KieRemoteRestOperationException.notFound("Process " + processId + " is not available.");
     }
 
     @GET
@@ -172,7 +172,7 @@ public class RuntimeResourceImpl extends ResourceBase {
                 procInstId);
         } catch( IllegalArgumentException iae ) { 
             if( iae.getMessage().startsWith("Could not find process instance") ) {
-                throw RestOperationException.notFound("Process instance " + procInstId + " is not available.");
+                throw KieRemoteRestOperationException.notFound("Process instance " + procInstId + " is not available.");
             }
             throw iae;
         }
@@ -236,7 +236,7 @@ public class RuntimeResourceImpl extends ResourceBase {
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(), oper, true));
                
         if( workItem == null ) { 
-            throw RestOperationException.notFound("WorkItem " + workItemId + " does not exist.");
+            throw KieRemoteRestOperationException.notFound("WorkItem " + workItemId + " does not exist.");
         }
         
         return createCorrectVariant(new JaxbWorkItemResponse(workItem), headers);
@@ -254,7 +254,7 @@ public class RuntimeResourceImpl extends ResourceBase {
         } else if ("abort".equalsIgnoreCase(operation.toLowerCase())) {
             cmd = new AbortWorkItemCommand(workItemId);
         } else {
-            throw RestOperationException.badRequest("Unsupported operation: " + oper);
+            throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper);
         }
       
         // Will NOT throw an exception if the work item does not exist!!
@@ -330,7 +330,7 @@ public class RuntimeResourceImpl extends ResourceBase {
         if (procInstResult != null) {
             return (ProcessInstance) procInstResult;
         } else if( throwEx ) {
-            throw RestOperationException.notFound("Unable to retrieve process instance " + procInstId
+            throw KieRemoteRestOperationException.notFound("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
         } else { 
             return null;
@@ -376,7 +376,7 @@ public class RuntimeResourceImpl extends ResourceBase {
                 null);
         } catch( IllegalArgumentException iae ) { 
             if( iae.getMessage().startsWith("Unknown process ID")) { 
-                throw RestOperationException.notFound("Process '" + processId + "' is not known to this deployment.");
+                throw KieRemoteRestOperationException.notFound("Process '" + processId + "' is not known to this deployment.");
             }
             throw iae;
         }
@@ -412,14 +412,14 @@ public class RuntimeResourceImpl extends ResourceBase {
                             return new QName((String) nameVal); 
                         }
                     } catch (Exception e) {
-                        throw RestOperationException.internalServerError("Unable to retrieve XmlRootElement info via reflection", e);
+                        throw KieRemoteRestOperationException.internalServerError("Unable to retrieve XmlRootElement info via reflection", e);
                     } 
                 }
             }
             if( ! xmlRootElemAnnoFound ) { 
                 String errorMsg = "Unable to serialize " + object.getClass().getName() + " instance "
                         + "because it is missing a " + XmlRootElement.class.getName() + " annotation with a name value.";
-                throw RestOperationException.internalServerError(errorMsg);
+                throw KieRemoteRestOperationException.internalServerError(errorMsg);
             }
             return null;
         }

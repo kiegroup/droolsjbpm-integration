@@ -1,9 +1,9 @@
 package org.kie.remote.services.jms;
 
-import static org.kie.remote.common.jaxb.JaxbRequestStatus.FORBIDDEN;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.FORBIDDEN;
 
 import java.security.Principal;
 import java.security.acl.Group;

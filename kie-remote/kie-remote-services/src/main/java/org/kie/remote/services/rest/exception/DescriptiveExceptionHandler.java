@@ -1,4 +1,4 @@
-package org.kie.remote.common.exception;
+package org.kie.remote.services.rest.exception;
 
 import static org.kie.remote.common.rest.RestEasy960Util.getVariant;
 import static org.kie.remote.common.rest.RestEasy960Util.jsonVariant;
@@ -12,10 +12,11 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 
-import org.kie.remote.common.jaxb.JaxbException;
-import org.kie.remote.common.jaxb.JaxbRequestStatus;
+import org.kie.services.client.serialization.jaxb.impl.JaxbRestRequestException;
+import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 @Provider
 @RequestScoped
-public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
+public class DescriptiveExceptionHandler implements ExceptionMapper<KieRemoteRestOperationException> {
 
     protected static Logger logger = LoggerFactory.getLogger(DescriptiveExceptionHandler.class);
 
@@ -34,8 +35,11 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     protected UriInfo uriInfo;
 
     @Context
-    protected HttpHeaders headers;
-
+    protected HttpHeaders headers;   
+    
+    @Context 
+    private Providers providers;
+    
 
     private static final String [] kieServicesRemotePaths = { 
        "deployment",
@@ -45,33 +49,13 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
     };
     
     @Override
-    public Response toResponse(Exception e) {
+    public Response toResponse(KieRemoteRestOperationException e) {
         
         // Translate exception to status
         ResponseBuilder responseBuilder = null;
         int status = -1;
-        if (e instanceof RestOperationException) {
-            status = ((RestOperationException) e).getStatus();
-        } else if (e.getClass().getPackage().getName().equals("org.jboss.resteasy.spi")) {
-            String simpleClassName = e.getClass().getSimpleName();
-            if ("BadRequestException".equals(simpleClassName)) {
-                status = 400; // 400: Bad request (due to syntax)
-            } else if ("ReaderException".equals(simpleClassName)) {
-                status = 400;
-            } else if ("UnauthorizedException".equals(simpleClassName)) {
-                status = 401; // 401: Unauthorized
-            } else if ("NotFoundException".equals(simpleClassName)) {
-                status = 404; // 404: Not found
-            } else if ("MethodNotAllowedException".equals(simpleClassName)) {
-                status = 405; // 405: (POST, GET, etc.) Method not allowed
-            } else if ("NotAcceptableException".equals(simpleClassName)) {
-                status = 406; // 406: Not acceptable (form of request)
-            } else if ("WriterException".equals(simpleClassName)) {
-                status = 500; // 500: internal server error
-            } else if ("InternalServerErrorException".equals(simpleClassName)) {
-                status = 500;
-            }
-        }
+        status = e.getStatus();
+
         logger.warn("Exception thrown when processing request [" + getRelativePath(uriInfo) + "]; responding with status " + status, e);
 
         // Convert status to correct information in response
@@ -102,11 +86,11 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<Exception> {
         }
        
         // Build and send response
-        JaxbException response = new JaxbException(uriInfo.getRequestUri().toString(), e, requestStatus);
+        JaxbRestRequestException response = new JaxbRestRequestException(uriInfo.getRequestUri().toString(), e, requestStatus);
         try {
             responseBuilder.entity(response.prettyPrint());
         } catch (JAXBException jaxbe) {
-            responseBuilder.entity(JaxbException.convertStackTraceToString(jaxbe));
+            responseBuilder.entity(JaxbRestRequestException.convertStackTraceToString(jaxbe));
         }
        
         // Determine if the exception came from kie-services-remote or guvnor

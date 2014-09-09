@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.api.command.Command;
-import org.kie.remote.common.jaxb.JaxbRequestStatus;
 
 @XmlRootElement(name = "other-response")
 @XmlAccessorType(XmlAccessType.FIELD)

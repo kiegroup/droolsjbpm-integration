@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MediaType;
 
-import org.kie.remote.common.exception.RestOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,17 +60,17 @@ public class AcceptHeaders
 
             int equalsIndex = parameter.indexOf('=');
             if (equalsIndex < 0)
-               throw RestOperationException.badRequest("Malformed parameter: " + parameter);
+               throw new IllegalArgumentException("Malformed parameter: " + parameter);
             String name = parameter.substring(0, equalsIndex).trim();
             if (!"q".equals(name))
-               throw RestOperationException.badRequest("Unsupported parameter: " + name);
+               throw new IllegalArgumentException("Unsupported parameter: " + name);
             String value = parameter.substring(equalsIndex + 1).trim();
             qualityValue = QualityValue.valueOf(value);
          }
 
          content = content.trim();
          if (content.length() == 0)
-            throw RestOperationException.badRequest("Empty field in: " + header + ".");
+            throw new IllegalArgumentException("Empty field in: " + header + ".");
          if (content.equals("*"))
             result.put(null, qualityValue);
          else
@@ -156,7 +155,7 @@ public class AcceptHeaders
       {
          int slashIndex = header.indexOf('/', offset);
          if (slashIndex < 0)
-            throw RestOperationException.badRequest("Malformed media type: " + header);
+            throw new IllegalArgumentException("Malformed media type: " + header);
          String type = header.substring(offset, slashIndex);
          String subtype;
          Map<String, String> parameters = null;
@@ -199,7 +198,7 @@ public class AcceptHeaders
       {
          int equalsIndex = header.indexOf('=', offset);
          if (equalsIndex < 0)
-            throw RestOperationException.badRequest("Malformed parameters: " + header);
+            throw new IllegalArgumentException("Malformed parameters: " + header);
          String name = header.substring(offset, equalsIndex).trim();
          offset = equalsIndex + 1;
          if (header.charAt(offset) == '"')
@@ -210,7 +209,7 @@ public class AcceptHeaders
             {
                end = header.indexOf('"', ++end);
                if (end < 0)
-                  throw RestOperationException.badRequest("Quoted string is not closed: " + header);
+                  throw new IllegalArgumentException("Quoted string is not closed: " + header);
             } while (header.charAt(end - 1) == '\\');
             String value = header.substring(offset, end);
             parameters.put(name, value);
@@ -222,19 +221,19 @@ public class AcceptHeaders
             {
                assert itemEndIndex == -1;
                if (header.substring(offset).trim().length() != 0)
-                  throw RestOperationException.badRequest("Tailing garbage: " + header);
+                  throw new IllegalArgumentException("Tailing garbage: " + header);
                return -1;
             }
             else if (parameterEndIndex < 0 || (itemEndIndex >= 0 && itemEndIndex < parameterEndIndex))
             {
                if (header.substring(offset, itemEndIndex).trim().length() != 0)
-                  throw RestOperationException.badRequest("Garbage after quoted string: " + header);
+                  throw new IllegalArgumentException("Garbage after quoted string: " + header);
                return itemEndIndex + 1;
             }
             else
             {
                if (header.substring(offset, parameterEndIndex).trim().length() != 0)
-                  throw RestOperationException.badRequest("Garbage after quoted string: " + header);
+                  throw new IllegalArgumentException("Garbage after quoted string: " + header);
                offset = parameterEndIndex + 1;
             }
          }

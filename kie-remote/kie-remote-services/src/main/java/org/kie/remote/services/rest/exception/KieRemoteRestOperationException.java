@@ -1,27 +1,27 @@
-package org.kie.remote.common.exception;
+package org.kie.remote.services.rest.exception;
 
 
-public class RestOperationException extends RuntimeException {
+public class KieRemoteRestOperationException extends RuntimeException {
 
     /** Generated serial version UID */
     private static final long serialVersionUID = 3065096836333886139L;
 
     protected Integer status = null;
 
-    public RestOperationException(String s) {
+    public KieRemoteRestOperationException(String s) {
         super(s);
     }
 
-    protected RestOperationException(String s, Status status) {
+    protected KieRemoteRestOperationException(String s, Status status) {
         super(s);
         this.status = status.getValue();
     }
 
-    public RestOperationException(String s, Throwable throwable) {
+    public KieRemoteRestOperationException(String s, Throwable throwable) {
         super(s, throwable);
     }
 
-    protected RestOperationException(String s, Throwable throwable, Status status) {
+    protected KieRemoteRestOperationException(String s, Throwable throwable, Status status) {
         super(s, throwable);
         this.status = status.getValue();
     }
@@ -100,31 +100,31 @@ public class RestOperationException extends RuntimeException {
     }
    
     // Syntax
-    public static RestOperationException badRequest(String msg) { 
-        return new RestOperationException(msg, Status.BAD_REQUEST);
+    public static KieRemoteRestOperationException badRequest(String msg) { 
+        return new KieRemoteRestOperationException(msg, Status.BAD_REQUEST);
     }
    
     // Command not accepted 
-    public static RestOperationException forbidden(String msg) { 
-        return new RestOperationException(msg, Status.FORBIDDEN);
+    public static KieRemoteRestOperationException forbidden(String msg) { 
+        return new KieRemoteRestOperationException(msg, Status.FORBIDDEN);
     }
    
     // permission problem
-    public static RestOperationException conflict(String msg, Exception e) { 
-        return new RestOperationException(msg, e, Status.CONFLICT);
+    public static KieRemoteRestOperationException conflict(String msg, Exception e) { 
+        return new KieRemoteRestOperationException(msg, e, Status.CONFLICT);
     }
   
     // instance does not exist
-    public static RestOperationException notFound(String msg) { 
-        return new RestOperationException(msg, Status.NOT_FOUND);
+    public static KieRemoteRestOperationException notFound(String msg) { 
+        return new KieRemoteRestOperationException(msg, Status.NOT_FOUND);
     }
    
     // technical exception (including serialization problems)
-    public static RestOperationException internalServerError(String msg) { 
-        return new RestOperationException(msg, Status.INTERNAL_SERVER_ERROR);
+    public static KieRemoteRestOperationException internalServerError(String msg) { 
+        return new KieRemoteRestOperationException(msg, Status.INTERNAL_SERVER_ERROR);
     }
     
-    public static RestOperationException internalServerError(String msg, Exception e) { 
-        return new RestOperationException(msg, e, Status.INTERNAL_SERVER_ERROR);
+    public static KieRemoteRestOperationException internalServerError(String msg, Exception e) { 
+        return new KieRemoteRestOperationException(msg, e, Status.INTERNAL_SERVER_ERROR);
     }
 }

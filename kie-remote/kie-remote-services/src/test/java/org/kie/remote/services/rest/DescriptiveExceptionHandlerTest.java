@@ -18,8 +18,8 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.remote.common.exception.DescriptiveExceptionHandler;
-import org.kie.remote.common.exception.RestOperationException;
+import org.kie.remote.services.rest.exception.DescriptiveExceptionHandler;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.slf4j.Logger;
 
 
@@ -44,7 +44,7 @@ public class DescriptiveExceptionHandlerTest extends DescriptiveExceptionHandler
         this.uriInfo = mock(UriInfo.class);
         doReturn(new URI("http://localhost:8080/test/rest/task/" + TASK_ID + "/start")).when(uriInfo).getRequestUri();
         
-        Exception e = RestOperationException.badRequest("test");
+        KieRemoteRestOperationException e = KieRemoteRestOperationException.badRequest("test");
         Response resp = toResponse(e);
         MultivaluedMap<String, Object> meta = resp.getMetadata();
         assertEquals( "Incorrect format used", MediaType.APPLICATION_XML_TYPE, meta.getFirst(HttpHeaders.CONTENT_TYPE));
