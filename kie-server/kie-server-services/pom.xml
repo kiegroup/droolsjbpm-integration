@@ -18,6 +18,8 @@
     <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
          is not able to override the value of the property. The port number would then always be the same
          (the default one, unless changed from outside) -->
+    <kie.server.context>kie-server-services</kie.server.context>
+    <kie.server.base.uri>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.uri>
   </properties>
 
   <dependencyManagement>
@@ -220,7 +222,7 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <kie.server.base.uri>http://${container.hostname}:${container.port}/kie-server-services/services/rest/server</kie.server.base.uri>
+            <kie.server.base.uri>${kie.server.base.uri}</kie.server.base.uri>
           </systemPropertyVariables>
         </configuration>
         <executions>
@@ -249,6 +251,18 @@
               <cargo.servlet.port>${container.port}</cargo.servlet.port>
             </properties>
           </configuration>
+          <deployables>
+            <deployable>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>${project.artifactId}</artifactId>
+              <type>war</type>
+              <properties>
+                <context>${kie.server.context}</context>
+              </properties>
+              <pingURL>${kie.server.base.uri}</pingURL>
+              <pingTimeout>30000</pingTimeout>
+            </deployable>
+          </deployables>
         </configuration>
         <executions>
           <execution>
