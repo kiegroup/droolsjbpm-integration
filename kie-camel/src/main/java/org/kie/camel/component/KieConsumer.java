@@ -15,10 +15,18 @@
  */
 package org.kie.camel.component;
 
+import java.util.EventListener;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
+import org.kie.api.event.KieRuntimeEventManager;
+import org.kie.api.event.kiebase.DefaultKieBaseEventListener;
+import org.kie.api.event.kiebase.KieBaseEventManager;
+import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.Channel;
 import org.kie.internal.runtime.KnowledgeRuntime;
 
@@ -31,6 +39,8 @@ public class KieConsumer extends DefaultConsumer {
     private KieEndpoint de;
     private KnowledgeRuntime krt;
     private String channelId;
+    private String eventType;
+    private CamelEventListener camelEventListener;
 
     public KieConsumer(Endpoint endpoint,
                        Processor processor) {
@@ -42,26 +52,40 @@ public class KieConsumer extends DefaultConsumer {
 
     @Override
     protected void doStop() throws Exception {
-        krt.unregisterChannel( channelId );
+        if (channelId != null) {
+            krt.unregisterChannel( channelId );
+        } else if (eventType != null) {
+            camelEventListener.removeEventListener(eventType);
+        }
         super.doStop();
     }
 
     @Override
     protected void doStart() throws Exception {
+        if (channelId != null) {
+            krt.registerChannel(channelId, new KSessionChannel());
+        } else if (eventType != null) {
+            camelEventListener = new CamelEventListener(krt, this);
+            camelEventListener.addEventListener(eventType);
+        } else {
+            throw new IllegalStateException("channelId or eventType is required");
+        }
         super.doStart();
-        KSessionChannel channel = new KSessionChannel();
-        krt.registerChannel( channelId, channel );
     }
 
     class KSessionChannel implements Channel {
         public void send(Object pojo) {
             Exchange exchange = de.createExchange( pojo );
-            try {
-                getProcessor().process(exchange);
-            } catch (Exception e) {
-                handleException(e);
-            }
+            process(pojo);
         }
     }
-    
+
+    void process(Object pojo) {
+        Exchange exchange = de.createExchange( pojo );
+        try {
+            getProcessor().process(exchange);
+        } catch (Exception e) {
+            handleException(e);
+        }
+    }
 }
