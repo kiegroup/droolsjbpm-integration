@@ -18,6 +18,7 @@ package org.kie.spring.persistence;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.FlushModeType;
 
 import org.drools.persistence.PersistenceContext;
 import org.drools.persistence.jpa.JpaPersistenceContext;
@@ -93,6 +94,7 @@ public abstract class AbstractKieSpringJpaManager
             EntityManager em = null;
             if (emHolder == null) {
                 em = this.emf.createEntityManager();
+                em.setFlushMode(FlushModeType.COMMIT);
                 emHolder = new EntityManagerHolder(em);
                 TransactionSynchronizationManager.bindResource("cmdEM", emHolder);
             } else {
