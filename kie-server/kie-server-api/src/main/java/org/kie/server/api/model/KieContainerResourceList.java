@@ -1,5 +1,6 @@
 package org.kie.server.api.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -17,6 +18,7 @@ public class KieContainerResourceList {
 
     public KieContainerResourceList() {
         super();
+        containers = new ArrayList<KieContainerResource>();
     }
 
     public KieContainerResourceList(List<KieContainerResource> containers) {
