@@ -521,7 +521,7 @@ public class KieServerImpl {
                 KieContainerInstance kci = containers.putIfAbsent(containerId, ci);
                 if( kci != null && kci.getStatus() == KieContainerStatus.FAILED ) {
                     // if previous container filed, allow override
-                    containers.put("containerId", ci);
+                    containers.put(containerId, ci);
                     return null;
                 }
                 return kci;

@@ -1,5 +1,9 @@
 package org.kie.server.integrationtests;
 
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
@@ -12,10 +16,6 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
 
 public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrationTest {
 
@@ -31,20 +31,25 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
     @Test
     public void testCreateContainer() throws Exception {
         ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1",
-                releaseId1));
+                                                                                                              releaseId1));
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testCreateContainerNonExistingGAV() throws Exception {
-        ServiceResponse<KieContainerResource> reply = client.createContainer("bad-gav", new KieContainerResource("bad-gav",
-                new ReleaseId("foo", "bar", "0.0.0")));
+        ServiceResponse<KieContainerResource> reply = client.createContainer("bad-gav",
+                                                                             new KieContainerResource("bad-gav",
+                                                                                                      new ReleaseId(
+                                                                                                              "foo",
+                                                                                                              "bar",
+                                                                                                              "0.0.0")));
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 
     @Test
     public void testCreateContainerNonExistingGAV2() throws Exception {
-        KieContainerResource resource = new KieContainerResource("no-gav2-container", new ReleaseId("foo", "bar", "0.0.0"));
+        KieContainerResource resource = new KieContainerResource("no-gav2-container",
+                                                                 new ReleaseId("foo", "bar", "0.0.0"));
 
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
@@ -56,7 +61,9 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
             Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, response.getEntity().getType());
         } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(), e, response);
+            throw new ClientResponseFailure(
+                    "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
+                    e, response);
         }
     }
 
@@ -73,6 +80,22 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
         }
+    }
+
+    @Test
+    public void testCreateContainerAfterFailure() throws Exception {
+        // non-existing ID to simulate failure
+        KieContainerResource resource = new KieContainerResource("kie1", new ReleaseId("non-existing", "non-existing",
+                                                                                       "0.0.0"));
+        ServiceResponse<KieContainerResource> reply = client.createContainer(resource.getContainerId(), resource);
+
+        Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
+
+        // now try to re-create the container with a valid release ID
+        resource.setReleaseId(releaseId1);
+        reply = client.createContainer(resource.getContainerId(), resource);
+
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
@@ -140,7 +163,8 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
                 return;
             }
         }
-        Assert.fail("Container list " + containers + " does not contain expected container with id " + expectedContainerId);
+        Assert.fail(
+                "Container list " + containers + " does not contain expected container with id " + expectedContainerId);
     }
 
 }
