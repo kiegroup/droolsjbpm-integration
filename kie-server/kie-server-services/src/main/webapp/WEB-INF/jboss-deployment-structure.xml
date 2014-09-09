@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+  <deployment>
+    <exclude-subsystems>
+      <!-- Excluding CDI subsystem, because it tries to instantiate beans that should be in fact managed by Guice -->
+      <subsystem name="weld" />
+    </exclude-subsystems>
+  </deployment>
+</jboss-deployment-structure>
