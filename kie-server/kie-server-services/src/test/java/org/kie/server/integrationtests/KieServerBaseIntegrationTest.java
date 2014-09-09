@@ -85,11 +85,8 @@ public abstract class KieServerBaseIntegrationTest {
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, response.getType());
         List<KieContainerResource> containers = response.getResult().getContainers();
-        // TODO server should return empty list instead of null when there are no containers!
-        if (containers != null) {
-            for (KieContainerResource container : containers) {
-                client.disposeContainer(container.getContainerId());
-            }
+        for (KieContainerResource container : containers) {
+            client.disposeContainer(container.getContainerId());
         }
     }
 

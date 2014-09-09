@@ -148,7 +148,7 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
         ServiceResponse<KieContainerResourceList> listReply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, listReply.getType());
         List<KieContainerResource> containers = listReply.getResult().getContainers();
-        Assert.assertEquals("No containers returned!", null, containers);
+        Assert.assertEquals("No containers returned!", 0, containers.size());
     }
 
     @Test
