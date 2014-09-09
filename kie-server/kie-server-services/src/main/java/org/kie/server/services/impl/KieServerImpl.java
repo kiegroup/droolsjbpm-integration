@@ -143,7 +143,8 @@ public class KieServerImpl {
             KieContainerInstance previous = null;
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
             synchronized (ci) {
-                if ((previous = context.addIfDoesntExist(containerId, ci)) == null) {
+                previous = context.addIfDoesntExist(containerId, ci);
+                if (previous == null) {
                     try {
                         KieServices ks = KieServices.Factory.get();
                         InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(releaseId);
@@ -516,7 +517,15 @@ public class KieServerImpl {
         }
 
         public KieContainerInstance addIfDoesntExist(String containerId, KieContainerInstance ci) {
-            return containers.putIfAbsent(containerId, ci);
+            synchronized ( containers ) {
+                KieContainerInstance kci = containers.putIfAbsent(containerId, ci);
+                if( kci != null && kci.getStatus() == KieContainerStatus.FAILED ) {
+                    // if previous container filed, allow override
+                    containers.put("containerId", ci);
+                    return null;
+                }
+                return kci;
+            }
         }
 
         public List<KieContainerInstance> getContainers() {

@@ -1,37 +1,17 @@
 package org.kie.server.integrationtests;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.drools.compiler.kie.builder.impl.InternalKieModule;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.jboss.resteasy.util.GenericType;
-import org.junit.After;
-import org.junit.AfterClass;
+import com.thoughtworks.xstream.XStream;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
@@ -44,8 +24,6 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceList;
-import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerCommand;
@@ -53,10 +31,6 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.services.rest.KieServerRestImpl;
-
-import com.thoughtworks.xstream.XStream;
 
 public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");

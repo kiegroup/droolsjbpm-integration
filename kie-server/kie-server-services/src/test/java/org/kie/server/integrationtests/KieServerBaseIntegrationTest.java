@@ -1,6 +1,8 @@
 package org.kie.server.integrationtests;
 
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,23 +15,40 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.List;
 
 public abstract class KieServerBaseIntegrationTest {
+
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
 
-    public static final String BASE_URI = System.getProperty("kie.server.base.uri",
-            "http://localhost:8080/kie-server-services/services/rest/server");
+    protected static String BASE_URI = System.getProperty("kie.server.base.uri");
+
+    protected static boolean LOCAL_SERVER = false;
+
+    protected static int PORT;
 
     private static MavenRepository repository;
 
+    protected TJWSEmbeddedJaxrsServer server;
+
     protected KieServicesClient client;
+
+    static {
+        if (BASE_URI == null) {
+            // falls back to local, in memory, server
+            LOCAL_SERVER = true;
+            PORT = findFreePort();
+            BASE_URI = "http://localhost:" + PORT + "/server";
+        }
+    }
 
     @BeforeClass
     public static void logSettings() {
@@ -38,15 +57,28 @@ public abstract class KieServerBaseIntegrationTest {
 
     @BeforeClass
     public static void configureCustomSettingsXml() {
-        System.setProperty("kie.maven.settings.custom",
-                ClassLoader.class.getResource("/kie-server-testing-custom-settings.xml").getFile());
-        logger.debug("Value of 'kie.maven.settings.custom' property:" + System.getProperty("kie.maven.settings.custom"));
+        if( !LOCAL_SERVER ) {
+            System.setProperty("kie.maven.settings.custom",
+                               ClassLoader.class.getResource("/kie-server-testing-custom-settings.xml").getFile());
+            logger.debug(
+                    "Value of 'kie.maven.settings.custom' property:" + System.getProperty("kie.maven.settings.custom"));
+        }
     }
 
     @Before
     public void setup() throws Exception {
+        if (LOCAL_SERVER) {
+            startServer();
+        }
         startClient();
         disposeAllContainers();
+    }
+
+    @After
+    public void tearDown() {
+        if (LOCAL_SERVER) {
+            server.stop();
+        }
     }
 
     private void disposeAllContainers() {
@@ -63,6 +95,13 @@ public abstract class KieServerBaseIntegrationTest {
 
     private void startClient() throws Exception {
         client = new KieServicesClient(BASE_URI);
+    }
+
+    private void startServer() throws Exception {
+        server = new TJWSEmbeddedJaxrsServer();
+        server.setPort(PORT);
+        server.start();
+        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
     }
 
     protected static void createAndDeployKJar(ReleaseId releaseId) {
@@ -109,4 +148,20 @@ public abstract class KieServerBaseIntegrationTest {
         repository = MavenRepository.getMavenRepository();
         repository.deployArtifact(releaseId, jar, pom);
     }
+
+    public static int findFreePort() {
+        int port = 0;
+        try {
+            ServerSocket server =
+                    new ServerSocket(0);
+            port = server.getLocalPort();
+            server.close();
+        } catch (IOException e) {
+            // failed to dynamically allocate port, try to use hard coded one
+            port = 9789;
+        }
+        System.out.println("Allocating port: "+port);
+        return port;
+    }
+
 }
