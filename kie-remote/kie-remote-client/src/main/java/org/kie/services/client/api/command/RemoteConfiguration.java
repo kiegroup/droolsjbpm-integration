@@ -46,6 +46,7 @@ public final class RemoteConfiguration {
 
     // JMS
     private boolean useSsl = false;
+    private boolean doNotUseSsl = false;
     private ConnectionFactory connectionFactory;
     private Queue ksessionQueue;
     private Queue taskQueue;
@@ -305,7 +306,7 @@ public final class RemoteConfiguration {
     }
     
     public boolean getUseUssl() {
-        return useSsl;
+        return useSsl && ! doNotUseSsl;
     } 
     
     Long getProcessInstanceId() {
@@ -361,6 +362,10 @@ public final class RemoteConfiguration {
 
     public void setUseSsl(boolean useSsl) {
         this.useSsl = useSsl;
+    }
+   
+    public void setDoNotUseSssl(boolean doNotUseSsl) {
+        this.doNotUseSsl = doNotUseSsl;
     }
    
     // Clone --- 

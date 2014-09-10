@@ -1,25 +1,15 @@
 package org.kie.services.client.api;
 
-import static org.kie.services.client.api.RemoteRuntimeEngineFactory.checkAndFinalizeConfig;
-import static org.kie.services.client.api.RemoteJmsRuntimeEngineFactory.getRemoteJbossInitialContext;
-
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 
-import org.hornetq.api.core.TransportConfiguration;
-import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
-import org.hornetq.core.remoting.impl.netty.TransportConstants;
-import org.hornetq.jms.client.HornetQJMSConnectionFactory;
 import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineBuilder;
-import org.kie.services.client.api.builder.RemoteRuntimeEngineBuilder;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
@@ -47,6 +37,8 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     String truststorePassword;
     String truststoreLocation;
     boolean useKeystoreAsTruststore = false;
+    
+    boolean doNotUseSsl = false;
     
     /**
      * builder logic: 
@@ -209,6 +201,12 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
         return this;
     }
   
+    @Override
+    public RemoteJmsRuntimeEngineBuilder doNotUseSsl() {
+        config.setDoNotUseSssl(doNotUseSsl);
+        return this;
+    }
+
     private void checkAndFinalizeConfig() {
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }

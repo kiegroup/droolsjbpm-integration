@@ -8,6 +8,9 @@ import java.util.Map;
 import javax.jms.ConnectionFactory;
 
 import org.hornetq.api.core.TransportConfiguration;
+import org.hornetq.api.core.client.ClientSessionFactory;
+import org.hornetq.api.core.client.HornetQClient;
+import org.hornetq.api.core.client.ServerLocator;
 import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.hornetq.jms.client.HornetQJMSConnectionFactory;
@@ -58,7 +61,7 @@ public abstract class RemoteRuntimeEngineFactory {
     public static RemoteRestRuntimeEngineBuilder newRestBuilder() { 
        return new RemoteRestRuntimeEngineBuilderImpl(); 
     }
-    
+   
     static void checkAndFinalizeConfig(RemoteConfiguration config, RemoteRuntimeEngineBuilder builder ) {
         if( builder instanceof RemoteJmsRuntimeEngineBuilderImpl ) { 
             RemoteJmsRuntimeEngineBuilderImpl jmsBuilder = (RemoteJmsRuntimeEngineBuilderImpl) builder;
