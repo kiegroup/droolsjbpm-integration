@@ -497,6 +497,19 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
     }
     
     @Test
+    public void jmsRuntimeEngineNoSslTest() { 
+        // doNotUseSsl
+        RemoteJmsRuntimeEngineFactory.newBuilder()
+            .addUserName("H")
+            .addPassword("gummy bears")
+            .addHostName("localhost")
+            .addJmsConnectorPort(5446)
+            .addRemoteInitialContext(remoteInitialContext)
+            .doNotUseSsl()
+            .build();
+    }
+    
+    @Test
     public void jmsRuntimeFactoryBuilderReuseTest() throws Exception { 
         RemoteJmsRuntimeEngineBuilder runtimeEngineBuilder = RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addDeploymentId("deploymentId")

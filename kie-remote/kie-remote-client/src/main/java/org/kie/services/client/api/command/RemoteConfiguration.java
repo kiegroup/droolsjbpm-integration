@@ -306,7 +306,11 @@ public final class RemoteConfiguration {
     }
     
     public boolean getUseUssl() {
-        return useSsl && ! doNotUseSsl;
+        return useSsl;
+    } 
+    
+    public boolean getDoNotUseSsl() { 
+        return doNotUseSsl;
     } 
     
     Long getProcessInstanceId() {
@@ -386,6 +390,7 @@ public final class RemoteConfiguration {
        this.type = config.type;
        this.userName = config.userName;
        this.useSsl = config.useSsl;
+       this.doNotUseSsl = config.doNotUseSsl;
     }
     
     public RemoteConfiguration clone() {

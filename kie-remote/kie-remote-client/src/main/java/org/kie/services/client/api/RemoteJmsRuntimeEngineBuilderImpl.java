@@ -38,8 +38,6 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     String truststoreLocation;
     boolean useKeystoreAsTruststore = false;
     
-    boolean doNotUseSsl = false;
-    
     /**
      * builder logic: 
      * 
@@ -203,7 +201,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
   
     @Override
     public RemoteJmsRuntimeEngineBuilder doNotUseSsl() {
-        config.setDoNotUseSssl(doNotUseSsl);
+        config.setDoNotUseSssl(true);
         return this;
     }
 

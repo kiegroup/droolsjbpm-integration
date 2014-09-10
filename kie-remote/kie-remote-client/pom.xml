@@ -145,6 +145,17 @@
       <artifactId>jetty-servlets</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <!-- for the live server test -->
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-remote-naming</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.xnio</groupId>
+      <artifactId>xnio-nio</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

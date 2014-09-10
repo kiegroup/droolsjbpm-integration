@@ -216,7 +216,7 @@ public abstract class AbstractRemoteCommandObject {
         boolean isTaskCommand = (command instanceof TaskCommand);
         if( isTaskCommand ) {
             sendQueue = config.getTaskQueue();
-            if( !config.getUseUssl() ) {
+            if( ! config.getUseUssl() && ! config.getDoNotUseSsl() ) {
                 throw new SecurityException("Task operation requests can only be sent via JMS if SSL is used.");
             }
         } else {
