@@ -56,12 +56,10 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     @BeforeClass
-    public static void configureCustomSettingsXml() {
-        if( !LOCAL_SERVER ) {
-            System.setProperty("kie.maven.settings.custom",
-                               ClassLoader.class.getResource("/kie-server-testing-custom-settings.xml").getFile());
-            logger.debug(
-                    "Value of 'kie.maven.settings.custom' property:" + System.getProperty("kie.maven.settings.custom"));
+    public static void setupCustomSettingsXml() {
+        if (!LOCAL_SERVER) {
+            String clientDeploymentSettingsXml = ClassLoader.class.getResource("/kie-server-testing-client-deployment-settings.xml").getFile();
+            System.setProperty("kie.maven.settings.custom", clientDeploymentSettingsXml);
         }
     }
 

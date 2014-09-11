@@ -14,12 +14,17 @@
   <description>KIE Execution Server Services</description>
 
   <properties>
+    <!-- Following properties are used only for testing -->
     <container.hostname>localhost</container.hostname>
     <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
          is not able to override the value of the property. The port number would then always be the same
          (the default one, unless changed from outside) -->
     <kie.server.context>kie-server-services</kie.server.context>
     <kie.server.base.uri>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.uri>
+    <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
+    <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
+    <!-- This property can be overriden when some other remote repo location should be used -->
+    <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
   </properties>
 
   <dependencyManagement>
@@ -208,7 +213,8 @@
             <phase>pre-integration-test</phase>
             <configuration>
               <tasks>
-                <mkdir dir="${project.build.directory}/kie-server-testing-maven-repo"/>
+                <mkdir dir="${kie.server.testing.server.local.repo.dir}"/>
+                <mkdir dir="${kie.server.testing.remote.repo.dir}"/>
               </tasks>
             </configuration>
             <goals>
@@ -243,7 +249,7 @@
             <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
             <type>embedded</type>
             <systemProperties>
-              <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-custom-settings.xml</kie.maven.settings.custom>
+              <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
             </systemProperties>
           </container>
           <configuration>
