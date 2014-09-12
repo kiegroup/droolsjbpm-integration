@@ -1,5 +1,6 @@
 package org.kie.server.integrationtests;
 
+import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.After;
@@ -19,8 +20,7 @@ import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
@@ -79,7 +79,7 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
-    private void disposeAllContainers() {
+    protected void disposeAllContainers() {
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, response.getType());
         List<KieContainerResource> containers = response.getResult().getContainers();
@@ -97,6 +97,29 @@ public abstract class KieServerBaseIntegrationTest {
         server.setPort(PORT);
         server.start();
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
+    }
+
+    protected static void buildAndDeployMavenProject(File basedir) {
+        // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
+        // magic which then results in CNFE in RestEasy client
+        // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
+        // remote repo
+        ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
+        MavenCli cli = new MavenCli();
+        String[] mvnArgs;
+        if (LOCAL_SERVER) {
+            // just install into local repository when running the local server. Deploying to remote repo will fail
+            // if the repo does not exists.
+            mvnArgs = new String[]{"clean", "install"};
+        } else {
+            mvnArgs = new String[]{"clean", "deploy"};
+        }
+        int mvnRunResult = cli.doMain(mvnArgs, basedir.getAbsolutePath(), System.out, System.out);
+        if (mvnRunResult != 0) {
+            throw new RuntimeException("Error while building Maven project from basedir " + basedir.getAbsolutePath() +
+                    ". Return code=" + mvnRunResult);
+        }
+        Thread.currentThread().setContextClassLoader(classLoaderBak);
     }
 
     protected static void createAndDeployKJar(ReleaseId releaseId) {

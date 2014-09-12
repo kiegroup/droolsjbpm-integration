@@ -27,12 +27,18 @@
     <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
   </properties>
 
+  <!-- This section should be eventually moved to kie-parent-with-dependencies -->
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>tjws</artifactId>
         <version>2.3.7.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${version.org.apache.maven}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -158,6 +164,12 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-embedder</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
