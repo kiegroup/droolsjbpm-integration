@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class KieServerBaseIntegrationTest {
 
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
@@ -180,6 +182,11 @@ public abstract class KieServerBaseIntegrationTest {
         }
         System.out.println("Allocating port: "+port);
         return port;
+    }
+
+    protected void assertSuccess(ServiceResponse<?> response) {
+        ServiceResponse.ResponseType type = response.getType();
+        assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS, type);
     }
 
 }

@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.kie.server.testing</groupId>
+  <artifactId>container-isolation-kjar2</artifactId>
+  <version>1.0.0.Final</version>
+  <packaging>kjar</packaging>
+
+  <properties>
+    <!-- The version is set during the Maven build (this file is a filtered resource) -->
+    <version.org.kie>${version.org.kie}</version.org.kie>
+    <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+        <version>${version.org.kie}</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <distributionManagement>
+    <repository>
+      <id>remote-testing-repo</id>
+      <url>${kie.server.testing.remote.repo.url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>remote-testing-repo</id>
+      <url>${kie.server.testing.remote.repo.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>
