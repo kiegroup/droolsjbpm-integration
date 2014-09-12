@@ -18,8 +18,9 @@ public class ContainerIsolationIntegrationTest extends KieServerBaseIntegrationT
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployMavenProject(new File(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile()));
-        buildAndDeployMavenProject(new File(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile()));
+        buildAndDeployCommonMavenParent();
+        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
+        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile());
     }
 
     @Test

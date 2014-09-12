@@ -19,8 +19,8 @@ public class StatefulSessionUsageIntegrationTest extends KieServerBaseIntegratio
 
     @BeforeClass
     public static void deployArtifacts() {
-        File basedir = new File(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
-        buildAndDeployMavenProject(basedir);
+        buildAndDeployCommonMavenParent();
+        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
     }
 
     @Test

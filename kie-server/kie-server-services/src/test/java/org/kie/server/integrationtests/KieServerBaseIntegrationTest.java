@@ -43,6 +43,8 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected KieServicesClient client;
 
+    private static boolean commonParentDeployed = false;
+
     static {
         if (BASE_URI == null) {
             // falls back to local, in memory, server
@@ -101,7 +103,7 @@ public abstract class KieServerBaseIntegrationTest {
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
     }
 
-    protected static void buildAndDeployMavenProject(File basedir) {
+    protected static void buildAndDeployMavenProject(String basedir) {
         // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
         // magic which then results in CNFE in RestEasy client
         // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
@@ -116,12 +118,19 @@ public abstract class KieServerBaseIntegrationTest {
         } else {
             mvnArgs = new String[]{"clean", "deploy"};
         }
-        int mvnRunResult = cli.doMain(mvnArgs, basedir.getAbsolutePath(), System.out, System.out);
+        int mvnRunResult = cli.doMain(mvnArgs, basedir, System.out, System.out);
         if (mvnRunResult != 0) {
-            throw new RuntimeException("Error while building Maven project from basedir " + basedir.getAbsolutePath() +
+            throw new RuntimeException("Error while building Maven project from basedir " + basedir +
                     ". Return code=" + mvnRunResult);
         }
         Thread.currentThread().setContextClassLoader(classLoaderBak);
+    }
+
+    protected static void buildAndDeployCommonMavenParent() {
+        // deploy only once as it is not needed to do that with every request
+        if (!commonParentDeployed) {
+            buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/common-parent").getFile());
+        }
     }
 
     protected static void createAndDeployKJar(ReleaseId releaseId) {
