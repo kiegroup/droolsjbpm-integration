@@ -27,6 +27,14 @@
     </pluginManagement>
   </build>
 
+  <repositories>
+    <repository>
+      <!-- Needed to download the Drools/jBPM SNAPSHOTs during build -->
+      <id>jboss-public-repo</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </repository>
+  </repositories>
+
   <distributionManagement>
     <repository>
       <id>remote-testing-repo</id>
