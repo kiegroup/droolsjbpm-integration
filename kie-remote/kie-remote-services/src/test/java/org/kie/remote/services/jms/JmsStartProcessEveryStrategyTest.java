@@ -105,7 +105,6 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         // test start process
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(DEPLOYMENT_ID, new StartProcessCommand(TEST_PROCESS_DEF_NAME));
-        cmdsRequest.setVersion(ServicesVersion.VERSION);
         JaxbCommandsResponse
         resp = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
 

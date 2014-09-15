@@ -33,7 +33,7 @@ import org.kie.api.task.model.User;
 import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.internal.task.api.model.InternalOrganizationalEntity;
 import org.kie.internal.task.api.model.InternalTask;
-import org.kie.remote.services.AcceptedCommands;
+import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
@@ -88,7 +88,7 @@ public class ResourceBase {
             // First check to make sure that all commands will be processed
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
-                if (!AcceptedCommands.getSet().contains(cmd.getClass())) {
+                if (!AcceptedServerCommands.isAcceptedCommandClass(cmd.getClass()) ) {
                     throw KieRemoteRestOperationException.forbidden("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
                 }
             }

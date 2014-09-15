@@ -129,51 +129,48 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    private void preprocessCommand( Object cmd, List<Object> extraClassInstanceList ) {
-        if( cmd instanceof CompleteWorkItemCommand ) {
-            addPossiblyNullObjectMap(((CompleteWorkItemCommand) cmd).getResult(), extraClassInstanceList);
-        } else if( cmd instanceof SignalEventCommand ) {
-            addPossiblyNullObject(((SignalEventCommand) cmd).getEvent(), extraClassInstanceList);
-        } else if( cmd instanceof StartCorrelatedProcessCommand ) {
-            addPossiblyNullObjectList(((StartCorrelatedProcessCommand) cmd).getData().getDatas(), extraClassInstanceList);
-            addPossiblyNullObjectMap(((StartCorrelatedProcessCommand) cmd).getParameter(), extraClassInstanceList);
-        } else if( cmd instanceof StartProcessCommand ) {
-            StartProcessCommand startProcCmd = (StartProcessCommand) cmd;
+    void preprocessCommand( Object cmdObj, List<Object> extraClassInstanceList ) {
+        if( cmdObj instanceof CompleteWorkItemCommand ) {
+            addPossiblyNullObject(((CompleteWorkItemCommand) cmdObj).getResult(), extraClassInstanceList);
+        } else if( cmdObj instanceof SignalEventCommand ) {
+            addPossiblyNullObject(((SignalEventCommand) cmdObj).getEvent(), extraClassInstanceList);
+        } else if( cmdObj instanceof StartCorrelatedProcessCommand ) {
+            StartCorrelatedProcessCommand cmd = (StartCorrelatedProcessCommand) cmdObj;
+            if( cmd.getData() != null ) { 
+                addPossiblyNullObject(cmd.getData().getDatas(), extraClassInstanceList);
+            }
+            addPossiblyNullObject(cmd.getParameter(), extraClassInstanceList);
+        } else if( cmdObj instanceof StartProcessCommand ) {
+            StartProcessCommand startProcCmd = (StartProcessCommand) cmdObj;
             if( startProcCmd.getData() != null ) { 
-                addPossiblyNullObjectList(startProcCmd.getData().getDatas(), extraClassInstanceList);
+                addPossiblyNullObject(startProcCmd.getData().getDatas(), extraClassInstanceList);
             } 
-            addPossiblyNullObjectMap(((StartProcessCommand) cmd).getParameter(), extraClassInstanceList);
-        } else if( cmd instanceof SetGlobalCommand ) {
-            addPossiblyNullObject(((SetGlobalCommand) cmd).getObject(), extraClassInstanceList);
-        } else if( cmd instanceof InsertObjectCommand ) {
-            addPossiblyNullObject(((InsertObjectCommand) cmd).getObject(), extraClassInstanceList);
-        } else if( cmd instanceof UpdateCommand ) {
-            addPossiblyNullObject(((UpdateCommand) cmd).getObject(), extraClassInstanceList);
-        } else if( cmd instanceof AddTaskCommand ) {
-            addPossiblyNullObjectMap(((AddTaskCommand) cmd).getParameter(), extraClassInstanceList);
-        } else if( cmd instanceof CompleteTaskCommand ) {
-            addPossiblyNullObjectMap(((CompleteTaskCommand) cmd).getData(), extraClassInstanceList);
-        } else if( cmd instanceof FailTaskCommand ) {
-            addPossiblyNullObjectMap(((FailTaskCommand) cmd).getData(), extraClassInstanceList);
+            addPossiblyNullObject(((StartProcessCommand) cmdObj).getParameter(), extraClassInstanceList);
+        } else if( cmdObj instanceof SetGlobalCommand ) {
+            addPossiblyNullObject(((SetGlobalCommand) cmdObj).getObject(), extraClassInstanceList);
+        } else if( cmdObj instanceof InsertObjectCommand ) {
+            addPossiblyNullObject(((InsertObjectCommand) cmdObj).getObject(), extraClassInstanceList);
+        } else if( cmdObj instanceof UpdateCommand ) {
+            addPossiblyNullObject(((UpdateCommand) cmdObj).getObject(), extraClassInstanceList);
+        } else if( cmdObj instanceof AddTaskCommand ) {
+            addPossiblyNullObject(((AddTaskCommand) cmdObj).getParameter(), extraClassInstanceList);
+        } else if( cmdObj instanceof CompleteTaskCommand ) {
+            addPossiblyNullObject(((CompleteTaskCommand) cmdObj).getData(), extraClassInstanceList);
+        } else if( cmdObj instanceof FailTaskCommand ) {
+            addPossiblyNullObject(((FailTaskCommand) cmdObj).getData(), extraClassInstanceList);
         } 
     }
 
-    private void addPossiblyNullObject( Object inputObject, List<Object> objectList ) {
+    void addPossiblyNullObject( Object inputObject, List<Object> objectList ) {
         if( inputObject != null ) {
-            objectList.add(inputObject);
-        }
-    }
-
-    private void addPossiblyNullObjectList( List<Object> inputList, List<Object> objectList ) {
-        if( inputList != null && !inputList.isEmpty() ) {
-            objectList.addAll(objectList);
-        }
-    }
-
-    private void addPossiblyNullObjectMap( JaxbStringObjectPairArray inputMap, List<Object> objectList ) {
-        if( inputMap != null && inputMap.getItems() != null && !inputMap.getItems().isEmpty() ) {
-            for( JaxbStringObjectPair stringObjectPair : inputMap.getItems() ) {
-                objectList.add(stringObjectPair.getValue());
+            if( inputObject instanceof List )  { 
+                objectList.addAll((List) inputObject);
+            } else if( inputObject instanceof JaxbStringObjectPairArray ) { 
+                for( JaxbStringObjectPair stringObjectPair : ((JaxbStringObjectPairArray) inputObject).getItems() ) {
+                    objectList.add(stringObjectPair.getValue());
+                }
+            } else {  
+                objectList.add(inputObject);
             }
         }
     }

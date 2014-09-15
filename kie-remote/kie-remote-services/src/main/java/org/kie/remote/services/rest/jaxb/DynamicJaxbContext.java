@@ -1,7 +1,7 @@
 package org.kie.remote.services.rest.jaxb;
 
 import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.getAllBaseJaxbClasses;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -174,7 +174,7 @@ public class DynamicJaxbContext extends JAXBContext {
      */
     private static void setupDefaultJaxbContext() {
         try {
-            Class<?> [] types = getAllBaseJaxbClasses();
+            Class<?> [] types = getAllBaseJaxbClasses(false);
             JAXBContext defaultJaxbContext = JAXBContext.newInstance(types);
 
             contextsCache.put(DEFAULT_JAXB_CONTEXT_ID, defaultJaxbContext);
@@ -206,7 +206,7 @@ public class DynamicJaxbContext extends JAXBContext {
         }
         
         // create set of all classes needed
-        Set<Class<?>> allClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses()));
+        Set<Class<?>> allClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses(false)));
         allClasses.addAll(depClasses);
         Class [] allClassesArr = allClasses.toArray(new Class[allClasses.size()]);
 

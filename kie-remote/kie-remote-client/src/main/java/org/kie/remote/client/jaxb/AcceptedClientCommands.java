@@ -1,5 +1,6 @@
 package org.kie.remote.client.jaxb;
 
+import org.kie.remote.jaxb.gen.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,99 +14,94 @@ public class AcceptedClientCommands {
         // static fields only
     }
     
-    private static Set<String> acceptedCommands = new HashSet<String>();
+    private static Set<Class<?>> acceptedCommands = new HashSet<Class<?>>();
     static {
-        acceptedCommands.add("AbortWorkItemCommand");
-        acceptedCommands.add("CompleteWorkItemCommand");
-        acceptedCommands.add("GetWorkItemCommand");
+        acceptedCommands.add(AbortWorkItemCommand.class);
+        acceptedCommands.add(CompleteWorkItemCommand.class);
+        acceptedCommands.add(GetWorkItemCommand.class);
 
-        acceptedCommands.add("AbortProcessInstanceCommand");
-        acceptedCommands.add("GetProcessIdsCommand");
-        acceptedCommands.add("GetProcessInstanceByCorrelationKeyCommand");
-        acceptedCommands.add("GetProcessInstanceCommand");
-        acceptedCommands.add("GetProcessInstancesCommand");
-        acceptedCommands.add("SetProcessInstanceVariablesCommand");
-        acceptedCommands.add("SignalEventCommand");
-        acceptedCommands.add("StartCorrelatedProcessCommand");
-        acceptedCommands.add("StartProcessCommand");
+        acceptedCommands.add(AbortProcessInstanceCommand.class);
+        acceptedCommands.add(GetProcessIdsCommand.class);
+        acceptedCommands.add(GetProcessInstanceByCorrelationKeyCommand.class);
+        acceptedCommands.add(GetProcessInstanceCommand.class);
+        acceptedCommands.add(GetProcessInstancesCommand.class);
+        acceptedCommands.add(SetProcessInstanceVariablesCommand.class);
+        acceptedCommands.add(SignalEventCommand.class);
+        acceptedCommands.add(StartCorrelatedProcessCommand.class);
+        acceptedCommands.add(StartProcessCommand.class);
 
-        acceptedCommands.add("GetVariableCommand");
-        acceptedCommands.add("GetFactCountCommand");
-        acceptedCommands.add("GetGlobalCommand");
-        acceptedCommands.add("GetIdCommand");
-        acceptedCommands.add("SetGlobalCommand");
+        acceptedCommands.add(GetVariableCommand.class);
+        acceptedCommands.add(GetFactCountCommand.class);
+        acceptedCommands.add(GetGlobalCommand.class);
+        acceptedCommands.add(GetIdCommand.class);
+        acceptedCommands.add(SetGlobalCommand.class);
 
-        acceptedCommands.add("DeleteCommand");
-        acceptedCommands.add("FireAllRulesCommand");
-        acceptedCommands.add("InsertObjectCommand");
-        acceptedCommands.add("UpdateCommand");
+        acceptedCommands.add(DeleteCommand.class);
+        acceptedCommands.add(FireAllRulesCommand.class);
+        acceptedCommands.add(InsertObjectCommand.class);
+        acceptedCommands.add(UpdateCommand.class);
 
         // Task commands
-        acceptedCommands.add("ActivateTaskCommand");
-        acceptedCommands.add("AddTaskCommand");
-        acceptedCommands.add("ClaimNextAvailableTaskCommand");
-        acceptedCommands.add("ClaimTaskCommand");
-        acceptedCommands.add("CompleteTaskCommand");
-        acceptedCommands.add("DelegateTaskCommand");
-        acceptedCommands.add("ExitTaskCommand");
-        acceptedCommands.add("FailTaskCommand");
-        acceptedCommands.add("ForwardTaskCommand");
-        acceptedCommands.add("GetAttachmentCommand");
+        acceptedCommands.add(ActivateTaskCommand.class);
+        acceptedCommands.add(AddTaskCommand.class);
+        acceptedCommands.add(ClaimNextAvailableTaskCommand.class);
+        acceptedCommands.add(ClaimTaskCommand.class);
+        acceptedCommands.add(CompleteTaskCommand.class);
+        acceptedCommands.add(DelegateTaskCommand.class);
+        acceptedCommands.add(ExitTaskCommand.class);
+        acceptedCommands.add(FailTaskCommand.class);
+        acceptedCommands.add(ForwardTaskCommand.class);
+        acceptedCommands.add(GetAttachmentCommand.class);
 
-        acceptedCommands.add("GetContentCommand");
-        acceptedCommands.add("GetTaskContentCommand");
+        acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetTaskContentCommand.class);
 
-        acceptedCommands.add("GetTaskAssignedAsBusinessAdminCommand");
-        acceptedCommands.add("GetTaskAssignedAsPotentialOwnerCommand");
-        acceptedCommands.add("GetTaskByWorkItemIdCommand");
-        acceptedCommands.add("GetTaskCommand");
-        acceptedCommands.add("GetTasksByProcessInstanceIdCommand");
-        acceptedCommands.add("GetTasksByStatusByProcessInstanceIdCommand");
-        acceptedCommands.add("GetTasksByVariousFieldsCommand");
-        acceptedCommands.add("GetTasksOwnedCommand");
-        acceptedCommands.add("NominateTaskCommand");
-        acceptedCommands.add("ReleaseTaskCommand");
-        acceptedCommands.add("ResumeTaskCommand");
-        acceptedCommands.add("SkipTaskCommand");
-        acceptedCommands.add("StartTaskCommand");
-        acceptedCommands.add("StopTaskCommand");
-        acceptedCommands.add("SuspendTaskCommand");
-        acceptedCommands.add("CompositeCommand");
-        acceptedCommands.add("ProcessSubTaskCommand");
-        acceptedCommands.add("ExecuteTaskRulesCommand");
-        acceptedCommands.add("CancelDeadlineCommand");
+        acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
+        acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
+        acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
+        acceptedCommands.add(GetTaskCommand.class);
+        acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
+        acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
+        acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
+        acceptedCommands.add(GetTasksOwnedCommand.class);
+        acceptedCommands.add(NominateTaskCommand.class);
+        acceptedCommands.add(ReleaseTaskCommand.class);
+        acceptedCommands.add(ResumeTaskCommand.class);
+        acceptedCommands.add(SkipTaskCommand.class);
+        acceptedCommands.add(StartTaskCommand.class);
+        acceptedCommands.add(StopTaskCommand.class);
+        acceptedCommands.add(SuspendTaskCommand.class);
+        acceptedCommands.add(ProcessSubTaskCommand.class);
+        acceptedCommands.add(ExecuteTaskRulesCommand.class);
+        acceptedCommands.add(CancelDeadlineCommand.class);
 
         // audit commands
-        acceptedCommands.add("ClearHistoryLogsCommand");
-        acceptedCommands.add("FindActiveProcessInstancesCommand");
-        acceptedCommands.add("FindNodeInstancesCommand");
-        acceptedCommands.add("FindProcessInstanceCommand");
-        acceptedCommands.add("FindProcessInstancesCommand");
-        acceptedCommands.add("FindSubProcessInstancesCommand");
-        acceptedCommands.add("FindSubProcessInstancesCommand");
-        acceptedCommands.add("FindVariableInstancesCommand");
-        acceptedCommands.add("FindVariableInstancesByNameCommand");
+        acceptedCommands.add(ClearHistoryLogsCommand.class);
+        acceptedCommands.add(FindActiveProcessInstancesCommand.class);
+        acceptedCommands.add(FindNodeInstancesCommand.class);
+        acceptedCommands.add(FindProcessInstanceCommand.class);
+        acceptedCommands.add(FindProcessInstancesCommand.class);
+        acceptedCommands.add(FindSubProcessInstancesCommand.class);
+        acceptedCommands.add(FindSubProcessInstancesCommand.class);
+        acceptedCommands.add(FindVariableInstancesCommand.class);
+        acceptedCommands.add(FindVariableInstancesByNameCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
-    public static Set<String> getAcceptedCommandNames() { 
-       return Collections.unmodifiableSet(acceptedCommands);
-    }
-    
     public static boolean isAcceptedCommandClass(Class<?> commandClass) { 
         if( ! commandClass.getPackage().getName().equals(AbortWorkItemCommand.class.getPackage().getName()) ) { 
            return false; 
         }
-        return acceptedCommands.contains(commandClass.getSimpleName());
+        return acceptedCommands.contains(commandClass);
     }
     
-    private static Set<String> taskCommandClassNamesThatInfluenceKieSession = new HashSet<String>();
+    private static Set<Class<?>> taskCommandClassNamesThatInfluenceKieSession = new HashSet<Class<?>>();
     static { 
-        taskCommandClassNamesThatInfluenceKieSession.add("CompleteTaskCommand");
-        taskCommandClassNamesThatInfluenceKieSession.add("ExitTaskCommand");
-        taskCommandClassNamesThatInfluenceKieSession.add("FailTaskCommand");
-        taskCommandClassNamesThatInfluenceKieSession.add("SkipTaskCommand");
+        taskCommandClassNamesThatInfluenceKieSession.add(CompleteTaskCommand.class);
+        taskCommandClassNamesThatInfluenceKieSession.add(ExitTaskCommand.class);
+        taskCommandClassNamesThatInfluenceKieSession.add(FailTaskCommand.class);
+        taskCommandClassNamesThatInfluenceKieSession.add(SkipTaskCommand.class);
         
         taskCommandClassNamesThatInfluenceKieSession = Collections.unmodifiableSet(taskCommandClassNamesThatInfluenceKieSession);
     }
@@ -114,38 +110,37 @@ public class AcceptedClientCommands {
         return taskCommandClassNamesThatInfluenceKieSession.contains(commandClass.getSimpleName());
     }
     
-    private static Set<String> sendObjectParameterCommandClassNames = new HashSet<String>();
+    private static Set<Class<?>> sendObjectParameterCommandClasses = new HashSet<Class<?>>();
     static { 
-        sendObjectParameterCommandClassNames.add("CompleteWorkItemCommand");
-        sendObjectParameterCommandClassNames.add("SignalEventCommand");
-        sendObjectParameterCommandClassNames.add("StartCorrelatedProcessCommand");
-        sendObjectParameterCommandClassNames.add("StartProcessCommand");
+        sendObjectParameterCommandClasses.add(CompleteWorkItemCommand.class);
+        sendObjectParameterCommandClasses.add(SignalEventCommand.class);
+        sendObjectParameterCommandClasses.add(StartCorrelatedProcessCommand.class);
+        sendObjectParameterCommandClasses.add(StartProcessCommand.class);
         
-        sendObjectParameterCommandClassNames.add("SetGlobalCommand");
-        sendObjectParameterCommandClassNames.add("InsertObjectCommand");
-        sendObjectParameterCommandClassNames.add("UpdateCommand");
+        sendObjectParameterCommandClasses.add(SetGlobalCommand.class);
+        sendObjectParameterCommandClasses.add(InsertObjectCommand.class);
+        sendObjectParameterCommandClasses.add(UpdateCommand.class);
 
-        sendObjectParameterCommandClassNames.add("AddTaskCommand");
-        sendObjectParameterCommandClassNames.add("CompleteTaskCommand");
-        sendObjectParameterCommandClassNames.add("FailTaskCommand");
-        sendObjectParameterCommandClassNames.add("CompositeCommand");
+        sendObjectParameterCommandClasses.add(AddTaskCommand.class);
+        sendObjectParameterCommandClasses.add(CompleteTaskCommand.class);
+        sendObjectParameterCommandClasses.add(FailTaskCommand.class);
         
-        sendObjectParameterCommandClassNames = Collections.unmodifiableSet(sendObjectParameterCommandClassNames);
+        sendObjectParameterCommandClasses = Collections.unmodifiableSet(sendObjectParameterCommandClasses);
     }
 
     public static boolean isSendObjectParameterCommandClass(Class<?> commandClass) { 
-        return sendObjectParameterCommandClassNames.contains(commandClass.getSimpleName());
+        return sendObjectParameterCommandClasses.contains(commandClass.getSimpleName());
     }
-    
-    private static Set<String> receiveObjectParameterCommandClassNames = new HashSet<String>();
+   
+    private static Set<Class<?>> receiveObjectParameterCommandClasses = new HashSet<Class<?>>();
     static { 
-        receiveObjectParameterCommandClassNames.add("GetVariableCommand");
-        receiveObjectParameterCommandClassNames.add("GetGlobalCommand");
+        receiveObjectParameterCommandClasses.add(GetVariableCommand.class);
+        receiveObjectParameterCommandClasses.add(GetGlobalCommand.class);
         
-        receiveObjectParameterCommandClassNames = Collections.unmodifiableSet(sendObjectParameterCommandClassNames);
+        receiveObjectParameterCommandClasses = Collections.unmodifiableSet(sendObjectParameterCommandClasses);
     }
     
     public static boolean isReceiveObjectParameterCommandClass(Class<?> commandClass) { 
-        return receiveObjectParameterCommandClassNames.contains(commandClass.getSimpleName());
+        return receiveObjectParameterCommandClasses.contains(commandClass.getSimpleName());
     }
 }

@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -108,14 +109,11 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 // exception
                 JaxbRestRequestException.class
         };
-       
-        String [] serviceSideClasses = { 
-                "org.kie.remote.services.jaxb.JaxbCommandsRequest",
-                "org.kie.remote.services.jaxb.JaxbCommandsResponse",
-                "org.kie.remote.services.jaxb.JaxbContentResponse",
-                "org.kie.remote.services.jaxb.JaxbTaskResponse",
-                "org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse"
-        };
+        KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
+    }
+    
+    private static Set<Class<?>> CLIENT_SIDE_JAXB_CLASS_SET;
+    static { 
         String [] clientSideClasses = { 
                 "org.kie.remote.client.jaxb.JaxbCommandsRequest",
                 "org.kie.remote.client.jaxb.JaxbCommandsResponse",
@@ -124,20 +122,33 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 "org.kie.remote.client.jaxb.JaxbTaskSummaryListResponse"
         };
         
-        List<Class<?>> kieJaxbClassList = new ArrayList<Class<?>>(kieJaxbClasses.length + serviceSideClasses.length);
-        kieJaxbClassList.addAll(Arrays.asList(kieJaxbClasses));
-        
+       
+        List<Class<?>> clientSideJaxbClassList = new ArrayList<Class<?>>();
         try { 
-            addClassesToList(clientSideClasses, kieJaxbClassList);
+            addClassesToList(clientSideClasses, clientSideJaxbClassList);
         } catch( ClassNotFoundException cnfe ) { 
-            try { 
-                addClassesToList(serviceSideClasses, kieJaxbClassList);
-            } catch( ClassNotFoundException clientCnfe ) { 
                 // do nothing
-            }
         }
-        KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(kieJaxbClassList);
+        CLIENT_SIDE_JAXB_CLASS_SET = Collections.unmodifiableSet(new HashSet<Class<?>>(clientSideJaxbClassList));
     };
+    
+    private static Set<Class<?>> SERVER_SIDE_JAXB_CLASS_SET;
+    static { 
+        String [] serviceSideClasses = { 
+                "org.kie.remote.services.jaxb.JaxbCommandsRequest",
+                "org.kie.remote.services.jaxb.JaxbCommandsResponse",
+                "org.kie.remote.services.jaxb.JaxbContentResponse",
+                "org.kie.remote.services.jaxb.JaxbTaskResponse",
+                "org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse"
+        };
+        List<Class<?>> serverSideJaxbClassList = new ArrayList<Class<?>>();
+        try { 
+            addClassesToList(serviceSideClasses, serverSideJaxbClassList);
+        } catch( ClassNotFoundException clientCnfe ) { 
+            // do nothing
+        }
+        SERVER_SIDE_JAXB_CLASS_SET = Collections.unmodifiableSet(new HashSet<Class<?>>(serverSideJaxbClassList));
+    }
 
     private static void addClassesToList(String [] classes, List<Class<?>> list) throws ClassNotFoundException { 
         for( int i = 0; i < classes.length; ++i ) { 
@@ -174,9 +185,13 @@ public class JaxbSerializationProvider implements SerializationProvider {
         ALL_BASE_JAXB_CLASSES = types;
     }
             
-    public static Class<?> [] getAllBaseJaxbClasses() { 
-        Class<?> [] copy = new Class<?>[ALL_BASE_JAXB_CLASSES.length];
+    public static Class<?> [] getAllBaseJaxbClasses(boolean clientSide) { 
+        Set<Class<?>> sideJaxbClassSet = clientSide ? CLIENT_SIDE_JAXB_CLASS_SET : SERVER_SIDE_JAXB_CLASS_SET;
+        Class<?> [] sideJaxbClasses = new Class<?>[sideJaxbClassSet.size()];
+        sideJaxbClasses = sideJaxbClassSet.toArray(sideJaxbClasses);
+        Class<?> [] copy = new Class<?>[ALL_BASE_JAXB_CLASSES.length + sideJaxbClasses.length];
         System.arraycopy(ALL_BASE_JAXB_CLASSES, 0, copy, 0, ALL_BASE_JAXB_CLASSES.length);
+        System.arraycopy(sideJaxbClasses, 0, copy, ALL_BASE_JAXB_CLASSES.length, sideJaxbClasses.length);
         return copy;
     }
 
@@ -185,28 +200,41 @@ public class JaxbSerializationProvider implements SerializationProvider {
     private boolean prettyPrint = false;
     private JAXBContext jaxbContext = null;
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
-  
-    public JaxbSerializationProvider() {
-        initializeJaxbContext(getAllBaseJaxbClasses());
+ 
+    public static JaxbSerializationProvider clientSideInstance() { 
+        return new JaxbSerializationProvider(Arrays.asList(getAllBaseJaxbClasses(true)));
     }
-
-    public JaxbSerializationProvider(Collection<Class<?>> extraJaxbClassList) {
-        Set<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses()));
+    
+    public static JaxbSerializationProvider clientSideInstance(Collection<Class<?>> extraJaxbClassList) { 
+        HashSet<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses(true)));
         jaxbClasses.addAll(extraJaxbClassList);
-        initializeJaxbContext(jaxbClasses.toArray(new Class<?>[jaxbClasses.size()]));
+        return new JaxbSerializationProvider(jaxbClasses);
     }
    
-    private void initializeJaxbContext(Class<?> [] jaxbClasses) {
+    public static JaxbSerializationProvider serverSideInstance() { 
+        return new JaxbSerializationProvider(Arrays.asList(getAllBaseJaxbClasses(false)));
+    }
+    
+    public static JaxbSerializationProvider newInstance(JAXBContext jaxbContext) { 
+         return new JaxbSerializationProvider(jaxbContext);
+    }
+    
+    private JaxbSerializationProvider(Collection<Class<?>> classList) {
+        initializeJaxbContexts(classList.toArray(new Class<?>[classList.size()]));
+    }
+   
+    private JaxbSerializationProvider(JAXBContext jaxbContext) {
+        this.jaxbContext = jaxbContext;
+    }
+
+    private void initializeJaxbContexts(Class<?> [] jaxbClasses) {
         try {
             jaxbContext = JAXBContext.newInstance(jaxbClasses);
         } catch (JAXBException jaxbe) {
             throw new SerializationException("Unsupported JAXB Class encountered during initialization: " + jaxbe.getMessage(), jaxbe);
         }
     }
-    public JaxbSerializationProvider(JAXBContext jaxbContext) {
-        this.jaxbContext = jaxbContext;
-    }
-
+    
     public void dispose() { 
        if( this.extraJaxbClasses != null ) { 
            this.extraJaxbClasses.clear();
@@ -285,13 +313,13 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return jaxbObj;
     }
 
-    public void addJaxbClasses(Class... jaxbClass) {
+    public void addJaxbClasses(boolean clientSide, Class... jaxbClass) {
         for (int i = 0; i < jaxbClass.length; ++i) {
             extraJaxbClasses.add(jaxbClass[i]);
         }
         Set<Class<?>> jaxbClassSet = new HashSet<Class<?>>(extraJaxbClasses); 
-        jaxbClassSet.addAll(Arrays.asList(getAllBaseJaxbClasses()));
-        initializeJaxbContext(jaxbClassSet.toArray(new Class<?>[jaxbClassSet.size()]));
+        jaxbClassSet.addAll(Arrays.asList(getAllBaseJaxbClasses(clientSide)));
+        initializeJaxbContexts(jaxbClassSet.toArray(new Class<?>[jaxbClassSet.size()]));
     }
 
     public Collection<Class<?>> getExtraJaxbClasses() { 

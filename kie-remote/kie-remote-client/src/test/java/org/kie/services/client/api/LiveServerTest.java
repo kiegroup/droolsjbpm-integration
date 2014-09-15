@@ -24,6 +24,7 @@ import org.kie.api.task.model.TaskSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 public class LiveServerTest {
 
     protected static Logger logger = LoggerFactory.getLogger(LiveServerTest.class);

@@ -21,7 +21,7 @@ public class VersionedJaxbCommandsRequestResponseTest {
 
     protected static final Logger logger = LoggerFactory.getLogger(VersionedJaxbCommandsRequestResponseTest.class);
     
-    protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
+    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.serverSideInstance();
     { 
         jaxbProvider.setPrettyPrint(true);
     }

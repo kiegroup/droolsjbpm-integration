@@ -29,13 +29,13 @@ public class JaxbRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
 
     protected static final Logger logger = LoggerFactory.getLogger(JaxbRemoteClientSerializationTest.class); 
 
-    protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
+    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.clientSideInstance();
     { 
         jaxbProvider.setPrettyPrint(true);
     }
 
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
-        jaxbProvider.addJaxbClasses(extraClass);
+        jaxbProvider.addJaxbClasses(true, extraClass);
     }
 
     public <T> T testRoundTrip(T in) throws Exception {

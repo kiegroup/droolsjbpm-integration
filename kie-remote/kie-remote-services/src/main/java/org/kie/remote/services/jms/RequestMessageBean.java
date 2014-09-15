@@ -40,7 +40,7 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.services.task.identity.adapter.UserGroupAdapter;
 import org.kie.api.command.Command;
-import org.kie.remote.services.AcceptedCommands;
+import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.exception.KieRemoteServicesInternalError;
@@ -280,7 +280,7 @@ public class RequestMessageBean implements MessageListener {
             } else { 
                 DynamicJaxbContext.setDeploymentJaxbContext(DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID);
             }
-            serializationProvider = new JaxbSerializationProvider(dynamicJaxbContext);
+            serializationProvider = JaxbSerializationProvider.newInstance(dynamicJaxbContext);
         } catch (JMSException jmse) {
             throw new KieRemoteServicesInternalError("Unable to check or read JMS message for property.", jmse);
         } catch (SerializationException se) {
@@ -327,7 +327,7 @@ public class RequestMessageBean implements MessageListener {
                 for (int i = 0; i < commands.size(); ++i) {
 
                     Command<?> cmd = commands.get(i);
-                    if (!AcceptedCommands.getSet().contains(cmd.getClass())) {
+                    if (!AcceptedServerCommands.isAcceptedCommandClass(cmd.getClass())) {
                         String cmdName = cmd.getClass().getName();
                         String errMsg = cmdName + " is not a supported command and will not be executed.";
                         logger.warn( errMsg );

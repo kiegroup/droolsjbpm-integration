@@ -36,6 +36,7 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: changed, add to documentation
 public class DocumentationJmsExamples {
 
     protected static final Logger logger = LoggerFactory.getLogger(DocumentationJmsExamples.class);
@@ -139,7 +140,7 @@ public class DocumentationJmsExamples {
                 throw new RemoteCommunicationException("Unable to setup a JMS connection.", jmse);
             }
 
-            JaxbSerializationProvider serializationProvider = new JaxbSerializationProvider();
+            JaxbSerializationProvider serializationProvider = JaxbSerializationProvider.clientSideInstance();
             // if necessary, add user-created classes here:
             // xmlSerializer.addJaxbClasses(MyType.class, AnotherJaxbAnnotatedType.class);
 

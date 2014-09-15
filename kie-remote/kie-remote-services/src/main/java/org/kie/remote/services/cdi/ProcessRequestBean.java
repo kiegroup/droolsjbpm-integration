@@ -4,12 +4,22 @@ import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
+import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.command.AuditCommand;
@@ -17,6 +27,9 @@ import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.task.commands.AddTaskCommand;
+import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
@@ -27,6 +40,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
+import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
@@ -36,6 +50,7 @@ import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * This class is used by both the {@link RuntimeResourceImpl} and {@link TaskResourceImpl} to do the core operations on
@@ -107,6 +122,7 @@ public class ProcessRequestBean {
             logger.warn( "Request received from client version [{}] while server is version [{}]! THIS MAY CAUSE PROBLEMS!", version, VERSION);
         }
         jaxbResponse.setVersion(VERSION);
+        preprocessCommand(cmd);
         
         String cmdName = cmd.getClass().getSimpleName();
         logger.debug("Processing command " + cmdName);
@@ -150,6 +166,57 @@ public class ProcessRequestBean {
             }
         }
     }
+   
+    void preprocessCommand(Command cmd) { 
+       if( AcceptedServerCommands.SEND_OBJECT_PARAMETER_COMMANDS.contains(cmd.getClass()) ) { 
+           if( cmd instanceof CompleteWorkItemCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((CompleteWorkItemCommand) cmd).getResults());
+           } else if( cmd instanceof SignalEventCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((SignalEventCommand) cmd).getEvent());
+           } else if( cmd instanceof StartCorrelatedProcessCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((StartCorrelatedProcessCommand) cmd).getData());
+               checkThatUserDefinedClassesWereUnmarshalled(((StartCorrelatedProcessCommand) cmd).getParameters());
+           } else if( cmd instanceof StartProcessCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((StartProcessCommand) cmd).getData());
+               checkThatUserDefinedClassesWereUnmarshalled(((StartProcessCommand) cmd).getParameters());
+           } else if( cmd instanceof SetGlobalCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((SetGlobalCommand) cmd).getObject());
+           } else if( cmd instanceof InsertObjectCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((InsertObjectCommand) cmd).getObject());
+           } else if( cmd instanceof UpdateCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((UpdateCommand) cmd).getObject());
+           } else if( cmd instanceof AddTaskCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((AddTaskCommand) cmd).getParams());
+           } else if( cmd instanceof CompleteTaskCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((CompleteTaskCommand) cmd).getData());
+           } else if( cmd instanceof FailTaskCommand ) {
+               checkThatUserDefinedClassesWereUnmarshalled(((FailTaskCommand) cmd).getData());
+           }  
+       }
+    }
+    
+    void checkThatUserDefinedClassesWereUnmarshalled(Object obj) { 
+       if( obj != null ) { 
+          if( obj instanceof List ) { 
+             for( Object listElem : (List) obj ) { 
+                 verifyObjectHasBeenUnmarshalled(listElem);
+             }
+          } else if( obj instanceof Map ) { 
+              for( Object mapVal : ((Map) obj).values() ) { 
+                 verifyObjectHasBeenUnmarshalled(mapVal);
+              }
+          } else { 
+              verifyObjectHasBeenUnmarshalled(obj);
+          }
+       }
+    }
+   
+    private void verifyObjectHasBeenUnmarshalled(Object obj) { 
+        if( Element.class.isAssignableFrom(obj.getClass()) ) { 
+            String typeName = ((Element) obj).getAttribute("xsi:type");
+            throw new IllegalStateException("Could not unmarshall user-defined class instance parameter of type '" + typeName + "'");
+        }
+    }
     
     /**
      * Executes a command on the {@link KieSession} from the proper {@link RuntimeManager}. This method
@@ -189,10 +256,8 @@ public class ProcessRequestBean {
      * @return The variable object instance.
      */
     public Object getVariableObjectInstanceFromRuntime(String deploymentId, long processInstanceId, String varName) { 
-        String errorMsg = "Unable to retrieve variable '" + varName + "' from process instance " + processInstanceId;
         try {
             Object procVar = processService.getProcessInstanceVariable(processInstanceId, varName);
-
             return procVar;
         } catch (ProcessInstanceNotFoundException e) {
             throw KieRemoteRestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");

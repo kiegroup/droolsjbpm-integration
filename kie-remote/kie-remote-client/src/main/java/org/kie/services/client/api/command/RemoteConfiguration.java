@@ -86,9 +86,9 @@ public final class RemoteConfiguration {
     
     public void initializeJaxbSerializationProvider() {
         if( extraJaxbClasses != null ) { 
-            jaxbSerializationProvider = new JaxbSerializationProvider(extraJaxbClasses);
+            jaxbSerializationProvider = JaxbSerializationProvider.clientSideInstance(extraJaxbClasses);
         } else {  
-            jaxbSerializationProvider = new JaxbSerializationProvider();
+            jaxbSerializationProvider = JaxbSerializationProvider.clientSideInstance();
         }
     }
 

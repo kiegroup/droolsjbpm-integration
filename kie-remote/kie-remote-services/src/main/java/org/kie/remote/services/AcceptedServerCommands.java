@@ -9,7 +9,18 @@ import org.drools.core.command.runtime.GetFactCountCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.GetIdCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
-import org.drools.core.command.runtime.process.*;
+import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
+import org.drools.core.command.runtime.process.AbortWorkItemCommand;
+import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
+import org.drools.core.command.runtime.process.GetProcessIdsCommand;
+import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
+import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
+import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
+import org.drools.core.command.runtime.process.GetWorkItemCommand;
+import org.drools.core.command.runtime.process.SetProcessInstanceVariablesCommand;
+import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
@@ -28,7 +39,6 @@ import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.CompositeCommand;
 import org.jbpm.services.task.commands.DelegateTaskCommand;
 import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
@@ -53,14 +63,12 @@ import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
-import org.jbpm.services.task.commands.TaskCommand;
-
 import org.kie.api.command.Command;
 
 @SuppressWarnings("rawtypes")
-public class AcceptedCommands {
+public class AcceptedServerCommands {
 
-    private AcceptedCommands() { 
+    private AcceptedServerCommands() { 
         // static fields only
     }
     
@@ -123,7 +131,6 @@ public class AcceptedCommands {
         acceptedCommands.add(StartTaskCommand.class);
         acceptedCommands.add(StopTaskCommand.class);
         acceptedCommands.add(SuspendTaskCommand.class);
-        acceptedCommands.add(CompositeCommand.class);
         acceptedCommands.add(ProcessSubTaskCommand.class);
         acceptedCommands.add(ExecuteTaskRulesCommand.class);
         acceptedCommands.add(CancelDeadlineCommand.class);
@@ -142,18 +149,8 @@ public class AcceptedCommands {
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
-    public static Set<Class<? extends Command>> getSet() {
-        return acceptedCommands;
-    }
-    
-    public static Set<Class<? extends TaskCommand<?>>> TASK_COMMANDS_THAT_INFLUENCE_KIESESSION = new HashSet<Class<? extends TaskCommand<?>>>();
-    static { 
-        TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(CompleteTaskCommand.class);
-        TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(ExitTaskCommand.class);
-        TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(FailTaskCommand.class);
-        TASK_COMMANDS_THAT_INFLUENCE_KIESESSION.add(SkipTaskCommand.class);
-        
-        TASK_COMMANDS_THAT_INFLUENCE_KIESESSION = Collections.unmodifiableSet(TASK_COMMANDS_THAT_INFLUENCE_KIESESSION);
+    public static boolean isAcceptedCommandClass(Class<?> commandClass) { 
+        return acceptedCommands.contains(commandClass);
     }
     
     public static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
@@ -170,16 +167,8 @@ public class AcceptedCommands {
         SEND_OBJECT_PARAMETER_COMMANDS.add(AddTaskCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteTaskCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(FailTaskCommand.class);
-        SEND_OBJECT_PARAMETER_COMMANDS.add(CompositeCommand.class);
         
         SEND_OBJECT_PARAMETER_COMMANDS = Collections.unmodifiableSet(SEND_OBJECT_PARAMETER_COMMANDS);
     }
 
-    static Set<Class<? extends Command>> RECV_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
-    static { 
-        RECV_OBJECT_PARAMETER_COMMANDS.add(GetVariableCommand.class);
-        RECV_OBJECT_PARAMETER_COMMANDS.add(GetGlobalCommand.class);
-        
-        RECV_OBJECT_PARAMETER_COMMANDS = Collections.unmodifiableSet(SEND_OBJECT_PARAMETER_COMMANDS);
-    }
 }

@@ -79,10 +79,8 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
 
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
-        cmdsRequest.setVersion(ServicesVersion.VERSION);
         this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         cmdsRequest = new JaxbCommandsRequest(new CompleteTaskCommand(TASK_ID, USER, null));
-        cmdsRequest.setVersion(ServicesVersion.VERSION);
         this.jmsProcessJaxbCommandsRequest(cmdsRequest);
        
         // verify
@@ -95,10 +93,8 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
 
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
-        cmdsRequest.setVersion(ServicesVersion.VERSION);
         this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         cmdsRequest = new JaxbCommandsRequest(new CompleteTaskCommand(TASK_ID, USER, null));
-        cmdsRequest.setVersion(ServicesVersion.VERSION);
         this.jmsProcessJaxbCommandsRequest(cmdsRequest);
         
         // verify
@@ -112,7 +108,6 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         // run cmd (no deploymentId set on JaxbConmandsRequest object
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new FindProcessInstancesCommand());
-        cmdsRequest.setVersion(ServicesVersion.VERSION);
         JaxbCommandsResponse 
         response = this.jmsProcessJaxbCommandsRequest(cmdsRequest);
        

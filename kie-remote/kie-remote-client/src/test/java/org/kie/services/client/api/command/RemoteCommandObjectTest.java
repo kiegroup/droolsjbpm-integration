@@ -1,6 +1,12 @@
 package org.kie.services.client.api.command;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -10,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,13 +42,12 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.drools.core.command.runtime.process.AbortWorkItemCommand;
-import org.jbpm.services.task.commands.CompositeCommand;
 import org.junit.Test;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.DeleteCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
+import org.mockito.Mockito;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -56,9 +62,11 @@ public class RemoteCommandObjectTest {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteCommandObjectTest.class);
 
-    private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.drools.core.command"),
+    private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.remote.command"),
             ClasspathHelper.forPackage("org.jbpm.services.task.commands"),
-            ClasspathHelper.forPackage("org.jbpm.process.audit.command"), new TypeAnnotationsScanner(),
+            ClasspathHelper.forPackage("org.jbpm.process.audit.command"),
+            ClasspathHelper.forPackage("org.kie.remote.jaxb.gen"),
+            new TypeAnnotationsScanner(),
             new FieldAnnotationsScanner(), new SubTypesScanner());
 
     private DatatypeFactory datatypeFactory;
@@ -87,14 +95,13 @@ public class RemoteCommandObjectTest {
             }
         });
         classes = new LinkedHashSet<Class<?>>(classList);
-        classes.remove(CompositeCommand.class);
         
         Map<Class, Class> kieCmdGenCmdClassMap = new LinkedHashMap<Class, Class>();
         for( Class<?> cmdClass : classes ) {
             if( ! cmdClass.getSimpleName().endsWith("Command") ) { 
                continue; 
             }
-            if( !AcceptedClientCommands.getAcceptedCommandNames().contains(cmdClass.getSimpleName()) ) {  
+            if( ! AcceptedClientCommands.isAcceptedCommandClass(cmdClass) ) {  
                 continue;
             }
             Class genCmdClass = Class.forName("org.kie.remote.jaxb.gen." + cmdClass.getSimpleName());
@@ -279,4 +286,21 @@ public class RemoteCommandObjectTest {
         return JAXBContext.newInstance(classes);
     }
 
+    @Test
+    public void preprocessTest() throws Exception { 
+        RemoteConfiguration config = new RemoteConfiguration("adsf", new URL("http://localhost:80808"), "user", "pwd" );
+        KieSessionClientCommandObject spyCmdObj = Mockito.spy(new KieSessionClientCommandObject(config));
+        
+        List<Object> objList = new ArrayList<Object>();
+        Field paramClassesField = AcceptedClientCommands.class.getDeclaredField("sendObjectParameterCommandClasses");
+        paramClassesField.setAccessible(true);
+        Set<Class> sendObjectParameterClasses = (Set<Class>) paramClassesField.get(null);
+        
+        for( Class clientClass : sendObjectParameterClasses ) { 
+            Object inst = clientClass.getConstructor(new Class[0]).newInstance(new Object[0]);
+            spyCmdObj.preprocessCommand(inst, objList);
+            logger.debug( "Are {} instances checked for user-defined classes?", clientClass.getSimpleName() );
+            verify(spyCmdObj, atLeastOnce()).addPossiblyNullObject(any(), any(List.class));
+        }
+    }
 }

@@ -42,14 +42,14 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         return TestType.JAXB;
     }
 
-    protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
+    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.clientSideInstance();
     { 
         jaxbProvider.setPrettyPrint(true);
     }
 
     @Override
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
-        jaxbProvider.addJaxbClasses(extraClass);
+        jaxbProvider.addJaxbClasses(true, extraClass);
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.HaltCommand;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
-import org.jbpm.services.task.commands.CompositeCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
@@ -33,7 +32,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.remote.services.AcceptedCommands;
+import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
@@ -56,13 +55,13 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
    
 
-    protected JaxbSerializationProvider jaxbProvider = new JaxbSerializationProvider();
+    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.serverSideInstance();
     { 
         jaxbProvider.setPrettyPrint(true);
     }
 
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
-        jaxbProvider.addJaxbClasses(extraClass);
+        jaxbProvider.addJaxbClasses(false, extraClass);
     }
 
     public <T> T testRoundTrip(T in) throws Exception {
@@ -81,21 +80,21 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
         XmlElements xmlElemsAnno = (XmlElements) commandsField.getAnnotations()[0];
         XmlElement[] xmlElems = xmlElemsAnno.value();
 
-        Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
-        assertEquals(AcceptedCommands.class.getSimpleName() + " contains a different set of Commands than "
+        Set<Class> cmdSet = getAcceptedCommandClassSet();
+        assertEquals(AcceptedServerCommands.class.getSimpleName() + " contains a different set of Commands than "
                 + JaxbCommandsRequest.class.getSimpleName(), cmdSet.size(), xmlElems.length);
         Set<String> xmlElemNameSet = new HashSet<String>();
         for (XmlElement xmlElemAnno : xmlElems) {
             Class cmdClass = xmlElemAnno.type();
             String name = xmlElemAnno.name();
             assertTrue(name + " is used twice as a name.", xmlElemNameSet.add(name));
-            assertTrue(cmdClass.getSimpleName() + " is present in " + AcceptedCommands.class.getSimpleName() + " but not in "
+            assertTrue(cmdClass.getSimpleName() + " is present in " + AcceptedServerCommands.class.getSimpleName() + " but not in "
                     + JaxbCommandsRequest.class.getSimpleName(), cmdSet.remove(cmdClass));
         }
         for (Class cmdClass : cmdSet) {
             logger.error("Missing: " + cmdClass.getSimpleName());
         }
-        assertEquals("See output for classes in " + AcceptedCommands.class.getSimpleName() + " that are not in "
+        assertEquals("See output for classes in " + AcceptedServerCommands.class.getSimpleName() + " that are not in "
                 + JaxbCommandsRequest.class.getSimpleName(), 0, cmdSet.size());
     }
  
@@ -138,9 +137,15 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
                 numAnnos);
     }
 
+    private Set<Class> getAcceptedCommandClassSet() throws Exception { 
+        Field commandSetField = AcceptedServerCommands.class.getDeclaredField("acceptedCommands");
+        commandSetField.setAccessible(true);
+        return new HashSet<Class>((Set<Class>) commandSetField.get(null));
+    }
+    
     @Test
     public void commandsWithListReturnTypesAreInCmdTypesList() throws Exception {
-        Set<Class> cmdSet = new HashSet<Class>(AcceptedCommands.getSet());
+        Set<Class> cmdSet = getAcceptedCommandClassSet();
         // remove "meta" command types
         assertTrue( "Removing " + GetTaskContentCommand.class.getSimpleName(), 
                 cmdSet.remove(GetTaskContentCommand.class)); // handled on ~l.244 of JaxbCommandsResponse
@@ -314,7 +319,7 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
     @Test
     public void unsupportedCommandsTest() {
         try {
-            JaxbCommandsRequest req = new JaxbCommandsRequest(new HaltCommand());
+            new JaxbCommandsRequest(new HaltCommand());
             fail( "An exception should have been thrown" );
         } catch (Exception e) {
             assertTrue(e instanceof UnsupportedOperationException);
@@ -322,7 +327,7 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
         Command [] cmdArrs = { new HaltCommand() };
         List<Command> cmds = Arrays.asList(cmdArrs);
         try {
-            JaxbCommandsRequest req = new JaxbCommandsRequest(cmds);
+            new JaxbCommandsRequest(cmds);
             fail( "An exception should have been thrown" );
         } catch (Exception e) {
             assertTrue(e instanceof UnsupportedOperationException);
@@ -335,4 +340,5 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
             assertTrue(e instanceof UnsupportedOperationException);
         }
     }
+ 
 }

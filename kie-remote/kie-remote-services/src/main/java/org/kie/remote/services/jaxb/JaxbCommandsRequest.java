@@ -48,7 +48,6 @@ import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
-import org.jbpm.services.task.commands.CompositeCommand;
 import org.jbpm.services.task.commands.DelegateTaskCommand;
 import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
@@ -75,7 +74,8 @@ import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
-import org.kie.remote.services.AcceptedCommands;
+import org.kie.remote.services.AcceptedServerCommands;
+import org.kie.services.shared.ServicesVersion;
 
 @XmlRootElement(name = "command-request")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -157,7 +157,6 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "start-task", type = StartTaskCommand.class),
             @XmlElement(name = "stop-task", type = StopTaskCommand.class),
             @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class),
-            @XmlElement(name = "task-composite-command", type = CompositeCommand.class),
             @XmlElement(name = "process-sub-tasks-command", type = ProcessSubTaskCommand.class),
             @XmlElement(name = "execute-task-rules-command", type = ExecuteTaskRulesCommand.class),
             @XmlElement(name = "cancel-deadline-command", type = CancelDeadlineCommand.class),
@@ -183,6 +182,7 @@ public class JaxbCommandsRequest {
         this.commands = new ArrayList<Command>();
         this.commands.add(command);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
+        this.version = ServicesVersion.VERSION;
     }
     
     public JaxbCommandsRequest(List<Command> commands) {
@@ -190,6 +190,7 @@ public class JaxbCommandsRequest {
         this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
+        this.version = ServicesVersion.VERSION;
     }
 
     private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
@@ -205,6 +206,7 @@ public class JaxbCommandsRequest {
         this.deploymentId = deploymentId;
         this.commands = new ArrayList<Command>();
         this.commands.add(command);
+        this.version = ServicesVersion.VERSION;
     }
 
     public JaxbCommandsRequest(String deploymentId, List<Command> commands) {
@@ -212,6 +214,7 @@ public class JaxbCommandsRequest {
         this.deploymentId = deploymentId;
         this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
+        this.version = ServicesVersion.VERSION;
     }
 
     private void checkThatCommandsAreAccepted(Collection<Command> cmds) { 
@@ -221,7 +224,7 @@ public class JaxbCommandsRequest {
     }
     
     private void checkThatCommandIsAccepted(Command<?> cmd) { 
-        if( ! AcceptedCommands.getSet().contains(cmd.getClass()) ) {
+        if( ! AcceptedServerCommands.isAcceptedCommandClass(cmd.getClass()) ) {
            throw new UnsupportedOperationException(cmd.getClass().getName() + " is not an accepted command." ); 
         }
     }
