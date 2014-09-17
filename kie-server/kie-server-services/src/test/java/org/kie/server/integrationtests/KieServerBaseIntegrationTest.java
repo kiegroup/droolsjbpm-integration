@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class KieServerBaseIntegrationTest {
 
@@ -130,6 +132,8 @@ public abstract class KieServerBaseIntegrationTest {
         // deploy only once as it is not needed to do that with every request
         if (!commonParentDeployed) {
             buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/common-parent").getFile());
+        } else {
+            logger.info("Common parent project already deployed!");
         }
     }
 
@@ -196,6 +200,15 @@ public abstract class KieServerBaseIntegrationTest {
     protected void assertSuccess(ServiceResponse<?> response) {
         ServiceResponse.ResponseType type = response.getType();
         assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS, type);
+    }
+
+    protected void assertResultContainsString(String result, String expectedString) {
+        assertTrue("Expecting string '" + expectedString + "' in result, but got: " + result, result.contains(expectedString));
+    }
+
+    protected void assertResultContainsStringRegex(String result, String regex) {
+        assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!" ,
+                Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
     }
 
 }
