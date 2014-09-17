@@ -3,20 +3,14 @@ package org.kie.services.remote.ws.deployment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 import javax.jws.WebService;
 
-import org.jbpm.kie.services.impl.KModuleDeploymentService;
-import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.model.QueryContextImpl;
-import org.jbpm.services.cdi.Kjar;
-import org.kie.internal.executor.api.ExecutorService;
+import org.kie.internal.query.QueryContext;
 import org.kie.remote.services.rest.DeployResourceBase;
 import org.kie.remote.services.rest.ResourceBase;
-import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.ws.common.ExceptionType;
 import org.kie.remote.services.ws.common.WebServiceFaultInfo;
 import org.kie.remote.services.ws.deployment.generated.DeploymentIdRequest;
@@ -95,7 +89,7 @@ public class DeploymentWebServiceImpl extends ResourceBase implements Deployment
         
         List<String> processIdList = null;
         try { 
-            processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContextImpl(pageInfo[0], pageInfo[1])));
+            processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContext(pageInfo[0], pageInfo[1])));
             Collections.sort(processIdList);
         } catch( Exception e) { 
             // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 

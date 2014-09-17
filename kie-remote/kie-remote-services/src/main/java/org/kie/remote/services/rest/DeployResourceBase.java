@@ -21,10 +21,10 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.ProcessDefinition;
-import org.jbpm.services.api.model.QueryContextImpl;
 import org.jbpm.services.cdi.Kjar;
 import org.kie.internal.executor.api.CommandContext;
 import org.kie.internal.executor.api.ExecutorService;
+import org.kie.internal.query.QueryContext;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
@@ -357,7 +357,7 @@ public class DeployResourceBase extends ResourceBase {
     public void fillProcessDefinitionList(String deploymentId, int [] pageInfo, int maxNumResults, List<JaxbProcessDefinition> procDefList) { 
         List<String> processIdList = Collections.EMPTY_LIST;
         try { 
-            processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContextImpl(pageInfo[0], pageInfo[1])));
+            processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContext(pageInfo[0], pageInfo[1])));
             Collections.sort(processIdList);
         } catch( Exception e) { 
             // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
