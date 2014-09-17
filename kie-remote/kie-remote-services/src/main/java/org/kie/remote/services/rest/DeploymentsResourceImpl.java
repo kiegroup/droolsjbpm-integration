@@ -10,12 +10,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.kie.remote.services.rest.api.DeploymentsResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 
 @Path("/deployment")
 @RequestScoped
-public class DeploymentsResourceImpl extends ResourceBase {
+public class DeploymentsResourceImpl extends ResourceBase implements DeploymentsResource {
 
     @Context
     private HttpHeaders headers;

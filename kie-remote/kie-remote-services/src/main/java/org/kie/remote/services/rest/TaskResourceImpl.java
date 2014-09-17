@@ -48,6 +48,7 @@ import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.api.TaskResource;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -67,7 +68,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/task")
 @RequestScoped
-public class TaskResourceImpl extends ResourceBase {
+public class TaskResourceImpl extends ResourceBase implements TaskResource {
 
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResourceImpl.class);
     

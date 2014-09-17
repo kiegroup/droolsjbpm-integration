@@ -20,6 +20,10 @@
   <dependencies>
     <dependency>
       <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
     <dependency>
@@ -207,11 +211,6 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-rest-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

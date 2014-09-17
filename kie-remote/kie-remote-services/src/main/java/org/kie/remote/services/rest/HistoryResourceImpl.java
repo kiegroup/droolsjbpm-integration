@@ -20,6 +20,7 @@ import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.api.HistoryResource;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -41,7 +42,7 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 @Path("/history")
 @RequestScoped
 @SuppressWarnings("unchecked")
-public class HistoryResourceImpl extends ResourceBase {
+public class HistoryResourceImpl extends ResourceBase implements HistoryResource {
 
     /* REST information */
     

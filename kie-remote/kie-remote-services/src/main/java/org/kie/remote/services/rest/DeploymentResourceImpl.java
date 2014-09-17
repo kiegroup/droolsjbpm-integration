@@ -13,6 +13,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.kie.remote.services.rest.api.DeploymentResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
-public class DeploymentResourceImpl extends ResourceBase {
+public class DeploymentResourceImpl extends ResourceBase implements DeploymentResource {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentResourceImpl.class);
     
