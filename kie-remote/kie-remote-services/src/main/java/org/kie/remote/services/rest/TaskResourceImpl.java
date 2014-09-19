@@ -83,6 +83,9 @@ public class TaskResourceImpl extends ResourceBase {
     @Inject
     protected IdentityProvider identityProvider;
    
+    @Inject
+    protected QueryResourceImpl queryResource;
+   
     private static String[] allowedOperations = { 
         "activate", 
         "claim", 
@@ -100,18 +103,6 @@ public class TaskResourceImpl extends ResourceBase {
         "suspend", 
         "nominate", 
         "content"};
-
-    private static String [] allowedQueryParams = {
-        "workItemId",             // 0
-        "taskId",                 // 1
-        "businessAdministrator",  // 2
-        "potentialOwner",         // 3
-        "status",                 // 4
-        "taskOwner",              // 5
-        "processInstanceId",      // 6
-        "language",               // 7
-        "union"                   // 8
-    };
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
@@ -126,52 +117,9 @@ public class TaskResourceImpl extends ResourceBase {
     @GET
     @Path("/query")
     public Response query() {
-        Map<String, String []> params = getRequestParams();
-        String oper = getRelativePath();
-        
-        for( String queryParam : params.keySet() ) { 
-            boolean allowed = false;
-            for( String allowedParam : allowedQueryParams ) { 
-                if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam)) { 
-                   allowed = true;
-                   break;
-                } 
-            }
-            if( ! allowed ) { 
-                throw KieRemoteRestOperationException.badRequest(queryParam + " is an unknown and unsupported query param for the task query operation." );
-            }
-        }
-        
-        List<Long> workItemIds = getLongListParam(allowedQueryParams[0], false, params, "query", true);
-        List<Long> taskIds = getLongListParam(allowedQueryParams[1], false, params, "query", true);
-        List<Long> procInstIds = getLongListParam(allowedQueryParams[6], false, params, "query", true);
-        List<String> busAdmins = getStringListParamAsList(allowedQueryParams[2], false, params, "query");
-        List<String> potOwners = getStringListParamAsList(allowedQueryParams[3], false, params, "query");
-        List<String> taskOwners = getStringListParamAsList(allowedQueryParams[5], false, params, "query");
-        List<String> language = getStringListParamAsList(allowedQueryParams[7], false, params, "query");
-        
-        String unionStr = getStringParam(allowedQueryParams[8], false, params, "query");
-        boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
-        
-        List<String> statusStrList = getStringListParamAsList(allowedQueryParams[4], false, params, "query");
-        List<Status> statuses = convertStringListToStatusList(statusStrList);
-        
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
-        int maxResults = getMaxNumResultsNeeded(pageInfo);
-        TaskCommand<?> queryCmd 
-            = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, 
-                    busAdmins, potOwners, taskOwners, 
-                    statuses, language, union, maxResults);
-        
-        List<TaskSummary> results = (List<TaskSummary>) doRestTaskOperation(null, queryCmd);
-        
-        logger.debug("{} results found.", results.size());
-        JaxbTaskSummaryListResponse resultList = paginateAndCreateResult(pageInfo, results, new JaxbTaskSummaryListResponse());
-        logger.debug("Returning {} results after pagination.", resultList.getList().size());
-        
-        return createCorrectVariant(resultList, headers);
+        return queryResource.taskSummaryQuery();
     }
-
+    
     @GET
     @Path("/{taskId: [0-9-]+}")
     public Response taskId(@PathParam("taskId") long taskId) { 
@@ -307,7 +255,5 @@ public class TaskResourceImpl extends ResourceBase {
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);
     }
  
-    private Object doRestTaskOperation(Long taskId, TaskCommand<?> cmd) { 
-        return processRequestBean.doRestTaskOperation(taskId, null, null, null, cmd);
-    }
+
 }

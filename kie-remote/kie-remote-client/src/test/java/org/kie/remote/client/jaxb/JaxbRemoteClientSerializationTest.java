@@ -1,5 +1,7 @@
 package org.kie.remote.client.jaxb;
 
+import static org.kie.internal.query.QueryParameterIdentifiers.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.TaskQueryService;
@@ -61,9 +64,17 @@ public class JaxbRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         List<Long> statuses = new ArrayList<Long>();
         statuses.add(procInstId);
         
+        List<Long> taskIds = ((InternalTaskService)taskService).getTasksByProcessInstanceId(procInstId);
+        assertEquals( "Task list size", 1, taskIds.size());
+        Task task = ((InternalTaskService)taskService).getTaskById(taskIds.get(0));
+        assertNotNull( "No people assignments!", task.getPeopleAssignments() );
+        assertNotNull( "No business adminstrators!", task.getPeopleAssignments().getBusinessAdministrators() );
+        assertFalse( "Empty business adminstrators!", task.getPeopleAssignments().getBusinessAdministrators().isEmpty() );
+        String busAdmin = task.getPeopleAssignments().getBusinessAdministrators().get(0).getId();
+        
         Map<String, List<?>> fieldVals = new HashMap<String, List<?>>();
-        fieldVals.put(TaskQueryService.PROCESS_INST_ID_LIST, statuses);
-        List<org.kie.api.task.model.TaskSummary> taskSumList = ((InternalTaskService)taskService).getTasksByVariousFields(fieldVals, true);
+        fieldVals.put(PROCESS_INSTANCE_ID_LIST, statuses);
+        List<org.kie.api.task.model.TaskSummary> taskSumList = ((InternalTaskService)taskService).getTasksByVariousFields(busAdmin, fieldVals, true);
         assertEquals( "Task summary list size", 1, taskSumList.size());
         TaskSummaryImpl taskSumImpl = (TaskSummaryImpl) taskSumList.get(0);
         taskSumImpl.setActualOwner(new UserImpl("Minnie"));

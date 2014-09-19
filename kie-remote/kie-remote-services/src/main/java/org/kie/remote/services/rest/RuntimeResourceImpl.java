@@ -318,7 +318,7 @@ public class RuntimeResourceImpl extends ResourceBase {
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
-
+    
     private ProcessInstance getProcessInstance(long procInstId, boolean throwEx ) { 
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);

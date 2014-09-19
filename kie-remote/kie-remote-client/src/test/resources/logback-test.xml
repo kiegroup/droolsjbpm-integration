@@ -12,6 +12,9 @@
   <!-- change to debug to see serializationTest output (JSON/JAXB/YAML strings) -->
   <logger name="org.kie.services" level="info"/>
   <logger name="org.kie.services.client.builder" level="info"/>
+
+  <!-- hibernate -->  
+  <logger name="org.hibernate" level="off" />
   
   <!--  gen classes tests.. -->
   <logger name="org.kie.services.client.api.command" level="info" />

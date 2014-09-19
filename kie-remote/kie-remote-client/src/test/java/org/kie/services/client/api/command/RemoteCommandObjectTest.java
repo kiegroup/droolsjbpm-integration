@@ -43,6 +43,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Test;
+import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.DeleteCommand;
@@ -163,7 +164,11 @@ public class RemoteCommandObjectTest {
         Class fieldType = field.getType();
         if( fieldTypeName.startsWith("java") || !fieldTypeName.contains(".") ) {
             if( fieldType.equals(String.class) ) {
-                field.set(obj, UUID.randomUUID().toString());
+                if( "className".equals(field.getName()) ) { 
+                    field.set(obj, String.class.getName() );
+                } else { 
+                    field.set(obj, UUID.randomUUID().toString());
+                }
             } else if( fieldType.equals(Integer.class) || fieldType.equals(int.class) ) {
                 field.set(obj, random.nextInt());
             } else if( fieldType.equals(Long.class) || fieldType.equals(long.class) ) {
@@ -219,7 +224,10 @@ public class RemoteCommandObjectTest {
                 field.set(obj, date);
             } else if( fieldType.equals(Object.class) ) { 
                 field.set(obj, "Object");
-            } else {  
+            } else if( fieldType.equals(byte[].class) ) { 
+                byte [] value = StringKeyObjectValueMapXmlAdapter.serializeObject("Object", "test");
+                field.set(obj, value);
+            } else { 
                 fail("> " + obj.getClass().getSimpleName() + "." + field.getName() + ": " + fieldType.getName());
             }
         } else if( fieldType.isEnum() ) { 

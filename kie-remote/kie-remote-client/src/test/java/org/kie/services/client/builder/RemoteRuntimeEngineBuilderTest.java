@@ -66,10 +66,6 @@ public class RemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactor
         super();
     }
     
-    @BeforeClass
-    public static void beforeClass() { 
-    }
-  
     @Rule
     public TestName testName = new TestName();
 

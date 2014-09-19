@@ -258,7 +258,6 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
         JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(data);
-        cmd.setData(values);
         executeCommand(cmd);
     }
 

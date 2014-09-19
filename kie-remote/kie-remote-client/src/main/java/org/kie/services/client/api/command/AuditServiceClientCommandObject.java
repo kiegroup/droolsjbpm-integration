@@ -6,6 +6,9 @@ import org.kie.api.runtime.manager.audit.AuditService;
 import org.kie.api.runtime.manager.audit.NodeInstanceLog;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
+import org.kie.api.runtime.manager.audit.query.NodeInstanceLogQueryBuilder;
+import org.kie.api.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;
+import org.kie.api.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
 import org.kie.remote.jaxb.gen.ClearHistoryLogsCommand;
 import org.kie.remote.jaxb.gen.FindActiveProcessInstancesCommand;
 import org.kie.remote.jaxb.gen.FindNodeInstancesCommand;
@@ -108,6 +111,21 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
     @Override
     public void dispose() {
         throw new UnsupportedOperationException("Dispose does not need to be called on the Remote Client  " + AuditService.class.getSimpleName() + " implementation.");
+    }
+
+    @Override
+    public NodeInstanceLogQueryBuilder nodeInstanceLogQuery() {
+        return unsupported(AuditService.class, NodeInstanceLogQueryBuilder.class);
+    }
+
+    @Override
+    public VariableInstanceLogQueryBuilder variableInstanceLogQuery() {
+        return unsupported(AuditService.class, VariableInstanceLogQueryBuilder.class);
+    }
+
+    @Override
+    public ProcessInstanceLogQueryBuilder processInstanceLogQuery() {
+        return unsupported(AuditService.class, ProcessInstanceLogQueryBuilder.class);
     }
 
 }
