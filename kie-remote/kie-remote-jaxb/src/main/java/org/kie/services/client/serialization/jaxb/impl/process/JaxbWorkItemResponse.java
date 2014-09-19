@@ -12,8 +12,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
 @XmlRootElement(name = "work-item-response")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -32,11 +32,11 @@ public class JaxbWorkItemResponse extends AbstractJaxbCommandResponse<WorkItem> 
     private Integer state = 0;
     
     @XmlElement(name="param-map")
-    @XmlJavaTypeAdapter(StringObjectMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(StringKeyObjectValueMapXmlAdapter.class)
     private Map<String, Object> parameters = new HashMap<String, Object>();
     
     @XmlElement(name="results-map")
-    @XmlJavaTypeAdapter(StringObjectMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(StringKeyObjectValueMapXmlAdapter.class)
     private Map<String, Object> results = new HashMap<String, Object>();
     
     @XmlElement

@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
+import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-with-vars-response")
@@ -19,7 +19,7 @@ import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbResponse {
 
     @XmlElement
-    @XmlJavaTypeAdapter(value=StringObjectMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(value=StringKeyObjectValueMapXmlAdapter.class)
     private Map<String, String> variables;
     
     @XmlElement

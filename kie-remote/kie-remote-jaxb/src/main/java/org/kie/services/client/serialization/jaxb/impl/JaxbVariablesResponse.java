@@ -10,14 +10,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.command.Command;
-import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
+import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 
 @XmlRootElement(name="variables-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JaxbVariablesResponse extends AbstractJaxbCommandResponse<Map<String,String>> {
 
     @XmlElement
-    @XmlJavaTypeAdapter(value=StringObjectMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(value=StringKeyObjectValueMapXmlAdapter.class)
     private Map<String, String> variables = new HashMap<String, String>();
     
     public JaxbVariablesResponse() {
