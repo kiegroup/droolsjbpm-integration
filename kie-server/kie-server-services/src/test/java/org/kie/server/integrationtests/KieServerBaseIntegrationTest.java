@@ -116,9 +116,9 @@ public abstract class KieServerBaseIntegrationTest {
         if (LOCAL_SERVER) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
             // if the repo does not exists.
-            mvnArgs = new String[]{"clean", "install"};
+            mvnArgs = new String[]{"-B", "clean", "install"};
         } else {
-            mvnArgs = new String[]{"clean", "deploy"};
+            mvnArgs = new String[]{"-B", "clean", "deploy"};
         }
         int mvnRunResult = cli.doMain(mvnArgs, basedir, System.out, System.out);
         if (mvnRunResult != 0) {
