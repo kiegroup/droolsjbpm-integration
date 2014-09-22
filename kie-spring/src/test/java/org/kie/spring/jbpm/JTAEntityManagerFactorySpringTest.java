@@ -1,5 +1,6 @@
 package org.kie.spring.jbpm;
 
+import static org.kie.internal.query.QueryParameterIdentifiers.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -167,9 +168,9 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
 
     private void executeTasksByProcessByTaskName(long processId, String taskName, TaskService taskService) {
         Map<String, List<?>> parameters = new HashMap<String, List<?>>();
-        parameters.put(TaskQueryService.PROCESS_INST_ID_LIST, Arrays.asList(processId));
-        parameters.put(TaskQueryService.STATUS_LIST, Arrays.asList(Status.Ready, Status.Created, Status.Reserved));
-        List<TaskSummary> tasks = ((InternalTaskService) taskService).getTasksByVariousFields(parameters, false);
+        parameters.put(PROCESS_INSTANCE_ID_LIST, Arrays.asList(processId));
+        parameters.put(STATUS_LIST, Arrays.asList(Status.Ready, Status.Created, Status.Reserved));
+        List<TaskSummary> tasks = ((InternalTaskService) taskService).getTasksByVariousFields("john", parameters, false);
 
         TaskSummary task = null;
         for (TaskSummary t : tasks) {
