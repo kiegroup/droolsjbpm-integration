@@ -155,6 +155,7 @@
     <dependency>
       <groupId>org.jboss.xnio</groupId>
       <artifactId>xnio-nio</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
