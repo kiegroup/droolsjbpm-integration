@@ -14,7 +14,7 @@ public interface KieContainersRegistry {
 
     /**
      * Returns the container instance for the given container id
-     * @param id
+     * @param containerId
      * @return
      */
     KieContainerInstance getContainer(String containerId);

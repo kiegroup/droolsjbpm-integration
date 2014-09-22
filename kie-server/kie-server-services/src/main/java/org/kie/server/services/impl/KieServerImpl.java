@@ -267,7 +267,7 @@ public class KieServerImpl {
                             // this may fail, but we already removed the container from the registry
                             kieContainer.dispose();
                         } catch (Exception e) {
-                            logger.warn("Container '" + containerId + "' disposed, but an unnexpected exception was raised", e);
+                            logger.warn("Container '" + containerId + "' disposed, but an unexpected exception was raised", e);
                             return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId +
                                     " disposed, but exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
                         }
@@ -361,7 +361,7 @@ public class KieServerImpl {
                 resource.getPollInterval() != null) {
             kci.getScanner().start(resource.getPollInterval());
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
-                    "Kie scanner successfuly created.",
+                    "Kie scanner successfully created.",
                     new KieScannerResource(mapStatus(kci.getScanner().getStatus())));
         } else if (!KieScannerStatus.STOPPED.equals(mapStatus(kci.getScanner().getStatus()))) {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
@@ -387,7 +387,7 @@ public class KieServerImpl {
                 KieScannerStatus.SCANNING.equals(mapStatus(kci.getScanner().getStatus()))) {
             kci.getScanner().stop();
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
-                    "Kie scanner successfuly stopped.",
+                    "Kie scanner successfully stopped.",
                     new KieScannerResource(mapStatus(kci.getScanner().getStatus())));
         } else {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
@@ -430,7 +430,7 @@ public class KieServerImpl {
         kci.getScanner().shutdown();
         kci.setScanner(null);
         return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
-                "Kie scanner successfuly shutdown.",
+                "Kie scanner successfully shutdown.",
                 new KieScannerResource(KieScannerStatus.DISPOSED));
     }
 
@@ -439,7 +439,7 @@ public class KieServerImpl {
             InternalKieScanner scanner = (InternalKieScanner) KieServices.Factory.get().newKieScanner(kci.getKieContainer());
             kci.setScanner(scanner);
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
-                    "Kie scanner successfuly created.",
+                    "Kie scanner successfully created.",
                     new KieScannerResource(mapStatus(scanner.getStatus())));
         } else {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
@@ -478,7 +478,7 @@ public class KieServerImpl {
                     logger.error("Error updating releaseId for container " + id + " to version " + releaseId + "\nMessages: " + results.getMessages());
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId, kci.getResource().getReleaseId());
                 } else {
-                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfuly updated.", kci.getResource().getReleaseId());
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
                 }
             } else {
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
@@ -520,7 +520,7 @@ public class KieServerImpl {
             synchronized ( containers ) {
                 KieContainerInstance kci = containers.putIfAbsent(containerId, ci);
                 if( kci != null && kci.getStatus() == KieContainerStatus.FAILED ) {
-                    // if previous container filed, allow override
+                    // if previous container failed, allow override
                     containers.put(containerId, ci);
                     return null;
                 }
