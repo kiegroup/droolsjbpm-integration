@@ -122,7 +122,6 @@ public class ProcessRequestBean {
             logger.warn( "Request received from client version [{}] while server is version [{}]! THIS MAY CAUSE PROBLEMS!", version, VERSION);
         }
         jaxbResponse.setVersion(VERSION);
-        preprocessCommand(cmd);
         
         String cmdName = cmd.getClass().getSimpleName();
         logger.debug("Processing command " + cmdName);
@@ -130,6 +129,9 @@ public class ProcessRequestBean {
         
         Object cmdResult = null;
         try {
+            // check that all parameters have been correctly deserialized/unmarshalled
+            preprocessCommand(cmd);
+            
             if( cmd instanceof TaskCommand<?> ) { 
                 TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
                 cmdResult = doTaskOperation(
