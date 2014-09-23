@@ -20,9 +20,12 @@ import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
+import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -220,10 +223,22 @@ public class KieServerImpl {
                     sessionId = m.group(1);
                 }
 
-                KieSession ks = null;
-                if (sessionId != null) {
-                    ks = kci.getKieContainer().getKieSession(sessionId);
+                // find the session
+                CommandExecutor ks = null;
+                if( sessionId != null ) {
+                    KieSessionModel ksm = kci.getKieContainer().getKieSessionModel(sessionId);
+                    if( ksm != null ) {
+                        switch (ksm.getType() ) {
+                            case STATEFUL:
+                                ks = kci.getKieContainer().getKieSession(sessionId);
+                                break;
+                            case STATELESS:
+                                ks = kci.getKieContainer().getStatelessKieSession(sessionId);
+                                break;
+                        }
+                    }
                 } else {
+                    // if no session ID is defined, then the default is a stateful session
                     ks = kci.getKieContainer().getKieSession();
                 }
                 if (ks != null) {
