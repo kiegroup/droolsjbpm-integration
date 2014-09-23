@@ -1,5 +1,6 @@
 package org.kie.services.client.serialization.jaxb.impl.query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,21 +15,36 @@ import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 public class JaxbQueryTaskInfo {
 
     @XmlElement
-    private JaxbTaskSummary taskSummary;
+    private Long processInstanceId;
+    
+    @XmlElement
+    private List<JaxbTaskSummary> taskSummaries = new ArrayList<JaxbTaskSummary>();
    
     @XmlElement
-    private List<JaxbVariableInfo> variables;
+    private List<JaxbVariableInfo> variables = new ArrayList<JaxbVariableInfo>();
 
     public JaxbQueryTaskInfo() {
         // default for JAXB
     }
     
-    public JaxbTaskSummary getTaskSummary() {
-        return taskSummary;
+    public JaxbQueryTaskInfo(long procInstId) {
+        this.processInstanceId = procInstId;
+    }
+    
+    public Long getProcessInstanceId() {
+        return processInstanceId;
     }
 
-    public void setTaskSummary( JaxbTaskSummary taskSummary ) {
-        this.taskSummary = taskSummary;
+    public void setProcessInstanceId( Long processInstanceId ) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public List<JaxbTaskSummary> getTaskSummaries() {
+        return taskSummaries;
+    }
+
+    public void setTaskSummaries( List<JaxbTaskSummary> taskSummaries ) {
+        this.taskSummaries = taskSummaries;
     }
 
     public List<JaxbVariableInfo> getVariables() {

@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.definition.process.Process;
+import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 
 @XmlRootElement(name="process-instance")
@@ -42,6 +43,14 @@ public class JaxbProcessInstance implements ProcessInstance {
 
     public JaxbProcessInstance(ProcessInstance processInstance) { 
         initialize(processInstance);
+    }
+
+    public JaxbProcessInstance(ProcessInstanceLog processInstanceLog) { 
+        if( processInstanceLog != null ) { 
+            this.id = processInstanceLog.getProcessInstanceId();
+            this.processId = processInstanceLog.getProcessId();
+            this.state = processInstanceLog.getStatus();
+        }
     }
 
     protected void initialize(ProcessInstance processInstance) { 

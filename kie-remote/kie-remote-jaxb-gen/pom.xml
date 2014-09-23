@@ -53,7 +53,6 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -172,7 +171,8 @@
                   <type>jar</type>
                   <overWrite>false</overWrite>
                   <outputDirectory>${basedir}/src/main/java</outputDirectory>
-                  <includes>org/jbpm/process/audit/command/*.java</includes>
+                  <includes>org/jbpm/process/audit/command/Find*.java,
+                    org/jbpm/process/audit/command/Clear*.java,</includes>
                 </artifactItem>
               </artifactItems>
               <includes>**/*.java</includes>
@@ -213,7 +213,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>1.5</version>
         <executions>
           <!-- 2. generate xsd's based on unpacked sources -->
           <execution>
