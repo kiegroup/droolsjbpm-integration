@@ -179,6 +179,30 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- TEST: persistence -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.btm</groupId>
+      <artifactId>btm</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-persistence-jpa</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- TEST: mock -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
@@ -200,14 +224,14 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- reflection -->
+    <!-- TEST: reflection -->
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!-- test REST -->
+    
+    <!-- TEST: REST/JAXRS -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
@@ -215,7 +239,27 @@
     </dependency>
   </dependencies>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jbpm</groupId>
+        <artifactId>jbpm-persistence-jpa</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <build>
+  
+    <testResources>
+        <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+        </testResource>
+    </testResources>
+    
     <plugins>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>

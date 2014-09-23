@@ -49,16 +49,6 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     @Context
     private HttpHeaders headers;
    
-    /* KIE information and processing */
-    
-    @Inject
-    private ProcessRequestBean processRequestBean;
-    
-
-    private AuditLogService getAuditLogService() { 
-        return processRequestBean.getAuditLogService();
-    }
-    
     // Rest methods --------------------------------------------------------------------------------------------------------------
     
     @POST

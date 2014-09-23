@@ -16,7 +16,7 @@ import org.kie.services.shared.ServicesVersion;
         targetNamespace = CommandWebServiceImpl.NAMESPACE)
 public class CommandWebServiceImpl extends ResourceBase implements CommandWebService {
 
-    final static String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
+    static final String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
     
     @Override
     public JaxbCommandsResponse execute( JaxbCommandsRequest request ) throws CommandWebServiceException {

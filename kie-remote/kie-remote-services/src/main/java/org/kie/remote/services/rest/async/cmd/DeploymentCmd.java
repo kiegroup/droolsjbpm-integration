@@ -24,11 +24,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DeploymentCmd implements Command {
 
-    private final static Logger logger = LoggerFactory.getLogger(DeploymentCmd.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentCmd.class);
 
-    public final static String DEPLOYMENT_UNIT = "DeploymentUnit";
-    public final static String JOB_TYPE = "JobType";
-    public final static String JOB_ID = "JobId";
+    public static final String DEPLOYMENT_UNIT = "DeploymentUnit";
+    public static final String JOB_TYPE = "JobType";
+    public static final String JOB_ID = "JobId";
     
     @Override
     public ExecutionResults execute(CommandContext ctx) throws Exception {

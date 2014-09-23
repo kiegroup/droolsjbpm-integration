@@ -287,7 +287,7 @@ public class ProcessRequestBean {
      * @param errorMsg
      * @return
      */
-    private Object doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<?> cmd) { 
+    private <T> T doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<T> cmd) { 
 
         // take care of serialization
         if( cmd instanceof GetTaskCommand 
@@ -309,7 +309,7 @@ public class ProcessRequestBean {
     }
 
 
-    public Object doRestTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<?> cmd) {
+    public <T> T doRestTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<T> cmd) {
         try { 
             return doTaskOperation(taskId, deploymentId, processInstanceId, task, cmd);
         } catch (PermissionDeniedException pde) {

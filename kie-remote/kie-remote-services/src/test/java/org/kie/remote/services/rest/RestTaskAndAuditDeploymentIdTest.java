@@ -41,7 +41,7 @@ import org.kie.services.shared.ServicesVersion;
 @SuppressWarnings("unchecked")
 public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implements TaskDeploymentIdTest {
     
-    private final static String USER = "user";
+    private static final String USER = "user";
 
     private DeploymentInfoBean runtimeMgrMgrMock;
 
