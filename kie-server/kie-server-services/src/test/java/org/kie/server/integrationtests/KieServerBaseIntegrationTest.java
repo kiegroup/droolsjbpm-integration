@@ -1,7 +1,12 @@
 package org.kie.server.integrationtests;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.After;
 import org.junit.Assert;
@@ -23,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -32,6 +39,9 @@ import static org.junit.Assert.assertTrue;
 public abstract class KieServerBaseIntegrationTest {
 
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
+
+    protected static final String DEFAULT_USERNAME = "yoda";
+    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
 
     protected static String BASE_URI = System.getProperty("kie.server.base.uri");
 
@@ -95,7 +105,11 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     private void startClient() throws Exception {
-        client = new KieServicesClient(BASE_URI);
+        if (LOCAL_SERVER) {
+            client = new KieServicesClient(BASE_URI);
+        } else {
+            client = new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD);
+        }
     }
 
     private void startServer() throws Exception {
@@ -209,6 +223,24 @@ public abstract class KieServerBaseIntegrationTest {
     protected void assertResultContainsStringRegex(String result, String regex) {
         assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!" ,
                 Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
+    }
+
+    protected ClientRequest newRequest(String uri) {
+        URI uriObject;
+        try {
+            uriObject = new URI(uri);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Malformed URI was specified: '" + uri + "'!", e);
+        }
+        if (LOCAL_SERVER) {
+            return new ClientRequest(uri);
+        } else {
+            DefaultHttpClient client = new DefaultHttpClient();
+            client.getCredentialsProvider().setCredentials(new AuthScope(uriObject.getHost(), uriObject.getPort()),
+                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
+            return new ClientRequest(uri, executor);
+        }
     }
 
 }

@@ -53,7 +53,7 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
 
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = new ClientRequest(BASE_URI + "/containers/" + resource.getContainerId());
+            ClientRequest clientRequest = newRequest(BASE_URI + "/containers/" + resource.getContainerId());
             response = clientRequest.body(
                     MediaType.APPLICATION_XML_TYPE, resource).put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {
@@ -71,7 +71,7 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
     public void testCreateContainerEmptyBody() throws Exception {
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = new ClientRequest(BASE_URI + "/containers/empty-body-container");
+            ClientRequest clientRequest = newRequest(BASE_URI + "/containers/empty-body-container");
             response = clientRequest.body(
                     MediaType.APPLICATION_XML_TYPE, "").put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {

@@ -273,6 +273,7 @@
           <configuration>
             <properties>
               <cargo.servlet.port>${container.port}</cargo.servlet.port>
+              <cargo.servlet.users>yoda:usetheforce123@:kie-server</cargo.servlet.users>
             </properties>
           </configuration>
           <deployables>
