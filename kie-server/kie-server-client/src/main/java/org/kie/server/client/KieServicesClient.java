@@ -9,7 +9,10 @@ import javax.ws.rs.core.Response;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
@@ -68,9 +71,12 @@ public class KieServicesClient {
         if (username == null || password == null) {
             return new ClientRequest(uri);
         } else {
-            DefaultHttpClient client = new DefaultHttpClient();
-            client.getCredentialsProvider().setCredentials(new AuthScope(uriObject.getHost(), uriObject.getPort()),
-                    new UsernamePasswordCredentials(username, password));
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(
+                    new AuthScope(uriObject.getHost(), uriObject.getPort()),
+                    new UsernamePasswordCredentials(username, password)
+            );
+            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
             return new ClientRequest(uri, executor);
         }

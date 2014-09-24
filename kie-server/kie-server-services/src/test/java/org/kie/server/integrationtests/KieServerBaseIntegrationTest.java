@@ -2,7 +2,10 @@ package org.kie.server.integrationtests;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.jboss.resteasy.client.ClientRequest;
@@ -25,7 +28,6 @@ import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
@@ -225,21 +227,24 @@ public abstract class KieServerBaseIntegrationTest {
                 Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
     }
 
-    protected ClientRequest newRequest(String uri) {
-        URI uriObject;
+    protected ClientRequest newRequest(String uriString) {
+        URI uri;
         try {
-            uriObject = new URI(uri);
+            uri = new URI(uriString);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Malformed URI was specified: '" + uri + "'!", e);
+            throw new RuntimeException("Malformed URI was specified: '" + uriString + "'!", e);
         }
         if (LOCAL_SERVER) {
-            return new ClientRequest(uri);
+            return new ClientRequest(uriString);
         } else {
-            DefaultHttpClient client = new DefaultHttpClient();
-            client.getCredentialsProvider().setCredentials(new AuthScope(uriObject.getHost(), uriObject.getPort()),
-                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(
+                    new AuthScope(uri.getHost(), uri.getPort()),
+                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD)
+            );
+            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-            return new ClientRequest(uri, executor);
+            return new ClientRequest(uriString, executor);
         }
     }
 
