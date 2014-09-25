@@ -169,7 +169,7 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
     private void executeTasksByProcessByTaskName(long processId, String taskName, TaskService taskService) {
         Map<String, List<?>> parameters = new HashMap<String, List<?>>();
         parameters.put(PROCESS_INSTANCE_ID_LIST, Arrays.asList(processId));
-        parameters.put(STATUS_LIST, Arrays.asList(Status.Ready, Status.Created, Status.Reserved));
+        parameters.put(TASK_STATUS_LIST, Arrays.asList(Status.Ready, Status.Created, Status.Reserved));
         List<TaskSummary> tasks = ((InternalTaskService) taskService).getTasksByVariousFields("john", parameters, false);
 
         TaskSummary task = null;
