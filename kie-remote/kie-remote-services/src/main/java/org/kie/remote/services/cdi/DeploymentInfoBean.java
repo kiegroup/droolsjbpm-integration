@@ -113,8 +113,6 @@ public class DeploymentInfoBean {
                 if( processInstanceId != null ) { 
                     processInstanceId = null;
                 }
-                // TODO: only warn if it's not a "start process instance" command
-                logger.warn("No process instance id supplied for operation!");
                 // Use the static method here instead of the constructor in order to use mock static magic in the tests
                 runtimeContext = ProcessInstanceIdContext.get();
             } else { 
