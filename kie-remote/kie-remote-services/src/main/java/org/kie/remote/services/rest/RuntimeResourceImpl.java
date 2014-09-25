@@ -314,7 +314,7 @@ public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource
                 procInstId);
         
         ProcessInstance processInstance = getProcessInstance(procInstId, false);
-        Map<String, String> vars = getVariables(processInstance.getId());
+        Map<String, String> vars = getVariables(procInstId);
         
         return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars), headers);
     }
