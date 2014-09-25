@@ -57,6 +57,12 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected KieServicesClient client;
 
+    /*
+       Indicates whether the testing common parent maven project has been deployed in this test run. Most of the testing
+       kjars depend on that parent, but it is not necessary to deploy it multiple times. This flag is set the first time
+       the parent project is deployed and the subsequent requests to deploy are just ignored, because the parent can
+       already be found in the maven repo.
+     */
     private static boolean commonParentDeployed = false;
 
     static {
