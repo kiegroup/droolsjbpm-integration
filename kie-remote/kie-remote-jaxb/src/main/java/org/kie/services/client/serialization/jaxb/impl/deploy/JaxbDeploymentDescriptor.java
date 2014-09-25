@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
@@ -52,27 +53,35 @@ public class JaxbDeploymentDescriptor {
 	private RuntimeStrategy runtimeStrategy = RuntimeStrategy.SINGLETON;
 	
 	@XmlElement(name="marshalling-strategy")
+	@XmlElementWrapper(name="marshalling-strategies")
 	private List<ObjectModel> marshallingStrategies;
 	
 	@XmlElement(name="event-listener")
+	@XmlElementWrapper(name="event-listeners")
 	private List<ObjectModel> eventListeners;
 	
 	@XmlElement(name="task-event-listener")
+	@XmlElementWrapper(name="task-event-listeners")
 	private List<ObjectModel> taskEventListeners;
 	
 	@XmlElement(name="global")
+	@XmlElementWrapper(name="globals")
 	private List<NamedObjectModel> globals;
 	
 	@XmlElement(name="work-item-handler")
+	@XmlElementWrapper(name="work-item-handlers")
 	private List<NamedObjectModel> workItemHandlers;
 	
 	@XmlElement(name="environment-entry")
+	@XmlElementWrapper(name="environment-entries")
 	private List<NamedObjectModel> environmentEntries;
 	
 	@XmlElement(name="configuration")
+	@XmlElementWrapper(name="configurations")
 	private List<NamedObjectModel> configuration;
 	
 	@XmlElement(name="required-role")
+	@XmlElementWrapper(name="required-roles")
 	private List<String> requiredRoles;
 	
 	@XmlElement(name="class")
