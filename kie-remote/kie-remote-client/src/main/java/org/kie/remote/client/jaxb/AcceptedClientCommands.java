@@ -107,7 +107,7 @@ public class AcceptedClientCommands {
     }
     
     public static boolean isTaskCommandClassThatInfluencesKieSession(Class<?> commandClass) { 
-        return taskCommandClassNamesThatInfluenceKieSession.contains(commandClass.getSimpleName());
+        return taskCommandClassNamesThatInfluenceKieSession.contains(commandClass);
     }
     
     private static Set<Class<?>> sendObjectParameterCommandClasses = new HashSet<Class<?>>();
@@ -129,7 +129,7 @@ public class AcceptedClientCommands {
     }
 
     public static boolean isSendObjectParameterCommandClass(Class<?> commandClass) { 
-        return sendObjectParameterCommandClasses.contains(commandClass.getSimpleName());
+        return sendObjectParameterCommandClasses.contains(commandClass);
     }
    
     private static Set<Class<?>> receiveObjectParameterCommandClasses = new HashSet<Class<?>>();
@@ -141,6 +141,6 @@ public class AcceptedClientCommands {
     }
     
     public static boolean isReceiveObjectParameterCommandClass(Class<?> commandClass) { 
-        return receiveObjectParameterCommandClasses.contains(commandClass.getSimpleName());
+        return receiveObjectParameterCommandClasses.contains(commandClass);
     }
 }
