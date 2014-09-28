@@ -28,8 +28,7 @@ public class DeploymentsResourceImpl extends ResourceBase implements Deployments
   
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    @GET
-    // TODO: docs pagination
+    @Override
     public Response listDeployments() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
@@ -41,9 +40,7 @@ public class DeploymentsResourceImpl extends ResourceBase implements Deployments
         return createCorrectVariant(resultList, headers);
     }
    
-    @GET
-    @Path("/processes")
-    // DOCS: (+ pagination)
+    @Override
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();

@@ -111,15 +111,13 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         return restProcessJaxbCommandsRequest(cmdsRequest);
     }
 
-    @GET
-    @Path("/query")
+    @Override
     @Deprecated
     public Response query() {
         return queryResource.taskSummaryQuery();
     }
     
-    @GET
-    @Path("/{taskId: [0-9-]+}")
+    @Override
     public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         JaxbTask task = (JaxbTask) doRestTaskOperationWithTaskId(taskId, cmd);
@@ -129,8 +127,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         return createCorrectVariant(task, headers);
     }
 
-    @POST
-    @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    @Override
     public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
@@ -192,8 +189,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         throw KieRemoteRestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
     
-    @GET
-    @Path("/{taskId: [0-9-]+}/content")
+    @Override
     public Response taskId_content(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
@@ -213,8 +209,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         return createCorrectVariant(content, headers);
     }
 
-    @GET
-    @Path("/{taskId: [0-9-]+}/showTaskForm")
+    @Override
     public Response taskId_form(@PathParam("taskId") long taskId) {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
@@ -235,8 +230,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
-    @GET
-    @Path("/content/{contentId: [0-9-]+}")
+    @Override
     public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
         cmd.setUserId(identityProvider.getName());
@@ -247,8 +241,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         return createCorrectVariant(new JaxbContent(content), headers);
     }
     
-    @POST
-    @Path("/history/bam/clear")
+    @Override
     public Response bam_clear() { 
         doRestTaskOperation(new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);

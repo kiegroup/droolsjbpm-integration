@@ -56,15 +56,14 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
    
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    @GET
+    @Override
     public Response getConfig() { 
         JaxbDeploymentUnit jaxbDepUnit = deployBase.determineStatus(deploymentId, true);
         logger.debug("Returning deployment unit information for " + deploymentId);
         return createCorrectVariant(jaxbDepUnit, headers);
     }
 
-    @POST
-    @Path("/deploy")
+    @Override
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
         // parse request/options 
         Map<String, String []> params = getRequestParams();
@@ -77,15 +76,13 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-    @POST
-    @Path("/undeploy")
+    @Override
     public Response undeploy() { 
         JaxbDeploymentJobResult jobResult = deployBase.submitUndeployJob(deploymentId);
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-    @GET
-    @Path("/processes")
+    @Override
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
