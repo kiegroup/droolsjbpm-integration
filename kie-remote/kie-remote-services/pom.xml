@@ -96,14 +96,14 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- jms -->
+    <!-- JMS -->
     <dependency>
       <groupId>org.jboss.spec.javax.jms</groupId>
       <artifactId>jboss-jms-api_1.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Rest -->
+    <!-- REST -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
@@ -118,6 +118,17 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!--  JSON -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+    </dependency> 
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+    </dependency> 
+    
 
     <!-- general -->
     <dependency>

@@ -21,7 +21,13 @@
       <artifactId>kie-internal</artifactId>
     </dependency>
 
-    <!-- jms -->
+    <!-- REST -->
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>jaxrs-api</artifactId>
+    </dependency>
+    
+    <!-- JMS -->
     <dependency>
       <groupId>org.jboss.spec.javax.jms</groupId>
       <artifactId>jboss-jms-api_1.1_spec</artifactId>

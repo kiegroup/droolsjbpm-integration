@@ -20,6 +20,16 @@
 
     <!-- command sources -->
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
       <optional>true</optional>
@@ -34,6 +44,13 @@
       <artifactId>jbpm-audit</artifactId>
       <optional>true</optional>
     </dependency>
+
+    <!-- other dependencies -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <optional>true</optional>
+    </dependency> 
 
     <!-- test -->
     <dependency>
