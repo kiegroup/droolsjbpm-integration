@@ -103,7 +103,7 @@ public class QueryResourceDataTest extends QueryResourceData {
     
        
     @Test
-//    @Ignore
+    @Ignore
     public void debugPrintQueryParameterIds() throws Exception { 
         Field [] fields = QueryParameterIdentifiers.class.getDeclaredFields();
         Map<Integer, String> idMap = new TreeMap<Integer, String>();

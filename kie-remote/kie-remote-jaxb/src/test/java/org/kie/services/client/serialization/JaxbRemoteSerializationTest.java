@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.services.client.AbstractRemoteSerializationTest;
-import org.kie.services.client.jaxb.JsonRemoteSerializationTest;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -35,7 +34,9 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
 
     private static final String PROCESS_INSTANCE_ID_NAME = "process-instance-id";
 
-    private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.services.client"),
+    private static Reflections reflections = new Reflections(
+            ClasspathHelper.forPackage("org.kie.services.client"),
+            ClasspathHelper.forPackage("org.kie.remote"),
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
 
     public TestType getType() {

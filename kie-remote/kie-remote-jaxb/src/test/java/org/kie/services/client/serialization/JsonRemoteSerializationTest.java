@@ -1,4 +1,4 @@
-package org.kie.services.client.jaxb;
+package org.kie.services.client.serialization;
 
 import java.util.ArrayList;
 import java.util.Arrays;

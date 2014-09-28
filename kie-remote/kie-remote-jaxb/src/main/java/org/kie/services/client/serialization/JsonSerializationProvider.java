@@ -13,6 +13,7 @@ public class JsonSerializationProvider implements SerializationProvider {
     public final static int JMS_SERIALIZATION_TYPE = 1;
 
     private ObjectMapper mapper = new JaxbJacksonObjectMapper();
+    
     private Class<?> outputType = null;
 
     public JsonSerializationProvider() {
@@ -45,11 +46,11 @@ public class JsonSerializationProvider implements SerializationProvider {
         try {
             return mapper.readValue(jsonStr, type);
         } catch (JsonGenerationException jge) {
-            throw new SerializationException("Unable to deserialize String " + type.getClass().getSimpleName() + " instance", jge);
+            throw new SerializationException("Unable to deserialize String " + type.getSimpleName() + " instance", jge);
         } catch (JsonMappingException jme) {
-            throw new SerializationException("Unable to deserialize String " + type.getClass().getSimpleName() + " instance", jme);
+            throw new SerializationException("Unable to deserialize String " + type.getSimpleName() + " instance", jme);
         } catch (IOException ie) {
-            throw new SerializationException("Unable to deserialize String to " + type.getClass().getSimpleName() + " instance", ie);
+            throw new SerializationException("Unable to deserialize String to " + type.getSimpleName() + " instance", ie);
         }
     }
 

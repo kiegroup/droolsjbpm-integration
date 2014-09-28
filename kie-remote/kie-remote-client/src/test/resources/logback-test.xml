@@ -5,7 +5,7 @@
     <encoder>
       <!-- %l lowers performance -->
       <!--<pattern>%d [%t] %-5p %l%n  %m%n</pattern>-->
-      <pattern>%d [%t|%c] %-5p %m%n</pattern>
+      <pattern>%d [%t|%C] %-5p %m%n</pattern>
     </encoder>
   </appender>
 
@@ -15,6 +15,7 @@
 
   <!-- hibernate -->  
   <logger name="org.hibernate" level="off" />
+  <logger name="org.hibernate.tool.hbm2ddl.DatabaseMetadata" level="error" />
   
   <!--  gen classes tests.. -->
   <logger name="org.kie.services.client.api.command" level="info" />
