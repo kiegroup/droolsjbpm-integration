@@ -89,7 +89,7 @@ public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 				if (hasId && notCompeted && notAborted) {
 					ProcessInstanceInfo info = new ProcessInstanceInfo(instance, ksession.getEnvironment());
 					info.setId(instance.getId());
-					info.update();
+					info.transform();
 					persistenceContext.persist(info);
 				}
 			}

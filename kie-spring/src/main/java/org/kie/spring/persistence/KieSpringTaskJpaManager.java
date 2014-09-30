@@ -3,6 +3,7 @@ package org.kie.spring.persistence;
 import javax.persistence.EntityManager;
 
 import org.drools.persistence.PersistenceContext;
+import org.drools.persistence.TransactionManager;
 import org.drools.persistence.jpa.JpaPersistenceContext;
 import org.jbpm.persistence.JpaProcessPersistenceContext;
 import org.jbpm.persistence.ProcessPersistenceContext;
@@ -28,7 +29,7 @@ public class KieSpringTaskJpaManager extends AbstractKieSpringJpaManager
 
     public PersistenceContext getApplicationScopedPersistenceContext() {
 
-        return new JpaPersistenceContext(getApplicationScopedEntityManager(), isJTA);
+        return new JpaPersistenceContext(getApplicationScopedEntityManager(), isJTA, (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     @Override

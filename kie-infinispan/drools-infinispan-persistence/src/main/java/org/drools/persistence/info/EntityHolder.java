@@ -49,7 +49,7 @@ public class EntityHolder {
 		this.type = "sessionInfo";
 		this.sessionInfoId = sessionInfo.getId();
 		this.sessionInfoVersion = sessionInfo.getVersion();
-		sessionInfo.update();
+		sessionInfo.transform();
 		this.sessionInfoData = Base64.encodeBase64String(sessionInfo.getData());
 		this.sessionInfoLastModificationDate = sessionInfo.getLastModificationDate();
 		this.sessionInfoStartDate = sessionInfo.getStartDate();
@@ -58,7 +58,7 @@ public class EntityHolder {
 	public EntityHolder(String key, WorkItemInfo workItemInfo) {
 		this.key = key;
 		this.type = "workItemInfo";
-		workItemInfo.update();
+		workItemInfo.transform();
 		this.workItemInfoId = workItemInfo.getId();
 		this.workItemInfoName = workItemInfo.getName();
 		this.workItemInfoVersion = workItemInfo.getVersion();
@@ -101,7 +101,7 @@ public class EntityHolder {
 	public void setSessionInfo(SessionInfo sessionInfo) {
 		this.sessionInfoId = sessionInfo.getId();
 		this.sessionInfoVersion = sessionInfo.getVersion();
-		sessionInfo.update();
+		sessionInfo.transform();
 		this.sessionInfoData = Base64.encodeBase64String(sessionInfo.getData());
 		this.sessionInfoLastModificationDate = sessionInfo.getLastModificationDate();
 		this.sessionInfoStartDate = sessionInfo.getStartDate();
@@ -140,7 +140,7 @@ public class EntityHolder {
 	}
 	
 	public void setWorkItemInfo(WorkItemInfo workItemInfo) {
-		workItemInfo.update();
+		workItemInfo.transform();
 		this.workItemInfoId = workItemInfo.getId();
 		this.workItemInfoName = workItemInfo.getName();
 		this.workItemInfoVersion = workItemInfo.getVersion();

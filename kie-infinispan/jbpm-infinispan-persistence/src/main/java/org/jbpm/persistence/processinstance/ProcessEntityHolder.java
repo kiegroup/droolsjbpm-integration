@@ -64,7 +64,7 @@ public class ProcessEntityHolder extends EntityHolder {
 		this.processInstanceLastModificationDate = processInstanceInfo.getLastModificationDate();
 		this.processInstanceLastReadDate = processInstanceInfo.getLastReadDate();
 		this.processId = processInstanceInfo.getProcessId();
-		processInstanceInfo.update();
+		processInstanceInfo.transform();
 		this.processInstanceByteArray = Base64.encodeBytes(processInstanceInfo.getProcessInstanceByteArray());
 		this.processInstanceStartDate = processInstanceInfo.getStartDate();
 		this.processInstanceState = processInstanceInfo.getState();

@@ -17,6 +17,7 @@
 package org.kie.spring.persistence;
 
 import org.drools.persistence.PersistenceContext;
+import org.drools.persistence.TransactionManager;
 import org.drools.persistence.jpa.JpaPersistenceContext;
 import org.jbpm.persistence.JpaProcessPersistenceContext;
 import org.jbpm.persistence.ProcessPersistenceContext;
@@ -45,11 +46,11 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
 
     public PersistenceContext getApplicationScopedPersistenceContext() {
 
-        return new JpaPersistenceContext(getApplicationScopedEntityManager(), isJTA);
+        return new JpaPersistenceContext(getApplicationScopedEntityManager(), isJTA, (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     public PersistenceContext getCommandScopedPersistenceContext() {
-        return new JpaPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), isJTA);
+        return new JpaPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), isJTA, (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     public void beginCommandScopedEntityManager() {
@@ -62,7 +63,7 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
     }
 
     public ProcessPersistenceContext getProcessPersistenceContext() {
-        return new JpaProcessPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER));
+        return new JpaProcessPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     public void endCommandScopedEntityManager() {

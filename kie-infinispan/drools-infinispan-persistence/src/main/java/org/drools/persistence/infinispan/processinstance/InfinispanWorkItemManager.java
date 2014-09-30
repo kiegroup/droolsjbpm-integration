@@ -42,13 +42,13 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
         context.persist( workItemInfo );
 
         ((WorkItemImpl) workItem).setId(workItemInfo.getId());
-        workItemInfo.update();
+        workItemInfo.transform();
         context.merge(workItemInfo);
         
         WorkItemHandler handler = (WorkItemHandler) this.workItemHandlers.get(workItem.getName());
         if (handler != null) {
             handler.executeWorkItem(workItem, this);
-        	workItemInfo.update();
+        	workItemInfo.transform();
         	context.merge(workItemInfo);
         } else {
             throwWorkItemNotFoundException( workItem );

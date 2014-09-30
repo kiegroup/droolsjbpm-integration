@@ -29,7 +29,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     		entity.setId(generateSessionInfoId());
     	}
     	String key = createSessionKey(entity.getId());
-    	entity.update();
+    	entity.transform();
         this.cache.put(key , new EntityHolder(key, entity) );
         return entity;
     }
@@ -98,7 +98,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     		workItemInfo.setId(generateWorkItemInfoId());
     	}
     	String key = createWorkItemKey(workItemInfo.getId());
-    	workItemInfo.update();
+    	workItemInfo.transform();
     	cache.put(key, new EntityHolder(key, workItemInfo));
     	return workItemInfo;
     }
@@ -118,7 +118,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
 
     public WorkItemInfo merge(WorkItemInfo workItemInfo) {
     	String key = createWorkItemKey(workItemInfo.getId());
-    	workItemInfo.update();
+    	workItemInfo.transform();
     	return ((EntityHolder) cache.put(key, new EntityHolder(key, workItemInfo))).getWorkItemInfo();
     }
     

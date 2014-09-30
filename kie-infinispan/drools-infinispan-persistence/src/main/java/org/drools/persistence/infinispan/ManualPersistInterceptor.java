@@ -68,7 +68,7 @@ public class ManualPersistInterceptor extends AbstractInterceptor {
 						ksession.getKieBase(), ksession.getSessionConfiguration(), 
 						ksession.getEnvironment()));
 			}
-			sessionInfo.update();
+			sessionInfo.transform();
 			persistenceContext.persist(sessionInfo);
 			return null;
 		}
