@@ -1,4 +1,4 @@
-package org.kie.remote.client.rest;
+package org.kie.remote.common.rest;
 
 import java.io.UnsupportedEncodingException;
 

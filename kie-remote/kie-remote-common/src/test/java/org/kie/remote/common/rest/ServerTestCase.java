@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-package org.kie.services.client.api.rest;
+package org.kie.remote.common.rest;
 
 import org.eclipse.jetty.util.B64Code;
 import org.junit.Before;
@@ -34,7 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.CHARSET_UTF8;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.CHARSET_UTF8;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package org.kie.remote.client.rest;
+package org.kie.remote.common.rest;
 
 /*
  * Copyright (c) 2014 Kevin Sawicki <kevinsawicki@gmail.com>
@@ -35,12 +35,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.CHARSET_UTF8;
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.appendQueryParameters;
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.deleteRequest;
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.getRequest;
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.newRequest;
-import static org.kie.remote.client.rest.KieRemoteHttpRequest.postRequest;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.CHARSET_UTF8;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.appendQueryParameters;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.deleteRequest;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.getRequest;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.newRequest;
+import static org.kie.remote.common.rest.KieRemoteHttpRequest.postRequest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -67,7 +67,6 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.services.client.api.rest.ServerTestCase;
 
 /**
  * Unit tests of {@link KieRemoteHttpRequest}

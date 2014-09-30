@@ -17,6 +17,10 @@
       <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
@@ -134,24 +138,7 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- for testing KieRemoteHttpRequest -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Used to test proxy -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlets</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
+  
     <!-- for the live server test -->
     <dependency>
       <groupId>org.jboss</groupId>
