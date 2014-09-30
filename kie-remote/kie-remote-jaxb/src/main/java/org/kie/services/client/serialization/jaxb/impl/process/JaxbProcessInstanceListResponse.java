@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
@@ -18,31 +19,43 @@ import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandRespon
 @XmlRootElement(name="process-instance-list-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={JaxbProcessInstanceResponse.class})
+@JsonIgnoreProperties({"result"})
 public class JaxbProcessInstanceListResponse extends AbstractJaxbCommandResponse<List<ProcessInstance>> {
 
     @XmlElements({
-        @XmlElement(name="process-instance",type=JaxbProcessInstanceResponse.class)
+        @XmlElement(name="process-instance",type=JaxbProcessInstance.class)
     })
-    private List<ProcessInstance> processInstanceList;
+    private List<JaxbProcessInstance> processInstanceList;
 
     public JaxbProcessInstanceListResponse() { 
-        this.processInstanceList = new ArrayList<ProcessInstance>();
+        this.processInstanceList = new ArrayList<JaxbProcessInstance>();
     }
     
-    public JaxbProcessInstanceListResponse(Collection<JaxbProcessInstanceResponse> taskSummaryCollection) { 
-       this.processInstanceList = new ArrayList<ProcessInstance>(taskSummaryCollection);
+    public JaxbProcessInstanceListResponse(Collection<JaxbProcessInstance> processInstanceList) { 
+       this.processInstanceList = new ArrayList<JaxbProcessInstance>(processInstanceList);
     }
     
-    public JaxbProcessInstanceListResponse(List<JaxbProcessInstanceResponse> taskSummaryCollection, int i, Command<?> cmd ) { 
+    public JaxbProcessInstanceListResponse(List<ProcessInstance> processInstanceList, int i, Command<?> cmd ) { 
         super(i, cmd);
-        this.processInstanceList = new ArrayList<ProcessInstance>(taskSummaryCollection);
+        setResult(processInstanceList);
     }
     
     public void setResult(List<ProcessInstance> result) {
-        this.processInstanceList = result;
+        this.processInstanceList = new ArrayList<JaxbProcessInstance>();
+        for( ProcessInstance procInst : result ) { 
+            JaxbProcessInstance jaxbProcInst;
+            if( procInst instanceof JaxbProcessInstance ) { 
+                jaxbProcInst = (JaxbProcessInstance) procInst;
+            } else { 
+                jaxbProcInst = new JaxbProcessInstance(procInst);
+            }
+            this.processInstanceList.add(jaxbProcInst);
+        }
     }
     
     public List<ProcessInstance> getResult() {
-        return processInstanceList;
+        List<ProcessInstance> resultList = new ArrayList<ProcessInstance>();
+        resultList.addAll(this.processInstanceList);
+        return resultList;
     }
 }

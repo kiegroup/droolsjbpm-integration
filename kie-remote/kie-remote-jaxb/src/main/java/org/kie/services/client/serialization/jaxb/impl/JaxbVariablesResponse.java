@@ -9,11 +9,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.kie.api.command.Command;
 import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 
 @XmlRootElement(name="variables-response")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(getterVisibility=JsonAutoDetect.Visibility.NONE, fieldVisibility=JsonAutoDetect.Visibility.ANY)
 public class JaxbVariablesResponse extends AbstractJaxbCommandResponse<Map<String,String>> {
 
     @XmlElement

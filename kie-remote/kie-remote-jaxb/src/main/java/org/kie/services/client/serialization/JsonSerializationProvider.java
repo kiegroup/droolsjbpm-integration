@@ -12,12 +12,11 @@ public class JsonSerializationProvider implements SerializationProvider {
 
     public final static int JMS_SERIALIZATION_TYPE = 1;
 
-    private ObjectMapper mapper = new JaxbJacksonObjectMapper();
-    
+    private ObjectMapper mapper = new ObjectMapper();
+   
     private Class<?> outputType = null;
 
     public JsonSerializationProvider() {
-        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
     }
 
     @Override
@@ -51,23 +50,6 @@ public class JsonSerializationProvider implements SerializationProvider {
             throw new SerializationException("Unable to deserialize String " + type.getSimpleName() + " instance", jme);
         } catch (IOException ie) {
             throw new SerializationException("Unable to deserialize String to " + type.getSimpleName() + " instance", ie);
-        }
-    }
-
-    private static class JaxbJacksonObjectMapper extends ObjectMapper {
-
-        public JaxbJacksonObjectMapper() {
-            super();
-
-            final AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-
-            this.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
-            this.configure(org.codehaus.jackson.map.SerializationConfig.Feature.WRAP_ROOT_VALUE, true);
-
-            this.setDeserializationConfig(this.getDeserializationConfig().withAnnotationIntrospector(introspector));
-            this.setSerializationConfig(this.getSerializationConfig().withAnnotationIntrospector(introspector));
-
-            this.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         }
     }
 

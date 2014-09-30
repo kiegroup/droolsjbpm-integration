@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
@@ -17,6 +18,7 @@ import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandRespon
 
 @XmlRootElement(name = "work-item-response")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(getterVisibility=JsonAutoDetect.Visibility.NONE, fieldVisibility=JsonAutoDetect.Visibility.ANY)
 public class JaxbWorkItemResponse extends AbstractJaxbCommandResponse<WorkItem> implements WorkItem {
 
     @XmlElement
@@ -57,6 +59,9 @@ public class JaxbWorkItemResponse extends AbstractJaxbCommandResponse<WorkItem> 
     }
     
     public long getId() {
+        if( id == null ) { 
+           return -1; 
+        }
         return id;
     }
 
@@ -101,6 +106,9 @@ public class JaxbWorkItemResponse extends AbstractJaxbCommandResponse<WorkItem> 
     }
 
     public long getProcessInstanceId() {
+        if( processInstanceId == null ) { 
+            return -1;
+        }
         return processInstanceId;
     }
 

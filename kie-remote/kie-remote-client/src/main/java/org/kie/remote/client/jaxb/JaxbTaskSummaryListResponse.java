@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
 import org.kie.api.command.Command;
@@ -23,6 +24,7 @@ import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 
 @XmlRootElement(name="task-summary-list-response")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(getterVisibility=JsonAutoDetect.Visibility.NONE, fieldVisibility=JsonAutoDetect.Visibility.ANY)
 public class JaxbTaskSummaryListResponse extends AbstractJaxbCommandResponse<List<TaskSummary>> implements JaxbPaginatedList<JaxbTaskSummary> {
 
     @XmlElements({

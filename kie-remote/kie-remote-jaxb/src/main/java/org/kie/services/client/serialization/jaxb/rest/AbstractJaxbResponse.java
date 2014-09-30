@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
 
 @XmlAccessorType(XmlAccessType.FIELD)

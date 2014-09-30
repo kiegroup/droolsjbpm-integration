@@ -1,5 +1,6 @@
 package org.kie.services.client;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
@@ -64,6 +67,12 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +87,12 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
     abstract public TestType getType();
     abstract public void addClassesToSerializationProvider(Class<?>... extraClass);
     public abstract <T> T testRoundTrip(T in) throws Exception;
-  
+ 
+    private static Reflections reflections = new Reflections(
+            ClasspathHelper.forPackage("org.kie.services.client"),
+            ClasspathHelper.forPackage("org.kie.remote"),
+            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
+
     // TESTS
     
     private static KieSession createKnowledgeSession(String processFile) throws Exception {
@@ -121,6 +135,20 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
     /*
      * Tests
      */
+
+    @Test
+    public void jaxbClassesTest() throws Exception {
+        Assume.assumeFalse(TestType.YAML.equals(getType()));
+        
+        int i = 0;
+        for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
+            ++i;
+            Constructor<?> construct = jaxbClass.getConstructor(new Class [] {});
+            Object jaxbInst = construct.newInstance(new Object [] {});
+            testRoundTrip(jaxbInst);
+        }
+        assertTrue( i > 20 );
+    }
 
     @Test
     public void genericResponseTest() throws Exception {

@@ -9,11 +9,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 
 @XmlRootElement(name="variable-instance-log")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonAutoDetect(getterVisibility=JsonAutoDetect.Visibility.NONE, fieldVisibility=JsonAutoDetect.Visibility.ANY)
 public class JaxbVariableInstanceLog extends AbstractJaxbHistoryObject<VariableInstanceLog> implements VariableInstanceLog, JaxbCommandResponse<VariableInstanceLog> {
 
     @XmlAttribute

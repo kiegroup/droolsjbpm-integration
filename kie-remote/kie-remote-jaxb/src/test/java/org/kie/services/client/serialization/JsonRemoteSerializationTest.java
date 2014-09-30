@@ -1,6 +1,5 @@
 package org.kie.services.client.serialization;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.PersistenceMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.services.client.AbstractRemoteSerializationTest;
-import org.kie.services.client.serialization.JsonSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 
 public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest {

@@ -13,12 +13,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.command.Command;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
 
 @XmlRootElement(name="exception-response")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties({"cause"})
 public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
 
     @XmlTransient
@@ -101,7 +103,9 @@ public class JaxbExceptionResponse extends AbstractJaxbCommandResponse<String> {
 
     public void setCause(Exception cause) {
         this.cause = cause;
-        this.stackTrace = convertStackTraceToString(cause);
+        if( cause != null ) { 
+            this.stackTrace = convertStackTraceToString(cause);
+        }
     }
 
     public String getStackTrace() {
