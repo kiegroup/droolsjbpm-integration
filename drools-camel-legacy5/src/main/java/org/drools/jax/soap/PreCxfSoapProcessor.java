@@ -21,21 +21,21 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreCxfSoapProcessor
     implements
     Processor {
 
-    private static final transient Log LOG = LogFactory.getLog( PreCxfSoapProcessor.class );
+    private static final transient Logger LOGGER = LoggerFactory.getLogger( PreCxfSoapProcessor.class );
 
     public void process(Exchange exchange) throws Exception {
         exchange.setPattern( ExchangePattern.InOut );
         BindingOperationInfo boi = (BindingOperationInfo) exchange.getProperty( BindingOperationInfo.class.toString() );
         if ( boi != null ) {
-            LOG.info( "boi.isUnwrapped" + boi.isUnwrapped() );
+            LOGGER.info( "boi.isUnwrapped" + boi.isUnwrapped() );
         }
         SOAPMessage soapMessage = (SOAPMessage) exchange.getIn().getBody();
         exchange.getOut().setBody( soapMessage.getSOAPBody().getTextContent() );
