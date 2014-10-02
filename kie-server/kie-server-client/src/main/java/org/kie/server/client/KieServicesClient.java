@@ -32,17 +32,25 @@ public class KieServicesClient {
     private final String baseURI;
     private final String username;
     private final String password;
-    
+    private final MediaType mediaType;
+
     public KieServicesClient(String baseURI) {
-        this.baseURI = baseURI;
-        this.username = null;
-        this.password = null;
+        this( baseURI, null, null, MediaType.APPLICATION_XML_TYPE );
+    }
+
+    public KieServicesClient(String baseURI, MediaType mediaType) {
+        this( baseURI, null, null, mediaType );
     }
 
     public KieServicesClient(String baseURI, String username, String password) {
+        this( baseURI, username, password, MediaType.APPLICATION_XML_TYPE );
+    }
+
+    public KieServicesClient(String baseURI, String username, String password, MediaType mediaType) {
         this.baseURI = baseURI;
         this.username = username;
         this.password = password;
+        this.mediaType = mediaType;
     }
 
     public ServiceResponse<KieServerInfo> getServerInfo() throws ClientResponseFailure {
@@ -69,7 +77,7 @@ public class KieServicesClient {
             throw new RuntimeException("Malformed URI was specified: '" + uri + "'!", e);
         }
         if (username == null || password == null) {
-            return new ClientRequest(uri);
+            return new ClientRequest(uri).accept(mediaType);
         } else {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(
@@ -78,7 +86,7 @@ public class KieServicesClient {
             );
             HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-            return new ClientRequest(uri, executor);
+            return new ClientRequest(uri, executor).accept(mediaType);
         }
     }
 
@@ -102,7 +110,7 @@ public class KieServicesClient {
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
             ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, resource).put(new GenericType<ServiceResponse<KieContainerResource>>(){});
+            response = clientRequest.body(mediaType, resource).put(new GenericType<ServiceResponse<KieContainerResource>>(){});
             if( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
                 return response.getEntity();
             } else if( response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode() ) {
@@ -152,7 +160,7 @@ public class KieServicesClient {
         ClientResponse<ServiceResponse<String>> response = null;
         try {
             ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, payload).post(new GenericType<ServiceResponse<String>>(){});
+            response = clientRequest.body(mediaType, payload).post(new GenericType<ServiceResponse<String>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -168,7 +176,7 @@ public class KieServicesClient {
         ClientResponse<List<ServiceResponse<? extends Object>>> response = null;
         try {
             ClientRequest clientRequest = newRequest(baseURI);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, script).post(new GenericType<List<ServiceResponse<? extends Object>>>() {});
+            response = clientRequest.body(mediaType, script).post(new GenericType<List<ServiceResponse<? extends Object>>>() {});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -200,7 +208,7 @@ public class KieServicesClient {
         ClientResponse<ServiceResponse<KieScannerResource>> response = null;
         try {
             ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, resource).post(new GenericType<ServiceResponse<KieScannerResource>>(){});
+            response = clientRequest.body(mediaType, resource).post(new GenericType<ServiceResponse<KieScannerResource>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -216,7 +224,7 @@ public class KieServicesClient {
         ClientResponse<ServiceResponse<ReleaseId>> response = null;
         try {
             ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/release-id");
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, releaseId).post(new GenericType<ServiceResponse<ReleaseId>>(){});
+            response = clientRequest.body(mediaType, releaseId).post(new GenericType<ServiceResponse<ReleaseId>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }

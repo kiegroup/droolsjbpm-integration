@@ -3,11 +3,14 @@ package org.kie.server.api.model;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * This is a JAXB friendly ReleaseId implementation
  * used for JAXB marshalling/unmarshalling only 
  */
 @XmlRootElement(name="release-id")
+@JsonIgnoreProperties({"snapshot"})
 public class ReleaseId implements org.kie.api.builder.ReleaseId {
 
     private String groupId;

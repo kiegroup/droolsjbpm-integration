@@ -15,6 +15,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -32,13 +34,25 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(Parameterized.class)
 public abstract class KieServerBaseIntegrationTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList( new Object[][] { {MediaType.APPLICATION_XML_TYPE}, {MediaType.APPLICATION_JSON_TYPE} } );
+    }
+
+    @Parameterized.Parameter
+    public MediaType MEDIA_TYPE;
 
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
 
@@ -114,9 +128,9 @@ public abstract class KieServerBaseIntegrationTest {
 
     private void startClient() throws Exception {
         if (LOCAL_SERVER) {
-            client = new KieServicesClient(BASE_URI);
+            client = new KieServicesClient(BASE_URI, MEDIA_TYPE);
         } else {
-            client = new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD);
+            client = new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD, MEDIA_TYPE);
         }
     }
 

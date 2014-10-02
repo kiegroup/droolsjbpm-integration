@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "script")
@@ -38,14 +39,15 @@ public class CommandScript implements Serializable {
     private static final long serialVersionUID = 510l;
 
     @XmlAttribute
-    private String            lookup;
+    private String lookup;
 
     @XmlElements({
-        @XmlElement(name = "create-container", type = CreateContainerCommand.class),
-        @XmlElement(name = "list-containers", type = ListContainersCommand.class),
-        @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
-        @XmlElement(name = "call-container", type = CallContainerCommand.class)
-    })
+                         @XmlElement(name = "create-container", type = CreateContainerCommand.class),
+                         @XmlElement(name = "list-containers", type = ListContainersCommand.class),
+                         @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
+                         @XmlElement(name = "call-container", type = CallContainerCommand.class)
+                 })
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     protected List<KieServerCommand> commands;
 
     public CommandScript() {
