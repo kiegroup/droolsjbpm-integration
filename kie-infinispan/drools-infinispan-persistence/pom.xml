@@ -54,6 +54,10 @@
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
       <artifactId>drools-persistence-jpa</artifactId>
     </dependency>
     <dependency>
@@ -61,7 +65,16 @@
       <artifactId>drools-persistence-jpa</artifactId>
       <type>test-jar</type>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+
     <!-- infinispan/lucene -->
     <dependency>
       <groupId>org.infinispan</groupId>
@@ -74,6 +87,12 @@
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
+    </dependency>
+
+    <!-- hibernate -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search-engine</artifactId>
     </dependency>
     
     <!-- Logging -->

@@ -13,12 +13,26 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hornetq</groupId>
+      <artifactId>hornetq-core-client</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
