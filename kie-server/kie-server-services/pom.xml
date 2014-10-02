@@ -389,6 +389,29 @@
       </build>
     </profile>
     <profile>
+      <id>jbossas71x</id>
+      <properties>
+        <jbossas71x.download.url>http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip</jbossas71x.download.url>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration combine.self="append">
+              <container>
+                <containerId>jboss71x</containerId>
+                <type>installed</type>
+                <zipUrlInstaller>
+                  <url>${jbossas71x.download.url}</url>
+                </zipUrlInstaller>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>eap63x</id>
       <properties>
         <!-- The EAP 6.3.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
