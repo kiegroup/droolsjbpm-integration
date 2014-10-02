@@ -4,6 +4,9 @@
     <exclude-subsystems>
       <!-- Excluding CDI subsystem, because it tries to instantiate beans that should be in fact managed by Guice -->
       <subsystem name="weld" />
+      <!-- The kie-server is bundling resteasy jars, so disabling the jaxrs subsystem will prevent incompatibilities
+           between different versions (e.g. WildFly 8 is using much newer resteasy) -->
+      <subsystem name="jaxrs" />
     </exclude-subsystems>
   </deployment>
 </jboss-deployment-structure>
