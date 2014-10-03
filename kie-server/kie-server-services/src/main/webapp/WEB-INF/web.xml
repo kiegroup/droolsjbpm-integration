@@ -49,7 +49,6 @@
   <context-param>
     <param-name>resteasy.providers</param-name>
     <param-value>
-      com.wordnik.swagger.jaxrs.json.JacksonJsonProvider,
       com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider,
       com.wordnik.swagger.jaxrs.listing.ResourceListingProvider
     </param-value>
@@ -60,7 +59,7 @@
     <servlet-class>com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig</servlet-class>
     <init-param>
       <param-name>api.version</param-name>
-      <param-value>1.0.0</param-value>
+      <param-value>2.0.0</param-value>
     </init-param>
     <init-param>
       <param-name>swagger.api.basepath</param-name>

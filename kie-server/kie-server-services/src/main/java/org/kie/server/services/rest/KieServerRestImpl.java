@@ -10,6 +10,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.kie.remote.common.rest.RestEasy960Util;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
@@ -22,6 +24,7 @@ import org.kie.server.services.impl.KieServerImpl;
 import static org.kie.remote.common.rest.RestEasy960Util.*;
 
 @Path("/server")
+@Api(value="/server",description="Kie server api for provisioning and interacting with KieContainers")
 public class KieServerRestImpl implements KieServer {
 
     private KieServerImpl server;
@@ -44,6 +47,7 @@ public class KieServerRestImpl implements KieServer {
     }
 
     @Override
+    @ApiOperation(value="Gets server info",response=Response.class)
     public Response getInfo(HttpHeaders headers) {
         return createCorrectVariant(server.getInfo(), headers);
     }
@@ -55,6 +59,7 @@ public class KieServerRestImpl implements KieServer {
     }
 
     @Override
+    @ApiOperation(value="Lists all existing KieContainers",response=Response.class)
     public Response listContainers(HttpHeaders headers) {
         return createCorrectVariant(server.listContainers(), headers);
     }
