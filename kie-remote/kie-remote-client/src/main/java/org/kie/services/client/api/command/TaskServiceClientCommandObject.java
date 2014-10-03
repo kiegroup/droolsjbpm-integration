@@ -100,7 +100,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             }
             org.kie.remote.jaxb.gen.OrganizationalEntity genOrgEnt = convertKieOrgEntToGenOrgEnt(kiePeepAssigns.getTaskInitiator());
             if( genOrgEnt != null ) {
-                genPeepAssigns.setTaskInitiator(genOrgEnt.getId());
+                genPeepAssigns.setTaskInitiatorId(genOrgEnt.getId());
             }
         }
         genTask.setPriority(task.getPriority());
@@ -123,7 +123,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             for( I18NText text : kieTextList ) {
                 org.kie.remote.jaxb.gen.I18NText genText = new org.kie.remote.jaxb.gen.I18NText();
                 genText.setId(text.getId());
-                genText.setLang(text.getLanguage());
+                genText.setLanguage(text.getLanguage());
                 genText.setText(text.getText());
                 genTextList.add(genText);
             }

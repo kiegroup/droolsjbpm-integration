@@ -377,7 +377,7 @@ abstract class JaxbWrapper {
 
         @Override
         public byte[] getContent() {
-            return genContent.getSerializedContent();
+            return genContent.getContent();
         }
     }
 
@@ -397,7 +397,7 @@ abstract class JaxbWrapper {
     
         @Override
         public String getLanguage() {
-            return this.jaxbText.getLang();
+            return this.jaxbText.getLanguage();
         }
     
         @Override
@@ -417,7 +417,7 @@ abstract class JaxbWrapper {
     
         @Override
         public User getTaskInitiator() {
-            return convertStringIdToUser(genPeopAssign.getTaskInitiator());
+            return convertStringIdToUser(genPeopAssign.getTaskInitiatorId());
         }
     
         @Override

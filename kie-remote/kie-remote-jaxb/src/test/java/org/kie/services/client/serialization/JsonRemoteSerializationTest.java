@@ -60,4 +60,5 @@ public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest
        JaxbDeploymentDescriptor copyDepDesc = testRoundTrip(depDesc);
        ComparePair.compareObjectsViaFields(depDesc, copyDepDesc);
     }
+
 }
