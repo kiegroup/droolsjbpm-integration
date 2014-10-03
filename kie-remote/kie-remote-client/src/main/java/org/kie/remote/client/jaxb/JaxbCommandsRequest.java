@@ -74,6 +74,7 @@ import org.kie.remote.jaxb.gen.StopTaskCommand;
 import org.kie.remote.jaxb.gen.SuspendTaskCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
 import org.kie.remote.jaxb.gen.UpdateCommand;
+import org.kie.services.shared.ServicesVersion;
 
 @XmlRootElement(name = "command-request")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -90,7 +91,7 @@ public class JaxbCommandsRequest {
 
     @XmlElement(name = "ver")
     @XmlSchemaType(name = "string")
-    private String version;
+    private String version = ServicesVersion.VERSION;
 
     @XmlElement
     @XmlSchemaType(name = "string")

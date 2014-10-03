@@ -92,7 +92,7 @@ public class JaxbCommandsRequest {
 
     @XmlElement(name = "ver")
     @XmlSchemaType(name = "string")
-    private String version;
+    private String version = ServicesVersion.VERSION;
 
     @XmlElement
     @XmlSchemaType(name = "string")
@@ -182,7 +182,6 @@ public class JaxbCommandsRequest {
         this.commands = new ArrayList<Command>();
         this.commands.add(command);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
-        this.version = ServicesVersion.VERSION;
     }
     
     public JaxbCommandsRequest(List<Command> commands) {
@@ -190,7 +189,6 @@ public class JaxbCommandsRequest {
         this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
-        this.version = ServicesVersion.VERSION;
     }
 
     private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
@@ -206,7 +204,6 @@ public class JaxbCommandsRequest {
         this.deploymentId = deploymentId;
         this.commands = new ArrayList<Command>();
         this.commands.add(command);
-        this.version = ServicesVersion.VERSION;
     }
 
     public JaxbCommandsRequest(String deploymentId, List<Command> commands) {
@@ -214,7 +211,6 @@ public class JaxbCommandsRequest {
         this.deploymentId = deploymentId;
         this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
-        this.version = ServicesVersion.VERSION;
     }
 
     private void checkThatCommandsAreAccepted(Collection<Command> cmds) { 
