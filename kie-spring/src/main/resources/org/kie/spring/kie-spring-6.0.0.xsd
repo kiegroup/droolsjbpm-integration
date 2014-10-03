@@ -490,4 +490,22 @@
     </xsd:complexType>
   </xsd:element>
   <!-- end of additions for ksession listeners -->
+
+  <!-- kie import -->
+  <xsd:element name="releaseId">
+    <xsd:complexType>
+      <xsd:attribute name="groupId" use="required" type="xsd:string"/>
+      <xsd:attribute name="artifactId" use="required" type="xsd:string"/>
+      <xsd:attribute name="version" use="required" type="xsd:string"/>
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="import">
+    <xsd:complexType>
+      <xsd:attribute name="releaseId-ref" use="optional" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- end of kie-import -->
 </xsd:schema>

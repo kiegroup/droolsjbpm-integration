@@ -28,6 +28,8 @@ public class KieSpringNamespaceHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("environment", new EnvironmentDefinitionParser());
         registerBeanDefinitionParser("fileLogger", new LoggerDefinitionParser());
         registerBeanDefinitionParser("consoleLogger", new LoggerDefinitionParser());
+        registerBeanDefinitionParser("import", new KieImportDefinitionParser());
+        registerBeanDefinitionParser("releaseId", new ReleaseIdDefinitionParser());
     }
 
 }

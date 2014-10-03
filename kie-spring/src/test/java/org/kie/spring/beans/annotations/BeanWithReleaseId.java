@@ -20,7 +20,9 @@ import org.kie.api.KieBase;
 import org.kie.api.cdi.KBase;
 import org.kie.api.cdi.KContainer;
 import org.kie.api.cdi.KReleaseId;
+import org.kie.api.cdi.KSession;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 public class BeanWithReleaseId {
 
@@ -42,8 +44,19 @@ public class BeanWithReleaseId {
     public KieContainer getKieContainer() {
         return kieContainer;
     }
-
     public void setKieContainer(KieContainer kieContainer) {
         this.kieContainer = kieContainer;
+    }
+
+    @KSession("ksession1")
+    @KReleaseId(groupId = "org.drools", artifactId = "named-kiesession", version = "6.1.0-SNAPSHOT")
+    KieSession kieSession;
+
+    public KieSession getKieSession() {
+        return kieSession;
+    }
+
+    public void setKieSession(KieSession kieSession) {
+        this.kieSession = kieSession;
     }
 }

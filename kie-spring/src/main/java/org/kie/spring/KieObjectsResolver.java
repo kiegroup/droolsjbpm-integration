@@ -57,7 +57,10 @@ public class KieObjectsResolver {
 
     public Object resolveKSession(String id, ReleaseId releaseId) {
         KieContainer kieContainer = resolveKContainer(releaseId);
+        return resolveKSession(kieContainer, id);
+    }
 
+    public Object resolveKSession(KieContainer kieContainer, String id) {
         KieProject kProject = ((KieContainerImpl) kieContainer).getKieProject();
         KieSessionModel kieSessionModel = kProject.getKieSessionModel(id);
         if (kieSessionModel.getType() == KieSessionModel.KieSessionType.STATEFUL) {
