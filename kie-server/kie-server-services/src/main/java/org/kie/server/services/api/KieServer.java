@@ -13,16 +13,20 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.ReleaseId;
 
 @Path("/server")
+@Api(value="/server",description="Kie server api for provisioning and interacting with KieContainers")
 public interface KieServer {
     
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @ApiOperation(value="Gets server info",response=Response.class)
     public Response getInfo(@Context HttpHeaders headers);
     
     @POST
@@ -33,6 +37,7 @@ public interface KieServer {
     @GET
     @Path("containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @ApiOperation(value="Lists all existing KieContainers",response=Response.class)
     public Response listContainers(@Context HttpHeaders headers);
     
     @GET

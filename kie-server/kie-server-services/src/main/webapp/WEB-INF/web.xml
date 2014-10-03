@@ -41,4 +41,32 @@
     <role-name>kie-server</role-name>
   </security-role>
 
+  <context-param>
+    <param-name>resteasy.resources</param-name>
+    <param-value>com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>resteasy.providers</param-name>
+    <param-value>
+      com.wordnik.swagger.jaxrs.json.JacksonJsonProvider,
+      com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider,
+      com.wordnik.swagger.jaxrs.listing.ResourceListingProvider
+    </param-value>
+  </context-param>
+
+  <servlet>
+    <servlet-name>DefaultJaxrsConfig</servlet-name>
+    <servlet-class>com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig</servlet-class>
+    <init-param>
+      <param-name>api.version</param-name>
+      <param-value>1.0.0</param-value>
+    </init-param>
+    <init-param>
+      <param-name>swagger.api.basepath</param-name>
+      <param-value>/services/rest</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+
 </web-app>

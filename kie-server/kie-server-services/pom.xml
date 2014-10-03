@@ -25,6 +25,8 @@
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
     <!-- This property can be overriden when some other remote repo location should be used -->
     <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
+
+    <version.com.wordnik.swagger>1.3.10</version.com.wordnik.swagger>
   </properties>
 
   <!-- This section should be eventually moved to kie-parent-with-dependencies -->
@@ -39,6 +41,26 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-embedder</artifactId>
         <version>${version.org.apache.maven}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-jersey-jaxrs_2.10</artifactId>
+        <version>${version.com.wordnik.swagger}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-annotations</artifactId>
+        <version>${version.com.wordnik.swagger}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-core_2.10</artifactId>
+        <version>${version.com.wordnik.swagger}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-jaxrs_2.10</artifactId>
+        <version>${version.com.wordnik.swagger}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -164,6 +186,24 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <!-- scope>provided</scope -->
+    </dependency>
+
+    <!-- Swagger - REST documentation -->
+    <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-jersey-jaxrs_2.10</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-core_2.10</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-jaxrs_2.10</artifactId>
     </dependency>
 
     <dependency>
