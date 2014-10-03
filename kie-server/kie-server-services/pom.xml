@@ -438,8 +438,16 @@
         </plugins>
       </build>
     </profile>
+    <!-- This profile basically disables any cargo related execution. It can be used when the tests should run on
+         a container that has already been started and it is not managed by cargo. It can also be used when doing
+         a "no-test" build, as the container should not be used in that case. -->
     <profile>
       <id>custom-container</id>
+      <activation>
+        <property>
+          <name>custom-container</name>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
