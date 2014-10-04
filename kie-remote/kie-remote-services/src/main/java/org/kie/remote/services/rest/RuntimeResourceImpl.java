@@ -196,13 +196,8 @@ public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource
             @PathParam("varName") String varName) {
         Object procVar =  processRequestBean.getVariableObjectInstanceFromRuntime(deploymentId, procInstId, varName);
      
-        // serialize
-        QName rootElementName = getRootElementName(procVar); 
-        @SuppressWarnings("rawtypes") // unknown at compile time, dynamic from deployment
-        JAXBElement<?> jaxbElem = new JAXBElement(rootElementName, procVar.getClass(), procVar) ;
-        
         // return
-        return createCorrectVariant(jaxbElem, headers);
+        return createCorrectVariant(procVar, headers);
     }
   
     @Override
