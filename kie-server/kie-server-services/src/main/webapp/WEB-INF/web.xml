@@ -58,7 +58,7 @@
 
   <servlet>
     <servlet-name>KieSwaggerJaxrsConfig</servlet-name>
-    <servlet-class>org.kie.server.services.rest.swagger.KieSwaggerJaxrsConfig</servlet-class>
+    <servlet-class>org.kie.remote.common.rest.swagger.KieSwaggerJaxrsConfig</servlet-class>
     <init-param>
       <param-name>api.version</param-name>
       <param-value>1.0.0</param-value>

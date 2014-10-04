@@ -1,4 +1,4 @@
-package org.kie.server.services.rest.swagger;
+package org.kie.remote.common.rest.swagger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

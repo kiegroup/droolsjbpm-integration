@@ -1,4 +1,4 @@
-package org.kie.server.services.rest.swagger;
+package org.kie.remote.common.rest.swagger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
