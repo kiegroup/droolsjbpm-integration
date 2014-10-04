@@ -27,8 +27,7 @@ public class CxfRestTestWithLookup extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return (AbstractXmlApplicationContext) InternalKieSpringUtils.getSpringContext(new ReleaseIdImpl("kie-camel", "test-spring", "0001"),
-                                                                                       CxfRestTestWithLookup.class.getResource("/org/kie/camel/component/CxfRsSpringWithoutSession.xml"));
+        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfRsSpringWithoutSession.xml");
     }
 
     @Test

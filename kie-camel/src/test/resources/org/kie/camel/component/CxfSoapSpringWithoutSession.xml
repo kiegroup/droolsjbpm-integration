@@ -47,6 +47,8 @@
     </kie:kbase>
   </kie:kmodule>
 
+  <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
   <cxf:cxfEndpoint id="soapServer"
              address="http://localhost:58002/soap"
              serviceName="ns:CommandExecutor"

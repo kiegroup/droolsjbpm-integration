@@ -47,6 +47,8 @@
     </kie:kbase>
   </kie:kmodule>
 
+  <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
   <!-- Defined the server endpoint to create the cxf-rs consumer -->
   <cxf:rsServer id="rsServer" 
           address="http://localhost:58001/rest"

@@ -35,8 +35,7 @@ public class CxfSoapTestWithLookup extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return (AbstractXmlApplicationContext) InternalKieSpringUtils.getSpringContext(new ReleaseIdImpl("kie-camel", "test-spring", "0001"),
-                                                                                       CxfSoapTestWithLookup.class.getResource("/org/kie/camel/component/CxfSoapSpringWithoutSession.xml"));
+        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfSoapSpringWithoutSession.xml");
     }
     // This test fails, I make it work with some hacks.
     // Look for //Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
