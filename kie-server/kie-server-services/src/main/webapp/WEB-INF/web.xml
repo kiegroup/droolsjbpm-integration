@@ -7,6 +7,7 @@
   <listener>
     <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
   </listener>
+  
   <servlet>
     <servlet-name>Resteasy</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
@@ -49,14 +50,15 @@
   <context-param>
     <param-name>resteasy.providers</param-name>
     <param-value>
+      com.wordnik.swagger.jaxrs.json.JacksonJsonProvider,
       com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider,
       com.wordnik.swagger.jaxrs.listing.ResourceListingProvider
     </param-value>
   </context-param>
 
   <servlet>
-    <servlet-name>DefaultJaxrsConfig</servlet-name>
-    <servlet-class>com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig</servlet-class>
+    <servlet-name>KieSwaggerJaxrsConfig</servlet-name>
+    <servlet-class>org.kie.server.services.rest.swagger.KieSwaggerJaxrsConfig</servlet-class>
     <init-param>
       <param-name>api.version</param-name>
       <param-value>2.0.0</param-value>
@@ -64,6 +66,10 @@
     <init-param>
       <param-name>swagger.api.basepath</param-name>
       <param-value>/services/rest</param-value>
+    </init-param>
+    <init-param>
+      <param-name>swagger.api.packages</param-name>
+      <param-value>org.kie.server.services.api</param-value>
     </init-param>
     <load-on-startup>2</load-on-startup>
   </servlet>
