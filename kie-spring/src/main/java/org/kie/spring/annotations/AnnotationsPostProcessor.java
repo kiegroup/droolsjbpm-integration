@@ -26,6 +26,7 @@ import org.kie.api.cdi.KReleaseId;
 import org.kie.api.cdi.KSession;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.StatelessKieSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
@@ -278,6 +279,33 @@ class AnnotationsPostProcessor implements InstantiationAwareBeanPostProcessor,
             name = kSessionAnnotation.value();
 
             checkResourceType(CommandExecutor.class);
+        }
+
+        protected Object getResourceToInject(Object target, String requestingBeanName) {
+            if( getReleaseId().equals(AnnotationsPostProcessor.this.getReleaseId())) {
+                return beanFactory.getBean(name);
+            } else {
+                KieContainer kieContainer = kieContainerMap.get(getReleaseId());
+                if  (kieContainer == null){
+                    kieContainer = KieServices.Factory.get().newKieContainer(getReleaseId());
+                    kieContainerMap.put(releaseId, kieContainer);
+                }
+                String type = "stateful";
+                if ( member instanceof Field){
+                    if(((Field)member).getGenericType() instanceof StatelessKieSession){
+                        type = "stateless";
+                    }
+                } else if (member instanceof Method) {
+                    if(((Method)member).getParameterTypes()[0].getName().equalsIgnoreCase(StatelessKieSession.class.getName())){
+                        type = "stateless";
+                    }
+                }
+                if (type.equalsIgnoreCase("stateful")) {
+                    return kieContainer.newKieSession(name);
+                } else {
+                    return kieContainer.newStatelessKieSession(name);
+                }
+            }
         }
     }
 
