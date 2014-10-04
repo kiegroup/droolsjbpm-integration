@@ -881,6 +881,10 @@ public class KieRemoteHttpRequest {
             if( requestInfo.body != null ) {
                 contentLength = requestInfo.body.toString().getBytes().length;
                 connection.setFixedLengthStreamingMode(contentLength);
+                List<String> contentTypeList = requestInfo.getHeader(ACCEPT);
+                if( contentTypeList != null && ! contentTypeList.isEmpty() ) { 
+                   requestInfo.setHeader(CONTENT_TYPE, contentTypeList.get(0));
+                }
             }
             requestInfo.setHeader(CONTENT_LENGTH, contentLength);
             connection.setInstanceFollowRedirects(followRedirects);
