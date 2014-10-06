@@ -29,6 +29,7 @@ import java.util.Map;
 public final class KieSpringUtils {
 
     private static ReleaseId defaultReleaseId;
+    static KieContainer kieClasspathContainer;
 
     public static ApplicationContext getSpringContext(ReleaseId releaseId) {
         return applicationContextMap.get(releaseId==null?defaultReleaseId:releaseId);
@@ -48,8 +49,9 @@ public final class KieSpringUtils {
     static {
         //this forces the KieModules to be loaded up.
         ks = KieServices.Factory.get();
-        KieContainer kContainer = ks.newKieClasspathContainer();
+        kieClasspathContainer = ks.newKieClasspathContainer();
     }
+
 
     static void setDefaultReleaseId(ReleaseId releaseId) {
         defaultReleaseId = releaseId;

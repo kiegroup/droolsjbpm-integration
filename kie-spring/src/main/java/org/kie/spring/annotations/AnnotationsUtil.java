@@ -25,7 +25,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-class AnnotationsUtil {
+public class AnnotationsUtil {
 
     private static final String KIE_ANNOTATION_PROCESSOR_CLASS_NAME =
             "org.kie.spring.annotations.AnnotationsPostProcessor";
