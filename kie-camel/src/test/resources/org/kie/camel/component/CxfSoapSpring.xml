@@ -55,6 +55,8 @@
 
   <bean id="kiePolicy" class="org.kie.camel.component.KiePolicy" />
 
+  <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+
   <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
 
     <route>

@@ -26,28 +26,10 @@
        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
-    ">
+">
 
-  <kie:kmodule id="CxfRsSpringWithoutSession">
-    <kie:kbase name="test1" packages="test1">
-      <kie:ksession name="ksession1">
-        <kie:batch>
-          <kie:set-global identifier="list" >
-            <bean class="java.util.ArrayList" />
-          </kie:set-global>
-        </kie:batch>
-      </kie:ksession>
-      <kie:ksession name="ksession2">
-        <kie:batch>
-          <kie:set-global identifier="list" >
-            <bean class="java.util.ArrayList" />
-          </kie:set-global>
-        </kie:batch>
-      </kie:ksession>
-    </kie:kbase>
-  </kie:kmodule>
-
-  <bean id="kieSpringPostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+  <!-- Imports the KieBase and KieSessions from the classpath dependencies -->
+  <kie:import />
 
   <!-- Defined the server endpoint to create the cxf-rs consumer -->
   <cxf:rsServer id="rsServer" 

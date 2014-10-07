@@ -16,31 +16,31 @@
 
 package org.kie.camel.component.cxf;
 
-import org.apache.camel.test.junit4.CamelSpringTestSupport;
-import org.drools.compiler.kproject.ReleaseIdImpl;
+import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
-import org.kie.spring.InternalKieSpringUtils;
+import org.kie.api.runtime.KieSession;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
-
-public class CxfRestTest extends CamelSpringTestSupport {
+public class CxfRestTestWithImport extends CamelSpringTestSupport {
 
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfRsSpring.xml");
+        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfRsSpringWithImport.xml");
     }
 
     @Test
     public void test1() throws Exception {
+        KieSession kieSession = (KieSession) applicationContext.getBean("ksession1");
+        kieSession.setGlobal("out", System.out);
+
         String cmd = "";
         cmd += "<batch-execution lookup=\"ksession1\">\n";
-        cmd += "  <insert out-identifier=\"salaboy\">\n";
-        cmd += "      <org.kie.pipeline.camel.Person>\n";
-        cmd += "         <name>salaboy</name>\n";
-        cmd += "      </org.kie.pipeline.camel.Person>\n";
+        cmd += "  <insert out-identifier=\"vkiran\">\n";
+        cmd += "      <org.drools.example.api.namedkiesession.Message>\n";
+        cmd += "         <name>HAL</name>\n";
+        cmd += "         <text>Hello, HAL. Do you read me, HAL?</text>\n";
+        cmd += "      </org.drools.example.api.namedkiesession.Message>\n";
         cmd += "   </insert>\n";
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
